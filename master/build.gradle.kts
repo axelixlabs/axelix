@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id("shared")
     id("org.springframework.boot") version "4.0.1"
@@ -97,6 +99,16 @@ tasks.bootJar {
     archiveFileName = "master.jar"
 }
 
+tasks.processResources {
+    filesMatching("application.yaml") {
+        // ReplaceTokens is used for ant-like style placeholders to not clash with Spring Boot ${} syntax
+
+        filter<ReplaceTokens>(
+            "tokens" to mapOf("project.version" to project.version.toString())
+        )
+    }
+}
+
 publishing {
     publications {
         named<MavenPublication>("nexus") {
@@ -111,5 +123,5 @@ publishing {
 }
 
 axelix {
-    properties.put("version", rootProject.version.toString())
+    properties.put("version", project.version.toString())
 }

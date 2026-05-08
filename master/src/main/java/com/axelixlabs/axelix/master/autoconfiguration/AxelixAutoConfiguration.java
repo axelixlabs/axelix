@@ -25,7 +25,7 @@ import org.springframework.web.client.RestClient;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
-import com.axelixlabs.axelix.master.exception.ExceptionHandlingFilter;
+import com.axelixlabs.axelix.master.filter.ExceptionHandlingFilter;
 
 /**
  * General Auto-configuration of Axelix project.

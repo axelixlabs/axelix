@@ -10,6 +10,8 @@ spring:
       server:
         protocol: streamable
         name: "axelix-mcp-server"
+        # Ant-like value placeholder is substituted by Gradle resources task
+        version: "@project.version@"
         streamable-http:
           mcp-endpoint: "/api/mcp"
   datasource:
