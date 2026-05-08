@@ -52,7 +52,7 @@ class McpOAuth2MetadataControllerTest {
             """
    {
      "authorization_servers" : [ "http://localhost:8081/realms/axelix" ],
-     "resource" : "http://localhost:8080/api/external/mcp",
+     "resource" : "http://localhost:8080/api/external/api/mcp",
      "scopes_supported" : [ "openid" ]
    }
    """;

@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.master.filter;
 
 import java.io.IOException;
 
+import com.axelixlabs.axelix.master.api.error.ApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,9 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.axelixlabs.axelix.master.api.error.ApiError;
-import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 
 /**
  * The {@link OncePerRequestFilter} that is supposed to handle exceptions
@@ -57,7 +56,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException {
         try {
-            doFilter(request, response, filterChain);
+            filterChain.doFilter(request, response);
         } catch (ServletException e) {
             handleApiError(response, deriveApiError(e));
         } catch (Exception e) {

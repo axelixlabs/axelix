@@ -85,16 +85,6 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public BeansFeedBuilder noOpBeanFeedBuilder() {
-        return () -> new BeansFeed(List.of());
-    }
-
-    @Bean
-    public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder noOpBeanFeedBuilder) {
-        return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
-    }
-
-    @Bean
     public WebIdentityAccessManager securityManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);

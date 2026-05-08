@@ -60,8 +60,7 @@ public class BeansApi {
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.BeansApi.FEED)
     public ResponseEntity<byte[]> getBeansFeed(@PathVariable("instanceId") String instanceId) {
-        byte[] body =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }
