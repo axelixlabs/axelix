@@ -77,6 +77,10 @@ public class MasterAuthorityResolver implements AuthorityResolver {
                 HttpMethod.POST,
                 DefaultAuthority.SCHEDULED_TASKS_MODIFY);
         put(ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+
+        // Thread Dump
+        put(ApiPaths.ThreadDumpApi.ENABLE_CONTENTION_MONITORING, HttpMethod.POST, DefaultAuthority.THREAD_DUMP_TOGGLE);
+        put(ApiPaths.ThreadDumpApi.DISABLE_CONTENTION_MONITORING, HttpMethod.POST, DefaultAuthority.THREAD_DUMP_TOGGLE);
     }
 
     @Override

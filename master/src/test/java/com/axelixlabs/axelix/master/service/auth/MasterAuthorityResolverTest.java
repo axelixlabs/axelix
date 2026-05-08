@@ -114,7 +114,17 @@ public class MasterAuthorityResolverTest {
                 Arguments.of(
                         "/api/external/scheduled-tasks/i/modify/interval",
                         HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY));
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+
+                // THREAD_DUMP_TOGGLE
+                Arguments.of(
+                        "/api/external/thread-dump/i/thread-contention-monitoring/enable",
+                        HttpMethod.POST,
+                        DefaultAuthority.THREAD_DUMP_TOGGLE),
+                Arguments.of(
+                        "/api/external/thread-dump/i/thread-contention-monitoring/disable",
+                        HttpMethod.POST,
+                        DefaultAuthority.THREAD_DUMP_TOGGLE));
     }
 
     private static Stream<Arguments> unmappedEndpoints() {

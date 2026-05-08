@@ -68,6 +68,10 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
         map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
 
+        // THREAD_DUMP_TOGGLE
+        map.put(ActuatorEndpoints.THREAD_DUMP_ENABLE_CONTENTION_MONITORING, DefaultAuthority.THREAD_DUMP_TOGGLE);
+        map.put(ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING, DefaultAuthority.THREAD_DUMP_TOGGLE);
+
         PATH_MAPPINGS = Collections.unmodifiableMap(map);
     }
 
