@@ -40,20 +40,15 @@ public abstract class AbstractByteInstanceStateCollector<T extends StateComponen
 
     private static final Logger log = LoggerFactory.getLogger(AbstractByteInstanceStateCollector.class);
 
-    protected final ObjectMapper objectMapper;
-
-    public AbstractByteInstanceStateCollector() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public byte[] collect(String instanceId, T settings) throws StateExportException {
         try {
             byte[] state = collectByte(instanceId, settings);
-            JsonNode json = objectMapper.readTree(state);
+            JsonNode json = OBJECT_MAPPER.readTree(state);
 
-            return objectMapper.writeValueAsBytes(json);
+            return OBJECT_MAPPER.writeValueAsBytes(json);
         } catch (JsonProcessingException e) {
             log.warn("Unable to serialize state provided by collector responsible for : {}", this.responsibleFor(), e);
             throw new StateExportException(instanceId, e);

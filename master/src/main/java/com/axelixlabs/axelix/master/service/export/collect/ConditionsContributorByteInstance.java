@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Conditions information for application state export.
@@ -35,10 +39,10 @@ import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateCompo
 public class ConditionsContributorByteInstance
         extends AbstractByteInstanceStateCollector<ConditionsStateComponentSettings> {
 
-    private final ConditionsApi conditionsApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public ConditionsContributorByteInstance(final ConditionsApi conditionsApi) {
-        this.conditionsApi = conditionsApi;
+    public ConditionsContributorByteInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -48,6 +52,7 @@ public class ConditionsContributorByteInstance
 
     @Override
     protected byte[] collectByte(String instanceId, ConditionsStateComponentSettings settings) {
-        return conditionsApi.getConditionsFeed(instanceId);
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
     }
 }

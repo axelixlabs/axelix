@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Beans information for application state export.
@@ -33,10 +37,10 @@ import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentS
 @Component
 public class BeansContributorByteInstance extends AbstractByteInstanceStateCollector<BeansStateComponentSettings> {
 
-    private final BeansApi beansApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public BeansContributorByteInstance(BeansApi beansApi) {
-        this.beansApi = beansApi;
+    public BeansContributorByteInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -46,6 +50,6 @@ public class BeansContributorByteInstance extends AbstractByteInstanceStateColle
 
     @Override
     protected byte[] collectByte(String instanceId, BeansStateComponentSettings settings) {
-        return beansApi.getBeansFeed(instanceId);
+        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
     }
 }

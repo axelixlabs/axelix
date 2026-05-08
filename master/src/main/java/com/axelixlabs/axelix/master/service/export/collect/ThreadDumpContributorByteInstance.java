@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Thread Dump information for application state export.
@@ -35,10 +39,10 @@ import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateCompo
 public class ThreadDumpContributorByteInstance
         extends AbstractByteInstanceStateCollector<ThreadDumpStateComponentSettings> {
 
-    private final ThreadDumpApi threadDumpApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public ThreadDumpContributorByteInstance(ThreadDumpApi threadDumpApi) {
-        this.threadDumpApi = threadDumpApi;
+    public ThreadDumpContributorByteInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -48,6 +52,7 @@ public class ThreadDumpContributorByteInstance
 
     @Override
     protected byte[] collectByte(String instanceId, ThreadDumpStateComponentSettings settings) {
-        return threadDumpApi.getThreadDump(instanceId);
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
     }
 }

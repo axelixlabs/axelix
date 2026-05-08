@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Caches information for application state export.
@@ -34,10 +38,10 @@ import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponent
 @Component
 public class CacheContributorByteInstance extends AbstractByteInstanceStateCollector<CachesStateComponentSettings> {
 
-    private final CachesReadApi cachesReadApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public CacheContributorByteInstance(final CachesReadApi cachesReadApi) {
-        this.cachesReadApi = cachesReadApi;
+    public CacheContributorByteInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -47,6 +51,7 @@ public class CacheContributorByteInstance extends AbstractByteInstanceStateColle
 
     @Override
     protected byte[] collectByte(String instanceId, CachesStateComponentSettings settings) {
-        return cachesReadApi.getAllCaches(instanceId);
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 }
