@@ -62,6 +62,7 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.CACHES_CLEAR,
                 DefaultAuthority.CACHES_TOGGLE,
                 DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.THREAD_DUMP_TOGGLE,
                 DefaultAuthority.CONFIG_PROPS_VALUES_READ,
                 DefaultAuthority.ENV_VALUES_READ,
                 DefaultAuthority.USERS_MANAGEMENT,
@@ -79,6 +80,7 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.CACHES_CLEAR,
                 DefaultAuthority.CACHES_TOGGLE,
                 DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.THREAD_DUMP_TOGGLE,
                 DefaultAuthority.CONFIG_PROPS_VALUES_READ,
                 DefaultAuthority.ENV_VALUES_READ));
 
@@ -93,7 +95,8 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.SCHEDULED_TASKS_MODIFY,
                 DefaultAuthority.CACHES_CLEAR,
                 DefaultAuthority.CACHES_TOGGLE,
-                DefaultAuthority.GARBAGE_COLLECTOR));
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.THREAD_DUMP_TOGGLE));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
@@ -179,7 +182,8 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.SCHEDULED_TASKS_MODIFY,
                 DefaultAuthority.CACHES_CLEAR,
                 DefaultAuthority.CACHES_TOGGLE,
-                DefaultAuthority.GARBAGE_COLLECTOR);
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.THREAD_DUMP_TOGGLE);
     }
 
     static Stream<Role> allRoles() {

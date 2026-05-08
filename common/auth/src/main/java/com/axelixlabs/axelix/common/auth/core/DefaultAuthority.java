@@ -61,6 +61,12 @@ public enum DefaultAuthority implements Authority {
     GARBAGE_COLLECTOR,
 
     /**
+     * Grants the right to enable/disable thread dump.
+     * <p>Allows enabling/disabling thread dump at runtime.</p>
+     */
+    THREAD_DUMP_TOGGLE,
+
+    /**
      * Grants the right to view managed users.
      * <p>Reserved for the {@code DefaultRole.SUPER_ADMIN} role.</p>
      */

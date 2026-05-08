@@ -51,7 +51,8 @@ public final class DefaultRole implements Role {
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY,
                         DefaultAuthority.CACHES_CLEAR,
                         DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR));
+                        DefaultAuthority.GARBAGE_COLLECTOR,
+                        DefaultAuthority.THREAD_DUMP_TOGGLE));
 
         ADMIN = new DefaultRole(
                 "ADMIN",
@@ -60,6 +61,7 @@ public final class DefaultRole implements Role {
                         DefaultAuthority.CACHES_CLEAR,
                         DefaultAuthority.CACHES_TOGGLE,
                         DefaultAuthority.GARBAGE_COLLECTOR,
+                        DefaultAuthority.THREAD_DUMP_TOGGLE,
                         DefaultAuthority.ENV_VALUES_READ,
                         DefaultAuthority.CONFIG_PROPS_VALUES_READ));
 

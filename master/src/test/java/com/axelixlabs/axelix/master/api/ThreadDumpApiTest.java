@@ -43,6 +43,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
@@ -332,10 +333,10 @@ class ThreadDumpApiTest {
 
     @ParameterizedTest
     @MethodSource("managementCachesContentionMonitoring")
-    void shouldEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) throws InterruptedException {
+    void shouldEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -355,7 +356,7 @@ class ThreadDumpApiTest {
         registry.register(createInstance(instanceId));
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -375,7 +376,7 @@ class ThreadDumpApiTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -394,13 +395,15 @@ class ThreadDumpApiTest {
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
-            path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/enable")
+            path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/enable",
+            requiredAuthority = DefaultAuthority.THREAD_DUMP_TOGGLE)
     void negativeAuthTestsOnEnableContentionMonitoring() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path =
-                    "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/disable")
+                    "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/disable",
+            requiredAuthority = DefaultAuthority.THREAD_DUMP_TOGGLE)
     void negativeAuthTestsOnDisableContentionMonitoring() {}
 
     private static Stream<Arguments> managementCachesContentionMonitoring() {

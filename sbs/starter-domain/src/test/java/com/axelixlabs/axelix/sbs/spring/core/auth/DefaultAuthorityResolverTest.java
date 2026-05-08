@@ -110,7 +110,11 @@ public class DefaultAuthorityResolverTest {
                 // GC
                 Arguments.of("/axelix-gc/trigger", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
                 Arguments.of("/axelix-gc/log/enable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of("/axelix-gc/log/disable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR));
+                Arguments.of("/axelix-gc/log/disable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+
+                // THREAD_DUMP_TOGGLE
+                Arguments.of("/axelix-thread-dump/enable", HttpMethod.POST, DefaultAuthority.THREAD_DUMP_TOGGLE),
+                Arguments.of("/axelix-thread-dump/disable", HttpMethod.POST, DefaultAuthority.THREAD_DUMP_TOGGLE));
     }
 
     @ParameterizedTest
@@ -140,8 +144,6 @@ public class DefaultAuthorityResolverTest {
                 Arguments.of("/axelix-metrics/{metric.name}", HttpMethod.GET),
                 Arguments.of("/axelix-metrics/jvm.buffer.count", HttpMethod.GET),
                 Arguments.of("/axelix-thread-dump", HttpMethod.GET),
-                Arguments.of("/axelix-thread-dump/enable", HttpMethod.POST),
-                Arguments.of("/axelix-thread-dump/disable", HttpMethod.POST),
                 Arguments.of("/axelix-transactions-monitoring", HttpMethod.GET),
                 Arguments.of("/axelix-feign", HttpMethod.GET));
     }
