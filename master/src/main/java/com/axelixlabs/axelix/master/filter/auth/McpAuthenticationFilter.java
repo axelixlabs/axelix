@@ -18,9 +18,26 @@
 package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import javax.security.sasl.AuthenticationException;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
@@ -29,16 +46,6 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Prop
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
@@ -53,13 +60,13 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
 
     @Nullable
     private final String resourceMetadata;
+
     private final boolean isOAuth2FlowEnabled;
     private final McpIdentityAccessManager mcpIdentityAccessManager;
 
     public McpAuthenticationFilter(
-        ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
-        McpIdentityAccessManager mcpIdentityAccessManager
-    ) {
+            ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
+            McpIdentityAccessManager mcpIdentityAccessManager) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
 
         OAuth2Properties oAuth2Properties = oAuth2PropertiesProvider.getIfAvailable();
@@ -86,7 +93,7 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         AuthorizationHeader authorizationHeader = parseAuthHeader(authHeader);
@@ -98,12 +105,13 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
 
         // We can do it safely since in Spring Web, the body of the HTTP Request that is
         // represented as InputStream is cached.
-        String jsonRpcBody = new String(request.getInputStream().readAllBytes());
+        byte[] requestBody = request.getInputStream().readAllBytes();
+        String jsonRpcBody = new String(requestBody, StandardCharsets.UTF_8);
 
         try {
             mcpIdentityAccessManager.verifyAccess(jsonRpcBody, authorizationHeader);
             // if nothing is thrown, we expect that all IAM checks passed successfully
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(new CachedBodyRequestWrapper(request, requestBody), response);
         } catch (AuthorizationException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (AuthenticationException e) {
@@ -121,8 +129,8 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
         // alongside the basic auth, the assumption described above still holds.
         if (isOAuth2FlowEnabled) {
             response.setHeader(
-                WWW_AUTHENTICATE_OAUTH2_HEADER,
-                AuthenticationSchemes.BEARER + " resource_metadata=\"" + resourceMetadata + "\"");
+                    WWW_AUTHENTICATE_OAUTH2_HEADER,
+                    AuthenticationSchemes.BEARER + " resource_metadata=\"" + resourceMetadata + "\"");
         }
     }
 
@@ -135,12 +143,54 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
 
             if (authHeader.startsWith(scheme.prefix())) {
                 return new AuthorizationHeader(
-                    scheme,
-                    authHeader.substring(scheme.prefix().length())
-                );
+                        scheme, authHeader.substring(scheme.prefix().length()));
             }
         }
 
         return null;
+    }
+
+    private static class CachedBodyRequestWrapper extends HttpServletRequestWrapper {
+
+        private final byte[] requestBody;
+
+        CachedBodyRequestWrapper(HttpServletRequest request, byte[] requestBody) {
+            super(request);
+            this.requestBody = requestBody;
+        }
+
+        @Override
+        public ServletInputStream getInputStream() {
+            return new ServletInputStream() {
+                private int currentIndex;
+
+                @Override
+                public int read() {
+                    if (currentIndex >= requestBody.length) {
+                        return -1;
+                    }
+
+                    return requestBody[currentIndex++] & 0xff;
+                }
+
+                @Override
+                public boolean isFinished() {
+                    return currentIndex >= requestBody.length;
+                }
+
+                @Override
+                public boolean isReady() {
+                    return true;
+                }
+
+                @Override
+                public void setReadListener(ReadListener readListener) {}
+            };
+        }
+
+        @Override
+        public java.io.BufferedReader getReader() {
+            return new java.io.BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8));
+        }
     }
 }

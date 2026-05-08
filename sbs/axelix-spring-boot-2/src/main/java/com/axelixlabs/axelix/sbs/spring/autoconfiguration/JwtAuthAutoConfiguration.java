@@ -33,12 +33,12 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
@@ -108,10 +108,12 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            WebIdentityAccessManager webIdentityAccessManager, SecurityContextExecutor securityContextExecutor, WebEndpointProperties webEndpointProperties) {
+            WebIdentityAccessManager webIdentityAccessManager,
+            SecurityContextExecutor securityContextExecutor,
+            WebEndpointProperties webEndpointProperties) {
 
         var jwtAuthorizationFilter = new JwtAuthorizationFilter(
-            webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
+                webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
 
         var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
         registration.setName("jwtAuthorizationFilter");

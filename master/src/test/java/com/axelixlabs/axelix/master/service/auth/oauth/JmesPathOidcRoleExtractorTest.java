@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.util.Base64;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;

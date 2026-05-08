@@ -20,15 +20,15 @@ package com.axelixlabs.axelix.master.mcp.auth;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import org.junit.jupiter.api.Test;
-
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
-import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,9 +63,6 @@ class DefaultMcpEndpointAuthorityResolverTest {
     }
 
     public static Stream<Arguments> cachesClearEndpoints() {
-        return Stream.of(
-            Arguments.of(McpEndpoints.CLEAR_ALL_CACHES),
-            Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE)
-        );
+        return Stream.of(Arguments.of(McpEndpoints.CLEAR_ALL_CACHES), Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE));
     }
 }

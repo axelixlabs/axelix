@@ -21,14 +21,14 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-
-import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
-import com.axelixlabs.axelix.master.mcp.McpEndpoint;
-import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import tools.jackson.databind.json.JsonMapper;
+
+import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -143,7 +143,6 @@ class DefaultMcpEndpointResolverTest {
                 Arguments.of(McpEndpoints.WALLBOARD_TOOL_NAME, McpEndpoints.WALLBOARD),
                 Arguments.of(McpEndpoints.CACHES_FEED_TOOL_NAME, McpEndpoints.ALL_CACHES),
                 Arguments.of(McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME, McpEndpoints.CLEAR_ALL_CACHES),
-                Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE)
-        );
+                Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE));
     }
 }

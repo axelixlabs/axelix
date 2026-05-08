@@ -213,7 +213,8 @@ class SelfRegistrationServiceTest {
         String authHeader = request.getHeader(SelfRegistrationService.AUTHORIZATION_HEADER);
         assertThat(authHeader).startsWith(AuthenticationSchemes.BEARER.prefix());
 
-        String token = authHeader.substring(AuthenticationSchemes.BEARER.prefix().length());
+        String token =
+                authHeader.substring(AuthenticationSchemes.BEARER.prefix().length());
 
         assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
     }

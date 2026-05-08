@@ -20,28 +20,25 @@ package com.axelixlabs.axelix.master.mcp.auth;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
-import org.springframework.stereotype.Component;
-
+import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Default implementation of {@link McpEndpointResolver}.
  *
  * @author Mikhail Polivakha
  */
-@Component
 public class DefaultMcpEndpointResolver implements McpEndpointResolver {
 
     private static final String TOOLS_CALL_METHOD = "tools/call";
     private static final String METHOD_JSON_FIELD = "method";
 
     private static final AuthenticationException PARSING_EXCEPTION =
-        new AuthenticationException("Unable to parse the incoming JSON-RPC request from the AI Agent");
+            new AuthenticationException("Unable to parse the incoming JSON-RPC request from the AI Agent");
 
     private static final Map<String, McpEndpoint> ENDPOINT_MAPPING = Map.of(
             McpEndpoints.BEANS_FEED_TOOL_NAME, McpEndpoints.BEANS_FEED,
@@ -52,8 +49,7 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
             McpEndpoints.WALLBOARD_TOOL_NAME, McpEndpoints.WALLBOARD,
             McpEndpoints.CACHES_FEED_TOOL_NAME, McpEndpoints.ALL_CACHES,
             McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME, McpEndpoints.CLEAR_ALL_CACHES,
-            McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE
-    );
+            McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE);
 
     private final JsonMapper jsonMapper;
 

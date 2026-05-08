@@ -38,5 +38,4 @@ public interface OidcRoleExtractor {
      *                                    the ID token nor the UserInfo endpoint
      */
     Role extractRole(String accessToken) throws OidcTokenExchangeException;
-
 }

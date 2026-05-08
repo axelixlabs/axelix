@@ -1,16 +1,34 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 package com.axelixlabs.axelix.master.mcp.auth.handler;
 
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link McpAuthenticationHandler} that is capable to authenticate {@link AuthenticationSchemes#BASIC Basic auth} requests.
@@ -42,9 +60,8 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
             String login = parts[0];
             String password = parts[1];
 
-            return Optional
-                .ofNullable(userAuthenticator.authenticate(login, password))
-                .orElseThrow(AuthenticationException::new);
+            return Optional.ofNullable(userAuthenticator.authenticate(login, password))
+                    .orElseThrow(AuthenticationException::new);
 
         } catch (Exception e) {
             log.debug("Basic authentication for accessing the MCP failed: {}", e.getMessage());
@@ -56,5 +73,4 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
     public AuthenticationScheme supportedAuthSchema() {
         return AuthenticationSchemes.BASIC;
     }
-
 }
