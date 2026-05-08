@@ -111,10 +111,10 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
         try {
             mcpIdentityAccessManager.verifyAccess(jsonRpcBody, authorizationHeader);
             // if nothing is thrown, we expect that all IAM checks passed successfully
-            filterChain.doFilter(new CachedBodyRequestWrapper(request, requestBody), response);
+            filterChain.doFilter(request, response);
         } catch (AuthorizationException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | com.axelixlabs.axelix.master.exception.auth.AuthenticationException e) {
             handleAuthenticationProblem(response);
         }
     }
@@ -148,49 +148,5 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
-    }
-
-    private static class CachedBodyRequestWrapper extends HttpServletRequestWrapper {
-
-        private final byte[] requestBody;
-
-        CachedBodyRequestWrapper(HttpServletRequest request, byte[] requestBody) {
-            super(request);
-            this.requestBody = requestBody;
-        }
-
-        @Override
-        public ServletInputStream getInputStream() {
-            return new ServletInputStream() {
-                private int currentIndex;
-
-                @Override
-                public int read() {
-                    if (currentIndex >= requestBody.length) {
-                        return -1;
-                    }
-
-                    return requestBody[currentIndex++] & 0xff;
-                }
-
-                @Override
-                public boolean isFinished() {
-                    return currentIndex >= requestBody.length;
-                }
-
-                @Override
-                public boolean isReady() {
-                    return true;
-                }
-
-                @Override
-                public void setReadListener(ReadListener readListener) {}
-            };
-        }
-
-        @Override
-        public java.io.BufferedReader getReader() {
-            return new java.io.BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8));
-        }
     }
 }

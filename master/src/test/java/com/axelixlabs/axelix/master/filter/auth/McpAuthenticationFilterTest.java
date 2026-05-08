@@ -21,13 +21,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.repository.UserRepository;
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +45,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.context.annotation.Import;
@@ -47,11 +53,18 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.autoconfiguration.McpAutoConfiguration;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
  * Integration tests for {@link McpAuthenticationFilter}.
@@ -69,6 +82,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class McpAuthenticationFilterTest {
 
     private static final String MCP_PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
+    private static final String MCP_SESSION_ID_HEADER = "mcp-session-id";
     private static final String MCP_PROTOCOL_VERSION = "2024-11-05";
 
     private static MockWebServer mockWebServer;
@@ -80,6 +94,15 @@ class McpAuthenticationFilterTest {
     private int port;
 
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private InstanceRepository instanceRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeAll
     static void startMockWebServer() throws IOException {
@@ -94,79 +117,246 @@ class McpAuthenticationFilterTest {
 
     @BeforeEach
     void setUpRestTemplate() {
+        instanceRepository.deleteAll();
+        userRepository.deleteAll();
         this.restTemplate = new TestRestTemplate(
                 new RestTemplateBuilder().rootUri("http://localhost:" + port));
     }
 
     @Test
-    void shouldAuthenticateAndProxyMcpToolCallEndToEnd() throws Exception {
+    void shouldAuthenticateAndProxyMcpToolCallEndToEnd() {
         String activeInstanceId = UUID.randomUUID().toString();
-        try {
-            // given.
-            // language=json
-            String beansResponse = """
-                    {
-                      "beans": [
-                        {
-                          "beanName": "testBean"
-                        }
-                      ]
-                    }
-                    """;
-            mockWebServer.setDispatcher(new Dispatcher() {
-                @Override
-                public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                    String path = request.getPath();
-
-                    if (path != null && path.equals("/" + activeInstanceId + "/actuator/axelix-beans")) {
-                        return new MockResponse()
-                                .setResponseCode(200)
-                                .setBody(beansResponse)
-                                .addHeader(HttpHeaders.CONTENT_TYPE, ACTUATOR_RESPONSE_CONTENT_TYPE);
-                    }
-
-                    return new MockResponse().setResponseCode(404);
+        // given.
+        // language=json
+        String beansResponse = """
+            {
+              "beans": [
+                {
+                  "beanName": "testBean"
                 }
-            });
-            instanceRegistry.register(
-                    TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+              ]
+            }
+            """;
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials("admin", "admin"));
-            headers.set(HttpHeaders.ACCEPT, "text/event-stream, application/json");
-            headers.set(MCP_PROTOCOL_VERSION_HEADER, MCP_PROTOCOL_VERSION);
+                if (path != null && path.equals("/" + activeInstanceId + "/actuator/axelix-beans")) {
+                    return new MockResponse()
+                        .setResponseCode(200)
+                        .setBody(beansResponse)
+                        .addHeader(HttpHeaders.CONTENT_TYPE, ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
 
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+        instanceRegistry.register(
+            TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+
+        HttpHeaders headers = commonMcpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials("admin", "admin"));
+        String mcpSessionId = initializeMcpSession(headers);
+        headers.set(MCP_SESSION_ID_HEADER, mcpSessionId);
+
+        // language=json
+        String toolsCallJsonRpcRequest = """
+            {
+              "jsonrpc": "2.0",
+              "id": 1,
+              "method": "tools/call",
+              "params": {
+                "name": "getInstanceBeans",
+                "arguments": {
+                  "instanceId": "%s"
+                }
+              }
+            }
+            """
+            .formatted(activeInstanceId);
+
+        ResponseEntity<String> response =
+            restTemplate.postForEntity("/api/mcp", new HttpEntity<>(toolsCallJsonRpcRequest, headers), String.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("typicalMcpRequests")
+    void shouldReturnUnauthorizedWhenAuthorizationHeaderIsMissing(String request) {
+        // given.
+        HttpHeaders headers = commonMcpHeaders();
+
+        // when.
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/mcp",
+                new HttpEntity<>(request, headers),
+                String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @MethodSource("typicalMcpRequests")
+    void shouldReturnUnauthorizedWhenBasicCredentialsAreInvalid(String request) {
+        // given.
+        HttpHeaders headers = commonMcpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials("admin", "wrong-password"));
+
+        // when.
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/mcp",
+                new HttpEntity<>(request, headers),
+                String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenUserIsNotAuthorizedForEndpoint() {
+        // given.
+        String activeInstanceId = UUID.randomUUID().toString();
+        String username = "viewer-user";
+        String password = "viewer-password";
+
+        userService.create(username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+
+        HttpHeaders headers = commonMcpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
+
+        // when.
+        ResponseEntity<String> response = restTemplate.postForEntity(
+            "/api/mcp",
+            new HttpEntity<>(buildToolsCallRequest(activeInstanceId, "clearAllCaches"), headers),
+            String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void shouldReturnOkWhenViewerIsTryingToListMcpEndpoints() {
+        // given.
+        String username = "viewer-user";
+        String password = "viewer-password";
+
+        userService.create(username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+
+        HttpHeaders headers = commonMcpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
+
+        // when.
+        ResponseEntity<String> response = restTemplate.postForEntity(
+            "/api/mcp",
+            new HttpEntity<>(buildInitializeRequest(), headers),
+            String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThatJson(
             // language=json
-            String toolsCallJsonRpcRequest = """
-                    {
-                      "jsonrpc": "2.0",
-                      "id": 1,
-                      "method": "tools/call",
-                      "params": {
-                        "name": "getInstanceBeans",
-                        "arguments": {
-                          "instanceId": "%s"
-                        }
-                      }
-                    }
-                    """
-                    .formatted(activeInstanceId);
-            ResponseEntity<String> response =
-                    restTemplate.postForEntity("/api/mcp", new HttpEntity<>(toolsCallJsonRpcRequest, headers), String.class);
+            """
+            {
+              "jsonrpc" : "2.0",
+              "id" : 999,
+              "result" : {
+                "protocolVersion" : "%s",
+                "capabilities" : {
+                  "completions" : { },
+                  "logging" : { },
+                  "prompts" : {
+                    "listChanged" : true
+                  },
+                  "resources" : {
+                    "subscribe" : false,
+                    "listChanged" : true
+                  },
+                  "tools" : {
+                    "listChanged" : true
+                  }
+                },
+                "serverInfo" : {
+                  "name" : "axelix-mcp-server",
+                  "version" : "1.0.0"
+                }
+              }
+            }
+            """.formatted(MCP_PROTOCOL_VERSION)).isEqualTo(response.getBody());
+    }
 
-            // then.
-            assertThat(response.getStatusCode().is2xxSuccessful())
-                    .as("tools/call response status=%s body=%s", response.getStatusCode(), response.getBody())
-                    .isTrue();
-            assertThat(response.getBody()).contains("testBean");
+    private HttpHeaders commonMcpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.ACCEPT, "text/event-stream, application/json");
+        headers.set(MCP_PROTOCOL_VERSION_HEADER, MCP_PROTOCOL_VERSION);
+        return headers;
+    }
 
-            RecordedRequest proxiedRequest = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
-            assertThat(proxiedRequest).isNotNull();
-            assertThat(proxiedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-beans");
-        } finally {
-            instanceRegistry.deRegister(com.axelixlabs.axelix.master.domain.InstanceId.of(activeInstanceId));
-        }
+    private String initializeMcpSession(HttpHeaders authHeaders) {
+        HttpHeaders initializeHeaders = commonMcpHeaders();
+        initializeHeaders.set(HttpHeaders.AUTHORIZATION, authHeaders.getFirst(HttpHeaders.AUTHORIZATION));
+
+        String initializeRequestBody = buildInitializeRequest();
+
+        ResponseEntity<String> initializeResponse = restTemplate.postForEntity(
+                "/api/mcp", new HttpEntity<>(initializeRequestBody, initializeHeaders), String.class);
+
+        assertThat(initializeResponse.getStatusCode().is2xxSuccessful()).isTrue();
+
+        String mcpSessionId = initializeResponse.getHeaders().getFirst(MCP_SESSION_ID_HEADER);
+        assertThat(mcpSessionId).isNotBlank();
+        return mcpSessionId;
+    }
+
+    public static Stream<Arguments> typicalMcpRequests() {
+        return Stream.of(
+            of(buildInitializeRequest(), buildToolsCallRequest(UUID.randomUUID().toString()))
+        );
+    }
+
+    private static String buildToolsCallRequest(String instanceId) {
+        return buildToolsCallRequest(instanceId, "getInstanceBeans");
+    }
+
+    private static String buildToolsCallRequest(String instanceId, String toolName) {
+        // language=json
+        return """
+            {
+              "jsonrpc": "2.0",
+              "id": 1,
+              "method": "tools/call",
+              "params": {
+                "name": "%s",
+                "arguments": {
+                  "instanceId": "%s"
+                }
+              }
+            }
+            """
+            .formatted(toolName, instanceId);
+    }
+
+    private static @NonNull String buildInitializeRequest() {
+        // language=json
+        return """
+            {
+              "jsonrpc": "2.0",
+              "id": 999,
+              "method": "initialize",
+              "params": {
+                "protocolVersion": "%s",
+                "capabilities": {},
+                "clientInfo": {
+                  "name": "mcp-auth-filter-test",
+                  "version": "1.0.0"
+                }
+              }
+            }
+            """.formatted(MCP_PROTOCOL_VERSION);
     }
 
     private String basicCredentials(String username, String password) {
