@@ -21,13 +21,24 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
+import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
+import com.axelixlabs.axelix.master.filter.ContentCachingServletRequest;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
+import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
+import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -35,15 +46,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-
-import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
-import com.axelixlabs.axelix.master.api.external.ApiPaths;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
-import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
-import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
-import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
@@ -57,21 +59,23 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String WWW_AUTHENTICATE_OAUTH2_HEADER = "WWW-Authenticate";
 
-    /**
-     * This is not some pre-computed value. This is merely a sensible maximum size of an MCP request.
-     */
-    private static final int MAX_MCP_REQUEST_SIZE = 1 * 1024 * 1024; // 1 MB
-
     @Nullable
     private final String resourceMetadata;
 
     private final boolean isOAuth2FlowEnabled;
     private final McpIdentityAccessManager mcpIdentityAccessManager;
+    private final SecurityContextExecutor securityContextExecutor;
+    private final JwtEncoderService jwtEncoderService;
 
     public McpAuthorizationFilter(
-            ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
-            McpIdentityAccessManager mcpIdentityAccessManager) {
+        ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
+        McpIdentityAccessManager mcpIdentityAccessManager,
+        SecurityContextExecutor securityContextExecutor,
+        JwtEncoderService jwtEncoderService
+    ) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
+        this.securityContextExecutor = securityContextExecutor;
+        this.jwtEncoderService = jwtEncoderService;
 
         OAuth2Properties oAuth2Properties = oAuth2PropertiesProvider.getIfAvailable();
 
@@ -107,17 +111,25 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        var wrapper = new ContentCachingRequestWrapper(request, MAX_MCP_REQUEST_SIZE);
+        var wrapper = new ContentCachingServletRequest(request);
         var requestAsString = new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         try {
-            mcpIdentityAccessManager.verifyAccess(requestAsString, authorizationHeader);
             // if nothing is thrown, we expect that all IAM checks passed successfully
-            filterChain.doFilter(wrapper, response);
+            User authenticatedUser = mcpIdentityAccessManager.verifyAccess(requestAsString, authorizationHeader);
+
+            String accessToken = jwtEncoderService.generateToken(authenticatedUser);
+
+            securityContextExecutor.runWithinSecurityContext(
+                () -> filterChain.doFilter(wrapper, response),
+                new DefaultSecurityContext(authenticatedUser, accessToken)
+            );
         } catch (AuthorizationException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (AuthenticationException e) {
             handleAuthenticationProblem(response);
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 

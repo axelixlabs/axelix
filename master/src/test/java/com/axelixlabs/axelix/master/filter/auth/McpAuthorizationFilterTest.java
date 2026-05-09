@@ -175,11 +175,29 @@ class McpAuthorizationFilterTest {
             """
             .formatted(activeInstanceId);
 
+        // when.
         ResponseEntity<String> response =
             restTemplate.postForEntity("/api/mcp", new HttpEntity<>(toolsCallJsonRpcRequest, headers), String.class);
 
         // then.
+        String sseData = parseSseData(response.getBody());
+
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThatJson(sseData).isEqualTo(
+            // language=json
+            """
+            {
+              "jsonrpc" : "2.0",
+              "id" : 1,
+              "result" : {
+                "content" : [ {
+                  "type" : "text",
+                  "text" : "{\\n  \\"beans\\": [\\n    {\\n      \\"beanName\\": \\"testBean\\"\\n    }\\n  ]\\n}\\n"
+                } ],
+                "isError" : false
+              }
+            }
+            """);
     }
 
     @ParameterizedTest
@@ -361,5 +379,14 @@ class McpAuthorizationFilterTest {
     private String basicCredentials(String username, String password) {
         String credentials = username + ":" + password;
         return Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String parseSseData(String event) {
+        return event
+            .lines()
+            .filter(s -> s.trim().startsWith("data:"))
+            .map(s -> s.substring("data:".length()).trim())
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Invalid SSE message format"));
     }
 }
