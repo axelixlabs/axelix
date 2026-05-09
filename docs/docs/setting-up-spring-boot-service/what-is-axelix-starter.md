@@ -24,7 +24,7 @@ Axelix Starter transforms your standard Spring Boot application into a "managed 
 - **Real-time Bean Analysis**: View all Spring beans.
 - **Configuration Property Inspection**: See property values and their sources
 - **Runtime Metrics**: Application performance and health metrics
-- **State export**: Export state of application instance (including sanitize heap-dump, thread-dump, env, etc.)
+- **State export**: Export state of application instance (including heap-dump, thread-dump, env, etc.)
 
 ## When to Use Axelix Starter
 

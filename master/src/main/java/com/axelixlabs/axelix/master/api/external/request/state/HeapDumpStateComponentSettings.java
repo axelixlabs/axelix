@@ -22,10 +22,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 /**
  * {@link StateComponentSettings} for heap dumps.
  *
- * @param sanitized Whether to provide sanitized heap.
  * @author Mikhail Polivakha
  */
-public record HeapDumpStateComponentSettings(boolean sanitized) implements StateComponentSettings {
+public class HeapDumpStateComponentSettings implements StateComponentSettings {
 
     @JsonGetter(COMPONENT)
     @Override

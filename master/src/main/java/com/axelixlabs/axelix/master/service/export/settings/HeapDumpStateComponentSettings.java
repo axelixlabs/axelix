@@ -23,10 +23,9 @@ import com.axelixlabs.axelix.master.service.export.StateComponentSettings;
 /**
  * {@link StateComponentSettings} for heap dumps.
  *
- * @param sanitized Whether to provide sanitized heap.
  * @author Mikhail Polivakha
  */
-public record HeapDumpStateComponentSettings(boolean sanitized) implements StateComponentSettings {
+public class HeapDumpStateComponentSettings implements StateComponentSettings {
 
     @Override
     public StateComponent component() {

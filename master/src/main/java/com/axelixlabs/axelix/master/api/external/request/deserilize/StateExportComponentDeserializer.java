@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.api.external.request.deserilize;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -45,8 +44,6 @@ import com.axelixlabs.axelix.master.api.external.request.state.ThreadDumpStateCo
  * @author Mikhail Polivakha
  */
 public class StateExportComponentDeserializer extends ValueDeserializer<List<StateComponentSettings>> {
-
-    private static final String SANITIZED_FIELD = "sanitized";
 
     @Override
     public List<StateComponentSettings> deserialize(JsonParser p, DeserializationContext ctxt) {
@@ -76,12 +73,7 @@ public class StateExportComponentDeserializer extends ValueDeserializer<List<Sta
             }
 
             switch (stateExportComponent) {
-                case HEAP_DUMP -> {
-                    // TODO: can we make it better? Like via readValue or smth
-                    boolean sanitized = extractSanitizedFlag(childNode);
-                    var heapDumpStateComponentSettings = new HeapDumpStateComponentSettings(sanitized);
-                    results.add(heapDumpStateComponentSettings);
-                }
+                case HEAP_DUMP -> results.add(new HeapDumpStateComponentSettings());
                 case THREAD_DUMP -> results.add(new ThreadDumpStateComponentSettings());
                 case BEANS -> results.add(new BeansStateComponentSettings());
                 case CACHES -> results.add(new CachesStateComponentSettings());
@@ -93,12 +85,6 @@ public class StateExportComponentDeserializer extends ValueDeserializer<List<Sta
             }
         }
         return results;
-    }
-
-    private static Boolean extractSanitizedFlag(JsonNode childNode) {
-        return Optional.ofNullable(childNode.get(SANITIZED_FIELD))
-                .map(it -> it.asBoolean(true))
-                .orElse(true);
     }
 
     private static void throwUnexpectedStateExportValue(JsonParser p, String stateComponentAsText) {

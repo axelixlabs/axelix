@@ -24,7 +24,6 @@ The download dialog allows you to select which components to include in the expo
 ![details download state](../../static/img/feature/details/details-download-state.gif)
 
 - **Heap Dump** - JVM Heap memory snapshot
-    - *Sanitization Option*: Can be sanitized to remove sensitive data **(Available in Enterprise)**
 - **Thread Dump** - Current thread states and stack traces
 - **Beans** - Spring Beans information
 - **Caches** - Cache contents

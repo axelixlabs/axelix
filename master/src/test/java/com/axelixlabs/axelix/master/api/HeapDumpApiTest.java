@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.master.api;
 
 import java.io.IOException;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -35,19 +35,15 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.HeapDumpApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.export.HeapDumpAnonymizer;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -55,8 +51,6 @@ import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link HeapDumpApi}.
@@ -80,9 +74,6 @@ class HeapDumpApiTest {
     @Autowired
     private InstanceRegistry registry;
 
-    @MockitoBean
-    private HeapDumpAnonymizer heapDumpAnonymizer;
-
     @BeforeAll
     static void startServer() throws IOException {
         mockWebServer = new MockWebServer();
@@ -102,30 +93,15 @@ class HeapDumpApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                String base64Data = Base64.getEncoder().encodeToString(mockHeapDump);
-
                 if (path.equals("/" + activeInstanceId + "/actuator/axelix-heap-dump")) {
                     return new MockResponse()
-                            .setBody(base64Data)
+                            .setBody(new String(mockHeapDump, StandardCharsets.UTF_8))
                             .addHeader("Content-Type", "application/octet-stream")
                             .setResponseCode(200);
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
-        });
-
-        when(heapDumpAnonymizer.anonymize(any(Resource.class))).thenAnswer(invocation -> {
-            Resource originalResource = invocation.getArgument(0);
-            String base64Content = new String(originalResource.getInputStream().readAllBytes());
-            byte[] decodedData = Base64.getDecoder().decode(base64Content);
-
-            return new ByteArrayResource(decodedData) {
-                @Override
-                public String getFilename() {
-                    return "heapdump.hprof";
-                }
-            };
         });
 
         registry.register(

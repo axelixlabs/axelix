@@ -29,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -38,7 +37,6 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.export.HeapDumpAnonymizer;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -51,11 +49,9 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class HeapDumpApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final HeapDumpAnonymizer heapDumpAnonymizer;
 
-    public HeapDumpApi(EndpointInvoker endpointInvoker, HeapDumpAnonymizer heapDumpAnonymizer) {
+    public HeapDumpApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.heapDumpAnonymizer = heapDumpAnonymizer;
     }
 
     @DefaultApiResponse(
@@ -76,16 +72,10 @@ public class HeapDumpApi {
             })
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.HeapDumpApi.INSTANCE_ID)
-    public ResponseEntity<Resource> getHeapDump(
-            @PathVariable("instanceId") String instanceId,
-            @RequestParam(defaultValue = "true", required = false) boolean sanitizeHeapDump) {
+    public ResponseEntity<Resource> getHeapDump(@PathVariable("instanceId") String instanceId) {
 
         Resource resource = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_HEAP_DUMP, NoHttpPayload.INSTANCE);
-
-        if (sanitizeHeapDump) {
-            resource = heapDumpAnonymizer.anonymize(resource);
-        }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

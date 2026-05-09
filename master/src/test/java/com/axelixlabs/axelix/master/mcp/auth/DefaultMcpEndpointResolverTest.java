@@ -90,8 +90,7 @@ class DefaultMcpEndpointResolverTest {
 
         // when.
         // then.
-        assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class);
+        assertThatThrownBy(() -> subject.resolve(request)).isInstanceOf(AuthenticationException.class);
     }
 
     @Test
@@ -106,8 +105,7 @@ class DefaultMcpEndpointResolverTest {
 
         // when.
         // then.
-        assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class);
+        assertThatThrownBy(() -> subject.resolve(request)).isInstanceOf(AuthenticationException.class);
     }
 
     @Test
@@ -126,8 +124,7 @@ class DefaultMcpEndpointResolverTest {
 
         // when.
         // then.
-        assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class);
+        assertThatThrownBy(() -> subject.resolve(request)).isInstanceOf(AuthenticationException.class);
     }
 
     public static Stream<Arguments> endpointMapping() {

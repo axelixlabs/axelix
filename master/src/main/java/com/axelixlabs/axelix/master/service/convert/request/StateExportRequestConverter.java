@@ -52,10 +52,7 @@ public class StateExportRequestConverter implements Converter<StateExportRequest
     @SuppressWarnings("PMD.CyclomaticComplexity")
     private com.axelixlabs.axelix.master.service.export.StateComponentSettings map(StateComponentSettings it) {
         return switch (it.getComponent()) {
-            case HEAP_DUMP ->
-                new HeapDumpStateComponentSettings(
-                        ((com.axelixlabs.axelix.master.api.external.request.state.HeapDumpStateComponentSettings) it)
-                                .sanitized());
+            case HEAP_DUMP -> new HeapDumpStateComponentSettings();
             case THREAD_DUMP -> new ThreadDumpStateComponentSettings();
             case BEANS -> new BeansStateComponentSettings();
             case CACHES -> new CachesStateComponentSettings();

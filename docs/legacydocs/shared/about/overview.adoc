@@ -37,7 +37,7 @@ possible:
 
 - To control hhe migration of the entire ecosystem from Spring Framework/Java/JDK Vendor version X to Y
 - To monitor the state of the particular Spring Boot application, i.e. the connection pool, transactions, the served RPS etc.
-- To download all the necessary debugging information - the state of the Spring Boot's Environment, the sanitized heap dump etc.
+- To download all the necessary debugging information - the state of the Spring Boot's Environment, heap dumps, etc.
 
 The list above is not exhaustive of course and there is much more.
 

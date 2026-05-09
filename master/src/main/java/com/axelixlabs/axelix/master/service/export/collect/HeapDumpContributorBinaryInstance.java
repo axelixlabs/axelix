@@ -46,7 +46,7 @@ public class HeapDumpContributorBinaryInstance
     @Override
     protected Resource collectResource(String instanceId, HeapDumpStateComponentSettings settings)
             throws StateExportException {
-        ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId, settings.sanitized());
+        ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId);
         if (heapDump.getBody() == null) {
             throw new StateExportException(
                     instanceId, "Heap dump endpoint returned successful status but empty content");

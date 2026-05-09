@@ -39,19 +39,15 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.StateExportApi;
-import com.axelixlabs.axelix.master.service.export.HeapDumpAnonymizer;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -60,8 +56,6 @@ import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link StateExportApi}.
@@ -76,9 +70,6 @@ class StateExportApiTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
-
-    @MockitoBean
-    private HeapDumpAnonymizer heapDumpAnonymizer;
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -115,8 +106,7 @@ class StateExportApiTest {
                       "component" : "GC_LOG_FILE"
                     },
                     {
-                        "component" : "HEAP_DUMP",
-                        "sanitized" : true
+                        "component" : "HEAP_DUMP"
                     }
                 ]
             }
@@ -426,9 +416,6 @@ class StateExportApiTest {
 
     @Test
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
-        when(heapDumpAnonymizer.anonymize(any(Resource.class)))
-                .thenReturn(new ByteArrayResource("sanitized".getBytes()));
-
         registry.register(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
@@ -470,7 +457,7 @@ class StateExportApiTest {
                 zis.closeEntry();
             }
 
-            assertThat(hprofData).isEqualTo("sanitized");
+            assertThat(hprofData).isEqualTo("Mock HPROF binary data");
             assertThat(zipEntriesNames)
                     .containsOnly(
                             "beans.json",
