@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
@@ -44,6 +45,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway")
+@Order(FiltersOrder.COOKIE_BASED_JWT_AUTHORIZATION_FILTER)
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final String authCookieName;

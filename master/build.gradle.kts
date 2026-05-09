@@ -99,12 +99,14 @@ tasks.bootJar {
     archiveFileName = "master.jar"
 }
 
+val projectVersion = version.toString()
+
 tasks.processResources {
     filesMatching("application.yaml") {
         // ReplaceTokens is used for ant-like style placeholders to not clash with Spring Boot ${} syntax
 
         filter<ReplaceTokens>(
-            "tokens" to mapOf("project.version" to project.version.toString())
+            "tokens" to mapOf("project.version" to projectVersion)
         )
     }
 }
@@ -123,5 +125,5 @@ publishing {
 }
 
 axelix {
-    properties.put("version", project.version.toString())
+    properties.put("version", projectVersion)
 }

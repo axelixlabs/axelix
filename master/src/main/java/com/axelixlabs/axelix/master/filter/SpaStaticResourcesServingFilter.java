@@ -25,6 +25,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +39,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
  *
  * @author Mikhail Polivakha
  */
+@Order(FiltersOrder.SPA_STATIC_RESOURCES_SERVING_FILTER)
 public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
     private final WebProperties webProperties;

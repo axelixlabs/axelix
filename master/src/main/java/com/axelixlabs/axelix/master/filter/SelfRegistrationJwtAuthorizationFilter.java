@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -45,6 +46,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @author Nikita Kirilllov
  */
 @Component
+@Order(FiltersOrder.SELF_REGISTRATION_JWT_AUTHORIZATION_FILTER)
 public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final IdentityAccessManager identityAccessManager;

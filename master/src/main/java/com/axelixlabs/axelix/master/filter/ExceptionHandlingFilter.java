@@ -24,7 +24,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,7 +36,7 @@ import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
  *
  * @author Mikhail Polivakha
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(FiltersOrder.EXCEPTION_HANDLING_FILTER)
 public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private final ApiExceptionTranslator apiExceptionTranslator;
