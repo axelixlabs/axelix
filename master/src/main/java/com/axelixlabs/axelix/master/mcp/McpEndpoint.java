@@ -22,10 +22,9 @@ import org.springaicommunity.mcp.annotation.McpTool;
 /**
  * An abstraction that represent the particular MCP Endpoint inside the Axelix Master MCP server.
  *
- * @implNote The instances of {@link McpEndpoint} are expected to be immutable.
  * @author Mikhail Polivakha
  */
-public interface McpEndpoint {
+public sealed interface McpEndpoint permits DefaultMcpEndpoint {
 
     /**
      * The name of this MCP Endpoint. The "name" in this context actually means the technical identifier

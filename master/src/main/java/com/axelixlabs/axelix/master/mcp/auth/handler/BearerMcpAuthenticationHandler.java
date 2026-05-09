@@ -48,7 +48,7 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
             Role role = roleExtractor.extractRole(credential);
             return new PasswordlessUser("MCP_AGENT", Set.of(role));
         } catch (OidcTokenExchangeException e) {
-            throw new AuthenticationException();
+            throw new AuthenticationException(e);
         }
     }
 

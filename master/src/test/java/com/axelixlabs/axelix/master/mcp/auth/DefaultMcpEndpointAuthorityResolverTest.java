@@ -43,7 +43,7 @@ class DefaultMcpEndpointAuthorityResolverTest {
 
     @ParameterizedTest
     @MethodSource(value = "cachesClearEndpoints")
-    void shouldResolveCachesClearAuthorityForClearAllCachesEndpoint(McpEndpoint endpoint) {
+    void shouldResolveCachesClearAuthorityForCachesClearingEndpoints(McpEndpoint endpoint) {
         // given.
         // when.
         Optional<Authority> result = subject.resolve(endpoint);

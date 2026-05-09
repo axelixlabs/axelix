@@ -447,9 +447,10 @@ abstract class AbstractMcpAuthorizationFilterTest {
     }
 
     public static Stream<Arguments> typicalMcpRequests() {
-        return Stream.of(of(
-                buildInitializeRequest(),
-                buildToolsCallRequest(UUID.randomUUID().toString())));
+        return Stream.of(
+            of(buildInitializeRequest()),
+            of(buildToolsCallRequest(UUID.randomUUID().toString()))
+        );
     }
 
     private static String buildToolsCallRequest(String instanceId) {

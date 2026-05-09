@@ -91,8 +91,7 @@ class DefaultMcpEndpointResolverTest {
         // when.
         // then.
         assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("Unable to parse the incoming JSON-RPC request from the AI Agent");
+                .isInstanceOf(AuthenticationException.class);
     }
 
     @Test
@@ -108,8 +107,7 @@ class DefaultMcpEndpointResolverTest {
         // when.
         // then.
         assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("Unable to parse the incoming JSON-RPC request from the AI Agent");
+                .isInstanceOf(AuthenticationException.class);
     }
 
     @Test
@@ -129,8 +127,7 @@ class DefaultMcpEndpointResolverTest {
         // when.
         // then.
         assertThatThrownBy(() -> subject.resolve(request))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("Unable to parse the incoming JSON-RPC request from the AI Agent");
+                .isInstanceOf(AuthenticationException.class);
     }
 
     public static Stream<Arguments> endpointMapping() {

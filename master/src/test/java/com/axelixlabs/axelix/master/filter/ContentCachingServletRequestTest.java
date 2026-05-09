@@ -27,17 +27,15 @@ import java.nio.charset.StandardCharsets;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link ContentCachingRequestWrapper}.
+ * Unit tests for {@link ContentCachingServletRequest}.
  *
  * @author Mikhail Polivakha
  */
