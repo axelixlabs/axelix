@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
-
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
@@ -42,7 +40,6 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
  *
  * @author Mikhail Polivakha
  */
-@Component
 public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager {
 
     private final Map<AuthenticationScheme, McpAuthenticationHandler> mcpAuthenticationHandlers;

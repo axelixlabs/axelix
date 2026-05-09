@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.util.Base64;
-import java.util.Base64.Decoder;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.burt.jmespath.Expression;
@@ -46,6 +43,7 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
 
     @Nullable
     private final Expression<JsonNode> jmesPathExpression;
+
     private final OidcClient oidcClient;
 
     public JmesPathOidcRoleExtractor(OidcClient oidcClient, @Nullable String roleAttributePath) {
