@@ -17,11 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.List;
-
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -30,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +34,6 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.user.UserCreateRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
-import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
@@ -62,22 +55,6 @@ public class UserManagementApi {
 
     public UserManagementApi(UserService userService) {
         this.userService = userService;
-    }
-
-    @DefaultApiResponse(summary = "Retrieve all users feed")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
-    @GetMapping(path = ApiPaths.UsersManagementApi.USERS_FEED)
-    public ResponseEntity<List<UserResponse>> getUsersFeed() {
-        List<UserResponse> users =
-                userService.findAll().stream().map(UserResponse::from).toList();
-
-        return ResponseEntity.ok(users);
     }
 
     @DefaultApiResponse(summary = "Create a new user")

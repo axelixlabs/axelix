@@ -67,7 +67,7 @@ public class MasterAuthorityResolverTest {
                 Arguments.of("/users-management/update", HttpMethod.PUT, DefaultAuthority.USERS_MANAGEMENT),
 
                 // USERS_VIEW
-                Arguments.of("/users-management/feed", HttpMethod.GET, DefaultAuthority.USERS_VIEW),
+                Arguments.of("/users/feed", HttpMethod.GET, DefaultAuthority.USERS_VIEW),
 
                 // CACHES_TOGGLE (servlet paths include /api/external; patterns are registered without it)
                 Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),

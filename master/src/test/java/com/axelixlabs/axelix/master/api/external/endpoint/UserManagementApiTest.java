@@ -61,7 +61,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserManagementApiTest {
 
-    private static final String USERS_FEED_PATH = "/api/external/users-management/feed";
+    private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USERS_CREATE_PATH = "/api/external/users-management/create";
     private static final String USERS_DELETE_PATH = "/api/external/users-management/delete";
     private static final String USERS_UPDATE_PATH = "/api/external/users-management/update";

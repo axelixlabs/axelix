@@ -40,6 +40,11 @@ public final class ApiPaths {
         public static final String LOGIN = "/users/login";
 
         public static final String LOGOUT = "/users/logout";
+
+        /**
+         * Endpoint to retrieve the feed of managed users.
+         */
+        public static final String USERS_FEED = "/users/feed";
     }
 
     public static final class UsersManagementApi {
@@ -53,11 +58,6 @@ public final class ApiPaths {
          * Endpoint to delete a managed user.
          */
         public static final String USERS_DELETE = "/users-management/delete";
-
-        /**
-         * Endpoint to retrieve the feed of managed users.
-         */
-        public static final String USERS_FEED = "/users-management/feed";
 
         /**
          * Endpoint to update a managed user.
