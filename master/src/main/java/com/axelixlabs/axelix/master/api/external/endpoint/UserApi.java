@@ -60,7 +60,7 @@ import com.axelixlabs.axelix.master.service.state.UserService;
 public class UserApi {
 
     private final CookieService cookieService;
-    private final List<UserAuthenticator> userAuthenticators;
+    private final UserAuthenticator userAuthenticator;
     private final JwtEncoderService jwtEncoderService;
     private final UserService userService;
 
@@ -68,11 +68,11 @@ public class UserApi {
 
     public UserApi(
             CookieService cookieService,
-            List<UserAuthenticator> userAuthenticators,
+            UserAuthenticator userAuthenticator,
             JwtEncoderService jwtEncoderService,
             UserService userService) {
         this.cookieService = cookieService;
-        this.userAuthenticators = userAuthenticators;
+        this.userAuthenticator = userAuthenticator;
         this.jwtEncoderService = jwtEncoderService;
         this.userService = userService;
     }
@@ -115,14 +115,7 @@ public class UserApi {
     @ApiResponse(description = "Forbidden. The access into the system is forbidden", responseCode = "403")
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        User user = null;
-
-        for (UserAuthenticator userAuthenticator : userAuthenticators) {
-            user = userAuthenticator.authenticate(loginRequest.username(), loginRequest.password());
-            if (user != null) {
-                break;
-            }
-        }
+        User user = userAuthenticator.authenticate(loginRequest.username(), loginRequest.password());
 
         if (user == null) {
             throw INVALID_CREDENTIALS_EXCEPTION;
