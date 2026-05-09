@@ -53,7 +53,7 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
     }
 
     @Override
-    public AuthenticationScheme supportedAuthSchema() {
+    public AuthenticationScheme supportedAuthScheme() {
         return AuthenticationSchemes.BEARER;
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.mcp.auth.handler;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Optional;
@@ -51,7 +52,7 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
     @Override
     public User handleAuthentication(String credential) {
         try {
-            String[] parts = new String(decoder.decode(credential)).split(":", 2);
+            String[] parts = new String(decoder.decode(credential), StandardCharsets.UTF_8).split(":", 2);
 
             if (parts.length != 2) {
                 throw new AuthenticationException("Invalid basic auth format");
@@ -64,13 +65,13 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
                     .orElseThrow(AuthenticationException::new);
 
         } catch (Exception e) {
-            log.debug("Basic authentication for accessing the MCP failed: {}", e.getMessage());
-            throw new AuthenticationException();
+            log.warn("Basic authentication for accessing the MCP failed: {}", e.getMessage());
+            throw new AuthenticationException(e);
         }
     }
 
     @Override
-    public AuthenticationScheme supportedAuthSchema() {
+    public AuthenticationScheme supportedAuthScheme() {
         return AuthenticationSchemes.BASIC;
     }
 }

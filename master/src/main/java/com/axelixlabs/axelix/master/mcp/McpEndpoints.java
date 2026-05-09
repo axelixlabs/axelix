@@ -38,13 +38,13 @@ public final class McpEndpoints {
     public static final String CLEAR_SPECIFIC_CACHE_TOOL_NAME = "clearSpecificCacheEntity";
     // Mcp endpoint names end
 
-    public static final McpEndpoint BEANS_FEED = () -> BEANS_FEED_TOOL_NAME;
-    public static final McpEndpoint ENVIRONMENT = () -> ENVIRONMENT_FEED_TOOL_NAME;
-    public static final McpEndpoint CONFIG_PROPS = () -> CONFIG_PROPS_FEED_TOOL_NAME;
-    public static final McpEndpoint CONDITIONS = () -> CONDITIONS_FEED_TOOL_NAME;
-    public static final McpEndpoint SCHEDULED_TASKS = () -> SCHEDULED_TASKS_FEED_TOOL_NAME;
-    public static final McpEndpoint WALLBOARD = () -> WALLBOARD_TOOL_NAME;
-    public static final McpEndpoint ALL_CACHES = () -> CACHES_FEED_TOOL_NAME;
-    public static final McpEndpoint CLEAR_ALL_CACHES = () -> CLEAR_ALL_CACHES_TOOL_NAME;
-    public static final McpEndpoint CLEAR_SPECIFIC_CACHE = () -> CLEAR_SPECIFIC_CACHE_TOOL_NAME;
+    public static final McpEndpoint BEANS_FEED = new DefaultMcpEndpoint(BEANS_FEED_TOOL_NAME);
+    public static final McpEndpoint ENVIRONMENT = new DefaultMcpEndpoint(ENVIRONMENT_FEED_TOOL_NAME);
+    public static final McpEndpoint CONFIG_PROPS = new DefaultMcpEndpoint(CONFIG_PROPS_FEED_TOOL_NAME);
+    public static final McpEndpoint CONDITIONS = new DefaultMcpEndpoint(CONDITIONS_FEED_TOOL_NAME);
+    public static final McpEndpoint SCHEDULED_TASKS = new DefaultMcpEndpoint(SCHEDULED_TASKS_FEED_TOOL_NAME);
+    public static final McpEndpoint WALLBOARD = new DefaultMcpEndpoint(WALLBOARD_TOOL_NAME);
+    public static final McpEndpoint ALL_CACHES = new DefaultMcpEndpoint(CACHES_FEED_TOOL_NAME);
+    public static final McpEndpoint CLEAR_ALL_CACHES = new DefaultMcpEndpoint(CLEAR_ALL_CACHES_TOOL_NAME);
+    public static final McpEndpoint CLEAR_SPECIFIC_CACHE = new DefaultMcpEndpoint(CLEAR_SPECIFIC_CACHE_TOOL_NAME);
 }

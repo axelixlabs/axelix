@@ -29,8 +29,6 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request,
  * presumably made from the browser.
  *
- * @see WebIdentityAccessManager Similar abstraction but for handling requests sent by the AI Agent.
- *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */

@@ -26,4 +26,4 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
  *
  * @author Mikhail Polivakha
  */
-public record AuthorizationHeader(AuthenticationScheme authSchema, String credential) {}
+public record AuthorizationHeader(AuthenticationScheme authScheme, String credential) {}

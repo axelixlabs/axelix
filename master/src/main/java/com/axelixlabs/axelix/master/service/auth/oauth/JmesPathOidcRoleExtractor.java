@@ -43,11 +43,9 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
 
     private static final Logger log = LoggerFactory.getLogger(JmesPathOidcRoleExtractor.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Decoder decoder = Base64.getUrlDecoder();
 
     @Nullable
     private final Expression<JsonNode> jmesPathExpression;
-
     private final OidcClient oidcClient;
 
     public JmesPathOidcRoleExtractor(OidcClient oidcClient, @Nullable String roleAttributePath) {
@@ -78,7 +76,7 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     }
 
     @Nullable
-    public Role extractRoleFromUserInfo(String accessToken) {
+    private Role extractRoleFromUserInfo(String accessToken) {
         try {
             String userInfo = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
 

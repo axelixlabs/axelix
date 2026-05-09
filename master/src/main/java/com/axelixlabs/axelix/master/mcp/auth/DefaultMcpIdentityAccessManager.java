@@ -59,14 +59,14 @@ public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager
         this.mcpEndpointResolver = mcpEndpointResolver;
         this.mcpEndpointAuthorityResolver = mcpEndpointAuthorityResolver;
         this.mcpAuthenticationHandlers = mcpAuthenticationHandlers.stream()
-                .collect(Collectors.toMap(McpAuthenticationHandler::supportedAuthSchema, Function.identity()));
+                .collect(Collectors.toMap(McpAuthenticationHandler::supportedAuthScheme, Function.identity()));
     }
 
     @Override
     public User verifyAccess(String jsonRpcRequest, AuthorizationHeader authorizationHeader)
             throws AuthorizationException, JwtProcessingException {
         McpAuthenticationHandler mcpAuthenticationHandler =
-                mcpAuthenticationHandlers.get(authorizationHeader.authSchema());
+                mcpAuthenticationHandlers.get(authorizationHeader.authScheme());
 
         Assert.notNull(
                 mcpAuthenticationHandler,

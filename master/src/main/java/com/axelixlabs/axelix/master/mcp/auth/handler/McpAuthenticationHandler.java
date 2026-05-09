@@ -44,5 +44,5 @@ public interface McpAuthenticationHandler {
     /**
      * @return the {@link AuthenticationScheme} supported by this {@link McpAuthenticationHandler}.
      */
-    AuthenticationScheme supportedAuthSchema();
+    AuthenticationScheme supportedAuthScheme();
 }
