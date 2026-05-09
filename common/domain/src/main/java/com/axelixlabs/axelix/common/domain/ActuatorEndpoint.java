@@ -23,7 +23,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpUrl;
 
 /**
- * Representation of Axelix endpoint.
+ * Representation of Axelix Actuator HTTP Endpoint.
  *
  * @author Mikhail Polivakha
  */

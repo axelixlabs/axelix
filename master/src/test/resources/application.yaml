@@ -10,6 +10,13 @@ spring:
     # changes it made will be seen by the actual test code). So, we use 'cache=shared'
     # in order to force all the connections to use the shared database.
     url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
+  ai:
+    mcp:
+      server:
+        protocol: streamable
+        name: "axelix-mcp-server"
+        streamable-http:
+          mcp-endpoint: "/api/mcp"
 
 logging:
   level:

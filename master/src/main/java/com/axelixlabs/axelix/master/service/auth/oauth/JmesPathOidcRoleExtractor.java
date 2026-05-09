@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.util.Base64;
-import java.util.Base64.Decoder;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.burt.jmespath.Expression;
@@ -43,7 +40,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
 
     private static final Logger log = LoggerFactory.getLogger(JmesPathOidcRoleExtractor.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Decoder decoder = Base64.getUrlDecoder();
 
     @Nullable
     private final Expression<JsonNode> jmesPathExpression;
@@ -61,16 +57,12 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     }
 
     @Override
-    public Role extractRole(Tokens tokens) throws OidcTokenExchangeException {
+    public Role extractRole(String accessToken) throws OidcTokenExchangeException {
         if (jmesPathExpression == null) {
             return DefaultRole.VIEWER;
         }
 
-        Role role = extractRoleFromIdToken(tokens.idToken());
-
-        if (role == null) {
-            role = extractRoleFromUserInfo(tokens.accessToken());
-        }
+        Role role = extractRoleFromUserInfo(accessToken);
 
         if (role == null) {
             throw new OidcTokenExchangeException(String.format(
@@ -79,17 +71,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
         }
 
         return role;
-    }
-
-    @Nullable
-    private Role extractRoleFromIdToken(String idToken) {
-        try {
-            String json = decodeIdToken(idToken);
-            return extractRoleFromJson(json);
-        } catch (Exception e) {
-            log.debug("Failed to extract role from ID token: {}", e.getMessage());
-        }
-        return null;
     }
 
     @Nullable
@@ -125,12 +106,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
             log.warn("Failed to extract role from JSON: {}", e.getMessage());
         }
         return null;
-    }
-
-    private String decodeIdToken(String idToken) {
-        String[] parts = idToken.split("\\.");
-        byte[] decoded = decoder.decode(parts[1]);
-        return new String(decoded);
     }
 
     @Nullable

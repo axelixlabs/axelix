@@ -39,9 +39,6 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  *
  * @param baseUrl           the base URL of this application.
  *
- * @param usernameClaim     the JWT claim to use as the username. If not specified,
- *                          falls back to {@code preferred_username}, then {@code name}, then {@code sub}.
- *
  * @param scopes            OAuth2 scopes requested during authorization code flow.
  *
  * @param roleAttributePath JMESPath expression evaluated against the ID token claims first,
@@ -58,7 +55,6 @@ public record OAuth2Properties(
         String clientId,
         String clientSecret,
         String baseUrl,
-        @Nullable String usernameClaim,
         String scopes,
         @Nullable String roleAttributePath) {
 

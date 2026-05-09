@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.util.Base64;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,53 +54,32 @@ class JmesPathOidcRoleExtractorTest {
     }
 
     @Test
-    void shouldExtractRoleFromIdTokenWhenPresent() {
+    void shouldExtractRoleFromUserInfo() {
         // given.
-        Tokens tokens = tokens("""
-        {
-            "roles": ["admin", "offline_access"]
-        }
-        """);
-        JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
-
-        // when.
-        Role role = extractor.extractRole(tokens);
-
-        // then.
-        assertThat(role).isEqualTo(DefaultRole.ADMIN);
-        verify(oidcClient, never()).validateAccessTokenAndExtractUserInfo(anyString());
-    }
-
-    @Test
-    void shouldFallbackToUserInfoWhenRoleMissingInIdToken() {
-        // given.
-        Tokens tokens = tokens("""
-            { "sub" : "user123" }
-            """);
+        String accessToken = "test-access-token";
         String userInfoJson = TestResourceReader.readResource("other/user-info-response.json");
-        when(oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken()))
-                .thenReturn(userInfoJson);
+
+        // and.
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(accessToken)).thenReturn(userInfoJson);
         JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
 
         // when.
-        Role role = extractor.extractRole(tokens);
+        Role role = extractor.extractRole(accessToken);
 
         // then.
         assertThat(role).isEqualTo(DefaultRole.ADMIN);
-        verify(oidcClient).validateAccessTokenAndExtractUserInfo(tokens.accessToken());
+        verify(oidcClient).validateAccessTokenAndExtractUserInfo(accessToken);
     }
 
     @MethodSource(value = "absentRoleAttributePath")
     @ParameterizedTest
     void shouldReturnViewerWhenExpressionIsNotSpecified(String roleAttributePath) {
         // given.
-        Tokens tokens = tokens("""
-            { "roles" : ["admin"] }
-            """);
-        JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, roleAttributePath);
+        String accessToken = "test-access-token";
+        var subject = new JmesPathOidcRoleExtractor(oidcClient, roleAttributePath);
 
         // when.
-        Role role = extractor.extractRole(tokens);
+        Role role = subject.extractRole(accessToken);
 
         // then.
         assertThat(role).isEqualTo(DefaultRole.VIEWER);
@@ -109,26 +87,25 @@ class JmesPathOidcRoleExtractorTest {
     }
 
     @Test
-    void shouldThrowWhenBothSourcesDoNotProvideRole() {
+    void shouldThrowWhenRoleCannotBeExtracted() {
         // given.
-        Tokens tokens = tokens("""
-            { "sub" : "user123" }
-            """);
-        when(oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken()))
-                .thenReturn("""
-            { "name" : "Test" }
+        String accessToken = "test-access-token";
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(accessToken)).thenReturn("""
+            {
+                "name" : "Test"
+            }
             """);
         JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
 
         // when & then.
-        assertThatThrownBy(() -> extractor.extractRole(tokens)).isInstanceOf(OidcTokenExchangeException.class);
+        assertThatThrownBy(() -> extractor.extractRole(accessToken)).isInstanceOf(OidcTokenExchangeException.class);
     }
 
     @Test
     void shouldExtractEditorFromUserInfo() {
         // given.
-        Tokens tokens = tokens("{}");
-        when(oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken()))
+        String accessToken = "test-access-token";
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(accessToken))
                 .thenReturn(
                         // language=json
                         """
@@ -139,10 +116,10 @@ class JmesPathOidcRoleExtractorTest {
                             }
                         ]
                     }""");
-        JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "data[0].roles[1]");
+        var subject = new JmesPathOidcRoleExtractor(oidcClient, "data[0].roles[1]");
 
         // when.
-        Role role = extractor.extractRole(tokens);
+        Role role = subject.extractRole(accessToken);
 
         // then.
         assertThat(role).isEqualTo(DefaultRole.EDITOR);
@@ -151,23 +128,15 @@ class JmesPathOidcRoleExtractorTest {
     @Test
     void shouldThrowWhenUserInfoRequestFails() {
         // given.
-        Tokens tokens = new Tokens("invalid.token.format", "test-access-token");
+        String accessToken = "test-access-token";
 
-        when(oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken()))
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(accessToken))
                 .thenThrow(new OidcTokenExchangeException("userinfo failed"));
 
-        JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
+        var subject = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
 
         // when & then.
-        assertThatThrownBy(() -> extractor.extractRole(tokens)).isInstanceOf(OidcTokenExchangeException.class);
-    }
-
-    private Tokens tokens(String idTokenPayloadJson) {
-        // header and signature are also supposed to be base64 encoded, but we're not really interested in them in this
-        // test class
-        String idToken =
-                "header." + Base64.getUrlEncoder().encodeToString(idTokenPayloadJson.getBytes()) + ".signature";
-        return new Tokens(idToken, "test-access-token");
+        assertThatThrownBy(() -> subject.extractRole(accessToken)).isInstanceOf(OidcTokenExchangeException.class);
     }
 
     static Stream<Arguments> absentRoleAttributePath() {

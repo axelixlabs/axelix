@@ -111,7 +111,7 @@ class DefaultOidcClientTest {
         String issuerUri = mockWebServer.url("").toString();
 
         OAuth2Properties oAuth2Properties =
-                new OAuth2Properties(issuerUri, CLIENT_ID, CLIENT_SECRET, issuerUri, null, null, null);
+                new OAuth2Properties(issuerUri, CLIENT_ID, CLIENT_SECRET, issuerUri, null, null);
 
         OidcMetadataProvider oidcMetadataProvider = mock(OidcMetadataProvider.class);
         when(oidcMetadataProvider.getTokenEndpoint()).thenReturn(issuerUri + "/token");
@@ -317,7 +317,7 @@ class DefaultOidcClientTest {
     }
 
     @Nested
-    class AccessTokenValidation {
+    class UserInfoEndpointValidation {
 
         @BeforeEach
         void drainStaleRecordedRequests() throws InterruptedException {
@@ -329,8 +329,8 @@ class DefaultOidcClientTest {
 
         @Test
         void shouldCompleteWhenUserInfoReturnsOk() throws Exception {
+            // given.
             String accessToken = "test-access-token";
-
             String jsonResponse = TestResourceReader.readResource("other/user-info-response.json");
 
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -338,7 +338,7 @@ class DefaultOidcClientTest {
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
                     if ("/userinfo".equals(request.getPath()) && "GET".equals(request.getMethod())) {
                         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-                        if ((AuthenticationSchemes.BEARER.code() + " " + accessToken).equals(auth)) {
+                        if ((AuthenticationSchemes.BEARER.prefix() + accessToken).equals(auth)) {
                             return new MockResponse()
                                     .setBody(jsonResponse)
                                     .addHeader("Content-Type", APPLICATION_JSON_VALUE)
@@ -349,18 +349,20 @@ class DefaultOidcClientTest {
                 }
             });
 
+            // when.
             String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
 
+            // then.
             assertThat(userInfoJson).isEqualTo(jsonResponse);
             RecordedRequest userInfoRequest = mockWebServer.takeRequest();
             assertThat(userInfoRequest.getPath()).isEqualTo("/userinfo");
             assertThat(userInfoRequest.getMethod()).isEqualTo("GET");
             assertThat(userInfoRequest.getHeader(HttpHeaders.AUTHORIZATION))
-                    .isEqualTo(AuthenticationSchemes.BEARER.code() + " " + accessToken);
+                    .isEqualTo(AuthenticationSchemes.BEARER.prefix() + accessToken);
         }
 
         @Test
-        void shouldThrowTokenExchangeExceptionWhenUserInfoReturnsUnauthorized() {
+        void shouldThrowWhenUserInfoReturnsUnauthorized() {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {

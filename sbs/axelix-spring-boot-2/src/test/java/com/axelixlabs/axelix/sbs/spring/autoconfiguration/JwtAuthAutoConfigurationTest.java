@@ -38,9 +38,9 @@ import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
@@ -71,7 +71,7 @@ class JwtAuthAutoConfigurationTest {
             assertThat(context).hasSingleBean(JwtEncoderService.class);
             assertThat(context).hasSingleBean(AuthorityResolver.class);
             assertThat(context).hasSingleBean(Authorizer.class);
-            assertThat(context).hasSingleBean(IdentityAccessManager.class);
+            assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
             assertThat(context).hasSingleBean(FilterRegistrationBean.class);
             assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
@@ -171,11 +171,11 @@ class JwtAuthAutoConfigurationTest {
     static class CustomJwtAuthorizationFilterConfig {
         @Bean
         public JwtAuthorizationFilter jwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager,
+                WebIdentityAccessManager webIdentityAccessManager,
                 SecurityContextExecutor securityContextExecutor,
                 WebEndpointProperties webEndpointProperties) {
             return new CustomJwtAuthorizationFilter(
-                    identityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
+                    webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
         }
     }
 
@@ -199,11 +199,12 @@ class JwtAuthAutoConfigurationTest {
     static class CustomSecurityContextExecutor extends ThreadLocalSecurityContextExecutor {}
 
     static class CustomJwtAuthorizationFilter extends JwtAuthorizationFilter {
+
         public CustomJwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager,
+                WebIdentityAccessManager webIdentityAccessManager,
                 SecurityContextExecutor securityContextExecutor,
                 String baseActuatorPath) {
-            super(identityAccessManager, securityContextExecutor, baseActuatorPath);
+            super(webIdentityAccessManager, securityContextExecutor, baseActuatorPath);
         }
     }
 }

@@ -33,12 +33,12 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 /**
@@ -81,9 +81,9 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public IdentityAccessManager identityAccessManager(
+    public WebIdentityAccessManager securityManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+        return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }
 
     @Bean
@@ -94,11 +94,11 @@ public class JwtAuthTestConfiguration {
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager,
+            WebIdentityAccessManager webIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
             WebEndpointProperties webEndpointProperties) {
         var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(
-                identityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath()));
+                webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath()));
         registration.setName("jwtAuthorizationFilter");
         return registration;
     }

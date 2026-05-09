@@ -57,7 +57,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException {
         try {
-            doFilter(request, response, filterChain);
+            filterChain.doFilter(request, response);
         } catch (ServletException e) {
             handleApiError(response, deriveApiError(e));
         } catch (Exception e) {

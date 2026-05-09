@@ -311,6 +311,14 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/feign/{instanceId}";
     }
 
+    public static final class McpOAuth2Api {
+
+        /**
+         * OAuth2 Protected Resource Metadata endpoint.
+         */
+        public static final String PROTECTED_RESOURCE_METADATA = "/mcp-oauth2/.well-known/oauth-protected-resource";
+    }
+
     public static final class McpToolApi {
 
         /**

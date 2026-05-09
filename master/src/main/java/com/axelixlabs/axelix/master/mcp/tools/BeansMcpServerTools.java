@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.mcp;
+package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -49,6 +50,7 @@ public class BeansMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.BEANS_FEED_TOOL_NAME,
             title = "Beans Feed",
             description = """
             Get all Spring beans information for a specific instance.

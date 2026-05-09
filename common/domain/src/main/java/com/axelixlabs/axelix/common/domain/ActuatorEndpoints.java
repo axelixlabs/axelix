@@ -24,17 +24,7 @@ import java.util.Set;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * Represents all possible {@link ActuatorEndpoint actuator endpoints} that are being used in the system:
- * <ul>
- *     <li>Custom</li>
- *     <li>Spring Boot</li>
- *     <li>Spring Cloud Config</li>
- *     <li>Spring Cloud Gateway etc.</li>
- * </ul>
- *
- * Documentation: <br/>
- * <a href="https://docs.spring.io/spring-boot/reference/actuator/endpoints.html">Actuator Documentation</a><br/>
- * <a href="https://docs.spring.io/spring-boot/api/rest/actuator/env.html">All Spring Boot supported endpoints</a>
+ * Represents all possible {@link ActuatorEndpoint Axelix actuator endpoints} that are being used in the system.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
@@ -87,9 +77,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Environment
     public static final ActuatorEndpoint GET_ALL_ENV_PROPERTIES = endpoint("/axelix-env", HttpMethod.GET);
 
-    // Health
-    public static final ActuatorEndpoint HEALTH = endpoint("/health", HttpMethod.GET);
-
     // Heap Dump
     public static final ActuatorEndpoint GET_HEAP_DUMP = endpoint("/axelix-heap-dump", HttpMethod.GET);
 
@@ -120,9 +107,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Metric
     public static final ActuatorEndpoint GET_METRIC_GROUPS = endpoint("/axelix-metrics", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_METRIC = endpoint("/axelix-metrics/{metric.name}", HttpMethod.GET);
-
-    // PropertyManagement
-    public static final ActuatorEndpoint PROPERTY_MANAGEMENT = endpoint("/axelix-property-management", HttpMethod.POST);
 
     // @Scheduled tasks
     public static final ActuatorEndpoint GET_SCHEDULED_TASKS = endpoint("/axelix-scheduled-tasks", HttpMethod.GET);

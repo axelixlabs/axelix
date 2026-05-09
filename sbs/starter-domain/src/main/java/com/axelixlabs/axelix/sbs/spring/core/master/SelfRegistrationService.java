@@ -146,7 +146,7 @@ public class SelfRegistrationService implements Closeable {
             }
         }
 
-        builder.header(AUTHORIZATION_HEADER, AuthenticationSchemes.BEARER.code() + " " + currentToken);
+        builder.header(AUTHORIZATION_HEADER, AuthenticationSchemes.BEARER.prefix() + currentToken);
 
         return builder.build();
     }

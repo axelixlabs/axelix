@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.mcp;
+package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.nio.charset.StandardCharsets;
 
@@ -28,45 +28,48 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * MCP Tools for working with configuration properties.
+ * MCP Tools for working with conditional evaluations.
  *
  * @since 19.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
 @Service
-public class ConfigPropsMcpServerTools {
+public class ConditionsMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
 
-    public ConfigPropsMcpServerTools(EndpointInvoker endpointInvoker) {
+    public ConditionsMcpServerTools(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @McpTool(
-            title = "Config Props Beans",
+            name = McpEndpoints.CONDITIONS_FEED_TOOL_NAME,
+            title = "@Conditional Feed",
             description = """
-            Get all configuration properties for a specific instance.
-            Returns @ConfigurationProperties beans with their values.
-            Use this when user asks about configuration properties or settings of an instance.
+            Get @Conditional conditions evaluation report for a specific instance.
+            This endpoint returns which Spring Boot and custom auto-configurations were applied or skipped with explanation why.
+            Use this when user asks about auto-configuration, conditions or why a bean is either missing and user expects it to
+            be there, or the bean is present, but the user expects this bean to not be bootstrapped.
 
             Because this Tool accepts "Instance ID" you probably will need to call 'getWallboard'
             tool to first retrieve the instances feed.
         """,
             annotations =
                     @McpAnnotations(
-                            title = "List of all the @ConfigurationProperties beans inside this Spring Boot app",
+                            title = "List that contain results of all @Conditional evaluations",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public String getInstanceConfigProps(@McpToolParam(description = "The instance ID") String instanceId) {
+    public String getInstanceConditions(@McpToolParam(description = "The instance ID") String instanceId) {
         return new String(
                 endpointInvoker.invoke(
-                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE),
+                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE),
                 StandardCharsets.UTF_8);
     }
 }

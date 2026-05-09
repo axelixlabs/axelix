@@ -107,7 +107,7 @@ public class TestRestTemplateBuilder {
     private TestRestTemplate buildWithToken(String expiredToken) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + expiredToken));
+                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + expiredToken));
     }
 
     private String generateToken(Role[] roles) {

@@ -362,7 +362,7 @@ class JwtAuthorizationFilterTest {
 
     private HttpEntity<Void> defaultEntity(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + token);
+        headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
 
         return new HttpEntity<>(headers);
     }

@@ -100,7 +100,7 @@ class OAuth2CallbackControllerTest {
         // and.
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
-        when(oidcRoleExtractor.extractRole(tokens)).thenReturn(DefaultRole.EDITOR);
+        when(oidcRoleExtractor.extractRole(tokens.accessToken())).thenReturn(DefaultRole.EDITOR);
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(

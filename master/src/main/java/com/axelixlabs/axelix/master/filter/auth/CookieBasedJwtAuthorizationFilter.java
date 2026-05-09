@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.filter;
+package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
 
@@ -35,8 +35,9 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.master.filter.FiltersOrder;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -49,15 +50,15 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final String authCookieName;
-    private final IdentityAccessManager identityAccessManager;
+    private final WebIdentityAccessManager webIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
 
     public CookieBasedJwtAuthorizationFilter(
             String authCookieName,
-            IdentityAccessManager identityAccessManager,
+            WebIdentityAccessManager webIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor) {
         this.authCookieName = authCookieName;
-        this.identityAccessManager = identityAccessManager;
+        this.webIdentityAccessManager = webIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
     }
 
@@ -69,13 +70,12 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // as well as actuator health endpoints
         return !path.startsWith("/api/")
                 || path.startsWith("/api/actuator/health")
-                // Temporarily excluded /api/mcp, waiting for the mcp server authentication issue to be resolved
-                // https://github.com/axelixlabs/axelix/issues/758
-                || path.startsWith("/api/mcp")
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
                 || path.startsWith("/api/external/settings/auth")
-                || path.equalsIgnoreCase("/api/internal/service/register");
+                || path.equalsIgnoreCase("/api/internal/service/register")
+                || path.startsWith("/api/mcp")
+                || path.equalsIgnoreCase("/api/external/mcp-oauth2/.well-known/oauth-protected-resource");
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        User user = identityAccessManager.verifyAccess(
+        User user = webIdentityAccessManager.verifyAccess(
                 request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
 
         try {

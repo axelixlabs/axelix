@@ -143,7 +143,7 @@ public class TestRestTemplateBuilder {
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + token));
+                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token));
     }
 
     private String generateToken(Role[] roles) {

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
+import java.util.List;
+
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -24,6 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
@@ -32,12 +35,12 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
@@ -46,7 +49,10 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProp
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
-import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
+import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
+import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
@@ -55,8 +61,10 @@ import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathOidcRoleExtractor
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
+import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
@@ -78,9 +86,9 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public IdentityAccessManager identityAccessManager(
+    public WebIdentityAccessManager identityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+        return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }
 
     @Bean
@@ -91,6 +99,12 @@ public class SecurityAutoConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Primary
+    public UserAuthenticator compositeUserAuthenticator(List<UserAuthenticator> userAuthenticators) {
+        return new CompositeUserAuthenticator(userAuthenticators);
     }
 
     /**
@@ -136,11 +150,11 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager,
+                WebIdentityAccessManager webIdentityAccessManager,
                 CookieProperties cookieProperties,
                 SecurityContextExecutor securityContextExecutor) {
             return new CookieBasedJwtAuthorizationFilter(
-                    cookieProperties.getName(), identityAccessManager, securityContextExecutor);
+                    cookieProperties.getName(), webIdentityAccessManager, securityContextExecutor);
         }
     }
 
@@ -151,6 +165,11 @@ public class SecurityAutoConfiguration {
     @ConditionalOnProperty(prefix = STATIC_ADMIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(StaticAdminCredentialsProperties.class)
     public static class StaticCredentialsConfig {
+
+        @Bean
+        public McpAuthenticationHandler basicAuthMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
+            return new BasicMcpAuthenticationHandler(userAuthenticator);
+        }
 
         @Bean
         public AuthenticationOption authSettingsStaticAdmin() {
@@ -177,6 +196,11 @@ public class SecurityAutoConfiguration {
     @ConditionalOnProperty(prefix = OAUTH_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(OAuth2Properties.class)
     public static class OAuth2Config {
+
+        @Bean
+        public McpAuthenticationHandler bearerMcpAuthenticationHandler(OidcRoleExtractor oidcRoleExtractor) {
+            return new BearerMcpAuthenticationHandler(oidcRoleExtractor);
+        }
 
         @Bean
         public AuthenticationOption authSettingsOAuth2(

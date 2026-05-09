@@ -30,10 +30,12 @@ public interface OidcRoleExtractor {
     /**
      * Determine the {@link Role} of the user identified by the {@link Tokens provided tokens pair}.
      *
-     * @param tokens the pair of tokens.
+     * @param accessToken the access token granted to the user. Using this access token, the implementation is
+     *                    supposed to determine the {@link Role} of the given user.
+     *
      * @return the role that is extracted. Never {@code null}.
      * @throws OidcTokenExchangeException if the role cannot be extracted from neither
      *                                    the ID token nor the UserInfo endpoint
      */
-    Role extractRole(Tokens tokens) throws OidcTokenExchangeException;
+    Role extractRole(String accessToken) throws OidcTokenExchangeException;
 }
