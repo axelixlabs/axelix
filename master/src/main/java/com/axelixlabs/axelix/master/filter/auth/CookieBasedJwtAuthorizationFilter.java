@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
 
+import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

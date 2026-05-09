@@ -32,4 +32,5 @@ public final class FiltersOrder {
     public static final int SPA_STATIC_RESOURCES_SERVING_FILTER = Ordered.HIGHEST_PRECEDENCE + 1;
     public static final int COOKIE_BASED_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 2;
     public static final int SELF_REGISTRATION_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 3;
+    public static final int MCP_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 4;
 }

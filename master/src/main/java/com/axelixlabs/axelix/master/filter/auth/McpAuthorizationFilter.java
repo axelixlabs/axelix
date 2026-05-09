@@ -18,26 +18,24 @@
 package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import javax.security.sasl.AuthenticationException;
-
+import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
+import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.ReadListener;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
@@ -54,9 +52,15 @@ import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class McpAuthenticationFilter extends OncePerRequestFilter {
+@Order(FiltersOrder.MCP_AUTHORIZATION_FILTER)
+public class McpAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String WWW_AUTHENTICATE_OAUTH2_HEADER = "WWW-Authenticate";
+
+    /**
+     * This is not some pre-computed value. This is merely a sensible maximum size of an MCP request.
+     */
+    private static final int MAX_MCP_REQUEST_SIZE = 1 * 1024 * 1024; // 1 MB
 
     @Nullable
     private final String resourceMetadata;
@@ -64,7 +68,7 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
     private final boolean isOAuth2FlowEnabled;
     private final McpIdentityAccessManager mcpIdentityAccessManager;
 
-    public McpAuthenticationFilter(
+    public McpAuthorizationFilter(
             ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
             McpIdentityAccessManager mcpIdentityAccessManager) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
@@ -103,18 +107,16 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // We can do it safely since in Spring Web, the body of the HTTP Request that is
-        // represented as InputStream is cached.
-        byte[] requestBody = request.getInputStream().readAllBytes();
-        String jsonRpcBody = new String(requestBody, StandardCharsets.UTF_8);
+        var wrapper = new ContentCachingRequestWrapper(request, MAX_MCP_REQUEST_SIZE);
+        var requestAsString = new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         try {
-            mcpIdentityAccessManager.verifyAccess(jsonRpcBody, authorizationHeader);
+            mcpIdentityAccessManager.verifyAccess(requestAsString, authorizationHeader);
             // if nothing is thrown, we expect that all IAM checks passed successfully
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(wrapper, response);
         } catch (AuthorizationException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        } catch (AuthenticationException | com.axelixlabs.axelix.master.exception.auth.AuthenticationException e) {
+        } catch (AuthenticationException e) {
             handleAuthenticationProblem(response);
         }
     }

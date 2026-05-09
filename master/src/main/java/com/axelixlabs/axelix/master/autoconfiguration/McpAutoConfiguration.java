@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
-import com.axelixlabs.axelix.master.filter.auth.McpAuthenticationFilter;
+import com.axelixlabs.axelix.master.filter.auth.McpAuthorizationFilter;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpIdentityAccessManager;
@@ -47,10 +47,10 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 public class McpAutoConfiguration {
 
     @Bean
-    public McpAuthenticationFilter mcpAuthenticationFilter(
+    public McpAuthorizationFilter mcpAuthenticationFilter(
             ObjectProvider<OAuth2Properties> oAuth2PropertiesObjectProvider,
             McpIdentityAccessManager mcpIdentityAccessManager) {
-        return new McpAuthenticationFilter(oAuth2PropertiesObjectProvider, mcpIdentityAccessManager);
+        return new McpAuthorizationFilter(oAuth2PropertiesObjectProvider, mcpIdentityAccessManager);
     }
 
     @Bean

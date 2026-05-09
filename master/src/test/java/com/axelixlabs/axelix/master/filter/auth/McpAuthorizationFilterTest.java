@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -67,7 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
- * Integration tests for {@link McpAuthenticationFilter}.
+ * Integration tests for {@link McpAuthorizationFilter}.
  *
  * @author Mikhail Polivakha
  */
@@ -79,7 +78,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
             "axelix.master.auth.options.static-admin.credentials.username=admin",
             "axelix.master.auth.options.static-admin.credentials.password=admin"
         })
-class McpAuthenticationFilterTest {
+class McpAuthorizationFilterTest {
 
     private static final String MCP_PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
     private static final String MCP_SESSION_ID_HEADER = "mcp-session-id";
@@ -305,7 +304,7 @@ class McpAuthenticationFilterTest {
         ResponseEntity<String> initializeResponse = restTemplate.postForEntity(
                 "/api/mcp", new HttpEntity<>(initializeRequestBody, initializeHeaders), String.class);
 
-        assertThat(initializeResponse.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(initializeResponse.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
 
         String mcpSessionId = initializeResponse.getHeaders().getFirst(MCP_SESSION_ID_HEADER);
         assertThat(mcpSessionId).isNotBlank();
