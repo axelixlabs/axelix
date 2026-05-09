@@ -21,6 +21,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -35,17 +48,6 @@ import com.axelixlabs.axelix.master.filter.ContentCachingServletRequest;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
@@ -57,7 +59,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(FiltersOrder.MCP_AUTHORIZATION_FILTER)
 public class McpAuthorizationFilter extends OncePerRequestFilter {
 
-    private static final String WWW_AUTHENTICATE_OAUTH2_HEADER = "WWW-Authenticate";
+    public static final String WWW_AUTHENTICATE_OAUTH2_HEADER = "WWW-Authenticate";
 
     @Nullable
     private final String resourceMetadata;
@@ -68,11 +70,10 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
     private final JwtEncoderService jwtEncoderService;
 
     public McpAuthorizationFilter(
-        ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
-        McpIdentityAccessManager mcpIdentityAccessManager,
-        SecurityContextExecutor securityContextExecutor,
-        JwtEncoderService jwtEncoderService
-    ) {
+            ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
+            McpIdentityAccessManager mcpIdentityAccessManager,
+            SecurityContextExecutor securityContextExecutor,
+            JwtEncoderService jwtEncoderService) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
         this.jwtEncoderService = jwtEncoderService;
@@ -121,9 +122,8 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             String accessToken = jwtEncoderService.generateToken(authenticatedUser);
 
             securityContextExecutor.runWithinSecurityContext(
-                () -> filterChain.doFilter(wrapper, response),
-                new DefaultSecurityContext(authenticatedUser, accessToken)
-            );
+                    () -> filterChain.doFilter(wrapper, response),
+                    new DefaultSecurityContext(authenticatedUser, accessToken));
         } catch (AuthorizationException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (AuthenticationException e) {
@@ -144,7 +144,7 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
         if (isOAuth2FlowEnabled) {
             response.setHeader(
                     WWW_AUTHENTICATE_OAUTH2_HEADER,
-                    AuthenticationSchemes.BEARER + " resource_metadata=\"" + resourceMetadata + "\"");
+                    AuthenticationSchemes.BEARER.code() + " resource_metadata=\"" + resourceMetadata + "\"");
         }
     }
 

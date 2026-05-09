@@ -19,15 +19,15 @@ package com.axelixlabs.axelix.master.autoconfiguration;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.filter.auth.McpAuthorizationFilter;
 import com.axelixlabs.axelix.master.mcp.auth.DefaultMcpEndpointAuthorityResolver;
@@ -53,13 +53,9 @@ public class McpAutoConfiguration {
             ObjectProvider<OAuth2Properties> oAuth2PropertiesObjectProvider,
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
-            JwtEncoderService jwtEncoderService
-    ) {
+            JwtEncoderService jwtEncoderService) {
         return new McpAuthorizationFilter(
-            oAuth2PropertiesObjectProvider,
-            mcpIdentityAccessManager,
-            securityContextExecutor,
-            jwtEncoderService);
+                oAuth2PropertiesObjectProvider, mcpIdentityAccessManager, securityContextExecutor, jwtEncoderService);
     }
 
     @Bean
