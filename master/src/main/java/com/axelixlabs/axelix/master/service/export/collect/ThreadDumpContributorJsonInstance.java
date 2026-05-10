@@ -21,38 +21,36 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Collects Spring Configuration Properties information for application state export.
+ * Collects Thread Dump information for application state export.
  *
- * @see ConfigPropsApi
- * @since 27.10.2025
+ * @see ThreadDumpApi
+ * @since 20.11.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
 @Component
-public class ConfigpropsContributorByteInstance
-        extends AbstractByteInstanceStateCollector<ConfigPropsStateComponentSettings> {
+public class ThreadDumpContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public ConfigpropsContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public ThreadDumpContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.CONFIG_PROPS;
+        return StateComponent.THREAD_DUMP;
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, ConfigPropsStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
     }
 }

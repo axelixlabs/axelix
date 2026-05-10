@@ -21,38 +21,34 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Collects Thread Dump information for application state export.
+ * Collects Spring Beans information for application state export.
  *
- * @see ThreadDumpApi
- * @since 20.11.2025
+ * @see BeansApi
+ * @since 27.10.2025
  * @author Nikita Kirillov
- * @author Sergey Cherkasov
  */
 @Component
-public class ThreadDumpContributorByteInstance
-        extends AbstractByteInstanceStateCollector<ThreadDumpStateComponentSettings> {
+public class BeansContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public ThreadDumpContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public BeansContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.THREAD_DUMP;
+        return StateComponent.BEANS;
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, ThreadDumpStateComponentSettings settings) {
-        return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
+    protected byte[] collectByte(String instanceId) {
+        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
     }
 }

@@ -17,12 +17,10 @@
  */
 package com.axelixlabs.axelix.master.service.export.collect;
 
-import java.io.IOException;
-
 import org.springframework.core.io.Resource;
 
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.exception.StateExportException;
-import com.axelixlabs.axelix.master.service.export.StateComponentSettings;
 
 /**
  * Abstract {@link InstanceStateCollector} that applies common binary data handling for binary state components.
@@ -30,18 +28,19 @@ import com.axelixlabs.axelix.master.service.export.StateComponentSettings;
  * @since 20.11.2025
  * @author Nikita Kirillov
  */
-public abstract class AbstractBinaryInstanceStateCollector<T extends StateComponentSettings>
-        implements InstanceStateCollector<T> {
+public abstract class AbstractBinaryInstanceStateCollector implements InstanceStateCollector {
 
     @Override
-    public byte[] collect(String instanceId, T settings) throws StateExportException {
+    public byte[] collect(String instanceId) throws StateExportException {
         try {
-            Resource resource = collectResource(instanceId, settings);
+            Resource resource = collectResource(instanceId);
             return resource.getContentAsByteArray();
-        } catch (IOException e) {
+        } catch (InstanceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
             throw new StateExportException(instanceId, e);
         }
     }
 
-    protected abstract Resource collectResource(String instanceId, T settings) throws StateExportException;
+    protected abstract Resource collectResource(String instanceId) throws StateExportException;
 }

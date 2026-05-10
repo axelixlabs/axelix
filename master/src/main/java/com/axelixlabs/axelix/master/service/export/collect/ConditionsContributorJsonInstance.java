@@ -24,7 +24,6 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -36,12 +35,11 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Sergey Cherkasov
  */
 @Component
-public class ConditionsContributorByteInstance
-        extends AbstractByteInstanceStateCollector<ConditionsStateComponentSettings> {
+public class ConditionsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public ConditionsContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public ConditionsContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
@@ -51,7 +49,7 @@ public class ConditionsContributorByteInstance
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, ConditionsStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
     }

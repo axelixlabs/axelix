@@ -21,37 +21,36 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.EnvStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Collects Spring Environment information for application state export.
+ * Collects Spring Configuration Properties information for application state export.
  *
- * @see EnvironmentApi
+ * @see ConfigPropsApi
  * @since 27.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
 @Component
-public class EnvironmentContributorByteInstance extends AbstractByteInstanceStateCollector<EnvStateComponentSettings> {
+public class ConfigpropsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public EnvironmentContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public ConfigpropsContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.ENV;
+        return StateComponent.CONFIG_PROPS;
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, EnvStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
     }
 }

@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.master.api.external.endpoint.GcLogFileApi;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.GcLogFileStateComponentSettings;
 
 /**
  * Collect gc-logfile for application state export.
@@ -33,8 +32,7 @@ import com.axelixlabs.axelix.master.service.export.settings.GcLogFileStateCompon
  * @author Nikita Kirillov
  */
 @Component
-public class GcLogFileContributorBinaryInstance
-        extends AbstractBinaryInstanceStateCollector<GcLogFileStateComponentSettings> {
+public class GcLogFileContributorBinaryInstance extends AbstractBinaryInstanceStateCollector {
 
     private final GcLogFileApi gcLogFileApi;
 
@@ -48,8 +46,7 @@ public class GcLogFileContributorBinaryInstance
     }
 
     @Override
-    protected Resource collectResource(String instanceId, GcLogFileStateComponentSettings settings)
-            throws StateExportException {
+    protected Resource collectResource(String instanceId) throws StateExportException {
         return gcLogFileApi.getGcLogFile(instanceId);
     }
 }

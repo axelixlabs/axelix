@@ -21,35 +21,36 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Collects Spring Beans information for application state export.
+ * Collects Spring Caches information for application state export.
  *
- * @see BeansApi
+ * @see CachesReadApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class BeansContributorByteInstance extends AbstractByteInstanceStateCollector<BeansStateComponentSettings> {
+public class CacheContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public BeansContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public CacheContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.BEANS;
+        return StateComponent.CACHES;
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, BeansStateComponentSettings settings) {
-        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
+    protected byte[] collectByte(String instanceId) {
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 }

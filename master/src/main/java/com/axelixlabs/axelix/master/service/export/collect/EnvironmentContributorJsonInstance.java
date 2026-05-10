@@ -21,37 +21,36 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * Collects Spring Caches information for application state export.
+ * Collects Spring Environment information for application state export.
  *
- * @see CachesReadApi
+ * @see EnvironmentApi
  * @since 27.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
 @Component
-public class CacheContributorByteInstance extends AbstractByteInstanceStateCollector<CachesStateComponentSettings> {
+public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
-    public CacheContributorByteInstance(EndpointInvoker endpointInvoker) {
+    public EnvironmentContributorJsonInstance(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.CACHES;
+        return StateComponent.ENV;
     }
 
     @Override
-    protected byte[] collectByte(String instanceId, CachesStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
     }
 }
