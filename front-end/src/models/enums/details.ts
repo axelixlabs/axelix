@@ -32,6 +32,5 @@ export enum EExportableComponent {
     CONDITIONS = "CONDITIONS",
     CONFIG_PROPS = "CONFIG_PROPS",
     ENV = "ENV",
-    LOG_FILE = "LOG_FILE",
     SCHEDULED_TASKS = "SCHEDULED_TASKS",
 }

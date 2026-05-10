@@ -25,8 +25,7 @@
             "CONDITIONS": "Conditions",
             "CONFIG_PROPS": "Configuration Properties",
             "ENV": "Environment",
-            "SCHEDULED_TASKS": "Scheduled Tasks",
-            "LOG_FILE": "Log File"
+            "SCHEDULED_TASKS": "Scheduled Tasks"
         },
         "spring": {
             "springBootVersion": "Spring Boot",

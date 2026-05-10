@@ -25,8 +25,7 @@
             "CONDITIONS": "Условия",
             "CONFIG_PROPS": "Свойства Конфигурации",
             "ENV": "Окружение",
-            "SCHEDULED_TASKS": "Запланированные Задачи",
-            "LOG_FILE": "Лог файл"
+            "SCHEDULED_TASKS": "Запланированные Задачи"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
