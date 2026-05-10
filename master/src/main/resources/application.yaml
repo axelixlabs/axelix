@@ -1,4 +1,4 @@
-# These are the default settings for Axelix Master.
+# These are the default settings for Axelix Master for ANY distribution of Axelix.
 server:
   port: 8080
 
@@ -15,10 +15,9 @@ spring:
         streamable-http:
           mcp-endpoint: "/api/mcp"
   datasource:
-    # TODO:
-    #  We need to decide on how the end users will provide
-    #  the location of the SQLite database along with the actual database choice and credentials for it.
-    url: jdbc:sqlite:axelix.db
+    url: ${axelix.master.database.url}
+    username: ${axelix.master.database.username}
+    password: ${axelix.master.database.password}
 
 management:
   endpoint:
@@ -33,31 +32,45 @@ management:
 # TODO: we need to think about the design of properties in general
 axelix:
   master:
+    database:
+      url: jdbc:sqlite:axelix.db
+      username: ""
+      password:
     discovery:
       self-registration:
+        enabled: false
         eviction:
           heartbeat-timeout: 45s
           schedule: "0 * * * * *"
       auto:
-        enabled: true
+        enabled: false
         broadcast:
           schedule: "0 * * * * *"
-        platform: kubernetes
         kubernetes:
           kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
           sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
           ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           filters:
             namespaces: default
+            labels:
     auth:
       jwt:
         lifespan: 12h
       options:
         super-admin:
-          enabled: true
           credentials:
             username: admin
             password: admin
+        local:
+          enabled: false
+        oauth2:
+          enabled: false
+          issuer-uri:
+          base-url:
+          client-id:
+          client-secret:
+          role-attribute-path:
+          scopes: openid
       cookie:
         name: auth_token
         name-authority: authorities

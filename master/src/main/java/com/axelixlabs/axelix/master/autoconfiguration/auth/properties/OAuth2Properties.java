@@ -58,7 +58,7 @@ public record OAuth2Properties(
         String scopes,
         @Nullable String roleAttributePath) {
 
-    private static final String DEFAULT_SCOPE = "openid";
+    private static final String OPENID_SCOPE = "openid";
 
     public OAuth2Properties {
         Assert.notNull(
@@ -69,8 +69,10 @@ public record OAuth2Properties(
                 "OAuth2 client-secret is required. Set " + OAUTH_LOGIN_PROPERTIES_PREFIX + ".client-secret");
         Assert.notNull(baseUrl, "OAuth2 base-url is required. Set " + OAUTH_LOGIN_PROPERTIES_PREFIX + ".base-url");
 
-        if (scopes == null) {
-            scopes = DEFAULT_SCOPE;
+        if (scopes == null || scopes.isEmpty()) {
+            scopes = OPENID_SCOPE;
+        } else if (!scopes.contains(OPENID_SCOPE)) {
+            scopes += (" " + OPENID_SCOPE);
         }
     }
 

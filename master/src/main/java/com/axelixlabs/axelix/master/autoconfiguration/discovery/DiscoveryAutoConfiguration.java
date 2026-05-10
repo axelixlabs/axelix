@@ -62,7 +62,6 @@ public class DiscoveryAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.discovery.auto", name = "platform", havingValue = "kubernetes")
     static class KubernetesDiscoveryAutoConfiguration {
 
         @Bean
