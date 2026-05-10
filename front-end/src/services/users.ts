@@ -19,7 +19,7 @@ import { apiFetch } from "api";
 import type { ICreateUserRequestData, IEditUserRequestData } from "models";
 
 export const getUsers = () => {
-    return apiFetch.get("users-management/feed");
+    return apiFetch.get("users/feed");
 };
 
 export const createUser = (data: ICreateUserRequestData) => {
