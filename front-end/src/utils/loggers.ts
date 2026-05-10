@@ -15,7 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IColorPallete } from "models";
+import type { TabsProps } from "antd";
+import type { TFunction } from "i18next";
+
+import { ELoggersTabs, type IColorPallete } from "models";
 
 import { colorPalette } from "./globals";
 
@@ -28,4 +31,17 @@ export const loggersColors: Record<string, IColorPallete> = {
     TRACE: colorPalette.LIGHT_BLUE,
     ALL: colorPalette.GREEN,
     DEFAULT: colorPalette.PURPLE,
+};
+
+export const loggersTabs = (t: TFunction): TabsProps["items"] => {
+    return [
+        {
+            key: ELoggersTabs.LOGGERS,
+            label: t("Loggers.loggers"),
+        },
+        {
+            key: ELoggersTabs.LOGGER_GROUPS,
+            label: t("Loggers.loggerGroups"),
+        },
+    ];
 };
