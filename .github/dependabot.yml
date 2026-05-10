@@ -4,7 +4,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/website"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     ignore:
@@ -19,7 +19,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/front-end"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     ignore:
@@ -34,7 +34,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/docs"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     ignore:
@@ -50,7 +50,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     groups:
@@ -62,7 +62,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     groups:
@@ -73,7 +73,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/website"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     groups:
@@ -84,7 +84,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/docs"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
     groups:
