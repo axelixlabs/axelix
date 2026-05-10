@@ -108,6 +108,8 @@ tasks.processResources {
             "tokens" to mapOf("project.version" to projectVersion)
         )
     }
+
+    exclude("application-local.yaml")
 }
 
 publishing {
