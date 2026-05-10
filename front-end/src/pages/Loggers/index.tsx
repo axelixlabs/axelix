@@ -82,7 +82,7 @@ const Loggers = () => {
                 <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
             </div>
 
-            <Activity mode={activeTab === ELoggersTabs.LOGGERS ? "visible" : "hidden"}>
+            <Activity mode={isLoggersTab ? "visible" : "hidden"}>
                 <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
                     <LoggersList
                         effectiveLoggers={effectiveLoggers}
@@ -92,7 +92,7 @@ const Loggers = () => {
                 </EmptyHandler>
             </Activity>
 
-            <Activity mode={activeTab === ELoggersTabs.LOGGER_GROUPS ? "visible" : "hidden"}>
+            <Activity mode={isLoggerGroupsTab ? "visible" : "hidden"}>
                 <EmptyHandler isEmpty={effectiveLoggerGroups.length === 0}>
                     <LoggerGroups
                         loggerGroups={effectiveLoggerGroups}
