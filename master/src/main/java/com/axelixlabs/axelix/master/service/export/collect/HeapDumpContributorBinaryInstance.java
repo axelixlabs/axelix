@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.master.api.external.endpoint.HeapDumpApi;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.HeapDumpStateComponentSettings;
 
 /**
  * Collect Heap Dump information for application state export.
@@ -34,8 +33,7 @@ import com.axelixlabs.axelix.master.service.export.settings.HeapDumpStateCompone
  * @author Nikita Kirillov
  */
 @Component
-public class HeapDumpContributorBinaryInstance
-        extends AbstractBinaryInstanceStateCollector<HeapDumpStateComponentSettings> {
+public class HeapDumpContributorBinaryInstance extends AbstractBinaryInstanceStateCollector {
 
     private final HeapDumpApi heapDumpApi;
 
@@ -44,13 +42,14 @@ public class HeapDumpContributorBinaryInstance
     }
 
     @Override
-    protected Resource collectResource(String instanceId, HeapDumpStateComponentSettings settings)
-            throws StateExportException {
+    protected Resource collectResource(String instanceId) throws StateExportException {
         ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId);
+
         if (heapDump.getBody() == null) {
             throw new StateExportException(
                     instanceId, "Heap dump endpoint returned successful status but empty content");
         }
+
         return heapDump.getBody();
     }
 

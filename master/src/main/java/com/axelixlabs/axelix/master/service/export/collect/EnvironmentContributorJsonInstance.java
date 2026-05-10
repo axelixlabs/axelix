@@ -23,9 +23,7 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.EnvStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -34,9 +32,10 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @see EnvironmentApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class EnvironmentContributorJsonInstance implements InstanceStateCollector<EnvStateComponentSettings> {
+public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
@@ -50,7 +49,7 @@ public class EnvironmentContributorJsonInstance implements InstanceStateCollecto
     }
 
     @Override
-    public byte[] collect(String instanceId, EnvStateComponentSettings settings) throws StateExportException {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
     }

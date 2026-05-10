@@ -23,9 +23,7 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ScheduledTasksStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -34,10 +32,10 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @see ScheduledTasksApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class ScheduledTasksContributorJsonInstance
-        implements InstanceStateCollector<ScheduledTasksStateComponentSettings> {
+public class ScheduledTasksContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
@@ -51,8 +49,7 @@ public class ScheduledTasksContributorJsonInstance
     }
 
     @Override
-    public byte[] collect(String instanceId, ScheduledTasksStateComponentSettings settings)
-            throws StateExportException {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
     }

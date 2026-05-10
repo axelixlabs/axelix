@@ -23,9 +23,7 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -36,7 +34,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Nikita Kirillov
  */
 @Component
-public class BeansContributorJsonInstance implements InstanceStateCollector<BeansStateComponentSettings> {
+public class BeansContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EndpointInvoker endpointInvoker;
 
@@ -50,7 +48,7 @@ public class BeansContributorJsonInstance implements InstanceStateCollector<Bean
     }
 
     @Override
-    public byte[] collect(String instanceId, BeansStateComponentSettings settings) throws StateExportException {
+    protected byte[] collectByte(String instanceId) {
         return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
     }
 }

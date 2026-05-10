@@ -17,30 +17,44 @@
  */
 package com.axelixlabs.axelix.master.service.export.collect;
 
-import org.springframework.core.io.Resource;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 
 /**
- * Abstract {@link InstanceStateCollector} that applies common binary data handling for binary state components.
+ * Abstract {@link InstanceStateCollector} that applies common marshalling and exception
+ * handling logic.
  *
- * @since 20.11.2025
- * @author Nikita Kirillov
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public abstract class AbstractBinaryInstanceStateCollector implements InstanceStateCollector {
+public abstract class AbstractJsonInstanceStateCollector implements InstanceStateCollector {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractJsonInstanceStateCollector.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     @Override
     public byte[] collect(String instanceId) throws StateExportException {
         try {
-            Resource resource = collectResource(instanceId);
-            return resource.getContentAsByteArray();
+            // TODO:
+            //  Now, here, we're essentially reading JSON just to "prettify" it.
+            //  So it may and probably would have some performance implications.
+            byte[] state = collectByte(instanceId);
+            JsonNode json = OBJECT_MAPPER.readTree(state);
+
+            return OBJECT_MAPPER.writeValueAsBytes(json);
         } catch (InstanceNotFoundException e) {
             throw e;
         } catch (Exception e) {
+            log.warn("Unable to serialize state provided by collector responsible for : {}", this.responsibleFor(), e);
             throw new StateExportException(instanceId, e);
         }
     }
 
-    protected abstract Resource collectResource(String instanceId) throws StateExportException;
+    protected abstract byte[] collectByte(String instanceId);
 }

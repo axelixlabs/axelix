@@ -17,9 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.export.collect;
 
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.StateComponentSettings;
 
 /**
  * Collector for application state data export functionality.
@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.master.service.export.StateComponentSettings;
  * @since 27.10.2025
  * @author Nikita Kirillov
  */
-public interface InstanceStateCollector<T extends StateComponentSettings> {
+public interface InstanceStateCollector {
 
     /**
      * @return the {@link StateComponent state export component} that this collector is responsible for.
@@ -39,6 +39,10 @@ public interface InstanceStateCollector<T extends StateComponentSettings> {
      *
      * @param instanceId the identifier of the application instance to collect data from
      * @return the collected data as the byte array
+     *
+     * @throws InstanceNotFoundException in case the implementation is unable to find
+     *                                   instance identified by the provided {@code instanceId}
+     * @throws StateExportException      in case there is an error during state export
      */
-    byte[] collect(String instanceId, T settings) throws StateExportException;
+    byte[] collect(String instanceId) throws StateExportException, InstanceNotFoundException;
 }

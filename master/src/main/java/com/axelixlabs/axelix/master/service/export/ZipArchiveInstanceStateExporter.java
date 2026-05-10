@@ -20,7 +20,9 @@ package com.axelixlabs.axelix.master.service.export;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,6 +39,7 @@ import com.axelixlabs.axelix.master.service.export.collect.InstanceStateCollecto
  * Default implementation of {@link InstanceStateExporter}.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 27.10.2025
  */
 @Service
@@ -44,31 +47,21 @@ public class ZipArchiveInstanceStateExporter implements InstanceStateExporter {
 
     private static final Logger log = LoggerFactory.getLogger(ZipArchiveInstanceStateExporter.class);
 
-    private final List<InstanceStateCollector<?>> collectors;
+    private final Map<StateComponent, InstanceStateCollector> collectors;
 
-    public ZipArchiveInstanceStateExporter(List<InstanceStateCollector<?>> collectors) {
-        this.collectors = collectors;
+    public ZipArchiveInstanceStateExporter(List<InstanceStateCollector> collectors) {
+        this.collectors = collectors.stream()
+                .collect(Collectors.toMap(InstanceStateCollector::responsibleFor, Function.identity()));
     }
 
     @Override
     public byte[] exportInstanceState(StateExport stateExportRequest, InstanceId instanceId)
             throws StateExportException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-            for (InstanceStateCollector<?> collector : collectors) {
-                findSettingsForExport(stateExportRequest, collector).ifPresent(settings -> {
-                    try {
-                        addCollectorDataToZip(zos, settings, instanceId.instanceId(), collector);
-                    } catch (IOException e) {
-                        log.error(
-                                "Exception in state collection for instance : {}. State collector responsible for {} thrown an error. Skipping this collector",
-                                instanceId.instanceId(),
-                                collector.responsibleFor(),
-                                e);
-                    }
-                });
-            }
+        var source = new ByteArrayOutputStream();
+
+        try (var zos = new ZipOutputStream(source)) {
+            exportStateIntoZipOutputStream(stateExportRequest, instanceId, zos);
         } catch (IOException e) {
             log.error(
                     "Failed to assemble state export archive for instance: {}. Error: {}",
@@ -78,22 +71,42 @@ public class ZipArchiveInstanceStateExporter implements InstanceStateExporter {
             throw new StateExportException(instanceId.instanceId(), e);
         }
 
-        return baos.toByteArray();
+        return source.toByteArray();
     }
 
-    private static Optional<StateComponentSettings> findSettingsForExport(
-            StateExport stateExportRequest, InstanceStateCollector<?> collector) {
-        return stateExportRequest.components().stream()
-                .filter(it -> it.component().equals(collector.responsibleFor()))
-                .findFirst();
+    private void exportStateIntoZipOutputStream(
+            StateExport stateExportRequest, InstanceId instanceId, ZipOutputStream zos) {
+
+        for (StateComponentSettings component : stateExportRequest.components()) {
+
+            InstanceStateCollector collector = collectors.get(component.component());
+
+            if (collector == null) {
+                log.warn(
+                        "Unable to find InstanceStateCollector for the requested StateComponent: {}. "
+                                + "That is not okay, please, report this to maintainers",
+                        component.component());
+                continue;
+            }
+
+            try {
+                addCollectorDataToZip(zos, instanceId.instanceId(), collector);
+            } catch (IOException e) {
+                log.error(
+                        "Exception in state collection for instance : {}. State collector responsible for {} thrown an error. Skipping this collector",
+                        instanceId.instanceId(),
+                        collector.responsibleFor(),
+                        e);
+            }
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void addCollectorDataToZip(
-            ZipOutputStream zos, StateComponentSettings settings, String instanceId, InstanceStateCollector collector)
+    private void addCollectorDataToZip(ZipOutputStream zos, String instanceId, InstanceStateCollector collector)
             throws IOException {
+
         StateComponent stateComponent = collector.responsibleFor();
-        byte[] state = collector.collect(instanceId, settings);
+        byte[] state = collector.collect(instanceId);
 
         zos.putNextEntry(new ZipEntry(stateComponent.getFilename()));
         zos.write(state);
