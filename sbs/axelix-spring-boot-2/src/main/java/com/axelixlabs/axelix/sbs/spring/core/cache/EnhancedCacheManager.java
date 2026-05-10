@@ -18,144 +18,49 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
 /**
- * CacheManager implementation that provides dynamic control over cache operations.
- * <p>
- * Current implementation stores the map of {@link EnhancedCache EnhancedCache instances}.
- * All the operations, like clear, eviction by key, get by key etc. can be performed of the
- * {@link EnhancedCache}, rather than on the {@link #delegate}, since {@link EnhancedCache}
- * instance by design internally holds the reference to the exact same {@link Cache} object
- * on the heap, as the underlying {@link #delegate} does.
+ * Extension of {@link CacheManager} that exposes management operations on top of an existing
+ * {@link CacheManager}. Implementations are typically attached to user-defined {@link CacheManager}
+ * beans through an AOP proxy so that the original concrete type is preserved.
  *
- * @since 24.11.2025
- * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class EnhancedCacheManager implements CacheManager {
+public interface EnhancedCacheManager extends CacheManager {
 
-    private final String cacheManagerBeanName;
-    private final CacheManager delegate;
-    private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
-
-    public EnhancedCacheManager(String cacheManagerBeanName, CacheManager delegate) {
-        this.delegate = delegate;
-        this.cacheManagerBeanName = cacheManagerBeanName;
-    }
-
-    public String getUnderlyingCacheManagerBeanName() {
-        return cacheManagerBeanName;
-    }
-
-    public void clear(String cacheName) {
-        Optional.ofNullable(this.getCache(cacheName)).ifPresent(Cache::invalidate);
-    }
-
-    public void clear(String cacheName, Object key) {
-        Optional.ofNullable(this.getCache(cacheName)).ifPresent(cache -> cache.evictIfPresent(key));
-    }
-
-    public void clearAll() {
-        caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.clear());
-    }
-
-    public Collection<EnhancedCache> getAll() {
-        return caches.values();
-    }
+    /**
+     * @return the bean name of the underlying {@link CacheManager} that this enhanced manager wraps.
+     */
+    String getUnderlyingCacheManagerBeanName();
 
     @Override
     @Nullable
-    public EnhancedCache getCache(@NonNull String name) {
-        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
-            Cache cache = delegate.getCache(s);
-
-            if (cache != null) {
-                return new DefaultEnhancedCache(cache);
-            } else {
-                return NonExistentEnhancedCache.INSTANCE;
-            }
-        });
-
-        if (enhancedCache instanceof NonExistentEnhancedCache) {
-            return null;
-        } else {
-            return enhancedCache;
-        }
-    }
-
-    @Override
-    @NonNull
-    public Collection<String> getCacheNames() {
-        return delegate.getCacheNames();
-    }
+    EnhancedCache getCache(@NonNull String name);
 
     /**
-     * Enable cache, if exists.
-     *
-     * @param cacheName cache name to enable.
+     * @return all enhanced caches that have been resolved through this manager.
      */
-    public void enable(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+    Collection<EnhancedCache> getAll();
 
-        if (cache != null) {
-            ((EnhancedCache) cache).enable();
-        }
-    }
+    void clear(String cacheName);
 
-    /**
-     * Disable cache, if exists.
-     *
-     * @param cacheName cache name to enable.
-     */
-    public void disable(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+    void clear(String cacheName, Object key);
 
-        if (cache != null) {
-            ((EnhancedCache) cache).disable();
-        }
-    }
+    void clearAll();
 
-    /**
-     * Enable all caches.
-     */
-    public void enableAll() {
-        this.caches.forEach((cacheManagerName, enhancedCache) -> {
-            enhancedCache.enable();
-        });
-    }
+    void enable(String cacheName);
 
-    /**
-     * Disable all caches.
-     */
-    public void disableAll() {
-        this.caches.forEach((cacheManagerName, enhancedCache) -> {
-            enhancedCache.disable();
-        });
-    }
+    void disable(String cacheName);
 
-    /**
-     * Check if a specific cache is currently enabled.
-     *
-     * @param cacheName the name of the cache to check
-     * @return {@code true} if the cache exists and is enabled, {@code false} otherwise
-     */
-    public boolean isEnabled(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+    void enableAll();
 
-        if (cache != null) {
-            return ((EnhancedCache) cache).isEnabled();
-        }
+    void disableAll();
 
-        return false;
-    }
+    boolean isEnabled(String cacheName);
 }

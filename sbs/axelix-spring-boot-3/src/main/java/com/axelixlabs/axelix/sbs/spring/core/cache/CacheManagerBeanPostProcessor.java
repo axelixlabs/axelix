@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import org.jspecify.annotations.NonNull;
 
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cache.CacheManager;
@@ -32,18 +34,23 @@ import org.springframework.cache.CacheManager;
  */
 public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
-    // TODO:
-    //  This is a dangerous practise.
-    //  The fact is that if the end-users have stuff like "cacheManager instanceof Caffiene" or smth
-    //  like that in their code, then our bean post processor will essentially break this code.
-    //  The problem above can be solved by creating a CGLIB proxy in runtime. The question is - in this case,
-    //  we would have to be sure that the concrete CacheManager class is not a final class, so we can create an
-    //  decedent.
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        if (bean instanceof CacheManager && !(bean instanceof EnhancedCacheManager)) {
-            return new EnhancedCacheManager(beanName, (CacheManager) bean);
+        if (!(bean instanceof CacheManager) || bean instanceof EnhancedCacheManager) {
+            return bean;
         }
-        return bean;
+        return createEnhancedCacheManagerProxy((CacheManager) bean, beanName);
+    }
+
+    private Object createEnhancedCacheManagerProxy(CacheManager target, String beanName) {
+        DefaultEnhancedCacheManager delegate = new DefaultEnhancedCacheManager(beanName, target);
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.setTarget(target);
+        proxyFactory.setProxyTargetClass(true);
+        proxyFactory.addAdvisor(new DefaultIntroductionAdvisor(new EnhancedCacheManagerIntroduction(delegate),
+            EnhancedCacheManager.class));
+
+        return proxyFactory.getProxy();
     }
 }

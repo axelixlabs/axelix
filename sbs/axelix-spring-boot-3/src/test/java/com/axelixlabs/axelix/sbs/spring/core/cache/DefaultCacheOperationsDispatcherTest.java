@@ -60,9 +60,9 @@ class DefaultCacheOperationsDispatcherTest {
     void setUp() {
         Map<String, CacheManager> managers = new HashMap<>();
 
-        cacheManager1 = new EnhancedCacheManager(
+        cacheManager1 = new DefaultEnhancedCacheManager(
                 TEST_CACHE_MANAGER_1, new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2));
-        cacheManager2 = new EnhancedCacheManager(TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2));
+        cacheManager2 = new DefaultEnhancedCacheManager(TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2));
         managers.put(TEST_CACHE_MANAGER_1, cacheManager1);
         managers.put(TEST_CACHE_MANAGER_2, cacheManager2);
 
