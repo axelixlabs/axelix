@@ -17,26 +17,34 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
+import org.jspecify.annotations.NullMarked;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
+
 /**
- * Configuration of the static-admin.
+ * Configuration of the {@link DefaultRole#SUPER_ADMIN}.
  *
  * @author Mikhail Polivakha
  */
-@SuppressWarnings("NullAway")
-@ConfigurationProperties(prefix = "axelix.master.auth.options.static-admin")
-public record StaticAdminCredentialsProperties(Credentials credentials) {
+@NullMarked
+@ConfigurationProperties(prefix = SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX)
+public record SuperAdminConfigurationProperties(Credentials credentials) {
 
-    public StaticAdminCredentialsProperties {
+    public SuperAdminConfigurationProperties {
         Assert.notNull(
                 credentials.username(),
-                "The username for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.username is specified correctly");
+                "The username for the super-admin is 'null'. Make sure the " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                        + ".credentials.username is specified correctly");
 
         Assert.notNull(
                 credentials.password(),
-                "The password for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.password is specified correctly");
+                "The password for the super-admin is 'null'. Make sure the " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                        + ".credentials.password is specified correctly");
     }
 
     public String getUsername() {

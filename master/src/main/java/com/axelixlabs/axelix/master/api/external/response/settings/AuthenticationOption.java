@@ -24,7 +24,8 @@ package com.axelixlabs.axelix.master.api.external.response.settings;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public sealed interface AuthenticationOption permits OidcAuthenticationOption, LoginPasswordAuthenticationOption {
+public sealed interface AuthenticationOption
+        permits OidcAuthenticationOption, SuperAdminAuthenticationOption, LocalAuthenticationOption {
 
     /**
      * Returns the name of the authentication option.

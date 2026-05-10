@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AuthOption } from "../types/auth";
+import type { LoginOption } from "../types/auth";
 
 export interface ILoginSubmitRequestData {
     /**
@@ -35,5 +35,5 @@ export interface IAuthOptionsResponseBody {
     /**
      * Authentication options configured on the backend
      */
-    authProviders: AuthOption[];
+    authenticationOptions: LoginOption[];
 }

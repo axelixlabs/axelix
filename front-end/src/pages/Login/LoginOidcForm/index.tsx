@@ -18,7 +18,7 @@
 import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { type OIDCAuthOption } from "models";
+import { type OIDCLoginOption } from "models";
 import { authorize } from "services";
 
 import styles from "./styles.module.css";
@@ -26,7 +26,7 @@ import styles from "./styles.module.css";
 import { LockIcon } from "assets";
 
 interface IProps {
-    option: OIDCAuthOption;
+    option: OIDCLoginOption;
 }
 
 export const LoginOidcForm = ({ option }: IProps) => {

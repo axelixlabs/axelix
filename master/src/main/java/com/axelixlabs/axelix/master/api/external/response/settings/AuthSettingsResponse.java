@@ -25,4 +25,4 @@ import java.util.List;
  * @since 06.03.2026
  * @author Nikita Kirillov
  */
-public record AuthSettingsResponse(List<AuthenticationOption> authProviders) {}
+public record AuthSettingsResponse(List<AuthenticationOption> authenticationOptions) {}

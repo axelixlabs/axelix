@@ -25,32 +25,29 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.utils.Assert;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 
 /**
- * {@link UserAuthenticator} that authenticates a given user by the static pair of the username/password.
+ * {@link UserAuthenticator} that authenticates a {@link DefaultRole#SUPER_ADMIN}.
  *
  * @author Mikhail Polivakha
  */
-public class StaticAdminUserAuthenticator implements UserAuthenticator {
+public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
-    private final StaticAdminCredentialsProperties staticCredentialsConfig;
+    private final SuperAdminConfigurationProperties superAdminConfiguration;
 
-    public StaticAdminUserAuthenticator(StaticAdminCredentialsProperties staticCredentialsConfig) {
-        Assert.notNull(staticCredentialsConfig.getUsername(), "username is required when static-admin is enabled");
-        Assert.notNull(staticCredentialsConfig.getPassword(), "password is required when static-admin is enabled");
-        this.staticCredentialsConfig = staticCredentialsConfig;
+    public SuperAdminUserAuthenticator(SuperAdminConfigurationProperties superAdminConfiguration) {
+        this.superAdminConfiguration = superAdminConfiguration;
     }
 
     @Override
     public @Nullable User authenticate(String username, String password) {
 
-        if (Objects.equals(staticCredentialsConfig.getUsername(), username)
-                && Objects.equals(staticCredentialsConfig.getPassword(), password)) {
+        if (Objects.equals(superAdminConfiguration.getUsername(), username)
+                && Objects.equals(superAdminConfiguration.getPassword(), password)) {
             return new DefaultUser(
-                    staticCredentialsConfig.getUsername(),
-                    staticCredentialsConfig.getPassword(),
+                    superAdminConfiguration.getUsername(),
+                    superAdminConfiguration.getPassword(),
                     Set.of(DefaultRole.SUPER_ADMIN));
         }
 

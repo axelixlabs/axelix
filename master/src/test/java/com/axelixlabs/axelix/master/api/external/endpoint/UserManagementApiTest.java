@@ -34,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.UserEntity;
@@ -43,25 +44,22 @@ import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.common.auth.core.DefaultAuthority.USERS_MANAGEMENT;
-import static com.axelixlabs.axelix.common.auth.core.DefaultAuthority.USERS_VIEW;
 import static com.axelixlabs.axelix.common.auth.core.DefaultRole.SUPER_ADMIN;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.DELETE;
-import static com.axelixlabs.axelix.common.domain.http.HttpMethod.GET;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.POST;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.PUT;
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link UserManagementApi}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "axelix.master.auth.options.local.enabled=true")
 public class UserManagementApiTest {
 
-    private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USERS_CREATE_PATH = "/api/external/users-management/create";
     private static final String USERS_DELETE_PATH = "/api/external/users-management/delete";
     private static final String USERS_UPDATE_PATH = "/api/external/users-management/update";
@@ -81,56 +79,6 @@ public class UserManagementApiTest {
     @BeforeEach
     void cleanUsersTable() {
         userRepository.deleteAll();
-    }
-
-    @Test
-    void shouldReturnEmptyUsersFeed() {
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.withRole(SUPER_ADMIN).getForEntity(USERS_FEED_PATH, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).isEqualTo("[]");
-    }
-
-    @Test
-    void shouldReturnAllManagedUsers() {
-        UserEntity alice = insertUser("alice", "alice@example.com", "aliceSecret", Set.of("ADMIN"), UserOrigin.LOCAL);
-        UserEntity bob = insertUser("bob", "bob@example.com", null, Set.of("VIEWER"), UserOrigin.OIDC);
-
-        // language=json
-        String expectedFeed = """
-                [
-                  {
-                    "id": "%s",
-                    "username": "alice",
-                    "email": "alice@example.com",
-                    "roles": ["ADMIN"],
-                    "userOrigin": "LOCAL",
-                    "lastLoginAt": null
-                  },
-                  {
-                    "id": "%s",
-                    "username": "bob",
-                    "email": "bob@example.com",
-                    "roles": ["VIEWER"],
-                    "userOrigin": "OAUTH2/OIDC",
-                    "lastLoginAt": null
-                  }
-                ]
-                """.formatted(alice.id(), bob.id());
-
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.withRole(SUPER_ADMIN).getForEntity(USERS_FEED_PATH, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedFeed);
-        assertThat(response.getBody()).doesNotContain("password");
     }
 
     @Test
@@ -156,7 +104,7 @@ public class UserManagementApiTest {
         List<UserEntity> users = userRepository.findAll();
         assertThat(users).hasSize(1);
 
-        UserEntity saved = users.get(0);
+        UserEntity saved = users.getFirst();
         assertThat(saved.id()).isNotBlank();
         assertThat(saved.username()).isEqualTo("newUser");
         assertThat(saved.email()).isEqualTo("newUser@example.com");
@@ -326,6 +274,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldUpdateAllUserFields() {
+        // given.
         UserEntity user = insertUser("oldName", "old@example.com", "oldPass", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
@@ -451,9 +400,6 @@ public class UserManagementApiTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
-
-    @ProtectedEndpointTests(method = GET, path = USERS_FEED_PATH, requiredAuthority = USERS_VIEW)
-    void negativeAuthTestsOnGetUsersFeed() {}
 
     @ProtectedEndpointTests(
             method = POST,

@@ -45,16 +45,19 @@ import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
 import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
-import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.SuperAdminAuthenticationOption;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
-import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -65,12 +68,33 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class SecurityAutoConfigurationTest {
 
+    private static final String SUPER_ADMIN_USERNAME = "test-super-admin";
+    private static final String SUPER_ADMIN_PASSWORD = "test-super-admin-secret";
+
+    private static String[] jwtPropertyValues() {
+        return new String[] {
+            "axelix.master.auth.jwt.algorithm=HMAC512",
+            "axelix.master.auth.jwt.signing-key=secret",
+            "axelix.master.auth.jwt.lifespan=PT30M",
+        };
+    }
+
+    private static String[] superAdminCredentialPropertyValues() {
+        return new String[] {
+            SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.username=" + SUPER_ADMIN_USERNAME,
+            SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.password=" + SUPER_ADMIN_PASSWORD,
+        };
+    }
+
+    /**
+     * Baseline context: JWT, cookie, core security beans, and super-admin login (always on when
+     * {@link SecurityAutoConfiguration} is active). Optional {@code local} and {@code oauth2} login are off unless
+     * enabled via properties and their auto-configurations are registered.
+     */
     private static ApplicationContextRunner baselineConfigAppContextRunner() {
         return new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
-                .withPropertyValues(
-                        "axelix.master.auth.jwt.algorithm=HMAC512",
-                        "axelix.master.auth.jwt.signing-key=secret",
-                        "axelix.master.auth.jwt.lifespan=PT30M")
+                .withPropertyValues(jwtPropertyValues())
+                .withPropertyValues(superAdminCredentialPropertyValues())
                 .withUserConfiguration(TestSecurityDependenciesConfig.class)
                 .withConfiguration(AutoConfigurations.of(
                         ConfigurationPropertiesAutoConfiguration.class,
@@ -84,12 +108,12 @@ class SecurityAutoConfigurationTest {
 
         @Test
         void shouldCreateAllBeansInDefaultScenario() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner();
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasSingleBean(MasterAuthorityResolver.class);
                 assertThat(context).hasSingleBean(AuthorityResolver.class);
                 assertThat(context).hasSingleBean(Authorizer.class);
@@ -98,24 +122,30 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
                 assertThat(context).hasSingleBean(CookieService.class);
                 assertThat(context).hasSingleBean(CookieBasedJwtAuthorizationFilter.class);
+                assertThat(context).hasSingleBean(SuperAdminUserAuthenticator.class);
+                assertThat(context)
+                        .getBeans(AuthenticationOption.class)
+                        .hasSize(1)
+                        .containsValue(context.getBean(SuperAdminAuthenticationOption.class));
             });
         }
 
         @Test
         void shouldFailWhenJwtAlgorithmPropertyIsMissing() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.signing-key=secret", "axelix.master.auth.jwt.lifespan=PT30M")
+                    .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
                             SecurityAutoConfiguration.class,
                             SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
             });
@@ -123,19 +153,20 @@ class SecurityAutoConfigurationTest {
 
         @Test
         void shouldFailWhenJwtSigningKeyPropertyIsMissing() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.lifespan=PT30M")
+                    .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
                             SecurityAutoConfiguration.class,
                             SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
             });
@@ -143,20 +174,21 @@ class SecurityAutoConfigurationTest {
 
         @Test
         void shouldPassSuccessfullyWhenLifespanPropertyIsMissing() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.signing-key=secret")
+                    .withPropertyValues(superAdminCredentialPropertyValues())
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
                             SecurityAutoConfiguration.class,
                             SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasNotFailed();
                 assertThat(context).hasSingleBean(JwtEncoderService.class);
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
@@ -168,78 +200,94 @@ class SecurityAutoConfigurationTest {
 
         @Test
         void shouldFailWhenJwtAlgorithmIsNotSupported() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=RSA512",
                             "axelix.master.auth.jwt.signing-key=secret",
                             "axelix.master.auth.jwt.lifespan=PT30M")
+                    .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
                             SecurityAutoConfiguration.class,
                             SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasFailed();
             });
         }
     }
 
     @Nested
-    class StaticAdminConfigurationTests {
+    class SuperAdminLoginConfigurationTests {
 
         @Test
-        void shouldCreateStaticAdminBeansWhenEnabled() {
-            // given
-            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
-                    .withPropertyValues(
-                            "axelix.master.auth.options.static-admin.enabled=true",
-                            "axelix.master.auth.options.static-admin.credentials.username=admin",
-                            "axelix.master.auth.options.static-admin.credentials.password=secret")
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.StaticCredentialsConfig.class));
+        void shouldFailWhenSuperAdminCredentialsAreMissing() {
+            // given.
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
+                    .withPropertyValues(jwtPropertyValues())
+                    .withUserConfiguration(TestSecurityDependenciesConfig.class)
+                    .withConfiguration(AutoConfigurations.of(
+                            ConfigurationPropertiesAutoConfiguration.class,
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class,
+                            SecurityAutoConfiguration.CookieAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
-                assertThat(context).hasSingleBean(StaticAdminUserAuthenticator.class);
+                // then.
+                assertThat(context).hasFailed();
+            });
+        }
+    }
+
+    @Nested
+    class LocalLoginConfigurationTests {
+
+        @Test
+        void shouldCreateLocalLoginBeansWhenEnabled() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
+                    .withPropertyValues("axelix.master.auth.options.local.enabled=true")
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.LocalLoginAutoConfiguration.class));
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasSingleBean(DatabaseUserAuthenticator.class);
+                assertThat(context).hasSingleBean(LocalAuthenticationOption.class);
+                assertThat(context).hasSingleBean(SuperAdminUserAuthenticator.class);
+                assertThat(context.getBeansOfType(AuthenticationOption.class).values())
+                        .hasSize(2)
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(SuperAdminAuthenticationOption.class))
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(LocalAuthenticationOption.class));
+            });
+        }
+
+        @Test
+        void shouldNotCreateLocalLoginBeansWhenLocalDisabled() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
+                    .withPropertyValues("axelix.master.auth.options.local.enabled=false")
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.LocalLoginAutoConfiguration.class));
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasNotFailed();
+                assertThat(context).doesNotHaveBean(DatabaseUserAuthenticator.class);
+                assertThat(context).doesNotHaveBean(LocalAuthenticationOption.class);
+                assertThat(context).hasSingleBean(SuperAdminUserAuthenticator.class);
                 assertThat(context)
                         .getBeans(AuthenticationOption.class)
                         .hasSize(1)
-                        .allSatisfy((_, authenticationOption) -> {
-                            assertThat(authenticationOption).isInstanceOf(LoginPasswordAuthenticationOption.class);
-                        });
-            });
-        }
-
-        @Test
-        void shouldNotCreateStaticAdminBeansWhenDisabled() {
-            // given
-            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
-                    .withPropertyValues("axelix.master.auth.options.static-admin.enabled=false")
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.StaticCredentialsConfig.class));
-
-            // when
-            contextRunner.run(context -> {
-                // then
-                assertThat(context).hasNotFailed();
-                assertThat(context).doesNotHaveBean(AuthenticationOption.class);
-            });
-        }
-
-        @Test
-        void shouldFailWhenStaticAdminCredentialsAreMissing() {
-            // given
-            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
-                    .withPropertyValues("axelix.master.auth.options.static-admin.enabled=true")
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.StaticCredentialsConfig.class));
-
-            // when
-            contextRunner.run(context -> {
-                // then
-                assertThat(context).hasFailed();
+                        .containsValue(context.getBean(SuperAdminAuthenticationOption.class));
             });
         }
     }
@@ -249,7 +297,7 @@ class SecurityAutoConfigurationTest {
 
         @Test
         void shouldCreateOAuth2BeansWhenEnabled() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
                     .withPropertyValues(
                             "axelix.master.auth.options.oauth2.enabled=true",
@@ -259,43 +307,46 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.base-url=https://app.example",
                             "axelix.master.auth.options.oauth2.scopes=openid profile")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.OAuth2Config.class));
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasSingleBean(OidcMetadataProvider.class);
                 assertThat(context).hasSingleBean(OidcClient.class);
-                assertThat(context)
-                        .getBeans(AuthenticationOption.class)
-                        .hasSize(1)
-                        .allSatisfy((_, authenticationOption) -> {
-                            assertThat(authenticationOption).isInstanceOf(OidcAuthenticationOption.class);
-                        });
+                assertThat(context.getBeansOfType(AuthenticationOption.class).values())
+                        .hasSize(2)
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(SuperAdminAuthenticationOption.class))
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(OidcAuthenticationOption.class));
             });
         }
 
         @Test
         void shouldNotCreateOAuth2BeansWhenDisabled() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
                     .withPropertyValues("axelix.master.auth.options.oauth2.enabled=false")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.OAuth2Config.class));
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasNotFailed();
                 assertThat(context).doesNotHaveBean(OidcMetadataProvider.class);
                 assertThat(context).doesNotHaveBean(OidcClient.class);
-                assertThat(context).doesNotHaveBean(AuthenticationOption.class);
+                assertThat(context)
+                        .getBeans(AuthenticationOption.class)
+                        .hasSize(1)
+                        .containsValue(context.getBean(SuperAdminAuthenticationOption.class));
             });
         }
 
         @Test
         void shouldFailWhenOAuth2RequiredPropertiesAreMissing() {
-            // given
+            // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
                     .withPropertyValues(
                             "axelix.master.auth.options.oauth2.enabled=true",
@@ -303,11 +354,12 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.client-secret=test-secret",
                             "axelix.master.auth.options.oauth2.base-url=https://app.example/callback")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
-                    .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.OAuth2Config.class));
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
+                // then.
                 assertThat(context).hasFailed();
             });
         }
@@ -317,13 +369,11 @@ class SecurityAutoConfigurationTest {
     class AuthenticationOptionCompositionTests {
 
         @Test
-        void shouldCreateBothAuthenticationOptionsWhenBothModesEnabled() {
-            // given
+        void shouldCreateSuperAdminLocalAndOidcOptionsWhenLocalAndOauth2Enabled() {
+            // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
                     .withPropertyValues(
-                            "axelix.master.auth.options.static-admin.enabled=true",
-                            "axelix.master.auth.options.static-admin.credentials.username=admin",
-                            "axelix.master.auth.options.static-admin.credentials.password=secret",
+                            "axelix.master.auth.options.local.enabled=true",
                             "axelix.master.auth.options.oauth2.enabled=true",
                             "axelix.master.auth.options.oauth2.issuer-uri=https://issuer.example",
                             "axelix.master.auth.options.oauth2.client-id=test-client",
@@ -332,15 +382,16 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.scopes=openid profile")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
-                            SecurityAutoConfiguration.StaticCredentialsConfig.class,
-                            SecurityAutoConfiguration.OAuth2Config.class));
+                            SecurityAutoConfiguration.LocalLoginAutoConfiguration.class,
+                            SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));
 
-            // when
+            // when.
             contextRunner.run(context -> {
-                // then
-                assertThat(context).getBeans(AuthenticationOption.class).hasSize(2);
+                // then.
+                assertThat(context).getBeans(AuthenticationOption.class).hasSize(3);
                 assertThat(context.getBeansOfType(AuthenticationOption.class).values())
-                        .anySatisfy(option -> assertThat(option).isInstanceOf(LoginPasswordAuthenticationOption.class))
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(SuperAdminAuthenticationOption.class))
+                        .anySatisfy(option -> assertThat(option).isInstanceOf(LocalAuthenticationOption.class))
                         .anySatisfy(option -> assertThat(option).isInstanceOf(OidcAuthenticationOption.class));
             });
         }
@@ -396,7 +447,6 @@ class SecurityAutoConfigurationTest {
 
     private static @NonNull AnnotationConfigApplicationContext isolatedContext() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        // Replace the standard environment with a mock or a blank one
         StandardEnvironment cleanEnv = new StandardEnvironment();
         cleanEnv.getPropertySources().remove(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
         cleanEnv.getPropertySources().remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);

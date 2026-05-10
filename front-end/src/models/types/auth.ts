@@ -15,13 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { type LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME } from "utils/auth";
+import {
+    type LOCAL_AUTH_OPTION_TYPE_NAME,
+    type OIDC_AUTH_OPTION_TYPE_NAME,
+    type SUPER_ADMIN_AUTH_OPTION_TYPE_NAME,
+} from "utils/auth";
 
-export type LoginPasswordAuthOption = {
-    type: typeof LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME;
+export type LocalLoginOption = {
+    type: typeof LOCAL_AUTH_OPTION_TYPE_NAME;
 };
 
-export type OIDCAuthOption = {
+export type SuperAdminLoginOption = {
+    type: typeof SUPER_ADMIN_AUTH_OPTION_TYPE_NAME;
+};
+
+export type OIDCLoginOption = {
     type: typeof OIDC_AUTH_OPTION_TYPE_NAME;
 
     /**
@@ -48,4 +56,4 @@ export type OIDCAuthOption = {
 /**
  * Possible auth option from the backend.
  */
-export type AuthOption = LoginPasswordAuthOption | OIDCAuthOption;
+export type LoginOption = LocalLoginOption | OIDCLoginOption | SuperAdminLoginOption;

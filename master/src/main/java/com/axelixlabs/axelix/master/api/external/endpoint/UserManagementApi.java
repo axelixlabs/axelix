@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserCreateRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
@@ -49,6 +51,10 @@ import com.axelixlabs.axelix.master.service.state.UserService;
         name = "Users Management API",
         description = "The endpoints for viewing, creating, deleting, and modifying managed users")
 @ExternalApiRestController
+@ConditionalOnProperty(
+        prefix = SecurityAutoConfiguration.LOCAL_LOGIN_PROPERTIES_PREFIX,
+        name = "enabled",
+        havingValue = "true")
 public class UserManagementApi {
 
     private final UserService userService;

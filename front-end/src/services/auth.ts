@@ -18,7 +18,7 @@
 import axios from "axios";
 
 import { apiFetch } from "api";
-import type { ILoginSubmitRequestData, OIDCAuthOption } from "models";
+import type { ILoginSubmitRequestData, OIDCLoginOption } from "models";
 
 export const login = (data: ILoginSubmitRequestData) => {
     return apiFetch.post("users/login", data);
@@ -35,7 +35,7 @@ export const getAuthOptions = () => {
 /**
  * Invoke OIDC '/authorize' endpoint
  */
-export const authorize = (option: OIDCAuthOption) => {
+export const authorize = (option: OIDCLoginOption) => {
     const params = new URLSearchParams();
     params.append("client_id", option.clientId);
     params.append("scope", option.scope);

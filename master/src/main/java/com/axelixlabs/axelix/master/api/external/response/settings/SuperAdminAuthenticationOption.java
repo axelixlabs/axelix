@@ -19,18 +19,20 @@ package com.axelixlabs.axelix.master.api.external.response.settings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+
 /**
- * Authentication option for logging-in with the pair of credentials (like username and password).
+ * Authentication option for logging-in as {@link DefaultRole#SUPER_ADMIN}.
  *
  * @since 06.03.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record LoginPasswordAuthenticationOption() implements AuthenticationOption {
+public record SuperAdminAuthenticationOption() implements AuthenticationOption {
 
     @Override
     @JsonProperty("type")
     public String type() {
-        return "login-password";
+        return "super-admin";
     }
 }

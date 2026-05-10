@@ -53,7 +53,7 @@ axelix:
       jwt:
         lifespan: 12h
       options:
-        static-admin:
+        super-admin:
           enabled: true
           credentials:
             username: admin

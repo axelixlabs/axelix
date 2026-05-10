@@ -43,12 +43,13 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
-import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.SuperAdminAuthenticationOption;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
@@ -63,7 +64,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
-import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
@@ -77,8 +78,9 @@ import com.axelixlabs.axelix.master.service.state.UserService;
 @AutoConfiguration
 public class SecurityAutoConfiguration {
 
-    public static final String OAUTH_PROPERTIES_PREFIX = "axelix.master.auth.options.oauth2";
-    public static final String STATIC_ADMIN_PROPERTIES_PREFIX = "axelix.master.auth.options.static-admin";
+    public static final String OAUTH_LOGIN_PROPERTIES_PREFIX = "axelix.master.auth.options.oauth2";
+    public static final String SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX = "axelix.master.auth.options.super-admin";
+    public static final String LOCAL_LOGIN_PROPERTIES_PREFIX = "axelix.master.auth.options.local";
 
     @Bean
     public MasterAuthorityResolver masterAuthorityResolver() {
@@ -105,6 +107,11 @@ public class SecurityAutoConfiguration {
     @Primary
     public UserAuthenticator compositeUserAuthenticator(List<UserAuthenticator> userAuthenticators) {
         return new CompositeUserAuthenticator(userAuthenticators);
+    }
+
+    @Bean
+    public McpAuthenticationHandler basicAuthMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
+        return new BasicMcpAuthenticationHandler(userAuthenticator);
     }
 
     /**
@@ -159,27 +166,15 @@ public class SecurityAutoConfiguration {
     }
 
     /**
-     * Autoconfiguration for static-admin security option.
+     * Autoconfiguration for {@link LocalAuthenticationOption}.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = STATIC_ADMIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
-    @EnableConfigurationProperties(StaticAdminCredentialsProperties.class)
-    public static class StaticCredentialsConfig {
+    @ConditionalOnProperty(prefix = LOCAL_LOGIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
+    public static class LocalLoginAutoConfiguration {
 
         @Bean
-        public McpAuthenticationHandler basicAuthMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
-            return new BasicMcpAuthenticationHandler(userAuthenticator);
-        }
-
-        @Bean
-        public AuthenticationOption authSettingsStaticAdmin() {
-            return new LoginPasswordAuthenticationOption();
-        }
-
-        @Bean
-        public StaticAdminUserAuthenticator staticCredentialsUserAuthenticator(
-                StaticAdminCredentialsProperties staticCredentialsConfig) {
-            return new StaticAdminUserAuthenticator(staticCredentialsConfig);
+        public AuthenticationOption localAuthenticationOption() {
+            return new LocalAuthenticationOption();
         }
 
         @Bean
@@ -190,12 +185,31 @@ public class SecurityAutoConfiguration {
     }
 
     /**
+     * Autoconfiguration for {@link SuperAdminAuthenticationOption}.
+     */
+    @AutoConfiguration
+    @EnableConfigurationProperties(SuperAdminConfigurationProperties.class)
+    public static class SuperAdminLoginAutoConfiguration {
+
+        @Bean
+        public AuthenticationOption superAdminAuthenticationOption() {
+            return new SuperAdminAuthenticationOption();
+        }
+
+        @Bean
+        public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
+                SuperAdminConfigurationProperties staticCredentialsConfig) {
+            return new SuperAdminUserAuthenticator(staticCredentialsConfig);
+        }
+    }
+
+    /**
      * Autoconfiguration for OAuth2/OIDC security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = OAUTH_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = OAUTH_LOGIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(OAuth2Properties.class)
-    public static class OAuth2Config {
+    public static class OAuth2LoginAutoConfiguration {
 
         @Bean
         public McpAuthenticationHandler bearerMcpAuthenticationHandler(OidcRoleExtractor oidcRoleExtractor) {

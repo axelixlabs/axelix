@@ -155,20 +155,45 @@ abstract class AbstractMcpAuthorizationFilterTest {
     @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.options.static-admin.enabled=true",
-                "axelix.master.auth.options.static-admin.credentials.username=admin",
-                "axelix.master.auth.options.static-admin.credentials.password=admin"
+                "axelix.master.auth.options.local.enabled=true",
+                "axelix.master.auth.options.super-admin.credentials.username=admin",
+                "axelix.master.auth.options.super-admin.credentials.password=admin",
             })
-    static class BasicAuth extends AbstractMcpAuthorizationFilterTest {
+    static class BasicAuthTest extends AbstractMcpAuthorizationFilterTest {
 
         @Test
-        void shouldAuthenticateAndProxyMcpToolCallEndToEnd() {
+        void shouldAuthenticateAsSuperAdminAndProxyMcpToolCallEndToEnd() {
             String activeInstanceId = UUID.randomUUID().toString();
 
             // given.
             registerInstanceForBeansTool(activeInstanceId);
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials("admin", "admin"));
+            String mcpSessionId = initializeMcpSession(restTemplate, headers);
+            headers.set(MCP_SESSION_ID_HEADER, mcpSessionId);
+
+            // when.
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "/api/mcp", new HttpEntity<>(buildToolsCallRequest(activeInstanceId), headers), String.class);
+
+            // then.
+            assertSuccessfulToolCallResponse(response);
+        }
+
+        @Test
+        void shouldAuthenticateAsDatabaseUserAndProxyMcpToolCallEndToEnd() {
+            // given.
+            String activeInstanceId = UUID.randomUUID().toString();
+            String username = "test-user";
+            String password = "test-password";
+
+            userService.create(
+                    username, "test-email@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+
+            // and.
+            registerInstanceForBeansTool(activeInstanceId);
+            HttpHeaders headers = commonMcpHeaders();
+            headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
             String mcpSessionId = initializeMcpSession(restTemplate, headers);
             headers.set(MCP_SESSION_ID_HEADER, mcpSessionId);
 
@@ -261,7 +286,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
                 "axelix.master.auth.options.oauth2.client-secret=test-client-secret",
                 "axelix.master.auth.options.oauth2.base-url=http://localhost:8080"
             })
-    static class BearerAuth extends AbstractMcpAuthorizationFilterTest {
+    static class BearerAuthTest extends AbstractMcpAuthorizationFilterTest {
 
         @MockitoBean
         private OidcRoleExtractor oidcRoleExtractor;

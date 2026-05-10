@@ -15,6 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export const LOCAL_AUTH_OPTION_TYPE_NAME = "local";
-export const OIDC_AUTH_OPTION_TYPE_NAME = "oidc";
-export const SUPER_ADMIN_AUTH_OPTION_TYPE_NAME = "super-admin";
+package com.axelixlabs.axelix.master.api.external.response.settings;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * {@link AuthenticationOption} for logging-in as LOCAL users.
+ *
+ * @author Mikhail Polivakha
+ */
+public record LocalAuthenticationOption() implements AuthenticationOption {
+
+    @Override
+    @JsonProperty("type")
+    public String type() {
+        return "local";
+    }
+}

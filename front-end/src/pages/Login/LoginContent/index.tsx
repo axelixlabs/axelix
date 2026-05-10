@@ -20,9 +20,9 @@ import { useTranslation } from "react-i18next";
 
 import { Loader } from "components";
 import { fetchData } from "helpers";
-import { type AuthOption, type IAuthOptionsResponseBody, type OIDCAuthOption, StatefulRequest } from "models";
+import { type IAuthOptionsResponseBody, type LoginOption, type OIDCLoginOption, StatefulRequest } from "models";
 import { getAuthOptions } from "services";
-import { LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME } from "utils";
+import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
 import { LoginPasswordForm } from "../LoginPasswordForm";
@@ -61,24 +61,27 @@ export const LoginContent = () => {
 
     const response = authOptions.response!;
 
-    const getAuthOption = (optionName: string): AuthOption | undefined => {
-        return response.authProviders.find(({ type }) => optionName === type);
+    const getAuthOption = (optionName: string): LoginOption | undefined => {
+        return response.authenticationOptions.find(({ type }) => optionName === type);
     };
 
-    const loginPasswordOptionPresent = getAuthOption(LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME);
+    const localLoginOptionPresent = getAuthOption(LOCAL_AUTH_OPTION_TYPE_NAME);
+    const superAdminLoginOptionPresent = getAuthOption(SUPER_ADMIN_AUTH_OPTION_TYPE_NAME);
     const oidcOptionPresent = getAuthOption(OIDC_AUTH_OPTION_TYPE_NAME);
+
+    const displayUsernamePasswordLoginForm = localLoginOptionPresent || superAdminLoginOptionPresent;
 
     return (
         <>
             <div className={styles.MainWrapper}>
                 <h1 className={`TextLarge ${styles.LoginTitle}`}>{t("Authentication.welcome")}</h1>
 
-                {loginPasswordOptionPresent && <LoginPasswordForm />}
+                {displayUsernamePasswordLoginForm && <LoginPasswordForm />}
 
-                {loginPasswordOptionPresent && oidcOptionPresent && <SeparatorLine />}
+                {displayUsernamePasswordLoginForm && oidcOptionPresent && <SeparatorLine />}
 
                 {ifFound(oidcOptionPresent, (value) => (
-                    <LoginOidcForm option={value as OIDCAuthOption} />
+                    <LoginOidcForm option={value as OIDCLoginOption} />
                 ))}
             </div>
         </>

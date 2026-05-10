@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
 
+import net.javacrumbs.jsonunit.core.Option;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,13 +68,13 @@ class SettingsApiTest {
     @AutoConfigureTestRestTemplate
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.options.static-admin.enabled=true",
-                "axelix.master.auth.options.static-admin.credentials.username=admin",
-                "axelix.master.auth.options.static-admin.credentials.password=password",
+                "axelix.master.auth.options.local.enabled=true",
+                "axelix.master.auth.options.super-admin.credentials.username=admin",
+                "axelix.master.auth.options.super-admin.credentials.password=admin",
                 "axelix.master.auth.options.oauth2.enabled=false"
             })
     @Nested
-    class WhenStaticAdminEnabled {
+    class WhenLocalEnabled {
 
         // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access
         // settings API.
@@ -81,7 +82,7 @@ class SettingsApiTest {
         private TestRestTemplate restTemplate;
 
         @Test
-        void shouldReturnStaticAdminSettings() {
+        void shouldReturnLocalLoginSettings() {
 
             ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings/auth", String.class);
 
@@ -89,14 +90,17 @@ class SettingsApiTest {
             // language=json
             String EXPECTED_JSON = """
                 {
-                  "authProviders": [
+                  "authenticationOptions": [
                     {
-                      "type": "login-password"
+                      "type": "super-admin"
+                    },
+                    {
+                      "type" : "local"
                     }
                   ]
                 }
                 """;
-            assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
+            assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
         }
     }
 
@@ -117,7 +121,10 @@ class SettingsApiTest {
                 // language=json
                 """
             {
-              "authProviders": [
+              "authenticationOptions": [
+                {
+                  "type": "super-admin"
+                },
                 {
                   "clientId": "test-client",
                   "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
@@ -148,7 +155,7 @@ class SettingsApiTest {
             ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings/auth", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
+            assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
         }
     }
 
@@ -156,9 +163,9 @@ class SettingsApiTest {
     @AutoConfigureTestRestTemplate
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.options.static-admin.enabled=true",
-                "axelix.master.auth.options.static-admin.credentials.username=admin",
-                "axelix.master.auth.options.static-admin.credentials.password=password",
+                "axelix.master.auth.options.local.enabled=true",
+                "axelix.master.auth.options.super-admin.credentials.password=admin",
+                "axelix.master.auth.options.super-admin.credentials.username=admin",
                 "axelix.master.auth.options.oauth2.enabled=true",
                 "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
                 "axelix.master.auth.options.oauth2.client-id=test-client",
@@ -166,13 +173,13 @@ class SettingsApiTest {
                 "axelix.master.auth.options.oauth2.base-url=http://localhost:3000"
             })
     @Nested
-    class WhenStaticAdminAndOAuth2Enabled {
+    class WhenLocalAndOAuth2Enabled {
 
         private static final String EXPECTED_JSON =
                 // language=json
                 """
                 {
-                  "authProviders": [
+                  "authenticationOptions": [
                     {
                       "clientId": "test-client",
                       "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
@@ -181,7 +188,10 @@ class SettingsApiTest {
                       "type": "oidc"
                     },
                     {
-                      "type": "login-password"
+                      "type": "super-admin"
+                    },
+                    {
+                      "type": "local"
                     }
                   ]
                 }
