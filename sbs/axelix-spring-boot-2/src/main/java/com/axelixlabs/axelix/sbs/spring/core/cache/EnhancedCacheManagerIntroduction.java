@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -33,8 +32,11 @@ import org.springframework.aop.support.AopUtils;
  * invocations on the proxy to the supplied delegate, while letting any concrete-class-specific method
  * proceed to the proxied target. This preserves the runtime type of the original {@code CacheManager}
  * bean while exposing the enhanced management API.
+ *
+ * @since 11.05.2026
+ * @author Artemiy Degtyarev
  */
-class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
+final class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
 
     private final EnhancedCacheManager delegate;
 

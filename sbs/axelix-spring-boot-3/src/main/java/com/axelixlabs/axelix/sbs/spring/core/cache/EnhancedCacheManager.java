@@ -32,6 +32,7 @@ import java.util.Collection;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public interface EnhancedCacheManager extends CacheManager {
 

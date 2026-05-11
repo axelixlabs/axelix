@@ -32,6 +32,7 @@ import org.springframework.cache.CacheManager;
  *
  * @since 24.11.2025
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 

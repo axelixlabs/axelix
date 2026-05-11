@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
@@ -63,6 +64,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         Optional.ofNullable(this.getCache(cacheName)).ifPresent(cache -> cache.evictIfPresent(key));
     }
 
+    /** Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency. */
     @Override
     public void clearAll() {
         this.getCacheNames().forEach(this::getCache);
@@ -121,6 +123,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     /**
      * Enable all caches.
+     * <p>Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency.
      */
     @Override
     public void enableAll() {
@@ -131,6 +134,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     /**
      * Disable all caches.
+     * <p>Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency.
      */
     @Override
     public void disableAll() {

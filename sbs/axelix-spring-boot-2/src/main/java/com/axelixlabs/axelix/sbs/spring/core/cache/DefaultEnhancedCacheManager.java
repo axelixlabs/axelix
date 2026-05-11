@@ -37,6 +37,7 @@ import org.springframework.cache.CacheManager;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
@@ -64,6 +65,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         Optional.ofNullable(this.getCache(cacheName)).ifPresent(cache -> cache.evictIfPresent(key));
     }
 
+    /** Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency. */
     @Override
     public void clearAll() {
         this.getCacheNames().forEach(this::getCache);
@@ -110,6 +112,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         }
     }
 
+    /** Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency. */
     @Override
     public void enableAll() {
         this.getCacheNames().forEach(this::getCache);
@@ -117,6 +120,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
         this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.enable());
     }
 
+    /** Best-effort with respect to caches created concurrently; late arrivals may be skipped, so callers should not rely on strong consistency. */
     @Override
     public void disableAll() {
         this.getCacheNames().forEach(this::getCache);
