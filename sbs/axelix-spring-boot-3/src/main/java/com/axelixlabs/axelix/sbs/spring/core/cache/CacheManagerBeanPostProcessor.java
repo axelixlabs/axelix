@@ -37,7 +37,7 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        if (!(bean instanceof CacheManager)) {
+        if (!(bean instanceof CacheManager) || bean instanceof EnhancedCacheManager) {
             return bean;
         }
         return createEnhancedCacheManagerProxy((CacheManager) bean, beanName);

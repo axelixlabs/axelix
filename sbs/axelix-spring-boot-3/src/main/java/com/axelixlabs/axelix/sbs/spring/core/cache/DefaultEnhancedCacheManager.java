@@ -56,7 +56,7 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     @Override
     public void clear(String cacheName) {
-        Optional.ofNullable(this.getCache(cacheName)).ifPresent(Cache::invalidate);
+        Optional.ofNullable(this.getCache(cacheName)).ifPresent(Cache::clear);
     }
 
     @Override
