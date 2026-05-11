@@ -42,7 +42,7 @@ class EnhancedCacheManagerTest {
     @BeforeEach
     void setUp() {
         CacheManager cacheManager = new ConcurrentMapCacheManager();
-        subject = new EnhancedCacheManager("testCacheManagerBeanName", cacheManager);
+        subject = new DefaultEnhancedCacheManager("testCacheManagerBeanName", cacheManager);
     }
 
     @Test

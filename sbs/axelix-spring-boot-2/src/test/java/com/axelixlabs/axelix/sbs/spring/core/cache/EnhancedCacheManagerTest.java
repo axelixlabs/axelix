@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 /**
- * Unit tests for {@link EnhancedCacheManager}.
+ * Unit tests for {@link DefaultEnhancedCacheManager}.
  *
  * @since 23.06.2025
  * @author Nikita Kirillov
@@ -42,7 +42,7 @@ class EnhancedCacheManagerTest {
     @BeforeEach
     void setUp() {
         CacheManager cacheManager = new ConcurrentMapCacheManager();
-        subject = new EnhancedCacheManager("testCacheManagerBeanName", cacheManager);
+        subject = new DefaultEnhancedCacheManager("testCacheManagerBeanName", cacheManager);
     }
 
     @Test
