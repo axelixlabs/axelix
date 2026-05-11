@@ -17,14 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.jspecify.annotations.Nullable;
-import org.springframework.aop.IntroductionInterceptor;
-import org.springframework.aop.support.AopUtils;
-
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.aop.IntroductionInterceptor;
+import org.springframework.aop.support.AopUtils;
 
 /**
  * Routes {@link EnhancedCacheManager} (and its inherited {@link org.springframework.cache.CacheManager})
@@ -48,8 +49,9 @@ final class EnhancedCacheManagerIntroduction implements IntroductionInterceptor 
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method delegateMethod = findDelegateMethod(invocation.getMethod());
 
-        if (delegateMethod != null)
+        if (delegateMethod != null) {
             return AopUtils.invokeJoinpointUsingReflection(delegate, delegateMethod, invocation.getArguments());
+        }
 
         return invocation.proceed();
     }
@@ -61,8 +63,9 @@ final class EnhancedCacheManagerIntroduction implements IntroductionInterceptor 
 
     @Nullable
     private Method findDelegateMethod(Method invokedMethod) {
-        if (invokedMethod.getDeclaringClass().equals(Object.class))
+        if (invokedMethod.getDeclaringClass().equals(Object.class)) {
             return null;
+        }
 
         return delegateMethods.computeIfAbsent(invokedMethod, s -> {
             try {

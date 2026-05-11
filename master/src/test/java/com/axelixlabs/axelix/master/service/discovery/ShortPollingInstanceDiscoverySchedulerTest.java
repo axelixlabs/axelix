@@ -32,7 +32,6 @@ import org.instancio.Select;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -122,10 +121,6 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    // TODO
-    //  This test is currently failing, and a ticket has already been opened to
-    //  track the fix https://github.com/axelixlabs/axelix/issues/944
-    @Disabled
     void shouldRegisterNewK8sInstancesWhenDiscovered() {
         String service1 = "service-1";
         String service2 = "service-2";

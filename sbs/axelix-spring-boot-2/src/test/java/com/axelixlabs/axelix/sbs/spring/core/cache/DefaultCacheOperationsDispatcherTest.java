@@ -61,9 +61,9 @@ class DefaultCacheOperationsDispatcherTest {
         Map<String, CacheManager> managers = new HashMap<>();
 
         cacheManager1 = new DefaultEnhancedCacheManager(
-            TEST_CACHE_MANAGER_1, new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2));
+                TEST_CACHE_MANAGER_1, new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2));
         cacheManager2 =
-            new DefaultEnhancedCacheManager(TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2));
+                new DefaultEnhancedCacheManager(TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2));
         managers.put(TEST_CACHE_MANAGER_1, cacheManager1);
         managers.put(TEST_CACHE_MANAGER_2, cacheManager2);
 
@@ -92,7 +92,7 @@ class DefaultCacheOperationsDispatcherTest {
     @Test
     void shouldNoOpOnClearingNonExistentCacheManager() {
         assertThatThrownBy(() -> dispatcher.clear("nonExistentCacheManager", "cache"))
-            .isInstanceOf(CacheManagerNotFoundException.class);
+                .isInstanceOf(CacheManagerNotFoundException.class);
     }
 
     @Test
@@ -114,7 +114,7 @@ class DefaultCacheOperationsDispatcherTest {
         // then.
         assertThat(cache.get(keyToRemove)).isNull();
         assertThat(cache.get(keyToKeep)).isNotNull().satisfies(cacheValue -> assertThat(cacheValue.get())
-            .isEqualTo("value2"));
+                .isEqualTo("value2"));
     }
 
     @Test
@@ -241,14 +241,14 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
-            .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
-            .findFirst()
-            .orElseThrow()
-            .getCaches()
-            .stream()
-            .filter(it -> TEST_CACHE_1.equals(it.getName()))
-            .findFirst()
-            .orElseThrow();
+                .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getCaches()
+                .stream()
+                .filter(it -> TEST_CACHE_1.equals(it.getName()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(cache.isContainsStats()).isTrue();
     }
@@ -264,14 +264,14 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
-            .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
-            .findFirst()
-            .orElseThrow()
-            .getCaches()
-            .stream()
-            .filter(it -> TEST_CACHE_1.equals(it.getName()))
-            .findFirst()
-            .orElseThrow();
+                .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getCaches()
+                .stream()
+                .filter(it -> TEST_CACHE_1.equals(it.getName()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(cache.isContainsStats()).isFalse();
     }
@@ -279,7 +279,7 @@ class DefaultCacheOperationsDispatcherTest {
     @Test
     void isCacheEnabled_shouldReturnTrueForEnabledCache() {
         assertThat(dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_1).isEnabled())
-            .isTrue();
+                .isTrue();
     }
 
     @Test
@@ -360,11 +360,11 @@ class DefaultCacheOperationsDispatcherTest {
         // then.
         assertThat(first.getEstimatedEntrySize()).isEqualTo(2L);
         assertThat(first.getLookupHistory().stream()
-            .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
-            .hasSize(2);
+                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+                .hasSize(2);
         assertThat(first.getLookupHistory().stream()
-            .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
-            .hasSize(2);
+                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+                .hasSize(2);
 
         // given.
         Cache cache2 = cacheManager2.getCache(TEST_CACHE_2);
@@ -378,45 +378,45 @@ class DefaultCacheOperationsDispatcherTest {
         // then.
         assertThat(second.getEstimatedEntrySize()).isEqualTo(1L);
         assertThat(second.getLookupHistory().stream()
-            .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
-            .hasSize(1);
+                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+                .hasSize(1);
         assertThat(second.getLookupHistory().stream()
-            .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
-            .hasSize(1);
+                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+                .hasSize(1);
     }
 
     @Test
     void shouldReturnNull_ForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.get("nonExistentManager", TEST_CACHE_1))
-            .isInstanceOf(CacheManagerNotFoundException.class);
+                .isInstanceOf(CacheManagerNotFoundException.class);
     }
 
     @Test
     void enableCacheManager_shouldThrowExceptionForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.enableCacheManager("nonExistentManager"))
-            .isInstanceOf(CacheManagerNotFoundException.class)
-            .hasMessageContaining("nonExistentManager");
+                .isInstanceOf(CacheManagerNotFoundException.class)
+                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
     void disableCacheManager_shouldThrowExceptionForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.disableCacheManager("nonExistentManager"))
-            .isInstanceOf(CacheManagerNotFoundException.class)
-            .hasMessageContaining("nonExistentManager");
+                .isInstanceOf(CacheManagerNotFoundException.class)
+                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
     void enableCache_shouldThrowExceptionForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.enableCache("nonExistentManager", TEST_CACHE_1))
-            .isInstanceOf(CacheManagerNotFoundException.class)
-            .hasMessageContaining("nonExistentManager");
+                .isInstanceOf(CacheManagerNotFoundException.class)
+                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
     void disableCache_shouldThrowExceptionForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.disableCache("nonExistentManager", TEST_CACHE_1))
-            .isInstanceOf(CacheManagerNotFoundException.class)
-            .hasMessageContaining("nonExistentManager");
+                .isInstanceOf(CacheManagerNotFoundException.class)
+                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
