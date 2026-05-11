@@ -26,8 +26,6 @@ logging:
           core:
             JdbcTemplate: DEBUG
 
-
-
 management:
   endpoint:
     health:
@@ -39,15 +37,6 @@ management:
         include: [ "health" ]
 
 axelix:
-  config:
-    auth:
-      tables:
-        user-table: users
-        role-table: roles
-        authority-table: authorities
-        user-role-table: user_roles
-        role-authority-table: role_authorities
-        role-components-table: role_components
   master:
     discovery:
       auto:
