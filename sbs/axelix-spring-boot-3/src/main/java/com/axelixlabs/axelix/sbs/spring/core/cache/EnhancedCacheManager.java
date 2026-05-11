@@ -28,9 +28,10 @@ import java.util.Collection;
  * {@link CacheManager}. Implementations are typically attached to user-defined {@link CacheManager}
  * beans through an AOP proxy so that the original concrete type is preserved.
  *
+ * @since 24.11.2025
+ * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
- * @author Nikita Kirillov
  */
 public interface EnhancedCacheManager extends CacheManager {
 

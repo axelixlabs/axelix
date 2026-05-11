@@ -28,8 +28,7 @@ import org.springframework.cache.CacheManager;
 /**
  * BeanPostProcessor that creates an AOP proxy for every {@link CacheManager} bean to introduce
  * the {@link EnhancedCacheManager} contract while preserving the runtime type of the original
- * cache manager. The proxy is built with Spring's {@link ProxyFactory} using CGLIB so that user
- * code performing checks like {@code cacheManager instanceof CaffeineCacheManager} continues to work.
+ * cache manager.
  *
  * @since 24.11.2025
  * @author Nikita Kirillov
@@ -54,6 +53,12 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
         proxyFactory.addAdvisor(new DefaultIntroductionAdvisor(
                 new EnhancedCacheManagerIntroduction(delegate), EnhancedCacheManager.class));
 
-        return proxyFactory.getProxy();
+        try {
+            return proxyFactory.getProxy();
+        } catch (Exception e) {
+           proxyFactory.setProxyTargetClass(false);
+
+            return proxyFactory.getProxy();
+        }
     }
 }

@@ -41,7 +41,7 @@ class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
 
     @Override
     public boolean implementsInterface(Class<?> intf) {
-        return intf.isAssignableFrom(EnhancedCacheManager.class);
+        return intf.equals(EnhancedCacheManager.class);
     }
 
     @Override
@@ -57,6 +57,9 @@ class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
 
     @Nullable
     private Method findDelegateMethod(Method invokedMethod) {
+        if (invokedMethod.getDeclaringClass().equals(Object.class))
+            return null;
+
         try {
             return EnhancedCacheManager.class.getMethod(invokedMethod.getName(), invokedMethod.getParameterTypes());
         } catch (NoSuchMethodException e) {

@@ -51,6 +51,12 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
         proxyFactory.addAdvisor(new DefaultIntroductionAdvisor(new EnhancedCacheManagerIntroduction(delegate),
             EnhancedCacheManager.class));
 
-        return proxyFactory.getProxy();
+        try {
+            return proxyFactory.getProxy();
+        } catch (Exception e) {
+            proxyFactory.setProxyTargetClass(false);
+
+            return proxyFactory.getProxy();
+        }
     }
 }

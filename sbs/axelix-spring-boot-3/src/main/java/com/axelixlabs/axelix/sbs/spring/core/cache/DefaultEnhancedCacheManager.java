@@ -28,15 +28,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * CacheManager implementation that provides dynamic control over cache operations.
- * <p>
- * Current implementation stores the map of {@link EnhancedCache EnhancedCache instances}.
- * All the operations, like clear, eviction by key, get by key etc. can be performed of the
- * {@link EnhancedCache}, rather than on the {@link #delegate}, since {@link EnhancedCache}
- * instance by design internally holds the reference to the exact same {@link Cache} object
- * on the heap, as the underlying {@link #delegate} does.
+ * Default {@link EnhancedCacheManager} implementation that delegates the core
+ * {@link CacheManager} contract to an underlying manager and maintains a map of
+ * {@link EnhancedCache} instances on top of the underlying caches.
  *
- * @since 24.11.2025
+ * @since 11.05.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
@@ -69,6 +65,8 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     @Override
     public void clearAll() {
+        this.getCacheNames().forEach(this::getCache);
+
         caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.clear());
     }
 
@@ -80,21 +78,11 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
+        return caches.computeIfAbsent(name, s -> {
             Cache cache = delegate.getCache(s);
 
-            if (cache != null) {
-                return new DefaultEnhancedCache(cache);
-            } else {
-                return NonExistentEnhancedCache.INSTANCE;
-            }
+            return cache != null ? new DefaultEnhancedCache(cache) : null;
         });
-
-        if (enhancedCache instanceof NonExistentEnhancedCache) {
-            return null;
-        } else {
-            return enhancedCache;
-        }
     }
 
     @Override
@@ -110,10 +98,10 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
      */
     @Override
     public void enable(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+        EnhancedCache cache = this.getCache(cacheName);
 
         if (cache != null) {
-            ((EnhancedCache) cache).enable();
+            cache.enable();
         }
     }
 
@@ -124,10 +112,10 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
      */
     @Override
     public void disable(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+        EnhancedCache cache = this.getCache(cacheName);
 
         if (cache != null) {
-            ((EnhancedCache) cache).disable();
+            cache.disable();
         }
     }
 
@@ -136,9 +124,9 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
      */
     @Override
     public void enableAll() {
-        this.caches.forEach((cacheManagerName, enhancedCache) -> {
-            enhancedCache.enable();
-        });
+        this.getCacheNames().forEach(this::getCache);
+
+        this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.enable());
     }
 
     /**
@@ -146,9 +134,9 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
      */
     @Override
     public void disableAll() {
-        this.caches.forEach((cacheManagerName, enhancedCache) -> {
-            enhancedCache.disable();
-        });
+        this.getCacheNames().forEach(this::getCache);
+
+        this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.disable());
     }
 
     /**
@@ -159,10 +147,10 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
      */
     @Override
     public boolean isEnabled(String cacheName) {
-        Cache cache = this.getCache(cacheName);
+        EnhancedCache cache = this.getCache(cacheName);
 
         if (cache != null) {
-            return ((EnhancedCache) cache).isEnabled();
+            return cache.isEnabled();
         }
 
         return false;

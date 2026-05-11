@@ -318,8 +318,8 @@ class DefaultCacheOperationsDispatcherTest {
         dispatcher.disableCacheManager(cacheManagerName);
 
         // then.
-        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_1).isEnabled()).isTrue();
-        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_2).isEnabled()).isTrue();
+        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_1).isEnabled()).isFalse();
+        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_2).isEnabled()).isFalse();
     }
 
     @Test

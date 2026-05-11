@@ -33,7 +33,7 @@ import org.springframework.cache.CacheManager;
  * {@link CacheManager} contract to an underlying manager and maintains a map of
  * {@link EnhancedCache} instances on top of the underlying caches.
  *
- * @since 24.11.2025
+ * @since 11.05.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
@@ -66,6 +66,8 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     @Override
     public void clearAll() {
+        this.getCacheNames().forEach(this::getCache);
+
         caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.clear());
     }
 
@@ -77,21 +79,11 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
+        return caches.computeIfAbsent(name, s -> {
             Cache cache = delegate.getCache(s);
 
-            if (cache != null) {
-                return new DefaultEnhancedCache(cache);
-            } else {
-                return NonExistentEnhancedCache.INSTANCE;
-            }
+            return cache != null ? new DefaultEnhancedCache(cache) : null;
         });
-
-        if (enhancedCache instanceof NonExistentEnhancedCache) {
-            return null;
-        } else {
-            return enhancedCache;
-        }
     }
 
     @Override
@@ -120,11 +112,15 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     @Override
     public void enableAll() {
+        this.getCacheNames().forEach(this::getCache);
+
         this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.enable());
     }
 
     @Override
     public void disableAll() {
+        this.getCacheNames().forEach(this::getCache);
+
         this.caches.forEach((cacheManagerName, enhancedCache) -> enhancedCache.disable());
     }
 
