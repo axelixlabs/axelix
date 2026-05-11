@@ -15,17 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export interface ICommonSliceState {
-    /**
-     * True if a login request is in progress
-     */
-    loading: boolean;
-
-    /**
-     * Error message if login failed, empty string otherwise
-     * */
-    error: string;
-}
+import type { LoginOption } from "../types/auth.ts";
 
 /**
  * The {@link IRequest} implementation that is stateful, meaning, that it produces
@@ -60,10 +50,6 @@ export class StatelessRequest implements IRequest {
         public error: string,
         public completed: boolean,
     ) {}
-
-    public completedSuccessfully(): boolean {
-        return this.completed && !this.error && !this.loading;
-    }
 
     public static loading(): StatelessRequest {
         return new StatelessRequest(true, "", false);
@@ -180,4 +166,16 @@ export interface IAutocompletionOption {
      *  The text value for the autocompletion entry
      *  */
     value: string;
+}
+
+export interface IAxelixSettings {
+    /**
+     * Boolean flag that represents if the MCP server is enabled.
+     */
+    isMcpServerEnabled: boolean;
+
+    /**
+     * Authentication options configured on the backend
+     */
+    authenticationOptions: LoginOption[];
 }

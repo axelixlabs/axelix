@@ -49,6 +49,8 @@ axelix:
         role-authority-table: role_authorities
         role-components-table: role_components
   master:
+    mcp-server:
+      enabled: false
     discovery:
       auto:
         broadcast:

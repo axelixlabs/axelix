@@ -16,10 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { lazy } from "react";
+import { useSelector } from "react-redux";
 import { Navigate, Route, Routes } from "react-router";
 
 import Loadable from "components";
 import { MainLayout } from "layout";
+
+import type { RootState } from "../store";
 
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
@@ -38,6 +41,8 @@ const Beans = Loadable(lazy(() => import("pages/Beans")));
 const MCP = Loadable(lazy(() => import("pages/MCP")));
 
 export const MainRoutes = () => {
+    const settings = useSelector((state: RootState) => state.settings);
+
     return (
         <>
             <Routes>
@@ -45,7 +50,7 @@ export const MainRoutes = () => {
                     <Route index element={<Navigate to="/wallboard" replace />} />
                     <Route path="/wallboard" element={<Wallboard />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/mcp-server" element={<MCP />} />
+                    {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
                 </Route>
 

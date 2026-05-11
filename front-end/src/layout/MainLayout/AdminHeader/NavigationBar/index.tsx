@@ -16,22 +16,28 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router";
+
+import type { RootState } from "store";
 
 import styles from "./styles.module.css";
 
 export const NavigationBar = () => {
     const { t } = useTranslation();
+    const settings = useSelector((state: RootState) => state.settings);
 
     return (
         <>
             <nav data-test="header-links">
-                <NavLink
-                    to="/mcp-server"
-                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
-                >
-                    MCP
-                </NavLink>
+                {settings.isMcpServerEnabled && (
+                    <NavLink
+                        to="/mcp-server"
+                        className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                    >
+                        MCP
+                    </NavLink>
+                )}
                 <NavLink
                     to="/dashboard"
                     className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}

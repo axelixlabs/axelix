@@ -84,7 +84,7 @@ class SettingsApiTest {
         @Test
         void shouldReturnLocalLoginSettings() {
 
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings/auth", String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             // language=json
@@ -97,7 +97,8 @@ class SettingsApiTest {
                     {
                       "type" : "local"
                     }
-                  ]
+                  ],
+                  "mcpServerEnabled" : false
                 }
                 """;
             assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
@@ -132,7 +133,8 @@ class SettingsApiTest {
                   "authorizationEndpoint": "https://example.external.com/realms/axelix/openid-connect/auth",
                   "type": "oidc"
                 }
-              ]
+              ],
+              "mcpServerEnabled" : false
             }
             """;
 
@@ -152,7 +154,7 @@ class SettingsApiTest {
 
         @Test
         void shouldReturnOAuth2Settings() {
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings/auth", String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
@@ -193,7 +195,8 @@ class SettingsApiTest {
                     {
                       "type": "local"
                     }
-                  ]
+                  ],
+                  "mcpServerEnabled" : false
                 }
                 """;
 
@@ -211,7 +214,7 @@ class SettingsApiTest {
 
         @Test
         void shouldReturnBothProviders() {
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings/auth", String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);

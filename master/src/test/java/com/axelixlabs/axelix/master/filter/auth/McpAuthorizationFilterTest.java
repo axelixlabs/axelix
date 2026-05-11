@@ -53,7 +53,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.autoconfiguration.McpAutoConfiguration;
+import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
@@ -155,6 +155,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
     @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
+                "axelix.master.mcp-server.enabled=true",
                 "axelix.master.auth.options.local.enabled=true",
                 "axelix.master.auth.options.super-admin.credentials.username=admin",
                 "axelix.master.auth.options.super-admin.credentials.password=admin",
@@ -280,6 +281,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
     @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
+                "axelix.master.mcp-server.enabled=true",
                 "axelix.master.auth.options.oauth2.enabled=true",
                 "axelix.master.auth.options.oauth2.issuer-uri=http://localhost:8999",
                 "axelix.master.auth.options.oauth2.client-id=test-client-id",

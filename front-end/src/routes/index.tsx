@@ -15,15 +15,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { BrowserRouter } from "react-router";
 
+import { getAxelixSettings } from "services";
 import { IS_AUTH } from "utils";
+
+import { setAxelixSettings } from "../store/slices";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
     const isAuth = localStorage.getItem(IS_AUTH);
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getAxelixSettings()
+            .then((value) => {
+                dispatch(setAxelixSettings(value.data));
+                setLoading(false);
+            })
+            .catch((reason) => {
+                // TODO: Insert an image of something went wrong
+                return reason;
+            });
+    }, [dispatch]);
+
+    if (loading) {
+        return "";
+    }
 
     return (
         <>

@@ -28,10 +28,6 @@ export const logout = () => {
     return apiFetch.post("users/logout");
 };
 
-export const getAuthOptions = () => {
-    return apiFetch.get("settings/auth");
-};
-
 /**
  * Invoke OIDC '/authorize' endpoint
  */

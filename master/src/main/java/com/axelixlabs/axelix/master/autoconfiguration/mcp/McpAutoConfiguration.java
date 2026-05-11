@@ -15,15 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration;
+package com.axelixlabs.axelix.master.autoconfiguration.mcp;
 
 import java.util.List;
-
-import tools.jackson.databind.json.JsonMapper;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
@@ -37,16 +31,23 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import tools.jackson.databind.json.JsonMapper;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Auto-Configuration for the MCP-related components
  *
  * @author Mikhail Polivakha
  */
-// TODO: Add the ability to disable MCP server
 // TODO: And bring other mcp-related beans here.
 @AutoConfiguration
+@ConditionalOnMcpServerEnabled
 public class McpAutoConfiguration {
+
+    public static final String MCP_CONFIGURATION_PROPERTIES_PREFIX = "axelix.master.mcp-server";
 
     @Bean
     public McpAuthorizationFilter mcpAuthenticationFilter(

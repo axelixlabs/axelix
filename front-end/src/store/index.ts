@@ -17,11 +17,12 @@
  */
 import { configureStore } from "@reduxjs/toolkit";
 
-import { AuthoritiesSlice } from "./slices";
+import { AuthoritiesSlice, SettingsSlice } from "./slices";
 
 export const store = configureStore({
     reducer: {
         authorities: AuthoritiesSlice.reducer,
+        settings: SettingsSlice.reducer,
     },
 });
 

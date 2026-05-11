@@ -15,29 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createSlice } from "@reduxjs/toolkit";
+import { apiFetch } from "api";
 
-import { EAuthorities, type IAxelixSettings } from "models";
-
-export const AuthoritiesSlice = createSlice({
-    name: "authorities",
-    initialState: [] as EAuthorities[],
-    reducers: {
-        setAuthorities: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: {} as IAxelixSettings,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
-export const { setAuthorities } = AuthoritiesSlice.actions;
-export const { setAxelixSettings } = SettingsSlice.actions;
+export const getAxelixSettings = () => {
+    return apiFetch.get("settings");
+};

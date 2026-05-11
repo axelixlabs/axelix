@@ -8,6 +8,7 @@ spring:
   ai:
     mcp:
       server:
+        enabled: ${axelix.master.mcp-server.enabled}
         protocol: streamable
         name: "axelix-mcp-server"
         # Ant-like value placeholder is substituted by Gradle resources task
@@ -32,6 +33,8 @@ management:
 # TODO: we need to think about the design of properties in general
 axelix:
   master:
+    mcp-server:
+      enabled: true
     database:
       url: jdbc:sqlite:axelix.db
       username: ""
