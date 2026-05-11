@@ -23,6 +23,8 @@ import org.springframework.aop.IntroductionInterceptor;
 import org.springframework.aop.support.AopUtils;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Routes {@link EnhancedCacheManager} (and its inherited {@link org.springframework.cache.CacheManager})
@@ -32,6 +34,7 @@ import java.lang.reflect.Method;
  */
 public class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
     private final EnhancedCacheManager delegate;
+    private final Map<Method, Method> delegateMethods = new ConcurrentHashMap<>();
 
     public EnhancedCacheManagerIntroduction(EnhancedCacheManager delegate) {
         this.delegate = delegate;
@@ -50,7 +53,7 @@ public class EnhancedCacheManagerIntroduction implements IntroductionInterceptor
 
     @Override
     public boolean implementsInterface(Class<?> intf) {
-        return intf.equals(EnhancedCacheManager.class);
+        return intf.isAssignableFrom(EnhancedCacheManager.class);
     }
 
     @Nullable
@@ -58,10 +61,12 @@ public class EnhancedCacheManagerIntroduction implements IntroductionInterceptor
         if (invokedMethod.getDeclaringClass().equals(Object.class))
             return null;
 
-        try {
-            return EnhancedCacheManager.class.getMethod(invokedMethod.getName(), invokedMethod.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        return delegateMethods.computeIfAbsent(invokedMethod, s -> {
+            try {
+                return EnhancedCacheManager.class.getMethod(s.getName(), s.getParameterTypes());
+            } catch (NoSuchMethodException e) {
+                return null;
+            }
+        });
     }
 }

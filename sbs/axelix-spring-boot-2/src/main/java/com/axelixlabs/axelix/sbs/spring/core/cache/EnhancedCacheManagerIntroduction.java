@@ -18,6 +18,9 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.Nullable;
@@ -35,13 +38,15 @@ class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
 
     private final EnhancedCacheManager delegate;
 
+    private final Map<Method, Method> delegateMethods = new ConcurrentHashMap<>();
+
     EnhancedCacheManagerIntroduction(EnhancedCacheManager delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public boolean implementsInterface(Class<?> intf) {
-        return intf.equals(EnhancedCacheManager.class);
+        return intf.isAssignableFrom(EnhancedCacheManager.class);
     }
 
     @Override
@@ -60,10 +65,12 @@ class EnhancedCacheManagerIntroduction implements IntroductionInterceptor {
         if (invokedMethod.getDeclaringClass().equals(Object.class))
             return null;
 
-        try {
-            return EnhancedCacheManager.class.getMethod(invokedMethod.getName(), invokedMethod.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        return delegateMethods.computeIfAbsent(invokedMethod, s -> {
+            try {
+                return EnhancedCacheManager.class.getMethod(s.getName(), s.getParameterTypes());
+            } catch (NoSuchMethodException e) {
+                return null;
+            }
+        });
     }
 }

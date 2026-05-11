@@ -37,7 +37,7 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        if (!(bean instanceof CacheManager) || bean instanceof EnhancedCacheManager) {
+        if (!(bean instanceof CacheManager)) {
             return bean;
         }
 
@@ -53,12 +53,6 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
         proxyFactory.addAdvisor(new DefaultIntroductionAdvisor(
                 new EnhancedCacheManagerIntroduction(delegate), EnhancedCacheManager.class));
 
-        try {
-            return proxyFactory.getProxy();
-        } catch (Exception e) {
-           proxyFactory.setProxyTargetClass(false);
-
-            return proxyFactory.getProxy();
-        }
+        return proxyFactory.getProxy();
     }
 }
