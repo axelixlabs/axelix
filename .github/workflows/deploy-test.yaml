@@ -118,6 +118,7 @@ jobs:
             --set image.ref=${{ steps.gradleProperties.outputs.value }} \
             --set axelix.master.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
             --set axelix.master.auth.jwt.algorithm=HMAC512 \
+            --set axelix.master.auth.cookie.secure=false \
             --set axelix.master.auth.options.oauth2.enabled=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED }} \
             --set axelix.master.auth.options.oauth2.issuerUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI }} \
             --set axelix.master.auth.options.oauth2.baseUrl=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }}  \
