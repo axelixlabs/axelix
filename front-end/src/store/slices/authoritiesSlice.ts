@@ -17,11 +17,13 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 
-import { EAuthorities, type IAxelixSettings } from "models";
+import { EAuthorities } from "models";
+
+const initialState: EAuthorities[] = [];
 
 export const AuthoritiesSlice = createSlice({
     name: "authorities",
-    initialState: [] as EAuthorities[],
+    initialState: initialState,
     reducers: {
         setAuthorities: (_, action) => {
             return action.payload;
@@ -29,15 +31,4 @@ export const AuthoritiesSlice = createSlice({
     },
 });
 
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: {} as IAxelixSettings,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
 export const { setAuthorities } = AuthoritiesSlice.actions;
-export const { setAxelixSettings } = SettingsSlice.actions;

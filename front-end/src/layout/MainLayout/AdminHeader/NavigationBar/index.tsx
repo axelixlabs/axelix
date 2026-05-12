@@ -16,16 +16,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
 import { NavLink } from "react-router";
 
-import type { RootState } from "store";
+import { useAppSelector } from "hooks";
 
 import styles from "./styles.module.css";
 
 export const NavigationBar = () => {
     const { t } = useTranslation();
-    const settings = useSelector((state: RootState) => state.settings);
+
+    const settings = useAppSelector((state) => state.settings);
 
     return (
         <>

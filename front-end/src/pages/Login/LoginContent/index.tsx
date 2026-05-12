@@ -16,10 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
 
-import { type LoginOption, type OIDCLoginOption } from "models";
-import type { RootState } from "store";
+import { useAppSelector } from "hooks";
+import type { LoginOption, OIDCLoginOption } from "models";
 import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
@@ -43,7 +42,7 @@ const ifFound = <I, O>(value: I | undefined, transformer: (val: I) => O): O | un
 export const LoginContent = () => {
     const { t } = useTranslation();
 
-    const settings = useSelector((state: RootState) => state.settings);
+    const settings = useAppSelector((state) => state.settings);
 
     const getAuthOption = (optionName: string): LoginOption | undefined => {
         return settings?.authenticationOptions?.find(({ type }) => optionName === type);

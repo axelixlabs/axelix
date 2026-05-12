@@ -108,23 +108,6 @@ export interface ITableRow {
     displayValue: string;
 }
 
-export interface IUpdatePropertyRequestData {
-    /**
-     * Instance id of service
-     */
-    instanceId: string;
-
-    /**
-     * Property name
-     */
-    propertyName: string;
-
-    /**
-     * New property value
-     */
-    newValue: string;
-}
-
 export interface IErrorResponse {
     /**
      * Server text used to display a user-friendly notification

@@ -16,21 +16,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { BrowserRouter } from "react-router";
 
+import { useAppDispatch } from "hooks";
 import { getAxelixSettings } from "services";
+import { setAxelixSettings } from "store/slices";
 import { IS_AUTH } from "utils";
-
-import { setAxelixSettings } from "../store/slices";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
     const isAuth = localStorage.getItem(IS_AUTH);
-    const dispatch = useDispatch();
-    const [loading, setLoading] = useState(true);
+    const dispatch = useAppDispatch();
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         getAxelixSettings()
@@ -42,10 +41,10 @@ export const AppRoutes = () => {
                 // TODO: Insert an image of something went wrong
                 return reason;
             });
-    }, [dispatch]);
+    }, []);
 
     if (loading) {
-        return "";
+        return null;
     }
 
     return (
