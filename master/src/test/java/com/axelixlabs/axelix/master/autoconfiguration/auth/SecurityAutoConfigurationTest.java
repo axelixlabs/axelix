@@ -240,7 +240,7 @@ class SecurityAutoConfigurationTest {
         void shouldCreateBasicMcpAuthenticationHandlerWhenMcpServerEnabled() {
             // given.
             ApplicationContextRunner contextRunner =
-                baselineConfigAppContextRunner().withPropertyValues("axelix.master.mcp-server.enabled=true");
+                    baselineConfigAppContextRunner().withPropertyValues("axelix.master.mcp-server.enabled=true");
 
             // when.
             contextRunner.run(context -> {

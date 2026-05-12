@@ -19,14 +19,14 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.AxelixSettings;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * API for retrieving master settings.
@@ -42,9 +42,9 @@ public class SettingsApi {
     private final boolean isMcpServerEnabled;
 
     public SettingsApi(
-        @Value("${" + McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled" + "}") boolean isMcpServerEnabled,
-        List<AuthenticationOption> authSettings
-    ) {
+            @Value("${" + McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled" + "}")
+                    boolean isMcpServerEnabled,
+            List<AuthenticationOption> authSettings) {
         this.isMcpServerEnabled = isMcpServerEnabled;
         this.authSettings = authSettings;
     }

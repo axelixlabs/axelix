@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -51,6 +50,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProp
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
