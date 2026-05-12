@@ -42,6 +42,16 @@ export interface IProps {
      * Whether to display the cancel button or not
      */
     displayCancel?: boolean;
+
+    /**
+     * Whether to display the okay button or not
+     */
+    displayOkay?: boolean;
+
+    /**
+     * Whether it is possible to close the Modal via clicking on the mask.
+     */
+    maskCloseable?: boolean;
 }
 
 export const UniversalModal = ({
@@ -53,6 +63,8 @@ export const UniversalModal = ({
     okText,
     loading,
     displayCancel = true,
+    displayOkay = true,
+    maskCloseable = false,
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
@@ -77,6 +89,18 @@ export const UniversalModal = ({
                           }
                         : {}
                 }
+                okButtonProps={
+                    !displayOkay
+                        ? {
+                              style: {
+                                  display: "none",
+                              },
+                          }
+                        : {}
+                }
+                mask={{
+                    closable: maskCloseable,
+                }}
             >
                 {children}
             </Modal>
