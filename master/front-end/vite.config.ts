@@ -30,7 +30,7 @@ export default defineConfig(async () => {
     let enterpriseAliases = {};
 
     try {
-        const enterpriseModule = await import("./src/enterprise/front-end/aliases");
+        const enterpriseModule = await import("./src/enterprise/front-end/src/aliases");
         if (enterpriseModule && enterpriseModule.getEnterpriseAliases) {
             enterpriseAliases = enterpriseModule.getEnterpriseAliases();
         }
