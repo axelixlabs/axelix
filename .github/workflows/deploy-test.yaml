@@ -124,11 +124,9 @@ jobs:
             # OAuth2 Settings
             --set axelix.master.auth.options.oauth2.enabled=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED }} \
             --set axelix.master.auth.options.oauth2.issuerUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI }} \
-            --set axelix.master.auth.options.oauth2.baseUrl=${{ #TODO }}  \
+            --set axelix.master.auth.options.oauth2.baseUrl=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }}  \
             --set axelix.master.auth.options.oauth2.clientId=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID }} \
             --set axelix.master.auth.options.oauth2.clientSecret=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET }} \
-            --set axelix.master.auth.options.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
-            --set axelix.master.auth.options.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
             
             # Local Settings
             --set axelix.master.auth.options.local.enabled=true \
