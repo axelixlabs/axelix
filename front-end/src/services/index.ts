@@ -23,6 +23,7 @@ export * from "./threadDump";
 export * from "./conditions";
 export * from "./wallboard";
 export * from "./dashboard";
+export * from "./settings";
 export * from "./loggers";
 export * from "./details";
 export * from "./metrics";

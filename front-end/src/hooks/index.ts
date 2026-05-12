@@ -15,10 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useSelector } from "react-redux";
+import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 import type { EAuthorities } from "models";
-import type { RootState } from "store";
+import type { AppDispatch, RootState } from "store";
+
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export const useAuthority = (authority: EAuthorities): boolean => {
     const authorities = useSelector((state: RootState) => state.authorities);

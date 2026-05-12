@@ -32,7 +32,7 @@ public final class ApiPaths {
 
     public static final class SettingsApi {
 
-        public static final String AUTH = "/settings/auth";
+        public static final String SETTINGS = "/settings";
     }
 
     public static final class UsersApi {

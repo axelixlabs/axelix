@@ -72,7 +72,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/actuator/health")
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
-                || path.startsWith("/api/external/settings/auth")
+                || path.startsWith("/api/external/settings")
                 || path.equalsIgnoreCase("/api/internal/service/register")
                 || path.startsWith("/api/mcp")
                 || path.equalsIgnoreCase("/api/external/mcp-oauth2/.well-known/oauth-protected-resource");

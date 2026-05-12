@@ -25,4 +25,7 @@ import java.util.List;
  * @since 06.03.2026
  * @author Nikita Kirillov
  */
-public record AuthSettingsResponse(List<AuthenticationOption> authenticationOptions) {}
+public record AxelixSettings(
+    List<AuthenticationOption> authenticationOptions,
+    boolean mcpServerEnabled
+) {}

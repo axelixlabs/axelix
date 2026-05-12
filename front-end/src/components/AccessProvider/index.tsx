@@ -18,15 +18,15 @@
 import { App } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
 
 import { getCookie, parseAuthorities } from "helpers";
+import { useAppDispatch } from "hooks";
 import { setAuthorities } from "store/slices";
 
 export const AccessProvider = () => {
     const { t } = useTranslation();
     const { message } = App.useApp();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         const authoritiesCookie = getCookie("authorities");

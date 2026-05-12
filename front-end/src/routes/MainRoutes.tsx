@@ -19,6 +19,7 @@ import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
 import Loadable from "components";
+import { useAppSelector } from "hooks";
 import { MainLayout } from "layout";
 
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
@@ -38,6 +39,8 @@ const Beans = Loadable(lazy(() => import("pages/Beans")));
 const MCP = Loadable(lazy(() => import("pages/MCP")));
 
 export const MainRoutes = () => {
+    const settings = useAppSelector((state) => state.settings);
+
     return (
         <>
             <Routes>
@@ -45,7 +48,7 @@ export const MainRoutes = () => {
                     <Route index element={<Navigate to="/wallboard" replace />} />
                     <Route path="/wallboard" element={<Wallboard />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/mcp-server" element={<MCP />} />
+                    {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
                 </Route>
 

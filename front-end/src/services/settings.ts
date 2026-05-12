@@ -15,16 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { configureStore } from "@reduxjs/toolkit";
+import { apiFetch } from "api";
 
-import { AuthoritiesSlice, SettingsSlice } from "./slices";
-
-export const store = configureStore({
-    reducer: {
-        authorities: AuthoritiesSlice.reducer,
-        settings: SettingsSlice.reducer,
-    },
-});
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const getAxelixSettings = () => {
+    return apiFetch.get("settings");
+};

@@ -15,13 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Loader } from "components";
-import { fetchData } from "helpers";
-import { type IAuthOptionsResponseBody, type LoginOption, type OIDCLoginOption, StatefulRequest } from "models";
-import { getAuthOptions } from "services";
+import { useAppSelector } from "hooks";
+import type { LoginOption, OIDCLoginOption } from "models";
 import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
@@ -45,24 +42,10 @@ const ifFound = <I, O>(value: I | undefined, transformer: (val: I) => O): O | un
 export const LoginContent = () => {
     const { t } = useTranslation();
 
-    const [authOptions, setAuthOptions] = useState(StatefulRequest.loading<IAuthOptionsResponseBody>());
-
-    useEffect(() => {
-        fetchData(setAuthOptions, getAuthOptions);
-    }, []);
-
-    if (authOptions.loading) {
-        return <Loader />;
-    }
-
-    if (authOptions.error) {
-        // TODO: How do we handle errors in this case?
-    }
-
-    const response = authOptions.response!;
+    const settings = useAppSelector((state) => state.settings);
 
     const getAuthOption = (optionName: string): LoginOption | undefined => {
-        return response.authenticationOptions.find(({ type }) => optionName === type);
+        return settings?.authenticationOptions?.find(({ type }) => optionName === type);
     };
 
     const localLoginOptionPresent = getAuthOption(LOCAL_AUTH_OPTION_TYPE_NAME);

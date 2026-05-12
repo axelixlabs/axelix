@@ -18,20 +18,26 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
+import { useAppSelector } from "hooks";
+
 import styles from "./styles.module.css";
 
 export const NavigationBar = () => {
     const { t } = useTranslation();
 
+    const settings = useAppSelector((state) => state.settings);
+
     return (
         <>
             <nav data-test="header-links">
-                <NavLink
-                    to="/mcp-server"
-                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
-                >
-                    MCP
-                </NavLink>
+                {settings.isMcpServerEnabled && (
+                    <NavLink
+                        to="/mcp-server"
+                        className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                    >
+                        MCP
+                    </NavLink>
+                )}
                 <NavLink
                     to="/dashboard"
                     className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}

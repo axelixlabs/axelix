@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
 import java.util.List;
 
+import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -110,6 +111,7 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMcpServerEnabled
     public McpAuthenticationHandler basicAuthMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
         return new BasicMcpAuthenticationHandler(userAuthenticator);
     }
@@ -212,6 +214,7 @@ public class SecurityAutoConfiguration {
     public static class OAuth2LoginAutoConfiguration {
 
         @Bean
+        @ConditionalOnMcpServerEnabled
         public McpAuthenticationHandler bearerMcpAuthenticationHandler(OidcRoleExtractor oidcRoleExtractor) {
             return new BearerMcpAuthenticationHandler(oidcRoleExtractor);
         }

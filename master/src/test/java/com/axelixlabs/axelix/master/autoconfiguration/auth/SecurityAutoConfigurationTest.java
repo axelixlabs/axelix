@@ -49,6 +49,9 @@ import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenti
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.SuperAdminAuthenticationOption;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
+import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
+import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
@@ -219,6 +222,33 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasFailed();
             });
         }
+
+        @Test
+        void shouldNotCreateBasicMcpAuthenticationHandlerWhenMcpServerDisabled() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner();
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).doesNotHaveBean(BasicMcpAuthenticationHandler.class);
+                assertThat(context).doesNotHaveBean(McpAuthenticationHandler.class);
+            });
+        }
+
+        @Test
+        void shouldCreateBasicMcpAuthenticationHandlerWhenMcpServerEnabled() {
+            // given.
+            ApplicationContextRunner contextRunner =
+                baselineConfigAppContextRunner().withPropertyValues("axelix.master.mcp-server.enabled=true");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasSingleBean(BasicMcpAuthenticationHandler.class);
+                assertThat(context).hasSingleBean(McpAuthenticationHandler.class);
+            });
+        }
     }
 
     @Nested
@@ -296,6 +326,31 @@ class SecurityAutoConfigurationTest {
     class OAuth2ConfigurationTests {
 
         @Test
+        void shouldCreateBearerMcpAuthenticationHandlerWhenMcpServerEnabled() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
+                    .withPropertyValues(
+                            "axelix.master.mcp-server.enabled=true",
+                            "axelix.master.auth.options.oauth2.enabled=true",
+                            "axelix.master.auth.options.oauth2.issuer-uri=https://issuer.example",
+                            "axelix.master.auth.options.oauth2.client-id=test-client",
+                            "axelix.master.auth.options.oauth2.client-secret=test-secret",
+                            "axelix.master.auth.options.oauth2.base-url=https://app.example",
+                            "axelix.master.auth.options.oauth2.scopes=openid profile")
+                    .withUserConfiguration(TestOAuth2DependenciesConfig.class)
+                    .withConfiguration(
+                            AutoConfigurations.of(SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasSingleBean(BasicMcpAuthenticationHandler.class);
+                assertThat(context).hasSingleBean(BearerMcpAuthenticationHandler.class);
+                assertThat(context).getBeans(McpAuthenticationHandler.class).hasSize(2);
+            });
+        }
+
+        @Test
         void shouldCreateOAuth2BeansWhenEnabled() {
             // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
@@ -315,6 +370,7 @@ class SecurityAutoConfigurationTest {
                 // then.
                 assertThat(context).hasSingleBean(OidcMetadataProvider.class);
                 assertThat(context).hasSingleBean(OidcClient.class);
+                assertThat(context).doesNotHaveBean(BearerMcpAuthenticationHandler.class);
                 assertThat(context.getBeansOfType(AuthenticationOption.class).values())
                         .hasSize(2)
                         .anySatisfy(option -> assertThat(option).isInstanceOf(SuperAdminAuthenticationOption.class))

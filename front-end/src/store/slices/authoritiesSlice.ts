@@ -17,7 +17,7 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { EAuthorities } from "models";
+import { EAuthorities } from "models";
 
 const initialState: EAuthorities[] = [];
 

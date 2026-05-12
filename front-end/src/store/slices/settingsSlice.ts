@@ -15,16 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { configureStore } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import { AuthoritiesSlice, SettingsSlice } from "./slices";
+import type { IAxelixSettings } from "models";
 
-export const store = configureStore({
-    reducer: {
-        authorities: AuthoritiesSlice.reducer,
-        settings: SettingsSlice.reducer,
+const initialState: IAxelixSettings = {
+    authenticationOptions: [],
+    isMcpServerEnabled: false,
+};
+
+export const SettingsSlice = createSlice({
+    name: "settings",
+    initialState: initialState,
+    reducers: {
+        setAxelixSettings: (_, action) => {
+            return action.payload;
+        },
     },
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const { setAxelixSettings } = SettingsSlice.actions;
