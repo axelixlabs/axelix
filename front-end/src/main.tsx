@@ -26,9 +26,9 @@ import "./customizedTable.css";
 const ENTERPRISE = "enterprise";
 
 if (import.meta.env.VITE_EDITION === ENTERPRISE) {
-    const modules = import.meta.glob("./enterprise/src/index.ts");
+    const modules = import.meta.glob("./enterprise/front-end/src/index.ts");
 
-    const path = "./enterprise/src/index.ts";
+    const path = "./enterprise/front-end/src/index.ts";
 
     const enterpriseModule = modules[path];
 

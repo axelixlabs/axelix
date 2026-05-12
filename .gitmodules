@@ -1,0 +1,3 @@
+[submodule "front-end/src/enterprise"]
+	path = front-end/src/enterprise
+	url = https://github.com/axelixlabs/axelix-enterprise.git

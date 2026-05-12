@@ -22,10 +22,21 @@ import * as path from "path";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 
-export default defineConfig(() => {
+export default defineConfig(async () => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
     const env = loadEnv("", process.cwd(), "");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:8080";
+
+    let enterpriseAliases = {};
+
+    try {
+        const enterpriseModule = await import("./src/enterprise/front-end/aliases");
+        if (enterpriseModule && enterpriseModule.getEnterpriseAliases) {
+            enterpriseAliases = enterpriseModule.getEnterpriseAliases();
+        }
+    } catch (e) {
+        console.log(e);
+    }
 
     return {
         plugins: [
@@ -59,11 +70,7 @@ export default defineConfig(() => {
                 store: path.resolve(__dirname, "./src/store"),
                 utils: path.resolve(__dirname, "./src/utils"),
                 helpers: path.resolve(__dirname, "./src/helpers"),
-                "enterprise-assets": path.resolve(__dirname, "./src/enterprise/src/assets"),
-                "enterprise-components": path.resolve(__dirname, "./src/enterprise/src/components"),
-                "enterprise-helpers": path.resolve(__dirname, "./src/enterprise/src/helpers"),
-                "enterprise-models": path.resolve(__dirname, "./src/enterprise/src/models"),
-                "enterprise-utils": path.resolve(__dirname, "./src/enterprise/src/utils"),
+                ...enterpriseAliases,
             },
         },
     };
