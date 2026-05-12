@@ -55,7 +55,7 @@ axelix:
           ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           filters:
             namespaces: default
-            labels:
+            # labels:
     auth:
       jwt:
         lifespan: 12h
