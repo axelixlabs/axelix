@@ -1,0 +1,3 @@
+[submodule "axelix-enterprise"]
+	path = axelix-enterprise
+	url = git@github.com:axelixlabs/axelix-enterprise.git
