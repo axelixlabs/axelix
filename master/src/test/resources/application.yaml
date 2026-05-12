@@ -9,7 +9,7 @@ spring:
     # what we want since we re-use the connections from the Hikari CP inside the single test (setup code relies that the
     # changes it made will be seen by the actual test code). So, we use 'cache=shared'
     # in order to force all the connections to use the shared database.
-    url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
+    url: "jdbc:sqlite:file:memdb_${random.uuid}?mode=memory&cache=shared"
   ai:
     mcp:
       server:

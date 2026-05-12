@@ -17,11 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import java.util.Collection;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.springframework.cache.CacheManager;
 
-import java.util.Collection;
+import org.springframework.cache.CacheManager;
 
 /**
  * Extension of {@link CacheManager} that exposes management operations on top of an existing

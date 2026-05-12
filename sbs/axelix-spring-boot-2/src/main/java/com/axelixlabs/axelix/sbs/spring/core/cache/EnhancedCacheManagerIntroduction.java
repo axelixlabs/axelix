@@ -56,16 +56,17 @@ final class EnhancedCacheManagerIntroduction implements IntroductionInterceptor 
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method delegateMethod = findDelegateMethod(invocation.getMethod());
 
-        if (delegateMethod != null)
+        if (delegateMethod != null) {
             return AopUtils.invokeJoinpointUsingReflection(delegate, delegateMethod, invocation.getArguments());
-
+        }
         return invocation.proceed();
     }
 
     @Nullable
     private Method findDelegateMethod(Method invokedMethod) {
-        if (invokedMethod.getDeclaringClass().equals(Object.class))
+        if (invokedMethod.getDeclaringClass().equals(Object.class)) {
             return null;
+        }
 
         return delegateMethods.computeIfAbsent(invokedMethod, s -> {
             try {
