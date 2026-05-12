@@ -25,9 +25,12 @@ import eslintPluginPrettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import { existsSync } from "fs";
 import globals from "globals";
 import * as jsoncParser from "jsonc-eslint-parser";
 import tseslint from "typescript-eslint";
+
+const ENTERPRISE_LICENSE_HEADER = "src/enterprise/LICENSE_HEADER_ENTERPRISE";
 
 export default [
     {
@@ -102,9 +105,11 @@ export default [
         },
     },
     {
-        files: ["src/enterprise/**/*.{js,jsx,ts,tsx}"],
+        files: ["src/enterprise/front-end/src/**/*.{js,jsx,ts,tsx}"],
         rules: {
-            "header/header": ["error", "../LICENSE_HEADER_ENTERPRISE"],
+            ...(existsSync(ENTERPRISE_LICENSE_HEADER) && {
+                "header/header": ["error", ENTERPRISE_LICENSE_HEADER],
+            }),
         },
     },
     {

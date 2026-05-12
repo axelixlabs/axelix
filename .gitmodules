@@ -1,3 +1,4 @@
 [submodule "axelix-enterprise"]
-	path = axelix-enterprise
-	branch = master
+  active = true
+  url = git@github.com:axelixlabs/axelix-enterprise.git
+  update = rebase
