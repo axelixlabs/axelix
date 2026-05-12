@@ -19,8 +19,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import type { IAxelixSettings } from "models";
 
-// TODO: Fix this
-const initialState: IAxelixSettings = {};
+const initialState: IAxelixSettings = {
+    authenticationOptions: [],
+    isMcpServerEnabled: false,
+};
 
 export const SettingsSlice = createSlice({
     name: "settings",
