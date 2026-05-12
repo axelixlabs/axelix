@@ -116,13 +116,26 @@ jobs:
             --set image.pullPolicy=Always \
             --set image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
             --set image.ref=${{ steps.gradleProperties.outputs.value }} \
-            --set app.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
-            --set app.auth.jwt.algorithm=HMAC512 \
-            --set app.auth.oauth2.enabled=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED }} \
-            --set app.auth.oauth2.issuerUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI }} \
-            --set app.auth.oauth2.clientId=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID }} \
-            --set app.auth.oauth2.clientSecret=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET }} \
-            --set app.auth.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
+          
+            # JWT Settings
+            --set axelix.master.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
+            --set axelix.master.auth.jwt.algorithm=HMAC512 \
+          
+            # OAuth2 Settings
+            --set axelix.master.auth.options.oauth2.enabled=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED }} \
+            --set axelix.master.auth.options.oauth2.issuerUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI }} \
+            --set axelix.master.auth.options.oauth2.baseUrl=${{ #TODO }}  \
+            --set axelix.master.auth.options.oauth2.clientId=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID }} \
+            --set axelix.master.auth.options.oauth2.clientSecret=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET }} \
+            --set axelix.master.auth.options.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
+            --set axelix.master.auth.options.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
+            
+            # Local Settings
+            --set axelix.master.auth.options.local.enabled=true \
+
+            # Discovery Settings
+            --set axelix.master.discovery.selfRegistration.enabled=true \
+
             --install axelix-master . \
             -f values.yaml
 
