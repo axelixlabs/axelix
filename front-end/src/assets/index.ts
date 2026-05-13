@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { default as CodeSnippetArrowIcon } from "../assets/icons/codeSnippetArrow.svg?react";
 export { default as ScheduledTasksIcon } from "../assets/icons/scheduledTasks.svg?react";
 export { default as ConfigPropsIcon } from "../assets/icons/configProps.svg?react";
 export { default as EnvironmentIcon } from "../assets/icons/environment.svg?react";
