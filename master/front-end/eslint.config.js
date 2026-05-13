@@ -30,7 +30,7 @@ import globals from "globals";
 import * as jsoncParser from "jsonc-eslint-parser";
 import tseslint from "typescript-eslint";
 
-const ENTERPRISE_LICENSE_HEADER = "src/enterprise/LICENSE_HEADER_ENTERPRISE";
+const LICENSE_HEADER_ENTERPRISE = "src/enterprise/LICENSE_HEADER_ENTERPRISE";
 
 export default [
     {
@@ -107,8 +107,8 @@ export default [
     {
         files: ["src/enterprise/front-end/src/**/*.{js,jsx,ts,tsx}"],
         rules: {
-            ...(existsSync(ENTERPRISE_LICENSE_HEADER) && {
-                "header/header": ["error", ENTERPRISE_LICENSE_HEADER],
+            ...(existsSync(LICENSE_HEADER_ENTERPRISE) && {
+                "header/header": ["error", LICENSE_HEADER_ENTERPRISE],
             }),
         },
     },
