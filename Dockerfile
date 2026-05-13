@@ -67,8 +67,7 @@ ENV JAVA_HEAP_DUMP_OPTS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
 ENV JAVA_ON_OUT_OF_MEMORY_OPTS="-XX:+CrashOnOutOfMemoryError"
 ENV JAVA_GC_LOG_OPTS="-Xlog:gc*,safepoint:/tmp/gc.log::filecount=10,filesize=100M"
 # Custom Java Properties
-ENV JAVA_OTHER_ARGS="-Dkubernetes.trust.certificates=true \
-                     -Daxelix.master.web.static-resources.location=file:/application/dist/"
+ENV JAVA_OTHER_ARGS="-Daxelix.master.web.static-resources.location=file:/application/dist/"
 
 ENTRYPOINT exec java \
     -XX:AOTCache=app.aot \
