@@ -25,8 +25,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import io.fabric8.kubernetes.api.model.ContainerPort;
+import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
@@ -50,6 +53,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.discovery.KubernetesDiscov
  *
  * @since 05.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class KubernetesDiscoveryClient implements DiscoveryClient {
 
@@ -187,8 +191,6 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
     private ServiceInstance createServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port)
             throws IllegalArgumentException {
 
-        validateServicePort(serviceId, port);
-
         Map<String, String> metadata = Map.of(
                 "namespace", namespace,
                 "servicePortName", port.getName(),
@@ -199,21 +201,44 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
                 serviceId,
                 pod.getMetadata().getName(),
                 pod.getStatus().getPodIP(),
-                port.getTargetPort().getIntVal(),
+                resolveTargetPort(serviceId, pod, port),
                 "https".equalsIgnoreCase(port.getName()),
                 metadata,
                 pod.getMetadata().getCreationTimestamp());
     }
 
-    private void validateServicePort(String serviceId, ServicePort servicePort) {
-        Integer targetPort = servicePort.getTargetPort().getIntVal();
+    private Integer resolveTargetPort(String serviceId, Pod pod, ServicePort servicePort) {
+        IntOrString targetPort = servicePort.getTargetPort();
 
         if (targetPort == null) {
-            throw new IllegalArgumentException("""
-                As of now, we do not support named K8S ports. \s
-                The targetPort of the K8S '%s' is supposed to be an integer, \s
-                but it is not. So, as of now, the service will not get registered. \s
-                """.formatted(serviceId));
+            // Per K8S API: when targetPort is omitted, it defaults to the value of port
+            // https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+            return servicePort.getPort();
         }
+
+        Integer intVal = targetPort.getIntVal();
+        if (intVal != null) {
+            return intVal;
+        }
+
+        String portName = targetPort.getStrVal();
+        Integer resolved = Optional.ofNullable(pod.getSpec()).map(PodSpec::getContainers).orElse(List.of()).stream()
+                .flatMap(container -> Optional.ofNullable(container.getPorts()).orElse(List.of()).stream())
+                .filter(containerPort -> Objects.equals(portName, containerPort.getName()))
+                .map(ContainerPort::getContainerPort)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        if (resolved == null) {
+            throw new IllegalArgumentException(
+                    """
+                Cannot resolve named targetPort '%s' for K8S service '%s'. \s
+                No matching containerPort was found in pod '%s', \s
+                so the service will not get registered. \s
+                """.formatted(portName, serviceId, pod.getMetadata().getName()));
+        }
+
+        return resolved;
     }
 }
