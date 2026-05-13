@@ -35,4 +35,5 @@ export enum EBeanOrigin {
 export enum ESearchSubject {
     BEAN_NAME_OR_ALIAS,
     BEAN_CLASS,
+    BEAN_NAME_BY_HASH,
 }

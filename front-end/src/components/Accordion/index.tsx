@@ -84,6 +84,11 @@ export const Accordion = ({
         };
     }, []);
 
+    useEffect(() => {
+        setOpen(accordionExpanded);
+        setIsContentMounted(accordionExpanded);
+    }, [accordionExpanded]);
+
     const handlerClick = (): void => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);

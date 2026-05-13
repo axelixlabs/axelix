@@ -18,18 +18,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
-import { fetchData, filterBeans } from "helpers";
-import { type IBeansResponseBody, StatefulRequest } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, getEffectiveBeans } from "helpers";
+import { type IBean, type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
 import { BeansAccordionsList } from "./BeansAccordionsList";
+import { BeansFirstSection } from "./BeansFirstSection";
 
 const Beans = () => {
     const { instanceId } = useParams();
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
+    const [selectedBean, setSelectedBean] = useState<IBean | null>(null);
 
     useEffect(() => {
         fetchData(setDataState, () => getBeansData(instanceId!));
@@ -44,17 +46,25 @@ const Beans = () => {
     }
 
     const beansFeed = dataState.response!.beans;
-    const effectiveBeans = search ? filterBeans(beansFeed, search) : beansFeed;
+    const effectiveBeans = getEffectiveBeans(selectedBean, search, beansFeed);
     const addonAfter = `${effectiveBeans.length} / ${beansFeed.length}`;
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <BeansFirstSection
+                addonAfter={addonAfter}
+                setSearch={setSearch}
+                setSelectedBean={setSelectedBean}
+                selectedBean={selectedBean}
+            />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <HashNavigable>
-                    <BeansAccordionsList effectiveBeans={effectiveBeans} />
-                </HashNavigable>
+                <BeansAccordionsList
+                    effectiveBeans={effectiveBeans}
+                    beansFeed={beansFeed}
+                    selectedBean={selectedBean}
+                    setSelectedBean={setSelectedBean}
+                />
             </EmptyHandler>
         </>
     );

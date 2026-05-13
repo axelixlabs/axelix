@@ -20,7 +20,7 @@ import { EConditionStatus, type ICondition } from "models";
 
 import styles from "./styles.module.css";
 
-import { CheckmarkIcon, CloseIcon } from "assets";
+import { CheckmarkIcon, XMarkIcon } from "assets";
 
 interface IStatusAwareCondition extends ICondition {
     status: EConditionStatus;
@@ -33,7 +33,7 @@ interface IProps {
 export const ConditionsAccordionEntry = ({ items }: IProps) => {
     const findNeededIcon = (status: EConditionStatus) => {
         if (status === EConditionStatus.NOT_MATCHED) {
-            return <CloseIcon />;
+            return <XMarkIcon />;
         }
 
         return <CheckmarkIcon />;

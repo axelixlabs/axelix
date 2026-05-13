@@ -31,18 +31,11 @@ interface IProps {
 }
 
 export const BeanAccordionLabels = ({ bean }: IProps) => {
-    const { beanName, className, scope, aliases } = bean;
+    const { beanName, className, scope } = bean;
 
     return (
         <>
-            <div
-                // These data attributes are later needed for scrolling. See scrollToAccordionById() function
-                data-bean-entry
-                data-bean-name={beanName}
-                data-bean-class={className}
-                data-bean-aliases={aliases}
-                className={styles.AccordionHeader}
-            >
+            <div className={styles.AccordionHeader}>
                 <div className={styles.AccordionHeaderContent}>
                     <div className={styles.BeanNameWrapper}>
                         <TooltipWithCopy text={beanName} />

@@ -16,13 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tree, type TreeDataNode } from "antd";
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { StyledLink } from "components";
-import { normalizeHtmlElementId } from "helpers";
+import { findBeanBySearchSubject, normalizeHtmlElementId } from "helpers";
 import { EBeanOrigin, ESearchSubject, type IBean } from "models";
-import { scrollToAccordionById } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -31,9 +31,19 @@ interface IProps {
      * The data of a single bean
      */
     bean: IBean;
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
 }
 
-export const BeanSourceTree = ({ bean }: IProps) => {
+export const BeanSourceTree = ({ bean, beansFeed, setSelectedBean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
@@ -61,12 +71,14 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                             title: (
                                 <div
                                     className={`${styles.ClickableBeanTreeItem}`}
-                                    onClick={() =>
-                                        scrollToAccordionById(
+                                    onClick={() => {
+                                        const foundBean = findBeanBySearchSubject(
                                             beanSource.enclosingClassFullName!,
                                             ESearchSubject.BEAN_CLASS,
-                                        )
-                                    }
+                                            beansFeed,
+                                        );
+                                        setSelectedBean(foundBean);
+                                    }}
                                 >
                                     <div className={styles.BeanTreeLabel}>
                                         {autoConfigurationRef

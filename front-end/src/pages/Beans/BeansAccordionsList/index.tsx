@@ -15,44 +15,99 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { BeanAccordionLabels } from "pages/Beans/BeanAccordionLabels";
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+import { type Dispatch, type SetStateAction, useEffect, useRef } from "react";
 import { useLocation } from "react-router";
 
 import { Accordion } from "components";
-import { normalizeHtmlElementId } from "helpers";
-import type { IBean } from "models";
+import { findBeanBySearchSubject } from "helpers";
+import { ESearchSubject, type IBean } from "models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
+import { BeanAccordionLabels } from "../BeanAccordionLabels";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * The list of beans
+     * The list of beans to display
      */
     effectiveBeans: IBean[];
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Selected bean
+     */
+    selectedBean: IBean | null;
+
+    /**
+     * Setter to set the selected bean
+     */
+    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
 }
 
-export const BeansAccordionsList = ({ effectiveBeans }: IProps) => {
+export const BeansAccordionsList = ({ effectiveBeans, selectedBean, setSelectedBean, beansFeed }: IProps) => {
     const { hash } = useLocation();
+
+    const ref = useRef<HTMLDivElement>(null);
+
+    const rowVirtualizer = useVirtualizer({
+        count: effectiveBeans.length,
+        getScrollElement: () => ref.current,
+        estimateSize: () => 77,
+        scrollPaddingStart: 80,
+    });
+
+    useEffect(() => {
+        if (hash) {
+            const foundBean = findBeanBySearchSubject(hash, ESearchSubject.BEAN_NAME_BY_HASH, beansFeed);
+            setSelectedBean(foundBean);
+        }
+    }, []);
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
 
     return (
         <>
-            <div className="AccordionsWrapper">
-                {effectiveBeans.map((bean) => {
-                    const activeId = hash ? hash.replace("#", "") : null;
-                    const id = normalizeHtmlElementId(bean.beanName);
-                    const accordionExpanded = id === activeId;
+            <div ref={ref} className={`AccordionsWrapper ${styles.MainWrapper}`}>
+                <div
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                    }}
+                    className={styles.InnerWrapper}
+                >
+                    {virtualItems.map(({ key, index, start }) => {
+                        const bean = effectiveBeans[index];
 
-                    return (
-                        <div id={id} key={id}>
-                            <Accordion
-                                header={<BeanAccordionLabels bean={bean} />}
-                                accordionExpanded={accordionExpanded}
+                        return (
+                            <div
+                                key={key}
+                                data-index={index}
+                                ref={rowVirtualizer.measureElement}
+                                className={styles.VirtualItem}
+                                style={{
+                                    transform: `translateY(${start}px)`,
+                                }}
                             >
-                                <BeanAccordionChildren bean={bean} />
-                            </Accordion>
-                        </div>
-                    );
-                })}
+                                <Accordion
+                                    header={<BeanAccordionLabels bean={bean} />}
+                                    accordionExpanded={Boolean(selectedBean)}
+                                >
+                                    <BeanAccordionChildren
+                                        bean={bean}
+                                        beansFeed={beansFeed}
+                                        setSelectedBean={setSelectedBean}
+                                    />
+                                </Accordion>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </>
     );

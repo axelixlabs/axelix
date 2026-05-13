@@ -17,7 +17,9 @@
  */
 import type { TFunction } from "i18next";
 
-import { EProxyType, type IBean } from "models";
+import { EProxyType, ESearchSubject, type IBean } from "models";
+
+import { normalizeHtmlElementId } from "./globals";
 
 export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): string => {
     if (!proxyType) {
@@ -81,4 +83,51 @@ export const defineBeanScopeColor = (scope: string): string => {
         default:
             return "magenta";
     }
+};
+
+export const getEffectiveBeans = (selectedBean: IBean | null, search: string, beansFeed: IBean[]): IBean[] => {
+    if (selectedBean) {
+        return [selectedBean];
+    }
+
+    if (search) {
+        return filterBeans(beansFeed, search);
+    }
+
+    return beansFeed;
+};
+
+export const findBeanBySearchSubject = (
+    query: string,
+    searchSubject: ESearchSubject,
+    beansFeed: IBean[],
+): IBean | null => {
+    const bean = beansFeed.find(({ className, beanName, aliases }) => {
+        if (searchSubject === ESearchSubject.BEAN_CLASS) {
+            return className === query;
+        }
+
+        if (searchSubject === ESearchSubject.BEAN_NAME_BY_HASH) {
+            const normalizedQuery = normalizeHtmlElementId(query);
+            const normalizedBeanName = normalizeHtmlElementId(beanName);
+
+            return normalizedBeanName === normalizedQuery;
+        }
+
+        if (searchSubject === ESearchSubject.BEAN_NAME_OR_ALIAS) {
+            return beanName === query || aliases.includes(query);
+        }
+
+        return false;
+    });
+
+    if (!bean) {
+        return null;
+    }
+
+    return bean;
+};
+
+export const getBeanShortName = (beanName: string): string => {
+    return beanName.split(".").at(-1) ?? beanName;
 };

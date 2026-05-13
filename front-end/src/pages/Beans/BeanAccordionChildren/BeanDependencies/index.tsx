@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { TooltipWithCopy } from "components";
-import { ESearchSubject, type IDependency } from "models";
-import { scrollToAccordionById } from "utils";
+import { findBeanBySearchSubject } from "helpers";
+import { ESearchSubject, type IBean, type IDependency } from "models";
 
 import styles from "./styles.module.css";
 
@@ -28,9 +29,19 @@ interface IProps {
      * List of dependencies
      */
     dependencies: IDependency[];
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
 }
 
-export const BeanDependencies = ({ dependencies }: IProps) => {
+export const BeanDependencies = ({ dependencies, beansFeed, setSelectedBean }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -42,7 +53,14 @@ export const BeanDependencies = ({ dependencies }: IProps) => {
                         <div className={styles.DependencyWrapper}>
                             <div
                                 className={styles.Dependency}
-                                onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
+                                onClick={() => {
+                                    const foundBean = findBeanBySearchSubject(
+                                        name,
+                                        ESearchSubject.BEAN_NAME_OR_ALIAS,
+                                        beansFeed,
+                                    );
+                                    setSelectedBean(foundBean);
+                                }}
                             >
                                 <TooltipWithCopy text={name} />
                             </div>

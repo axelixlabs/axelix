@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -31,9 +32,19 @@ interface IProps {
      * The profile of the given bean
      */
     bean: IBean;
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
 }
 
-export const BeanSource = ({ bean }: IProps) => {
+export const BeanSource = ({ bean, beansFeed, setSelectedBean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
@@ -53,7 +64,7 @@ export const BeanSource = ({ bean }: IProps) => {
                 {t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}
             </StyledLink>
         );
-    } else if (origin == EBeanOrigin.UNKNOWN && isConfigPropsBean) {
+    } else if (origin === EBeanOrigin.UNKNOWN && isConfigPropsBean) {
         beanSourceTitle = (
             <StyledLink href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}>
                 {t(`Beans.beanSource.CONFIG_PROPS_BEAN`)}
@@ -67,7 +78,11 @@ export const BeanSource = ({ bean }: IProps) => {
         <>
             <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.tree.main`)}:</div>
 
-            {statelessBeanSource ? beanSourceTitle : <BeanSourceTree bean={bean} />}
+            {statelessBeanSource ? (
+                beanSourceTitle
+            ) : (
+                <BeanSourceTree bean={bean} beansFeed={beansFeed} setSelectedBean={setSelectedBean} />
+            )}
         </>
     );
 };

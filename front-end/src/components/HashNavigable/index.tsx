@@ -19,8 +19,6 @@ import accordionStyles from "components/Accordion/styles.module.css";
 import { type PropsWithChildren, useEffect } from "react";
 import { useLocation } from "react-router";
 
-import styles from "./styles.module.css";
-
 interface IProps {
     /**
      * The class to which we add a highlight style to indicate that it has been scrolled into view
@@ -54,7 +52,7 @@ export const HashNavigable = ({ children, className = accordionStyles.HeaderWrap
             return;
         }
 
-        header.classList.add(styles.Highlight);
+        header.classList.add("Highlight");
     }, [hash]);
 
     return <>{children}</>;

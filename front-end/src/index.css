@@ -105,3 +105,17 @@ a:hover {
 .recharts-wrapper :focus {
     outline: none;
 }
+
+.Highlight {
+    animation: highlight-fade 8s;
+}
+
+@keyframes highlight-fade {
+    0% {
+        background-color: var(--axelix-primary-green);
+    }
+
+    100% {
+        background-color: var(--axelix-primary-light-green);
+    }
+}
