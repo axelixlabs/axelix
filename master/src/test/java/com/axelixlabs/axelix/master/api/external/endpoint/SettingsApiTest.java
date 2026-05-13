@@ -98,7 +98,7 @@ class SettingsApiTest {
                       "type" : "local"
                     }
                   ],
-                  "mcpServerEnabled" : false
+                  "isMcpServerEnabled" : false
                 }
                 """;
             assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
@@ -134,7 +134,7 @@ class SettingsApiTest {
                   "type": "oidc"
                 }
               ],
-              "mcpServerEnabled" : false
+              "isMcpServerEnabled" : false
             }
             """;
 
@@ -196,7 +196,7 @@ class SettingsApiTest {
                       "type": "local"
                     }
                   ],
-                  "mcpServerEnabled" : false
+                  "isMcpServerEnabled" : false
                 }
                 """;
 
