@@ -52,7 +52,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
@@ -151,7 +150,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
-    @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
@@ -277,7 +276,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
         }
     }
 
-    @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {

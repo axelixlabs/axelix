@@ -48,7 +48,6 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModif
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
@@ -70,7 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @since 28.08.2025
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ScheduledTasksApiTest {
 
     // language=json

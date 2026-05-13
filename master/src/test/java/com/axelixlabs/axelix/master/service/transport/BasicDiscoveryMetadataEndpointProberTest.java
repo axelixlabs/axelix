@@ -40,7 +40,6 @@ import org.springframework.context.annotation.Primary;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -54,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class)
+@SpringBootTest
 @Import(BasicDiscoveryMetadataEndpointProberTest.ProberTestSecurityConfiguration.class)
 class BasicDiscoveryMetadataEndpointProberTest {
 

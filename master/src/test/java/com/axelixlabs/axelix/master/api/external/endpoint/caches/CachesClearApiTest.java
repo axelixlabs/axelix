@@ -36,7 +36,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
@@ -50,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CachesClearApiTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();

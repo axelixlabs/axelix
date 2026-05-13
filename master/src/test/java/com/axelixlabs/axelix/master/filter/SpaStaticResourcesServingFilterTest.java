@@ -30,7 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
 
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -42,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SpaStaticResourcesServingFilterTest {
 
     private static final String SPA_DIST = "spa-dist";

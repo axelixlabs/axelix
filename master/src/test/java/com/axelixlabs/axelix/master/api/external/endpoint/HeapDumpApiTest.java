@@ -41,7 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
@@ -58,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HeapDumpApiTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
