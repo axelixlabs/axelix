@@ -20,9 +20,9 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,8 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest
-class CommitIdPluginGitInformationProviderTest {
+class CommitIdPluginGitInformationProviderTest extends AbstractEndpointTest {
 
     @Autowired
     private CommitIdPluginGitInformationProvider subject;
