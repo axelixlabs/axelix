@@ -1,10 +1,6 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-
 plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
-    kotlin("jvm") version "2.2.21"
 }
 
 val springBootTestPlatformVersion = "2.7.18"
@@ -31,8 +27,3 @@ tasks.withType<JavaCompile>().configureEach {
     options.release = 11
     options.compilerArgs.add("-parameters")
 }
-
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-}
-
