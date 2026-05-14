@@ -1,0 +1,4 @@
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.NetworkClient: ERROR
