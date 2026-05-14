@@ -22,6 +22,15 @@ import java.util.List;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Test fixture that issues transactional calls under every {@link Propagation} mode the
+ * transaction monitoring endpoint cares about. Each {@code @Transactional} method becomes a
+ * distinct entrypoint in the endpoint's output, which lets {@link TransactionMonitoringEndpointTest}
+ * assert that monitoring picks up (or correctly skips) the right propagation behaviours.
+ *
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
+ */
 public class PropagationTestHelper {
 
     private final OwnerRepository ownerRepository;

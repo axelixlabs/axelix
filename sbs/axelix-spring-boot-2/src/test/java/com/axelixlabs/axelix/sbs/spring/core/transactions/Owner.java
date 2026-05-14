@@ -29,6 +29,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+/**
+ * Test-only JPA entity backing {@link TransactionMonitoringEndpointTest}. Pairs with {@link Pet} to
+ * exercise lazy-loading / N + 1 scenarios that the transaction monitoring endpoint should observe.
+ *
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
+ */
 @Entity
 @Table(name = "owner")
 public class Owner {

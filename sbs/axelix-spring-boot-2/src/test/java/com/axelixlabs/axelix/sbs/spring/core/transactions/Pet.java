@@ -25,6 +25,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Test-only JPA entity owned by {@link Owner}. The {@link javax.persistence.ManyToOne} side of the
+ * association is what drives the N + 1 SELECT that {@link TransactionMonitoringEndpointTest}
+ * asserts against.
+ *
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
+ */
 @Entity
 @Table(name = "pet")
 public class Pet {

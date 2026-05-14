@@ -20,6 +20,14 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Spring Data JPA repository for {@link Owner}. The {@code @Transactional} finder is intentional —
+ * {@link TransactionMonitoringEndpointTest} relies on Spring Data opening a transaction here so the
+ * transaction monitoring endpoint can pick it up as an entrypoint.
+ *
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
+ */
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     @Transactional

@@ -75,7 +75,8 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
  * since the Spring TestContext framework caches contexts based on their
  * effective configuration.
  *
- * @author Axelix Labs
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
  */
 @TestConfiguration
 @Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class})

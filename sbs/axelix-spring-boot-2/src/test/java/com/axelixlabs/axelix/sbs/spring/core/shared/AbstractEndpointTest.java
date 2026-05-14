@@ -35,7 +35,8 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
  * single {@code ApplicationContext} that is built once for the entire
  * endpoint-test suite.
  *
- * @author Axelix Labs
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,

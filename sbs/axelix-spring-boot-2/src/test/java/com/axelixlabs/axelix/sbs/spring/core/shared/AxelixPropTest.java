@@ -32,7 +32,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * that fields such as {@code name} can be optional and absent without breaking
  * binding.
  *
- * @author Axelix Labs
+ * @since 14.05.2026
+ * @author Artemiy Degtyarev
  */
 @ConfigurationProperties(prefix = "axelix.prop.test")
 public class AxelixPropTest {
