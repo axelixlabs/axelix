@@ -39,12 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest
-@Import({
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class,
-    DefaultServiceMetadataAssembler.class,
-    DefaultBasicDiscoveryMetadataAssemblerTest.CurrentConfig.class
-})
+@Import({DefaultServiceMetadataAssembler.class, DefaultBasicDiscoveryMetadataAssemblerTest.CurrentConfig.class})
 class DefaultBasicDiscoveryMetadataAssemblerTest {
 
     @Autowired

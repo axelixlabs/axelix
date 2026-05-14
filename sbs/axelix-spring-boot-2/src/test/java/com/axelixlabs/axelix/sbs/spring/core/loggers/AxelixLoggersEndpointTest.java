@@ -27,22 +27,18 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,16 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(
-        properties = {
-            "logging.group.axelix.logger.group=axelix.logger.test",
-            "logging.level.axelix.logger.test=WARN",
-            "logging.level.a.b=WARN",
-            "logging.level.a.b.c.d.e=DEBUG"
-        })
-@Import(AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration.class)
-public class AxelixLoggersEndpointTest {
+public class AxelixLoggersEndpointTest extends AbstractEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -246,15 +233,5 @@ public class AxelixLoggersEndpointTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(request, headers);
-    }
-
-    @TestConfiguration
-    static class AxelixLoggersEndpointTestConfiguration {
-
-        @Bean
-        public AxelixLoggersEndpoint axelixLoggersEndpoint(
-                LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
-            return new AxelixLoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
-        }
     }
 }

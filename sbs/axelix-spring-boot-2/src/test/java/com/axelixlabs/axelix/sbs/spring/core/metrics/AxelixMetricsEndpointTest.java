@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.binder.MeterBinder;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,21 +28,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
-import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
-import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
-import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -55,16 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({
-    AxelixMetricsEndpoint.class,
-    MetricsEndpoint.class,
-    DefaultServiceMetricsGroupsAssembler.class,
-    BaseUnitParser.class,
-    KilobytesMemoryBaseUnitValueTransformer.class,
-    BytesMemoryBaseUnitValueTransformer.class
-})
-class AxelixMetricsEndpointTest {
+class AxelixMetricsEndpointTest extends AbstractEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -193,41 +174,5 @@ class AxelixMetricsEndpointTest {
                         "Others",
                         "standalone",
                         "Test metric belonging to the 'Others' group without a prefix and with a description"));
-    }
-
-    @TestConfiguration
-    static class AxelixMetricsEndpointTestConfiguration {
-
-        @Bean
-        public MeterBinder groupingMetrics() {
-            return registry -> {
-                Counter.builder("axelixMetrics.test.metric1")
-                        .description("Test metric belonging to the `axelixMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("axelixMetrics.test.metric2")
-                        .description("Test metric belonging to the `axelixMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("axelixMetrics.test.metric3").register(registry);
-
-                Counter.builder("testMetrics.axelix.metric1")
-                        .description("Test metric belonging to the `testMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("testMetrics.axelix.metric2").register(registry);
-
-                Counter.builder("standalone")
-                        .description(
-                                "Test metric belonging to the 'Others' group without a prefix and with a description")
-                        .register(registry);
-
-                Gauge.builder(
-                                "for.value.transformations", () -> 5480079 // ~ 5.22 MB
-                                )
-                        .baseUnit("bytes")
-                        .register(registry);
-            };
-        }
     }
 }

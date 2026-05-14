@@ -6,6 +6,44 @@ axelix:
         algorithm: "HMAC512"
         signing-key: "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff"
 
+  # Test properties consolidated from former @TestPropertySource declarations
+  # across endpoint integration tests. They are kept here so that the shared
+  # Spring ApplicationContext used by all *EndpointTest classes contains the
+  # superset of properties each test requires.
+  prop:
+    test:
+      name: axelix-beans
+      tags:
+        environment: test
+        version: 1.0.0
+      enabled-contexts: user-service, payment-service
+      http-client:
+        requests:
+          - name: user-api
+            base-url: https://api.users.example.com/v1
+            methods:
+              - type: GET
+                retries:
+                  - count: 3
+                    parameters:
+                      timeout: 5000
+              - type: POST
+          - name: payment-api
+            base-url: https://api.payments.example.com/v2
+            methods:
+              - type: PUT
+                retries:
+                  - count: 2
+                    parameters:
+                      log-level: DEBUG
+  env:
+    test:
+      prop1: fromTestSource
+      toBeSanitized: shouldBeSanitized
+  conditions:
+    test:
+      flag: enabled
+
 spring:
   info:
     git:
@@ -26,6 +64,7 @@ management:
       exposure:
         include:
           - health
+          - info
           - axelix-property-management
           - axelix-profile-management
           - axelix-metadata
@@ -41,8 +80,16 @@ management:
           - axelix-thread-dump
           - axelix-gc
           - axelix-heap-dump
+          - axelix-transactions-monitoring
+          - axelix-scheduled-tasks
+          - axelix-details
 
 logging:
   level:
     org.apache.kafka: WARN
     org.apache.kafka.clients.NetworkClient: ERROR
+    axelix.logger.test: WARN
+    a.b: WARN
+    a.b.c.d.e: DEBUG
+  group:
+    axelix.logger.group: axelix.logger.test
