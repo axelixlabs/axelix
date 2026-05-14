@@ -42,7 +42,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
@@ -62,7 +61,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TransactionMonitoringApiTest {
 
     private static final String ACTUAL_AND_EXPECTED_TRANSACTION_MONITORING_JSON =

@@ -47,7 +47,6 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
@@ -68,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class)
+@SpringBootTest
 @Import(DefaultEndpointInvokerTest.DefaultEndpointInvokerTestConfiguration.class)
 public class DefaultEndpointInvokerTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
