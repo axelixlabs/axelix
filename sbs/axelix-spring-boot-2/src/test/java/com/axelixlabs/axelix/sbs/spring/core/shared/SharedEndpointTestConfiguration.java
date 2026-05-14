@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistenceTestFixtures;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
@@ -62,6 +63,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.env.TestBeanWithCustomAnnotations;
+import com.axelixlabs.axelix.sbs.spring.core.env.TestBeanWithSpEL;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.OwnerRepository;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
 
@@ -79,7 +82,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
  * @author Artemiy Degtyarev
  */
 @TestConfiguration
-@Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class})
+@Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class, QualifiersPersistenceTestFixtures.class})
 @EnableConfigurationProperties(AxelixPropTest.class)
 public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
 
@@ -299,6 +302,27 @@ public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
     @Bean
     public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
         return new PropagationTestHelper(ownerRepository);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // ValueInjectionTrackerBeanPostProcessor test fixtures.
+    //
+    // The bean instances are constructed with placeholder values so Spring does not need to resolve the constructor
+    // {@code @Value} placeholders. The {@code @Value}/{@link com.axelixlabs.axelix.sbs.spring.core.env.TimeoutValue}
+    // annotations remain on the class itself, so the {@code ValueInjectionTrackerBeanPostProcessor} still discovers
+    // every constructor / field / method / parameter injection point declared on the bean class.
+    // The {@code @Autowired} setters on {@code TestBeanWithCustomAnnotations} still run, so {@code test.spring.profiles
+    // .active} must be present in the environment - see {@link AbstractEndpointTest#registerDynamicProperties}.
+    // -----------------------------------------------------------------------------------------------------------------
+
+    @Bean
+    public TestBeanWithCustomAnnotations testBeanWithCustomAnnotations() {
+        return new TestBeanWithCustomAnnotations("TestApp", "5000");
+    }
+
+    @Bean
+    public TestBeanWithSpEL testBeanWithSpEL() {
+        return new TestBeanWithSpEL();
     }
 
     // -----------------------------------------------------------------------------------------------------------------

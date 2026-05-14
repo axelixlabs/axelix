@@ -59,5 +59,12 @@ public abstract class AbstractEndpointTest {
         // same {@code application.yaml}) are not accidentally affected by them.
         registry.add("axelix.prop.test.tags.forSanitization", () -> "toBeSanitized");
         registry.add("axelix.prop.test.tags.FOR_SANITIZATION", () -> "toBeSanitized");
+
+        // Required by the {@link com.axelixlabs.axelix.sbs.spring.core.env.TestBeanWithCustomAnnotations}
+        // bean (registered for {@code ValueInjectionTrackerBeanPostProcessorTest}). Its {@code @Autowired
+        // setProfile} setter and {@code calculateRandomTimeout} method use placeholders without defaults,
+        // so the bean fails to construct unless these resolve.
+        registry.add("test.spring.profiles.active", () -> "production");
+        registry.add("test.method.timeout", () -> "4200");
     }
 }
