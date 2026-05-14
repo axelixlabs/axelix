@@ -21,7 +21,9 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.jspecify.annotations.Nullable;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -37,6 +40,7 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.HeapDumpCustomizer;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -48,10 +52,14 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @ExternalApiRestController
 public class HeapDumpApi {
 
+    @Nullable
+    private final HeapDumpCustomizer heapDumpCustomizer;
+
     private final EndpointInvoker endpointInvoker;
 
-    public HeapDumpApi(EndpointInvoker endpointInvoker) {
+    public HeapDumpApi(EndpointInvoker endpointInvoker, ObjectProvider<HeapDumpCustomizer> heapDumpCustomizerProvider) {
         this.endpointInvoker = endpointInvoker;
+        this.heapDumpCustomizer = heapDumpCustomizerProvider.getIfAvailable();
     }
 
     @DefaultApiResponse(
@@ -72,10 +80,16 @@ public class HeapDumpApi {
             })
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.HeapDumpApi.INSTANCE_ID)
-    public ResponseEntity<Resource> getHeapDump(@PathVariable("instanceId") String instanceId) {
+    public ResponseEntity<Resource> getHeapDump(
+            @PathVariable("instanceId") String instanceId,
+            @RequestParam(defaultValue = "true", required = false) boolean sanitizeHeapDump) {
 
         Resource resource = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_HEAP_DUMP, NoHttpPayload.INSTANCE);
+
+        if (sanitizeHeapDump && heapDumpCustomizer != null) {
+            resource = heapDumpCustomizer.customize(resource);
+        }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

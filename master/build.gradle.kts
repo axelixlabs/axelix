@@ -2,8 +2,8 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.0.1"
     id("com.axelixlabs.axelix-internal")
+    id("java-test-fixtures")
 }
 
 val springBootVersion = "4.0.5"
@@ -17,37 +17,37 @@ val jmesPathVersion = "0.6.0"
 
 dependencies {
     // Self
-    implementation(project(":common:domain"))
-    implementation(project(":common:api"))
-    implementation(project(":common:auth"))
-    implementation(project(":common:utils"))
+    api(project(":common:domain"))
+    api(project(":common:api"))
+    api(project(":common:auth"))
+    api(project(":common:utils"))
 
     // Impl
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
-    implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    api(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
+    api(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-restclient")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    api("org.springframework.boot:spring-boot-starter-data-jdbc")
+    api("org.springframework.boot:spring-boot-starter-restclient")
+    api("org.springframework.boot:spring-boot-starter-webmvc")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+    api("org.springframework.boot:spring-boot-starter-liquibase")
 
-    implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
-    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
-    implementation("org.springframework.security:spring-security-crypto")
+    api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
+    api("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
+    api("org.springframework.security:spring-security-crypto")
 
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
-    implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
+    api("org.slf4j:slf4j-api")
+    api("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
+    api("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:
     //  This library is archived, and it only supports Jackson 2.x
     //  For now we're gonna get away with it, but Spring Boot 4 already
     //  establishes a baseline for Jackson 3, but it still ca work with Jackson 2.
     //  So, we need to decide how are we going to work with this.
-    implementation("io.burt:jmespath-jackson:${jmesPathVersion}")
+    api("io.burt:jmespath-jackson:${jmesPathVersion}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")
@@ -55,24 +55,29 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
 
+    // Test Self
+    testFixturesImplementation(project(":common:domain"))
+    testFixturesImplementation(project(":common:api"))
+    testFixturesImplementation(project(":common:auth"))
+    testFixturesImplementation(project(":common:utils"))
+
     // Test
-    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
-    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
+    testFixturesApi(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testFixturesApi(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-jdbc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-restclient-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-testcontainers")
 
-    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.testcontainers:mysql:$testcontainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-    testImplementation("org.postgresql:postgresql")
-    testImplementation("com.mysql:mysql-connector-j")
-    testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.0")
+    testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
+    testFixturesApi("org.testcontainers:mysql:$testcontainersVersion")
+    testFixturesApi("org.testcontainers:junit-jupiter:$testcontainersVersion")
+    testFixturesApi("org.postgresql:postgresql")
+    testFixturesApi("com.mysql:mysql-connector-j")
+    testFixturesApi("com.squareup.okhttp3:mockwebserver")
+    testFixturesApi("com.squareup.okhttp3:okhttp")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
@@ -83,19 +88,16 @@ configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
 }
 
+// Allow standard tests in 'src/test' to reuse dependencies declared within 'src/testFixtures' to avoid duplication
+configurations {
+    testImplementation.get().extendsFrom(testFixturesApi.get())
+    testImplementation.get().extendsFrom(testFixturesImplementation.get())
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
-}
-
-// We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need
-tasks.jar {
-    enabled = false
-}
-
-tasks.bootJar {
-    archiveFileName = "master.jar"
 }
 
 tasks.processResources {
@@ -113,17 +115,17 @@ tasks.processResources {
     exclude("application-local.yaml")
 }
 
-publishing {
-    publications {
-        named<MavenPublication>("nexus") {
-            artifact(tasks.bootJar.get())
+sourceSets {
+    test {
+        resources {
+            srcDir("src/testFixtures/resources")
         }
     }
-    publications {
-        named<MavenPublication>("gpr") {
-            artifact(tasks.bootJar.get())
-        }
-    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-parameters")
+    options.release = 25
 }
 
 axelix {
