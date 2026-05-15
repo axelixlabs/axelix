@@ -66,6 +66,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          # ENTERPRISE_GITHUB_TOKEN: read-only token for axelix-enterprise private submodule.
+          # Default GITHUB_TOKEN cannot access cross-repository private submodules.
           token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
           submodules: 'true'
 

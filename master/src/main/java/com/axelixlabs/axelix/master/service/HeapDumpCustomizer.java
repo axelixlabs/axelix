@@ -17,7 +17,11 @@
  */
 package com.axelixlabs.axelix.master.service;
 
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.core.io.Resource;
+
+import com.axelixlabs.axelix.master.exception.StateExportException;
 
 /**
  * Interface for customizing or processing heap dump resources.
@@ -31,6 +35,8 @@ public interface HeapDumpCustomizer {
      *
      * @param originalHeapDump the raw heap dump
      * @return the processed heap dump resource
+     * @throws StateExportException if processing of the heap dump customize fails
      */
-    Resource customize(Resource originalHeapDump);
+    @NonNull
+    Resource customize(Resource originalHeapDump) throws StateExportException;
 }

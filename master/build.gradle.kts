@@ -78,6 +78,7 @@ dependencies {
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
 
     // Test Self
+    testImplementation(testFixtures(project))
     testFixturesImplementation(project(":common:domain"))
     testFixturesImplementation(project(":common:api"))
     testFixturesImplementation(project(":common:auth"))
@@ -110,12 +111,6 @@ configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
 }
 
-// Allow standard tests in 'src/test' to reuse dependencies declared within 'src/testFixtures' to avoid duplication
-configurations {
-    testImplementation.get().extendsFrom(testFixturesApi.get())
-    testImplementation.get().extendsFrom(testFixturesImplementation.get())
-}
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -135,14 +130,6 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
-}
-
-sourceSets {
-    test {
-        resources {
-            srcDir("src/testFixtures/resources")
-        }
-    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
