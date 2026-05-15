@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractorTestFixtures;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistenceTestFixtures;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
@@ -82,7 +83,12 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
  * @author Artemiy Degtyarev
  */
 @TestConfiguration
-@Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class, QualifiersPersistenceTestFixtures.class})
+@Import({
+    EnvironmentTestConfig.class,
+    JwtAuthTestConfiguration.class,
+    QualifiersPersistenceTestFixtures.class,
+    DefaultBeanMetaInfoExtractorTestFixtures.class
+})
 @EnableConfigurationProperties(AxelixPropTest.class)
 public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
 
