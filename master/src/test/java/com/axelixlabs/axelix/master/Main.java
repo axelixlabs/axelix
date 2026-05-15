@@ -18,24 +18,20 @@
 package com.axelixlabs.axelix.master;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * The master entrypoint.
+ * Minimal Spring Boot application used exclusively for testing this application.
  *
- * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-@SpringBootApplication
-@EnableAutoConfiguration(
+@SpringBootApplication(
         exclude = {CompositeDiscoveryClientAutoConfiguration.class, SimpleDiscoveryClientAutoConfiguration.class})
-@EnableScheduling
-public class ApplicationEntrypoint {
+public class Main {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ApplicationEntrypoint.class, args);
+    static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
     }
 }

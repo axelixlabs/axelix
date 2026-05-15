@@ -65,6 +65,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
+          submodules: 'true'
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
