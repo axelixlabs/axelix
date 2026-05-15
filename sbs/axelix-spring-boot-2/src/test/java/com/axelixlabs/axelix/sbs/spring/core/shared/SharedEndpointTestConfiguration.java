@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.shared;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -26,7 +24,6 @@ import java.util.function.Supplier;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,18 +36,9 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
-import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
@@ -79,6 +67,16 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
  * since the Spring TestContext framework caches contexts based on their
  * effective configuration.
  *
+ * <p>The scheduled-task fixtures (flags, {@code @Scheduled} methods, custom
+ * trigger and {@link SchedulingConfigurer} hook) used to live here too. They
+ * have been moved into each scheduled-task test class so those tests can run
+ * in their own isolated Spring contexts without sharing mutable scheduler
+ * state with the rest of the endpoint suite. The {@link #taskScheduler()}
+ * bean below stays because Main's {@code @EnableScheduling} brings in
+ * {@link com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration},
+ * whose {@code TaskRescheduler} beans require a {@link TaskScheduler} at
+ * wiring time even when no application {@code @Scheduled} method exists.
+ *
  * @since 14.05.2026
  * @author Artemiy Degtyarev
  */
@@ -90,16 +88,17 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.PropagationTestHelper;
     DefaultBeanMetaInfoExtractorTestFixtures.class
 })
 @EnableConfigurationProperties(AxelixPropTest.class)
-public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
+public class SharedEndpointTestConfiguration {
 
     // -----------------------------------------------------------------------------------------------------------------
     // TestRestTemplate authentication.
     //
     // With the shared context, the JWT authorization filter (from {@link JwtAuthTestConfiguration}) is registered for
     // every endpoint test. The default {@link TestRestTemplate} bean injected via {@code @SpringBootTest} has no JWT
-    // token, so every actuator request would receive 401. The {@link BeanPostProcessor} below intercepts the default
-    // {@code TestRestTemplate} and installs an admin-role JWT as the default {@code Authorization} header. Tests that
-    // need a specific role can still use {@link com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder}.
+    // token, so every actuator request would receive 401. The {@link TestRestTemplateAuthInstaller} below intercepts
+    // the default {@code TestRestTemplate} and installs an admin-role JWT as the default {@code Authorization}
+    // header. Tests that need a specific role can still use
+    // {@link com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder}.
     // -----------------------------------------------------------------------------------------------------------------
 
     @Bean
@@ -108,30 +107,18 @@ public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
         return new TestRestTemplateAuthInstaller(testRestTemplate, jwtEncoderService);
     }
 
-    static class TestRestTemplateAuthInstaller {
+    // -----------------------------------------------------------------------------------------------------------------
+    // TaskScheduler stub.
+    //
+    // Required by {@link com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration},
+    // which auto-runs because Main has {@code @EnableScheduling}. The shared context registers no {@code @Scheduled}
+    // methods, so this scheduler is effectively idle - see the per-test scheduling contexts for the live ones.
+    // -----------------------------------------------------------------------------------------------------------------
 
-        TestRestTemplateAuthInstaller(TestRestTemplate testRestTemplate, JwtEncoderService jwtEncoderService) {
-            String token = jwtEncoderService.generateToken(
-                    new DefaultUser("testUser", "testPassword", java.util.Set.of(DefaultRole.ADMIN)));
-            testRestTemplate.getRestTemplate().getInterceptors().add((request, body, execution) -> {
-                if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    request.getHeaders().set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
-                }
-                return execution.execute(request, body);
-            });
-        }
+    @Bean
+    public TaskScheduler taskScheduler() {
+        return new ConcurrentTaskScheduler();
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Scheduled task flags (set by @Scheduled methods, observed by AxelixScheduledTasksEndpointTest).
-    // -----------------------------------------------------------------------------------------------------------------
-
-    public static volatile boolean cronFlag = false;
-    public static volatile boolean fixedDelayFlag = false;
-    public static volatile boolean fixedRateFlag = false;
-    public static volatile boolean customTaskFlag = false;
-
-    public static final String CUSTOM_TRIGGER_NAME = "CustomTestTrigger";
 
     // -----------------------------------------------------------------------------------------------------------------
     // Cache test infrastructure.
@@ -329,88 +316,5 @@ public class SharedEndpointTestConfiguration implements SchedulingConfigurer {
     @Bean
     public TestBeanWithSpEL testBeanWithSpEL() {
         return new TestBeanWithSpEL();
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // Scheduled tasks endpoint test fixtures.
-    //
-    // The scheduled task auto-configuration registers all the management beans for us, but it requires:
-    //   - a {@link TaskScheduler} bean,
-    //   - {@code @Scheduled} methods to inspect,
-    //   - a {@link SchedulingConfigurer} that contributes a non-{@code @Scheduled} (i.e. "custom") task.
-    // -----------------------------------------------------------------------------------------------------------------
-
-    @Bean
-    public TaskScheduler taskScheduler() {
-        return new ConcurrentTaskScheduler();
-    }
-
-    @Scheduled(cron = "*/1 * * * * *")
-    public void testCronTask() {
-        cronFlag = true;
-    }
-
-    @Scheduled(cron = "*/2 * * * * *")
-    public void testCronTaskForModify() {
-        // intentionally empty
-    }
-
-    @Scheduled(fixedDelay = 100)
-    public void testFixedDelayTask() {
-        fixedDelayFlag = true;
-    }
-
-    @Scheduled(fixedDelay = 20000000)
-    public void testFixedDelayTaskForModify() {
-        // intentionally empty
-    }
-
-    @Scheduled(fixedDelay = 2000000000)
-    public void testFixedDelayTaskForExecute() {
-        fixedDelayFlag = true;
-    }
-
-    @Scheduled(fixedRate = 100, initialDelay = 50)
-    public void testFixedRateTask() {
-        fixedRateFlag = true;
-    }
-
-    @Scheduled(fixedRate = 20000000)
-    public void testFixedRateTaskForModify() {
-        // intentionally empty
-    }
-
-    @Scheduled(fixedRate = 2000000000)
-    public void testFixedRateTaskForExecute() {
-        fixedRateFlag = true;
-    }
-
-    @Override
-    public void configureTasks(@NonNull ScheduledTaskRegistrar registrar) {
-        registrar.addTriggerTask(new CustomTestTask(), new CustomTestTrigger());
-    }
-
-    public static class CustomTestTask implements Runnable {
-        @Override
-        public void run() {
-            customTaskFlag = true;
-        }
-
-        @Override
-        public String toString() {
-            return CustomTestTask.class.getName();
-        }
-    }
-
-    public static class CustomTestTrigger implements Trigger {
-        @Override
-        public Date nextExecutionTime(@NonNull TriggerContext triggerContext) {
-            return Date.from(Instant.now().plusMillis(100));
-        }
-
-        @Override
-        public String toString() {
-            return CUSTOM_TRIGGER_NAME;
-        }
     }
 }
