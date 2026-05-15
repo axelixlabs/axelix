@@ -41,7 +41,14 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = Main.class,
-        args = {"--axelix.env.test.prop3=fromCommandLine"})
+        args = {"--axelix.env.test.prop3=fromCommandLine", "--fooBar=fromArgs"},
+        // The actuator-published {@code ConfigurationPropertiesReportEndpoint} (used directly by
+        // {@code DefaultConfigurationPropertiesConverterTest}) defaults to {@code WHEN_AUTHORIZED} for value
+        // visibility, which redacts every value when no security context is bound. Axelix's own
+        // {@code axelix-configprops} path goes through {@link
+        // com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService}, which builds
+        // its own delegate endpoints and is unaffected by this property, so no other endpoint test changes.
+        properties = "management.endpoint.configprops.show-values=always")
 @Import(SharedEndpointTestConfiguration.class)
 public abstract class AbstractEndpointTest {
 
@@ -66,5 +73,15 @@ public abstract class AbstractEndpointTest {
         // so the bean fails to construct unless these resolve.
         registry.add("test.spring.profiles.active", () -> "production");
         registry.add("test.method.timeout", () -> "4200");
+
+        // Required by {@link com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtractorTest}. The
+        // metadata extractor only keeps entries for property names actually present in the {@link
+        // org.springframework.core.env.Environment} (see {@code DefaultPropertyMetadataExtractor#filterMetadata}),
+        // so these keys must exist for the test's lookups to succeed. Descriptions/deprecations come from
+        // {@code spring-configuration-metadata.json} on the test classpath.
+        registry.add("prop.test.server.port", () -> "test");
+        registry.add("prop.test.logging.level.root", () -> "test");
+        registry.add("custom.test.without.reason.property", () -> "test");
+        registry.add("custom.test.without.replacement.property", () -> "test");
     }
 }

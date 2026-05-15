@@ -26,11 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.StandardEnvironment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
@@ -39,8 +34,7 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,9 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(args = "--fooBar=fromArgs")
-@Import({EnvironmentTestConfig.class, DefaultEnvPropertyEnricherTest.CurrentTestConfig.class})
-class DefaultEnvPropertyEnricherTest {
+class DefaultEnvPropertyEnricherTest extends AbstractEndpointTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
@@ -67,23 +59,12 @@ class DefaultEnvPropertyEnricherTest {
     @Autowired
     private EnvPropertyEnricher enricher;
 
-    @TestConfiguration
-    static class CurrentTestConfig {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-            return new EndpointsConfigurationProperties();
-        }
-
-        @Bean
-        SmartSanitizingFunction smartSanitizingFunction() {
-            return new SmartSanitizingFunction(List.of(), new DefaultPropertyNameNormalizer());
-        }
-    }
-
     @BeforeAll
     static void beforeAll() {
+        // The command-line argument {@code --fooBar=fromArgs} is registered on {@link AbstractEndpointTest} so it
+        // is present in the shared {@code commandLineArgs} property source. Setting {@code foo.bar} as a system
+        // property here gives the same canonical property a lower-precedence source, which lets the test verify
+        // that the command-line value wins the {@code isPrimary} computation.
         System.setProperty("foo.bar", "system.property");
     }
 

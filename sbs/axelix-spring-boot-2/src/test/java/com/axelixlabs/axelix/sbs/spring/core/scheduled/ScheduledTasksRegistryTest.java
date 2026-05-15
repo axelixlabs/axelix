@@ -17,34 +17,21 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
+import com.axelixlabs.axelix.sbs.spring.core.shared.SharedEndpointTestConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,17 +41,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest
-@Import(ScheduledTasksRegistryTest.ScheduledTaskRegistryTestConfiguration.class)
-class ScheduledTasksRegistryTest {
+class ScheduledTasksRegistryTest extends AbstractEndpointTest {
 
-    private static final String CRON_TASK_ID = ScheduledTaskRegistryTestConfiguration.class.getName() + ".testCronTask";
+    private static final String CRON_TASK_ID = SharedEndpointTestConfiguration.class.getName() + ".testCronTask";
     private static final String FIXED_DELAY_TASK_ID =
-            ScheduledTaskRegistryTestConfiguration.class.getName() + ".testFixedDelayTask";
+            SharedEndpointTestConfiguration.class.getName() + ".testFixedDelayTask";
     private static final String FIXED_RATE_TASK_ID =
-            ScheduledTaskRegistryTestConfiguration.class.getName() + ".testFixedRateTask";
-    private static final String CUSTOM_TASK_ID =
-            ScheduledTaskRegistryTestConfiguration.class.getName() + ".testCustomTask";
+            SharedEndpointTestConfiguration.class.getName() + ".testFixedRateTask";
+    private static final String CUSTOM_TASK_ID = SharedEndpointTestConfiguration.CustomTestTask.class.getName();
+
+    private static final List<String> EXPECTED_TASK_IDS =
+            List.of(CRON_TASK_ID, FIXED_DELAY_TASK_ID, FIXED_RATE_TASK_ID, CUSTOM_TASK_ID);
 
     @Autowired
     private ScheduledTasksRegistry taskRegistry;
@@ -73,20 +60,22 @@ class ScheduledTasksRegistryTest {
     void shouldRegisterAllScheduledTasks() {
         Collection<ManagedScheduledTask> registeredTasks = taskRegistry.getAll();
 
-        assertThat(registeredTasks).isNotNull().isNotEmpty().hasSize(4);
+        assertThat(registeredTasks).isNotNull().isNotEmpty();
 
         List<String> taskIds =
                 registeredTasks.stream().map(ManagedScheduledTask::getId).collect(Collectors.toList());
 
+        // The shared Spring context registers a superset of scheduled tasks via
+        // {@link SharedEndpointTestConfiguration}; this test verifies that the four task variants this class cares
+        // about (cron / fixedDelay / fixedRate / custom trigger) are all present and addressable.
         assertThat(taskIds)
-                .hasSize(4)
                 .allSatisfy(id -> assertThat(id).isNotBlank())
-                .containsExactlyInAnyOrder(CRON_TASK_ID, FIXED_DELAY_TASK_ID, FIXED_RATE_TASK_ID, CUSTOM_TASK_ID);
+                .containsAll(EXPECTED_TASK_IDS);
 
         assertThat(registeredTasks)
                 .allSatisfy(task -> assertThat(task.getFuture().isCancelled()).isFalse());
 
-        taskIds.forEach(id -> assertThat(taskRegistry.find(id))
+        EXPECTED_TASK_IDS.forEach(id -> assertThat(taskRegistry.find(id))
                 .isPresent()
                 .get()
                 .extracting(ManagedScheduledTask::getId)
@@ -99,63 +88,20 @@ class ScheduledTasksRegistryTest {
     void shouldHaveCorrectTaskTypes() {
         Collection<ManagedScheduledTask> tasks = taskRegistry.getAll();
 
-        assertThat(tasks)
-                .hasSize(4)
-                .extracting(ManagedScheduledTask::getScheduledTask)
-                .extracting(ScheduledTask::getTask)
-                .satisfiesExactlyInAnyOrder(
-                        task -> assertThat(task).isInstanceOf(CronTask.class),
-                        task -> assertThat(task).isInstanceOf(FixedDelayTask.class),
-                        task -> assertThat(task).isInstanceOf(FixedRateTask.class),
-                        task -> assertThat(task).isInstanceOf(TriggerTask.class).isNotInstanceOf(CronTask.class));
+        // Each of the four expected variants must produce its own concrete Spring {@link ScheduledTask} type.
+        assertThat(findScheduledTask(tasks, CRON_TASK_ID).getTask()).isInstanceOf(CronTask.class);
+        assertThat(findScheduledTask(tasks, FIXED_DELAY_TASK_ID).getTask()).isInstanceOf(FixedDelayTask.class);
+        assertThat(findScheduledTask(tasks, FIXED_RATE_TASK_ID).getTask()).isInstanceOf(FixedRateTask.class);
+        assertThat(findScheduledTask(tasks, CUSTOM_TASK_ID).getTask())
+                .isInstanceOf(TriggerTask.class)
+                .isNotInstanceOf(CronTask.class);
     }
 
-    @TestConfiguration
-    @EnableScheduling
-    static class ScheduledTaskRegistryTestConfiguration implements SchedulingConfigurer {
-
-        @Bean
-        public TaskScheduler taskScheduler() {
-            return new ConcurrentTaskScheduler();
-        }
-
-        @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
-        }
-
-        @Scheduled(cron = "*/2 * * * * *")
-        public void testCronTask() {}
-
-        @Scheduled(fixedDelay = 2000)
-        public void testFixedDelayTask() {}
-
-        @Scheduled(fixedRate = 2000, initialDelay = 100)
-        public void testFixedRateTask() {}
-
-        @Override
-        public void configureTasks(ScheduledTaskRegistrar registrar) {
-            Runnable customTask = new Runnable() {
-                @Override
-                public void run() {
-                    executeCustomTask();
-                }
-
-                @Override
-                public String toString() {
-                    return CUSTOM_TASK_ID;
-                }
-            };
-            registrar.addTriggerTask(customTask, new CustomTrigger());
-        }
-
-        private void executeCustomTask() {}
-
-        static class CustomTrigger implements Trigger {
-            @Override
-            public Date nextExecutionTime(@NonNull TriggerContext triggerContext) {
-                return Date.from(Instant.now().plusMillis(1000));
-            }
-        }
+    private static ScheduledTask findScheduledTask(Collection<ManagedScheduledTask> tasks, String taskId) {
+        return tasks.stream()
+                .filter(task -> task.getId().equals(taskId))
+                .map(ManagedScheduledTask::getScheduledTask)
+                .findFirst()
+                .orElseThrow();
     }
 }

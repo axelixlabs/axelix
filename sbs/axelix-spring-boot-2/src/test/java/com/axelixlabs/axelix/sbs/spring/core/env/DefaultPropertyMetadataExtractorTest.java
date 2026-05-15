@@ -21,12 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.context.TestPropertySource;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,16 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @since 05.12.2025
  */
-@TestPropertySource(
-        properties = {
-            "prop.test.server.port=test",
-            "prop.test.logging.level.root=test",
-            "custom.test.without.reason.property=test",
-            "custom.test.without.replacement.property=test"
-        })
-@SpringBootTest
-@Import(DefaultPropertyMetadataExtractorTest.DefaultPropertyMetadataExtractorTestConfiguration.class)
-class DefaultPropertyMetadataExtractorTest {
+class DefaultPropertyMetadataExtractorTest extends AbstractEndpointTest {
 
     @Autowired
     private PropertyMetadataExtractor extractor;
@@ -55,6 +42,8 @@ class DefaultPropertyMetadataExtractorTest {
 
     @BeforeEach
     void setUp() throws InterruptedException {
+        // {@link DefaultPropertyMetadataExtractor#loadAndFilterPropertyMetadata} is invoked asynchronously on
+        // {@code ApplicationReadyEvent}. Allow it to finish loading the metadata before exercising the extractor.
         Thread.sleep(1000);
     }
 
@@ -101,20 +90,5 @@ class DefaultPropertyMetadataExtractorTest {
     void shouldNotExtractPropertyMetadataWithoutDeprecated() {
         PropertyMetadata nonExistentMetadata = extractor.getMetadata("non.existent.property");
         assertThat(nonExistentMetadata).isNull();
-    }
-
-    @TestConfiguration
-    static class DefaultPropertyMetadataExtractorTestConfiguration {
-
-        @Bean
-        public PropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultPropertyNameNormalizer();
-        }
-
-        @Bean
-        public PropertyMetadataExtractor propertyMetadataExtractor(
-                ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
-            return new DefaultPropertyMetadataExtractor(configurableEnvironment, propertyNameNormalizer);
-        }
     }
 }
