@@ -31,7 +31,7 @@ const Users = () => {
 
     const [filters, setFilters] = useState<IUsersFilters>({
         roles: [],
-        providers: [],
+        userOrigins: [],
     });
 
     const fetchUsers = (): void => {

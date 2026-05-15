@@ -22,4 +22,5 @@ export enum ERoles {
 
 export enum EUserOrigin {
     LOCAL = "LOCAL",
+    OIDC = "OIDC",
 }

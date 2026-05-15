@@ -114,7 +114,7 @@ export interface IUsersFilters {
     /**
      * Origins of users account
      */
-    providers: EUserOrigin[];
+    userOrigins: EUserOrigin[];
 }
 
 export interface IEditableUser extends Omit<IUser, "email"> {

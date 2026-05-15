@@ -22,7 +22,7 @@ import { Outlet } from "react-router";
 import { AccessProvider } from "components";
 
 import { AdminHeader } from "./AdminHeader";
-import { CommonSiderMenu } from "./Siders";
+import { InstanceSiderMenu } from "./Siders";
 import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
@@ -34,12 +34,12 @@ interface IProps {
     hideSider?: boolean;
 
     /**
-     * Overrides the default {@link CommonSiderMenu}
+     * Overrides the default {@link InstanceSiderMenu}
      */
     siderContent?: JSX.Element;
 }
 
-export const MainLayout = ({ hideSider, siderContent }: IProps) => {
+export const MainLayout = ({ hideSider, siderContent = <InstanceSiderMenu /> }: IProps) => {
     return (
         <>
             <AccessProvider />
@@ -48,7 +48,7 @@ export const MainLayout = ({ hideSider, siderContent }: IProps) => {
 
                 {!hideSider && (
                     <Sider width={270} className={styles.Sider}>
-                        <div className={styles.SiderScrollContainer}>{siderContent ?? <CommonSiderMenu />}</div>
+                        <div className={styles.SiderScrollContainer}>{siderContent}</div>
                     </Sider>
                 )}
 

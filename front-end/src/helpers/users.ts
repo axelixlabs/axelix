@@ -20,16 +20,14 @@ import type { IUser, IUsersFilters } from "models";
 export const filterUsers = (users: IUser[], search: string, filters: IUsersFilters): IUser[] => {
     const formattedSearch = search.toLowerCase().trim();
     const hasRolesFilters = filters.roles.length > 0;
-    const hasProvidersFilters = filters.providers.length > 0;
+    const hasOriginFilters = filters.userOrigins.length > 0;
 
-    return users.filter(({ username, email, roles, provider }) => {
-        const matchesRoles = roles.some((role) => filters.roles.includes(role));
-        if (hasRolesFilters && !matchesRoles) {
+    return users.filter(({ username, email, roles, userOrigin }) => {
+        if (hasRolesFilters && !roles.some((role) => filters.roles.includes(role))) {
             return false;
         }
 
-        const matchesProviders = filters.providers.includes(provider);
-        if (hasProvidersFilters && !matchesProviders) {
+        if (hasOriginFilters && !filters.userOrigins.includes(userOrigin)) {
             return false;
         }
 
@@ -40,10 +38,7 @@ export const filterUsers = (users: IUser[], search: string, filters: IUsersFilte
         const lowerUsername = username.toLowerCase();
         const lowerEmail = (email ?? "").toLowerCase();
 
-        const matchesUsername = lowerUsername.includes(formattedSearch);
-        const matchesEmail = lowerEmail.includes(formattedSearch);
-
-        return matchesUsername || matchesEmail;
+        return lowerUsername.includes(formattedSearch) || lowerEmail.includes(formattedSearch);
     });
 };
 

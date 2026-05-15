@@ -20,7 +20,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "components";
-import { EUserOrigin, ERoles, type IUsersFilters } from "models";
+import { ERoles, EUserOrigin, type IUsersFilters } from "models";
 import { roleOptions } from "utils";
 
 import { CreateUser } from "./CreateUser";
@@ -56,8 +56,8 @@ interface IProps {
 export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, fetchUsers }: IProps) => {
     const { t } = useTranslation();
 
-    const providersOptions = Object.values(EUserOrigin).map((provider) => ({
-        value: provider,
+    const userOriginOptions = Object.values(EUserOrigin).map((origin) => ({
+        value: origin,
     }));
 
     const rolesHandleChange = (value: ERoles[]): void => {
@@ -67,10 +67,10 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
         }));
     };
 
-    const providersHandleChange = (value: EUserOrigin[]): void => {
+    const userOriginsHandleChange = (value: EUserOrigin[]): void => {
         setFilters((prev) => ({
             ...prev,
-            providers: value,
+            userOrigins: value,
         }));
     };
 
@@ -93,12 +93,12 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                     <Select
                         mode="multiple"
                         showSearch={false}
-                        placeholder={t("Users.providers")}
+                        placeholder={t("Users.origins")}
                         size="small"
                         maxTagCount={1}
-                        value={filters.providers}
-                        onChange={providersHandleChange}
-                        options={providersOptions}
+                        value={filters.userOrigins}
+                        onChange={userOriginsHandleChange}
+                        options={userOriginOptions}
                         className={styles.FilterSelect}
                     />
                 </div>
