@@ -1,5 +1,11 @@
 rootProject.name = "axelix"
 
+val enterpriseDir = file("axelix-enterprise")
+if (enterpriseDir.exists() && file("axelix-enterprise/master-enterprise/build.gradle.kts").exists()) {
+    include(":master-enterprise")
+    project(":master-enterprise").projectDir = file("axelix-enterprise/master-enterprise")
+}
+
 include(
     ":master",
     ":sbs:axelix-spring-boot-2",
