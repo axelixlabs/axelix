@@ -29,9 +29,23 @@ dependencies {
     }
 }
 
+val aggregateTestProfilerReports by tasks.registering(Copy::class) {
+    group = "reporting"
+    description = "Aggregates spring-test-profiler HTML reports from all subprojects."
+
+    subprojects.forEach { sub ->
+        dependsOn(sub.tasks.withType<Test>())
+        from(sub.layout.buildDirectory.dir("spring-test-profiler")) {
+            into(sub.name)
+        }
+    }
+    into(layout.buildDirectory.dir("reports/spring-test-profiler"))
+}
+
 tasks {
     check {
         dependsOn(testAggregateTestReport)
+        dependsOn(aggregateTestProfilerReports)
     }
 }
 

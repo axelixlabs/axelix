@@ -48,6 +48,15 @@ runs:
         path: 'build/reports/tests/test/aggregated-results' # Aggregated tests results will be stored there
         retention-days: 3
 
+    - name: Upload spring-test-profiler reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: spring-test-profiler-reports
+        path: 'build/reports/spring-test-profiler'
+        retention-days: 3
+        if-no-files-found: ignore
+
     - name: Download and trust Nexus SSL certificate for Gradle
       if: ${{ inputs.deploy-to-nexus == 'true' }}
       run: |
