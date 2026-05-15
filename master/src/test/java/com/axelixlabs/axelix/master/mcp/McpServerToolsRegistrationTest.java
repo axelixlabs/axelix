@@ -56,6 +56,13 @@ class McpServerToolsRegistrationTest {
                         "getWallboard",
                         "getAllCaches",
                         "clearAllCaches",
-                        "clearSpecificCacheEntity");
+                        "clearSpecificCacheEntity",
+                        "getAvailableLoggingLevels",
+                        "getLoggerGroupsFeed",
+                        "findLoggersByName",
+                        "findGroupsByName",
+                        "changeLoggingLevelByLoggerName",
+                        "changeLoggingLevelByGroupName",
+                        "resetLoggingLevelByLoggerName");
     }
 }
