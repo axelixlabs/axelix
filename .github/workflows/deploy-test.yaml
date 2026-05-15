@@ -51,6 +51,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
+          submodules: 'true'
 
       - name: Build Backend
         uses: ./.github/actions/build-backend

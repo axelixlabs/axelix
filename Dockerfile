@@ -5,18 +5,18 @@ WORKDIR /application
 
 # Copy distributions
 COPY front-end/dist dist
-COPY master/build/libs/master.jar master.jar
+COPY axelix-enterprise/master-enterprise/build/libs/master-enterprise.jar master-enterprise.jar
 
-RUN java -Djarmode=tools -jar master.jar extract --layers --launcher
+RUN java -Djarmode=tools -jar master-enterprise.jar extract --layers --launcher
 
 # Stage: AOT Cache training (JEP 483 — Ahead-of-Time Class Loading & Linking)
 FROM eclipse-temurin:25-jre-alpine AS training
 WORKDIR /application
 
-COPY --from=layers /application/master/dependencies/ ./
-COPY --from=layers /application/master/spring-boot-loader/ ./
-COPY --from=layers /application/master/snapshot-dependencies/ ./
-COPY --from=layers /application/master/application/ ./
+COPY --from=layers /application/master-enterprise/dependencies/ ./
+COPY --from=layers /application/master-enterprise/spring-boot-loader/ ./
+COPY --from=layers /application/master-enterprise/snapshot-dependencies/ ./
+COPY --from=layers /application/master-enterprise/application/ ./
 COPY --from=layers /application/dist/ ./dist
 
 # Step 1: Record class loading profile (training run — app may crash without infra, that's expected)
@@ -50,10 +50,10 @@ USER axelix
 WORKDIR /application
 
 # Copy Spring Boot application layers
-COPY --from=layers /application/master/dependencies/ ./
-COPY --from=layers /application/master/spring-boot-loader/ ./
-COPY --from=layers /application/master/snapshot-dependencies/ ./
-COPY --from=layers /application/master/application/ ./
+COPY --from=layers /application/master-enterprise/dependencies/ ./
+COPY --from=layers /application/master-enterprise/spring-boot-loader/ ./
+COPY --from=layers /application/master-enterprise/snapshot-dependencies/ ./
+COPY --from=layers /application/master-enterprise/application/ ./
 
 # Copy the front-end static files distribution (path must match static-locations below)
 COPY --from=layers /application/dist/ ./dist

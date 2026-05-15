@@ -78,6 +78,7 @@ dependencies {
     testFixturesApi("com.mysql:mysql-connector-j")
     testFixturesApi("com.squareup.okhttp3:mockwebserver")
     testFixturesApi("com.squareup.okhttp3:okhttp")
+    testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.0")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
