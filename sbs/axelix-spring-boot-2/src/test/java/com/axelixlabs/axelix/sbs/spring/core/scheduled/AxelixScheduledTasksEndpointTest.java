@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,27 @@ class AxelixScheduledTasksEndpointTest extends AbstractEndpointTest {
 
     private static final String CUSTOM_TRIGGER = SharedEndpointTestConfiguration.CUSTOM_TRIGGER_NAME;
 
+    // Original schedules declared on SharedEndpointTestConfiguration. The shared Spring context is reused across the
+    // whole endpoint-test suite, so tests in this class must restore any task they disable or whose schedule they
+    // mutate, otherwise subsequent test methods (and other endpoint tests) see leaked state.
+    private static final String ORIGINAL_CRON_FOR_MODIFY = "*/2 * * * * *";
+    private static final long ORIGINAL_INTERVAL_FOR_MODIFY = 20_000_000L;
+
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @AfterEach
+    void restoreTaskState() {
+        enableScheduledTask(CRON_TASK_ID);
+        enableScheduledTask(FIXED_DELAY_TASK_ID);
+        enableScheduledTask(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
+        enableScheduledTask(FIXED_RATE_TASK_ID);
+        enableScheduledTask(CUSTOM_TASK_ID);
+
+        modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, ORIGINAL_CRON_FOR_MODIFY);
+        modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, ORIGINAL_INTERVAL_FOR_MODIFY);
+        modifyInterval(FIXED_RATE_TASK_ID_FOR_MODIFY, ORIGINAL_INTERVAL_FOR_MODIFY);
+    }
 
     @Test
     void shouldEnableDisabledTask_testCronTask() throws InterruptedException {
@@ -370,6 +390,25 @@ class AxelixScheduledTasksEndpointTest extends AbstractEndpointTest {
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/actuator/axelix-scheduled-tasks/enable", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+    }
+
+    private void modifyCronExpression(String target, String cronExpression) {
+        ScheduledTaskCronExpressionModifyRequest request =
+                new ScheduledTaskCronExpressionModifyRequest(target, cronExpression);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+    }
+
+    private void modifyInterval(String target, long interval) {
+        ScheduledTaskIntervalModifyRequest request = new ScheduledTaskIntervalModifyRequest(target, interval);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
