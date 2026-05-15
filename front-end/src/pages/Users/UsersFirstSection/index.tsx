@@ -20,7 +20,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "components";
-import { EProvider, ERoles, type IUsersFilters } from "models";
+import { EUserOrigin, ERoles, type IUsersFilters } from "models";
 import { roleOptions } from "utils";
 
 import { CreateUser } from "./CreateUser";
@@ -56,7 +56,7 @@ interface IProps {
 export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, fetchUsers }: IProps) => {
     const { t } = useTranslation();
 
-    const providersOptions = Object.values(EProvider).map((provider) => ({
+    const providersOptions = Object.values(EUserOrigin).map((provider) => ({
         value: provider,
     }));
 
@@ -67,7 +67,7 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
         }));
     };
 
-    const providersHandleChange = (value: EProvider[]): void => {
+    const providersHandleChange = (value: EUserOrigin[]): void => {
         setFilters((prev) => ({
             ...prev,
             providers: value,

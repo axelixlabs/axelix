@@ -47,7 +47,7 @@ export const UsersTable = ({ users }: IProps) => {
 
                 <EmptyHandler isEmpty={users.length === 0}>
                     {users.map((user) => {
-                        const { id, username, email, roles, lastLoginAt, provider } = user;
+                        const { id, username, email, roles, lastLoginAt, userOrigin } = user;
                         const formattedLastLogin = lastLoginAt
                             ? dayjs(lastLoginAt).format("DD.MM.YYYY HH:mm")
                             : t("Users.notLoggedIn");
@@ -62,7 +62,7 @@ export const UsersTable = ({ users }: IProps) => {
                                 <div className="RowChunk">{username}</div>
                                 <div className="RowChunk">{email}</div>
                                 <div className="RowChunk">{formattedLastLogin}</div>
-                                <div className="RowChunk">{provider}</div>
+                                <div className="RowChunk">{userOrigin}</div>
                                 <div className="RowChunk">
                                     <UserRoleTags roles={roles} />
                                 </div>

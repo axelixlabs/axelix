@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EProvider, ERoles } from "../enums/users";
+import type { ERoles, EUserOrigin } from "../enums/users";
 
 export interface IUser {
     /**
@@ -36,7 +36,7 @@ export interface IUser {
     /**
      * Origin of the user account
      */
-    provider: EProvider;
+    userOrigin: EUserOrigin;
 
     /**
      * The roles granted to this user
@@ -114,7 +114,7 @@ export interface IUsersFilters {
     /**
      * Origins of users account
      */
-    providers: EProvider[];
+    providers: EUserOrigin[];
 }
 
 export interface IEditableUser extends Omit<IUser, "email"> {

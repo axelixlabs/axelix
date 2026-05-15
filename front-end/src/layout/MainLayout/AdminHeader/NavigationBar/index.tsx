@@ -18,7 +18,8 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
-import { useAppSelector } from "hooks";
+import { useAppSelector, useAuthority } from "hooks";
+import { EAuthorities } from "models";
 
 import styles from "./styles.module.css";
 
@@ -26,17 +27,19 @@ export const NavigationBar = () => {
     const { t } = useTranslation();
 
     const settings = useAppSelector((state) => state.settings);
+    const hasUsersViewAccess = useAuthority(EAuthorities.USERS_VIEW);
 
     return (
         <>
             <nav data-test="header-links">
-                {/* TODO: Fix in the future */}
-                <NavLink
-                    to="/users"
-                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
-                >
-                    {t("Header.users")}
-                </NavLink>
+                {hasUsersViewAccess && (
+                    <NavLink
+                        to="/users"
+                        className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                    >
+                        {t("Header.users")}
+                    </NavLink>
+                )}
                 {settings.isMcpServerEnabled && (
                     <NavLink
                         to="/mcp-server"

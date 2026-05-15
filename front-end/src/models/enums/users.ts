@@ -20,6 +20,6 @@ export enum ERoles {
     VIEWER = "VIEWER",
 }
 
-export enum EProvider {
+export enum EUserOrigin {
     LOCAL = "LOCAL",
 }
