@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +46,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for {@link DefaultConfigurationPropertiesService}.
  *
- * <p>Each nested class autowires the raw dependencies from the shared endpoint context
- * and constructs its own {@link DefaultConfigurationPropertiesService} instance with the
- * {@link SmartSanitizingFunction} configuration it wants to exercise. This avoids
- * spinning up a dedicated {@code ApplicationContext} per sanitization scheme.
+ * <p>Each test method autowires the raw dependencies from the shared endpoint context and constructs its own
+ * {@link DefaultConfigurationPropertiesService} instance via {@link #withSanitizeAll()} or
+ * {@link #withExplicitSanitization()} to exercise the {@link SmartSanitizingFunction} configuration it cares
+ * about. The test methods are flat rather than grouped in {@code @Nested} classes so the entire test class joins
+ * the single shared Spring {@code ApplicationContext} used by every other endpoint test, instead of triggering a
+ * second cached context.
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
@@ -74,123 +74,115 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractEndpointT
     @Autowired
     private PropertyNameNormalizer propertyNameNormalizer;
 
-    @Nested
-    class WithoutExplicitSanitizationProperties {
+    @Test
+    void withSanitizeAll_shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
+        // given.
+        DefaultConfigurationPropertiesService configurationPropertiesService = withSanitizeAll();
 
-        private DefaultConfigurationPropertiesService configurationPropertiesService;
+        // when.
+        User user = createUserWithAuthorities();
+        SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+        ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
+                configurationPropertiesService::getConfigProps, securityContext);
 
-        @BeforeEach
-        void setUp() {
-            SmartSanitizingFunction sanitizingFunction = new SmartSanitizingFunction(
-                    EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
-            configurationPropertiesService = new DefaultConfigurationPropertiesService(
-                    sanitizingFunction,
-                    applicationContext,
-                    configurationPropertiesConverter,
-                    requiredAuthorityCheckService);
-        }
+        // then.
+        Set<@Nullable String> values = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .map(KeyValue::getValue)
+                .collect(Collectors.toSet());
 
-        @Test
-        void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = createUserWithAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
-
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
-                    .collect(Collectors.toSet());
-
-            // TODO: Well, the "null" sanitization policy is not something that we currently have control over.
-            // It is also not clear if we want to sanitize "null" values in general. I think
-            // that it makes sense to sanitize them as well, but currently it is not possible due
-            // to internal implementation of the Spring Boot Actuator native config props endpoint.
-            assertThat(values).containsOnly(null, "******");
-        }
-
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
-
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
-                    .collect(Collectors.toSet());
-
-            assertThat(values).doesNotContain("******");
-        }
+        // TODO: Well, the "null" sanitization policy is not something that we currently have control over.
+        // It is also not clear if we want to sanitize "null" values in general. I think
+        // that it makes sense to sanitize them as well, but currently it is not possible due
+        // to internal implementation of the Spring Boot Actuator native config props endpoint.
+        assertThat(values).containsOnly(null, "******");
     }
 
-    @Nested
-    class WithExplicitSanitizationProperties {
+    @Test
+    void withSanitizeAll_shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
+        // given.
+        DefaultConfigurationPropertiesService configurationPropertiesService = withSanitizeAll();
 
-        private DefaultConfigurationPropertiesService configurationPropertiesService;
+        // when.
+        User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+        SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+        ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
+                configurationPropertiesService::getConfigProps, securityContext);
 
-        @BeforeEach
-        void setUp() {
-            SmartSanitizingFunction sanitizingFunction = new SmartSanitizingFunction(
-                    List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
-                    propertyNameNormalizer);
-            configurationPropertiesService = new DefaultConfigurationPropertiesService(
-                    sanitizingFunction,
-                    applicationContext,
-                    configurationPropertiesConverter,
-                    requiredAuthorityCheckService);
-        }
+        // then.
+        Set<@Nullable String> values = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .map(KeyValue::getValue)
+                .collect(Collectors.toSet());
 
-        @Test
-        void shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
-            // when.
-            User user = createUserWithAuthorities();
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+        assertThat(values).doesNotContain("******");
+    }
 
-            // then.
-            Map<String, String> sanitizedProperties = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .filter(prop -> "******".equals(prop.getValue()))
-                    .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue, (a, b) -> a));
+    @Test
+    void withExplicitSanitization_shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
+        // given.
+        DefaultConfigurationPropertiesService configurationPropertiesService = withExplicitSanitization();
 
-            assertThat(sanitizedProperties)
-                    .containsOnlyKeys("tags.forSanitization", "tags.FOR_SANITIZATION")
-                    .containsValues("******", "******");
+        // when.
+        User user = createUserWithAuthorities();
+        SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+        ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
+                configurationPropertiesService::getConfigProps, securityContext);
 
-            List<KeyValue> nonSanitizedProps = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .filter(prop -> !"******".equals(prop.getValue()))
-                    .filter(prop -> prop.getValue() != null)
-                    .collect(Collectors.toList());
+        // then.
+        Map<String, String> sanitizedProperties = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .filter(prop -> "******".equals(prop.getValue()))
+                .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue, (a, b) -> a));
 
-            assertThat(nonSanitizedProps)
-                    .allMatch(prop -> !prop.getKey().contains("forSanitization")
-                            && !prop.getKey().contains("FOR_SANITIZATION"));
-        }
+        assertThat(sanitizedProperties)
+                .containsOnlyKeys("tags.forSanitization", "tags.FOR_SANITIZATION")
+                .containsValues("******", "******");
 
-        @Test
-        void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
-            // when.
-            User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
-            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
-            ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+        List<KeyValue> nonSanitizedProps = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .filter(prop -> !"******".equals(prop.getValue()))
+                .filter(prop -> prop.getValue() != null)
+                .collect(Collectors.toList());
 
-            // then.
-            Set<@Nullable String> values = configProps.getBeans().stream()
-                    .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
-                    .collect(Collectors.toSet());
+        assertThat(nonSanitizedProps)
+                .allMatch(prop -> !prop.getKey().contains("forSanitization")
+                        && !prop.getKey().contains("FOR_SANITIZATION"));
+    }
 
-            assertThat(values).doesNotContain("******");
-            assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
-        }
+    @Test
+    void withExplicitSanitization_shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
+        // given.
+        DefaultConfigurationPropertiesService configurationPropertiesService = withExplicitSanitization();
+
+        // when.
+        User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+        SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+        ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
+                configurationPropertiesService::getConfigProps, securityContext);
+
+        // then.
+        Set<@Nullable String> values = configProps.getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .map(KeyValue::getValue)
+                .collect(Collectors.toSet());
+
+        assertThat(values).doesNotContain("******");
+        assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
+    }
+
+    private DefaultConfigurationPropertiesService withSanitizeAll() {
+        SmartSanitizingFunction sanitizingFunction =
+                new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
+        return new DefaultConfigurationPropertiesService(
+                sanitizingFunction, applicationContext, configurationPropertiesConverter, requiredAuthorityCheckService);
+    }
+
+    private DefaultConfigurationPropertiesService withExplicitSanitization() {
+        SmartSanitizingFunction sanitizingFunction = new SmartSanitizingFunction(
+                List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
+                propertyNameNormalizer);
+        return new DefaultConfigurationPropertiesService(
+                sanitizingFunction, applicationContext, configurationPropertiesConverter, requiredAuthorityCheckService);
     }
 }
