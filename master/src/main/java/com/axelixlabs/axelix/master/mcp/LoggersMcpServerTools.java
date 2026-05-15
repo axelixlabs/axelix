@@ -59,7 +59,7 @@ public class LoggersMcpServerTools {
 
             Present the results as a numbered list.
 
-            Use this ONLY when the user asks what logging levels are available.
+            Use this ONLY when when you want to understand what logging levels are available.
             Do NOT use this to browse loggers — use "Find Loggers" instead.
 
             Because this Tool accepts "Instance ID" you probably will need to call 'getWallboard'
