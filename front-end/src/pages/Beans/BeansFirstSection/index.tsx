@@ -69,9 +69,9 @@ export const BeansFirstSection = ({ addonAfter, setSearch, selectedBean, setSele
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter onSearch={clearSelectedBean} />
             {selectedBean && (
                 <div className={styles.SelectedBeanTagWrapper}>
-                    <Tag onClick={clearSelectedBean} className={styles.Tag}>
+                    <Tag className={styles.Tag}>
                         {getBeanShortName(selectedBean.beanName)}
-                        <CloseIcon className={styles.CloseIcon} />
+                        <CloseIcon onClick={clearSelectedBean} className={styles.CloseIcon} />
                     </Tag>
                 </div>
             )}

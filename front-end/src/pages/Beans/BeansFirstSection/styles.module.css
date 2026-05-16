@@ -18,10 +18,15 @@
 
     &:hover {
         background-color: #1db865;
+        cursor: default;
     }
 }
 
 .CloseIcon {
     margin-left: 8px;
     color: var(--axelix-primary-white);
+
+    &:hover {
+        cursor: pointer;
+    }
 }
