@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useParams } from "react-router";
 
-import { type IUser } from "models";
+import { Loader } from "components";
+import { type IUser, StatefulRequest } from "models";
+import { getUserById } from "services";
 
 import { UserProfileActions } from "./UserProfileActions";
 import { UserTable } from "./UserTable";
@@ -30,24 +31,23 @@ import { BackwardArrowIcon } from "assets";
 
 const UserProfile = () => {
     const { t } = useTranslation();
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { message } = App.useApp();
+    const { userId } = useParams();
 
-    const state = location.state;
-    const [user, setUser] = useState<IUser | undefined>(state?.user);
+    const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUser>());
 
-    useEffect(() => {
-        if (!user) {
-            message.error(t("Users.userNotFound"));
-            navigate("/users", { replace: true });
-            return;
-        }
-    }, [user]);
+    const loadUser = () => {
+        getUserById(userId!).then((value) => {
+            setUserResponse(StatefulRequest.success(value.data));
+        });
+    };
 
-    if (!user) {
-        return null;
+    useEffect(() => loadUser(), [userId]);
+
+    if (userResponse.loading) {
+        return <Loader />;
     }
+
+    const user = userResponse.response!;
 
     return (
         <>
@@ -57,9 +57,9 @@ const UserProfile = () => {
 
             <div className={`TextMedium ${styles.FirstSectionUsername}`}>{user.username}</div>
 
-            <UserTable user={user} setUser={setUser} />
+            <UserTable user={user} reLoadUser={loadUser} />
 
-            <UserProfileActions userId={user.id} />
+            <UserProfileActions userId={userId!} />
         </>
     );
 };

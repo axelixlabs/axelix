@@ -18,6 +18,5 @@
 import { apiFetch } from "api";
 
 export const getTransactionalData = (instanceId: string) => {
-    // TODO: Replace this with the real path
     return apiFetch.get(`transaction-monitoring/${instanceId}`);
 };

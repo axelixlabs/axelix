@@ -46,7 +46,7 @@ const createMenuItems = (items: IMenuItem[]): AntdMenuItem[] => {
     }));
 };
 
-export const getItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
+export const getInstanceItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
     const basePath = `/instance/${instanceId}`;
 
     const insightsMenuItemsData: IMenuItem[] = [

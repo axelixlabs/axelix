@@ -17,7 +17,7 @@
  */
 import type { MenuItem } from "models";
 
-export const findOpenKeys = (items: MenuItem[], pathname: string): string[] => {
+export const findOpenInstanceKeys = (items: MenuItem[], pathname: string): string[] => {
     const openKeys: string[] = [];
     let hasJvmChildMatch = false;
 

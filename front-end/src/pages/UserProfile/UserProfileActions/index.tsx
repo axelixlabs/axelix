@@ -79,7 +79,15 @@ export const UserProfileActions = ({ userId }: IProps) => {
                 {t("Users.deleteModalDescription")}
             </Modal>
 
-            <Button type="primary" icon={<TrashIcon />} onClick={showModal} className={styles.DeleteUser}>
+            <Button
+                style={{
+                    boxShadow: "0 4px 12px rgba(255, 0, 10, 0.1)",
+                }}
+                type="primary"
+                icon={<TrashIcon />}
+                onClick={showModal}
+                className={styles.DeleteUser}
+            >
                 {t("Users.deleteUser")}
             </Button>
 

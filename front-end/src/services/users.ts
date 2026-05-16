@@ -22,6 +22,10 @@ export const getUsers = () => {
     return apiFetch.get("users/feed");
 };
 
+export const getUserById = (userId: string) => {
+    return apiFetch.get(`users/feed/${userId}`);
+};
+
 export const createUser = (data: ICreateUserRequestData) => {
     return apiFetch.post("users-management/create", data);
 };

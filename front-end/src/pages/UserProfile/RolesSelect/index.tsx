@@ -18,12 +18,12 @@
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 import { App, Button, Form, Select } from "antd";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { UserRoleTags } from "components";
 import { emptyStringToNull, extractErrorCode } from "helpers";
-import { ERoles, type IEditUserRequestData, type IEditableUser, type IUser, StatelessRequest } from "models";
+import { ERoles, type IEditUserRequestData, type IEditableUser, StatelessRequest } from "models";
 import { editUser } from "services";
 import { roleOptions } from "utils";
 
@@ -36,12 +36,12 @@ interface IProps {
     user: IEditableUser;
 
     /**
-     * The setter of user data
+     * Re-load the given user.
      */
-    setUser: Dispatch<SetStateAction<IUser | undefined>>;
+    reLoadUser: () => void;
 }
 
-export const RolesSelect = ({ user, setUser }: IProps) => {
+export const RolesSelect = ({ user, reLoadUser }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
     const { id, email, username, roles: initialRoles } = user;
@@ -66,12 +66,7 @@ export const RolesSelect = ({ user, setUser }: IProps) => {
                 setRequestData(StatelessRequest.success());
                 message.success(t("Users.userEdited"));
                 setEditingValue(false);
-                setUser((prev) => {
-                    return {
-                        ...prev!,
-                        roles: actualRoles,
-                    };
-                });
+                reLoadUser();
             })
             .catch((error) => {
                 setRequestData(StatelessRequest.error(extractErrorCode(error?.response?.data)));

@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { IEditableUser, IUser } from "models";
@@ -34,12 +33,12 @@ interface IProps {
     user: IUser;
 
     /**
-     * The setter of user data
+     * Callback for re-loading the given user.
      */
-    setUser: Dispatch<SetStateAction<IUser | undefined>>;
+    reLoadUser: () => void;
 }
 
-export const UserTable = ({ user, setUser }: IProps) => {
+export const UserTable = ({ user, reLoadUser }: IProps) => {
     const { t } = useTranslation();
 
     // Converts nullable IUser fields to strings for convenience in forms
@@ -59,7 +58,7 @@ export const UserTable = ({ user, setUser }: IProps) => {
                     <ProfileIcon /> <span className={styles.Label}>{t("username")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="username" setUser={setUser} />
+                    <EditableValue user={editableUser} field="username" reLoadUser={reLoadUser} />
                 </div>
             </div>
             <div className="TableRow">
@@ -67,7 +66,7 @@ export const UserTable = ({ user, setUser }: IProps) => {
                     <EmailIcon /> <span className={styles.Label}>Email</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="email" setUser={setUser} />
+                    <EditableValue user={editableUser} field="email" reLoadUser={reLoadUser} />
                 </div>
             </div>
             <div className="TableRow">
@@ -75,7 +74,7 @@ export const UserTable = ({ user, setUser }: IProps) => {
                     <ShieldIcon /> <span className={styles.Label}>{t("Users.roles")}</span>
                 </div>
                 <div className="RowChunk">
-                    <RolesSelect user={editableUser} setUser={setUser} />
+                    <RolesSelect user={editableUser} reLoadUser={reLoadUser} />
                 </div>
             </div>
 
@@ -84,7 +83,7 @@ export const UserTable = ({ user, setUser }: IProps) => {
                     <LockOutlinedIcon /> <span className={styles.Label}>{t("password")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="password" setUser={setUser} />
+                    <EditableValue user={editableUser} field="password" reLoadUser={reLoadUser} />
                 </div>
             </div>
         </div>

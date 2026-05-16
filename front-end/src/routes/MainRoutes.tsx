@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { UsersSiderMenu } from "layout/MainLayout/Siders";
 import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
@@ -55,9 +54,9 @@ export const MainRoutes = () => {
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
                 </Route>
 
-                <Route path="/" element={<MainLayout siderContent={<UsersSiderMenu />} />}>
+                <Route path="/" element={<MainLayout hideSider />}>
                     <Route path="/users" element={<Users />} />
-                    <Route path="/users/profile/*" element={<UserProfile />} />
+                    <Route path="/users/:userId" element={<UserProfile />} />
                 </Route>
 
                 <Route element={<MainLayout />}>

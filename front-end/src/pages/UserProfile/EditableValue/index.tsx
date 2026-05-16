@@ -18,14 +18,13 @@
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 import { App, Button, Form, Input } from "antd";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { emptyStringToNull, extractErrorCode } from "helpers";
 import {
     type IEditUserRequestData,
     type IEditableUser,
-    type IUser,
     StatelessRequest,
     type UserProfileEditableValueField,
 } from "models";
@@ -46,12 +45,12 @@ interface IProps {
     field: UserProfileEditableValueField;
 
     /**
-     * The setter of user data
+     * Callback for re-loading the user.
      */
-    setUser: Dispatch<SetStateAction<IUser | undefined>>;
+    reLoadUser: () => void;
 }
 
-export const EditableValue = ({ user, field, setUser }: IProps) => {
+export const EditableValue = ({ user, field, reLoadUser }: IProps) => {
     const { message } = App.useApp();
     const { t } = useTranslation();
 
@@ -83,17 +82,7 @@ export const EditableValue = ({ user, field, setUser }: IProps) => {
                 setRequestData(StatelessRequest.success());
                 message.success(t("Users.userEdited"));
                 setEditingValue(false);
-
-                if (isPasswordField) {
-                    setActualValue("");
-                } else {
-                    setUser((prev) => {
-                        return {
-                            ...prev!,
-                            [field]: actualValue,
-                        };
-                    });
-                }
+                reLoadUser();
             })
             .catch((error) => {
                 setRequestData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
