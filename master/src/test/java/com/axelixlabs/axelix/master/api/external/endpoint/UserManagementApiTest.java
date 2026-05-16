@@ -303,19 +303,23 @@ public class UserManagementApiTest {
     }
 
     @Test
-    void shouldKeepUserUnchanged_WhenUpdateRequestContainsNullPassword() {
-        UserEntity user = insertUser("keep", "keep@example.com", "keepPass", Set.of("VIEWER"), UserOrigin.LOCAL);
+    void shouldUpdateRetainingThePassword_WhenUpdateRequestContainsNullPassword() {
+        String oldPassword = "oldPass";
+        UserEntity user =
+                insertUser("oldUsername", "old-email@example.com", oldPassword, Set.of("VIEWER"), UserOrigin.LOCAL);
+
+        String newUsername = "newUsername";
 
         // language=json
         String request = """
                 {
                   "id": "%s",
-                  "username": "renamed",
+                  "username": "%s",
                   "email": null,
                   "roles": ["VIEWER"],
                   "password": null
                 }
-                """.formatted(user.id());
+                """.formatted(user.id(), newUsername);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -326,10 +330,10 @@ public class UserManagementApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
-        assertThat(updated.username()).isEqualTo("keep");
-        assertThat(updated.email()).isEqualTo("keep@example.com");
+        assertThat(updated.username()).isEqualTo(newUsername);
+        assertThat(updated.email()).isEqualTo(null);
         assertThat(updated.roles().values()).isEqualTo(user.roles().values());
-        assertThat(updated.password()).isEqualTo(user.password());
+        assertThat(passwordEncoder.matches(oldPassword, updated.password())).isTrue();
     }
 
     @Test
