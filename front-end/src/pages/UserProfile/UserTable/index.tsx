@@ -18,7 +18,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { nullToEmptyString } from "helpers";
 import type { IEditableUser, IUser } from "models";
 
 import { EditableValue } from "../EditableValue";
@@ -46,7 +45,7 @@ export const UserTable = ({ user, setUser }: IProps) => {
     // Converts nullable IUser fields to strings for convenience in forms
     const editableUser: IEditableUser = {
         ...user,
-        email: nullToEmptyString(user.email),
+        email: user.email ?? "",
         password: "",
     };
 

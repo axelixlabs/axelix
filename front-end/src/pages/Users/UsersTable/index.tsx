@@ -41,7 +41,7 @@ export const UsersTable = ({ users }: IProps) => {
                     <div className="RowChunk">{t("username")}</div>
                     <div className="RowChunk">Email</div>
                     <div className="RowChunk">{t("Users.lastLogin")}</div>
-                    <div className="RowChunk">{t("Users.provider")}</div>
+                    <div className="RowChunk">{t("Users.origin")}</div>
                     <div className="RowChunk">{t("Users.roles")}</div>
                 </div>
 
@@ -54,7 +54,7 @@ export const UsersTable = ({ users }: IProps) => {
 
                         return (
                             <Link
-                                to="/users/profile"
+                                to={`/users/profile/${user.id}`}
                                 state={{ user }}
                                 className={`TableRow ${styles.TableRow}`}
                                 key={id}

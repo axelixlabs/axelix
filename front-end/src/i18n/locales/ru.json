@@ -284,11 +284,11 @@
     "Users": {
         "lastLogin": "Последний вход",
         "provider": "Провайдер",
-        "origins": "Происхождение",
+        "origin": "Происхождение",
         "role": "Роль",
         "roles": "Роли",
         "back": "Назад",
-        "userInformation": "Информация о пользователе",
+        "userInformation": "Информация о Пользователе",
         "selectRoles": "Выберите роли",
         "notLoggedIn": "Не заходил",
         "deleteUser": "Удалить пользователя",

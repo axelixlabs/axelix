@@ -42,10 +42,6 @@ export const filterUsers = (users: IUser[], search: string, filters: IUsersFilte
     });
 };
 
-export const nullToEmptyString = (value: string | null): string => {
-    return value ?? "";
-};
-
 export const emptyStringToNull = (value: string): string | null => {
     if (value === "") {
         return null;

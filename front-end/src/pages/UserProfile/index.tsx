@@ -31,10 +31,10 @@ import { BackwardArrowIcon } from "assets";
 const UserProfile = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const state = location.state;
     const navigate = useNavigate();
     const { message } = App.useApp();
 
+    const state = location.state;
     const [user, setUser] = useState<IUser | undefined>(state?.user);
 
     useEffect(() => {
@@ -43,13 +43,6 @@ const UserProfile = () => {
             navigate("/users", { replace: true });
             return;
         }
-
-        navigate(".", {
-            replace: true,
-            state: {
-                user: user,
-            },
-        });
     }, [user]);
 
     if (!user) {

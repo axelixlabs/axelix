@@ -93,7 +93,7 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                     <Select
                         mode="multiple"
                         showSearch={false}
-                        placeholder={t("Users.origins")}
+                        placeholder={t("Users.origin")}
                         size="small"
                         maxTagCount={1}
                         value={filters.userOrigins}

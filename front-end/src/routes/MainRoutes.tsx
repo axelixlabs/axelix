@@ -57,7 +57,7 @@ export const MainRoutes = () => {
 
                 <Route path="/" element={<MainLayout siderContent={<UsersSiderMenu />} />}>
                     <Route path="/users" element={<Users />} />
-                    <Route path="/users/profile" element={<UserProfile />} />
+                    <Route path="/users/profile/*" element={<UserProfile />} />
                 </Route>
 
                 <Route element={<MainLayout />}>
