@@ -77,6 +77,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserApiTest {
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
+    private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -260,6 +261,47 @@ class UserApiTest {
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedFeed);
         assertThat(response.getBody()).doesNotContain("password");
+    }
+
+    @Test
+    void shouldReturnUserByHisId() {
+        // given.
+        UserEntity alice = insertUser("alice", "alice@example.com", "aliceSecret", Set.of("ADMIN"), UserOrigin.LOCAL);
+
+        // language=json
+        String expectedUser = """
+                {
+                  "id": "%s",
+                  "username": "alice",
+                  "email": "alice@example.com",
+                  "roles": ["ADMIN"],
+                  "userOrigin": "LOCAL",
+                  "lastLoginAt": null
+                }
+                """.formatted(alice.id());
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USER_BY_ID_PATH, String.class, alice.id());
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).isEqualTo(expectedUser);
+        assertThat(response.getBody()).doesNotContain("password");
+    }
+
+    @Test
+    void shouldReturnNotFoundIfUserIsNotFound() {
+        // given.
+        String unknownUserId = UUID.randomUUID().toString();
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

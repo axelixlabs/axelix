@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -229,7 +228,6 @@ abstract class DatabaseUserServiceTest {
     @Test
     void updateLastLoginAt_shouldSetLastLoginAtToNow() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
-        Instant before = Instant.now();
 
         // when.
         userService.updateLastLoginAt("alice");
@@ -256,20 +254,21 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateUserPatch_shouldKeepExistingValuesWhenPasswordIsNull() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
-        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+    void updateUserPatch_shouldUpdateAllProvidedFields_PasswordIsNotProvided() {
+        // given.
+        String oldPassword = "oldPass";
+        userService.create("oldName", "old@example.com", oldPassword, "VIEWER", UserOrigin.LOCAL);
+        UserEntity existing = userRepository.findByUsername("oldName").orElseThrow();
 
         // when.
-        userService.updateUserPatch(
-                existing.id(), "renamed", null, null, existing.roles().values());
+        userService.updateUserPatch(existing.id(), "newName", "new@example.com", null, Set.of("ADMIN", "EDITOR"));
 
         // then.
         UserEntity updated = userRepository.findById(existing.id()).orElseThrow();
-        assertThat(updated.username()).isEqualTo("alice");
-        assertThat(updated.email()).isEqualTo("a@example.com");
-        assertThat(updated.roles().values()).isEqualTo(existing.roles().values());
-        assertThat(updated.password()).isEqualTo(existing.password());
+        assertThat(updated.username()).isEqualTo("newName");
+        assertThat(updated.email()).isEqualTo("new@example.com");
+        assertThat(updated.roles().values()).containsExactlyInAnyOrder("ADMIN", "EDITOR");
+        assertThat(passwordEncoder.matches(oldPassword, updated.password())).isTrue();
     }
 
     @Test

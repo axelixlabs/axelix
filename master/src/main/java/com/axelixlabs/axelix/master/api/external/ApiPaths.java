@@ -45,6 +45,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the feed of managed users.
          */
         public static final String USERS_FEED = "/users/feed";
+
+        /**
+         * Endpoint to retrieve the feed of managed users.
+         */
+        public static final String GET_USER_BY_ID = "/users/feed/{userId}";
     }
 
     public static final class UsersManagementApi {

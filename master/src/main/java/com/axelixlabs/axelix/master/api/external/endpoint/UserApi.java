@@ -25,12 +25,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -58,6 +61,8 @@ import com.axelixlabs.axelix.master.service.state.UserService;
         description = "The endpoints for user login, authentication, and listing managed users")
 @ExternalApiRestController
 public class UserApi {
+
+    private static final Logger log = LoggerFactory.getLogger(UserApi.class);
 
     private final CookieService cookieService;
     private final UserAuthenticator userAuthenticator;
@@ -91,6 +96,26 @@ public class UserApi {
                 userService.findAll().stream().map(UserResponse::from).toList();
 
         return ResponseEntity.ok(users);
+    }
+
+    @DefaultApiResponse(summary = "Retrieve user by ID")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+    @GetMapping(path = ApiPaths.UsersApi.GET_USER_BY_ID)
+    public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
+        return userService
+                .findUserById(userId)
+                .map(UserResponse::from)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.warn("User with ID was not found {}", userId);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     /**

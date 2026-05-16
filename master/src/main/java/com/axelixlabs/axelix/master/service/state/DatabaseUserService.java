@@ -111,14 +111,12 @@ public class DatabaseUserService implements UserService {
         Set<String> validRoles =
                 roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 
-        if (password != null) {
-            userRepository.updateUserPatch(
-                    id,
-                    requireNonBlankTrimmed(username),
-                    email == null ? null : requireNonBlankTrimmed(email),
-                    passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                    new UserEntity.Roles(validRoles));
-        }
+        userRepository.updateUserPatch(
+                id,
+                requireNonBlankTrimmed(username),
+                email == null ? null : requireNonBlankTrimmed(email),
+                password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                new UserEntity.Roles(validRoles));
     }
 
     private String requireNonBlankTrimmed(@Nullable String value) throws UserInvalidValueException {
