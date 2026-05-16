@@ -16,12 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Layout } from "antd";
+import type { JSX } from "react";
 import { Outlet } from "react-router";
 
 import { AccessProvider } from "components";
 
 import { AdminHeader } from "./AdminHeader";
-import { SiderMenu } from "./SiderMenu";
+import { InstanceSiderMenu } from "./Siders";
 import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
@@ -31,20 +32,25 @@ interface IProps {
      * When hideSider is true, sider will be hidden.
      */
     hideSider?: boolean;
+
+    /**
+     * Overrides the default {@link InstanceSiderMenu}
+     */
+    siderContent?: JSX.Element;
 }
 
-export const MainLayout = ({ hideSider }: IProps) => {
+export const MainLayout = ({ hideSider, siderContent = <InstanceSiderMenu /> }: IProps) => {
     return (
         <>
             <AccessProvider />
             <Layout className={styles.MainWrapper}>
                 <AdminHeader />
 
-                <Sider width={270} className={`${styles.Sider} ${hideSider ? styles.HideSider : ""}`}>
-                    <div className={styles.SiderScrollContainer}>
-                        <SiderMenu />
-                    </div>
-                </Sider>
+                {!hideSider && (
+                    <Sider width={270} className={styles.Sider}>
+                        <div className={styles.SiderScrollContainer}>{siderContent}</div>
+                    </Sider>
+                )}
 
                 <Layout className={styles.ContentLayout}>
                     <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>

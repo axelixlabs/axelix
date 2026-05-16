@@ -44,9 +44,6 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Query("SELECT SUM(heap) FROM instances")
     Double findTotalHeap();
 
-    @Query("SELECT instance_id FROM instances")
-    List<String> findAllIds();
-
     Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
 
     @Modifying

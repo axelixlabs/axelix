@@ -100,6 +100,7 @@ export const UniversalModal = ({
                 }
                 mask={{
                     closable: maskCloseable,
+                    blur: true,
                 }}
             >
                 {children}

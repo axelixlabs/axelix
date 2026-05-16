@@ -1,0 +1,22 @@
+.EditForm {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    column-gap: 8px;
+}
+
+.PreviewWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.RolesSelect {
+    width: min(300px, 100%);
+}
+
+.ActionButton {
+    flex-shrink: 0;
+}

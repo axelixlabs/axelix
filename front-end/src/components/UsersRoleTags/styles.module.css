@@ -1,0 +1,10 @@
+.Tag {
+    padding-inline: 8px;
+    text-transform: uppercase;
+    font-size: inherit;
+    margin-right: 8px;
+}
+
+.Tag:last-child {
+    margin-right: 0;
+}

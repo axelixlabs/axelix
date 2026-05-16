@@ -37,10 +37,6 @@
     background-color: #f5f5f5;
 }
 
-.TableRow:last-child {
-    border-radius: 6px;
-}
-
 .RowChunk {
     display: flex;
     align-items: center;

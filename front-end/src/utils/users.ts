@@ -15,19 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./instanceSiderMenu";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
+import type { InputProps } from "antd";
+
+import { ERoles, type UserProfileEditableValueField } from "models";
+
+export const userProfileInputTypeMap: Record<UserProfileEditableValueField, InputProps["type"]> = {
+    username: "text",
+    email: "email",
+    password: "password",
+};
+
+export const roleOptions = Object.values(ERoles).map((role) => {
+    return {
+        value: role,
+    };
+});

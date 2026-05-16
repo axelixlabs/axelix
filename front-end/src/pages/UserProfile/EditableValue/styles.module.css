@@ -1,0 +1,22 @@
+.ActionButton {
+    flex-shrink: 0;
+}
+
+.PreviewWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.EditForm {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    column-gap: 8px;
+}
+
+.EditFormField {
+    width: min(300px, 100%);
+}

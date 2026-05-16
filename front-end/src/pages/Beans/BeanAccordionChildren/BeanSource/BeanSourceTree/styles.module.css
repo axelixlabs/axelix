@@ -16,10 +16,6 @@
     color: var(--axelix-primary-green);
 }
 
-.BeanTreeItemHover:hover {
-    color: var(--axelix-primary-green);
-}
-
 .BeanTreeLabel {
     flex-shrink: 0;
 }

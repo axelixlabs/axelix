@@ -15,28 +15,4 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Menu } from "antd";
-import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router";
-
-import { findOpenKeys } from "helpers";
-import { getItems } from "utils";
-
-import styles from "./styles.module.css";
-
-export const SiderMenu = () => {
-    const { t } = useTranslation();
-
-    const { pathname } = useLocation();
-    const { instanceId } = useParams();
-
-    return (
-        <Menu
-            mode="inline"
-            items={getItems(instanceId!, t)}
-            selectedKeys={[pathname]}
-            defaultOpenKeys={findOpenKeys(getItems(instanceId!, t), pathname)}
-            className={styles.Menu}
-        />
-    );
-};
+export { InstanceSiderMenu } from "./InstanceSiderMenu";

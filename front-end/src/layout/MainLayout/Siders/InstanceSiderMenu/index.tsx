@@ -15,19 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./instanceSiderMenu";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
+import { Menu } from "antd";
+import { useTranslation } from "react-i18next";
+import { useLocation, useParams } from "react-router";
+
+import { findOpenInstanceKeys } from "helpers";
+import { getInstanceItems } from "utils";
+
+import styles from "./styles.module.css";
+
+export const InstanceSiderMenu = () => {
+    const { t } = useTranslation();
+
+    const { pathname } = useLocation();
+    const { instanceId } = useParams();
+
+    return (
+        <Menu
+            mode="inline"
+            items={getInstanceItems(instanceId!, t)}
+            selectedKeys={[pathname]}
+            defaultOpenKeys={findOpenInstanceKeys(getInstanceItems(instanceId!, t), pathname)}
+            className={styles.Menu}
+        />
+    );
+};
