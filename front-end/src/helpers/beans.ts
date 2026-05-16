@@ -46,22 +46,26 @@ export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): str
     return message;
 };
 
-export const filterBeans = (beans: IBean[], search: string): IBean[] => {
+export const filterBeans = (beans: IBean[], selectedBean: IBean | null, search: string): IBean[] => {
     const formattedSearch = search.toLowerCase().trim();
 
-    return beans.filter(({ beanName, className, aliases }) => {
-        const lowerBeanName = beanName.toLowerCase();
-        if (lowerBeanName.includes(formattedSearch)) {
-            return true;
-        }
+    return beans
+        .filter(({ beanName, className, aliases }) => {
+            const lowerBeanName = beanName.toLowerCase();
+            if (lowerBeanName.includes(formattedSearch)) {
+                return true;
+            }
 
-        const lowerClassName = className.toLowerCase();
-        if (lowerClassName.includes(formattedSearch)) {
-            return true;
-        }
+            const lowerClassName = className.toLowerCase();
+            if (lowerClassName.includes(formattedSearch)) {
+                return true;
+            }
 
-        return aliases.some((alias) => alias.toLowerCase().includes(formattedSearch));
-    });
+            return aliases.some((alias) => alias.toLowerCase().includes(formattedSearch));
+        })
+        .filter(({ beanName }) => {
+            return selectedBean == null || selectedBean.beanName === beanName;
+        });
 };
 
 export const defineBeanScopeColor = (scope: string): string => {
@@ -86,12 +90,8 @@ export const defineBeanScopeColor = (scope: string): string => {
 };
 
 export const getEffectiveBeans = (selectedBean: IBean | null, search: string, beansFeed: IBean[]): IBean[] => {
-    if (selectedBean) {
-        return [selectedBean];
-    }
-
-    if (search) {
-        return filterBeans(beansFeed, search);
+    if (selectedBean || search) {
+        return filterBeans(beansFeed, selectedBean, search);
     }
 
     return beansFeed;

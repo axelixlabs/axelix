@@ -41,14 +41,9 @@ interface IProps {
      * Options for the autocomplete input.
      */
     autocompleteOptions?: AutoCompleteProps["options"];
-
-    /**
-     * Callback triggered on each search input change
-     */
-    onSearch?: () => void;
 }
 
-export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeBottomGutter, onSearch }: IProps) => {
+export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeBottomGutter }: IProps) => {
     // TODO: Make the search a block element during polishing
     const { t } = useTranslation();
 
@@ -61,7 +56,6 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeB
 
         debounceRef.current = setTimeout(() => {
             setSearch(value);
-            onSearch?.();
         }, 500);
     };
 
