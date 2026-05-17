@@ -17,12 +17,10 @@
  */
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-import { type Dispatch, type SetStateAction, useEffect, useRef } from "react";
-import { useLocation } from "react-router";
+import { useRef } from "react";
 
 import { Accordion } from "components";
-import { findBeanBySearchSubject } from "helpers";
-import { ESearchSubject, type IBean } from "models";
+import { type IBean } from "models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
 import { BeanAccordionLabels } from "../BeanAccordionLabels";
@@ -43,17 +41,15 @@ interface IProps {
     /**
      * Selected bean
      */
-    selectedBean: IBean | null;
+    selectedBeanName: string | null;
 
     /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeansAccordionsList = ({ effectiveBeans, selectedBean, setSelectedBean, beansFeed }: IProps) => {
-    const { hash } = useLocation();
-
+export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBean, beansFeed }: IProps) => {
     const ref = useRef<HTMLDivElement>(null);
 
     const rowVirtualizer = useVirtualizer({
@@ -62,13 +58,6 @@ export const BeansAccordionsList = ({ effectiveBeans, selectedBean, setSelectedB
         estimateSize: () => 77,
         scrollPaddingStart: 80,
     });
-
-    useEffect(() => {
-        if (hash) {
-            const foundBean = findBeanBySearchSubject(hash, ESearchSubject.BEAN_NAME_BY_HASH, beansFeed);
-            setSelectedBean(foundBean);
-        }
-    }, []);
 
     const virtualItems = rowVirtualizer.getVirtualItems();
 
@@ -96,13 +85,9 @@ export const BeansAccordionsList = ({ effectiveBeans, selectedBean, setSelectedB
                             >
                                 <Accordion
                                     header={<BeanAccordionLabels bean={bean} />}
-                                    accordionExpanded={Boolean(selectedBean)}
+                                    accordionExpanded={Boolean(selectedBeanName === bean.beanName)}
                                 >
-                                    <BeanAccordionChildren
-                                        bean={bean}
-                                        beansFeed={beansFeed}
-                                        setSelectedBean={setSelectedBean}
-                                    />
+                                    <BeanAccordionChildren bean={bean} beansFeed={beansFeed} selectBean={selectBean} />
                                 </Accordion>
                             </div>
                         );

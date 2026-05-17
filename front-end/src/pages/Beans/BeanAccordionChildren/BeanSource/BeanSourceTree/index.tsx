@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tree, type TreeDataNode } from "antd";
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -40,10 +39,10 @@ interface IProps {
     /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanSourceTree = ({ bean, beansFeed, setSelectedBean }: IProps) => {
+export const BeanSourceTree = ({ bean, beansFeed, selectBean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
@@ -77,7 +76,9 @@ export const BeanSourceTree = ({ bean, beansFeed, setSelectedBean }: IProps) => 
                                             ESearchSubject.BEAN_CLASS,
                                             beansFeed,
                                         );
-                                        setSelectedBean(foundBean);
+                                        if (foundBean) {
+                                            selectBean(foundBean?.beanName);
+                                        }
                                     }}
                                 >
                                     <div className={styles.BeanTreeLabel}>

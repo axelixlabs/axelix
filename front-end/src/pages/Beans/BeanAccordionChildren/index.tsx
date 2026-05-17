@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { Dispatch, SetStateAction } from "react";
-
 import { type IBean } from "models";
 
 import { BeanBooleanFlag } from "./BeanBooleanFlag";
@@ -40,28 +38,22 @@ interface IProps {
     /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanAccordionChildren = ({ bean, beansFeed, setSelectedBean }: IProps) => {
+export const BeanAccordionChildren = ({ bean, beansFeed, selectBean }: IProps) => {
     const { dependencies, aliases, qualifiers, isLazyInit, isPrimary } = bean;
 
     return (
         <>
             <div className={styles.AccordionBody}>
-                {dependencies.length > 0 && (
-                    <BeanDependencies
-                        dependencies={dependencies}
-                        beansFeed={beansFeed}
-                        setSelectedBean={setSelectedBean}
-                    />
-                )}
+                {dependencies.length > 0 && <BeanDependencies selectBean={selectBean} dependencies={dependencies} />}
                 {aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={aliases} />}
                 {qualifiers.length > 0 && <BeanSimpleList valuesTag="qualifiers" values={qualifiers} />}
                 <BeanProxyType proxyType={bean.proxyType} />
                 <BeanBooleanFlag valueTag={"isLazyInitBean"} value={isLazyInit} />
                 <BeanBooleanFlag valueTag={"isPrimaryBean"} value={isPrimary} />
-                <BeanSource bean={bean} beansFeed={beansFeed} setSelectedBean={setSelectedBean} />
+                <BeanSource selectBean={selectBean} bean={bean} beansFeed={beansFeed} />
             </div>
         </>
     );

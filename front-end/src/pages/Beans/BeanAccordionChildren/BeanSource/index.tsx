@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -41,17 +40,17 @@ interface IProps {
     /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanSource = ({ bean, beansFeed, setSelectedBean }: IProps) => {
+export const BeanSource = ({ bean, beansFeed, selectBean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
     const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
     const { origin } = beanSource;
 
-    const statelessBeanSource =
+    const simpleBeanSource =
         origin === EBeanOrigin.UNKNOWN ||
         origin === EBeanOrigin.COMPONENT_ANNOTATION ||
         origin === EBeanOrigin.SYNTHETIC_BEAN;
@@ -78,10 +77,10 @@ export const BeanSource = ({ bean, beansFeed, setSelectedBean }: IProps) => {
         <>
             <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.tree.main`)}:</div>
 
-            {statelessBeanSource ? (
+            {simpleBeanSource ? (
                 beanSourceTitle
             ) : (
-                <BeanSourceTree bean={bean} beansFeed={beansFeed} setSelectedBean={setSelectedBean} />
+                <BeanSourceTree selectBean={selectBean} bean={bean} beansFeed={beansFeed} />
             )}
         </>
     );

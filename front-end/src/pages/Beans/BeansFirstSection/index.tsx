@@ -21,7 +21,6 @@ import { useNavigate } from "react-router";
 
 import { PageSearch } from "components";
 import { getBeanShortName } from "helpers";
-import type { IBean } from "models";
 
 import styles from "./styles.module.css";
 
@@ -39,38 +38,33 @@ interface IProps {
     setSearch: Dispatch<SetStateAction<string>>;
 
     /**
-     * Selected bean
+     * Selected bean name.
      */
-    selectedBean: IBean | null;
+    selectedBeanName: string | null;
 
     /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeansFirstSection = ({ addonAfter, setSearch, selectedBean, setSelectedBean }: IProps) => {
+export const BeansFirstSection = ({ addonAfter, setSearch, selectedBeanName, selectBean }: IProps) => {
     const navigate = useNavigate();
 
     const clearSelectedBean = (): void => {
-        setSelectedBean(null);
-        navigate(
-            {
-                hash: "",
-            },
-            {
-                replace: true,
-            },
-        );
+        selectBean(null);
+        navigate("", {
+            replace: true,
+        });
     };
 
     return (
         <div className={styles.MainWrapper}>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
-            {selectedBean && (
+            {selectedBeanName && (
                 <div className={styles.SelectedBeanTagWrapper}>
                     <Tag className={styles.Tag}>
-                        {getBeanShortName(selectedBean.beanName)}
+                        {getBeanShortName(selectedBeanName)}
                         <CloseIcon onClick={clearSelectedBean} className={styles.CloseIcon} />
                     </Tag>
                 </div>

@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { TooltipWithCopy } from "components";
-import { findBeanBySearchSubject } from "helpers";
-import { ESearchSubject, type IBean, type IDependency } from "models";
+import { type IDependency } from "models";
 
 import styles from "./styles.module.css";
 
@@ -31,17 +29,12 @@ interface IProps {
     dependencies: IDependency[];
 
     /**
-     * Full list of beans used for search
-     */
-    beansFeed: IBean[];
-
-    /**
      * Setter to set the selected bean
      */
-    setSelectedBean: Dispatch<SetStateAction<IBean | null>>;
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanDependencies = ({ dependencies, beansFeed, setSelectedBean }: IProps) => {
+export const BeanDependencies = ({ dependencies, selectBean }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -51,17 +44,7 @@ export const BeanDependencies = ({ dependencies, beansFeed, setSelectedBean }: I
                 {dependencies.map(({ name }) => (
                     <div key={name} className={styles.AccordionBodyChunkList}>
                         <div className={styles.DependencyWrapper}>
-                            <div
-                                className={styles.Dependency}
-                                onClick={() => {
-                                    const foundBean = findBeanBySearchSubject(
-                                        name,
-                                        ESearchSubject.BEAN_NAME_OR_ALIAS,
-                                        beansFeed,
-                                    );
-                                    setSelectedBean(foundBean);
-                                }}
-                            >
+                            <div className={styles.Dependency} onClick={() => selectBean(name)}>
                                 <TooltipWithCopy text={name} />
                             </div>
                         </div>

@@ -16,11 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 
 import { EmptyHandler, Loader } from "components";
 import { fetchData, getEffectiveBeans } from "helpers";
-import { type IBean, type IBeansResponseBody, StatefulRequest } from "models";
+import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
 import { BeansAccordionsList } from "./BeansAccordionsList";
@@ -28,10 +28,21 @@ import { BeansFirstSection } from "./BeansFirstSection";
 
 const Beans = () => {
     const { instanceId } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
-    const [selectedBean, setSelectedBean] = useState<IBean | null>(null);
+
+    const selectedBeanName = searchParams.get("name");
+    const selectBean = (beanNameToSelect: string | null) => {
+        setSearchParams(
+            beanNameToSelect
+                ? {
+                      name: beanNameToSelect,
+                  }
+                : new URLSearchParams(), // simulating the removal of the name parameter
+        );
+    };
 
     useEffect(() => {
         fetchData(setDataState, () => getBeansData(instanceId!));
@@ -46,7 +57,7 @@ const Beans = () => {
     }
 
     const beansFeed = dataState.response!.beans;
-    const effectiveBeans = getEffectiveBeans(selectedBean, search, beansFeed);
+    const effectiveBeans = getEffectiveBeans(selectedBeanName, search, beansFeed);
     const addonAfter = `${effectiveBeans.length} / ${beansFeed.length}`;
 
     return (
@@ -54,16 +65,16 @@ const Beans = () => {
             <BeansFirstSection
                 addonAfter={addonAfter}
                 setSearch={setSearch}
-                setSelectedBean={setSelectedBean}
-                selectedBean={selectedBean}
+                selectBean={selectBean}
+                selectedBeanName={selectedBeanName}
             />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
                 <BeansAccordionsList
                     effectiveBeans={effectiveBeans}
                     beansFeed={beansFeed}
-                    selectedBean={selectedBean}
-                    setSelectedBean={setSelectedBean}
+                    selectedBeanName={selectedBeanName}
+                    selectBean={selectBean}
                 />
             </EmptyHandler>
         </>
