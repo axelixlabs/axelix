@@ -47,10 +47,6 @@ import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-// TODO: We should dynamically register instances of EndpointProbers.
-//  We can do that, but that requires a significant ActuatorEndpoint revisiting.
-//  In particular, ActuatorEndpoint should now not only the request Http Path and Http Method,
-//  but it should also know the shape of the returned object, along with it's format.
 @AutoConfiguration
 public class EndpointProbersAutoConfiguration {
 

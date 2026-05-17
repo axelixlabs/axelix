@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 /**
@@ -34,6 +35,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
  * @author Nikita Kirillov
  */
 @ExternalApiRestController
+@ConditionalOnMcpServerEnabled
 @ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
 public class McpOAuth2MetadataController {
 

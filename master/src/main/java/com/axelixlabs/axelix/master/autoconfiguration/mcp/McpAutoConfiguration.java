@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
  *
  * @author Mikhail Polivakha
  */
-// TODO: And bring other mcp-related beans here.
 @AutoConfiguration
 @ConditionalOnMcpServerEnabled
 public class McpAutoConfiguration {

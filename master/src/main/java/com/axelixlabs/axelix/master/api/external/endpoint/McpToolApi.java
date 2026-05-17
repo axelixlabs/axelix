@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.McpToolFeedResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.service.McpToolsService;
 
 /**
@@ -40,6 +41,7 @@ import com.axelixlabs.axelix.master.service.McpToolsService;
         name = "MCP Tools API",
         description = "The endpoints related to rendering MCP tools configured in the master service.")
 @ExternalApiRestController
+@ConditionalOnMcpServerEnabled
 public class McpToolApi {
 
     private final McpToolsService mcpToolsService;

@@ -40,7 +40,7 @@ import com.axelixlabs.axelix.common.api.caches.SingleCache;
  * @author Mikhail Polivakha
  */
 // TODO:
-//  We need to migrate to more recent versions of jspecify. Current version incorrectly
+//  We need to migrate to more recent versions of NullAway. Current version incorrectly
 //  reports the nullability issue with type-use annotations on generics
 @SuppressWarnings("NullAway")
 public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatcher {
