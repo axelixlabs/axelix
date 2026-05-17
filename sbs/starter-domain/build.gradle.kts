@@ -1,6 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
+    kotlin("jvm") version "2.2.21"
 }
 
 val springBootTestPlatformVersion = "2.7.18"
@@ -27,4 +31,42 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.release = 11
     options.compilerArgs.add("-parameters")
+}
+
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {}
+
+        val concurrencyTestsSuite = "concurrencyTest"
+
+        register<JvmTestSuite>(concurrencyTestsSuite) {
+
+            sources {
+                kotlin {
+                    setSrcDirs(listOf("src/$concurrencyTestsSuite/kotlin"))
+                }
+            }
+
+            dependencies {
+                implementation("org.jetbrains.lincheck:lincheck:3.5")
+
+                // Additional Test Suites do not inherit production dependencies automatically.
+                implementation(project(":sbs:starter-domain"))
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks {
+    withType(KotlinJvmCompile::class).configureEach {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+    }
 }

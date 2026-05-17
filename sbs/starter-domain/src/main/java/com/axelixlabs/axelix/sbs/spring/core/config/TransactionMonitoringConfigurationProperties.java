@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
-import java.time.Duration;
 import java.util.Objects;
 
 import com.axelixlabs.axelix.common.utils.Assert;
@@ -38,33 +37,18 @@ public class TransactionMonitoringConfigurationProperties implements Validateabl
     private Integer maxTransactionsPerMethod;
 
     /**
-     * Interval for clearing old transaction records.
-     */
-    private Duration cleanupInterval;
-
-    /**
      * Create a new TransactionMonitoringConfigurationProperties
      */
     public TransactionMonitoringConfigurationProperties() {
         this.maxTransactionsPerMethod = 30;
-        this.cleanupInterval = Duration.ofSeconds(5);
     }
 
     public Integer getMaxTransactionsPerMethod() {
         return maxTransactionsPerMethod;
     }
 
-    public Duration getCleanupInterval() {
-        return cleanupInterval;
-    }
-
     public TransactionMonitoringConfigurationProperties setMaxTransactionsPerMethod(Integer maxTransactionsPerMethod) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
-        return this;
-    }
-
-    public TransactionMonitoringConfigurationProperties setCleanupInterval(Duration cleanupInterval) {
-        this.cleanupInterval = cleanupInterval;
         return this;
     }
 
@@ -74,25 +58,22 @@ public class TransactionMonitoringConfigurationProperties implements Validateabl
             return false;
         }
         TransactionMonitoringConfigurationProperties that = (TransactionMonitoringConfigurationProperties) o;
-        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod)
-                && Objects.equals(cleanupInterval, that.cleanupInterval);
+        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maxTransactionsPerMethod, cleanupInterval);
+        return Objects.hash(maxTransactionsPerMethod);
     }
 
     @Override
     public String toString() {
-        return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod="
-                + maxTransactionsPerMethod + ", cleanupInterval="
-                + cleanupInterval + '}';
+        return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod=" + maxTransactionsPerMethod
+                + "\"" + '}';
     }
 
     @Override
     public void validate() throws IllegalArgumentException {
         Assert.isTrue(maxTransactionsPerMethod > 0, "maxTransactionsPerMethod must be positive");
-        Assert.isTrue(cleanupInterval.toMillis() > 0, "cleanupInterval must be positive");
     }
 }

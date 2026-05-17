@@ -17,13 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core;
 
-import java.time.Duration;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -36,43 +32,48 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class SlidingWindow<E> {
 
-    private final ConcurrentLinkedDeque<E> deque;
+    private final Deque<E> deque;
     private final int capacity;
-    private static final ScheduledExecutorService CLEANER = Executors.newSingleThreadScheduledExecutor();
+    private final Object lock = new Object();
 
-    public SlidingWindow(int capacity, Duration cleanupInterval) {
-        this.deque = new ConcurrentLinkedDeque<>();
+    public SlidingWindow(int capacity) {
+        this.deque = new LinkedList<>();
         this.capacity = capacity;
-        // TODO: allow configuring the end-user scheduled executor service
-        CLEANER.scheduleWithFixedDelay(this::clear, 0L, cleanupInterval.toSeconds(), TimeUnit.SECONDS);
     }
 
     public void put(E element) {
-        deque.offer(element);
+        synchronized (lock) {
+            deque.offer(element);
+            clear();
+        }
     }
 
     public List<E> get() {
-        var copy = new LinkedList<>(deque);
+        synchronized (lock) {
+            var copy = new LinkedList<>(deque);
 
-        if (copy.size() > capacity) {
-            return copy.subList(copy.size() - capacity, copy.size());
+            if (copy.size() > capacity) {
+                return copy.subList(copy.size() - capacity, copy.size());
+            }
+
+            return copy;
         }
-
-        return copy;
     }
 
     public void clear() {
-        int currentSize = deque.size();
+        synchronized (lock) {
+            int currentSize = deque.size();
 
-        if (currentSize <= capacity) {
-            return;
-        }
+            if (currentSize <= capacity) {
+                return;
+            }
 
-        // We're not draining the queue till the 'capacity' size to avoid potential infinite loop
-        int toRemove = currentSize - capacity;
-        for (int i = 0; i < toRemove; i++) {
-            if (deque.pollFirst() == null) {
-                break;
+            // We're not draining the queue till the 'capacity' size to avoid potential infinite loop
+            int toRemove = currentSize - capacity;
+            for (int i = 0; i < toRemove; i++) {
+                if (deque.pollFirst() == null) {
+                    break;
+                }
             }
         }
     }

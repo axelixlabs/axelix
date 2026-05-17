@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core;
 
-import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,13 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SlidingWindowTest {
 
     private static final int CAPACITY = 5;
-    private static final Duration CLEANUP_INTERVAL = Duration.ofSeconds(1);
 
     private SlidingWindow<String> slidingWindow;
 
     @BeforeEach
     void setUp() {
-        slidingWindow = new SlidingWindow<>(CAPACITY, CLEANUP_INTERVAL);
+        slidingWindow = new SlidingWindow<>(CAPACITY);
     }
 
     @Test

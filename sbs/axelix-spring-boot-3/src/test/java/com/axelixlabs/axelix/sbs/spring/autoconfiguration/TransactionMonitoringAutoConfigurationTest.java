@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -158,7 +157,7 @@ class TransactionMonitoringAutoConfigurationTest {
     static class CustomTransactionStatsCollector extends DefaultTransactionStatsCollector {
 
         public CustomTransactionStatsCollector() {
-            super(1000, Duration.ofSeconds(5));
+            super(1000);
         }
     }
 

@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -443,7 +442,7 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
+            return new DefaultTransactionStatsCollector(30);
         }
 
         @Bean

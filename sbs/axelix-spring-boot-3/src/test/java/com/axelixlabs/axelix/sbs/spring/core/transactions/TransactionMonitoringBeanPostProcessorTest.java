@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +127,7 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
+            return new DefaultTransactionStatsCollector(30);
         }
 
         @Bean
