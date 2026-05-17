@@ -16,20 +16,33 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
-import { fetchData, filterBeans } from "helpers";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, getEffectiveBeans } from "helpers";
 import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
 import { BeansAccordionsList } from "./BeansAccordionsList";
+import { BeansFirstSection } from "./BeansFirstSection";
 
 const Beans = () => {
     const { instanceId } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
+
+    const selectedBeanName = searchParams.get("name");
+    const selectBean = (beanNameToSelect: string | null) => {
+        setSearchParams(
+            beanNameToSelect
+                ? {
+                      name: beanNameToSelect,
+                  }
+                : new URLSearchParams(), // simulating the removal of the name parameter
+        );
+    };
 
     useEffect(() => {
         fetchData(setDataState, () => getBeansData(instanceId!));
@@ -44,17 +57,25 @@ const Beans = () => {
     }
 
     const beansFeed = dataState.response!.beans;
-    const effectiveBeans = search ? filterBeans(beansFeed, search) : beansFeed;
+    const effectiveBeans = getEffectiveBeans(selectedBeanName, search, beansFeed);
     const addonAfter = `${effectiveBeans.length} / ${beansFeed.length}`;
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <BeansFirstSection
+                addonAfter={addonAfter}
+                setSearch={setSearch}
+                selectBean={selectBean}
+                selectedBeanName={selectedBeanName}
+            />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <HashNavigable>
-                    <BeansAccordionsList effectiveBeans={effectiveBeans} />
-                </HashNavigable>
+                <BeansAccordionsList
+                    effectiveBeans={effectiveBeans}
+                    beansFeed={beansFeed}
+                    selectedBeanName={selectedBeanName}
+                    selectBean={selectBean}
+                />
             </EmptyHandler>
         </>
     );

@@ -29,21 +29,31 @@ interface IProps {
      * Single bean
      */
     bean: IBean;
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanAccordionChildren = ({ bean }: IProps) => {
+export const BeanAccordionChildren = ({ bean, beansFeed, selectBean }: IProps) => {
     const { dependencies, aliases, qualifiers, isLazyInit, isPrimary } = bean;
 
     return (
         <>
             <div className={styles.AccordionBody}>
-                {dependencies.length > 0 && <BeanDependencies dependencies={dependencies} />}
+                {dependencies.length > 0 && <BeanDependencies selectBean={selectBean} dependencies={dependencies} />}
                 {aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={aliases} />}
                 {qualifiers.length > 0 && <BeanSimpleList valuesTag="qualifiers" values={qualifiers} />}
                 <BeanProxyType proxyType={bean.proxyType} />
                 <BeanBooleanFlag valueTag={"isLazyInitBean"} value={isLazyInit} />
                 <BeanBooleanFlag valueTag={"isPrimaryBean"} value={isPrimary} />
-                <BeanSource bean={bean} />
+                <BeanSource selectBean={selectBean} bean={bean} beansFeed={beansFeed} />
             </div>
         </>
     );

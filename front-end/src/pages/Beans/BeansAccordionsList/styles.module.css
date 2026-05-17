@@ -1,0 +1,16 @@
+.MainWrapper {
+    /* TODO: Remove this magic number after layout improvement */
+    height: calc(100vh - 225px);
+    overflow: auto;
+}
+
+.InnerWrapper {
+    position: relative;
+}
+
+.VirtualItem {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}

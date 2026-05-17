@@ -31,16 +31,26 @@ interface IProps {
      * The profile of the given bean
      */
     bean: IBean;
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanSource = ({ bean }: IProps) => {
+export const BeanSource = ({ bean, beansFeed, selectBean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
     const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
     const { origin } = beanSource;
 
-    const statelessBeanSource =
+    const simpleBeanSource =
         origin === EBeanOrigin.UNKNOWN ||
         origin === EBeanOrigin.COMPONENT_ANNOTATION ||
         origin === EBeanOrigin.SYNTHETIC_BEAN;
@@ -53,7 +63,7 @@ export const BeanSource = ({ bean }: IProps) => {
                 {t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}
             </StyledLink>
         );
-    } else if (origin == EBeanOrigin.UNKNOWN && isConfigPropsBean) {
+    } else if (origin === EBeanOrigin.UNKNOWN && isConfigPropsBean) {
         beanSourceTitle = (
             <StyledLink href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}>
                 {t(`Beans.beanSource.CONFIG_PROPS_BEAN`)}
@@ -67,7 +77,11 @@ export const BeanSource = ({ bean }: IProps) => {
         <>
             <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.tree.main`)}:</div>
 
-            {statelessBeanSource ? beanSourceTitle : <BeanSourceTree bean={bean} />}
+            {simpleBeanSource ? (
+                beanSourceTitle
+            ) : (
+                <BeanSourceTree selectBean={selectBean} bean={bean} beansFeed={beansFeed} />
+            )}
         </>
     );
 };

@@ -44,6 +44,7 @@ interface IProps {
 }
 
 export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeBottomGutter }: IProps) => {
+    // TODO: Make the search a block element during polishing
     const { t } = useTranslation();
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,7 +54,9 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeB
             clearTimeout(debounceRef.current);
         }
 
-        debounceRef.current = setTimeout(() => setSearch(value), 500);
+        debounceRef.current = setTimeout(() => {
+            setSearch(value);
+        }, 500);
     };
 
     if (autocompleteOptions) {

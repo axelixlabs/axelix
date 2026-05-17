@@ -18,8 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { TooltipWithCopy } from "components";
-import { ESearchSubject, type IDependency } from "models";
-import { scrollToAccordionById } from "utils";
+import { type IDependency } from "models";
 
 import styles from "./styles.module.css";
 
@@ -28,9 +27,14 @@ interface IProps {
      * List of dependencies
      */
     dependencies: IDependency[];
+
+    /**
+     * Setter to set the selected bean
+     */
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeanDependencies = ({ dependencies }: IProps) => {
+export const BeanDependencies = ({ dependencies, selectBean }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -40,10 +44,7 @@ export const BeanDependencies = ({ dependencies }: IProps) => {
                 {dependencies.map(({ name }) => (
                     <div key={name} className={styles.AccordionBodyChunkList}>
                         <div className={styles.DependencyWrapper}>
-                            <div
-                                className={styles.Dependency}
-                                onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
-                            >
+                            <div className={styles.Dependency} onClick={() => selectBean(name)}>
                                 <TooltipWithCopy text={name} />
                             </div>
                         </div>

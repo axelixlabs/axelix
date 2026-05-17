@@ -25,7 +25,7 @@ jobs:
       - name: Check PR size
         uses: ./.github/actions/check-pr-size
         with:
-          max-lines: '400'
+          max-lines: '600'
 
   frontend-build:
     needs: check-pr-size

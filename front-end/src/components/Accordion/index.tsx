@@ -84,6 +84,12 @@ export const Accordion = ({
         };
     }, []);
 
+    // TODO: Why do we need it?
+    useEffect(() => {
+        setOpen(accordionExpanded);
+        setIsContentMounted(accordionExpanded);
+    }, [accordionExpanded]);
+
     const handlerClick = (): void => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);

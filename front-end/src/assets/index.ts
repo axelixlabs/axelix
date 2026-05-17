@@ -42,6 +42,7 @@ export { default as SpringIcon } from "../assets/icons/spring.svg?react";
 export { default as TargetIcon } from "../assets/icons/target.svg?react";
 export { default as ShieldIcon } from "../assets/icons/shield.svg?react";
 export { default as BurgerIcon } from "../assets/icons/burger.svg?react";
+export { default as XMarkIcon } from "../assets/icons/xMark.svg?react";
 export { default as ArrowIcon } from "../assets/icons/arrow.svg?react";
 export { default as BeansIcon } from "../assets/icons/beans.svg?react";
 export { default as BuildIcon } from "../assets/icons/build.svg?react";

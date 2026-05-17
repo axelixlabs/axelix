@@ -15,44 +15,84 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { BeanAccordionLabels } from "pages/Beans/BeanAccordionLabels";
-import { useLocation } from "react-router";
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+import { useRef } from "react";
 
 import { Accordion } from "components";
-import { normalizeHtmlElementId } from "helpers";
-import type { IBean } from "models";
+import { type IBean } from "models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
+import { BeanAccordionLabels } from "../BeanAccordionLabels";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * The list of beans
+     * The list of beans to display
      */
     effectiveBeans: IBean[];
+
+    /**
+     * Full list of beans used for search
+     */
+    beansFeed: IBean[];
+
+    /**
+     * Selected bean
+     */
+    selectedBeanName: string | null;
+
+    /**
+     * Setter to set the selected bean
+     */
+    selectBean: (beanName: string | null) => void;
 }
 
-export const BeansAccordionsList = ({ effectiveBeans }: IProps) => {
-    const { hash } = useLocation();
+export const BeansAccordionsList = ({ effectiveBeans, selectedBeanName, selectBean, beansFeed }: IProps) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    const rowVirtualizer = useVirtualizer({
+        count: effectiveBeans.length,
+        getScrollElement: () => ref.current,
+        estimateSize: () => 77,
+        scrollPaddingStart: 80,
+    });
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
 
     return (
         <>
-            <div className="AccordionsWrapper">
-                {effectiveBeans.map((bean) => {
-                    const activeId = hash ? hash.replace("#", "") : null;
-                    const id = normalizeHtmlElementId(bean.beanName);
-                    const accordionExpanded = id === activeId;
+            <div ref={ref} className={`AccordionsWrapper ${styles.MainWrapper}`}>
+                <div
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                    }}
+                    className={styles.InnerWrapper}
+                >
+                    {virtualItems.map(({ key, index, start }) => {
+                        const bean = effectiveBeans[index];
 
-                    return (
-                        <div id={id} key={id}>
-                            <Accordion
-                                header={<BeanAccordionLabels bean={bean} />}
-                                accordionExpanded={accordionExpanded}
+                        return (
+                            <div
+                                key={key}
+                                data-index={index}
+                                ref={rowVirtualizer.measureElement}
+                                className={styles.VirtualItem}
+                                style={{
+                                    transform: `translateY(${start}px)`,
+                                }}
                             >
-                                <BeanAccordionChildren bean={bean} />
-                            </Accordion>
-                        </div>
-                    );
-                })}
+                                <Accordion
+                                    header={<BeanAccordionLabels bean={bean} />}
+                                    accordionExpanded={Boolean(selectedBeanName === bean.beanName)}
+                                >
+                                    <BeanAccordionChildren bean={bean} beansFeed={beansFeed} selectBean={selectBean} />
+                                </Accordion>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </>
     );
