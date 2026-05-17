@@ -60,7 +60,9 @@ import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthentica
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -239,8 +241,8 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldCreateBasicMcpAuthenticationHandlerWhenMcpServerEnabled() {
             // given.
-            ApplicationContextRunner contextRunner =
-                    baselineConfigAppContextRunner().withPropertyValues("axelix.master.mcp-server.enabled=true");
+            ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
+                    .withPropertyValues(MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled=true");
 
             // when.
             contextRunner.run(context -> {
@@ -330,13 +332,13 @@ class SecurityAutoConfigurationTest {
             // given.
             ApplicationContextRunner contextRunner = baselineConfigAppContextRunner()
                     .withPropertyValues(
-                            "axelix.master.mcp-server.enabled=true",
-                            "axelix.master.auth.options.oauth2.enabled=true",
-                            "axelix.master.auth.options.oauth2.issuer-uri=https://issuer.example",
-                            "axelix.master.auth.options.oauth2.client-id=test-client",
-                            "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                            "axelix.master.auth.options.oauth2.base-url=https://app.example",
-                            "axelix.master.auth.options.oauth2.scopes=openid profile")
+                            MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled=true",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".enabled=true",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".issuer-uri=https://issuer.example",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".client-id=test-client",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".client-secret=test-secret",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".base-url=https://app.example",
+                            OAUTH_LOGIN_PROPERTIES_PREFIX + ".scopes=openid profile")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
                     .withConfiguration(
                             AutoConfigurations.of(SecurityAutoConfiguration.OAuth2LoginAutoConfiguration.class));

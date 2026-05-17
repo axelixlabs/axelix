@@ -39,6 +39,8 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
+
 /**
  * Controller handling the OAuth2 Authorization Code Flow callback.
  * <p>
@@ -52,7 +54,7 @@ import com.axelixlabs.axelix.master.service.transport.BadRequestException;
  * @author Nikita Kirillov
  */
 @ExternalApiRestController
-@ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = OAUTH_LOGIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
 public class OAuth2CallbackController {
 
     private static final String WALLBOARD_PATH = "/wallboard";

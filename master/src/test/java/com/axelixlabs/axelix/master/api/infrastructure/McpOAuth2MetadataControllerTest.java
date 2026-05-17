@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 /**
@@ -36,6 +37,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
+            MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled=true",
             "axelix.master.auth.options.oauth2.enabled=true",
             "axelix.master.auth.options.oauth2.issuer-uri=http://localhost:8081/realms/axelix",
             "axelix.master.auth.options.oauth2.client-id=test-client",

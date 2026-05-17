@@ -46,6 +46,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +60,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
+            MCP_CONFIGURATION_PROPERTIES_PREFIX + ".enabled=true",
             "axelix.master.auth.options.oauth2.enabled=true",
             "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
             "axelix.master.auth.options.oauth2.client-id=test-client",

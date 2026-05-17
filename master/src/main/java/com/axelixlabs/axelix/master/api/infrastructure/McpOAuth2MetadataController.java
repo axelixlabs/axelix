@@ -29,6 +29,8 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Prop
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
+
 /**
  * Exposes OAuth2 Protected Resource Metadata for MCP authentication discovery.
  *
@@ -36,7 +38,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
  */
 @ExternalApiRestController
 @ConditionalOnMcpServerEnabled
-@ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = OAUTH_LOGIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
 public class McpOAuth2MetadataController {
 
     private final String issuerUri;
