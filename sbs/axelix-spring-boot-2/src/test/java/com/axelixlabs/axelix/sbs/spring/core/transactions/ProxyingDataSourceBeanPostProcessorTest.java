@@ -22,10 +22,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,9 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-@Import(ProxyingDataSourceBeanPostProcessorTest.ProxyingDataSourceBeanPostProcessorTestConfiguration.class)
-class ProxyingDataSourceBeanPostProcessorTest {
+class ProxyingDataSourceBeanPostProcessorTest extends AbstractEndpointTest {
 
     @Autowired
     private DataSource dataSource;
@@ -64,20 +60,5 @@ class ProxyingDataSourceBeanPostProcessorTest {
         Object result = subject.postProcessAfterInitialization(alreadyProxied, "dataSource");
 
         assertThat(result).isSameAs(alreadyProxied);
-    }
-
-    @TestConfiguration
-    static class ProxyingDataSourceBeanPostProcessorTestConfiguration {
-
-        @Bean
-        public QueriesRecorder queriesRecorder() {
-            return new DefaultQueriesRecorder();
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor proxyingDataSourceBeanPostProcessor(
-                QueriesRecorder queriesRecorder) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesRecorder);
-        }
     }
 }

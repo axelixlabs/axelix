@@ -17,21 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
-import java.util.Properties;
-
 import kotlin.KotlinVersion;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.boot.info.GitProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.SpringVersion;
 
 import com.axelixlabs.axelix.common.api.InstanceDetails;
@@ -40,10 +30,7 @@ import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
-import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,9 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 30.10.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest
-@Import(DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class)
-class DefaultServiceDetailsAssemblerTest {
+class DefaultServiceDetailsAssemblerTest extends AbstractEndpointTest {
 
     @Autowired
     private ServiceDetailsAssembler serviceDetailsAssembler;
@@ -97,41 +82,5 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(os.getName()).isNotBlank();
         assertThat(os.getVersion()).isNotBlank();
         assertThat(os.getArch()).isNotBlank();
-    }
-
-    @TestConfiguration
-    static class DefaultServiceDetailsAssemblerTestConfig {
-
-        @Bean
-        @Primary
-        public BuildProperties buildProperties() {
-            Properties props = new Properties();
-            props.setProperty("group", "com.axelixlabs.axelix");
-            props.setProperty("artifact", "axelix-sbs");
-            props.setProperty("version", "1.0.0-SNAPSHOT");
-            props.setProperty("name", "test-application");
-            props.setProperty("time", "2025-10-30T09:10:13.428Z");
-
-            return new BuildProperties(props);
-        }
-
-        @Bean
-        public GitInformationProvider gitInformationProvider(GitProperties gitProperties) {
-            return new CommitIdPluginGitInformationProvider(gitProperties);
-        }
-
-        @Bean
-        public LibraryInformationProvider libraryInformationProvider() {
-            return new DefaultLibraryInformationProvider();
-        }
-
-        @Bean
-        public ServiceDetailsAssembler serviceDetailsAssembler(
-                GitInformationProvider gitInformationProvider,
-                ObjectProvider<BuildProperties> providerBuildProperties,
-                LibraryInformationProvider libraryInformationProvider) {
-            return new DefaultServiceDetailsAssembler(
-                    gitInformationProvider, providerBuildProperties, libraryInformationProvider);
-        }
     }
 }

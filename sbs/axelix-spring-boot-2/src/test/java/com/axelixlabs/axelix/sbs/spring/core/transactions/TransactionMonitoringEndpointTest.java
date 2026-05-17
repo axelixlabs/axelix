@@ -17,42 +17,21 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,10 +44,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
-@Import(TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration.class)
-class TransactionMonitoringEndpointTest {
+class TransactionMonitoringEndpointTest extends AbstractEndpointTest {
+
+    private static final String PROPAGATION_HELPER_FQN = PropagationTestHelper.class.getName();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -100,7 +78,7 @@ class TransactionMonitoringEndpointTest {
                 .isEqualTo(
                         // language=json
                         "{\n" + "  \"entrypoints\" : [ {\n"
-                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"className\" : \"" + PROPAGATION_HELPER_FQN + "\",\n"
                                 + "    \"methodName\" : \"saveRequiresNew\",\n"
                                 + "    \"executions\" : [ {\n"
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
@@ -149,7 +127,7 @@ class TransactionMonitoringEndpointTest {
             propagationTestHelper.saveRequiresNew("Johnson");
         }
 
-        var allStats = transactionStatsCollector.getAllStats();
+        Map<?, ?> allStats = transactionStatsCollector.getAllStats();
 
         assertThat(allStats.size()).isGreaterThan(0);
 
@@ -172,7 +150,7 @@ class TransactionMonitoringEndpointTest {
                 .isEqualTo(
                         // language=json
                         "{\n" + "  \"entrypoints\" : [ {\n"
-                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"className\" : \"" + PROPAGATION_HELPER_FQN + "\",\n"
                                 + "    \"methodName\" : \"saveMultipleOwners\",\n"
                                 + "    \"executions\" : [ {\n"
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
@@ -234,17 +212,17 @@ class TransactionMonitoringEndpointTest {
                 .isEqualTo(
                         // language=json
                         "{\n" + "  \"entrypoints\" : [ {\n"
-                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"className\" : \"" + PROPAGATION_HELPER_FQN + "\",\n"
                                 + "    \"methodName\" : \"findOwnerById\",\n"
                                 + "    \"executions\" : [ {\n"
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select owner0_.id as id1_1_0_, owner0_.last_name as last_nam2_1_0_ from owner owner0_ where owner0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      }, {\n"
-                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_1_0_, pets0_.id as id1_1_0_, pets0_.id as id1_1_1_, pets0_.name as name2_1_1_, pets0_.owner_id as owner_id3_1_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
+                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_2_0_, pets0_.id as id1_2_0_, pets0_.id as id1_2_1_, pets0_.name as name2_2_1_, pets0_.owner_id as owner_id3_2_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -290,13 +268,13 @@ class TransactionMonitoringEndpointTest {
                 .isEqualTo(
                         // language=json
                         "{\n" + "  \"entrypoints\" : [ {\n"
-                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"className\" : \"" + PROPAGATION_HELPER_FQN + "\",\n"
                                 + "    \"methodName\" : \"updateOwner\",\n"
                                 + "    \"executions\" : [ {\n"
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select owner0_.id as id1_1_0_, owner0_.last_name as last_nam2_1_0_ from owner owner0_ where owner0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      }, {\n"
@@ -344,13 +322,13 @@ class TransactionMonitoringEndpointTest {
                 .isEqualTo(
                         // language=json
                         "{\n" + "  \"entrypoints\" : [ {\n"
-                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"className\" : \"" + PROPAGATION_HELPER_FQN + "\",\n"
                                 + "    \"methodName\" : \"testRollbackScenario\",\n"
                                 + "    \"executions\" : [ {\n"
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                                + "        \"sql\" : \"select owner0_.id as id1_1_, owner0_.last_name as last_nam2_1_ from owner owner0_ where owner0_.last_name=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -422,169 +400,5 @@ class TransactionMonitoringEndpointTest {
                 restTemplate.getForEntity("/actuator/axelix-transactions-monitoring", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         return response.getBody();
-    }
-
-    @TestConfiguration
-    @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = {Owner.class, Pet.class})
-    static class TransactionMonitoringEndpointTestConfiguration {
-
-        @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-                TransactionMonitoringService transactionMonitoringService) {
-            return new TransactionMonitoringEndpoint(transactionMonitoringService);
-        }
-
-        @Bean
-        public TransactionMonitoringService transactionMonitoringService(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new DefaultTransactionMonitoringService(transactionStatsCollector);
-        }
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
-        }
-
-        @Bean
-        public QueriesRecorder queriesStatsCollector() {
-            return new DefaultQueriesRecorder();
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
-        }
-
-        @Bean
-        public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
-            return new PropagationTestHelper(ownerRepository);
-        }
-    }
-
-    @Entity
-    @Table(name = "owner")
-    static class Owner {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        private String lastName;
-
-        @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-        private List<Pet> pets = new ArrayList<>();
-
-        public List<Pet> getPets() {
-            return pets;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public Owner setLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        public Owner addPet(Pet pet) {
-            this.pets.add(pet);
-            return this;
-        }
-    }
-
-    @Entity
-    @Table(name = "pet")
-    static class Pet {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        private String name;
-
-        @ManyToOne
-        @JoinColumn(name = "owner_id")
-        private Owner owner;
-
-        public Pet() {}
-
-        public Pet(String name, Owner owner) {
-            this.name = name;
-            this.owner = owner;
-        }
-    }
-
-    interface OwnerRepository extends JpaRepository<Owner, Long> {
-
-        @Transactional
-        Owner findByLastName(String lastName);
-    }
-
-    static class PropagationTestHelper {
-
-        private final OwnerRepository ownerRepository;
-
-        public PropagationTestHelper(OwnerRepository ownerRepository) {
-            this.ownerRepository = ownerRepository;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void saveRequiresNew(String lastName) {
-            ownerRepository.save(new Owner().setLastName(lastName));
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void saveMultipleOwners() {
-            ownerRepository.saveAll(List.of(new Owner(), new Owner(), new Owner()));
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void updateOwner(Owner owner) {
-            // will cause entityManager.merge --> new SELECT, since Owner has an id
-            ownerRepository.save(owner);
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void findOwnerById(Long id) {
-            Owner owner = ownerRepository.findById(id).orElseThrow();
-            owner.getPets().size(); // will cause n + 1
-        }
-
-        @Transactional(propagation = Propagation.NESTED)
-        public void testNested() {
-            ownerRepository.findByLastName("Schroeder");
-        }
-
-        @Transactional(propagation = Propagation.NOT_SUPPORTED)
-        public void testNotSupported(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-
-        @Transactional(propagation = Propagation.SUPPORTS)
-        public void testSupports(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-
-        @Transactional(propagation = Propagation.SUPPORTS)
-        public void testSupportsWithoutTransaction() {}
-
-        @Transactional
-        public void testRollbackScenario(String lastName) {
-            ownerRepository.findByLastName(lastName);
-            throw new RuntimeException("Test rollback");
-        }
     }
 }

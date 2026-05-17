@@ -17,21 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
-
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,43 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({
-    AxelixMetadataEndpoint.class,
-    AxelixMetadataEndpointTest.CurrentConfig.class,
-    DefaultServiceMetadataAssembler.class,
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class
-})
-class AxelixMetadataEndpointTest {
+class AxelixMetadataEndpointTest extends AbstractEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
-
-    @TestConfiguration
-    static class CurrentConfig {
-
-        @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
-
-        @Bean
-        HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
-        }
-
-        @Bean
-        AxelixVersionDiscoverer axelixVersionDiscoverer() {
-            return () -> "1.1.3";
-        }
-
-        @Bean
-        public LibraryInformationProvider libraryInformationProvider() {
-            return new DefaultLibraryInformationProvider();
-        }
-    }
 
     @Test
     void shouldReceiveServiceMetadata() {

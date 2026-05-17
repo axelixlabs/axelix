@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -30,22 +29,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
@@ -56,26 +46,9 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
-import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
-import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
-import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
+import com.axelixlabs.axelix.sbs.spring.core.shared.SharedEndpointTestConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -87,26 +60,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @since 28.07.2025
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(
-        properties = {
-            "axelix.prop.test.name=axelix-beans",
-        })
-@Import({
-    JwtAuthorizationFilterTestConfiguration.class,
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
-    EnvironmentTestConfig.class,
-    JwtAuthTestConfiguration.class
-})
-class JwtAuthorizationFilterTest {
+class JwtAuthorizationFilterTest extends AbstractEndpointTest {
 
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
 
-    // Cache and CacheManager names under test
-    private static final String TEST_CACHE_1 = "cache";
-    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
+    // Cache and CacheManager names under test (provided by the shared endpoint context).
+    private static final String TEST_CACHE_1 = SharedEndpointTestConfiguration.TEST_CACHE_1;
+    private static final String MAIN_CACHE_MANAGER = SharedEndpointTestConfiguration.MAIN_CACHE_MANAGER;
 
     private EnhancedCacheManager cacheManager;
 
@@ -392,69 +353,6 @@ class JwtAuthorizationFilterTest {
         @Override
         public String getName() {
             return name();
-        }
-    }
-
-    @TestConfiguration
-    static class JwtAuthorizationFilterTestConfiguration {
-
-        @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
-        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
-            return new QualifiersPersistencePostProcessor();
-        }
-
-        @Bean
-        public BeanMetaInfoExtractor beanMetaInfoExtractor(
-                ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
-        }
-
-        @Bean
-        public BeansFeedBuilder noOpBeanFeedBuilder() {
-            return () -> new BeansFeed(List.of());
-        }
-
-        @Bean
-        public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder noOpBeanFeedBuilder) {
-            return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
-        }
-
-        @Bean
-        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-            return new EndpointsConfigurationProperties();
-        }
-
-        @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
-            return new AxelixEnvironmentEndpoint(environmentService);
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.env.test.toBeSanitized", "AXELIX_FOR_SANITIZATION"), propertyNameNormalizer);
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CacheManagerBeanPostProcessor();
-        }
-
-        @Bean(name = MAIN_CACHE_MANAGER)
-        public org.springframework.cache.CacheManager testSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1);
         }
     }
 }

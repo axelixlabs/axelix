@@ -21,14 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,14 +38,7 @@ import static org.assertj.core.data.MapEntry.entry;
  * @since 30.10.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"management.endpoints.web.exposure.include=axelix-details"})
-@Import({
-    DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class,
-    InstanceDetailsEndpointTest.AxelixDetailsEndpointTestConfig.class
-})
-class InstanceDetailsEndpointTest {
+class InstanceDetailsEndpointTest extends AbstractEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -104,14 +95,5 @@ class InstanceDetailsEndpointTest {
                         entry("time", "2025-10-30T09:10:13.428Z"));
 
         assertThatJson(responseBody).inPath("os").isObject().containsOnlyKeys("name", "version", "arch");
-    }
-
-    @TestConfiguration
-    static class AxelixDetailsEndpointTestConfig {
-
-        @Bean
-        public AxelixDetailsEndpoint axelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
-            return new AxelixDetailsEndpoint(serviceDetailsAssembler);
-        }
     }
 }

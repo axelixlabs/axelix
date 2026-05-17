@@ -20,22 +20,23 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration test for {@link CommitIdPluginGitInformationProvider}.
  *
+ * <p>{@link CommitIdPluginGitInformationProvider} is auto-registered by
+ * {@code GitInformationProviderAutoConfiguration} once {@code GitProperties}
+ * is on the classpath (provided by {@code ProjectInfoAutoConfiguration} which
+ * is included in {@code @SpringBootApplication}'s default auto-configurations).
+ *
  * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import({CommitIdPluginGitInformationProvider.class, ProjectInfoAutoConfiguration.class})
-class CommitIdPluginGitInformationProviderTest {
+class CommitIdPluginGitInformationProviderTest extends AbstractEndpointTest {
 
     @Autowired
     private CommitIdPluginGitInformationProvider subject;

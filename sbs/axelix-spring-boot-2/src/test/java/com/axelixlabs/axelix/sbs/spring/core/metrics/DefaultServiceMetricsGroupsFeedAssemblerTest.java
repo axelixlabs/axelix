@@ -17,19 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.binder.MeterBinder;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,8 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-public class DefaultServiceMetricsGroupsFeedAssemblerTest {
+class DefaultServiceMetricsGroupsFeedAssemblerTest extends AbstractEndpointTest {
 
     @Autowired
     ServiceMetricsGroupsAssembler assembler;
@@ -82,40 +76,5 @@ public class DefaultServiceMetricsGroupsFeedAssemblerTest {
                 .filter(group -> group.getGroupName().equals(groupName))
                 .findFirst()
                 .get();
-    }
-
-    @TestConfiguration
-    static class DefaultServiceMetricsGroupsAssemblerTestConfiguration {
-
-        @Bean
-        public ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler(MeterRegistry registry) {
-            return new DefaultServiceMetricsGroupsAssembler(registry);
-        }
-
-        @Bean
-        public MeterBinder groupingMetrics() {
-            return registry -> {
-                Counter.builder("axelixMetrics.test.metric1")
-                        .description("Test metric belonging to the `axelixMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("axelixMetrics.test.metric2")
-                        .description("Test metric belonging to the `axelixMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("axelixMetrics.test.metric3").register(registry);
-
-                Counter.builder("testMetrics.axelix.metric1")
-                        .description("Test metric belonging to the `testMetrics` group with a description")
-                        .register(registry);
-
-                Counter.builder("testMetrics.axelix.metric2").register(registry);
-
-                Counter.builder("standalone")
-                        .description(
-                                "Test metric belonging to the 'Others' group without a prefix and with a description")
-                        .register(registry);
-            };
-        }
     }
 }

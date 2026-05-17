@@ -23,10 +23,9 @@ import java.lang.management.ThreadMXBean;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ThreadDumpManagementEndpointTest {
+public class ThreadDumpManagementEndpointTest extends AbstractEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -63,19 +61,5 @@ public class ThreadDumpManagementEndpointTest {
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isFalse();
-    }
-
-    @TestConfiguration
-    static class ThreadDumpManagementEndpointTestConfiguration {
-        @Bean
-        public ThreadDumpContentionMonitoringManagement management() {
-            return new DefaultThreadDumpContentionMonitoringManagement();
-        }
-
-        @Bean
-        public ThreadDumpManagementEndpoint threadDumpManagementEndpoint(
-                ThreadDumpContentionMonitoringManagement management) {
-            return new ThreadDumpManagementEndpoint(management);
-        }
     }
 }

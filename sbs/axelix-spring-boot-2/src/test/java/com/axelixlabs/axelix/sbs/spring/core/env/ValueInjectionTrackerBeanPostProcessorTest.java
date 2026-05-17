@@ -17,24 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,32 +36,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(
-        classes = {
-            ValueInjectionTrackerBeanPostProcessorTest.ValueInjectionTrackerBeanPostProcessorTestConfig.class,
-            ValueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations.class,
-            ValueInjectionTrackerBeanPostProcessorTest.TestBeanWithSpEL.class
-        })
-@TestPropertySource(
-        properties = {
-            "test.server.port=9090",
-            "test.spring.application.name=TimeoutTestApp",
-            "test.spring.profiles.active=production",
-            "test.app.timeout=3000",
-            "test.inner.timeout=1500",
-            "test.inner.constructor.timeout=2500",
-            "test.method.timeout=4200"
-        })
-class ValueInjectionTrackerBeanPostProcessorTest {
+class ValueInjectionTrackerBeanPostProcessorTest extends AbstractEndpointTest {
 
-    @TestConfiguration
-    static class ValueInjectionTrackerBeanPostProcessorTestConfig {
-
-        @Bean
-        public static ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor() {
-            return new ValueInjectionTrackerBeanPostProcessor(new DefaultPropertyNameNormalizer());
-        }
-    }
+    // Bean name matches the @Bean factory method name in SharedEndpointTestConfiguration.
+    private static final String TEST_BEAN_WITH_CUSTOM_ANNOTATIONS = "testBeanWithCustomAnnotations";
 
     @Autowired
     private ValueInjectionTrackerBeanPostProcessor subject;
@@ -87,8 +56,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
         // then.
         assertThat(points).hasSize(1).first().satisfies(point -> {
-            assertThat(point.getBeanName())
-                    .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+            assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
             assertThat(point.getInjectionType()).isEqualTo(InjectionType.FIELD);
             assertThat(point.getTargetName()).isEqualTo("serverPort");
             assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyServerPort + ":8080}");
@@ -109,8 +77,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                 .orElseThrow();
 
         // then.
-        assertThat(injectionPoint.getBeanName())
-                .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+        assertThat(injectionPoint.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
         assertThat(injectionPoint.getPropertyExpression()).isEqualTo("${" + propertyTimeout + ":5000}");
     }
 
@@ -123,8 +90,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
         List<InjectionPoint> appNamePoints =
                 subject.getInjectionPointsForProperty(normalizer.normalize(propertyApplicationName));
         assertThat(appNamePoints).hasSize(1).first().satisfies(point -> {
-            assertThat(point.getBeanName())
-                    .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+            assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
             assertThat(point.getInjectionType()).isEqualTo(InjectionType.CONSTRUCTOR_PARAMETER);
             assertThat(point.getTargetName()).isEqualTo("appName");
             assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyApplicationName + ":TestApp}");
@@ -144,8 +110,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                 .hasSize(1)
                 .first()
                 .satisfies(point -> {
-                    assertThat(point.getBeanName())
-                            .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+                    assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
                     assertThat(point.getPropertyExpression()).isEqualTo("${test.app.timeout:5000}");
                 });
     }
@@ -159,8 +124,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
         List<InjectionPoint> profilePoints =
                 subject.getInjectionPointsForProperty(normalizer.normalize(propertyProfile));
         assertThat(profilePoints).hasSize(1).first().satisfies(point -> {
-            assertThat(point.getBeanName())
-                    .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+            assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
             assertThat(point.getInjectionType()).isEqualTo(InjectionType.METHOD_PARAMETER);
             assertThat(point.getTargetName()).contains("setProfile");
             assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyProfile + "}");
@@ -181,8 +145,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                 .hasSize(1)
                 .first()
                 .satisfies(point -> {
-                    assertThat(point.getBeanName())
-                            .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+                    assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
                     assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyTimeout + ":5000}");
                 });
     }
@@ -201,8 +164,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                 .hasSize(1)
                 .first()
                 .satisfies(point -> {
-                    assertThat(point.getBeanName())
-                            .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+                    assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
                     assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyMethodTimeout + "}");
                 });
     }
@@ -221,8 +183,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                 .hasSize(1)
                 .first()
                 .satisfies(point -> {
-                    assertThat(point.getBeanName())
-                            .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
+                    assertThat(point.getBeanName()).isEqualTo(TEST_BEAN_WITH_CUSTOM_ANNOTATIONS);
                     assertThat(point.getPropertyExpression()).isEqualTo("${" + propertyAppTimeout + ":5000}");
                 });
     }
@@ -257,62 +218,5 @@ class ValueInjectionTrackerBeanPostProcessorTest {
                     assertThat(p.getInjectionType()).isEqualTo(InjectionType.FIELD);
                     assertThat(p.getPropertyExpression()).isEqualTo("#{systemProperties['user.home']}");
                 });
-    }
-
-    @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Value("${test.app.timeout:5000}")
-    public @interface TimeoutValue {}
-
-    @Component
-    public static class TestBeanWithSpEL {
-
-        @Value("#{environment.getProperty('server.port')}")
-        private String envPort;
-
-        @Value("#{systemProperties['user.home']}")
-        private String systemHome;
-
-        @Value("#{environment.getProperty('app.timeout')}")
-        public Integer getTimeout() {
-            return 5000;
-        }
-    }
-
-    @Component
-    public static class TestBeanWithCustomAnnotations {
-
-        @Value("${test.server.port:8080}")
-        private String serverPort;
-
-        @TimeoutValue
-        private Integer timeout;
-
-        public TestBeanWithCustomAnnotations(
-                @Value("${test.spring.application.name:TestApp}") String appName,
-                @TimeoutValue String connectionTimeout) {}
-
-        private String profile;
-        private Integer maxTimeout;
-
-        @Autowired
-        public void setProfile(@Value("${test.spring.profiles.active}") String profile) {
-            this.profile = profile;
-        }
-
-        @Autowired
-        public void setMaxTimeout(@TimeoutValue Integer timeout) {
-            this.maxTimeout = timeout * 2;
-        }
-
-        @Value("${test.method.timeout}")
-        public void calculateRandomTimeout() {}
-
-        @TimeoutValue
-        public void getDefaultTimeout() {}
-
-        public String getServerPort() {
-            return serverPort;
-        }
     }
 }

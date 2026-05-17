@@ -18,15 +18,9 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,17 +29,10 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.axelixlabs.axelix.sbs.spring.core.shared.AbstractEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,18 +43,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-@Import(TransactionMonitoringBeanPostProcessorTest.TransactionMonitoringBeanPostProcessorTestConfiguration.class)
-class TransactionMonitoringBeanPostProcessorTest {
+class TransactionMonitoringBeanPostProcessorTest extends AbstractEndpointTest {
 
     @Autowired
     private OwnerRepository ownerRepository;
 
     @Autowired
     private PropagationTestHelper propagationTestHelper;
-
-    @Autowired
-    private PropagationTestService propagationTestService;
 
     @Autowired
     private TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor;
@@ -82,16 +64,14 @@ class TransactionMonitoringBeanPostProcessorTest {
         propagationCache = (Map<MethodClassKey, Propagation>)
                 ReflectionTestUtils.getField(transactionMonitoringBeanPostProcessor, "propagationCache");
 
-        transactionalBeans = List.of(propagationTestService, propagationTestHelper, ownerRepository);
+        transactionalBeans = List.of(propagationTestHelper, ownerRepository);
     }
 
     @Test
     void testServicesAreProxied() {
+        // PropagationTestHelper is a concrete class, so the proxy must be CGLIB rather than a JDK proxy.
         assertThat(AopUtils.isCglibProxy(propagationTestHelper)).isTrue();
-        assertThat(AopUtils.isCglibProxy(propagationTestService)).isTrue();
-
         assertThat(AopUtils.isJdkDynamicProxy(propagationTestHelper)).isFalse();
-        assertThat(AopUtils.isJdkDynamicProxy(propagationTestService)).isFalse();
     }
 
     @Test
@@ -110,128 +90,14 @@ class TransactionMonitoringBeanPostProcessorTest {
     void testCachesAreFilled() throws NoSuchMethodException {
         assertThat(propagationCache).isNotEmpty();
 
-        Method testRequired = PropagationTestService.class.getDeclaredMethod("testRequired", String.class);
-        MethodClassKey key = new MethodClassKey(testRequired, PropagationTestService.class);
-
+        // A @Transactional method on a concrete class.
+        Method saveRequiresNew = PropagationTestHelper.class.getDeclaredMethod("saveRequiresNew", String.class);
+        MethodClassKey key = new MethodClassKey(saveRequiresNew, PropagationTestHelper.class);
         assertThat(propagationCache).containsKey(key);
 
-        Method testFromNonTransactional = PropagationTestHelper.class.getMethod("testMandatory", String.class);
-        key = new MethodClassKey(testFromNonTransactional, PropagationTestHelper.class);
-
+        // A @Transactional default method on a Spring Data repository interface.
+        Method findByLastName = OwnerRepository.class.getDeclaredMethod("findByLastName", String.class);
+        key = new MethodClassKey(findByLastName, OwnerRepository.class);
         assertThat(propagationCache).containsKey(key);
-    }
-
-    @TestConfiguration
-    @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = Owner.class)
-    static class TransactionMonitoringBeanPostProcessorTestConfiguration {
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
-        }
-
-        @Bean
-        public QueriesRecorder queriesStatsCollector() {
-            return new DefaultQueriesRecorder();
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
-        }
-
-        @Bean
-        public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
-        }
-
-        @Bean
-        public PropagationTestService propagationTestService(
-                OwnerRepository ownerRepository, PropagationTestHelper helper) {
-            return new PropagationTestService(ownerRepository, helper);
-        }
-    }
-
-    @Entity
-    static class Owner {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        private String lastName;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-    }
-
-    interface OwnerRepository extends JpaRepository<Owner, Long> {
-
-        @Transactional
-        default Owner findByLastName(String lastName) {
-            return new Owner();
-        }
-
-        @Transactional(propagation = Propagation.SUPPORTS)
-        default List<Owner> findAll() {
-            return List.of(new Owner());
-        }
-    }
-
-    static class PropagationTestHelper {
-
-        private final OwnerRepository ownerRepository;
-        private final PropagationTestHelper self;
-
-        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            this.ownerRepository = ownerRepository;
-            this.self = self;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testRequiresNew(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testNestedRequiresNew() {
-            ownerRepository.findByLastName("Franklin");
-        }
-
-        @Transactional(propagation = Propagation.MANDATORY)
-        public void testMandatory(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-    }
-
-    static class PropagationTestService {
-
-        private final OwnerRepository ownerRepository;
-        private final PropagationTestHelper helperService;
-
-        public PropagationTestService(OwnerRepository ownerRepository, PropagationTestHelper helperService) {
-            this.ownerRepository = ownerRepository;
-            this.helperService = helperService;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRED)
-        void testRequired(String lastName) {
-            ownerRepository.findByLastName(lastName);
-            helperService.testNestedRequiresNew();
-        }
     }
 }
