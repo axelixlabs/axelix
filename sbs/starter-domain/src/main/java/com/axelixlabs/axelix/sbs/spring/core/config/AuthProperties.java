@@ -28,7 +28,7 @@ import com.axelixlabs.axelix.common.utils.Assert;
  * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway.Init")
-public class AuthProperties implements Validateable {
+public class AuthProperties implements Validatable {
 
     /**
      * JWT related configuration

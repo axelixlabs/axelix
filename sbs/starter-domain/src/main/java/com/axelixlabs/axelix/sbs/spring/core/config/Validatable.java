@@ -22,7 +22,7 @@ package com.axelixlabs.axelix.sbs.spring.core.config;
  *
  * @author Mikhail Polivakha
  */
-public interface Validateable {
+public interface Validatable {
 
     /**
      * Perform the actual validation. Exits normally if everything is okay.

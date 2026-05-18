@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringB
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * Auto-configuration for Transaction Monitoring infrastructure.
@@ -44,6 +45,12 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollec
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValidationListener validationListener() {
+        return new ValidationListener();
+    }
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")

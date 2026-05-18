@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.utils.Assert;
  * @author Cherkasov Sergey
  */
 @SuppressWarnings("NullAway.Init")
-public class SelfRegistrationConfigurationProperties implements Validateable {
+public class SelfRegistrationConfigurationProperties implements Validatable {
 
     /**
      * The URL of the master that the service must connect to.

@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleLis
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -47,6 +48,12 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 @ConditionalOnClass(WebEndpointProperties.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValidationListener validationListener() {
+        return new ValidationListener();
+    }
 
     @Bean
     @ConditionalOnMissingBean
