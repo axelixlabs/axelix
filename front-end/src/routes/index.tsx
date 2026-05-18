@@ -18,16 +18,18 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router";
 
+import { getCookie } from "helpers";
 import { useAppDispatch } from "hooks";
 import { getAxelixSettings } from "services";
 import { setAxelixSettings } from "store/slices";
-import { IS_AUTH } from "utils";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
-    const isAuth = localStorage.getItem(IS_AUTH);
+    // authorities cookie is supposed to live as long as the main access cookie,
+    // so we rely on the presence of the authorities cookie here
+    const isAuthenticated = Boolean(getCookie("authorities"));
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -49,7 +51,7 @@ export const AppRoutes = () => {
 
     return (
         <>
-            <BrowserRouter>{isAuth ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>
+            <BrowserRouter>{isAuthenticated ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>
         </>
     );
 };

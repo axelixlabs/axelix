@@ -19,7 +19,6 @@ import type { IColorPallete } from "models";
 
 export const SEARCH_PARAMS_FILTER = "f";
 export const UNKNOWN_ERROR = "UNKNOWN_ERROR";
-export const IS_AUTH = "IS_AUTH";
 
 export const colorPalette: Record<string, IColorPallete> = {
     GREY: {

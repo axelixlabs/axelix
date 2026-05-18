@@ -25,7 +25,6 @@ import { useTranslation } from "react-i18next";
 import { extractErrorCode } from "helpers";
 import { type IErrorResponse, StatelessRequest } from "models";
 import { logout } from "services";
-import { IS_AUTH } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -40,7 +39,6 @@ export const ProfileMenu = () => {
         logout()
             .then(() => {
                 setLogoutData(StatelessRequest.success());
-                localStorage.removeItem(IS_AUTH);
                 window.location.href = "/login";
             })
             // TODO: We need to decide whether we need the code below, since our errors are already being handled through Axios interceptors, and basically the code below isn’t used at all.

@@ -19,7 +19,6 @@ import axios, { AxiosError } from "axios";
 
 import { extractErrorCode, showErrorNotification } from "helpers";
 import { EIgnoredErrors, type IErrorResponse } from "models";
-import { IS_AUTH } from "utils";
 
 /**
  * Browser will route such requests (with no host:port) to the same origin as the current
@@ -51,7 +50,6 @@ apiFetch.interceptors.response.use(
         }
 
         if (error.response?.status === 401 && window.location.pathname !== "/login") {
-            localStorage.removeItem(IS_AUTH);
             window.location.href = "/login";
         }
 
