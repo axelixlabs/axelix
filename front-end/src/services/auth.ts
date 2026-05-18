@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import axios from "axios";
-
 import { apiFetch } from "api";
 import type { ILoginSubmitRequestData, OIDCLoginOption } from "models";
 
@@ -38,7 +36,5 @@ export const authorize = (option: OIDCLoginOption) => {
     params.append("response_type", "code");
     params.append("redirect_uri", option.redirectUri);
 
-    const authUrl = `${option.authorizationEndpoint}?${params.toString()}`;
-
-    window.location.href = authUrl;
+    window.location.href = `${option.authorizationEndpoint}?${params.toString()}`;
 };
