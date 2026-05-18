@@ -38,9 +38,7 @@ export const authorize = (option: OIDCLoginOption) => {
     params.append("response_type", "code");
     params.append("redirect_uri", option.redirectUri);
 
-    return axios.post(option.authorizationEndpoint, params, {
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-    });
+    const authUrl = `${option.authorizationEndpoint}?${params.toString()}`;
+
+    window.location.href = authUrl;
 };
