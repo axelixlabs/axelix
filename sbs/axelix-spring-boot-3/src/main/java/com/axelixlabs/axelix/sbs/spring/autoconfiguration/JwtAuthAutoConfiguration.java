@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
+import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.
@@ -55,6 +56,12 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 @ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValidationListener validationListener() {
+        return new ValidationListener();
+    }
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.sbs.auth")

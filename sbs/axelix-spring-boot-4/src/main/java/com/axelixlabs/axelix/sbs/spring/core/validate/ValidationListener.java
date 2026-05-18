@@ -20,22 +20,20 @@ package com.axelixlabs.axelix.sbs.spring.core.validate;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.Validateable;
+import com.axelixlabs.axelix.sbs.spring.core.config.Validatable;
 
 /**
- * Listener for {@link ApplicationReadyEvent} that is supposed to validate all {@link Validateable}
+ * Listener for {@link ApplicationReadyEvent} that is supposed to validate all {@link Validatable}
  * beans in the context.
  *
  * @author Mikhail Polivakha
  */
-@Component
 public class ValidationListener implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         ConfigurableApplicationContext context = event.getApplicationContext();
-        context.getBeansOfType(Validateable.class).values().forEach(Validateable::validate);
+        context.getBeansOfType(Validatable.class).values().forEach(Validatable::validate);
     }
 }

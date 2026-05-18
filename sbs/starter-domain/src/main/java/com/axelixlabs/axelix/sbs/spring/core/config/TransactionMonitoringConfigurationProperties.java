@@ -29,7 +29,7 @@ import com.axelixlabs.axelix.common.utils.Assert;
  * @author Cherkasov Sergey
  * @author Mikhail Polivakha
  */
-public class TransactionMonitoringConfigurationProperties implements Validateable {
+public class TransactionMonitoringConfigurationProperties implements Validatable {
 
     /**
      * Maximum number of transaction records to keep per method.

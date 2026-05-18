@@ -26,7 +26,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.Validateable;
+import com.axelixlabs.axelix.sbs.spring.core.config.Validatable;
 
 /**
  * Unit tests for {@link ValidationListener}.
@@ -67,7 +67,7 @@ class ValidationListenerTest {
         });
     }
 
-    static class TestValidationTarget implements Validateable {
+    static class TestValidationTarget implements Validatable {
 
         private final boolean valid;
 
