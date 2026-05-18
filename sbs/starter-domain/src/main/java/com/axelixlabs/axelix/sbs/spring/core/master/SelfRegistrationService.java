@@ -121,7 +121,7 @@ public class SelfRegistrationService implements Closeable {
     }
 
     private static boolean isUnauthorized(int statusCode) {
-        return statusCode >= 200 && statusCode < 300;
+        return statusCode == 401;
     }
 
     private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)
