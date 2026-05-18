@@ -18,13 +18,12 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.time.Duration;
-import java.util.List;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
@@ -98,6 +97,7 @@ public class JwtAuthTestConfiguration {
             WebIdentityAccessManager webIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
             WebEndpointProperties webEndpointProperties) {
+
         var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(
                 webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath()));
         registration.setName("jwtAuthorizationFilter");

@@ -73,15 +73,12 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final EndpointPathMatcher pathMatcher;
 
-    private final String actuatorPathPrefix;
-
-    public DefaultAuthorityResolver(String actuatorPathPrefix, EndpointPathMatcher pathMatcher) {
+    public DefaultAuthorityResolver(EndpointPathMatcher pathMatcher) {
         this.pathMatcher = pathMatcher;
-        this.actuatorPathPrefix = actuatorPathPrefix;
     }
 
     /**
-     * Important: The path parameter is expected to be relative to the actuator base path
+     * Important: The requestPath parameter is expected to be relative to the actuator base path
      * WebEndpointProperties#getBasePath().
      * <p>
      * For example, if the full request is "/actuator/axelix-beans", the path passed here should be "/axelix-beans".
@@ -92,17 +89,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         // TODO: well, technically we probably can resolve via simple map lookup, I guess...
         return PATH_MAPPINGS.entrySet().stream()
                 .filter(entry -> entry.getKey().httpMethod().equals(httpMethod))
-                .filter(entry -> {
-                    if (requestPath.startsWith(actuatorPathPrefix)) {
-                        return pathMatcher.matches(
-                                entry.getKey().path().originalUrl(),
-                                requestPath.substring(actuatorPathPrefix.length()));
-
-                    } else {
-
-                        return pathMatcher.matches(entry.getKey().path().originalUrl(), requestPath);
-                    }
-                })
+                .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), requestPath))
                 .map(Map.Entry::getValue)
                 .findFirst();
     }

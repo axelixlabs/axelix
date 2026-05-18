@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -86,8 +85,8 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AuthorityResolver authorityResolver(WebEndpointProperties webEndpointProperties) {
-        return new DefaultAuthorityResolver(webEndpointProperties.getBasePath(), (pathTemplate, actualPath) -> {
+    public AuthorityResolver authorityResolver() {
+        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
             return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });

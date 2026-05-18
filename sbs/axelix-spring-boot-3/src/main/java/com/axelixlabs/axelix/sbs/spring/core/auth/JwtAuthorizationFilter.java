@@ -86,7 +86,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            User user = webIdentityAccessManager.verifyAccess(request.getRequestURI(), requestHttpMethod, token);
+            String relativePath = request.getServletPath().substring(baseActuatorPath.length());
+
+            User user = webIdentityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
 
             securityContextExecutor.runWithinSecurityContext(
                     () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
