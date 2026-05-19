@@ -1,6 +1,7 @@
-import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+
+import { presetOptions } from './config/preset-options';
+import { themeConfig } from './config/theme-config';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -14,6 +15,7 @@ const config: Config = {
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
+    faster: false, // Opt out of Rspack-based faster build — keeps @docusaurus/faster unneeded
   },
 
   // Set the production url of your site here
@@ -24,6 +26,13 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap',
+      rel: 'stylesheet',
+    },
+  ],
+
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
@@ -32,78 +41,9 @@ const config: Config = {
     locales: ['en'],
   },
 
-  presets: [
-    [
-      'classic',
-      {
-        docs: {
-          routeBasePath: 'docs',
-          sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-        },
-        blog: {
-          routeBasePath: 'blog',
-          showReadingTime: true,
+  presets: [['classic', presetOptions]],
 
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
-        theme: {
-          customCss: './src/css/custom.css',
-        },
-      } satisfies Preset.Options,
-    ],
-  ],
-
-  themeConfig: {
-    // Replace with your project's social card
-    image: 'img/logo.svg',
-    colorMode: {
-      respectPrefersColorScheme: true,
-    },
-    navbar: {
-      logo: {
-        alt: 'Axelix logo',
-        src: 'img/logo.svg',
-        srcDark: 'img/logo-dark.svg',
-        href: "/docs/introduction"
-      },
-      items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Docs',
-        },
-        { to: '/blog', label: 'Blog', position: 'left' },
-        {
-          href: 'https://github.com/axelixlabs/axelix',
-          position: 'right',
-          className: 'header-github-link',
-          htmlAttributes: {
-            rel: 'noopener noreferrer',
-          },
-          'aria-label': 'GitHub repository',
-        },
-      ],
-    },
-    footer: {
-      style: 'dark',
-      copyright: `© ${new Date().getFullYear()} Axelix Labs. All rights reserved.`,
-    },
-    prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.vsDark,
-      additionalLanguages: ['java'],
-    },
-  } satisfies Preset.ThemeConfig,
+  themeConfig,
 };
 
 export default config;

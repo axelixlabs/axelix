@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Metrics
 
 The Metrics page provides comprehensive monitoring and performance insights for your Spring Boot applications.
@@ -17,7 +13,7 @@ to the same functional area.
 
 ---
 
-## Metric Details{#details}
+## Metric Details
 
 The Metric Details page provides in-depth analysis of individual metrics with interactive charts, real-time values,
 and intelligent tag filtering capabilities.

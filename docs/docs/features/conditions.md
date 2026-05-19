@@ -1,7 +1,3 @@
----
-sidebar_position: 8
----
-
 # Conditions
 
 The **Conditions** page provides information about the configured conditions in the Spring Boot application.
@@ -11,7 +7,7 @@ The **Conditions** page provides information about the configured conditions in 
 
 ---
 
-## TAB: Negative Matches{#negative}
+## TAB: Negative Matches
 **A scrollable list displaying all conditions whose requirements do not match.**
 
 ![conditions negative matches page](../../static/img/feature/conditions/conditions-not-matches-details-page.png)
@@ -24,7 +20,7 @@ The **Conditions** page provides information about the configured conditions in 
 - **Message**      Descriptive message explaining why the condition matched or did not match.
 
 
-## TAB: Positive Matches{#positive}
+## TAB: Positive Matches
 **A scrollable list displaying all conditions whose requirements match.**
 
 ![conditions matches page](../../static/img/feature/conditions/conditions-matches-details-page.png)

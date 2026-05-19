@@ -1,7 +1,3 @@
----
-sidebar_position: 6
----
-
 # Configuration Properties
 
 The **Configuration Properties** page provides full visibility into all properties in the Spring Boot application,
@@ -16,7 +12,7 @@ plus an active-properties counter.
 
 ---
 
-## Configuration Properties Details{#details}
+## Configuration Properties Details
 ![configprops details page](../../static/img/feature/configprops/configprops-details-page.png)
 ***Configuration Properties details as presented in Axelix UI***
 
@@ -34,7 +30,7 @@ to the Application properties files.
 
 ---
 
-## Interactive Features{#interactive}
+## Interactive Features
 
 We provide the ability to change the property value:
 1) To do this, click <img src="/img/feature/icons/overwrite-icon.png" alt="overwrite-icon" width="20" height="20"/> next to the selected property’s value.

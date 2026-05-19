@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 # Properties
 The Properties page provides complete visibility into all configuration properties and their sources within 
 Spring Boot application. It shows the current values, where each value came from and the priority hierarchy 
@@ -21,7 +17,7 @@ of active properties.
 
 ---
 
-## Properties Details{#details}
+## Properties Details
 ![properties details page](../../static/img/feature/properties/properties-details-page.png)
 ***Properties as presented in Axelix UI***
 

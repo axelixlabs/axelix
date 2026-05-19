@@ -1,7 +1,3 @@
----
-sidebar_position: 11
----
-
 # Thread Dump
 The **Thread Dump** page provides a convenient interface for analyzing all threads present in the Spring Boot application.
 
@@ -14,7 +10,7 @@ and setting <img src="/img/feature/icons/settings-icon.png" alt="settings-icon" 
 
 ---
 
-## Thread Dump Details {#thred-dump-details}
+## Thread Dump Details
 ![thread dump details page](../../static/img/feature/thread-dump/thread-dump-details-page.png)
 ***Thread Dump details page as presented in Axelix UI***
 
@@ -35,7 +31,7 @@ select the desired time range, after which detailed thread information will be a
   - **IdentityHashCode**:        Identity hash code of the lock object.
 - **StackTrace**:                Stack trace of the thread.
 
-### Color coding indicating the thread state {#color-coding}
+### Color coding indicating the thread state
 
 |                                         Indication                                          | Description          |
 |:-------------------------------------------------------------------------------------------:|----------------------|

@@ -1,0 +1,167 @@
+/*
+ * Chrome — peripheral UI around the main content area:
+ * right-side TOC, breadcrumbs, prev/next pagination, footer,
+ * and miscellaneous Docusaurus pieces (cards, hash links, etc.).
+ */
+
+/* ============================================================
+ * Right-side table of contents
+ * ============================================================ */
+.theme-doc-toc-desktop {
+  border-left: 1px solid var(--axelix-border);
+  padding-left: 1rem;
+  width: var(--axelix-toc-width);
+}
+
+.table-of-contents {
+  font-size: 14px;
+  border-left: none;
+}
+
+.table-of-contents__link {
+  color: var(--axelix-fg-muted);
+  padding: 0.2rem 0 0.2rem 0.6rem;
+  display: block;
+  position: relative;
+  transition: color 0.12s ease;
+}
+
+.table-of-contents__link:hover {
+  color: var(--axelix-fg);
+  text-decoration: none;
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link--active code {
+  color: var(--ifm-color-primary) !important;
+  font-weight: 600;
+}
+
+.table-of-contents__link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 2px;
+  border-radius: 1px;
+  background-color: var(--ifm-color-primary);
+}
+
+/* ============================================================
+ * Breadcrumbs above title
+ * ============================================================ */
+.theme-doc-breadcrumbs {
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumbs__item {
+  font-size: 0.82rem;
+}
+
+.breadcrumbs__link {
+  color: var(--axelix-fg-muted);
+  background: transparent;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.breadcrumbs__link:hover {
+  background: var(--ifm-menu-color-background-hover);
+  color: var(--axelix-fg);
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+  background: transparent;
+  color: var(--axelix-fg);
+  font-weight: 500;
+}
+
+/* ============================================================
+ * Pagination (prev/next)
+ * ============================================================ */
+.pagination-nav__link {
+  border: 1px solid var(--axelix-border);
+  border-radius: var(--axelix-radius);
+  background: var(--axelix-bg);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+  background: var(--axelix-bg-subtle);
+}
+
+.pagination-nav__sublabel {
+  color: var(--axelix-fg-subtle);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.pagination-nav__label {
+  color: var(--axelix-fg);
+  font-weight: 600;
+}
+
+/* ============================================================
+ * Footer
+ * ============================================================ */
+.footer {
+  background: var(--axelix-bg);
+  color: var(--axelix-fg-muted);
+  border-top: 1px solid var(--axelix-border);
+  padding: 1.5rem 1rem;
+}
+
+.footer--dark {
+  background: var(--axelix-bg);
+  color: var(--axelix-fg-muted);
+}
+
+.footer__copyright {
+  font-size: 0.85rem;
+  color: var(--axelix-fg-subtle);
+}
+
+/* ============================================================
+ * Misc Docusaurus pieces
+ * ============================================================ */
+.theme-doc-version-banner,
+.theme-doc-version-badge {
+  border-radius: var(--axelix-radius-sm);
+}
+
+/* Generated category index cards. */
+.card {
+  border: 1px solid var(--axelix-border);
+  border-radius: var(--axelix-radius);
+  padding: 1.1rem;
+  background: var(--axelix-bg);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--ifm-color-primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+article header h1 {
+  margin-bottom: 0.5rem;
+}
+
+/* Anchor links on hover. */
+.hash-link {
+  color: var(--axelix-fg-subtle);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+h1:hover .hash-link,
+h2:hover .hash-link,
+h3:hover .hash-link,
+h4:hover .hash-link {
+  opacity: 1;
+}

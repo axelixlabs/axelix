@@ -1,5 +1,5 @@
 import { Redirect } from '@docusaurus/router';
 
 export default function Home() {
-  return <Redirect to="/docs/introduction" />;
+  return <Redirect to="/docs/product/introduction" />;
 };
