@@ -75,6 +75,4 @@ axelix:
           role-attribute-path:
           scopes: openid
       cookie:
-        name: auth_token
-        name-authority: authorities
         secure: false

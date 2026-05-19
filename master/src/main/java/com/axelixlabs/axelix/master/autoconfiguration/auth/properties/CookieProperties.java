@@ -25,9 +25,9 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
  */
 public class CookieProperties {
 
-    private String name = "auth_token";
+    private final String authCookieName = "auth_token";
 
-    private String nameAuthority = "authorities";
+    private final String authoritiesCookieName = "authorities";
 
     /**
      * Secure attribute for cookies.
@@ -35,20 +35,12 @@ public class CookieProperties {
      */
     private boolean secure = true;
 
-    public String getName() {
-        return name;
+    public String getAuthCookieName() {
+        return authCookieName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNameAuthority() {
-        return nameAuthority;
-    }
-
-    public void setNameAuthority(String nameAuthority) {
-        this.nameAuthority = nameAuthority;
+    public String getAuthoritiesCookieName() {
+        return authoritiesCookieName;
     }
 
     public boolean isSecure() {

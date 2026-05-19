@@ -34,7 +34,6 @@ axelix:
             username: admin
             password: admin
       cookie:
-        name: auth-token
         secure: false
 
 management:

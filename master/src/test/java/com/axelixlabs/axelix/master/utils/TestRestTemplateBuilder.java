@@ -137,7 +137,7 @@ public class TestRestTemplateBuilder {
     private TestRestTemplate buildWithToken(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), token)));
+                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getAuthCookieName(), token)));
     }
 
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {

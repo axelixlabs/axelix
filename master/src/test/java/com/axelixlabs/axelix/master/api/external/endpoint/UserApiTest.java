@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -130,8 +131,7 @@ class UserApiTest {
 
         String cookieHeader = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
         assertThat(cookieHeader).isNotNull();
-        assertThat(cookieHeader).isNotNull();
-        assertThat(cookieHeader).contains(cookieProperties.getName());
+        assertThat(cookieHeader).contains(cookieProperties.getAuthCookieName());
         assertThat(cookieHeader)
                 .contains(String.valueOf(jwtProperties.getLifespan().getSeconds()));
         assertThat(cookieHeader).contains("HttpOnly");
@@ -194,7 +194,7 @@ class UserApiTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(HttpHeaders.COOKIE, cookieProperties.getName() + "=" + token);
+        headers.add(HttpHeaders.COOKIE, cookieProperties.getAuthCookieName() + "=" + token);
 
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
@@ -207,7 +207,7 @@ class UserApiTest {
 
         String logoutCookieHeader = logoutResponse.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
         assertThat(logoutCookieHeader).isNotNull();
-        assertThat(logoutCookieHeader).contains(cookieProperties.getName());
+        assertThat(logoutCookieHeader).contains(cookieProperties.getAuthCookieName());
         assertThat(logoutCookieHeader.toLowerCase()).contains("max-age=0");
     }
 

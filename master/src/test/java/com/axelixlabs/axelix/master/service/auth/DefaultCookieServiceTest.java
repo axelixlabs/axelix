@@ -63,16 +63,16 @@ class DefaultCookieServiceTest {
         String testToken = "test-jwt-token-123";
 
         // when.
-        ResponseCookie cookie = cookieService.buildAuthCookie(testToken);
+        ResponseCookie authCookie = cookieService.buildAuthCookie(testToken);
 
         // then.
-        assertThat(cookie).isNotNull().satisfies(c -> {
-            assertThat(c.getValue()).isEqualTo(testToken);
-            assertThat(c.getName()).isEqualTo(cookieProperties.getName());
-            assertThat(c.isHttpOnly()).isTrue();
-            assertThat(c.getPath()).isEqualTo("/");
-            assertThat(c.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(c.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+        assertThat(authCookie).isNotNull().satisfies(cookie -> {
+            assertThat(cookie.getValue()).isEqualTo(testToken);
+            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthCookieName());
+            assertThat(cookie.isHttpOnly()).isTrue();
+            assertThat(cookie.getPath()).isEqualTo("/");
+            assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
         });
     }
 
@@ -83,16 +83,16 @@ class DefaultCookieServiceTest {
                 new DefaultRole("OBSERVER", Set.of(DefaultAuthority.CACHES_TOGGLE, DefaultAuthority.ENV_VALUES_READ));
 
         // when.
-        ResponseCookie cookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
-        String decodedValue = new String(Base64.getDecoder().decode(cookie.getValue()), StandardCharsets.UTF_8);
+        ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
+        String decodedValue = new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
 
         // then.
-        assertThat(cookie).isNotNull().satisfies(c -> {
-            assertThat(c.getName()).isEqualTo(cookieProperties.getNameAuthority());
-            assertThat(c.isHttpOnly()).isFalse();
-            assertThat(c.getPath()).isEqualTo("/");
-            assertThat(c.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(c.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+        assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {
+            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
+            assertThat(cookie.isHttpOnly()).isFalse();
+            assertThat(cookie.getPath()).isEqualTo("/");
+            assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
         });
         assertThat(decodedValue).startsWith("[").endsWith("]");
         assertThat(decodedValue).contains(DefaultAuthority.CACHES_TOGGLE.name());
@@ -105,16 +105,16 @@ class DefaultCookieServiceTest {
         Role targetRole = new DefaultRole("VIEWER", Set.of());
 
         // when.
-        ResponseCookie cookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
-        String decodedValue = new String(Base64.getDecoder().decode(cookie.getValue()), StandardCharsets.UTF_8);
+        ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
+        String decodedValue = new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
 
         // then.
-        assertThat(cookie).isNotNull().satisfies(c -> {
-            assertThat(c.getName()).isEqualTo(cookieProperties.getNameAuthority());
-            assertThat(c.isHttpOnly()).isFalse();
-            assertThat(c.getPath()).isEqualTo("/");
-            assertThat(c.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(c.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+        assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {
+            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
+            assertThat(cookie.isHttpOnly()).isFalse();
+            assertThat(cookie.getPath()).isEqualTo("/");
+            assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
         });
         assertThat(decodedValue).isEqualTo("[]");
     }
@@ -125,7 +125,7 @@ class DefaultCookieServiceTest {
         ResponseCookie cookie = cookieService.buildExpiredAuthCookie();
 
         // then.
-        assertThat(cookie.getName()).isEqualTo(cookieProperties.getName());
+        assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthCookieName());
         assertThat(cookie.getValue()).isEmpty();
         assertThat(cookie.getMaxAge().toSeconds()).isZero();
         assertThat(cookie.isHttpOnly()).isTrue();
@@ -137,7 +137,7 @@ class DefaultCookieServiceTest {
         ResponseCookie cookie = cookieService.buildExpiredAuthMetadataCookie();
 
         // then.
-        assertThat(cookie.getName()).isEqualTo(cookieProperties.getNameAuthority());
+        assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
         assertThat(cookie.getValue()).isEmpty();
         assertThat(cookie.getMaxAge().toSeconds()).isZero();
         assertThat(cookie.isHttpOnly()).isFalse();
