@@ -19,8 +19,8 @@ jobs:
           java-version: '25'
 
       - name: Run Concurrency Tests
-        run: ./gradlew \
-          clean \
+        run: |
+          ./gradlew clean \
           :sbs:axelix-spring-boot-3:concurrencyTest \
           :sbs:starter-domain \
           --no-build-cache \
