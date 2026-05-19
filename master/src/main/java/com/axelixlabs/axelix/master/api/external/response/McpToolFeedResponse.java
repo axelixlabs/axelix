@@ -47,14 +47,14 @@ public record McpToolFeedResponse(@JsonProperty("tools") List<Tool> tools) {
     /**
      * Additional properties describing a Tool to clients.
      *
-     * @param readOnlyHint      If {@code true), the tool does not modify its environment. (default {@code false)
-     * @param destructiveHint   If {@code true), the tool may perform destructive updates to its environment.
-     *                          If {@code  false}, the tool performs only additive updates. (default {@code true)
-     * @param idempotentHint    If {@code true), calling the tool repeatedly with the same arguments will have no
-     *                          additional effect on the its environment. (default {@code false)
-     * @param openWorldHint     If {@code true), this tool may interact with an “open world” of external entities.
+     * @param readOnlyHint      If {@code true}, the tool does not modify its environment. (default {@code false})
+     * @param destructiveHint   If {@code true}, the tool may perform destructive updates to its environment.
+     *                          If {@code  false}, the tool performs only additive updates. (default {@code true}
+     * @param idempotentHint    If {@code true}, calling the tool repeatedly with the same arguments will have no
+     *                          additional effect on the environment. (default {@code false})
+     * @param openWorldHint     If {@code true}, this tool may interact with an “open world” of external entities.
      *                          If {@code  false}, the tool’s domain of interaction is closed. For example, the world
-     *                          of a web search tool is open, whereas that of a memory tool is not. (default {@code true)
+     *                          of a web search tool is open, whereas that of a memory tool is not. (default {@code true})
      */
     public record ToolAnnotations(
             @JsonProperty("readOnlyHint") Boolean readOnlyHint,

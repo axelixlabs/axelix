@@ -41,12 +41,18 @@ jobs:
       - name: Build and Test
         run: ./gradlew clean build
 
-  release-backend-artifacts:
+  release-artifacts:
     needs: [build-and-test-backend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    env:
+      VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
+      VITE_APP_ISSUE_TRACKER_LINK: https://github.com/axelixlabs/axelix/issues
+      VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
+      VITE_APP_REFERENCE_GUIDE_LINK: #TODO
+      VITE_APP_BLOG_LINK: #TODO
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -62,18 +68,52 @@ jobs:
 
       # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
       # and to create the release build from scratch.
-      - name: Build
+      - name: Build Backend
         run: ./gradlew clean build sourcesJar javadocJar
 
-      - name: Publish to GitHub Packages
-        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
+      - name: Install frontend dependencies
+        working-directory: front-end
+        run: npm ci
+
+      - name: Linting source files
+        working-directory: front-end
+        run: npm run lint
+
+      - name: Linting CSS files
+        working-directory: front-end
+        run: npm run lint-css
+
+      - name: Running tests
+        working-directory: front-end
+        run: npm run test
+
+      - name: Create .env file
+        working-directory: front-end
+        run: |
+          echo "VITE_APP_VERSION=${{ github.event.inputs.git_tag }}" >> .env
+          echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
+          echo "VITE_APP_ISSUE_TRACKER_LINK=${{ env.VITE_APP_ISSUE_TRACKER_LINK }}" >> .env
+          echo "VITE_APP_LICENSE_LINK=${{ env.VITE_APP_LICENSE_LINK }}" >> .env.production
+          echo "VITE_APP_REFERENCE_GUIDE_LINK=${{ env.VITE_APP_REFERENCE_GUIDE_LINK }}" >> .env
+          echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
+
+      - name: Build frontend
+        working-directory: front-end
+        run: npm run build
+
+      - name: Clean-up .env
+        working-directory: front-end
+        run: rm .env
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
 
       - name: Build Docker Image
-        run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file master/docker/Dockerfile .
+        run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file Dockerfile .
 
+      # ====================================================================================
+      # Artifacts Publication, after all builds, linters, tests, and Docker pushes succeed.
+      # ====================================================================================
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v4
         with:
@@ -87,79 +127,9 @@ jobs:
       - name: Docker logout from GitHub Container Registry
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
-  release-frontend-artifacts:
-    needs: [ build-and-test-backend, release-backend-artifacts ]
-    runs-on: ubuntu-latest
-    env:
-      # Vite Config
-      VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
-      VITE_APP_ISSUE_TRACKER_LINK: https://github.com/axelixlabs/axelix/issues
-      VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
-      VITE_APP_REFERENCE_GUIDE_LINK: #TODO
-      VITE_APP_BLOG_LINK: #TODO
-    defaults:
-      run:
-        working-directory: front-end
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.inputs.git_tag }}
-          fetch-depth: 0
+      - name: Publish to GitHub Packages
+        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
 
-      - name: Installing dependencies
-        run: npm ci
-
-      - name: Linting source files
-        run: npm run lint
-
-      - name: Linting CSS files
-        run: npm run lint-css
-
-      - name: Running tests
-        run: npm run test
-
-      - name: Create .env file
-        run: |
-          echo "VITE_APP_VERSION=${{ github.event.inputs.git_tag }}" >> .env
-          echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
-          echo "VITE_APP_ISSUE_TRACKER_LINK=${{ env.VITE_APP_ISSUE_TRACKER_LINK }}" >> .env
-          echo "VITE_APP_LICENSE_LINK=${{ env.VITE_APP_LICENSE_LINK }}" >> .env.production
-          echo "VITE_APP_REFERENCE_GUIDE_LINK=${{ env.VITE_APP_REFERENCE_GUIDE_LINK }}" >> .env
-          echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
-
-      - name: Running build
-        run: npm run build
-
-      - name: Clean-up
-        run: rm .env
-
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v5
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v4
-        with:
-          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
-          username: ${{ env.USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Docker Image
-        run: |
-          docker build \
-            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }} \
-            --file Dockerfile .
-
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v4
-        with:
-          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
-          username: ${{ env.USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker push to GitHub Container registry
-        run: |
-          docker push ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }}
-
-      - name: Docker logout from GitHub Container Registry
-        run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
+#        // TODO: Uncomment later
+#      - name: Publish to Maven Central
+#        run: ./gradlew publishGprPublicationToMavenCentralRepository
