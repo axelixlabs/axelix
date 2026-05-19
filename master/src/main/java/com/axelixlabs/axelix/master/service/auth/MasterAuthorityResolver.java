@@ -30,7 +30,6 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
-import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 /**
  * Implementation of {@link AuthorityResolver} that is supposed to handle master endpoints.
@@ -80,13 +79,9 @@ public class MasterAuthorityResolver implements AuthorityResolver {
     }
 
     @Override
-    public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
+    public Optional<Authority> resolve(String relativeRequestPath, HttpMethod httpMethod) {
 
-        if (requestPath.startsWith(WebAutoConfiguration.EXTERNAL_API_PATH)) {
-            requestPath = requestPath.substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
-        }
-
-        PathContainer pathContainer = PathContainer.parsePath(requestPath);
+        PathContainer pathContainer = PathContainer.parsePath(relativeRequestPath);
 
         for (RegisteredPattern registered : REGISTERED_PATTERNS) {
             if (registered.method == httpMethod && registered.pathPattern.matches(pathContainer)) {

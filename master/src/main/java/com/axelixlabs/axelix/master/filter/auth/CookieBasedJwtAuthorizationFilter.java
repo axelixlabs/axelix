@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 
 /**
@@ -68,6 +69,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
         // Static content (/, /index.html, /assets/*, etc.) is served at root and does not require auth
         // as well as actuator health endpoints
+        // TODO: We must refactor it
         return !path.startsWith("/api/")
                 || path.startsWith("/api/actuator/health")
                 || path.equalsIgnoreCase("/api/external/users/login")
@@ -91,8 +93,9 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        User user = webIdentityAccessManager.verifyAccess(
-                request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
+        String relativePath = request.getServletPath().substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
+
+        User user = webIdentityAccessManager.verifyAccess(relativePath, HttpMethod.valueOf(request.getMethod()), token);
 
         try {
             securityContextExecutor.runWithinSecurityContext(

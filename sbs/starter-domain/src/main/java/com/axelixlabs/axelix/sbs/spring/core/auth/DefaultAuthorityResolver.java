@@ -84,12 +84,12 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
      * For example, if the full request is "/actuator/axelix-beans", the path passed here should be "/axelix-beans".
      */
     @Override
-    public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
+    public Optional<Authority> resolve(String relativeRequestPath, HttpMethod httpMethod) {
 
         // TODO: well, technically we probably can resolve via simple map lookup, I guess...
         return PATH_MAPPINGS.entrySet().stream()
                 .filter(entry -> entry.getKey().httpMethod().equals(httpMethod))
-                .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), requestPath))
+                .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), relativeRequestPath))
                 .map(Map.Entry::getValue)
                 .findFirst();
     }

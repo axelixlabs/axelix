@@ -59,6 +59,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+// TODO: Revisit this test design.
 /**
  * Integration tests for {@link AxelixScheduledTasksEndpoint}
  *
@@ -568,5 +569,3 @@ class AxelixScheduledTasksEndpointTest {
         }
     }
 }
-
-// TODO: Revisit this test design.
