@@ -124,9 +124,9 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
 
         for (var entry : labels.entrySet()) {
             if (entry.getValue() == null || entry.getValue().isEmpty()) {
-                serviceOperation = serviceOperation.withLabel(entry.getKey(), entry.getValue());
-            } else {
                 serviceOperation = serviceOperation.withLabel(entry.getKey());
+            } else {
+                serviceOperation = serviceOperation.withLabel(entry.getKey(), entry.getValue());
             }
         }
 
