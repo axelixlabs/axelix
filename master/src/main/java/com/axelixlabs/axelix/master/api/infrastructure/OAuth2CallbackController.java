@@ -78,6 +78,9 @@ public class OAuth2CallbackController {
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
     public ResponseEntity<?> callback(@RequestParam(required = false) String code) {
 
+        // TODO: Well, the code is actually required, but we have to throw exception manually
+        // here instead of relying on spring web binding mechanism to throw it. We need to think about it.
+        // The way it is currently implemented (required = false) can confuse the reader
         if (code == null || code.isBlank()) {
             throw new BadRequestException("The authorization code is required");
         }
