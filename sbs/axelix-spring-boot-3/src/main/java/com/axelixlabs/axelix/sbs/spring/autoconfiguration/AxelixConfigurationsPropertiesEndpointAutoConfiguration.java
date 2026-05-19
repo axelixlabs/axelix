@@ -23,9 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
@@ -88,7 +86,7 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
     @ConditionalOnMissingBean
     public RequiredAuthorityCheckService requiredAuthorityCheckService(
             SecurityContextExecutor securityContextExecutor) {
-        return new CustomRequiredAuthorityCheckService(securityContextExecutor);
+        return new RequiredAuthorityCheckService(securityContextExecutor);
     }
 
     @Bean
@@ -110,17 +108,5 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
             ConfigurationPropertiesService configurationPropertiesService) {
         return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
-    }
-
-    static class CustomRequiredAuthorityCheckService extends RequiredAuthorityCheckService {
-
-        public CustomRequiredAuthorityCheckService(SecurityContextExecutor securityContextExecutor) {
-            super(securityContextExecutor);
-        }
-
-        @Override
-        public boolean hasAuthority(DefaultAuthority requiredAuthority) throws AuthorizationException {
-            return true;
-        }
     }
 }

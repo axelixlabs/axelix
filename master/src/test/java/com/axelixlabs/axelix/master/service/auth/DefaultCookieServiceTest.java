@@ -84,7 +84,8 @@ class DefaultCookieServiceTest {
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
-        String decodedValue = new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
+        String decodedValue =
+                new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
 
         // then.
         assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {
@@ -106,7 +107,8 @@ class DefaultCookieServiceTest {
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
-        String decodedValue = new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
+        String decodedValue =
+                new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
 
         // then.
         assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {

@@ -102,6 +102,22 @@ public class TestRestTemplateBuilder {
 
         return buildWithToken(malformedToken);
     }
+
+    public TestRestTemplate withExpiredTokenInAuthHeader() {
+        String expiredToken = generateExpiredToken();
+
+        return buildWithToken(expiredToken);
+    }
+
+    public TestRestTemplate withMalformedTokenInAuthHeader() {
+        String malformedToken = "malformed token";
+
+        return buildWithToken(malformedToken);
+    }
+
+    public TestRestTemplate withoutToken() {
+        return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
+    }
     // END: Bad token auth scenarios
 
     private TestRestTemplate buildWithToken(String expiredToken) {

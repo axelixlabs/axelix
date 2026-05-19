@@ -22,13 +22,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,18 +46,16 @@ import static org.assertj.core.data.MapEntry.entry;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"management.endpoints.web.exposure.include=axelix-details"})
-@Import({
-    DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class,
-    InstanceDetailsEndpointTest.AxelixDetailsEndpointTestConfig.class
-})
-class InstanceDetailsEndpointTest {
+@Import({DefaultServiceDetailsAssemblerTestConfig.class, AxelixDetailsEndpoint.class, JwtAuthTestConfiguration.class})
+class AxelixDetailsEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Test
     void shouldReturnValidDetailsStructure() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-details", String.class);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/actuator/axelix-details", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -106,12 +107,6 @@ class InstanceDetailsEndpointTest {
         assertThatJson(responseBody).inPath("os").isObject().containsOnlyKeys("name", "version", "arch");
     }
 
-    @TestConfiguration
-    static class AxelixDetailsEndpointTestConfig {
-
-        @Bean
-        public AxelixDetailsEndpoint axelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
-            return new AxelixDetailsEndpoint(serviceDetailsAssembler);
-        }
-    }
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-details")
+    void negativeAuthTests() {}
 }

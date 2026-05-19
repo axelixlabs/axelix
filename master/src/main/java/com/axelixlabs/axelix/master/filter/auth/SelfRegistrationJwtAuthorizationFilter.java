@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 
 /**
@@ -63,7 +64,7 @@ public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        return !path.equalsIgnoreCase("/api/internal/service/register");
+        return !path.equalsIgnoreCase(WebAutoConfiguration.INTERNAL_API_PATH + "/service/register");
     }
 
     @Override
@@ -79,8 +80,9 @@ public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        User user = webIdentityAccessManager.verifyAccess(
-                request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
+        String servletPath = request.getServletPath().substring(WebAutoConfiguration.INTERNAL_API_PATH.length());
+
+        User user = webIdentityAccessManager.verifyAccess(servletPath, HttpMethod.valueOf(request.getMethod()), token);
 
         try {
             securityContextExecutor.runWithinSecurityContext(

@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

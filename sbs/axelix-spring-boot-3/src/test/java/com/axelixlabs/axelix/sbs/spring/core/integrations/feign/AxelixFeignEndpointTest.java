@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -45,6 +44,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,7 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "management.endpoints.web.exposure.include=axelix-feign")
-@Import(AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration.class)
+@Import({AxelixFeignEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
 public class AxelixFeignEndpointTest {
 
     private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION = "service-1";
@@ -70,7 +73,7 @@ public class AxelixFeignEndpointTest {
     private static final String NETWORK_ADDRESS_2 = "http://service1-api";
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplateBuilder testRestTemplate;
 
     @Test
     void shouldReturnService_WithPathInFeignAnnotation() {
@@ -176,12 +179,15 @@ public class AxelixFeignEndpointTest {
                         assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
     }
 
+    @ProtectedEndpointTests(
+            method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
+            path = "/actuator/axelix-feign")
+    void negativeAuthTests() {}
+
     private FeignIntegration getFeignIntegration(String serviceName) {
-        ResponseEntity<Set<FeignIntegration>> response = testRestTemplate.exchange(
-                "/actuator/axelix-feign",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<Set<FeignIntegration>>() {});
+        ResponseEntity<Set<FeignIntegration>> response = testRestTemplate
+                .asViewer()
+                .exchange("/actuator/axelix-feign", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 
         return response.getBody().stream()
                 .filter(integration -> serviceName.equals(integration.getServiceName()))

@@ -52,7 +52,7 @@ public class DefaultWebIdentityAccessManager implements WebIdentityAccessManager
     }
 
     @Override
-    public User verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    public User verifyAccess(String relativeRequestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException {
 
         if (token == null || token.isEmpty()) {
@@ -61,7 +61,7 @@ public class DefaultWebIdentityAccessManager implements WebIdentityAccessManager
 
         PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
 
-        Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath, requestHttpMethod);
+        Optional<Authority> requiredAuthority = authorityResolver.resolve(relativeRequestPath, requestHttpMethod);
 
         AuthorizationRequest authorizationRequest =
                 new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));

@@ -69,50 +69,32 @@ public class MasterAuthorityResolverTest {
                 // USERS_VIEW
                 Arguments.of("/users/feed", HttpMethod.GET, DefaultAuthority.USERS_VIEW),
 
-                // CACHES_TOGGLE (servlet paths include /api/external; patterns are registered without it)
-                Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/api/external/caches/i/cm/cn/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/api/external/caches/i/cm/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/api/external/caches/i/cm/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                // CACHES_TOGGLE
+                Arguments.of("/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/caches/i/cm/cn/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/caches/i/cm/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/caches/i/cm/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
                 Arguments.of("/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
 
                 // CACHES_CLEAR
-                Arguments.of("/api/external/caches/i/cache/cn", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
-                Arguments.of("/api/external/caches/i", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/caches/i/cache/cn", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/caches/i", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
 
                 // GARBAGE_COLLECTOR
-                Arguments.of(
-                        "/api/external/garbage-collector/logs/i/disable",
-                        HttpMethod.POST,
-                        DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of(
-                        "/api/external/garbage-collector/logs/i/enable",
-                        HttpMethod.POST,
-                        DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of(
-                        "/api/external/garbage-collector/i/trigger",
-                        HttpMethod.POST,
-                        DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/garbage-collector/logs/i/disable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/garbage-collector/logs/i/enable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/garbage-collector/i/trigger", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
 
                 // SCHEDULED_TASKS_MODIFY
+                Arguments.of("/scheduled-tasks/i/disable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/scheduled-tasks/i/enable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/scheduled-tasks/i/execute", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
-                        "/api/external/scheduled-tasks/i/disable",
+                        "/scheduled-tasks/i/modify/cron-expression",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
-                        "/api/external/scheduled-tasks/i/enable",
-                        HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/api/external/scheduled-tasks/i/execute",
-                        HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/api/external/scheduled-tasks/i/modify/cron-expression",
-                        HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/api/external/scheduled-tasks/i/modify/interval",
+                        "/scheduled-tasks/i/modify/interval",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY));
     }
@@ -120,12 +102,12 @@ public class MasterAuthorityResolverTest {
     private static Stream<Arguments> unmappedEndpoints() {
         return Stream.of(
                 // wrong method for known path
-                Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.GET),
-                Arguments.of("/api/external/scheduled-tasks/i/modify/cron-expression", HttpMethod.GET),
+                Arguments.of("/caches/i/cm/cn/disable", HttpMethod.GET),
+                Arguments.of("/scheduled-tasks/i/modify/cron-expression", HttpMethod.GET),
 
                 // known but public endpoints
-                Arguments.of("/api/external/caches/i", HttpMethod.GET),
-                Arguments.of("/api/external/garbage-collector/logs/i/status", HttpMethod.GET),
+                Arguments.of("/caches/i", HttpMethod.GET),
+                Arguments.of("/garbage-collector/logs/i/status", HttpMethod.GET),
 
                 // unknown endpoint
                 Arguments.of("/unknown/path", HttpMethod.POST));

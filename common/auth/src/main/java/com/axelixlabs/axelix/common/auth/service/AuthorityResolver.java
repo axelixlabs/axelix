@@ -34,13 +34,15 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 public interface AuthorityResolver {
 
     /**
-     * Resolves the required {@link Authority} for the given request requestPath.
+     * Resolves the required {@link Authority} for the given request relative path.
      *
-     * @param requestPath  the complete (i.e. not stripped) request path (e.g. "/actuator/axelix-beans").
-     * @param httpMethod   the HTTP method (e.g. {@link HttpMethod#GET}).
+     * @param relativeRequestPath  the relative request path with prefix already split. E.g. {@code /axelix-beans}
+     *                             is correct, {@code /actuator/axelix-beans} is not, {@code /beans/feed} is correct,
+     *                             {@code /api/external/beans/feed} is not.
+     * @param httpMethod           the HTTP method (e.g. {@link HttpMethod#GET}).
      *
-     * @return             an {@link Optional} containing the required {@link Authority},
-     *                     or {@link Optional#empty()} if no authority is associated with the requestPath
+     * @return                     an {@link Optional} containing the required {@link Authority},
+     *                             or {@link Optional#empty()} if no authority is associated with the relative request path
      */
-    Optional<Authority> resolve(String requestPath, HttpMethod httpMethod);
+    Optional<Authority> resolve(String relativeRequestPath, HttpMethod httpMethod);
 }

@@ -25,9 +25,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
+
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,17 +43,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(JwtAuthTestConfiguration.class)
 public class ThreadDumpManagementEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Test
     void shouldEnableThreadContentionMonitoring() {
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
         // when.
-        restTemplate.postForEntity("/actuator/axelix-thread-dump/enable", null, Void.class);
+        restTemplate.asViewer().postForEntity("/actuator/axelix-thread-dump/enable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isTrue();
@@ -57,7 +63,8 @@ public class ThreadDumpManagementEndpointTest {
     @Test
     void shouldReceiveThreadDumpJson() {
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-thread-dump", String.class);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/actuator/axelix-thread-dump", String.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -69,11 +76,14 @@ public class ThreadDumpManagementEndpointTest {
         threadMXBean.setThreadContentionMonitoringEnabled(true);
 
         // when.
-        restTemplate.postForEntity("/actuator/axelix-thread-dump/disable", null, Void.class);
+        restTemplate.asViewer().postForEntity("/actuator/axelix-thread-dump/disable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isFalse();
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-thread-dump")
+    void negativeAuthTests() {}
 
     @TestConfiguration
     static class ThreadDumpManagementEndpointTestConfiguration {

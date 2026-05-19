@@ -23,14 +23,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,10 +44,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans", "axelix.conditions.test.flag=enabled"})
+@Import(JwtAuthTestConfiguration.class)
 class AxelixConditionsEndpointTest {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplateBuilder testRestTemplate;
 
     @TestConfiguration
     static class AxelixConditionsEndpointTestConfiguration {
@@ -89,7 +93,7 @@ class AxelixConditionsEndpointTest {
 
         // when.
         ResponseEntity<ConditionsFeed> response =
-                testRestTemplate.getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-conditions", ConditionsFeed.class);
 
         // then.
         assertThat(response).isNotNull();
@@ -122,4 +126,9 @@ class AxelixConditionsEndpointTest {
                     });
                 });
     }
+
+    @ProtectedEndpointTests(
+            method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
+            path = "/actuator/axelix-conditions")
+    void negativeAuthTests() {}
 }

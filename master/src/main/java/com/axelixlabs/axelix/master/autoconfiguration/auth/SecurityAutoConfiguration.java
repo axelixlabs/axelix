@@ -163,7 +163,7 @@ public class SecurityAutoConfiguration {
                 CookieProperties cookieProperties,
                 SecurityContextExecutor securityContextExecutor) {
             return new CookieBasedJwtAuthorizationFilter(
-                cookieProperties.getAuthCookieName(), webIdentityAccessManager, securityContextExecutor);
+                    cookieProperties.getAuthCookieName(), webIdentityAccessManager, securityContextExecutor);
         }
     }
 

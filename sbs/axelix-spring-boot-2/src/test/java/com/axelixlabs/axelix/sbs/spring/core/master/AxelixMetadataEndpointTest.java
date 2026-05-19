@@ -25,13 +25,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,12 +49,13 @@ import static org.assertj.core.api.Assertions.assertThat;
     AxelixMetadataEndpointTest.CurrentConfig.class,
     DefaultServiceMetadataAssembler.class,
     CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class
+    CommitIdPluginShortBuildInfoProvider.class,
+    JwtAuthTestConfiguration.class
 })
 class AxelixMetadataEndpointTest {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplateBuilder testRestTemplate;
 
     @TestConfiguration
     static class CurrentConfig {
@@ -81,7 +85,8 @@ class AxelixMetadataEndpointTest {
     @Test
     void shouldReceiveServiceMetadata() {
         // when.
-        ResponseEntity<String> result = testRestTemplate.getForEntity("/actuator/axelix-metadata", String.class);
+        ResponseEntity<String> result =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metadata", String.class);
 
         // then.
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
@@ -105,4 +110,7 @@ class AxelixMetadataEndpointTest {
                         + "  \"vmFeatures\": []\n"
                         + "}");
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metadata")
+    void negativeAuthTests() {}
 }

@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +45,10 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,19 +65,20 @@ import static org.assertj.core.api.Assertions.assertThat;
     DefaultServiceMetricsGroupsAssembler.class,
     BaseUnitParser.class,
     KilobytesMemoryBaseUnitValueTransformer.class,
-    BytesMemoryBaseUnitValueTransformer.class
+    BytesMemoryBaseUnitValueTransformer.class,
+    JwtAuthTestConfiguration.class
 })
 class AxelixMetricsEndpointTest {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplateBuilder testRestTemplate;
 
     @Test
     void shouldProduceOnlyValidCombinationsOfTags() {
         // when.
         String metricName = "jvm.memory.max";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -114,7 +118,7 @@ class AxelixMetricsEndpointTest {
         // when.
         String metricName = "for.value.transformations";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -130,7 +134,7 @@ class AxelixMetricsEndpointTest {
         // when.
         String metricName = "jvm.gc.overhead";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -145,7 +149,7 @@ class AxelixMetricsEndpointTest {
     void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
         // when.
         ResponseEntity<MetricsGroupsFeed> response =
-                testRestTemplate.getForEntity("/actuator/axelix-metrics", MetricsGroupsFeed.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-metrics", MetricsGroupsFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -194,6 +198,9 @@ class AxelixMetricsEndpointTest {
                         "standalone",
                         "Test metric belonging to the 'Others' group without a prefix and with a description"));
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-metrics")
+    void negativeAuthTests() {}
 
     @TestConfiguration
     static class AxelixMetricsEndpointTestConfiguration {

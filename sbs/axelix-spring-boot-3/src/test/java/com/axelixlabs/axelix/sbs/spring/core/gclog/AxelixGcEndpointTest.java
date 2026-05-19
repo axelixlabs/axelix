@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
@@ -39,15 +38,20 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpointTest.AxelixGcEndpointTestTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(AxelixGcEndpointTest.AxelixGcEndpointTestTestConfiguration.class)
+@Import({AxelixGcEndpointTestTestConfiguration.class, JwtAuthTestConfiguration.class})
 class AxelixGcEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private GcLogService gcLogService;
@@ -66,8 +70,9 @@ class AxelixGcEndpointTest {
 
     @Test
     void status_shouldReturnCurrentStatus() {
+        // User with the VIEWER role has the authority to view the gc log status.
         ResponseEntity<GcLogStatusResponse> response =
-                restTemplate.getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
+                restTemplate.asViewer().getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -85,7 +90,7 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> response =
-                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
+                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -100,12 +105,12 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
+                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         ResponseEntity<Void> disableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gc/log/disable", null, Void.class);
+                restTemplate.asAdmin().postForEntity("/actuator/axelix-gc/log/disable", null, Void.class);
 
         assertThat(disableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -120,14 +125,15 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
+                restTemplate.asAdmin().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         System.gc();
         Thread.sleep(500);
 
-        ResponseEntity<byte[]> response = restTemplate.getForEntity("/actuator/axelix-gc/log/file", byte[].class);
+        ResponseEntity<byte[]> response =
+                restTemplate.asEditor().getForEntity("/actuator/axelix-gc/log/file", byte[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -137,7 +143,7 @@ class AxelixGcEndpointTest {
     @Test
     void triggerGc_shouldTriggerGarbageCollection() {
         ResponseEntity<Void> response =
-                restTemplate.postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
+                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
 
         // Cannot assert GC happened, but endpoint should respond
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -148,14 +154,17 @@ class AxelixGcEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest("invalid-level");
 
         ResponseEntity<String> response =
-                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", request, String.class);
+                restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-gc/log/status")
+    void negativeAuthTests() {}
+
     private GcLogStatusResponse getStatus() {
         ResponseEntity<GcLogStatusResponse> response =
-                restTemplate.getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
+                restTemplate.asEditor().getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
 
         return response.getBody();
     }

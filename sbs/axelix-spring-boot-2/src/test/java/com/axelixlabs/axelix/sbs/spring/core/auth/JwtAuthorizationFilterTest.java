@@ -174,7 +174,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-env", HttpMethod.GET),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
     }
 

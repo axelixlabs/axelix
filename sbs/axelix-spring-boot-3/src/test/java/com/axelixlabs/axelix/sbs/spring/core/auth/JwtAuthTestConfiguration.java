@@ -69,7 +69,7 @@ public class JwtAuthTestConfiguration {
 
     @Bean
     public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver("/actuator", (pathTemplate, actualPath) -> {
+        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
             return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });

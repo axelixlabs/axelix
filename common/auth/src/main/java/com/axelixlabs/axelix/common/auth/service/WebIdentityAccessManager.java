@@ -38,10 +38,10 @@ public interface WebIdentityAccessManager {
      * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.
      * In case access is granted, the method returns the user identified by the bearer access token has been granted access.
      *
-     * @param requestPath       the complete (i.e. not stripped) context path of the request,
-     *                          e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
-     * @param requestHttpMethod the HTTP method of the request.
-     * @param token             the Bearer access token of the user.
+     * @param relativeRequestPath the relative path of the request with prefix like (/api/external or /actuator) being
+     *                            already stripped. e.g. it is expected to be {@code /beans/feed} or {@code /axelix-beans}.
+     * @param requestHttpMethod   the HTTP method of the request.
+     * @param token               the Bearer access token of the user.
      *
      * @return the user that was granted access.
      *
@@ -49,6 +49,6 @@ public interface WebIdentityAccessManager {
      * @throws JwtProcessingException in case the implementation is unable to verify the validity
      *                                of the token or if the token is deemed invalid.
      */
-    User verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    User verifyAccess(String relativeRequestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException;
 }
