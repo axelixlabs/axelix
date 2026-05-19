@@ -78,8 +78,7 @@ public class OAuth2CallbackController {
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
     public ResponseEntity<?> callback(@RequestParam(required = false) String code) {
 
-        // TODO: handle it better
-        if (code == null) {
+        if (code == null || code.isBlank()) {
             throw new BadRequestException("The authorization code is required");
         }
 
