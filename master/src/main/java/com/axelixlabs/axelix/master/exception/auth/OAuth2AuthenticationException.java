@@ -18,18 +18,18 @@
 package com.axelixlabs.axelix.master.exception.auth;
 
 /**
- * Exception thrown when the authorization code exchange with the OIDC provider fails.
+ * The exception that happened during the OAuth2/OIDC authentication flow.
  *
- * @since 04.03.2026
+ * @since 19.05.26
  * @author Nikita Kirillov
  */
-public class OidcTokenExchangeException extends OAuth2AuthenticationException {
+public class OAuth2AuthenticationException extends RuntimeException {
 
-    public OidcTokenExchangeException(String message) {
+    public OAuth2AuthenticationException(String message) {
         super(message);
     }
 
-    public OidcTokenExchangeException(String message, Throwable cause) {
+    public OAuth2AuthenticationException(String message, Throwable cause) {
         super(message, cause);
     }
 }

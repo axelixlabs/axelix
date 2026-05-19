@@ -24,7 +24,7 @@ package com.axelixlabs.axelix.master.exception.auth;
  * @since 04.03.2026
  * @author Nikita Kirillov
  */
-public class OidcMetadataUnavailableException extends RuntimeException {
+public class OidcMetadataUnavailableException extends OAuth2AuthenticationException {
 
     public OidcMetadataUnavailableException(String issuerUri) {
         super("OIDC metadata is unavailable from: " + issuerUri);

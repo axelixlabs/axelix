@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
@@ -143,6 +144,7 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn400WhenCodeParamMissing() {
+        // when.
         ResponseEntity<Void> response =
                 restTemplate.getForEntity("http://localhost:" + port + "/api/external/oauth2/callback", Void.class);
 
@@ -153,9 +155,11 @@ class OAuth2CallbackControllerTest {
     void shouldReturn401WhenCodeExchangeFails() {
         when(oidcClient.exchangeCodeForTokens(CODE)).thenThrow(new OidcTokenExchangeException("exchange failed"));
 
+        // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
@@ -165,10 +169,26 @@ class OAuth2CallbackControllerTest {
         when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN))
                 .thenThrow(new InvalidJwtTokenException("invalid token"));
 
+        // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldReturn502WhenUserInfoEndpointUnavailable() {
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(new Tokens(ID_TOKEN, "access-token"));
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN))
+                .thenThrow(new OidcMetadataUnavailableException("metadata unavailable"));
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
     }
 
     private static @NonNull String findCookie(List<String> cookies, String s) {
