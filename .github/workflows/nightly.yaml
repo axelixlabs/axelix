@@ -22,6 +22,6 @@ jobs:
         run: |
           ./gradlew clean \
           :sbs:axelix-spring-boot-3:concurrencyTest \
-          :sbs:starter-domain \
+          :sbs:starter-domain:concurrencyTest \
           --no-build-cache \
           --no-configuration-cache
