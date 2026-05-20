@@ -1,0 +1,49 @@
+<svg
+  viewBox="0 0 220 60"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.2"
+  stroke-linecap="round"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g
+    stroke="currentColor"
+    style="color: color-mix(in srgb, var(--axelix-green-500) 35%, transparent)"
+  >
+    <path d="M30 30 L80 12" />
+    <path d="M30 30 L80 30" />
+    <path d="M30 30 L80 48" />
+    <path d="M80 12 L140 12" />
+    <path d="M80 30 L140 30" />
+    <path d="M80 30 L140 48" />
+    <path d="M140 12 L190 22" />
+    <path d="M140 30 L190 38" />
+  </g>
+  <g
+    fill="#F4F4F6"
+    stroke="currentColor"
+    style="color: var(--axelix-green-600)"
+  >
+    <circle cx="30" cy="30" r="5" />
+    <circle cx="80" cy="12" r="4" />
+    <circle cx="80" cy="30" r="4" />
+    <circle
+      cx="80"
+      cy="48"
+      r="4"
+      style="color: #bbb"
+      stroke-dasharray="2 2"
+    />
+    <circle cx="140" cy="12" r="4" />
+    <circle cx="140" cy="30" r="4" />
+    <circle
+      cx="140"
+      cy="48"
+      r="4"
+      style="color: #bbb"
+      stroke-dasharray="2 2"
+    />
+    <circle cx="190" cy="22" r="4" />
+    <circle cx="190" cy="38" r="4" />
+  </g>
+</svg>

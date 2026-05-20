@@ -1,8 +1,10 @@
-export { Installation } from "./Installation";
-export { FirstSection } from "./FirstSection";
-export { WhatCanDo } from "./WhatCanDo";
-export { Header } from "./Header";
+export { Capabilities } from "./Capabilities";
+export { Enterprise } from "./Enterprise";
+export { Install } from "./Install";
+export { Problem } from "./Problem";
 export { Footer } from "./Footer";
-export { Zigzag } from "./Zigzag";
-export { Copy } from "./Copy";
+export { Header } from "./Header";
+export { Strip } from "./Strip";
+export { Hero } from "./Hero";
+export { Logo } from "./Logo";
 export { FAQ } from "./FAQ";

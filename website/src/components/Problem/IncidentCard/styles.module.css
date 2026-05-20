@@ -1,0 +1,200 @@
+.Incident {
+  border-radius: 16px;
+  background-color: color-mix(in srgb, #0a1c04 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.Ih {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  color: #bdd3a0;
+  text-transform: uppercase;
+}
+
+.Lhs {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.Dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff6b4a;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff6b4a 22%, transparent);
+  animation: pulse 1.6s infinite;
+}
+
+.Sev {
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #ff9c80;
+  background-color: color-mix(in srgb, #ff6b4a 14%, transparent);
+  border: 1px solid color-mix(in srgb, #ff6b4a 32%, transparent);
+  letter-spacing: .06em;
+}
+
+.Rhs {
+  color: #a3b88a;
+  letter-spacing: .06em;
+}
+
+.Tl {
+  position: relative;
+  padding-block: 8px 24px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 114px;
+    top: 18px;
+    bottom: 18px;
+    width: 1px;
+    background-color: color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
+  }
+
+  @media (width <=540px) {
+    &::before {
+      left: 64px;
+    }
+  }
+}
+
+.TlRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 24px;
+  padding: 14px 22px 14px 18px;
+  align-items: start;
+  
+  & .T {
+    font-family: var(--axelix-mono);
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: #a3b88a;
+    padding-top: 2px;
+    text-align: right;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 110px;
+    top: 20px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-900);
+    border: 1.5px solid color-mix(in srgb, var(--axelix-green-400) 60%, transparent);
+  }
+
+  &.Hit {
+    &::before {
+      background-color: var(--axelix-green-400);
+      border-color: var(--axelix-green-400);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+    }
+  }
+
+  & .Event {
+    padding-left: 24px;
+
+    & h4 {
+      margin: 0;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 1.4;
+      color: #f0f4e6;
+      letter-spacing: -0.005em;
+
+      & code {
+        font-family: var(--axelix-mono);
+        font-size: 14px;
+        padding: 1px 6px;
+        border-radius: 4px;
+        background-color: color-mix(in srgb, var(--axelix-green-500) 18%, transparent);
+        color: #d9ebbf;
+        border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
+      }
+
+      & em {
+        font-style: normal;
+        font-weight: 500;
+        color: #fff;
+      }
+    }
+  }
+
+  @media (width <=540px) {
+    grid-template-columns: 54px 1fr;
+    gap: 14px;
+    padding: 14px 18px;
+
+    &::before {
+      left: 60px;
+    }
+
+    & .Event {
+      padding-left: 16px;
+    }
+  }
+}
+
+
+.Blocked {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  letter-spacing: .04em;
+  color: #ff9c80;
+
+  &::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: repeating-linear-gradient(45deg, #ff6b4a 0 2px, transparent 2px 4px);
+  }
+
+  &.Ok {
+    color: #bde08f;
+
+    &::before {
+      background-color: var(--axelix-green-400);
+    }
+  }
+}
+
+
+.Iff {
+  padding: 14px 22px;
+  border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  color: #a3b88a;
+  letter-spacing: .06em;
+
+  & b {
+    color: #e7eee0;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    font-family: var(--axelix-font);
+    font-size: 13px;
+  }
+}

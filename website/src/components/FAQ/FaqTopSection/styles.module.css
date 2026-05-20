@@ -1,0 +1,64 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    column-gap: 65px;
+    align-items: end;
+    margin-bottom: 55px;
+}
+
+.Eyebrow {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--axelix-green-700);
+    padding: 4px 12px;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--axelix-green-100) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
+    margin-bottom: 24px;
+}
+
+.Eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-500);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+}
+
+.Title {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    color: var(--axelix-ink);
+}
+
+.UnderlinedText {
+    background-image: linear-gradient(var(--axelix-green-500), var(--axelix-green-500));
+    background-position: 0 92%;
+    background-repeat: no-repeat;
+    background-size: 100% 6px;
+    padding-bottom: 2px;
+}
+
+.Intro {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--axelix-ink-3);
+    max-width: 420px;
+}
+
+@media (width <=980px) {
+    .MainWrapper {
+        grid-template-columns: 1fr;
+        column-gap: 30px;
+    }
+}
