@@ -1,7 +1,7 @@
 import {
   Capabilities,
   Enterprise,
-  Faq,
+  FAQ,
   Hero,
   Install,
   Problem,
@@ -17,7 +17,7 @@ export default function Page() {
       <Capabilities />
       <Install />
       <Enterprise />
-      <Faq />
+      <FAQ />
     </>
   );
 }

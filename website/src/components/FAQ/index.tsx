@@ -3,6 +3,8 @@
 import { PlusIcon } from "@/assets";
 import { useState, type ReactNode } from "react";
 import styles from "./styles.module.css";
+import { FAQFooter } from "./FAQFooter";
+import { FAQTopSection } from "./FAQTopSection";
 
 type Item = { q: string; a: ReactNode };
 
@@ -13,7 +15,7 @@ const ITEMS: Item[] = [
       <p>
         The open-source console for debugging, observing and operating Spring
         Boot microservices in production. <em>Every capability is exposed
-        twice</em> — to engineers through a web console, and to AI agents
+          twice</em> — to engineers through a web console, and to AI agents
         through an embedded MCP server. A single role model gates both.
       </p>
     ),
@@ -73,24 +75,13 @@ const ITEMS: Item[] = [
   },
 ];
 
-export const Faq = () => {
+export const FAQ = () => {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section className={styles.Faq} id="faq">
       <div className={`wrap ${styles.Wrap}`}>
-        <div className={styles.Header}>
-          <div>
-            <span className={styles.Eyebrow}>FAQ</span>
-            <h2 className={styles.H2}>
-              Questions, <span className={styles.Stroke}>answered.</span>
-            </h2>
-          </div>
-          <p className={styles.Intro}>
-            Everything you&apos;d ask before pointing a console at your fleet
-            — license, safety, platform support, and what&apos;s next.
-          </p>
-        </div>
+        <FAQTopSection />
 
         <ol className={styles.List}>
           {ITEMS.map((it, i) => {
@@ -118,20 +109,7 @@ export const Faq = () => {
           })}
         </ol>
 
-        <div className={styles.ContactCard}>
-          <div>
-            <span className={styles.Label}>Still curious?</span>
-            <h3>Reach the team — we reply within a working day.</h3>
-            <p>
-              Architectural questions, production-readiness checks, enterprise
-              pilots. Anything not answered above is the kind of thing we like
-              answering directly.
-            </p>
-          </div>
-          <a href="mailto:hello@axelix.io" className={styles.Cta}>
-            hello@axelix.io <span className={styles.Arr}>→</span>
-          </a>
-        </div>
+        <FAQFooter />
       </div>
     </section>
   );

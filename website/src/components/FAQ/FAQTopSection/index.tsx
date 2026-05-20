@@ -1,6 +1,6 @@
 import styles from "./styles.module.css";
 
-export const FaqTopSection = () => {
+export const FAQTopSection = () => {
     return (
         <div className={styles.MainWrapper}>
             <div>
