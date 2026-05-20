@@ -1,7 +1,3 @@
----
-sidebar_position: 12
----
-
 # Garbage Collector
 
 We provide convenient access to `Garbage Collector` logs in the Spring Boot application.
@@ -17,7 +13,7 @@ The “Enable GC Logging” option allows you to do this.
 ---
 
 
-## Garbage Collector Details{#details}
+## Garbage Collector Details
 After enabling Garbage Collector logging, you can select the logging level:
 - INFO
 - WARNING

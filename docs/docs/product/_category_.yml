@@ -1,0 +1,22 @@
+# label    : display name of the category as shown in the sidebar header
+#            and the breadcrumb trail. Overrides the default that would be
+#            inferred from the folder name.
+label: Product
+
+# position : sort order of this category among its siblings inside the
+#            parent sidebar. Lower numbers appear first. Equivalent to
+#            `sidebar_position` frontmatter on docs.
+position: 1
+
+# collapsed: whether the category renders collapsed by default in the
+#            sidebar. `false` keeps it expanded on first render.
+collapsed: false
+
+# link     : what clicking the category header does in the sidebar.
+link:
+  # type   : `doc` jumps to a specific document (set its id below);
+  #          `generated-index` would build an auto-generated landing page.
+  type: doc
+  # id     : the doc identifier (folder-relative path without `.md`).
+  #          Required when `type: doc`.
+  id: product/introduction

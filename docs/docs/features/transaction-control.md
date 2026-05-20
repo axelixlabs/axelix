@@ -1,7 +1,3 @@
----
-sidebar_position: 10
----
-
 # Transaction Control
 
 The `Transaction Control` page provides access to metrics describing transaction duration in the Spring Boot application.
@@ -17,7 +13,7 @@ information. It includes search functionality for easier navigation and a counte
 
 ---
 
-## Transaction Control Details {#details}
+## Transaction Control Details
 ![scheduled tasks details page](../../static/img/feature/transaction/transaction-details-page.png)
 ***Transaction Details as presented in Axelix UI***
 

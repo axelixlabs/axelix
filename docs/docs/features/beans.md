@@ -1,7 +1,3 @@
----
-sidebar_position: 5
----
-
 # Beans
 
 The **Beans** page provides comprehensive visibility into all Spring beans within your managed applications.
@@ -12,7 +8,7 @@ This page displays every active bean with its metadata in an interactive.
 A scrollable list displaying all active beans in the application, organized with expandable dropdowns
 and a search function for easy navigation.
 
-## Bean Scope Color Indicator (Right side){#scope}
+## Bean Scope Color Indicator (Right side)
 A prominent, framed section on the right side that displays the scope of the currently selected bean, such as:
 - **Singleton**
 - **Prototype**
@@ -24,7 +20,7 @@ A prominent, framed section on the right side that displays the scope of the cur
 - **Custom scopes** (User custom scopes)
 ---
 
-## Bean Details Dropdown{#details}
+## Bean Details Dropdown
 When you expand any bean in the list, a detailed dropdown reveals extended information about that specific bean.
 ![beans dropdown page](../../static/img/feature/beans/beans-dropdown-page.png)
 ***Bean dropdown page as presented in Axelix UI***
@@ -66,9 +62,10 @@ is located under the name Bean)
         - Usually beans registered programmatically via `BeanDefinitionRegistry`
 ---
 
-## Interactive Features{#interactive}
 
-### Navigation Icons & Quick Actions{#navigation}
+## Interactive Features
+
+### Navigation Icons & Quick Actions
 The Beans page includes interactive icons that provide quick access to related functionality.\
 
 Example: redirect icon - ![redirect icon](../../static/img/feature/icons/redirect-icon.png)

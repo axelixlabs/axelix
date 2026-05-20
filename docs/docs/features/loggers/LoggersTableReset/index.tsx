@@ -1,5 +1,5 @@
 /* TODO: Make some improvs in future*/
-import styles from './styles.module.css'
+import styles from '../_LoggersTables.module.css'
 
 export const LoggersTableReset = () => {
   return (

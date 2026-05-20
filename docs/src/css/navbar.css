@@ -1,0 +1,249 @@
+/*
+ * Navbar — Prisma-style two-row header.
+ *
+ * Row 1 (56px): logo + "/docs" mono breadcrumb on the left,
+ *               Blog + GitHub + theme toggle on the right.
+ * Row 2 (40px): tab links (Get Started, UI Guide, Features...)
+ *               with an underline indicator for the active tab.
+ *
+ * Implementation: flex with wrap on `.navbar__inner`, a zero-height
+ * pseudo break forces the tabs onto the second line. The Docusaurus
+ * `.navbar__items` left container uses `display: contents` so its
+ * children participate directly in the outer flex order.
+ */
+
+.navbar {
+  background: var(--axelix-bg);
+  border-bottom: 1px solid var(--axelix-border);
+  height: var(--axelix-navbar-height);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: none;
+}
+
+.navbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: flex-start;
+  align-self: center;
+  width: 100%;
+  max-width: var(--axelix-layout-max);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+}
+
+/* Promote the left items' children (brand + tabs) into the outer flex flow. */
+.navbar__items:not(.navbar__items--right) {
+  display: contents;
+}
+
+.navbar__brand {
+  order: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--axelix-navbar-row-1);
+  margin: 0;
+}
+
+.navbar__logo {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navbar__logo img {
+  height: 100%;
+  width: auto;
+}
+
+/* Right cluster sits on the top row, pushed to the end (Prisma: gap-2). */
+.navbar__items--right {
+  order: 2;
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--axelix-navbar-row-1);
+}
+
+/* Force a row break between the brand row and the tabs row. */
+.navbar__inner::after {
+  content: '';
+  order: 3;
+  flex-basis: 100%;
+  height: 0;
+}
+
+/* Tab links — chip-shape with fill on active.
+ * Anchored to the bottom of row 2; the cluster is horizontally centered via
+ * margin-auto on the first/last tab. Snapshots of prior variants live in
+ * `navbar-axl.md`.
+ */
+.navbar__tab {
+  order: 4;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 8px 4px 0;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--axelix-fg-muted);
+  white-space: nowrap;
+  background: transparent;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Center the tab cluster on row 2: push first tab right, last tab left. */
+.navbar__brand + .navbar__tab {
+  margin-left: auto;
+}
+.navbar__tab:last-of-type {
+  margin-right: auto;
+}
+
+.navbar__tab:hover {
+  color: var(--axelix-fg);
+  background-color: var(--axelix-bg-subtle);
+  text-decoration: none;
+}
+
+.navbar__tab.navbar__link--active,
+.navbar__tab[aria-current='page'] {
+  color: var(--axelix-active-fg);
+  background-color: var(--axelix-active-bg);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .navbar__tab.navbar__link--active,
+[data-theme='dark'] .navbar__tab[aria-current='page'] {
+  background-color: var(--axelix-active-bg);
+}
+
+/* On blog routes there are no section tabs; collapse the navbar to a single row. */
+html.plugin-blog .navbar__tab,
+html.plugin-blog .navbar__inner::after {
+  display: none;
+}
+
+html.plugin-blog .navbar {
+  height: var(--axelix-navbar-row-1);
+}
+
+
+/* Pill buttons in the navbar (Docs, Blog, GitHub).
+ *   outline (default) : transparent bg, bordered, hover → tinted bg
+ *   primary           : solid dark bg, used by GitHub
+ */
+.navbar__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 36px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--axelix-border);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--axelix-fg);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.navbar__pill:not(.navbar__pill--primary):hover {
+  color: var(--axelix-active-fg);
+  background-color: var(--axelix-hover-bg);
+  border-color: var(--axelix-border-strong);
+  text-decoration: none;
+}
+
+[data-theme='dark'] .navbar__pill:not(.navbar__pill--primary):hover {
+  background-color: var(--axelix-hover-bg);
+}
+
+.navbar__pill--primary {
+  color: var(--axelix-bg);
+  background-color: var(--axelix-fg);
+  border-color: var(--axelix-fg);
+}
+
+.navbar__pill--primary:hover {
+  color: var(--axelix-bg);
+  background-color: var(--axelix-fg);
+  border-color: var(--axelix-fg);
+  opacity: 0.85;
+}
+
+.navbar-sidebar {
+  background: var(--axelix-bg);
+}
+
+/* Mobile: collapse to a single 56px row; tabs slide into the burger drawer. */
+@media (max-width: 996px) {
+  .navbar {
+    height: 56px;
+    flex-direction: row;
+  }
+  .navbar__inner {
+    flex-wrap: nowrap;
+    padding: 0 1rem;
+    height: 56px;
+  }
+  .navbar__inner::after {
+    display: none;
+  }
+  .navbar__items:not(.navbar__items--right) {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .navbar__tab {
+    order: initial;
+    height: auto;
+    padding: 0.5rem 0.75rem;
+    margin: 0;
+    border-bottom: none;
+  }
+  .navbar__brand {
+    height: auto;
+    order: initial;
+  }
+  .navbar__items--right {
+    height: auto;
+    order: initial;
+  }
+}
+
+/* Hide Docusaurus's auto-appended external-link glyph inside pill buttons —
+ * the GitHub mark is already provided by `.header-github-link::before`. */
+.navbar__pill svg[class*='iconExternalLink_'] {
+  display: none;
+}
+
+/* GitHub primary pill — inject the GitHub mark via `::before` so the
+ * Docusaurus anchor stays `<a class="…">GitHub</a>` (no custom HTML). */
+.header-github-link::before {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask-image: url('/icons/github.svg');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}

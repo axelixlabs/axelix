@@ -1,0 +1,143 @@
+/*
+ * Design tokens — must load before all other component stylesheets.
+ * Light theme is defined on :root; dark variants on [data-theme='dark'].
+ * Mobile :root tweaks (navbar height) live at the bottom.
+ */
+
+:root {
+  /* Axelix green palette (preserved) */
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+
+  /* Prisma-inspired neutral surfaces */
+  --axelix-bg: #ffffff;
+  --axelix-bg-subtle: #f7fafc;
+  --axelix-bg-elevated: #ffffff;
+  --axelix-fg: #0f172a;
+  --axelix-fg-muted: #475569;
+  --axelix-fg-subtle: #64748b;
+  --axelix-border: #e2e8f0;
+  --axelix-border-strong: #cbd5e1;
+  --axelix-accent-tint: #e8f5ee;
+  --axelix-active-bg: #d3ebdb;
+  --axelix-active-fg: #5cac57;
+  --axelix-hover-bg: #e9f6ee;
+  --axelix-code-bg: #f8fafc;
+  --axelix-code-border: #e2e8f0;
+  --axelix-kbd-bg: #f1f5f9;
+
+  /* Status colors — used by admonitions (info / warning / danger).
+   * Defined here so dark-mode tuning has a single place to override. */
+  --axelix-color-info: #0ea5e9;
+  --axelix-color-warning: #f59e0b;
+  --axelix-color-danger: #ef4444;
+
+  /* Layout proportions (mirrors Prisma) */
+  --axelix-navbar-height: 96px;
+  --axelix-navbar-row-1: 56px;
+  --axelix-navbar-row-2: 40px;
+  --axelix-sidebar-width: 268px;
+  --doc-sidebar-width: 268px;
+  --axelix-toc-width: 240px;
+  --axelix-content-max: 820px;
+  --axelix-layout-max: 1600px;
+  --axelix-radius: 8px;
+  --axelix-radius-sm: 6px;
+
+  /* Docusaurus overrides */
+  --ifm-font-family-base: 'Golos Text', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-font-weight: 700;
+  --ifm-h1-font-size: 2.5rem;
+  --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.3rem;
+  --ifm-code-font-size: 0.9em;
+  --ifm-code-padding-horizontal: 0.35em;
+  --ifm-code-padding-vertical: 0.15em;
+  --ifm-code-background: var(--axelix-code-bg);
+  --ifm-code-border-radius: 4px;
+  --ifm-pre-background: var(--axelix-code-bg);
+  --ifm-pre-padding: 1rem 1.25rem;
+  --ifm-navbar-background-color: var(--axelix-bg);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: var(--axelix-navbar-height);
+  --ifm-navbar-link-color: var(--axelix-fg);
+  --ifm-navbar-link-hover-color: var(--ifm-color-primary);
+  --ifm-toc-border-color: transparent;
+  --ifm-toc-link-color: var(--axelix-fg-muted);
+  --ifm-background-color: var(--axelix-bg);
+  --ifm-background-surface-color: var(--axelix-bg);
+  --ifm-color-content: var(--axelix-fg);
+  --ifm-color-content-secondary: var(--axelix-fg-muted);
+  --ifm-link-color: var(--ifm-color-primary);
+  --ifm-link-hover-color: var(--ifm-color-primary-darker);
+  --ifm-link-decoration: none;
+  --ifm-link-hover-decoration: underline;
+  --ifm-menu-color: var(--axelix-fg-muted);
+  --ifm-menu-color-active: var(--ifm-color-primary);
+  --ifm-menu-color-background-active: transparent;
+  --ifm-menu-color-background-hover: rgba(15, 23, 42, 0.04);
+  --ifm-menu-link-padding-vertical: 0.4rem;
+  --ifm-menu-link-padding-horizontal: 0.75rem;
+  --ifm-hr-background-color: var(--axelix-border);
+  --ifm-table-border-color: var(--axelix-border);
+  --ifm-table-stripe-background: var(--axelix-bg-subtle);
+  --docusaurus-highlighted-code-line-bg: rgba(46, 133, 85, 0.12);
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+
+  --axelix-bg: #131420;
+  --axelix-bg-subtle: #111827;
+  --axelix-bg-elevated: #131420;
+  --axelix-fg: #f8fafc;
+  --axelix-fg-muted: #cbd5e1;
+  --axelix-fg-subtle: #94a3b8;
+  --axelix-border: #1f2937;
+  --axelix-border-strong: #334155;
+  --axelix-accent-tint: rgba(37, 194, 160, 0.12);
+  --axelix-active-bg: rgba(34, 197, 94, 0.18);
+  --axelix-active-fg: var(--ifm-color-primary-lighter);
+  --axelix-hover-bg: rgba(34, 197, 94, 0.18);
+  --axelix-code-bg: #0f172a;
+  --axelix-code-border: #1f2937;
+  --axelix-kbd-bg: #1f2937;
+
+  --ifm-background-color: var(--axelix-bg);
+  --ifm-background-surface-color: var(--axelix-bg);
+  --ifm-navbar-background-color: var(--axelix-bg);
+  --ifm-navbar-link-color: var(--axelix-fg);
+  --ifm-color-content: var(--axelix-fg);
+  --ifm-color-content-secondary: var(--axelix-fg-muted);
+  --ifm-toc-link-color: var(--axelix-fg-muted);
+  --ifm-menu-color: var(--axelix-fg-muted);
+  --ifm-menu-color-background-hover: rgba(248, 250, 252, 0.05);
+  --ifm-code-background: var(--axelix-code-bg);
+  --ifm-pre-background: var(--axelix-code-bg);
+  --ifm-hr-background-color: var(--axelix-border);
+  --ifm-table-border-color: var(--axelix-border);
+  --ifm-table-stripe-background: var(--axelix-bg-subtle);
+  --docusaurus-highlighted-code-line-bg: rgba(37, 194, 160, 0.18);
+}
+
+/* Mobile token override — navbar collapses to a single row. */
+@media (max-width: 996px) {
+  :root {
+    --axelix-navbar-height: 56px;
+  }
+}

@@ -1,0 +1,86 @@
+/*
+ * Sidebar — Docusaurus's left navigation menu.
+ * Includes the container, the menu list and links, active/hover states,
+ * and the Prisma-style vertical guide line for nested groups.
+ */
+
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--axelix-border) !important;
+  background: var(--axelix-bg);
+}
+
+aside.theme-doc-sidebar-container > div:first-child {
+  width: var(--axelix-sidebar-width);
+}
+
+.theme-doc-sidebar-menu {
+  padding: 1.25rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Top-level (root) items — normal weight. */
+.menu__list > .menu__list-item > .menu__link,
+.menu__list > .menu__list-item > .menu__list-item-collapsible > .menu__link {
+  font-weight: 400;
+  color: var(--axelix-fg);
+  font-size: 0.92rem;
+  letter-spacing: -0.005em;
+}
+
+/* All menu links */
+.menu__link {
+  border-radius: var(--axelix-radius-sm);
+  font-weight: 400;
+  line-height: 1.45;
+  padding: 0.4rem 0.75rem;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.menu__link:hover {
+  background-color: var(--ifm-menu-color-background-hover);
+  color: var(--axelix-fg);
+}
+
+.menu__list .menu__list-item .menu__link--active,
+.menu__list .menu__list-item .menu__link--active:hover {
+  color: var(--axelix-active-fg);
+  background-color: var(--axelix-active-bg);
+  font-weight: 400;
+}
+
+[data-theme='dark'] .menu__list .menu__list-item .menu__link--active,
+[data-theme='dark'] .menu__list .menu__list-item .menu__link--active:hover {
+  background-color: var(--axelix-active-bg);
+}
+
+/* Vertical guide line for nested groups — Prisma's hallmark. */
+.menu__list .menu__list {
+  margin-left: 0.85rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--axelix-border);
+  position: relative;
+}
+
+[data-theme='dark'] .menu__list .menu__list {
+  border-left-color: var(--axelix-border);
+}
+
+/* Caret on collapsibles — keep on right, restyle. */
+.menu__caret,
+.menu__link--sublist-caret::after {
+  opacity: 0.6;
+}
+
+.menu__caret:hover,
+.menu__link--sublist-caret:hover::after {
+  opacity: 1;
+}
+
+.menu__list-item:not(:first-child) {
+  margin-top: 1px;
+}
+
+/* Small gap between top-level groups. */
+.menu__list > .menu__list-item + .menu__list-item {
+  margin-top: 2px;
+}

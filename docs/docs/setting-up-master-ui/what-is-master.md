@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 # What is Master?
 
 Axelix Master (or simply "Master") is the central hub of the Axelix ecosystem, application with enhanced capabilities for managing and monitoring Spring Boot applications across various environments.

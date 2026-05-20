@@ -1,7 +1,3 @@
----
-sidebar_position: 7
----
-
 # Scheduled Tasks
 The “Scheduled Tasks” page provides access to all tasks annotated with `@Scheduled` within a Spring Boot application.
 You can also update the task status, modify its schedule, and trigger it manually when required.
@@ -14,9 +10,9 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ---
 
-## Scheduled Tasks Details{#details}
+## Scheduled Tasks Details
 
-### Cron{#cron}    
+### Cron
 ![cron expression page details](../../static/img/feature/scheduled-tasks/cron-expression-page-details.png)
 ***Scheduled Tasks as presented in Axelix UI***
 
@@ -28,7 +24,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
                                 the target. (See **Interactive Features**)
 - **Run**:                      Forces immediate execution of the task. (See **Interactive Features**)
 
-### Fixed delay{#fixed-delay} 
+### Fixed delay
 ![fixed rate page details](../../static/img/feature/scheduled-tasks/fixed-rate-page-details.png)
 ***Scheduled Tasks as presented in Axelix UI***
 
@@ -41,7 +37,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
                                 the target. (See **Interactive Features**)
 - **Run**:                      Forces immediate execution of the task. (See **Interactive Features**)
 
-### Fixed rate{#fixed-rate}  
+### Fixed rate
 ![fixed delay page details](../../static/img/feature/scheduled-tasks/fixed-delay-page-details.png)
 ***Scheduled Tasks as presented in Axelix UI***
 
@@ -56,20 +52,22 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ---
 
-## Interactive Features{#interactive}
+## Interactive Features
 
-### Run{#run}
+### Run
 We provide the ability to trigger a task manually without affecting its schedule. To do so, simply click <img src="/img/feature/icons/play-icon.png" alt="play-icon" width="20" height="20"/>, 
 and the task will be executed immediately.
 
-### Interval/Cron expression{#modify}
+<a id="modify"></a>
+
+### Interval/Cron expression
 You have a convenient way to modify the interval and cron expression of a scheduled task in real time.
 1. Click <img src="/img/feature/icons/overwrite-icon.png" alt="overwrite-icon" width="20" height="20"/> next to the schedule you want to modify.
 2. An interactive dialog will open, allowing you to make changes. After making changes, click the <img src="/img/feature/icons/cancel-icon.png" alt="cancel-icon" width="20" height="20"/> to cancel the change,
    or the <img src="/img/feature/icons/save-icon.png" alt="save-icon" width="20" height="20"/> to confirm the action.
 3. Once confirmed, the task will follow the new schedule.
 
-### Status{#status}
+### Status
 We provide the ability to manage the target state. The initial state of each target is (on) 
 <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/>, 
 meaning the task is executed according to the configured schedule. When the **Status** is switched to (off) 

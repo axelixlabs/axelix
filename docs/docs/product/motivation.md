@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Motivation
 
 This document explains the core problems that Axile solves for Spring Boot developers and organizations.

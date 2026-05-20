@@ -1,0 +1,207 @@
+/*
+ * Content — main article area: markdown body, headings, tables, code
+ * blocks, admonitions. Mobile override for max-width lives at the bottom.
+ */
+
+.theme-doc-markdown,
+.markdown {
+  max-width: var(--axelix-content-max);
+  margin: 0 auto;
+  color: var(--axelix-fg);
+}
+
+main .container {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.theme-doc-markdown h1,
+.markdown h1:first-child {
+  font-size: var(--ifm-h1-font-size);
+  letter-spacing: -0.025em;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+}
+
+.theme-doc-markdown h2,
+.markdown h2 {
+  font-size: var(--ifm-h2-font-size);
+  letter-spacing: -0.015em;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--axelix-border);
+  font-weight: 700;
+}
+
+.theme-doc-markdown h3,
+.markdown h3 {
+  font-size: var(--ifm-h3-font-size);
+  margin-top: 2rem;
+  font-weight: 600;
+}
+
+.markdown p,
+.markdown li {
+  color: var(--axelix-fg);
+}
+
+.markdown a {
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+}
+
+.markdown img {
+  border-radius: var(--axelix-radius);
+  border: 1px solid var(--axelix-border);
+  display: block;
+  margin: 1.25rem auto;
+  max-width: 100%;
+}
+
+.markdown hr {
+  border: none;
+  border-top: 1px solid var(--axelix-border);
+  margin: 2rem 0;
+}
+
+.markdown blockquote {
+  border-left: 3px solid var(--axelix-border-strong);
+  background: var(--axelix-bg-subtle);
+  color: var(--axelix-fg-muted);
+  padding: 0.75rem 1rem;
+  border-radius: 0 var(--axelix-radius-sm) var(--axelix-radius-sm) 0;
+  margin: 1rem 0;
+}
+
+/* Inline code chip. */
+.markdown code:not(pre code) {
+  background: var(--axelix-code-bg);
+  border: 1px solid var(--axelix-code-border);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* Tables — Prisma-style clean separation. */
+.markdown table {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--axelix-border);
+  border-radius: var(--axelix-radius);
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.25rem 0;
+}
+
+.markdown table th,
+.markdown table td {
+  border: none;
+  border-bottom: 1px solid var(--axelix-border);
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+}
+
+.markdown table th {
+  background: var(--axelix-bg-subtle);
+  font-weight: 600;
+  color: var(--axelix-fg);
+  font-size: 0.88rem;
+}
+
+.markdown table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================================
+ * Code blocks
+ * ============================================================ */
+.theme-code-block {
+  border-radius: var(--axelix-radius) !important;
+  border: 1px solid var(--axelix-code-border);
+  box-shadow: none !important;
+  margin: 1.25rem 0;
+  overflow: hidden;
+}
+
+[class*='codeBlockTitle'] {
+  background: var(--axelix-bg-subtle) !important;
+  border-bottom: 1px solid var(--axelix-code-border) !important;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  color: var(--axelix-fg-muted);
+  padding: 0.5rem 1rem !important;
+}
+
+[class*='codeBlockContent'] pre,
+[class*='codeBlockContainer'] pre {
+  background: var(--axelix-code-bg) !important;
+  border-radius: 0;
+}
+
+[class*='copyButton'] {
+  background: var(--axelix-bg-elevated) !important;
+  border: 1px solid var(--axelix-border) !important;
+}
+
+/* ============================================================
+ * Admonitions (callouts)
+ * ============================================================ */
+.theme-admonition,
+.alert {
+  border-radius: var(--axelix-radius);
+  border: 1px solid var(--axelix-border);
+  border-left-width: 3px;
+  background: var(--axelix-bg-subtle);
+  padding: 0.9rem 1rem 0.9rem 1.1rem;
+  margin: 1.25rem 0;
+  box-shadow: none;
+}
+
+.theme-admonition .admonition-heading h5,
+.alert .admonition-heading h5 {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.theme-admonition-note,
+.alert--secondary {
+  border-left-color: var(--axelix-fg-subtle);
+}
+
+.theme-admonition-tip,
+.alert--success {
+  border-left-color: var(--ifm-color-primary);
+}
+
+.theme-admonition-info,
+.alert--info {
+  border-left-color: var(--axelix-color-info);
+}
+
+.theme-admonition-warning,
+.theme-admonition-caution,
+.alert--warning {
+  border-left-color: var(--axelix-color-warning);
+}
+
+.theme-admonition-danger,
+.alert--danger {
+  border-left-color: var(--axelix-color-danger);
+}
+
+/* Mobile: let markdown body span the full viewport width. */
+@media (max-width: 996px) {
+  .theme-doc-markdown,
+  .markdown {
+    max-width: 100%;
+  }
+}

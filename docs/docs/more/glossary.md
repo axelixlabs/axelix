@@ -1,7 +1,3 @@
----
-sidebar_position: 7
----
-
 # Glossary
 
 This document defines key terms and abbreviations used throughout the Axile documentation and codebase.

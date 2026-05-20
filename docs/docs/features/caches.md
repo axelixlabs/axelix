@@ -1,7 +1,3 @@
----
-sidebar_position: 9
----
-
 # Caches
 
 The **Caches** page provides access to all configured caches in the Spring Boot application. It displays cache 
@@ -17,7 +13,7 @@ A scrollable list of all configured `Caches` in the application, grouped by thei
 
 ---
 
-## The Cache Details{#details}
+## The Cache Details
 ![caches details page](../../static/img/feature/caches/caches-details-page.png)
 ***Cache details page as presented in Axelix UI***
 
@@ -38,7 +34,7 @@ Operations on Caches:
 
 ---
 
-## **Interactive Features**{#interactive}
+## **Interactive Features**
 
 ### Clear All caches
 We provide a convenient way to clear all caches in the application. To do so, click the <img src="/img/feature/icons/clear-all-caches-icon.png" alt="clear-all-caches-icon" width="80" height="20"/>

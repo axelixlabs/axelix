@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 # What is Axelix Starter?
 
 Axelix Starter (also known as ASBS - Axelix Spring Boot Starter) is a Spring Boot starter dependency that enables your

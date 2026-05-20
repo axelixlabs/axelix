@@ -1,0 +1,23 @@
+/*
+ * Base — global html/body defaults and the outer layout container that
+ * caps and centers the page content at `--axelix-layout-max`.
+ */
+
+html,
+body {
+  background: var(--axelix-bg);
+  color: var(--axelix-fg);
+  font-feature-settings: 'cv01' on, 'cv02' on, 'cv06' on, 'cv07' on, 'cv08' on, 'cv10' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Widen the overall layout like Prisma. */
+.main-wrapper,
+.container {
+  width: 100%;
+  max-width: var(--axelix-layout-max);
+  margin-inline: auto;
+}
