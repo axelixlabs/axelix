@@ -1,0 +1,116 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '2.7.18'
+  id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+  id 'org.graalvm.buildtools.native' version '0.10.6'
+  id 'org.cyclonedx.bom' version '2.3.1'
+  id 'io.spring.javaformat' version '0.0.46'
+  id "io.spring.nohttp" version "0.0.11"
+  id "com.gorylenko.gradle-git-properties" version "2.5.3"
+}
+
+group = 'org.springframework.samples'
+version = '2.7.18'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+}
+
+// Axelix
+repositories {
+  mavenLocal()
+  mavenCentral()
+  maven { url = uri("https://repo.spring.io/milestone") }
+  maven {
+    name = "Nucleon Forge Axelix"
+    url =
+      uri(
+        "https://" + (project.findProperty("nexus.host.port") ?: System.getenv("NEXUS_HOST_PORT")) +
+          "/repository/axile-monorepo/"
+      )
+    credentials {
+      username = project.findProperty("nexus.user") ?: System.getenv("NEXUS_USER")
+      password = project.findProperty("nexus.password") ?: System.getenv("NEXUS_PASSWORD")
+    }
+    mavenContent {
+      snapshotsOnly()
+    }
+  }
+}
+
+ext.checkstyleVersion = "10.25.0"
+ext.springJavaformatCheckstyleVersion = "0.0.46"
+ext.sqliteDialectVersion = "0.1.4"
+ext.sqliteJdbcVersion = "3.51.2.0"
+ext.webjarsLocatorLiteVersion = "1.1.0"
+ext.webjarsFontawesomeVersion = "4.7.0"
+ext.webjarsBootstrapVersion = "5.3.6"
+
+dependencies {
+  // Axelix
+  implementation("com.axelixlabs:axelix-spring-boot-2:1.0.0-SNAPSHOT") {
+    changing = true
+  }
+
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'javax.cache:cache-api'
+  implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+  runtimeOnly 'org.springframework.boot:spring-boot-starter-actuator'
+  runtimeOnly "org.webjars:webjars-locator-lite:${webjarsLocatorLiteVersion}"
+  runtimeOnly "org.webjars.npm:bootstrap:${webjarsBootstrapVersion}"
+  runtimeOnly "org.webjars.npm:font-awesome:${webjarsFontawesomeVersion}"
+  runtimeOnly 'com.github.ben-manes.caffeine:caffeine'
+
+  runtimeOnly 'com.h2database:h2'
+  runtimeOnly 'com.mysql:mysql-connector-j'
+  runtimeOnly 'org.postgresql:postgresql'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//  testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+//  testImplementation 'org.springframework.boot:spring-boot-docker-compose'
+  testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
+  testImplementation 'org.testcontainers:mysql:1.21.4'
+  checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:${springJavaformatCheckstyleVersion}"
+  checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleVersion}"
+}
+
+
+// Skipped tests
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+tasks.withType(Checkstyle).configureEach {
+  enabled = false
+}
+
+gitProperties {
+  failOnNoGitDirectory = false
+}
+
+checkstyle {
+  configDirectory = project.file('src/checkstyle')
+  configFile = file('src/checkstyle/nohttp-checkstyle.xml')
+}
+
+checkstyleNohttp {
+  configDirectory = project.file('src/checkstyle')
+  configFile = file('src/checkstyle/nohttp-checkstyle.xml')
+}
+
+tasks.named("formatMain").configure { dependsOn("checkstyleMain") }
+tasks.named("formatMain").configure { dependsOn("checkstyleNohttp") }
+
+tasks.named("formatTest").configure { dependsOn("checkstyleTest") }
+tasks.named("formatTest").configure { dependsOn("checkstyleNohttp") }
+
+wrapper {
+  gradleVersion = "8.14.3"
+  distributionType = Wrapper.DistributionType.ALL
+}

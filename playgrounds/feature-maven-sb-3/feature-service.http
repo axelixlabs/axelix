@@ -1,0 +1,8 @@
+# Get feature-service JWT using Client Credentials Flow
+POST http://localhost:9191/realms/feature-tracker/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=feature-service&client_secret=v4r6oquq0CKSN95sESpSZXxUWiunE8pe
+
+###
+

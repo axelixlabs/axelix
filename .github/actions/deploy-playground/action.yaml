@@ -1,0 +1,49 @@
+name: "Deploy Playground"
+description: "Containerize a pre-built playground service, push to Yandex CR and deploy via Helm"
+inputs:
+  working-directory:
+    description: Playground directory
+    required: true
+  image-tag:
+    description: Image tag (name:version)
+    required: true
+  helm-release:
+    description: Helm release name
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v5
+
+    - name: Build Docker Image
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: docker build --tag $CR_URL/$CR_REPOSITORY/${{ inputs.image-tag }} --file docker/Dockerfile .
+
+    - name: Docker login to Yandex Cloud CR
+      shell: bash
+      run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
+
+    - name: Docker push to Yandex Cloud CR
+      shell: bash
+      run: docker push $CR_URL/$CR_REPOSITORY/${{ inputs.image-tag }}
+
+    - name: Docker logout
+      shell: bash
+      run: docker logout $CR_URL
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v5.0.0
+      with:
+        version: v3.14.0
+
+    - name: Deploy to K8S
+      working-directory: ${{ inputs.working-directory }}/chart
+      shell: bash
+      run: |
+        mkdir -p ~/.kube
+        echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
+        chmod 600 ~/.kube/config
+        helm upgrade --install ${{ inputs.helm-release }} . --set image.ref=$CR_URL/$CR_REPOSITORY/${{ inputs.image-tag }} -f values.yaml

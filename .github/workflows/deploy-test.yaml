@@ -15,6 +15,7 @@ on:
       - '.editorconfig'
       - '.gitignore'
       - 'CONTRIBUTING.adoc'
+      - 'playgrounds/**'
 
 jobs:
   build-deploy-source:
@@ -130,21 +131,12 @@ jobs:
             -f values.yaml
 
   dispatch:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
-    needs: [build-deploy-source]
-    strategy:
-      matrix:
-        playground_repo: [
-          'axelixlabs/notification-service',
-          'axelixlabs/feature-service',
-          'axelixlabs/spring-petclinic',
-          'axelixlabs/spring-petclinic-sb-2'
-        ]
+    needs: [ build-deploy-source ]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v4
         with:
-          token: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
-          repository: ${{ matrix.playground_repo }}
-          event-type: monorepo-backend-updated
+          event-type: playground-updated
