@@ -8,10 +8,11 @@ import {
   CopyIcon,
   DockerIcon,
   K8sIcon,
+  ServerIcon,
 } from "@/assets";
 import styles from "./styles.module.css";
 
-type Method = "docker" | "compose" | "k8s";
+type Method = "docker" | "compose" | "k8s" | "bare";
 type SbVariant = "sb2" | "sb3" | "sb4";
 type CfgVariant = "yaml" | "properties";
 
@@ -31,14 +32,21 @@ const METHODS: { id: Method; label: string; icon: React.ReactNode }[] = [
     label: "Kubernetes",
     icon: <K8sIcon width="22" height="22" />,
   },
+  {
+    id: "bare",
+    label: "Bare Metal",
+    icon: <ServerIcon width="22" height="22" />,
+  },
 ];
 
 const DESCRIPTIONS: Record<Method, string> = {
+  k8s: "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
+  compose:
+        "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
   docker:
     "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
-  compose:
-    "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
-  k8s: "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
+  bare:
+    "Installing Axelix on bare metal without containerization is also possible by directly laucnhing a JAR file"
 };
 
 const STEP_NAMES: Record<1 | 2 | 3, string> = {
@@ -302,6 +310,9 @@ export const Install = () => {
                 {step === 1 && method === "k8s" && (
                   <K8sSnippet refEl={activeSnippetRef} />
                 )}
+                {step === 1 && method === "bare" && (
+                  <BareMetal refEl={activeSnippetRef} />
+                )}
 
                 {/* STEP 2 */}
                 {step === 2 && (
@@ -442,12 +453,6 @@ function DockerSnippet({ refEl }: SnippetProps) {
         </span>
         <span className={styles.Line}>
           {"    "}
-          <span className={styles.Ar}>-e</span> AXELIX_MASTER_DISCOVERY_AUTO=
-          <span className={styles.Kw}>false</span>{" "}
-          <span className={styles.Nl}>\</span>
-        </span>
-        <span className={styles.Line}>
-          {"    "}
           <span className={styles.Co}># Important: change the algorithm and key for production use</span>
         </span>
         <span className={styles.Line}>
@@ -510,16 +515,11 @@ function ComposeSnippet({ refEl }: SnippetProps) {
           <span className={styles.At}>ports</span>:
         </span>
         <span className={styles.Line}>
-          {"      "}- <span className={styles.St}>&quot;8080:8080&quot;</span>
+          {"      "}- <span className={styles.St}>&quot;9444:8080&quot;</span>
         </span>
         <span className={styles.Line}>
           {"    "}
           <span className={styles.At}>environment</span>:
-        </span>
-        <span className={styles.Line}>
-          {"      "}
-          <span className={styles.At}>AXELIX_MASTER_DISCOVERY_AUTO</span>:{" "}
-          <span className={styles.St}>&quot;false&quot;</span>
         </span>
         <span className={styles.Line}>
           {"      "}
@@ -533,13 +533,55 @@ function ComposeSnippet({ refEl }: SnippetProps) {
         <span className={styles.Line}>
           {"      "}
           <span className={styles.At}>AXELIX_AUTH_JWT_SIGNING_KEY</span>:{" "}
-          <span className={styles.Kw}>{"${AXELIX_TOKEN}"}</span>
+          <span className={styles.Kw}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
         </span>
         <span className={styles.Line}>
           {"    "}
           <span className={styles.At}>restart</span>:{" "}
           <span className={styles.St}>unless-stopped</span>
         </span>
+
+        <span className={styles.Line}>
+          {"    "}
+        </span>
+
+        <span className={styles.Line}>
+          {"  "}<span className={styles.At}>your-spring-boot-app</span>:
+        </span>
+        <span className={styles.Line}>
+          {"    "}
+            <span className={styles.At}>build</span>:{" "}
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+            <span className={styles.At}>dockerfile</span>:{" "}
+            <span className={styles.St}>/path/to/Dockerfile</span>
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+            <span className={styles.At}>context</span>:{" "}
+            <span className={styles.St}>.</span>
+        </span>
+        <span className={styles.Line}>
+          {"    "}
+            <span className={styles.At}>environment</span>:{" "}
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+            <span className={styles.At}>- AXELIX_SBS_DISCOVERY_INSTANCE_NAME</span>:{" "}
+            <span className={styles.St}>my-app</span>
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+            <span className={styles.At}>- AXELIX_SBS_DISCOVERY_INSTANCE_ACTUATOR_URL</span>:{" "}
+            <span className={styles.St}>http://my-app.com/actuator</span>
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+            <span className={styles.At}>- AXELIX_SBS_DISCOVERY_MASTER_URL</span>:{" "}
+            <span className={styles.St}>http://localhost:9444/api/internal/service/register</span>
+        </span>
+
       </code>
     </pre>
   );
@@ -558,33 +600,69 @@ function K8sSnippet({ refEl }: SnippetProps) {
           <span className={styles.Co}># Install Axelix Master via Helm</span>
         </span>
         <span className={styles.Line}>
+          <span className={styles.Co}># Important: Please, change the algorithm and the key for production use</span>
+        </span>
+        <span className={styles.Line}>
           <span className={styles.Cm}>helm repo add</span>{" "}
-          <span className={styles.St}>axelix</span>{" "}
-          <span className={styles.St}>https://charts.axelix.io</span>
+          <span className={styles.St}>axelixlabs</span>{" "}
+          <span className={styles.St}>https://axelixlabs.github.io/helm-charts</span>
+        </span>
+        <span className={styles.Line}>
+          <span className={styles.Cm}>helm repo update</span>{" "}
         </span>
         <span className={styles.Line}>
           <span className={styles.Cm}>helm install</span>{" "}
           <span className={styles.St}>axelix</span>{" "}
-          <span className={styles.St}>axelix/axelix-master</span>{" "}
+          <span className={styles.St}>axelixlabs/axelix</span>{" "}
           <span className={styles.Nl}>\</span>
         </span>
         <span className={styles.Line}>
           {"    "}
-          <span className={styles.Ar}>--namespace</span>{" "}
-          <span className={styles.St}>axelix</span>{" "}
-          <span className={styles.Ar}>--create-namespace</span>{" "}
+          <span className={styles.Ar}>--set</span>{" "}
+          <span className={styles.St}>axelix.master.auth.jwt.algorithm=HMAC512</span>{" "}
+        </span>
+        <span className={styles.Line}>
+          {"    "}
+          <span className={styles.Ar}>--set</span>{" "}
+          <span className={styles.St}>axelix.master.auth.jwt.signingKey=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>{" "}
+        </span>
+      </code>
+    </pre>
+  );
+}
+
+function BareMetal({ refEl }: SnippetProps) {
+  return (
+    <pre
+      className={`${styles.Snippet} ${styles.Active}`}
+      ref={(el) => {
+        refEl.current = el;
+      }}
+    >
+      <code>
+        <span className={styles.Line}>
+          <span className={styles.Co}># Download and run the Axelix Master JAR</span>
+        </span>
+        <span className={styles.Line}>
+          <span className={styles.Co}># Important: Please, change the algorithm and the key for production use</span>
+        </span>
+        <span className={styles.Line}>
+          <span className={styles.Cm}>java -jar axelix-1.0.0.jar</span>{" "}
           <span className={styles.Nl}>\</span>
         </span>
         <span className={styles.Line}>
           {"    "}
-          <span className={styles.Ar}>--set</span> auth.jwt.algorithm=
-          <span className={styles.St}>HMAC256</span>{" "}
+          <span className={styles.St}>--server.port=8080</span>{" "}
           <span className={styles.Nl}>\</span>
         </span>
         <span className={styles.Line}>
           {"    "}
-          <span className={styles.Ar}>--set</span> auth.jwt.signingKey=
-          <span className={styles.Kw}>$AXELIX_TOKEN</span>
+            <span className={styles.St}>--axelix.master.auth.jwt.algorithm=HMAC512</span>{" "}
+            <span className={styles.Nl}>\</span>
+        </span>
+        <span className={styles.Line}>
+          {"    "}
+            <span className={styles.St}>--axelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
         </span>
       </code>
     </pre>
@@ -604,28 +682,41 @@ function YamlSnippet({ refEl }: SnippetProps) {
           <span className={styles.At}>axelix</span>:
         </span>
         <span className={styles.Line}>
-          {"  "}<span className={styles.At}>master</span>:
+          {"  "}<span className={styles.At}>sbs</span>:
         </span>
         <span className={styles.Line}>
-          {"    "}
-          <span className={styles.At}>url</span>:{" "}
-          <span className={styles.St}>http://localhost:8080</span>
+          {"    "}<span className={styles.At}>auth</span>:
         </span>
         <span className={styles.Line}>
-          {"  "}<span className={styles.At}>auth</span>:
+          {"      "}<span className={styles.At}>jwt</span>:
         </span>
         <span className={styles.Line}>
-          {"    "}<span className={styles.At}>jwt</span>:
-        </span>
-        <span className={styles.Line}>
-          {"      "}
+          {"        "}
           <span className={styles.At}>algorithm</span>:{" "}
-          <span className={styles.St}>HMAC256</span>
+          <span className={styles.St}>HMAC512</span>
+        </span>
+        <span className={styles.Line}>
+          {"        "}
+          <span className={styles.At}>signing-key</span>:{" "}
+          <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
+        </span>
+        <span className={styles.Line}>
+          {"    "}<span className={styles.At}>discovery</span>:
         </span>
         <span className={styles.Line}>
           {"      "}
-          <span className={styles.At}>signing-key</span>:{" "}
-          <span className={styles.Kw}>{"${AXELIX_TOKEN}"}</span>
+          <span className={styles.At}>instance-name</span>:{" "}
+          <span className={styles.St}>my-app</span>
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+          <span className={styles.At}>instance-url</span>:{" "}
+          <span className={styles.St}>https://my-app.com/actuator</span>
+        </span>
+        <span className={styles.Line}>
+          {"      "}
+          <span className={styles.At}>master-url</span>:{" "}
+          <span className={styles.St}>https://axelix-master.com/api/internal/service/register</span>
         </span>
       </code>
     </pre>

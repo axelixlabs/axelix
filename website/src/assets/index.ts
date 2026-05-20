@@ -31,3 +31,4 @@ export { default as RbacIcon } from "./icons/rbac.svg";
 export { default as K8sIcon } from "./icons/k8s.svg";
 export { default as SsoIcon } from "./icons/sso.svg";
 export { default as GcIcon } from "./icons/gc.svg";
+export { default as ServerIcon } from "./icons/server.svg";
