@@ -2,9 +2,9 @@ rootProject.name = "axelix"
 
 include(
     ":master",
-    ":sbs:axelix-spring-boot-2",
-    ":sbs:axelix-spring-boot-3",
-    ":sbs:axelix-spring-boot-4",
+    ":sbs:axelix-spring-boot-2-starter",
+    ":sbs:axelix-spring-boot-3-starter",
+    ":sbs:axelix-spring-boot-4-starter",
     ":sbs:starter-domain",
     ":common:api",
     ":common:auth",

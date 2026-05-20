@@ -70,7 +70,7 @@ testing {
 
                 // This is the dependency for the compiled production. Additional Test Suites do not have them
                 // in any of their Gradle configurations.
-                implementation(project(":sbs:axelix-spring-boot-3"))
+                implementation(project(":sbs:axelix-spring-boot-3-starter"))
                 implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
                 implementation("org.springframework:spring-context")
             }
