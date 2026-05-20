@@ -1,13 +1,23 @@
-import { FirstSection, WhatCanDo, Installation, Zigzag, FAQ } from "@/components";
+import {
+  Capabilities,
+  Enterprise,
+  Faq,
+  Hero,
+  Install,
+  Problem,
+  Strip,
+} from "@/components";
 
 export default function Page() {
   return (
     <>
-      <FirstSection />
-      <Zigzag />
-      <Installation />
-      <WhatCanDo />
-      <FAQ />
+      <Hero />
+      <Strip />
+      <Problem />
+      <Capabilities />
+      <Install />
+      <Enterprise />
+      <Faq />
     </>
   );
 }

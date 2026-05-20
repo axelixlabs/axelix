@@ -1,0 +1,51 @@
+.MainWrapper {
+  margin-bottom: 65px;
+}
+
+.Eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #cfe2b3;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
+  
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-400);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
+  }
+}
+
+.Title {
+  margin-top: 24px;
+  font-weight: 500;
+  font-size: clamp(36px, 4.6vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5f8ee;
+  max-width: 900px;
+  text-wrap: balance;
+}
+
+.Accent {
+  color: var(--axelix-green-400);
+}
+
+.Stroke {
+  color: inherit;
+  background-image: linear-gradient(var(--axelix-green-400), var(--axelix-green-400));
+  background-position: 0 92%;
+  background-repeat: no-repeat;
+  background-size: 100% 6px;
+  padding-bottom: 2px;
+}
