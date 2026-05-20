@@ -20,9 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -45,7 +43,6 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Nikita Kirillov
  */
 @AutoConfiguration
-@ConditionalOnClass(WebEndpointProperties.class)
 @ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
 
@@ -66,11 +63,9 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
-            WebEndpointProperties webEndpointProperties) {
-
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
         return new DefaultSelfRegistrationMetadataAssembler(
-                serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
+                serviceMetadataAssembler, selfRegistrationConfigurationProperties);
     }
 
     @Bean

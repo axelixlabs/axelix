@@ -17,8 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
@@ -51,7 +50,7 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
      * The URL of the service, including the postfix for the actuator path, e.g. {@code https://my-app:6061/actuator}.
      * The master will use this URL to communicate with this service.
      */
-    private String instanceUrl;
+    private String instanceActuatorUrl;
 
     /**
      * The interval of the frequency of self-registration of this service in the master.
@@ -63,8 +62,8 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
         return masterUrl;
     }
 
-    public String getInstanceUrl() {
-        return instanceUrl;
+    public String getInstanceActuatorUrl() {
+        return instanceActuatorUrl;
     }
 
     public String getInstanceName() {
@@ -75,34 +74,30 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
         return heartbeatInterval;
     }
 
-    public SelfRegistrationConfigurationProperties setMasterUrl(String masterUrl) {
+    public void setMasterUrl(String masterUrl) {
         validateUrl(masterUrl, "axelix.sbs.discovery.master-url");
         this.masterUrl = masterUrl;
-        return this;
     }
 
-    public SelfRegistrationConfigurationProperties setInstanceUrl(String instanceUrl) {
-        validateUrl(instanceUrl, "axelix.sbs.discovery.instance-url");
-        this.instanceUrl = instanceUrl;
-        return this;
+    public void setInstanceActuatorUrl(String instanceActuatorUrl) {
+        validateUrl(instanceActuatorUrl, "axelix.sbs.discovery.instance-url");
+        this.instanceActuatorUrl = cleanInstanceActuatorUrl(instanceActuatorUrl);
     }
 
-    public SelfRegistrationConfigurationProperties setInstanceName(String instanceName) {
+    public void setInstanceName(String instanceName) {
         this.instanceName = instanceName;
-        return this;
     }
 
-    public SelfRegistrationConfigurationProperties setHeartbeatInterval(@Nullable Duration heartbeatInterval) {
+    public void setHeartbeatInterval(@Nullable Duration heartbeatInterval) {
         if (heartbeatInterval != null) {
             this.heartbeatInterval = heartbeatInterval;
         }
-        return this;
     }
 
     @Override
     public void validate() {
         validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
-        validateRequiredProperty(instanceUrl, "axelix.sbs.discovery.instance-url");
+        validateRequiredProperty(instanceActuatorUrl, "axelix.sbs.discovery.instance-url");
         validateRequiredProperty(instanceName, "axelix.sbs.discovery.instance-name");
     }
 
@@ -116,11 +111,18 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
                 isValidUrl(url), String.format("Property '%s' must be a valid URL, but was: %s", propertyName, url));
     }
 
+    private String cleanInstanceActuatorUrl(String instanceActuatorUrl) {
+        if (instanceActuatorUrl.endsWith("/")) {
+            return instanceActuatorUrl.substring(0, instanceActuatorUrl.length() - 1);
+        }
+        return instanceActuatorUrl;
+    }
+
     private boolean isValidUrl(String url) {
         try {
-            new URL(url);
+            URI.create(url).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             return false;
         }
     }

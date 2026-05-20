@@ -68,7 +68,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
-            "axelix.sbs.discovery.instance-url=http://localhost:8089/",
+            "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator",
             "axelix.sbs.discovery.heartbeat-interval=PT1S"
         })
 @Import({
@@ -138,7 +138,7 @@ class SelfRegistrationServiceTest {
                 SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
 
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, "/actuator");
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
         }
 
         @Bean

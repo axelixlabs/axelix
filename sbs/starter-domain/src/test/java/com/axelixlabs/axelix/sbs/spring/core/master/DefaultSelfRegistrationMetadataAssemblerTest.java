@@ -56,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.master-url=http://localhost:8080/",
-            "axelix.sbs.discovery.instance-url=http://localhost:8089/"
+            "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator"
         })
 class DefaultSelfRegistrationMetadataAssemblerTest {
 
@@ -82,7 +82,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
                 ServiceMetadataAssembler serviceMetadataAssembler,
                 SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, "/actuator");
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
         }
 
         @Bean

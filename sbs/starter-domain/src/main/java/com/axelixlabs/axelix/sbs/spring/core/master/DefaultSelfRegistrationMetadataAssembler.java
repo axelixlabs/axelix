@@ -39,17 +39,13 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     private final String deploymentAt;
 
-    private final String fullActuatorUrl;
-
     public DefaultSelfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
-            String baseActuatorPath) {
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
         this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
         this.deploymentAt = Instant.now().toString();
-        this.fullActuatorUrl = joinPath(selfRegistrationConfigurationProperties.getInstanceUrl(), baseActuatorPath);
     }
 
     @Override
@@ -58,12 +54,7 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
                 serviceMetadataAssembler.assemble(),
                 instanceId,
                 selfRegistrationConfigurationProperties.getInstanceName(),
-                fullActuatorUrl,
+                selfRegistrationConfigurationProperties.getInstanceActuatorUrl(),
                 deploymentAt);
-    }
-
-    private String joinPath(String instanceUrl, String baseActuatorPath) {
-        String cleanHost = instanceUrl.endsWith("/") ? instanceUrl.substring(0, instanceUrl.length() - 1) : instanceUrl;
-        return cleanHost + baseActuatorPath;
     }
 }

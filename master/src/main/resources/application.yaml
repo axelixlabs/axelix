@@ -41,7 +41,7 @@ axelix:
       password:
     discovery:
       self-registration:
-        enabled: false
+        enabled: true
         eviction:
           heartbeat-timeout: 45s
           schedule: "0 * * * * *"
