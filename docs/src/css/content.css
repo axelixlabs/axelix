@@ -64,6 +64,16 @@ main .container {
   max-width: 100%;
 }
 
+.markdown li img,
+.markdown img[width],
+.markdown img[height] {
+  display: inline;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  vertical-align: middle;
+}
+
 .markdown hr {
   border: none;
   border-top: 1px solid var(--axelix-border);
@@ -116,6 +126,13 @@ main .container {
 
 .markdown table tr:last-child td {
   border-bottom: none;
+}
+
+/* Allow long inline-code identifiers (e.g. dotted property keys) to wrap
+ * inside table cells so the table never overflows into the TOC sidebar. */
+.markdown table code:not(pre code) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ============================================================

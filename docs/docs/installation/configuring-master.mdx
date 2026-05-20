@@ -1,0 +1,368 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Configuring Master
+
+This page shows how to run Axelix Master in your own environment. Pick a shape that matches how you ship the rest of your services: a standalone JAR, a Docker container, a Docker Compose stack, or a Kubernetes deployment.
+
+## Before you start
+
+A few facts to fix in your head before you copy any of the snippets below — they save debugging time later.
+
+- **HTTP port**: Master listens on `8080` by default (`server.port`).
+- **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
+- **Front-end assets**: the `master.jar` and the published Docker image both bundle the UI — there is nothing extra to wire up for the web interface.
+- **Authentication**: Master ships with a built-in super-admin account `admin / admin` and an unset JWT signing key. In any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
+
+## Configuration reference
+
+Every Axelix Master property lives under the `axelix.master.*` namespace. The tables below list each one with its default value where one is set; entries marked *(unset)* must be supplied yourself before the corresponding feature can start.
+
+:::warning
+The default super-admin credentials (`admin / admin`) grant full control over every service Master has discovered, and the JWT signing key has no default at all. Override both — together with `axelix.master.auth.cookie.secure` when serving over HTTPS — before exposing Master to anyone other than yourself.
+:::
+
+### Database
+
+| Property                              | Default                | Description                                                                                                                                |
+|---------------------------------------|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.database.url`          | `jdbc:sqlite:axelix.db` | JDBC URL. The prefix selects the engine: `jdbc:sqlite:`, `jdbc:postgresql:`, or `jdbc:mysql:`. SQLite does not survive container restarts without a mounted volume and does not support multiple Master replicas. |
+| `axelix.master.database.username`     | empty                  | Database user.                                                                                                                             |
+| `axelix.master.database.password`     | empty                  | Database password.                                                                                                                         |
+
+### Authentication — JWT
+
+| Property                              | Default   | Description                                                                                                                  |
+|---------------------------------------|-----------|------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.jwt.algorithm`    | *(unset)* | Signing algorithm. One of `HMAC256` or `HMAC512`. `HMAC512` is the value used in the bundled local profile.                  |
+| `axelix.master.auth.jwt.signing-key`  | *(unset)* | Secret used to sign and verify session tokens. Use a long random value; rotate it to invalidate all sessions.                |
+| `axelix.master.auth.jwt.lifespan`     | `12h`     | Token lifetime as a Spring `Duration` (e.g. `30m`, `12h`, `7d`).                                                             |
+
+### Authentication — super-admin
+
+| Property                                                        | Default | Description                                                                       |
+|-----------------------------------------------------------------|---------|-----------------------------------------------------------------------------------|
+| `axelix.master.auth.options.super-admin.credentials.username`   | `admin` | Built-in super-admin login. The super-admin holds every authority in the system.  |
+| `axelix.master.auth.options.super-admin.credentials.password`   | `admin` | Built-in super-admin password. Pick a long, random value.                         |
+
+### Authentication — local users
+
+| Property                                     | Default | Description                                                                |
+|----------------------------------------------|---------|----------------------------------------------------------------------------|
+| `axelix.master.auth.options.local.enabled`   | `false` | Allow user accounts stored in Master's own database to sign in.            |
+
+### Authentication — OAuth2 / OIDC
+
+| Property                                                       | Default   | Description                                                                                                                                  |
+|----------------------------------------------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`                    | `false`   | Enable OIDC sign-in.                                                                                                                         |
+| `axelix.master.auth.options.oauth2.issuer-uri`                 | *(unset)* | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints.                                      |
+| `axelix.master.auth.options.oauth2.client-id`                  | *(unset)* | Client identifier registered with the OIDC provider.                                                                                         |
+| `axelix.master.auth.options.oauth2.client-secret`              | *(unset)* | Client secret registered with the OIDC provider.                                                                                             |
+| `axelix.master.auth.options.oauth2.base-url`                   | *(unset)* | Public base URL of this Master instance; used to build the OAuth2 callback redirect URI.                                                     |
+| `axelix.master.auth.options.oauth2.scopes`                     | `openid`  | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                          |
+| `axelix.master.auth.options.oauth2.role-attribute-path`        | *(unset)* | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role.                 |
+
+### Authentication — session cookie
+
+| Property                              | Default | Description                                                                                            |
+|---------------------------------------|---------|--------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.cookie.secure`    | `false` | Set to `true` whenever Master is served over HTTPS so the session cookie is not sent over plain HTTP.  |
+
+### Discovery — auto-discovery
+
+| Property                                                     | Default                                                                          | Description                                                                                |
+|--------------------------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `axelix.master.discovery.auto.enabled`                       | `false`                                                                          | Enable platform-driven autodiscovery of managed services.                                  |
+| `axelix.master.discovery.auto.platform`                      | *(unset)*                                                                        | Discovery platform. Currently `kubernetes` is the only supported value.                    |
+| `axelix.master.discovery.auto.broadcast.schedule`            | `0 * * * * *`                                                                    | Cron expression that triggers the discovery scan.                                          |
+| `axelix.master.discovery.auto.kubernetes.kube-apiserver-url` | `https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}`            | URL of the Kubernetes API server.                                                          |
+| `axelix.master.discovery.auto.kubernetes.sa-token-path`      | `/var/run/secrets/kubernetes.io/serviceaccount/token`                            | Path inside the Master pod where the ServiceAccount token is mounted.                      |
+| `axelix.master.discovery.auto.kubernetes.ca-cert-path`       | `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`                           | Path inside the Master pod where the kube-apiserver CA certificate is mounted.             |
+| `axelix.master.discovery.auto.kubernetes.filters.namespaces` | `default`                                                                        | Comma-separated list of namespaces to scan.                                                |
+| `axelix.master.discovery.auto.kubernetes.filters.labels`     | empty                                                                            | Map of label key/value pairs a Kubernetes Service must match to be picked up by discovery. |
+
+### Discovery — self-registration
+
+| Property                                                               | Default       | Description                                                                                          |
+|------------------------------------------------------------------------|---------------|------------------------------------------------------------------------------------------------------|
+| `axelix.master.discovery.self-registration.enabled`                    | `true`        | Accept self-registration heartbeats from Spring Boot Starter–equipped applications. Set to `false` to refuse them. |
+| `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` | `45s`         | Drop a self-registered instance after this long without a heartbeat.                                 |
+| `axelix.master.discovery.self-registration.eviction.schedule`          | `0 * * * * *` | Cron expression that triggers the eviction sweep.                                                    |
+
+### MCP server
+
+| Property                              | Default | Description                                                                       |
+|---------------------------------------|---------|-----------------------------------------------------------------------------------|
+| `axelix.master.mcp-server.enabled`    | `true`  | Expose the bundled Model Context Protocol server at `/api/mcp`.                   |
+
+## Run as a JAR
+
+Use this when you want the lightest possible runtime — a single process on a machine you already manage, no container runtime involved.
+
+### 1. Download the JAR
+
+Grab the `master.jar` attached to the release you want from the [Releases page](https://github.com/axelixlabs/axelix/releases). The published artifact already bundles the UI, so there is nothing else to build.
+
+### 2. Start Master
+
+Provide a JWT signing key and an algorithm. Everything else can stay on defaults for a first run.
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
+  -jar master.jar
+```
+
+Master is then reachable at `http://localhost:8080`. Sign in with the super-admin credentials you configured.
+
+### Override more settings with a config file
+
+Spring Boot reads any `application.yaml` or `application.properties` placed next to the JAR (or anywhere referenced by `--spring.config.location`). Put overrides there instead of accumulating `-D` flags. Pick the format you use for the rest of your stack, then the database engine — Master picks the engine from the JDBC URL prefix, and Liquibase creates the schema on first startup.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+<Tabs groupId="db-engine">
+  <TabItem value="sqlite" label="SQLite">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:sqlite:axelix.db
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+        lifespan: 12h
+      options:
+        super-admin:
+          credentials:
+            username: ${AXELIX_ADMIN_USERNAME}
+            password: ${AXELIX_ADMIN_PASSWORD}
+      cookie:
+        secure: true
+```
+
+  </TabItem>
+  <TabItem value="postgres" label="PostgreSQL">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://db.internal:5432/axelix
+      username: ${AXELIX_DB_USERNAME}
+      password: ${AXELIX_DB_PASSWORD}
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+        lifespan: 12h
+      options:
+        super-admin:
+          credentials:
+            username: ${AXELIX_ADMIN_USERNAME}
+            password: ${AXELIX_ADMIN_PASSWORD}
+      cookie:
+        secure: true
+```
+
+  </TabItem>
+  <TabItem value="mysql" label="MySQL">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:mysql://db.internal:3306/axelix
+      username: ${AXELIX_DB_USERNAME}
+      password: ${AXELIX_DB_PASSWORD}
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+        lifespan: 12h
+      options:
+        super-admin:
+          credentials:
+            username: ${AXELIX_ADMIN_USERNAME}
+            password: ${AXELIX_ADMIN_PASSWORD}
+      cookie:
+        secure: true
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+<Tabs groupId="db-engine">
+  <TabItem value="sqlite" label="SQLite">
+
+```properties
+axelix.master.database.url=jdbc:sqlite:axelix.db
+axelix.master.auth.jwt.algorithm=HMAC512
+axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+axelix.master.auth.jwt.lifespan=12h
+axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
+axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
+axelix.master.auth.cookie.secure=true
+```
+
+  </TabItem>
+  <TabItem value="postgres" label="PostgreSQL">
+
+```properties
+axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
+axelix.master.database.username=${AXELIX_DB_USERNAME}
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.auth.jwt.algorithm=HMAC512
+axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+axelix.master.auth.jwt.lifespan=12h
+axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
+axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
+axelix.master.auth.cookie.secure=true
+```
+
+  </TabItem>
+  <TabItem value="mysql" label="MySQL">
+
+```properties
+axelix.master.database.url=jdbc:mysql://db.internal:3306/axelix
+axelix.master.database.username=${AXELIX_DB_USERNAME}
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.auth.jwt.algorithm=HMAC512
+axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+axelix.master.auth.jwt.lifespan=12h
+axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
+axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
+axelix.master.auth.cookie.secure=true
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+</Tabs>
+
+## Run with Docker
+
+Use this when you want a single, immutable artifact that already bundles both Master and the UI.
+
+The release pipeline publishes the image to GitHub Container Registry:
+
+```
+ghcr.io/axelixlabs/axelix:1.0.0-SNAPSHOT
+```
+
+:::note
+The snippets below pin `1.0.0-SNAPSHOT` for illustration. Check the [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own commands.
+:::
+
+### Run command
+
+A minimal run, suitable for a first look:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e JAVA_OTHER_ARGS="\
+    -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+    -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
+    -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
+  ghcr.io/axelixlabs/axelix:1.0.0-SNAPSHOT
+```
+
+A few notes about this command:
+
+- `JAVA_OTHER_ARGS` is the standard hook the image reserves for `-D` system properties; the entrypoint splices it into the `java` command.
+- The image runs as the non-root user `axelix` and uses an Ahead-of-Time class loading cache built at image-build time, so startup is faster than a plain JAR launch.
+- The default database is still SQLite at the working directory (`/application/axelix.db`). The file lives inside the container's writable layer and disappears when the container is removed. Either switch to PostgreSQL/MySQL (see the next section) or mount a volume at the SQLite path.
+
+## Run with Docker Compose
+
+Use this when you want Master plus an external database in one declarative file — the natural shape for a small self-hosted deployment.
+
+The repository does not currently ship a Compose file for running Master itself; the example below is a complete stack you can drop into a new `docker-compose.yaml`, edit, and start with `docker compose up -d`. The `master` service is pinned to `1.0.0-SNAPSHOT` here — swap in the latest tag from the [Releases page](https://github.com/axelixlabs/axelix/releases) before shipping.
+
+```yaml title="docker-compose.yaml"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: axelix
+      POSTGRES_USER: ${AXELIX_DB_USERNAME:?set AXELIX_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AXELIX_DB_PASSWORD:?set AXELIX_DB_PASSWORD}
+    volumes:
+      - axelix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  master:
+    image: ghcr.io/axelixlabs/axelix:1.0.0-SNAPSHOT
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_OTHER_ARGS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.auth.jwt.algorithm=HMAC512
+        -Daxelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+        -Daxelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
+        -Daxelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
+        -Daxelix.master.auth.cookie.secure=false
+
+volumes:
+  axelix-pgdata:
+```
+
+Provide the values via an `.env` file next to the Compose file:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix
+AXELIX_DB_PASSWORD=...
+AXELIX_JWT_SIGNING_KEY=...
+AXELIX_ADMIN_USERNAME=admin
+AXELIX_ADMIN_PASSWORD=...
+```
+
+`axelix.master.auth.cookie.secure` is `false` in this example because the snippet exposes Master over plain HTTP for local testing. Put Master behind a TLS-terminating proxy and flip it to `true` for any real deployment.
+
+## Run on Kubernetes
+
+Use this when you want Master to live in the same cluster as the services it monitors and to discover them automatically.
+
+Axelix ships a first-party Helm chart, so you do not need to assemble manifests by hand:
+
+- **Chart source**: [github.com/axelixlabs/helm-charts](https://github.com/axelixlabs/helm-charts) — `README.md` documents every value the chart exposes, including database connection, JWT, super-admin credentials, autodiscovery, RBAC, and Ingress.
+- **Published package**: [artifacthub.io/packages/helm/axelix/axelix](https://artifacthub.io/packages/helm/axelix/axelix) — pulls the chart from the Axelix Helm repository and lists the available versions.
+
+A typical install boils down to:
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/helm-charts
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Put your overrides — at minimum `axelix.master.auth.jwt.signing-key`, the super-admin password, and the database connection — into `values.yaml`. The chart wires the ServiceAccount + RBAC required for in-cluster autodiscovery for you.
+
+Expose the Service through your cluster's usual mechanism — an `Ingress` or a `Gateway` — for a quick check.
+
+## Related
+
+- [Configuring Spring Boot Starter](../installation/configuring-spring-boot-starter.mdx) — wire your monitored applications so Master can see them.
+- [What is Master?](../setting-up-master-ui/what-is-master.md) — background on what Master does once it is running.
+- [Authentication](../setting-up-master-ui/authentication.md) — deeper look at JWT, super-admin, and OAuth2/OIDC.

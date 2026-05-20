@@ -32,7 +32,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 - **Runnable**:                 The *target* that will be executed.
 - **Initial Delay (ms)**:       The delay, in milliseconds, before first execution.
 - **Interval (ms)**:            The interval, in milliseconds, between the start of each execution. (See **Interactive Features**)
-- **Status**                    Shows the target state and provides the ability to enable <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/>
+- **Status**:                   Shows the target state and provides the ability to enable <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/>
                                 or disable <img src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon" width="32" height="15"/>
                                 the target. (See **Interactive Features**)
 - **Run**:                      Forces immediate execution of the task. (See **Interactive Features**)
@@ -45,7 +45,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 - **Runnable**:                 The *target* that will be executed.
 - **Initial Delay (ms)**:       The delay, in milliseconds, before first execution.
 - **Interval (ms)**:            The interval, in milliseconds, between the start of each execution. (See **Interactive Features**)
-- **Status**                    Shows the target state and provides the ability to enable <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/> 
+- **Status**:                   Shows the target state and provides the ability to enable <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/> 
                                 or disable <img src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon" width="32" height="15"/> 
                                 the target. (See **Interactive Features**)
 - **Run**:                      Forces immediate execution of the task. (See **Interactive Features**)
@@ -54,16 +54,16 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ## Interactive Features
 
+The actions below — running a task on demand, modifying its schedule, and toggling its status — require the `SCHEDULED_TASKS_MODIFY` authority, granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. Users without this authority see the same controls but cannot interact with them.
+
 ### Run
 We provide the ability to trigger a task manually without affecting its schedule. To do so, simply click <img src="/img/feature/icons/play-icon.png" alt="play-icon" width="20" height="20"/>, 
 and the task will be executed immediately.
 
-<a id="modify"></a>
-
 ### Interval/Cron expression
 You have a convenient way to modify the interval and cron expression of a scheduled task in real time.
 1. Click <img src="/img/feature/icons/overwrite-icon.png" alt="overwrite-icon" width="20" height="20"/> next to the schedule you want to modify.
-2. An interactive dialog will open, allowing you to make changes. After making changes, click the <img src="/img/feature/icons/cancel-icon.png" alt="cancel-icon" width="20" height="20"/> to cancel the change,
+2. An interactive dialog will open, allowing you to make changes. When you edit a cron expression, the dialog shows a live **Valid** / **Invalid** indicator next to the input — it updates on every keystroke against the same validator the backend uses, and the save action stays disabled until the expression is valid. After making changes, click the <img src="/img/feature/icons/cancel-icon.png" alt="cancel-icon" width="20" height="20"/> to cancel the change,
    or the <img src="/img/feature/icons/save-icon.png" alt="save-icon" width="20" height="20"/> to confirm the action.
 3. Once confirmed, the task will follow the new schedule.
 

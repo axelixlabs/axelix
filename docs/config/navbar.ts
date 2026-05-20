@@ -33,6 +33,13 @@ export const navbar: Navbar = {
       className: 'navbar__tab',
     },
     {
+      to: '/docs/installation/configuring-master',
+      label: 'Installation',
+      position: 'left',
+      activeBaseRegex: '^/docs/installation',
+      className: 'navbar__tab',
+    },
+    {
       to: '/docs/setting-up-master-ui/what-is-master',
       label: 'Master',
       position: 'left',
