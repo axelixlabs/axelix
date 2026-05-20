@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Fragment } from "react/jsx-runtime";
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+import { useRef } from "react";
 
 import { Copy } from "components";
 import { EConditionStatus, type IConditionBeanNegative } from "models";
@@ -31,36 +33,73 @@ interface IProps {
 }
 
 export const NegativeConditions = ({ negativeMatches }: IProps) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    const rowVirtualizer = useVirtualizer({
+        count: negativeMatches.length,
+        getScrollElement: () => ref.current,
+        estimateSize: () => 103,
+        scrollPaddingStart: 80,
+        gap: 40,
+    });
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
+
     return (
         <>
-            {negativeMatches.map(({ className, methodName, matched, notMatched }) => {
-                const itemsWithStatus = [
-                    ...notMatched.map((item) => ({ ...item, status: EConditionStatus.NOT_MATCHED })),
-                    ...matched.map((item) => ({ ...item, status: EConditionStatus.MATCHED })),
-                ];
+            <div ref={ref} className={styles.ConditionsMainWrapper}>
+                <div
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                    }}
+                    className={styles.ConditionsInnerWrapper}
+                >
+                    {virtualItems.map(({ key, index, start }) => {
+                        const { className, methodName, matched, notMatched } = negativeMatches[index];
 
-                return (
-                    <Fragment key={className + methodName}>
-                        <div className={styles.ConditionHeaderWrapper}>
-                            <div className={styles.ConditionHeaderSection}>
-                                <div>Class:</div>
-                                <div className={styles.Value}>{className}</div>
-                                <Copy text={className} />
-                            </div>
-                            {methodName && (
-                                <>
+                        const itemsWithStatus = [
+                            ...notMatched.map((item) => ({
+                                ...item,
+                                status: EConditionStatus.NOT_MATCHED,
+                            })),
+                            ...matched.map((item) => ({
+                                ...item,
+                                status: EConditionStatus.MATCHED,
+                            })),
+                        ];
+
+                        return (
+                            <div
+                                key={key}
+                                data-index={index}
+                                ref={rowVirtualizer.measureElement}
+                                className={styles.VirtualItem}
+                                style={{
+                                    transform: `translateY(${start}px)`,
+                                }}
+                            >
+                                <div className={styles.ConditionHeaderWrapper}>
                                     <div className={styles.ConditionHeaderSection}>
-                                        <div>Method:</div>
-                                        <div className={styles.Value}>{methodName}</div>
-                                        <Copy text={methodName} />
+                                        <div>Class:</div>
+                                        <div className={styles.Value}>{className}</div>
+                                        <Copy text={className} />
                                     </div>
-                                </>
-                            )}
-                        </div>
-                        <ConditionsAccordionEntry items={itemsWithStatus} />
-                    </Fragment>
-                );
-            })}
+                                    {methodName && (
+                                        <>
+                                            <div className={styles.ConditionHeaderSection}>
+                                                <div>Method:</div>
+                                                <div className={styles.Value}>{methodName}</div>
+                                                <Copy text={methodName} />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                <ConditionsAccordionEntry items={itemsWithStatus} />
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         </>
     );
 };

@@ -15,7 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Fragment } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router";
 
 import { Copy } from "components";
 import { normalizeHtmlElementId } from "helpers";
@@ -32,43 +35,88 @@ interface IProps {
 }
 
 export const PositiveConditions = ({ positiveMatches }: IProps) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const { hash } = useLocation();
+
+    const rowVirtualizer = useVirtualizer({
+        count: positiveMatches.length,
+        getScrollElement: () => ref.current,
+        estimateSize: () => 103,
+        scrollPaddingStart: 80,
+        gap: 40,
+    });
+
+    const targetIndex = positiveMatches.findIndex(({ className, methodName }) => {
+        const full = `${className}${methodName ?? ""}`;
+        return normalizeHtmlElementId(full) === normalizeHtmlElementId(hash);
+    });
+
+    useEffect(() => {
+        if (!hash || targetIndex === -1) {
+            return;
+        }
+
+        rowVirtualizer.scrollToIndex(targetIndex, {
+            align: "start",
+            behavior: "smooth",
+        });
+    }, []);
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
+
     return (
         <>
-            {positiveMatches.map(({ className, methodName, matched }) => {
-                const items = matched.map((item) => {
-                    return {
-                        ...item,
-                        status: EConditionStatus.MATCHED,
-                    };
-                });
+            <div ref={ref} className={styles.ConditionsMainWrapper}>
+                <div
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                    }}
+                    className={styles.ConditionsInnerWrapper}
+                >
+                    {virtualItems.map(({ key, index, start }) => {
+                        const { className, methodName, matched } = positiveMatches[index];
 
-                const id = normalizeHtmlElementId(`${className}${methodName ? methodName : ""}`);
+                        const items = matched.map((item) => {
+                            return {
+                                ...item,
+                                status: EConditionStatus.MATCHED,
+                            };
+                        });
 
-                return (
-                    <Fragment key={id}>
-                        {/* TODO: There is a problem with scrolling here, fix it in the future */}
-                        <div id={id} className={styles.ScrollableWrapper}>
-                            <div className={styles.ConditionHeaderWrapper}>
-                                <div className={styles.ConditionHeaderSection}>
-                                    <div>Class:</div>
-                                    <div className={styles.Value}>{className}</div>
-                                    <Copy text={className} />
+                        return (
+                            <div
+                                key={key}
+                                data-index={index}
+                                ref={rowVirtualizer.measureElement}
+                                className={styles.VirtualItem}
+                                style={{
+                                    transform: `translateY(${start}px)`,
+                                }}
+                            >
+                                <div
+                                    className={`${styles.ConditionHeaderWrapper} ${index === targetIndex ? "Highlight" : ""}`}
+                                >
+                                    <div className={styles.ConditionHeaderSection}>
+                                        <div>Class:</div>
+                                        <div className={styles.Value}>{className}</div>
+                                        <Copy text={className} />
+                                    </div>
+                                    {methodName && (
+                                        <>
+                                            <div className={styles.ConditionHeaderSection}>
+                                                <div>Method:</div>
+                                                <div className={styles.Value}>{methodName}</div>
+                                                <Copy text={methodName} />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                                {methodName && (
-                                    <>
-                                        <div className={styles.ConditionHeaderSection}>
-                                            <div>Method:</div>
-                                            <div className={styles.Value}>{methodName}</div>
-                                            <Copy text={className} />
-                                        </div>
-                                    </>
-                                )}
+                                <ConditionsAccordionEntry items={items} />
                             </div>
-                        </div>
-                        <ConditionsAccordionEntry items={items} />
-                    </Fragment>
-                );
-            })}
+                        );
+                    })}
+                </div>
+            </div>
         </>
     );
 };
