@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
@@ -49,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Aleksei Ermakov
  * @since 14.10.2025
  */
 @AutoConfiguration
@@ -58,8 +60,10 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
-        return new ScheduledTasksRegistry(taskHolders.orderedStream().collect(Collectors.toList()));
+    public ScheduledTasksRegistry scheduledTasksRegistry(
+            ObjectProvider<ScheduledTaskHolder> taskHolders, ObjectProvider<TaskScheduler> taskScheduler) {
+        return new ScheduledTasksRegistry(
+                taskHolders.orderedStream().collect(Collectors.toList()), requireTaskScheduler(taskScheduler));
     }
 
     @Bean
@@ -103,7 +107,7 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @NonNull
     private static TaskScheduler requireTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
-        TaskScheduler taskScheduler = scheduler.getIfAvailable();
+        TaskScheduler taskScheduler = resolveTaskScheduler(scheduler);
 
         // TODO: Should we throw an exception here? or an annotation above the class is enough
         // @ConditionalOnBean({ScheduledAnnotationBeanPostProcessor.class, TaskScheduler.class})
@@ -114,6 +118,19 @@ public class ScheduledTaskManagementAutoConfiguration {
         }
 
         return taskScheduler;
+    }
+
+    // We intentionally avoid getIfAvailable() here. Since Axelix is a library, users may legitimately
+    // have multiple TaskScheduler beans (e.g. one added by Spring Batch, another by their own config).
+    // getIfUnique() lets @Primary and @Order guide the selection without failing the context.
+    // If no unique bean exists, we fall back to the highest-priority bean from the ordered stream.
+    @Nullable
+    private static TaskScheduler resolveTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
+        TaskScheduler taskScheduler = scheduler.getIfUnique();
+        if (taskScheduler != null) {
+            return taskScheduler;
+        }
+        return scheduler.orderedStream().findFirst().orElse(null);
     }
 
     private static ThreadPoolTaskExecutor createThreadPoolExecutor() {

@@ -113,6 +113,14 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
+    @Test
+    void shouldCreateRegistryWhenMultipleTaskSchedulersPresent() {
+        contextRunner.withUserConfiguration(MultipleTaskSchedulersConfig.class).run(context -> {
+            assertThat(context).hasNotFailed();
+            assertThat(context).hasSingleBean(ScheduledTasksRegistry.class);
+        });
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -124,10 +132,26 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @TestConfiguration
+    static class MultipleTaskSchedulersConfig {
+
+        @Bean
+        public TaskScheduler firstTaskScheduler() {
+            return new ThreadPoolTaskScheduler();
+        }
+
+        @Bean
+        public TaskScheduler secondTaskScheduler() {
+            return new ThreadPoolTaskScheduler();
+        }
+    }
+
+    @TestConfiguration
     static class CustomScheduledTasksRegistryConfig {
         @Bean
-        public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
-            return new CustomScheduledTasksRegistry(taskHolders.orderedStream().collect(Collectors.toList()));
+        public ScheduledTasksRegistry scheduledTasksRegistry(
+                ObjectProvider<ScheduledTaskHolder> taskHolders, TaskScheduler taskScheduler) {
+            return new CustomScheduledTasksRegistry(
+                    taskHolders.orderedStream().collect(Collectors.toList()), taskScheduler);
         }
     }
 
@@ -149,8 +173,8 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     static class CustomScheduledTasksRegistry extends ScheduledTasksRegistry {
-        public CustomScheduledTasksRegistry(List<ScheduledTaskHolder> taskHolders) {
-            super(taskHolders);
+        public CustomScheduledTasksRegistry(List<ScheduledTaskHolder> taskHolders, TaskScheduler taskScheduler) {
+            super(taskHolders, taskScheduler);
         }
     }
 

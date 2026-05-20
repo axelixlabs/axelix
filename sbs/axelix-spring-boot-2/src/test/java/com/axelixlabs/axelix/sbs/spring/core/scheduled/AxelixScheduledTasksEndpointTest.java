@@ -125,6 +125,7 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("nextExecution").isNull();
         });
     }
 
@@ -141,6 +142,7 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("nextExecution").isNull();
         });
 
         enableScheduledTask(taskId);
@@ -150,6 +152,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNotNull();
         });
     }
 
@@ -166,6 +171,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
     }
 
@@ -182,6 +190,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
 
         enableScheduledTask(taskId);
@@ -191,6 +202,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNotNull();
         });
     }
 
@@ -207,6 +221,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
     }
 
@@ -223,6 +240,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
 
         enableScheduledTask(taskId);
@@ -232,6 +252,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNotNull();
         });
     }
 
@@ -249,6 +272,9 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("trigger").isEqualTo(CUSTOM_TRIGGER);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
     }
 
@@ -265,6 +291,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
 
         enableScheduledTask(taskId);
@@ -274,6 +303,9 @@ class AxelixScheduledTasksEndpointTest {
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNotNull();
         });
     }
 
@@ -397,6 +429,9 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(false);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNull();
         });
         assertThat(fixedDelayFlag).isTrue();
     }
@@ -414,6 +449,9 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("runnable.target").isEqualTo(FIXED_RATE_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(true);
+            assertThatJson(task).node("lastExecution.status").isEqualTo("SUCCESS");
+            assertThatJson(task).node("lastExecution.time").isNotNull();
+            assertThatJson(task).node("nextExecution").isNotNull();
         });
         assertThat(fixedRateFlag).isTrue();
     }
@@ -468,8 +506,9 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
+        public ScheduledTasksRegistry scheduledTaskRegistry(
+                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler taskScheduler) {
+            return new ScheduledTasksRegistry(List.of(processor), taskScheduler);
         }
 
         @Bean
@@ -559,7 +598,7 @@ class AxelixScheduledTasksEndpointTest {
         static class CustomTestTrigger implements Trigger {
             @Override
             public Date nextExecutionTime(@NonNull TriggerContext triggerContext) {
-                return Date.from(Instant.now().plusMillis(100));
+                return Date.from(Instant.now().plusMillis(150));
             }
 
             @Override
