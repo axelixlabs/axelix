@@ -1,0 +1,40 @@
+.MainWrapper {
+  border-top: 1px solid var(--axelix-line);
+  border-bottom: 1px solid var(--axelix-line);
+  overflow: hidden;
+}
+
+.Track {
+  display: flex;
+  column-gap: 50px;
+  padding-block: 14px;
+  font-family: var(--axelix-mono);
+  font-size: 12px;
+  letter-spacing: .05em;
+  color: var(--axelix-green-800);
+  white-space: nowrap;
+  animation: scroll 50s linear infinite;
+}
+
+.Track span {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 50px;
+  flex-shrink: 0;
+
+  &::after {
+    content: "●";
+    color: var(--axelix-green-500);
+    margin-left: 50px;
+  }
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
