@@ -86,41 +86,57 @@ A typical single-feature page should need ~2–4 backend files, ~2–4 front-end
 
 Match the user's intent to the existing site structure:
 
+- **`docs/docs/product/`** — what Axelix is and why it exists: `introduction.md`, `motivation.md`, `architecture.md`. Only edit these when the user explicitly asks.
+- **`docs/docs/ui-guide/`** — UI-walkthrough material that doesn't belong to a single feature.
 - **`docs/docs/features/`** — capabilities exposed in the Axelix UI (one `*.md` per feature; subdirectories exist for grouped features like `loggers/`).
 - **`docs/docs/setting-up-master-ui/`** — installation/configuration of the master UI itself.
 - **`docs/docs/setting-up-spring-boot-service/`** — how end users add the SBS to their own Spring Boot applications.
-- **`docs/docs/ui-guide/`** — UI-walkthrough material that doesn't belong to a single feature.
-- Top-level (`architecture.md`, `glossary.md`, `motivation.md`, `compatibility-matrix.md`, `introduction.md`) — only edit these when the user explicitly asks.
+- **`docs/docs/more/`** — supporting reference material that doesn't fit elsewhere: `compatibility-matrix.md`, `glossary.md`. Only edit these when the user explicitly asks.
 
 If a fitting page already exists, edit it. Don't create a duplicate. If no fitting page exists, create one with a sensible filename (lowercase, hyphenated, no spaces — match neighbours).
 
 If the same feature ships in both `axelix-spring-boot-2` and `axelix-spring-boot-3`, write **one** page; surface version-specific differences (snippet for SB2, snippet for SB3) with `<Tabs>` from §5 — don't fork the page.
 
-When you create a new subdirectory, add a `_category_.json` next to the pages so Docusaurus labels the sidebar group correctly. Match the existing pattern from `docs/docs/features/_category_.json`:
+When you create a new subdirectory, add a `_category_.yml` next to the pages so Docusaurus labels the sidebar group correctly. The shape comes from `docs/docs/features/_category_.yml`, but **every value below is a placeholder — replace each one for your new category. Do not copy `label: Features`, `position: 3`, or `id: features/details` verbatim; reusing `features/details` would wire your new category header to the existing Features doc.**
 
-```json
-{
-  "label": "Features",
-  "position": 5,
-  "link": {
-    "type": "generated-index"
-  }
-}
+```yaml
+label: YOUR_CATEGORY_LABEL       # display name shown in the sidebar (e.g. "Setting Up Master UI")
+position: N                      # integer slot among sibling categories — pick a free one
+collapsed: false                 # match the neighbouring categories' choice
+link:
+  type: doc
+  id: YOUR_CATEGORY/YOUR_LANDING_DOC_ID   # must point at a real doc inside this category
 ```
+
+- `label` and `position` control the category header and its order in the sidebar — pick a free `position` slot; don't collide with an existing sibling.
+- `collapsed: false` keeps the category expanded on first render — match the neighbouring categories' choice.
+- `link.type: doc` plus `link.id` makes clicking the category header jump to a specific entry document. `link.id` must be the folder-relative path (no `.md` extension) of a doc that actually exists inside *this* category — never reuse another category's landing id like `features/details`. The site no longer uses `generated-index` landing pages — every category points at a real doc.
+
+Page order inside the sidebar is then defined explicitly by a `_position.ts` file in the same directory. Match the existing pattern from `docs/docs/features/_position.ts`:
+
+```typescript
+const prefix = 'features';
+
+const pages: string[] = [
+  'details',
+  'metrics',
+  'loggers/loggers',
+  'properties',
+  // ...
+].map((id) => `${prefix}/${id}`);
+
+export default pages;
+```
+
+Each entry is `<category>/<page-id>` (no `.md` extension). The position of an id in the array is the page's position in the sidebar. **A page that is not listed in `_position.ts` will not appear in the sidebar at all** — adding the file alone is not enough.
+
+If you create a brand-new top-level category (rare), also register it in `docs/sidebars.ts`: import its `_position.ts` and add a `<name>Sidebar` key alongside the existing ones.
 
 ### 4. Match the existing page style
 
 Look at 2–3 sibling pages before writing. The conventions are:
 
-- **Frontmatter** with `sidebar_position` controlling order, e.g.
-
-  ```markdown
-  ---
-  sidebar_position: 5
-  ---
-  ```
-
-  Pick a position that fits the existing sequence; don't reshuffle siblings unless asked.
+- **No frontmatter.** Pages start directly with the `# Title` line — no `---` block, no `sidebar_position` field. Sidebar order lives in the category's `_position.ts` (see §3); placing a page at the right slot in that array is how you control its position. Don't reshuffle siblings unless asked.
 
 - **One H1** that matches the page topic (`# Beans`, `# Properties`).
 - **Lead paragraph**: one or two sentences stating what the page is and what users get from it. No throat-clearing.
@@ -271,13 +287,9 @@ If you're tempted to write something you can't substantiate from the code — de
 
 ### 9. Standard page skeleton
 
-When a page needs to be built from scratch, this skeleton fits the existing site. Skip sections that don't apply rather than padding them. Outer fences are quadrupled so the inner code blocks render correctly.
+When a page needs to be built from scratch, this skeleton fits the existing site. Skip sections that don't apply rather than padding them. Outer fences are quadrupled so the inner code blocks render correctly. Remember to register the page id in the category's `_position.ts` — without it the page won't appear in the sidebar (see §3).
 
 ````markdown
----
-sidebar_position: <N>
----
-
 # <Feature Name>
 
 <One- or two-sentence lead: what this page covers, who it helps.>
@@ -290,16 +302,16 @@ sidebar_position: <N>
 
 <Short paragraph: what the user sees in Axelix and where the data comes from.>
 
-## Overview{#overview}
+## Overview
 
 <What the feature does at a glance. 2–4 bullets or a short paragraph.>
 
-## <Detail section, e.g. "Property fields">{#details}
+## <Detail section, e.g. "Property fields">
 
 - **<Field>**: <description, with real values where helpful>.
 - **<Field>**: <description>.
 
-## Configuration{#configuration}
+## Configuration
 
 <If the feature is gated by a property or starter setting, document the exact key, the default, and how to change it. Use a yaml block.>
 
@@ -308,7 +320,7 @@ axelix:
   <real.property.key>: <real-default>
 ```
 
-## Related{#related}
+## Related
 
 - [<Related feature>](../features/<page>.md)
 - [<Setup page>](../setting-up-spring-boot-service/<page>.md)
@@ -323,8 +335,8 @@ Before reporting the page as done:
 - Re-read your draft against the source. Every concrete claim (paths, property keys, defaults, supported versions, conditional behavior) must be traceable to a file you read.
 - For every Markdown link on the page, confirm the target file exists on disk relative to the page's location.
 - Check every image path exists under `docs/static/img/...`. If any file is missing, replace the broken `![]()` reference with the `:::danger[📸 SCREENSHOT REQUIRED]` placeholder from §7 — never leave a dead path or a hidden HTML comment.
-- Confirm the `sidebar_position` is unique among siblings. List the values with `grep -h '^sidebar_position' docs/docs/<dir>/*.md` and pick a number that's unused in that directory.
-- If the user explicitly asked for it, or if this task targets `compatibility-matrix.md` (or an adjacent matrix-related doc), update `compatibility-matrix.md` to reflect a new feature, version, or environment. Otherwise keep changes scoped to the target file and mention the matrix gap to the user at handoff — consistent with §3 ("only edit top-level pages when the user explicitly asks") and the anti-pattern below ("stay inside the file you're documenting").
+- Confirm the new page id is listed in the category's `_position.ts` at the slot you want it in the sidebar, and that the file itself has no leftover `---` frontmatter block at the top.
+- If the user explicitly asked for it, or if this task targets `docs/docs/more/compatibility-matrix.md` (or an adjacent matrix-related doc), update `compatibility-matrix.md` to reflect a new feature, version, or environment. Otherwise keep changes scoped to the target file and mention the matrix gap to the user at handoff — consistent with §3 ("only edit `product/` and `more/` pages when the user explicitly asks") and the anti-pattern below ("stay inside the file you're documenting").
 - Run a quick sanity scan: any phrase that sounds like marketing or that you can't point to in the code — cut it.
 - **Style-consistency pass.** Read the page once with the consistency rule from §4 in mind. For every parallel section (Cron / Fixed delay / Fixed rate, or any analogous trio), check that every row describing the same field/control/concept uses the same wording shape, the same level of example, the same anchor links, the same admonitions. If section A has an `(e.g. ...)` and section B doesn't, fix it before handoff — that's exactly the kind of difference that erodes the reader's trust.
 
@@ -344,61 +356,3 @@ These mistakes show up easily; watch for them:
 - **Raw JSON of API responses on a feature page.** Same reason. The user reads a feature page to understand a screen, not the bytes underneath. A JSON shape on a feature page invites them to think about a layer they didn't sign up to debug.
 - **Auto-configuration conditions framed as user requirements.** When Axelix's autoconfiguration is gated by `@ConditionalOnBean(SomeFrameworkType.class)` or similar, that condition is usually *already satisfied* by Spring Boot's own auto-configuration in any normal setup — the user doesn't do anything to provide it. Listing it as "the application **must** provide a `TaskScheduler` bean" makes the reader think they have a step to perform when in reality Spring Boot has already done it. **Document only what the user actually configures.** Background prerequisites that Spring Boot satisfies on their behalf belong in one short sentence ("Spring Boot's auto-configuration provides X automatically"), or are simply omitted. To tell the difference: ask "would a user with a vanilla Spring Boot project hit this requirement, or has Spring Boot already handled it?" If Spring Boot handled it, don't make the reader feel they have a checkbox to tick.
 
-## Reference: layout cheatsheet
-
-```text
-docs/docs/
-├── architecture.md
-├── compatibility-matrix.md
-├── glossary.md
-├── introduction.md
-├── motivation.md
-├── features/
-│   ├── _category_.json
-│   ├── beans.md
-│   ├── caches.md
-│   ├── conditions.md
-│   ├── configuration-properties.md
-│   ├── details.md
-│   ├── garbage-collector.md
-│   ├── loggers/        <- subdirectory for grouped feature
-│   ├── metrics.md
-│   ├── properties.md
-│   ├── scheduled-tasks.md
-│   ├── thread-dump.md
-│   └── transaction-control.md
-├── setting-up-master-ui/
-│   ├── _category_.json
-│   ├── authentication.md
-│   ├── configuring-master.md
-│   └── what-is-master.md
-├── setting-up-spring-boot-service/
-└── ui-guide/
-
-master/src/main/java/com/axelixlabs/axelix/master/
-├── api/{external,internal,error}     <- REST controllers, error mapping
-├── autoconfiguration/{auth,discovery,probers,web}
-├── domain/                            <- master-side domain
-├── exception/{auth,...}
-├── filter/
-├── mcp/
-├── repository/{,dialect}
-├── service/{auth,convert,discovery,export,serde,state,transport}
-└── utils/
-
-sbs/
-├── axelix-spring-boot-2/              <- starter for Spring Boot 2
-├── axelix-spring-boot-3/              <- starter for Spring Boot 3
-│   └── src/main/.../autoconfiguration/  <- AxelixXxxAutoConfiguration classes
-└── starter-domain/                    <- shared starter domain
-
-front-end/src/
-├── api/                               <- API client layer (calls to master)
-├── components/                        <- shared UI components
-├── i18n/                              <- displayed string source of truth
-├── pages/                             <- one folder per UI screen
-├── routes/                            <- URL → page mapping
-└── services/                          <- non-API client logic
-```
-
-Use this as a map. The truth is in the code; this skill exists to make sure your docs reflect it.
