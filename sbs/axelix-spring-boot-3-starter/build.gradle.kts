@@ -67,6 +67,7 @@ testing {
 
             dependencies {
                 implementation("org.jetbrains.lincheck:lincheck:3.5")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
                 // This is the dependency for the compiled production. Additional Test Suites do not have them
                 // in any of their Gradle configurations.

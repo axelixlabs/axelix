@@ -49,6 +49,7 @@ testing {
 
             dependencies {
                 implementation("org.jetbrains.lincheck:lincheck:3.5")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
                 // Additional Test Suites do not inherit production dependencies automatically.
                 implementation(project(":sbs:starter-domain"))
