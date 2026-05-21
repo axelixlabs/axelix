@@ -4,8 +4,8 @@ const prefix = 'setting-up-master-ui';
 
 const pages: string[] = [
   'what-is-master',
-  'configuring-master',
-  'authentication',
+  'configuring-master/configuring-master',
+  'authentication/authentication',
 ].map((id) => `${prefix}/${id}`);
 
 export default pages;

@@ -7,12 +7,6 @@
 /* ============================================================
  * Right-side table of contents
  * ============================================================ */
-.theme-doc-toc-desktop {
-  border-left: 1px solid var(--axelix-border);
-  padding-left: 1rem;
-  width: var(--axelix-toc-width);
-}
-
 .table-of-contents {
   font-size: 14px;
   border-left: none;

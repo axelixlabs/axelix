@@ -4,7 +4,7 @@ const prefix = 'setting-up-spring-boot-service';
 
 const pages: string[] = [
   'what-is-axelix-starter',
-  'configuring-axelix-starter',
+  'configuring-axelix-starter/configuring-axelix-starter',
 ].map((id) => `${prefix}/${id}`);
 
 export default pages;

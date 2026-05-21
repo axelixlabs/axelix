@@ -9,18 +9,20 @@
   background: var(--axelix-bg);
 }
 
-aside.theme-doc-sidebar-container > div:first-child {
-  width: var(--axelix-sidebar-width);
-}
-
 .theme-doc-sidebar-menu {
   padding: 1.25rem 0.75rem;
   font-size: 0.9rem;
 }
 
-/* Top-level (root) items — normal weight. */
-.menu__list > .menu__list-item > .menu__link,
-.menu__list > .menu__list-item > .menu__list-item-collapsible > .menu__link {
+/* Top-level (root) items — normal weight.
+ * The `:not(.navbar__pill)` guard prevents this color override from hitting
+ * navbar items (Docs, Blog, GitHub) that Docusaurus copies into the mobile
+ * hamburger drawer wrapped as `.menu__list-item > .menu__link`. Without the
+ * guard, the GitHub pill loses its primary `color` and its `::before` GitHub
+ * mark (which uses `currentColor`) becomes invisible against the same-color
+ * pill background. */
+.menu__list > .menu__list-item > .menu__link:not(.navbar__pill),
+.menu__list > .menu__list-item > .menu__list-item-collapsible > .menu__link:not(.navbar__pill) {
   font-weight: 400;
   color: var(--axelix-fg);
   font-size: 0.92rem;

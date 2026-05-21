@@ -191,7 +191,7 @@ html.plugin-blog .navbar {
   background: var(--axelix-bg);
 }
 
-/* Mobile: collapse to a single 56px row; tabs slide into the burger drawer. */
+/* Mobile: collapse to a single 56px row; tabs and pills slide into the burger drawer. */
 @media (max-width: 996px) {
   .navbar {
     height: 56px;
@@ -205,18 +205,6 @@ html.plugin-blog .navbar {
   .navbar__inner::after {
     display: none;
   }
-  .navbar__items:not(.navbar__items--right) {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  .navbar__tab {
-    order: initial;
-    height: auto;
-    padding: 0.5rem 0.75rem;
-    margin: 0;
-    border-bottom: none;
-  }
   .navbar__brand {
     height: auto;
     order: initial;
@@ -224,6 +212,15 @@ html.plugin-blog .navbar {
   .navbar__items--right {
     height: auto;
     order: initial;
+  }
+  /* Hide tabs and pills in the top navbar — Docusaurus already duplicates
+   * them into the hamburger drawer (which wraps items in `.menu__list`,
+   * not `.navbar__items`). The two `display: inline-flex` base rules above
+   * override infima's stock `.navbar__item { display: none }` at this
+   * breakpoint, so we re-assert the hide explicitly, scoped to top navbar. */
+  .navbar__items .navbar__tab,
+  .navbar__items .navbar__pill {
+    display: none;
   }
 }
 
@@ -242,6 +239,10 @@ html.plugin-blog .navbar {
   width: 16px;
   height: 16px;
   background-color: currentColor;
+  -webkit-mask-image: url('/icons/github.svg');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
   mask-image: url('/icons/github.svg');
   mask-repeat: no-repeat;
   mask-position: center;
