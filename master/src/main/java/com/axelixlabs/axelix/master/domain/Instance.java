@@ -110,6 +110,5 @@ public record Instance(
         UP,
         DOWN,
         UNKNOWN,
-        RELOAD
     }
 }

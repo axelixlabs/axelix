@@ -56,6 +56,5 @@ public record InstancesGridResponse(Collection<InstanceShortProfile> instances) 
         UP,
         DOWN,
         UNKNOWN,
-        RELOAD
     }
 }

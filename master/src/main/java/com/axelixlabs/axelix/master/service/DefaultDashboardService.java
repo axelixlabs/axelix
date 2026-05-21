@@ -80,7 +80,7 @@ public class DefaultDashboardService implements DashboardService {
         for (Instance instance : instanceRegistry.getAll()) {
             switch (instance.status()) {
                 case UP -> statuesMap.compute(Status.UP, counterIncrementFunction());
-                case DOWN, RELOAD -> statuesMap.compute(Status.DOWN, counterIncrementFunction());
+                case DOWN -> statuesMap.compute(Status.DOWN, counterIncrementFunction());
                 case UNKNOWN -> statuesMap.compute(Status.UNKNOWN, counterIncrementFunction());
             }
 

@@ -49,7 +49,6 @@ public class InstancesToShortProfileConverter implements Converter<Instance, Ins
                     case UP -> InstanceStatus.UP;
                     case DOWN -> InstanceStatus.DOWN;
                     case UNKNOWN -> InstanceStatus.UNKNOWN;
-                    case RELOAD -> InstanceStatus.RELOAD;
                 },
                 buildDeployedForField(instance),
                 instance.javaVersion(),
