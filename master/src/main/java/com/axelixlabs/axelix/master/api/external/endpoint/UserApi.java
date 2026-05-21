@@ -171,7 +171,7 @@ public class UserApi {
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
     public ResponseEntity<?> logout() {
         ResponseCookie authCookie = cookieService.buildExpiredAuthCookie();
-        ResponseCookie authoritiesCookie = cookieService.buildExpiredAuthCookie();
+        ResponseCookie authoritiesCookie = cookieService.buildExpiredAuthMetadataCookie();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, authCookie.toString())

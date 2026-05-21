@@ -204,14 +204,19 @@ class UserApiTest {
         // then.
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        String logoutCookieHeader = logoutResponse.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
-        assertThat(logoutCookieHeader).isNotNull();
-        assertThat(logoutCookieHeader).contains(cookieProperties.getAuthCookieName());
-        assertThat(logoutCookieHeader.toLowerCase()).contains("max-age=0");
+        assertThat(logoutResponse.getHeaders().get(HttpHeaders.SET_COOKIE))
+                .hasSize(2)
+                .allSatisfy(cookieHeader -> {
+                    assertThat(cookieHeader.toLowerCase()).contains("max-age=0");
+                });
+        assertThat(logoutResponse.getHeaders().get(HttpHeaders.SET_COOKIE))
+                .anySatisfy(cookieHeader -> assertThat(cookieHeader).contains(cookieProperties.getAuthCookieName()))
+                .anySatisfy(
+                        cookieHeader -> assertThat(cookieHeader).contains(cookieProperties.getAuthoritiesCookieName()));
     }
 
     @Test
-    void shouldLogoutEvenWithoutCookie() {
+    void shouldReturn401OnLogoutWithoutCookie() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
