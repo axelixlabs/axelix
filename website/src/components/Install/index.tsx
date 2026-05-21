@@ -39,14 +39,26 @@ const METHODS: { id: Method; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-const DESCRIPTIONS: Record<Method, string> = {
-  k8s: "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
-  compose:
-        "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
-  docker:
-    "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
-  bare:
-    "Installing Axelix on bare metal without containerization is also possible by directly laucnhing a JAR file"
+const METHODS_DATA: Record<Method, {
+  description: string,
+  href: string;
+}> = {
+  k8s: {
+    description: "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
+    href: "https://axelix.io/docs/installation/configuring-master#run-on-kubernetes"
+  },
+  compose: {
+    description: "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
+    href: "https://axelix.io/docs/installation/configuring-master#run-with-docker-compose"
+  },
+  docker: {
+    description: "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
+    href: "https://axelix.io/docs/installation/configuring-master#run-with-docker"
+  },
+  bare: {
+    description: "Installing Axelix on bare metal without containerization is also possible by directly launching a JAR file",
+    href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar"
+  }
 };
 
 const STEP_NAMES: Record<1 | 2 | 3, string> = {
@@ -218,8 +230,8 @@ export const Install = () => {
             ))}
 
             <div className={styles.MethFoot}>
-              <p className={styles.Desc}>{DESCRIPTIONS[method]}</p>
-              <a className={styles.Docs} href="https://axelix.io/docs/product/introduction" target="_blank" rel="noopener noreferrer">
+              <p className={styles.Desc}>{METHODS_DATA[method].description}</p>
+              <a className={styles.Docs} href={METHODS_DATA[method].href} target="_blank" rel="noopener noreferrer">
                 Read Documentation <span className={styles.Arr}>→</span>
               </a>
             </div>
@@ -345,22 +357,14 @@ export const Install = () => {
                   ← {step > 1 ? STEP_NAMES[(step - 1) as 1 | 2 | 3] : "Previous"}
                 </button>
                 <span className={styles.Status}>Step {step} of 3</span>
-                {step < 3 ? (
-                  <button
-                    className={`${styles.NavBtn} ${styles.Next}`}
-                    type="button"
-                    onClick={() => setStep((step + 1) as 1 | 2 | 3)}
-                  >
-                    Next: {STEP_NAMES[(step + 1) as 1 | 2 | 3]} →
-                  </button>
-                ) : (
-                  <button
-                    className={`${styles.NavBtn} ${styles.Done}`}
-                    type="button"
-                  >
-                    Done — open localhost:8080 →
-                  </button>
-                )}
+                <button
+                  className={`${styles.NavBtn} ${styles.Next}`}
+                  type="button"
+                  disabled={step === 3}
+                  onClick={() => setStep((step + 1) as 1 | 2 | 3)}
+                >
+                  Next: {STEP_NAMES[(step + 1) as 1 | 2 | 3]} →
+                </button>
               </div>
             </div>
           </div>
