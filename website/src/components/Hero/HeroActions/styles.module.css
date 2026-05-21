@@ -1,0 +1,63 @@
+.ActionsWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+.ActionButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--axelix-font);
+    font-weight: 500;
+    border: 1px solid var(--axelix-line-3);
+    transition-duration: 0.3s;
+    line-height: 1;
+    padding: 14px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+
+    &:hover {
+        border-color: var(--axelix-ink-2);
+        background-color: #0f14100a;
+    }
+}
+
+.GreenButton {
+    background-color: var(--axelix-green-500);
+    color: #fff;
+    border-color: var(--axelix-green-500);
+
+    &:hover {
+        background-color: var(--axelix-green-600);
+        border-color: var(--axelix-green-600);
+    }
+}
+
+.Arrow {
+    transition: transform 0.3s;
+}
+
+.ActionButton:hover .Arrow {
+    transform: translateX(3px);
+}
+
+.Badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--axelix-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: var(--axelix-green-700);
+    background-color: color-mix(in srgb, var(--axelix-green-100) 75%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
+    margin-left: 4px;
+    line-height: 1;
+}

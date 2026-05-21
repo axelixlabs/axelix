@@ -1,0 +1,77 @@
+.HeroBackground {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.32) 22%, rgba(0, 0, 0, 0.7) 55%, #000 85%);
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.32) 22%, rgba(0, 0, 0, 0.7) 55%, #000 85%);
+}
+
+.HeroBackground :global(.ln) {
+    stroke: #639922;
+    stroke-width: 1;
+    stroke-opacity: 0.22;
+    fill: none;
+}
+
+.HeroBackground :global(.nd) {
+    fill: #639922;
+    fill-opacity: 0.45;
+}
+
+.HeroBackground :global(.nd.big) {
+    fill-opacity: 0.6;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: hero-node-pulse 3.8s ease-in-out infinite;
+}
+
+.HeroBackground :global(.nd.big):nth-of-type(2n) {
+    animation-delay: -1.2s;
+}
+
+.HeroBackground :global(.nd.big):nth-of-type(3n) {
+    animation-delay: -2.4s;
+}
+
+.HeroBackground :global(.nd.big):nth-of-type(5n) {
+    animation-delay: -0.6s;
+}
+
+@keyframes hero-node-pulse {
+
+    0%,
+    100% {
+        fill-opacity: 0.45;
+        transform: scale(1);
+    }
+
+    50% {
+        fill-opacity: 0.85;
+        transform: scale(1.45);
+    }
+}
+
+.HeroBackground :global(.packet) {
+    fill: #fff;
+    stroke: #639922;
+    stroke-width: 1.2;
+    filter: drop-shadow(0 0 4px rgba(99, 153, 34, 0.55));
+}
+
+.HeroBackground :global(.route) {
+    stroke: none;
+    fill: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .HeroBackground :global(.nd.big) {
+        animation: none;
+    }
+
+    .HeroBackground :global(.packet) {
+        display: none;
+    }
+}

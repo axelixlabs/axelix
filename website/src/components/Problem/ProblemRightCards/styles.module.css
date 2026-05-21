@@ -1,0 +1,38 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.Card {
+    padding: 20px 22px;
+    border-radius: 12px;
+    background-color: color-mix(in srgb, #0a1c04 55%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+    backdrop-filter: blur(10px);
+}
+
+.CardTitle {
+    font-family: var(--axelix-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--axelix-green-400);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.CardSubtitle {
+    margin: 0;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.35;
+    color: #f0f4e6;
+    letter-spacing: -0.01em;
+}
+
+.CardDescription {
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #b6c5a3;
+}
