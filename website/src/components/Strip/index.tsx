@@ -7,8 +7,8 @@ export const Strip = () => {
   return (
     <div className={styles.MainWrapper}>
       <div className={styles.Track}>
-        <span>{TAPE}</span>
-        <span>{TAPE}</span>
+        <div className={styles.Tape}>{TAPE}</div>
+        <div className={styles.Tape}>{TAPE}</div>
       </div>
     </div>
   );

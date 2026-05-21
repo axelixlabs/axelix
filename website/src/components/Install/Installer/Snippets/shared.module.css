@@ -1,0 +1,80 @@
+.Snippet {
+    display: none;
+    padding: 0 18px;
+    margin: 0;
+    font-family: var(--axelix-code);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #e7eee0;
+    counter-reset: ln;
+    white-space: normal;
+}
+
+.Snippet.Active {
+    display: block;
+    animation: snippet-in .25s ease;
+}
+
+@keyframes snippet-in {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.Snippet .Line {
+    display: block;
+    position: relative;
+    padding-left: 44px;
+    counter-increment: ln;
+    white-space: pre;
+}
+
+.Snippet .Line::before {
+    content: counter(ln);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    text-align: right;
+    color: color-mix(in srgb, var(--axelix-green-400) 38%, transparent);
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.Snippet .Co {
+    color: rgba(182, 197, 163, 0.65);
+    font-style: italic;
+}
+
+.Snippet .Kw {
+    color: #8fbdf0;
+}
+
+.Snippet .St {
+    color: #bde08f;
+}
+
+.Snippet .Ar {
+    color: #bdd3a0;
+}
+
+.Snippet .At {
+    color: #bdd3a0;
+}
+
+.Snippet .Tg {
+    color: #88b8e8;
+}
+
+.Snippet .Nl {
+    color: color-mix(in srgb, var(--axelix-green-400) 35%, transparent);
+}
+
+.Snippet .Cm {
+    color: #f4f7ec;
+}

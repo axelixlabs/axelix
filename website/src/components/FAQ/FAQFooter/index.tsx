@@ -4,7 +4,7 @@ export const FAQFooter = () => {
     return (
         <div className={styles.MainWrapper}>
             <div>
-                <span className={styles.Label}>Still curious?</span>
+                <div className={styles.Label}>Still curious?</div>
                 <h3 className={styles.Title}>Reach the team — we reply within answer working day.</h3>
                 <p className={styles.Description}>
                     Architectural questions, production-readiness checks, enterprise pilots. Anything not answered above

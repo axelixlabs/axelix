@@ -1,41 +1,32 @@
-
-.Trust {
+.BenefitsWrapper {
   margin-top: 48px;
-  padding-top: 0;
-  border-top: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   max-width: 680px;
   width: 100%;
-  text-align: center;
 }
 
-
-.K {
+.Label {
   font-family: var(--axelix-mono);
   font-size: 10.5px;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--axelix-ink-3);
   margin-bottom: 6px;
 }
 
-.V {
+.Value {
   font-size: 14.5px;
   color: var(--axelix-ink);
   font-weight: 500;
-  letter-spacing: -0.01em;
 }
 
-
-.Small {
-  display: block;
+.SmallValue {
   font-family: var(--axelix-mono);
   font-size: 11.5px;
   color: var(--axelix-ink-3);
   font-weight: 400;
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
   margin-top: 3px;
-  text-transform: none;
 }

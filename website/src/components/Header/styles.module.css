@@ -13,7 +13,7 @@
   gap: 8px;
   padding: 4px 12px;
   border-radius: 999px;
-  background-color: color-mix(in srgb, #fff 55%, transparent);
+  background-color: rgba(255, 255, 255, 0.55);
   border: 1px solid color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
   backdrop-filter: saturate(160%) blur(18px);
   box-shadow:
@@ -22,6 +22,6 @@
   margin: 0 auto;
 }
 
-.Logo {
+.LogoIcon {
   width: 120px;
 }

@@ -1,0 +1,103 @@
+.MainWrapper {
+    position: relative;
+}
+
+.Trigger {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 6px 12px;
+    background-color: var(--axelix-green-400);
+    border: 1px solid var(--axelix-green-400);
+    border-radius: 8px;
+    color: #0a1c04;
+    font-family: var(--axelix-code);
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: background-color 0.3s, border-color 0.3s;
+
+    &:hover {
+        background-color: #a6cf5d;
+        border-color: #a6cf5d;
+    }
+}
+
+.Label {
+    color: #0a1c04;
+    font-weight: 500;
+}
+
+.Arrow {
+    width: 12px;
+    height: 12px;
+    color: #0a1c04;
+    transition: transform 0.3s;
+}
+
+.ActiveWrapper .Trigger {
+    background-color: #a6cf5d;
+    border-color: #a6cf5d;
+}
+
+.ActiveWrapper .Arrow {
+    transform: rotate(180deg);
+}
+
+.Menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 5;
+    min-width: 160px;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    background-color: #0f2806;
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
+    border-radius: 10px;
+    box-shadow:
+        0 16px 36px -16px rgba(0, 0, 0, 0.55),
+        0 0 0 1px color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
+}
+
+.ActiveWrapper .Menu {
+    display: flex;
+}
+
+.Option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 7px 10px 7px 12px;
+    color: rgba(231, 238, 224, 0.75);
+    font-family: var(--axelix-code);
+    font-size: 12.5px;
+    border-radius: 7px;
+    white-space: nowrap;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+        color: #ffffff;
+        background-color: color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
+
+    }
+}
+
+.ActiveOption {
+    color: var(--axelix-green-400);
+    background-color: color-mix(in srgb, var(--axelix-green-400) 10%, transparent);
+
+}
+
+.CheckIcon {
+    width: 12px;
+    height: 12px;
+    color: var(--axelix-green-400);
+    opacity: 0;
+}
+
+.ActiveOption .CheckIcon {
+    opacity: 1;
+}

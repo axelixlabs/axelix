@@ -3,14 +3,11 @@ import styles from "./styles.module.css";
 export const HeroBackground = () => {
     return (
         <svg
-            className={styles.HeroBg}
+            className={styles.HeroBackground}
             viewBox="0 0 1400 800"
             preserveAspectRatio="xMidYMid slice"
-            aria-hidden="true"
         >
-            {/* Lines */}
             <g className="ln">
-                {/* Top-left cluster */}
                 <line x1="80" y1="60" x2="180" y2="120" />
                 <line x1="180" y1="120" x2="260" y2="80" />
                 <line x1="180" y1="120" x2="110" y2="230" />
@@ -32,7 +29,6 @@ export const HeroBackground = () => {
                 <line x1="320" y1="320" x2="420" y2="240" />
                 <line x1="420" y1="240" x2="360" y2="180" />
                 <line x1="420" y1="240" x2="440" y2="110" />
-                {/* Top-right cluster */}
                 <line x1="940" y1="110" x2="1050" y2="60" />
                 <line x1="1050" y1="60" x2="1180" y2="100" />
                 <line x1="1180" y1="100" x2="1310" y2="160" />
@@ -47,7 +43,6 @@ export const HeroBackground = () => {
                 <line x1="980" y1="240" x2="1020" y2="380" />
                 <line x1="1020" y1="380" x2="1100" y2="190" />
                 <line x1="1020" y1="380" x2="1180" y2="360" />
-                {/* Top horizon band — extra density pass */}
                 <line x1="260" y1="80" x2="440" y2="110" />
                 <line x1="440" y1="110" x2="560" y2="180" />
                 <line x1="440" y1="110" x2="700" y2="260" />
@@ -68,7 +63,6 @@ export const HeroBackground = () => {
                 <line x1="860" y1="30" x2="840" y2="180" />
                 <line x1="380" y1="50" x2="440" y2="110" />
                 <line x1="260" y1="80" x2="380" y2="50" />
-                {/* Mid-left edge */}
                 <line x1="100" y1="500" x2="180" y2="620" />
                 <line x1="180" y1="620" x2="320" y2="680" />
                 <line x1="320" y1="680" x2="260" y2="560" />
@@ -79,7 +73,6 @@ export const HeroBackground = () => {
                 <line x1="380" y1="600" x2="320" y2="680" />
                 <line x1="380" y1="600" x2="260" y2="560" />
                 <line x1="380" y1="600" x2="460" y2="720" />
-                {/* Mid-right edge */}
                 <line x1="1100" y1="190" x2="1180" y2="360" />
                 <line x1="1240" y1="260" x2="1180" y2="360" />
                 <line x1="1180" y1="360" x2="1340" y2="440" />
@@ -91,7 +84,6 @@ export const HeroBackground = () => {
                 <line x1="1080" y1="520" x2="1100" y2="640" />
                 <line x1="1340" y1="600" x2="1340" y2="440" />
                 <line x1="1340" y1="600" x2="1240" y2="550" />
-                {/* Bottom-center connectors */}
                 <line x1="320" y1="680" x2="460" y2="720" />
                 <line x1="460" y1="720" x2="540" y2="660" />
                 <line x1="540" y1="660" x2="640" y2="700" />
@@ -103,7 +95,6 @@ export const HeroBackground = () => {
                 <line x1="540" y1="660" x2="640" y2="700" />
                 <line x1="640" y1="700" x2="540" y2="660" />
                 <line x1="940" y1="660" x2="820" y2="720" />
-                {/* Center band */}
                 <line x1="560" y1="180" x2="700" y2="260" />
                 <line x1="700" y1="260" x2="840" y2="180" />
                 <line x1="560" y1="180" x2="440" y2="110" />
@@ -121,7 +112,6 @@ export const HeroBackground = () => {
                 <line x1="800" y1="540" x2="900" y2="460" />
                 <line x1="640" y1="540" x2="540" y2="660" />
                 <line x1="800" y1="540" x2="940" y2="660" />
-                {/* Center band — extra density pass */}
                 <line x1="560" y1="180" x2="620" y2="380" />
                 <line x1="840" y1="180" x2="780" y2="360" />
                 <line x1="560" y1="180" x2="500" y2="460" />
@@ -143,7 +133,6 @@ export const HeroBackground = () => {
                 <line x1="700" y1="260" x2="440" y2="110" />
                 <line x1="700" y1="260" x2="940" y2="110" />
             </g>
-            {/* Nodes */}
             <g className="nd">
                 <circle cx="80" cy="60" r="2.5" />
                 <circle cx="180" cy="120" r="3" className="big" />
@@ -174,7 +163,6 @@ export const HeroBackground = () => {
                 <circle cx="1180" cy="360" r="3" className="big" />
                 <circle cx="1340" cy="440" r="2.5" />
                 <circle cx="1240" cy="550" r="2.5" />
-                {/* Density pass +12 */}
                 <circle cx="80" cy="180" r="2" />
                 <circle cx="140" cy="300" r="2.5" />
                 <circle cx="320" cy="320" r="2.5" />
@@ -188,12 +176,10 @@ export const HeroBackground = () => {
                 <circle cx="1340" cy="600" r="2" />
                 <circle cx="540" cy="660" r="2.5" />
                 <circle cx="940" cy="660" r="2.5" />
-                {/* Top horizon band */}
                 <circle cx="380" cy="50" r="2" />
                 <circle cx="540" cy="30" r="2.5" />
                 <circle cx="700" cy="50" r="3" className="big" />
                 <circle cx="860" cy="30" r="2.5" />
-                {/* Center band nodes */}
                 <circle cx="560" cy="180" r="2.5" />
                 <circle cx="700" cy="260" r="3" className="big" />
                 <circle cx="840" cy="180" r="2.5" />
@@ -205,7 +191,6 @@ export const HeroBackground = () => {
                 <circle cx="800" cy="540" r="2.5" />
             </g>
 
-            {/* Hidden routes for packets */}
             <defs>
                 <path
                     id="route1"
@@ -239,7 +224,6 @@ export const HeroBackground = () => {
                 />
             </defs>
 
-            {/* Animated packets */}
             <g>
                 <circle className="packet" r="2.2">
                     <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">

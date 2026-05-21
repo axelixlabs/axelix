@@ -1,0 +1,98 @@
+.MainWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 8px;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 42px;
+        top: 48px;
+        bottom: 48px;
+        width: 1px;
+        background: linear-gradient(180deg,
+                color-mix(in srgb, var(--axelix-green-400) 0%, transparent) 0%,
+                color-mix(in srgb, var(--axelix-green-400) 35%, transparent) 50%,
+                color-mix(in srgb, var(--axelix-green-400) 0%, transparent) 100%);
+        pointer-events: none;
+    }
+}
+
+.Card {
+    position: relative;
+    border-radius: 14px;
+    padding: 22px 24px;
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+}
+
+.CardMainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.Tier {
+    font-family: var(--axelix-mono);
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(189, 211, 160, 0.8);
+}
+
+.CardTitle {
+    font-weight: 500;
+    font-size: 19px;
+    letter-spacing: -0.012em;
+    color: #f0f4e6;
+}
+
+.Meta {
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    letter-spacing: .04em;
+    color: rgba(189, 211, 160, 0.65);
+}
+
+.Badge {
+    align-self: start;
+    font-family: var(--axelix-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+    color: var(--axelix-green-400);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent)
+}
+
+.ThirdCard .Badge {
+    background: var(--axelix-green-400);
+    color: inherit;
+}
+
+.FirstCard {
+    background: color-mix(in srgb, #0a1c04 40%, transparent);
+    margin-right: 32px;
+}
+
+.SecondCard {
+    background: color-mix(in srgb, #0a1c04 60%, transparent);
+    margin-right: 18px;
+}
+
+.ThirdCard {
+    background-color: color-mix(in srgb, var(--axelix-green-400) 12%, transparent);
+    border-color: color-mix(in srgb, var(--axelix-green-400) 45%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--axelix-green-400) 25%, transparent) inset;
+    color: #0a1c04;
+}

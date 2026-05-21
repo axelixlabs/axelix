@@ -9,7 +9,7 @@ export const FAQTopSection = () => {
                     Questions, <span className={styles.UnderlinedText}>answered.</span>
                 </h2>
             </div>
-            <p className={styles.Intro}>
+            <p className={styles.IntroText}>
                 Everything you&apos;d ask before pointing answer console at your fleet — license, safety, platform
                 support, and what&apos;s next.
             </p>

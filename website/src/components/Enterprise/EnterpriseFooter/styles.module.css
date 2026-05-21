@@ -1,0 +1,91 @@
+.MainWrapper {
+    margin-top: 55px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+    padding: 28px 32px;
+    border-radius: 16px;
+    background-color: rgba(10, 28, 4, 0.5);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    @media (max-width: 720px) {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 24px;
+    }
+}
+
+.Eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--axelix-mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--axelix-green-400);
+    margin-bottom: 8px;
+
+    &::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--axelix-green-400);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+    }
+}
+
+.Title {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(20px, 1.8vw, 26px);
+    letter-spacing: -0.018em;
+    color: #f5f8ee;
+    max-width: 30ch;
+}
+
+.Description {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(189, 211, 160, 0.8);
+    max-width: 46ch;
+}
+
+.Button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #0a1c04;
+    padding: 14px 22px;
+    border-radius: 11px;
+    background-color: var(--axelix-green-400);
+    border: 1px solid var(--axelix-green-400);
+    transition: background-color .15s, transform .15s;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: #a6cf5d;
+        transform: translateY(-1px);
+    }
+
+    &:hover .Arrow {
+        transform: translateX(3px);
+    }
+}
+
+.Arrow {
+    transition: transform .15s;
+}
+
+@media (max-width: 720px) {
+    .Button {
+        justify-self: start;
+    }
+}

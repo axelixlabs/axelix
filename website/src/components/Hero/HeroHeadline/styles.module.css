@@ -1,0 +1,33 @@
+.Title {
+    margin: 0 auto;
+    font-family: var(--axelix-font);
+    font-weight: 500;
+    font-size: clamp(44px, 6.6vw, 92px);
+    line-height: 0.98;
+    letter-spacing: -0.034em;
+    color: var(--axelix-ink);
+}
+
+.GreenText {
+    color: var(--axelix-green-500);
+}
+
+.UnderlinedText {
+    text-decoration: underline;
+    text-decoration-color: var(--axelix-green-500);
+    text-decoration-thickness: 8px;
+    text-underline-offset: 6px;
+}
+
+.Lede {
+    margin-top: 28px;
+    font-size: clamp(17px, 1.5vw, 20px);
+    line-height: 1.45;
+    color: var(--axelix-ink-2);
+    max-width: 680px;
+}
+
+.AccentedText {
+    font-style: normal;
+    font-weight: 500;
+}

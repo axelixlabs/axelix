@@ -1,0 +1,42 @@
+.MainWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  color: #bdd3a0;
+  text-transform: uppercase;
+}
+
+.Lhs {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.Dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff6b4a;
+  box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.22);
+  animation: pulse 1.6s infinite;
+}
+
+.Badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: #ff9c80;
+  background-color: rgba(255, 107, 74, 0.14);
+  border: 1px solid rgba(255, 107, 74, 0.32);
+  letter-spacing: 0.06em;
+}
+
+.Date {
+  color: #a3b88a;
+  letter-spacing: 0.06em;
+}
