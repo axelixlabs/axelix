@@ -1,9 +1,10 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import styles from './_configuringAxelixStarter.module.css';
 
 # Configuring Spring Boot Starter
 
-This page shows how to wire the Axelix Spring Boot Starter into a [Spring Boot](https://spring.io/) application so [Axelix Master](../installation/configuring-master.mdx) can discover it, read its state, and act on it — both from the UI and through Master's bundled MCP (Model Context Protocol) server, which exposes the same data to AI agents. Pick the starter module matching your Boot major version, expose the Axelix actuator endpoints, share the JWT signing key with Master, and tell Master where to find the instance.
+This page shows how to wire the Axelix Spring Boot Starter into a [Spring Boot](https://spring.io/) application so [Axelix Master](../../installation/configuring-master.mdx) can discover it, read its state, and act on it — both from the UI and through Master's bundled MCP (Model Context Protocol) server, which exposes the same data to AI agents. Pick the starter module matching your Boot major version, expose the Axelix actuator endpoints, share the JWT signing key with Master, and tell Master where to find the instance.
 
 ## Before you start
 
@@ -14,7 +15,7 @@ A few facts worth pinning down before you copy any of the snippets below.
     - `com.axelixlabs:axelix-spring-boot-3-starter` — Spring Boot 3.x (built and tested against `3.0.13`, Spring Cloud `2022.0.4`, minimum JDK 17).
 - **What the starter contributes**: a set of Axelix-specific actuator endpoints (`axelix-metadata`, `axelix-beans`, `axelix-loggers`, …), a JWT-based authorization filter that gates them, and an optional self-registration component that announces this instance to Master.
 - **Two consumers of the same data**: Master serves the Axelix UI at `/` and an MCP server at `/api/mcp` (controlled by `axelix.master.mcp-server.enabled`, on by default). Both read from the actuator endpoints the starter exposes, so wiring the starter up makes the instance visible to UI users *and* to MCP clients with no extra configuration on the starter side.
-- **What Master needs to talk to the instance**: HTTP reachability to the application's actuator base path (default `/actuator`), the Axelix endpoints exposed through `management.endpoints.web.exposure.include`, and a JWT signing key identical to the one configured on Master — see [Authentication — JWT](../installation/configuring-master.mdx#authentication--jwt) for the master side.
+- **What Master needs to talk to the instance**: HTTP reachability to the application's actuator base path (default `/actuator`), the Axelix endpoints exposed through `management.endpoints.web.exposure.include`, and a JWT signing key identical to the one configured on Master — see [Authentication — JWT](../../installation/configuring-master.mdx#authentication--jwt) for the master side.
 - **Two ways Master finds the instance**:
     - **Master-side autodiscovery** — Master scans its environment (currently Kubernetes Services) and probes the actuator endpoint itself. The starter only needs to expose the endpoints; nothing additional to configure.
     - **Self-registration** — the starter posts a heartbeat to Master on a fixed interval. Use this when Master cannot scan the instance's environment (different network, no platform integration, plain VMs).
@@ -108,7 +109,7 @@ The starter also depends on [Spring Boot Actuator](https://mvnrepository.com/art
 
 ## Expose the Axelix actuator endpoints
 
-Spring Boot hides custom actuator endpoints from web exposure by default. Add the Axelix IDs to `management.endpoints.web.exposure.include` so Master can reach them. `axelix-metadata` is the one Master probes first to confirm the instance is alive; the rest power the corresponding features in the UI.
+Spring Boot hides custom actuator endpoints from web exposure by default. Add the Axelix IDs to `management.endpoints.web.exposure.include` so Master can reach them. `axelix-metadata` <span className={styles.required}>required</span> is the endpoint Master probes first to confirm the instance is alive — without it the instance will not appear in Master, regardless of whether you use Master-side autodiscovery or starter-side self-registration. The rest of the endpoints power the corresponding features in the UI.
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -119,7 +120,6 @@ management:
     web:
       exposure:
         include:
-          - health
           - axelix-metadata
           - axelix-beans
           - axelix-caches
@@ -151,7 +151,7 @@ management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,ax
 
 ## Share the JWT signing key with Master
 
-Every Axelix actuator endpoint is gated by `JwtAuthorizationFilter`. The filter expects an HS256/HS512 token signed with the same key Master uses, so the two sides must agree on the algorithm and the secret. Use the same value you set for `axelix.master.auth.jwt.signing-key` on Master.
+Every Axelix actuator endpoint is gated by `JwtAuthorizationFilter`. The filter expects an HS256, HS384, or HS512 token signed with the same key Master uses, so the two sides must agree on the algorithm and the secret. Use the same value you set for `axelix.master.auth.jwt.signing-key` on Master.
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -190,7 +190,7 @@ Pick one of the two paths below. They are mutually exclusive in practice — sel
 
 ### Option A — Master-side autodiscovery
 
-When Master runs inside a Kubernetes cluster alongside your services, the simplest setup is to let Master scan the namespace for Services and probe each one's `/actuator/axelix-metadata`. No further configuration is needed on the starter side beyond exposing the actuator endpoints and sharing the JWT signing key. Configure the master-side scan with `axelix.master.discovery.auto.*` — see [Discovery — auto-discovery](../installation/configuring-master.mdx#discovery--auto-discovery) on the Master page.
+When Master runs inside a Kubernetes cluster alongside your services, the simplest setup is to let Master scan the namespace for Services and probe each one's `/actuator/axelix-metadata`. No further configuration is needed on the starter side beyond exposing the actuator endpoints and sharing the JWT signing key. Configure the master-side scan with `axelix.master.discovery.auto.*` — see [Discovery — auto-discovery](../../installation/configuring-master.mdx#discovery--auto-discovery) on the Master page.
 
 ### Option B — Self-registration
 
@@ -239,24 +239,42 @@ Every starter property lives under the `axelix.sbs.*` namespace.
 
 ### Authentication — JWT
 
+<div className={styles.configTable}>
+
 | Property                              | Default | Description                                                                                                                  |
 |---------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.auth.jwt.algorithm`       | *(unset)* | Signing algorithm. One of `HMAC256` or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.                  |
-| `axelix.sbs.auth.jwt.signing-key`     | *(unset)* | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
+| `axelix.sbs.auth.jwt.algorithm`       | *(unset)* <span className={styles.required}>required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.                  |
+| `axelix.sbs.auth.jwt.signing-key`     | *(unset)* <span className={styles.required}>required</span> | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
 | `axelix.sbs.auth.jwt.duration`        | `5m`    | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.            |
 
+</div>
+
 ### Self-registration
+
+Self-registration is **off by default** (`axelix.sbs.discovery.auto=false`) — leave it that way when Master can find the instance through Master-side autodiscovery instead.
+
+When `axelix.sbs.discovery.auto=true`, the following properties become **required**:
+
+- `axelix.sbs.discovery.master-url`
+- `axelix.sbs.discovery.instance-url`
+- `axelix.sbs.discovery.instance-name`
+
+The Master-side receiver of these heartbeats — endpoint, eviction timeout, eviction sweep schedule — is documented on the Master page in [Discovery — self-registration](../../installation/configuring-master.mdx#discovery--self-registration). The JWT signing key configured under `axelix.sbs.auth.jwt.signing-key` must match `axelix.master.auth.jwt.signing-key` on Master, otherwise heartbeats are rejected with `401`.
+
+<div className={styles.configTable}>
 
 | Property                                       | Default | Description                                                                                                                  |
 |------------------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.auto`                    | `false` | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                |
-| `axelix.sbs.discovery.master-url`              | *(unset)* | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
-| `axelix.sbs.discovery.instance-url`            | *(unset)* | Base URL of this service as reachable from Master (no `/actuator` suffix). Required when `auto=true`.                        |
-| `axelix.sbs.discovery.instance-name`           | *(unset)* | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                |
+| `axelix.sbs.discovery.master-url`              | *(unset)* <span className={styles.required}>required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
+| `axelix.sbs.discovery.instance-url`            | *(unset)* <span className={styles.required}>required</span> | Base URL of this service as reachable from Master (no `/actuator` suffix). Required when `auto=true`.                        |
+| `axelix.sbs.discovery.instance-name`           | *(unset)* <span className={styles.required}>required</span> | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                |
 | `axelix.sbs.discovery.heartbeat-interval`      | `15s`   | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                   |
+
+</div>
 
 ## Related
 
-- [Configuring Master](../installation/configuring-master.mdx) — where the signing key, eviction timeout, and Kubernetes scan are set.
-- [What is Master?](../setting-up-master-ui/what-is-master.md) — background on how Master uses the data the starter exposes.
-- [Authentication](../setting-up-master-ui/authentication.md) — deeper look at JWT and authority resolution on both sides.
+- [Configuring Master](../../installation/configuring-master.mdx) — where the signing key, eviction timeout, and Kubernetes scan are set.
+- [What is Master?](../../setting-up-master-ui/what-is-master.md) — background on how Master uses the data the starter exposes.
+- [Authentication](../../setting-up-master-ui/authentication/authentication.mdx) — deeper look at JWT and authority resolution on both sides.

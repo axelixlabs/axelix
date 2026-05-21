@@ -1,16 +1,24 @@
+import signInOptionsStyles from './_signInOptionsTable.module.css';
+import rolesStyles from './_rolesTable.module.css';
+import oauth2Styles from './_oauth2PropertiesTable.module.css';
+
 # Authentication
 
-This page explains how sign-in to Axelix Master actually works: which authentication options exist, how the browser session is established and verified on each request, the role/authority model that gates the UI, and how the MCP server authenticates AI agents. The property keys themselves live in [Configuring Master](../installation/configuring-master.mdx#configuration-reference) — the goal here is the mental model.
+This page explains how sign-in to Axelix Master actually works: which authentication options exist, how the browser session is established and verified on each request, the role/authority model that gates the UI, and how the MCP server authenticates AI agents. The property keys themselves live in [Configuring Master](../../installation/configuring-master.mdx#configuration-reference) — the goal here is the mental model.
 
 ## The three sign-in options
 
 Master ships three independent authentication providers. Any combination can be enabled at the same time; the login screen at `/login` renders the controls for whichever ones are active.
+
+<div className={signInOptionsStyles.signInOptionsTable}>
 
 | Option        | Default       | Toggle property                                                                                     | Use it when                                                                            |
 |---------------|---------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | Super-admin   | Always active | (controlled by `axelix.master.auth.options.super-admin.credentials.{username,password}`)            | First-time setup, recovery account, single-operator deployments.                       |
 | Local users   | Off           | `axelix.master.auth.options.local.enabled=true`                                                     | Multiple operators, no external IdP, you want Master to own the password store.        |
 | OAuth2 / OIDC | Off           | `axelix.master.auth.options.oauth2.enabled=true`                                                    | Production. SSO through Keycloak, Auth0, Okta, Google, or any OIDC-compliant provider. |
+
+</div>
 
 When more than one option is enabled, the screen stacks them: the username/password form appears for super-admin and local users, followed by a single **Sign in with OAuth2/OIDC Provider** button when OIDC is on.
 
@@ -28,7 +36,7 @@ Local users are managed through the **Users** screen in the UI — creating, upd
 
 ### OAuth2 / OIDC
 
-Master implements the standard Authorization Code Flow. Enable it with `axelix.master.auth.options.oauth2.enabled=true` and supply `issuer-uri`, `client-id`, `client-secret`, and the public `base-url` of this Master deployment (see [Authentication — OAuth2 / OIDC](../installation/configuring-master.mdx#authentication--oauth2--oidc) for the full property list).
+Master implements the standard Authorization Code Flow. Enable it with `axelix.master.auth.options.oauth2.enabled=true` and supply `issuer-uri`, `client-id`, `client-secret`, and the public `base-url` of this Master deployment.
 
 The end-to-end flow:
 
@@ -39,6 +47,22 @@ The end-to-end flow:
 5. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with the session cookies set.
 
 The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses them once to identify the user and then issues its own session JWT.
+
+**When `axelix.master.auth.options.oauth2.enabled=true`, these properties must be supplied:** `issuer-uri`, `client-id`, `client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes. `role-attribute-path` is optional — leave it unset to map every signed-in user to the `VIEWER` role.
+
+<div className={oauth2Styles.configTable}>
+
+| Property                                                       | Default   | Description                                                                                                                                  |
+|----------------------------------------------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`                    | `false`   | Enable OIDC sign-in.                                                                                                                         |
+| `axelix.master.auth.options.oauth2.issuer-uri`                 | *(unset)* <span className={oauth2Styles.required}>required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`. |
+| `axelix.master.auth.options.oauth2.client-id`                  | *(unset)* <span className={oauth2Styles.required}>required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                |
+| `axelix.master.auth.options.oauth2.client-secret`              | *(unset)* <span className={oauth2Styles.required}>required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                    |
+| `axelix.master.auth.options.oauth2.base-url`                   | *(unset)* <span className={oauth2Styles.required}>required</span> | Public base URL of this Master instance; used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.            |
+| `axelix.master.auth.options.oauth2.scopes`                     | `openid`  | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                          |
+| `axelix.master.auth.options.oauth2.role-attribute-path`        | *(unset)* | Optional. JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+
+</div>
 
 ## The session: cookies and JWT
 
@@ -51,7 +75,7 @@ Every sign-in path ends the same way: Master mints a JWT and hands it back as a 
 - **`auth_token`** — the JWT itself. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan` (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure` — leave it `false` only over plain-HTTP localhost.
 - **`authorities`** — a Base64-encoded JSON array of the authority names the signed-in user holds, e.g. `["ENV_VALUES_READ","SCHEDULED_TASKS_MODIFY"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons to render. It is purely a UI hint; the backend re-derives authorities from the JWT on every request, so tampering with this cookie only changes what the UI offers, not what the server allows.
 
-The JWT itself is HMAC-signed (`HMAC256` or `HMAC512`, set via `axelix.master.auth.jwt.algorithm`) with the secret in `axelix.master.auth.jwt.signing-key`. Its claims are the username (`sub`), the issued-at and expiry timestamps, and a `roles` claim that encodes each granted role together with its authorities and nested components.
+The JWT itself is HMAC-signed (`HMAC256`, `HMAC384`, or `HMAC512`, set via `axelix.master.auth.jwt.algorithm`) with the secret in `axelix.master.auth.jwt.signing-key`. Its claims are the username (`sub`), the issued-at and expiry timestamps, and a `roles` claim that encodes each granted role together with its authorities and nested components.
 
 ### What every request goes through
 
@@ -73,12 +97,16 @@ To force every active session to end (after a compromised key, a stale shared se
 
 Master uses a fixed set of roles and a fixed set of authorities. Roles are bundles of authorities, the authorization check is always against authorities, never role names. This means a custom role wired in by the OIDC mapping or the database layer must resolve to one of the built-in names — there is no way today to define a new authority from configuration.
 
+<div className={rolesStyles.rolesTable}>
+
 | Role              | Authorities granted                                                                                                                                              | Who gets it                                                                                          |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | `SUPER_ADMIN`     | Every authority defined by Master, including `USERS_VIEW` and `USERS_MANAGEMENT`.                                                                                | The built-in super-admin account.                                                                    |
 | `ADMIN`           | `ENV_VALUES_READ`, `CONFIG_PROPS_VALUES_READ`, `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                   | Local DB users with role `admin`; OIDC users whose `role-attribute-path` resolves to `admin`.        |
 | `EDITOR`          | `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                                                                  | Local DB users with role `editor`; OIDC users whose `role-attribute-path` resolves to `editor`.      |
 | `VIEWER`          | None — read-only view of everything not gated by an authority.                                                                                                   | Local DB users with role `viewer`; OIDC users with no `role-attribute-path` set or unmapped values.  |
+
+</div>
 
 What each authority gates:
 
@@ -112,6 +140,6 @@ MCP clients that implement RFC 9728 use that header to discover Master's OAuth2 
 
 ## Related
 
-- [Configuring Master — Authentication properties](../installation/configuring-master.mdx#authentication--jwt) — every property key and default referenced on this page.
-- [Configuring Spring Boot Starter](../installation/configuring-spring-boot-starter.mdx) — the starter side of the same JWT signing key.
-- [What is Master?](./what-is-master.md) — broader background on what Master does once the session is live.
+- [Configuring Master — Authentication properties](../../installation/configuring-master.mdx#authentication--jwt) — every property key and default referenced on this page.
+- [Configuring Spring Boot Starter](../../installation/configuring-spring-boot-starter.mdx) — the starter side of the same JWT signing key.
+- [What is Master?](../what-is-master.md) — broader background on what Master does once the session is live.
