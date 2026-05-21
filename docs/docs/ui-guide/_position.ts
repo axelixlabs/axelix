@@ -6,6 +6,8 @@ const pages: string[] = [
   'dashboard',
   'wallboard',
   'service-profile',
+  'users',
+  'mcp',
 ].map((id) => `${prefix}/${id}`);
 
 export default pages;
