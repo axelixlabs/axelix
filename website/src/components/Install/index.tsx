@@ -56,7 +56,7 @@ const METHODS_DATA: Record<Method, {
     href: "https://axelix.io/docs/installation/configuring-master#run-with-docker"
   },
   bare: {
-    description: "Installing Axelix on bare metal without containerization is also possible by directly laucnhing a JAR file",
+    description: "Installing Axelix on bare metal without containerization is also possible by directly launching a JAR file",
     href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar"
   }
 };
