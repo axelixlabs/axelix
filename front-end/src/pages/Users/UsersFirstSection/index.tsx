@@ -20,8 +20,9 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "components";
+import { useAppSelector } from "hooks";
 import { ERoles, EUserOrigin, type IUsersFilters } from "models";
-import { roleOptions } from "utils";
+import { LOCAL_AUTH_OPTION_TYPE_NAME, roleOptions } from "utils";
 
 import { CreateUser } from "./CreateUser";
 import styles from "./styles.module.css";
@@ -55,6 +56,7 @@ interface IProps {
 
 export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, fetchUsers }: IProps) => {
     const { t } = useTranslation();
+    const settings = useAppSelector((state) => state.settings);
 
     const userOriginOptions = Object.values(EUserOrigin).map((origin) => ({
         value: origin,
@@ -104,7 +106,9 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                 </div>
             </div>
 
-            <CreateUser fetchUsers={fetchUsers} />
+            {settings.authenticationOptions.find((value) => {
+                return value.type === LOCAL_AUTH_OPTION_TYPE_NAME;
+            }) && <CreateUser fetchUsers={fetchUsers} />}
         </div>
     );
 };

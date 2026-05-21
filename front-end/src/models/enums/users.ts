@@ -18,6 +18,7 @@
 export enum ERoles {
     EDITOR = "EDITOR",
     VIEWER = "VIEWER",
+    ADMIN = "ADMIN",
 }
 
 export enum EUserOrigin {
