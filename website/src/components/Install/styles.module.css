@@ -596,12 +596,6 @@
   background: color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
 }
 
-.NavBtn.Next { color: var(--axelix-green-400); }
-.NavBtn.Next:hover {
-  background: color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
-  color: #cce7a8;
-}
-
 .NavBtn.Done {
   color: #0a1c04;
   background: var(--axelix-green-400);

@@ -83,7 +83,7 @@ export const Footer = () => {
                 <li><a href="https://github.com/axelixlabs/axelix?tab=LGPL-3.0-1-ov-file" target="_blank" rel="noopener noreferrer">LGPL-3.0</a></li>
                 <li><a href="#" target="_blank" rel="noopener noreferrer">Privacy</a></li>
                 <li><a href="#" target="_blank" rel="noopener noreferrer">Terms</a></li>
-                <li><a href="#" target="_blank" rel="noopener noreferrer">Security</a></li>
+                <li><a href="https://axelix.io/docs/setting-up-master-ui/authentication" target="_blank" rel="noopener noreferrer">Security</a></li>
               </ul>
             </div>
           </div>
