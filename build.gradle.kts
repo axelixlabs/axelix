@@ -52,12 +52,9 @@ tasks {
 subprojects {
 
     apply(plugin = "java")
-    // TODO: We do not need to apply maven-publish to all the subprojects actually
-    apply(plugin = "maven-publish")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "pmd")
     apply(plugin = "net.ltgt.errorprone")
-    apply(plugin = "signing")
 
     dependencies {
         errorprone("com.google.errorprone:error_prone_core:2.41.0")
@@ -108,6 +105,70 @@ subprojects {
         }
     }
 
+    testing {
+        suites {
+            withType<JvmTestSuite>().configureEach {
+                useJUnitJupiter()
+            }
+        }
+    }
+
+    pmd {
+        isIgnoreFailures = false
+        isConsoleOutput = true
+        toolVersion = "7.16.0"
+        ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
+    }
+
+    tasks {
+        // Enable custom Javadoc tags
+        withType(Javadoc::class.java).configureEach {
+            val options = options as StandardJavadocDocletOptions
+            options.tags(
+                "apiNote:a:API Note:",
+                "implNote:a:Implementation Note:"
+            )
+        }
+
+        withType(JavaCompile::class.java).configureEach {
+            options.errorprone {
+                // TODO Consider enable compilation warnings on first milestone release
+                disableAllChecks = true
+            }
+        }
+
+        named<JavaCompile>("compileJava") {
+            options.errorprone {
+                check("NullAway", CheckSeverity.ERROR)
+                option("NullAway:AnnotatedPackages", "com.axelixlabs.axelix")
+                option("NullAway:JSpecifyMode", true)
+                option("NullAway:CheckOptionalEmptiness", true)
+            }
+        }
+
+        check {
+            dependsOn(pmdMain, pmdTest)
+        }
+    }
+}
+
+val publishableProjects = listOf(
+    project(":sbs:axelix-spring-boot-2-starter"),
+    project(":sbs:axelix-spring-boot-3-starter"),
+    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
+    //project(":sbs:axelix-spring-boot-4-starter"),
+    project(":master")
+)
+
+configure(publishableProjects) {
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
     publishing {
         repositories {
 
@@ -133,6 +194,19 @@ subprojects {
                     password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
                 }
             }
+
+            // We do not publish bootJar to MavenCentral
+            // TODO: revisit later
+//            if (project.name != "master") {
+//                maven {
+//                    name = "MavenCentral"
+//                    url = uri("https://sonatype.com")
+//                    credentials {
+//                        username = project.findProperty("sonatype.user") as String? ?: System.getenv("SONATYPE_USER")
+//                        password = project.findProperty("sonatype.password") as String? ?: System.getenv("SONATYPE_PASSWORD")
+//                    }
+//                }
+//            }
         }
 
         publications {
@@ -144,7 +218,6 @@ subprojects {
 
             // Publish to GitHub Package Registry
             register<MavenPublication>("gpr") {
-
                 from(components["java"])
 
                 // Configure the POM file details
@@ -223,52 +296,6 @@ subprojects {
                     """
                 )
             }
-        }
-    }
-
-    testing {
-        suites {
-            withType<JvmTestSuite>().configureEach {
-                useJUnitJupiter()
-            }
-        }
-    }
-
-    pmd {
-        isIgnoreFailures = false
-        isConsoleOutput = true
-        toolVersion = "7.16.0"
-        ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
-    }
-
-    tasks {
-        // Enable custom Javadoc tags
-        withType(Javadoc::class.java).configureEach {
-            val options = options as StandardJavadocDocletOptions
-            options.tags(
-                "apiNote:a:API Note:",
-                "implNote:a:Implementation Note:"
-            )
-        }
-
-        withType(JavaCompile::class.java).configureEach {
-            options.errorprone {
-                // TODO Consider enable compilation warnings on first milestone release
-                disableAllChecks = true
-            }
-        }
-
-        named<JavaCompile>("compileJava") {
-            options.errorprone {
-                check("NullAway", CheckSeverity.ERROR)
-                option("NullAway:AnnotatedPackages", "com.axelixlabs.axelix")
-                option("NullAway:JSpecifyMode", true)
-                option("NullAway:CheckOptionalEmptiness", true)
-            }
-        }
-
-        check {
-            dependsOn(pmdMain, pmdTest)
         }
     }
 }
