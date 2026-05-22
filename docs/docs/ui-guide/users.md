@@ -1,0 +1,70 @@
+# Users
+
+The **Users** screen is where you see who can sign in to Axelix Master, what role each account carries, and — when local authentication is enabled — where you create, edit, and delete those accounts. The page is reachable from the **Users** link in the top navigation bar.
+
+## Who can open this page
+
+The **Users** link only appears for accounts that hold the `USERS_VIEW` authority. By default, that authority is bundled only with the built-in `SUPER_ADMIN` role — `ADMIN`, `EDITOR`, and `VIEWER` cannot see the link or load the page. See [Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full grant table.
+
+The **Create User** button, and the edit and delete controls on the profile screen, additionally require the `USERS_MANAGEMENT` authority, which is also reserved for `SUPER_ADMIN`.
+
+## The users list
+
+The top section gives you three ways to narrow the table:
+
+- **Search** filters by username or email. The counter on the right of the search field shows `<matches> / <total>` so you can see how many users are currently visible compared to the full list.
+- **Roles** — multi-select drop-down. Picking one or more roles keeps only users that have at least one of the selected roles.
+- **Origin** — multi-select drop-down with two values: `LOCAL` and `OIDC`. In the current release every account in this table is `LOCAL` — OIDC sessions are authenticated per request and are not persisted to the users database, so the `OIDC` filter returns an empty list today.
+
+Below the filters, the table lists every visible user with these columns:
+
+- **Username** — the login name used at the sign-in screen.
+- **Email** — the email address attached to the account. May be blank.
+- **Last login** — the timestamp of the most recent successful sign-in, formatted as `DD.MM.YYYY HH:mm`. Accounts that have never signed in show **Not logged in**.
+- **Origin** — `LOCAL` for every persisted account today. See the **Origin** filter note above.
+- **Roles** — coloured tags for each role granted to the user (`ADMIN`, `EDITOR`, `VIEWER`).
+
+Click any row to open the [User Profile](#user-profile) for that account.
+
+## Creating a user
+
+The **Create User** button is only rendered when local authentication is enabled in Master (`axelix.master.auth.options.local.enabled=true`). It is hidden in OIDC-only deployments because new accounts there come from the identity provider, not from the Axelix UI.
+
+Clicking the button opens a modal with the following fields:
+
+- **Username** — the login name. Must be unique.
+- **Email** — optional. If you leave it blank, the account is stored without an email.
+- **Password** — the initial password. The user can change it later from their profile.
+- **Role** — exactly one role: `ADMIN`, `EDITOR`, or `VIEWER`. Multiple roles can be assigned later from the profile screen.
+
+A successful creation closes the modal, shows a **User created successfully** toast, and refreshes the list.
+
+## User Profile
+
+Selecting a row in the users list opens that account's profile page. It presents the **User Profile** card with four inline-editable fields, followed by an action area for managing the account itself.
+
+Each row in the card carries an edit pencil on the right. Clicking it swaps the value for an input plus a confirm and a cancel action. The save action sends the new value to Master immediately; the cancel action reverts the field without persisting.
+
+- **Username** — the login name. Editing it changes how the user signs in.
+- **Email** — the email address. Saving an empty value clears the email on the account.
+- **Roles** — the multi-select drop-down lets you assign any combination of `ADMIN`, `EDITOR`, and `VIEWER`. The user's effective permissions are the union of the authorities those roles grant.
+- **Password** — the value is always masked as `••••••••••`. Editing it sets a brand-new password; there is no "show current value" because Master never stores the password in clear text. Leaving the field empty and confirming saves an empty string and is rejected by the backend.
+
+Below the card sit two action buttons:
+
+- **Delete user** — opens a confirmation modal (**Are you sure you want to delete this user?**). Confirming removes the account immediately; the page navigates back to the users list and a **User deleted successfully** toast appears. There is no undo.
+- **Access Log** — currently disabled. The control is reserved for an upcoming feature that will ship with Axelix Enterprise. Both the Access Log and Axelix Enterprise itself are still in development, so the button cannot be clicked today.
+
+:::warning
+The **Delete user** action is irreversible. The account is removed from the database — there is no soft-delete or restore.
+:::
+
+## OIDC sessions
+
+When OIDC is enabled, sign-ins through your identity provider work without an account in this table. Master derives the role from `axelix.master.auth.options.oauth2.role-attribute-path` on every request and never writes the user to its database. As a result, OIDC users do not show up on this screen and cannot be managed from it — all role management for them lives in your identity provider.
+
+:::info
+Persisting OIDC users in the Master database is on the roadmap. Once that lands, accounts that sign in through the identity provider will appear in this table alongside `LOCAL` users, and the `OIDC` origin filter will start returning results. Until then, OIDC accounts remain session-only.
+:::
+
+For the full picture of how authentication is wired, see [Authentication](../setting-up-master-ui/authentication/authentication.mdx).

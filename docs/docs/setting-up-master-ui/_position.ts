@@ -6,6 +6,7 @@ const pages: string[] = [
   'what-is-master',
   'configuring-master/configuring-master',
   'authentication/authentication',
+  'mcp/mcp-tools',
 ].map((id) => `${prefix}/${id}`);
 
 export default pages;
