@@ -13,7 +13,7 @@ val springCloudVersion = "2022.0.4"
 
 dependencies {
     // Self
-    api(project(":sbs:starter-domain"))
+    compileOnly(project(":sbs:starter-domain"))
 
     // Impl
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
@@ -32,6 +32,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
     // Test
+    testImplementation(project(":sbs:starter-domain"))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
