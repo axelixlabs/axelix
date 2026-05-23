@@ -20,7 +20,7 @@ jobs:
   build-deploy-source:
     runs-on: ubuntu-latest
     env:
-      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+      YANDEX_CLOUD_OAUTH2_TOKEN: ${{ secrets.YANDEX_CLOUD_OAUTH2_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: axelix
@@ -51,6 +51,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
 
       - name: Build Backend
         uses: ./.github/actions/build-backend
@@ -84,7 +87,7 @@ jobs:
 
       - name: Docker login to Yandex Cloud CR
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
-        run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
+        run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
         run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
