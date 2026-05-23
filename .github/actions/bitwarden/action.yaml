@@ -1,0 +1,14 @@
+name: "Bitwarden Credentials Integration"
+inputs:
+  bw-access-token:
+    description: BitWarden Access Token
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Fetch Secrets from Bitwarden
+      uses: bitwarden/sm-action@v3.0.0
+      with:
+        access_token: ${{ inputs.bw-access-token }}
+        secrets: |
+          60a7fb0c-5534-426d-baf3-b453013dbfa8 > YANDEX_CLOUD_OAUTH2_TOKEN
