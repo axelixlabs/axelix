@@ -48,4 +48,4 @@ jobs:
       - name: Build Backend
         uses: ./.github/actions/build-backend
         with:
-          gradle-cache-enryption-key: ${{ env.GRADLE_CACHE_ENCRYPTION_KEY }}
+          gradle-cache-enryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}

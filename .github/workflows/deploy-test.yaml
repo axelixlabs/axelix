@@ -24,7 +24,6 @@ jobs:
       CR_URL: ${{ vars.CR_URL }}
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: axelix
-      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
@@ -55,7 +54,7 @@ jobs:
         uses: ./.github/actions/build-backend
         with:
           deploy-to-nexus: true
-          gradle-cache-enryption-key: ${{ env.GRADLE_CACHE_ENCRYPTION_KEY }}
+          gradle-cache-enryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Build Frontend
         uses: ./.github/actions/build-frontend
@@ -109,7 +108,7 @@ jobs:
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config
-          echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
+          echo "$SANDBOX_KUBE_CONFIG" > ~/.kube/config
           chmod 600 ~/.kube/config
           helm upgrade \
             --set image.pullPolicy=Always \
