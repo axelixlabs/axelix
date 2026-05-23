@@ -2,7 +2,7 @@
 
 Welcome to Axelix! We're glad you're here.
 
-Axelix is a monitoring and runtime-debugging tool for Spring Boot applications written in Java or Kotlin. It connects to your running services and exposes the live state of each application — its beans, configuration sources, transactions, scheduled tasks, caches, threads, and metrics — through a web UI for developers and QA engineers, and through a bundled MCP server for AI agents. Parts of that state can be changed on the fly without a redeploy. Concretely, you can spot N+1 query patterns in live transactions, track cache hit and miss rates, and manage scheduled tasks by pausing, resuming, or triggering them.
+Axelix is a monitoring and runtime-debugging tool for Spring Boot applications written in Java or Kotlin. It connects to your running services and exposes the live state of each application — its beans, configuration sources, transactions, scheduled tasks, caches, threads, and metrics — through a web UI for human engineers, and through a bundled MCP server for AI agents. Parts of that state can be changed on the fly without a redeploy. 
 
 We care about how quickly you can get Axelix running. [Installation](../installation/configuring-master.mdx) walks you through bringing Master up, and the [Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter.md) guide covers adding the starter to your application.
 
