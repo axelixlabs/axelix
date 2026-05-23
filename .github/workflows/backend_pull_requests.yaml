@@ -36,11 +36,14 @@ jobs:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
       NEXUS_URL: ${{ secrets.NEXUS_URL }}
-
-      GRADLE_CACHE_ENCRYPTION_KEY: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
       - name: Build Backend
         uses: ./.github/actions/build-backend

@@ -46,8 +46,6 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID: ${{ secrets.OIDC_GOOGLE_CLIENT_ID }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET: ${{ secrets.OIDC_GOOGLE_CLIENT_SECRET }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
-
-      GRADLE_CACHE_ENCRYPTION_KEY: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

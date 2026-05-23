@@ -12,3 +12,6 @@ runs:
         access_token: ${{ inputs.bw-access-token }}
         secrets: |
           60a7fb0c-5534-426d-baf3-b453013dbfa8 > YANDEX_CLOUD_OAUTH2_TOKEN
+          56f5441b-55f4-494e-a44f-b453013d11e9 > ALGOLIA_APPLICATION_ID
+          e7af9a48-fe20-4155-9ef6-b453013d7407 > ALGOLIA_SEARCH_API_KEY
+          b4977ab8-ce56-4190-9e27-b453014fd2d1 > GRADLE_CACHE_ENCRYPTION_KEY
