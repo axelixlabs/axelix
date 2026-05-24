@@ -13,9 +13,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_CONTAINER_REGISTRY: ghcr.io
   RELEASE_TAG: ${{ github.event.inputs.git_tag }}
-  PGP_KEY_ID: ${{ secrets.PGP_KEY_ID }}
-  PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
-  PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
 
 jobs:
   build-and-test-backend:

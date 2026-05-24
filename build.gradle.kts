@@ -281,8 +281,11 @@ configure(publishableProjects) {
         // Signing artifacts only in case publishGprPublicationToGitHubPackagesRepository is present
         if (gradle.taskGraph.hasTask(":publishGprPublicationToGitHubPackagesRepository")) {
 
-            val signingKey = System.getenv("PGP_SIGNING_KEY")
-            val signingPassword = System.getenv("PGP_SIGNING_KEY_PASSPHRASE")
+            val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
+            val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
+
+            val signingKey = System.getenv(gpgSigningKeyIdEnvVariableName)
+            val signingPassword = System.getenv(gpgPassphraseEnvVariableName)
 
             if (signingKey != null && signingPassword != null) {
                 useInMemoryPgpKeys(signingKey, signingPassword)
@@ -291,8 +294,8 @@ configure(publishableProjects) {
                 throw GradleException(
                     """
                     Signing requires:
-                    1. signing.key property OR PGP_SIGNING_KEY env var.
-                    2. signing.password property OR SIGNING_KEY_PASSPHRASE env var.
+                    1. $gpgSigningKeyIdEnvVariableName env var.
+                    2. $gpgPassphraseEnvVariableName env var.
                     """
                 )
             }
