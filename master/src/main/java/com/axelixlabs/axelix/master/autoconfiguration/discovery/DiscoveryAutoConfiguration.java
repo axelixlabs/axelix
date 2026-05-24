@@ -33,8 +33,8 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
@@ -93,10 +93,13 @@ public class DiscoveryAutoConfiguration {
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
                 DiscoveryClient discoveryClient,
                 ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-                AxelixVersionDiscoverer axelixVersionDiscoverer,
+                CompatibilityDetectionStrategy compatibilityDetectionStrategy,
                 InstanceFactory instanceFactory) {
             return new KubernetesInstanceDiscoverer(
-                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, instanceFactory);
+                    discoveryClient,
+                    managedServiceMetadataEndpointProber,
+                    compatibilityDetectionStrategy,
+                    instanceFactory);
         }
     }
 }

@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.service.discovery.k8s;
 import java.net.URI;
 import java.util.Map;
 
+import org.jspecify.annotations.NullUnmarked;
+
 import org.springframework.cloud.client.ServiceInstance;
 
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -39,6 +41,7 @@ import com.axelixlabs.axelix.master.domain.Instance;
  * @since 06.11.2025
  * @author Nikita Kirillov
  */
+@NullUnmarked
 public record KubernetesServiceInstance(
         String instanceId,
         String serviceId,

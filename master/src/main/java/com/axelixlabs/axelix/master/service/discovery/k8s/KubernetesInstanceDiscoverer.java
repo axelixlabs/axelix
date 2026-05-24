@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -50,9 +50,9 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            AxelixVersionDiscoverer axelixVersionDiscoverer,
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy,
             InstanceFactory instanceFactory) {
-        super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        super(log, discoveryClient, managedServiceMetadataEndpointProber, compatibilityDetectionStrategy);
         this.instanceFactory = instanceFactory;
     }
 

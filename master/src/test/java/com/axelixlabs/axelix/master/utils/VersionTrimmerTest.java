@@ -48,7 +48,10 @@ class VersionTrimmerTest {
                 Arguments.of("1.2.3.4", "1"),
                 Arguments.of("17.0.19", "17"),
                 Arguments.of("2.5.0-SNAPSHOT", "2"),
-                Arguments.of("3.0.0-RELEASE", "3"));
+                Arguments.of("3.0.0-RELEASE", "3"),
+                Arguments.of(null, null),
+                Arguments.of("", ""),
+                Arguments.of("   ", "   "));
     }
 
     @ParameterizedTest
@@ -65,6 +68,9 @@ class VersionTrimmerTest {
                 Arguments.of("11.0", "11.0"),
                 Arguments.of("11", "11"),
                 Arguments.of("2.5.0-SNAPSHOT", "2.5"),
-                Arguments.of("3.0.0-RELEASE", "3.0"));
+                Arguments.of("3.0.0-RELEASE", "3.0"),
+                Arguments.of(null, null),
+                Arguments.of("", ""),
+                Arguments.of("   ", "   "));
     }
 }

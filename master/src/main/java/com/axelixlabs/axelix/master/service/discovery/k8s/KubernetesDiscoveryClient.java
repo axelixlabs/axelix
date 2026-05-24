@@ -37,7 +37,6 @@ import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +74,7 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
     }
 
     @Override
-    public List<ServiceInstance> getInstances(@NonNull String serviceId) {
+    public List<ServiceInstance> getInstances(String serviceId) {
         List<ServiceInstance> instances = new ArrayList<>();
 
         for (String namespace : namespaces) {

@@ -83,7 +83,7 @@ class KubernetesInstanceDiscovererTest {
     private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
 
     @Autowired
-    private AxelixVersionDiscoverer axelixVersionDiscoverer;
+    private CompatibilityDetectionStrategy compatibilityDetectionStrategy;
 
     @Autowired
     private DefaultInstanceFactory instanceFactory;
@@ -120,6 +120,12 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
+        public CompatibilityDetectionStrategy compatibilityDetectionStrategy(
+                AxelixVersionDiscoverer axelixVersionDiscoverer) {
+            return new MajorVersionCompatibilityDetectionStrategy(axelixVersionDiscoverer);
+        }
+
+        @Bean
         public DefaultInstanceFactory instanceFactory() {
             return new DefaultInstanceFactory();
         }
@@ -132,7 +138,7 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, instanceFactory);
+                discoveryClient, managedServiceMetadataEndpointProber, compatibilityDetectionStrategy, instanceFactory);
     }
 
     @AfterEach
@@ -216,6 +222,51 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
         });
+    }
+
+    @Test
+    void shouldRegisterInstanceWhenOnlyMinorVersionDiffers() {
+        String serviceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+            {
+              "version": "1.5.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "vmFeatures": []
+            }
+            """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance serviceInstance = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), serviceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
+        Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(serviceInstance));
+
+        Set<Instance> instances = subject.discover();
+
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(instanceId);
     }
 
     @Test

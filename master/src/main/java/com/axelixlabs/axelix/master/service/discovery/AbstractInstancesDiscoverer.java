@@ -23,7 +23,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -34,7 +33,6 @@ import org.springframework.util.CollectionUtils;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -60,21 +58,21 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
-    private final AxelixVersionDiscoverer axelixVersionDiscoverer;
+    private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            AxelixVersionDiscoverer axelixVersionDiscoverer) {
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
         this.logger = logger;
-        this.axelixVersionDiscoverer = axelixVersionDiscoverer;
+        this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
     }
 
     @Override
-    public @NonNull Set<@NonNull Instance> discover() {
+    public Set<Instance> discover() {
         List<String> serviceIds = discoveryClient.getServices();
 
         if (CollectionUtils.isEmpty(serviceIds)) {
@@ -101,7 +99,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         return result;
     }
 
-    private @Nullable InstanceIntermediateProfile getManagedServiceMetadata(@NonNull ServiceInstance serviceInstance) {
+    private @Nullable InstanceIntermediateProfile getManagedServiceMetadata(ServiceInstance serviceInstance) {
         String actuatorUrl = serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
@@ -117,12 +115,12 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         }
     }
 
-    private boolean isCompatibleVersion(@NonNull InstanceIntermediateProfile profile) {
-        if (profile.metadata().getVersion().equals(axelixVersionDiscoverer.getVersion())) {
+    private boolean isCompatibleVersion(InstanceIntermediateProfile profile) {
+        if (compatibilityDetectionStrategy.isCompatible(profile.metadata().getVersion())) {
             return true;
         } else {
             logger.warn(
-                    "Service: {} have not a valid version",
+                    "Service: {} has a version of Axelix starter that current Axelix Master is not capable to work with",
                     profile.serviceInstance().getServiceId());
             return false;
         }
