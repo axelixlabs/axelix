@@ -32,10 +32,10 @@ jobs:
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ env.PRODUCTION_WEBSITE_HOST }}
-          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           source: "docker-compose.yml,infra/nginx"
-          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}"
+          target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}"
 
       - name: Prepare Standalone Folder
         working-directory: website
@@ -47,20 +47,20 @@ jobs:
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ env.PRODUCTION_WEBSITE_HOST }}
-          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           source: "website/.next/static,website/.next/standalone,website/Dockerfile"
-          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
+          target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}/axelix-website"
           strip_components: 1
 
       - name: Build Docker image on server and restart container
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ env.PRODUCTION_WEBSITE_HOST }}
-          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           script: |
             set -eux
-            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+            cd /home/${{ env.PRODUCTION_WEBSITE_USER }}
             sudo docker compose rm -f -s website
             sudo docker compose up --build -d website
