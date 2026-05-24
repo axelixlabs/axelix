@@ -1,0 +1,109 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Thread Dump
+
+The **Thread Dump** page shows a live snapshot of every thread in the managed Spring Boot instance. The page polls the
+instance periodically, so the list, the thread states, and the timeline reflect recent JVM state rather than a frozen
+capture.
+
+![thread dump main page](../../static/img/feature/thread-dump/thread-dump-main-page.png)
+***Thread Dump page as presented in Axelix UI***
+
+The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all
+open it and toggle **Thread Contention Monitoring**. See
+[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+The top of the page hosts three controls:
+
+- A **search** input that filters the thread list by name; the counter next to it shows `<matching> / <total>`.
+- A **Settings** <img src="/img/feature/icons/settings-icon.png" alt="settings-icon" width="20" height="20"/> button
+  that opens a modal with the **Thread Contention Monitoring** switch (see [Settings](#settings) below).
+- A sliding **timeline** strip used to pick the moment in time you want to inspect — selecting a range there drives
+  the per-thread detail view below.
+
+Threads are sorted by JVM priority and rendered as accordions. The header of each accordion shows the thread name,
+its current state, and a color-coded state indicator (see [Thread state colors](#thread-state-colors) below).
+
+## Thread Dump Details
+
+![thread dump details page](../../static/img/feature/thread-dump/thread-dump-details-page.png)
+***Thread Dump details page as presented in Axelix UI***
+
+Expand a thread to see its detailed snapshot for the time range picked on the timeline:
+
+- **Thread id**:              JVM-assigned thread identifier.
+- **Thread name**:            Thread name.
+- **Thread state**:           JVM thread state (`RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED`, …).
+- **Priority**:               JVM thread priority.
+- **Blocked count**:          Total times the thread was blocked. Populated only while **Thread Contention
+                              Monitoring** is enabled — otherwise shown as *Not Available*.
+- **Blocked time**:           Time the thread spent blocked, in milliseconds. Same condition as **Blocked count**.
+- **Waited count**:           Total times the thread waited for notification. Same condition.
+- **Waited time**:            Time the thread spent waiting, in milliseconds. Same condition.
+- **Daemon**:                 Whether the thread is a daemon thread.
+- **Locked by**:              Information about the lock object the thread is waiting on, when applicable:
+    - **Class**:              Fully qualified class name of the lock object.
+    - **Identity hash code**: Identity hash code of the lock object.
+- **Stacktrace**:             Stack trace captured for the selected moment.
+
+### Thread state colors
+
+|                                         Indication                                          | State                |
+|:-------------------------------------------------------------------------------------------:|----------------------|
+|    <img src="/img/feature/thread-dump/running-green-state.png" width="25" height="25"/>     | RUNNABLE             |
+|     <img src="/img/feature/thread-dump/running-blue-state.png" width="25" height="25"/>     | RUNNABLE (native)    |
+|    <img src="/img/feature/thread-dump/waiting-yellow-state.png" width="25" height="25"/>    | WAITING              |
+|    <img src="/img/feature/thread-dump/waiting-orange-state.png" width="25" height="25"/>    | WAITING (suspended)  |
+| <img src="/img/feature/thread-dump/timed-waiting-orange-state.png" width="25" height="25"/> | TIMED_WAITING        |
+|    <img src="/img/feature/thread-dump/blocked-red-state.png" height="25"/>                  | BLOCKED              |
+|   <img src="/img/feature/thread-dump/terminated-grey-state.png" width="25" height="25"/>    | TERMINATED           |
+|     <img src="/img/feature/thread-dump/other-purple-state.png" width="25" height="25"/>     | other                |
+
+
+## Settings
+
+Clicking <img src="/img/feature/icons/settings-icon.png" alt="settings-icon" width="20" height="20"/> opens a modal
+with one switch:
+
+- **Thread Contention Monitoring** — enables JMX contention monitoring on the instance's `ThreadMXBean`. When on, the
+  JVM tracks how long each thread spent **BLOCKED** and **WAITING**, which lights up the `Blocked count` / `Blocked
+  time` / `Waited count` / `Waited time` fields above. When off, those four fields stay *Not Available*.
+
+Note that contention monitoring has measurable JVM overhead, so production instances typically leave it disabled and turn it on
+only during a focused investigation.
+
+## Properties
+
+The page is backed by the `axelix-thread-dump` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose
+it through the standard Spring Boot Actuator properties — see
+[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+for the full list of Axelix endpoints and surrounding setup:
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-thread-dump
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-thread-dump
+```
+
+  </TabItem>
+</Tabs>
+
+## See also
+
+- [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

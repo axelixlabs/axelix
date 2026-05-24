@@ -1,0 +1,98 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Garbage Collector
+
+The **Garbage Collector** page lets you enable JVM GC logging on a managed Spring Boot instance, trigger an
+on-demand collection, and download the resulting log file. GC logging is normally off in production; the page exists
+to switch it on for a focused investigation and then turn it off again.
+
+![garbage collector main page](../../static/img/feature/garbage-collector/gc-main-page.png)
+***Garbage Collector as presented in Axelix UI***
+
+## Access
+
+Reading the GC log file and inspecting the logging status are available to every authenticated user — **VIEWER**,
+**EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open the page and download an existing log. The active controls
+are gated by a separate authority:
+
+- **Trigger GC**, **Enable GC Logging**, and **Disable GC Logging** require the `GARBAGE_COLLECTOR` authority.
+
+`GARBAGE_COLLECTOR` is granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
+buttons but the destructive ones stay disabled. See
+[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## Enabling GC logging
+
+GC logging is off by default. The page shows an empty-state with an **Enable GC Logging** button until logging is
+turned on. Clicking it opens a modal where you pick the JVM log level:
+
+<img src="/img/feature/garbage-collector/enable-gc-logging.png" alt="enable-gc-logging" width="490" height="280"/>
+
+The level list is taken at runtime from `jcmd VM.log list` on the target instance — typically `error`, `warning`,
+`info`, `debug`, `trace`. The `off` level is intentionally excluded; to stop logging use **Disable GC Logging**
+instead. Switching the level to `off` could rotate or clear the existing log file depending on the JVM
+distribution, which is exactly what the dedicated disable path avoids.
+
+## Working with logs
+
+Once logging is enabled, the page header exposes three actions:
+
+1. **Trigger GC** <img src="/img/feature/icons/play-icon.png" width="20" height="20"/> — forces a collection by
+   invoking `System.gc()` on the instance, so you do not have to wait for a natural GC event to produce entries.
+   Requires `GARBAGE_COLLECTOR`.
+2. **Download GC Log** <img src="/img/feature/icons/download-icon.png" width="20" height="20"/> — streams the
+   current GC log file to the browser as `text/plain`. Read-only — available to everyone.
+3. **Disable GC Logging** <img src="/img/feature/icons/disable-icon.png" width="20" height="20"/> — switches GC
+   logging back off without touching the already-written log file. Requires `GARBAGE_COLLECTOR`.
+
+A representative line from a downloaded GC log, annotated:
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ GC pause duration
+              │                  │    │    │               │               │    │   └─ Total heap
+              │                  │    │    │               │               │    └─ After heap
+              │                  │    │    │               │               └─ Before heap
+              │                  │    │    │               └─ GC event description
+              │                  │    │    └─ GC event ID
+              │                  │    └─ Log tag (subsystem)
+              │                  └─ Log level
+              └─ Timestamp (ISO-8601 with timezone)
+```
+
+## Properties
+
+The page is backed by the `axelix-gc` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
+through the standard Spring Boot Actuator properties — see
+[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+for the full list of Axelix endpoints and surrounding setup:
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </TabItem>
+</Tabs>
+
+## See also
+
+- [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
