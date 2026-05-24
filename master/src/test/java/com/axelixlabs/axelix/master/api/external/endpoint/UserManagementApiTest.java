@@ -361,6 +361,51 @@ public class UserManagementApiTest {
     }
 
     @Test
+    void shouldReturnBadRequest_WhenCreateRequestRoleIsMissing() {
+        // language=json
+        String request = """
+                {
+                  "username": "u",
+                  "email": "u@example.com",
+                  "password": "p"
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenUpdateRolesAreEmpty() {
+        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+
+        // language=json
+        String request = """
+                {
+                  "id": "%s",
+                  "username": "u",
+                  "roles": []
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        UserEntity untouched = userRepository.findById(user.id()).orElseThrow();
+        assertThat(untouched.roles().values()).containsExactly("VIEWER");
+    }
+
+    @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainBlank() {
         UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 

@@ -108,6 +108,10 @@ public class DatabaseUserService implements UserService {
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
+        if (roles.isEmpty()) {
+            throw new UserInvalidValueException(null);
+        }
+
         Set<String> validRoles =
                 roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 

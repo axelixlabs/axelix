@@ -51,6 +51,11 @@ export const RolesSelect = ({ user, reLoadUser }: IProps) => {
     const [requestData, setRequestData] = useState(StatelessRequest.inactive());
 
     const handleConfirm = (): void => {
+        if (actualRoles.length === 0) {
+            message.error(t("Users.ValidationErrors.roles"));
+            return;
+        }
+
         setRequestData(StatelessRequest.loading());
 
         const data: IEditUserRequestData = {
@@ -116,6 +121,7 @@ export const RolesSelect = ({ user, reLoadUser }: IProps) => {
                 type="primary"
                 htmlType="submit"
                 loading={requestData.loading}
+                disabled={actualRoles.length === 0}
                 className={styles.ActionButton}
             />
         </Form>

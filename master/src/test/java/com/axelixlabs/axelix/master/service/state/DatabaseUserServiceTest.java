@@ -345,6 +345,20 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
+    void updateUserPatch_shouldThrowWhenRolesAreEmpty() {
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
+        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+
+        // when. / then.
+        assertThatThrownBy(
+                        () -> userService.updateUserPatch(existing.id(), "alice", "alice@example.com", "p", Set.of()))
+                .isInstanceOf(UserInvalidValueException.class);
+
+        UserEntity untouched = userRepository.findById(existing.id()).orElseThrow();
+        assertThat(untouched.roles().values()).containsExactly("VIEWER");
+    }
+
+    @Test
     void updateUserPatch_shouldThrowWhenRolesContainBlank() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();

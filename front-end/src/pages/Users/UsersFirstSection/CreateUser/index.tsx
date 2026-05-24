@@ -140,7 +140,7 @@ export const CreateUser = ({ fetchUsers }: IProps) => {
                             },
                         ]}
                     >
-                        <Select options={roleOptions} />
+                        <Select allowClear={false} options={roleOptions} />
                     </Form.Item>
                 </Form>
             </UniversalModal>
