@@ -15,6 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
       - name: Install dependencies
         run: npm ci
         working-directory: website
@@ -26,7 +31,7 @@ jobs:
       - name: Copy global resources to VM via SCP
         uses: appleboy/scp-action@v1.0.0
         with:
-          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           source: "docker-compose.yml,infra/nginx"
@@ -41,7 +46,7 @@ jobs:
       - name: Copy build resources to VM via SCP
         uses: appleboy/scp-action@v1.0.0
         with:
-          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           source: "website/.next/static,website/.next/standalone,website/Dockerfile"
@@ -51,7 +56,7 @@ jobs:
       - name: Build Docker image on server and restart container
         uses: appleboy/ssh-action@v1.2.5
         with:
-          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           script: |
