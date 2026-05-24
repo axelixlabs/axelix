@@ -7,6 +7,8 @@ export const TargetThemeIcon = () => {
     <ThemedImage
       alt="Target icon"
       className={styles.TargetIcon}
+      width={15}
+      height={15}
       sources={{
         dark: useBaseUrl('/img/feature/icons/target-light.svg'),
         light: useBaseUrl('/img/feature/icons/target-dark.svg'),

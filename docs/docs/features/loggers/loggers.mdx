@@ -1,3 +1,5 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import {LoggersTable} from './LoggersTable';
 import {LoggersTableReset} from './LoggersTableReset';
 import {TargetThemeIcon} from './TargetThemeIcon';
@@ -8,28 +10,32 @@ import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 The **Loggers** page provides access to all configured logging mechanisms in a Spring Boot application, 
 logger groups, and allows changing their logging levels.
 
-![beans main page](../../../static/img/feature/loggers/loggers-main-page.png)
+![loggers main page](../../../static/img/feature/loggers/loggers-main-page.png)
 ***Loggers page as presented in Axelix UI***
 
----
+The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all
+open it, change levels, and reset levels. See
+[Roles and authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the
+full role/authority matrix.
 
-## TAB: Loggers
+## Loggers tab
 A scrollable list displaying all active loggers in the application, with an indicator of their logging levels,
-a search function for easy navigation, and a counter of active loggers.
+a search function for easy navigation, and a counter of active loggers in the form `<matching> / <total>`.
 
 - **Name**:                 The name of the logger.
 - **Logging level**:        The logger's current level. (See **Interactive Features**)
-- **Reset**                 Resets the logging level to its initial value. (See **Interactive Features**)
+- **Reset**:                Resets the logging level to its initial value. (See **Interactive Features**)
 
-## TAB: Logger groups
+## Logger groups tab
+![loggers group main page](../../../static/img/feature/loggers/loggers-main-group-page.png)
+***Loggers group page as presented in Axelix UI***
+
 A scrollable list displaying all logger groups, with an indicator of their logging levels,
 a search function for groups and loggers for easy navigation, and a counter of groups.
 
 - **Name**:                 The name of the logger group.
 - **Logging group level**:  The current logging level of the logger group. If no level is highlighted by a color indicator, 
                             the loggers within the group have different logging levels. (See **Interactive Features**)
-
----
 
 ## Interactive Features
 
@@ -54,8 +60,46 @@ We also provide the ability to reset the logging level for a specific logger:
 <LoggersTableReset />
 
 ### Logger groups
-- It is important to understand that if all loggers belonging to the same group have different logging levels,
-  the group will not have a color indicator indicating the logging level.
-- When changing the logging level, for example, of the `web` group to <WARN />, all loggers belonging to this group
-  will have the <WARN /> logging level.
-- Unfortunately, as of today, logger groups do not have the ability to reset the logging level.
+- If the loggers in a group have different levels, the group has no color indicator on the level row.
+- Changing the level of, for example, the `web` group to <WARN /> applies <WARN /> to every logger in that group.
+- Resetting the level of a logger group is not supported — only individual loggers can be reset.
+
+## MCP Tools
+
+Reading the logger tree and changing levels at runtime — for a single logger, a logger group, or resetting an
+individual logger — are also exposed to AI agents through MCP. See the
+[MCP Tools catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
+
+## Properties
+
+The page is backed by the `axelix-loggers` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
+through the standard Spring Boot Actuator properties — see
+[Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+for the full list of Axelix endpoints and surrounding setup:
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-loggers
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-loggers
+```
+
+  </TabItem>
+</Tabs>
+
+## See also
+
+- [Configuring Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
