@@ -1,5 +1,6 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.io.path.readText
@@ -303,27 +304,32 @@ configure(publishableProjects) {
         }
     }
 
+    val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
+    val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
+
+    val signingKey = System.getenv(gpgSigningKeyIdEnvVariableName)
+    val signingPassword = System.getenv(gpgPassphraseEnvVariableName)
+
     signing {
-        if (tasks.publish.filter { gradle.taskGraph.hasTask(it) }.isPresent) {
+        if (signingKey != null && signingPassword != null) {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+        }
+        sign(publishing.publications.getByName("main"))
+    }
 
-            val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
-            val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
+    gradle.taskGraph.whenReady {
+        val isPublishing = allTasks.any { it is PublishToMavenRepository }
 
-            val signingKey = System.getenv(gpgSigningKeyIdEnvVariableName)
-            val signingPassword = System.getenv(gpgPassphraseEnvVariableName)
+        signing.isRequired = isPublishing
 
-            if (signingKey != null && signingPassword != null) {
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign(publishing.publications["gpr"])
-            } else {
-                throw GradleException(
-                    """
-                    Signing requires:
-                    1. $gpgSigningKeyIdEnvVariableName env var.
-                    2. $gpgPassphraseEnvVariableName env var.
-                    """
-                )
-            }
+        if (signing.isRequired && (signingKey == null || signingPassword == null)) {
+            throw GradleException(
+                """
+                Signing requires:
+                1. $gpgSigningKeyIdEnvVariableName env var.
+                2. $gpgPassphraseEnvVariableName env var.
+                """.trimIndent()
+            )
         }
     }
 }
