@@ -115,12 +115,7 @@ tasks.processResources {
 
 publishing {
     publications {
-        named<MavenPublication>("nexus") {
-            artifact(tasks.bootJar.get())
-        }
-    }
-    publications {
-        named<MavenPublication>("gpr") {
+        named<MavenPublication>("main") {
             artifact(tasks.bootJar.get())
         }
     }

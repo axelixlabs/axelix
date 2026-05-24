@@ -126,7 +126,7 @@ jobs:
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
       - name: Publish to GitHub Packages
-        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
+        run: ./gradlew publish
 
 #        // TODO: Uncomment later
 #      - name: Publish to Maven Central

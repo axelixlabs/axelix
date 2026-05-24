@@ -244,21 +244,14 @@ configure(publishableProjects) {
 
         publications {
 
-            // Publish to Nexus
-            register<MavenPublication>("nexus") {
-                from(components["java"])
-            }
-
-            // Publish to GitHub Package Registry
-            register<MavenPublication>("gpr") {
+            // The 'main' publication. Created for each subproject that is supposed to be published.
+            register<MavenPublication>("main") {
                 from(components["java"])
 
                 // Configure the POM file details
-                // TODO: Remove all TODOs below after configuring for Maven Central publication
-                // TODO: Requirements: https://maven.apache.org/repository/guide-central-repository-upload.html
                 pom {
                     name.set(project.name)
-                    description = "A unified monitoring solution for Java Spring Boot deployments"
+                    description = "An AI-native monitoring solution for Java Spring Boot deployments"
                     url = "https://github.com/axelixlabs/axelix"
                     packaging = "jar"
 
@@ -311,8 +304,7 @@ configure(publishableProjects) {
     }
 
     signing {
-        // Signing artifacts only in case publishGprPublicationToGitHubPackagesRepository is present
-        if (gradle.taskGraph.hasTask(":publishGprPublicationToGitHubPackagesRepository")) {
+        if (tasks.publish.filter { gradle.taskGraph.hasTask(it) }.isPresent) {
 
             val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
             val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
