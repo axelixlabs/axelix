@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
+import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterMatches } from "helpers";
 import {
     type ConditionBeanCollection,
@@ -85,9 +85,7 @@ const Conditions = () => {
             label: t("Conditions.positiveMatches"),
             children: (
                 <Matches title={t("Conditions.positiveMatches")}>
-                    <HashNavigable className={styles.ConditionHeaderWrapper}>
-                        <PositiveConditions positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
-                    </HashNavigable>
+                    <PositiveConditions positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
                 </Matches>
             ),
         },

@@ -44,7 +44,6 @@ export const ConditionsAccordionEntry = ({ items }: IProps) => {
             <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
                 {items.map(({ message, condition, status }) => (
                     <Accordion
-                        wrapperStyles={styles.AccordionWrapperStyles}
                         header={
                             <div className={styles.LabelWrapper}>
                                 {findNeededIcon(status)}

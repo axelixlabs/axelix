@@ -1,15 +1,6 @@
 .AccordionsWrapper {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    margin-bottom: 40px;
-}
-
-.AccordionWrapperStyles {
-    border-bottom: none;
-}
-
-.AccordionsWrapper:last-child {
-    margin-bottom: 0;
 }
 
 .LabelWrapper {
