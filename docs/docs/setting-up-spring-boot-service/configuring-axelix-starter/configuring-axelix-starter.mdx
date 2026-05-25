@@ -25,7 +25,7 @@ A few facts worth pinning down before you copy any of the snippets below.
 Declare the starter coordinate matching your Boot major version.
 
 :::note
-The snippets below pin `1.0.0-SNAPSHOT` for illustration. Check the [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and use that version in your own build.
+The snippets below pin `1.0.0-M1` for illustration. Check the [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and use that version in your own build.
 :::
 
 <Tabs groupId="spring-boot-major">
@@ -36,7 +36,7 @@ The snippets below pin `1.0.0-SNAPSHOT` for illustration. Check the [Releases pa
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-SNAPSHOT")
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1")
 }
 ```
 
@@ -45,7 +45,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-SNAPSHOT'
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1'
 }
 ```
 
@@ -57,7 +57,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-3-starter</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-M1</version>
   </dependency>
 </dependencies>
 ```
@@ -73,7 +73,7 @@ dependencies {
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-SNAPSHOT")
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1")
 }
 ```
 
@@ -82,7 +82,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-SNAPSHOT'
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1'
 }
 ```
 
@@ -94,7 +94,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-2-starter</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-M1</version>
   </dependency>
 </dependencies>
 ```
@@ -205,7 +205,7 @@ axelix:
     discovery:
       auto: true
       master-url: http://master.internal:8080/api/internal/service/register
-      instance-url: http://my-app.internal:8080
+      instance-actuator-url: http://my-app.internal:8080
       instance-name: orders-service
       heartbeat-interval: 15s
 ```
@@ -216,7 +216,7 @@ axelix:
 ```properties
 axelix.sbs.discovery.auto=true
 axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
-axelix.sbs.discovery.instance-url=http://my-app.internal:8080
+axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080
 axelix.sbs.discovery.instance-name=orders-service
 axelix.sbs.discovery.heartbeat-interval=15s
 ```
@@ -226,12 +226,67 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 A few details that catch people out:
 
-- `instance-url` is the **base** URL of the service as Master will reach it from its own network — host and port only. The starter appends the actuator base path (`/actuator` by default, or whatever you set in `management.endpoints.web.base-path`) when assembling the registration payload.
+- `instance-actuator-url` is the **base** URL of the service as Master will reach it from its own network — host and port only. The starter appends the actuator base path (`/actuator` by default, or whatever you set in `management.endpoints.web.base-path`) when assembling the registration payload.
 - `master-url` is the **full** URL including `/api/internal/service/register`. The starter posts to it verbatim.
 - `instance-name` is the label Master shows for this instance in the UI and in MCP responses. Pick a name that survives restarts and replicas — typically the service name, not the pod name.
 - Self-registration is accepted by Master out of the box (`axelix.master.discovery.self-registration.enabled` is `true` by default); set it to `false` if you want to refuse heartbeats. Master evicts an instance after `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` of silence (`45s` by default), so keep `heartbeat-interval` comfortably under that.
 
 The starter validates these properties at startup, misspelling `master-url` or pointing it at a malformed URL fails fast rather than silently dropping heartbeats.
+
+## Sanitize sensitive property values
+
+The Axelix `axelix-env` and `axelix-configprops` endpoints return property values to Master. To keep secrets out of
+casual reads, the starter masks values it returns to callers that lack the right authority. The mechanism is the same
+for both endpoints, controlled by a single starter property:
+
+`axelix.sbs.endpoints.config.sanitized-properties`
+
+- **Empty list (default)** — every value returned by `axelix-env` and `axelix-configprops` is replaced with
+  `******` for callers without the relevant authority. The default is intentionally conservative: no opt-in needed
+  to be safe.
+- **Non-empty list** — only the listed keys are masked; everything else is returned raw to any caller. Use this when
+  the conservative default is too aggressive and you want to mask only specific keys (passwords, tokens, signing keys).
+
+Authority is checked per-endpoint:
+
+- **`axelix-env`** — the `ENV_VALUES_READ` authority lets the caller see raw values.
+- **`axelix-configprops`** — the `CONFIG_PROPS_VALUES_READ` authority lets the caller see raw values.
+
+Both authorities are granted by Master's built-in **ADMIN** and **SUPER_ADMIN** roles. **VIEWER** and **EDITOR**
+always go through the sanitization function. See
+[Roles and authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the
+full matrix.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </TabItem>
+</Tabs>
+
+:::note
+The standard Spring Boot Actuator masking switches — `management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize`, and their `configprops` equivalents — are **not** consulted.
+:::
 
 ## Configuration reference
 
@@ -256,7 +311,7 @@ Self-registration is **off by default** (`axelix.sbs.discovery.auto=false`) — 
 When `axelix.sbs.discovery.auto=true`, the following properties become **required**:
 
 - `axelix.sbs.discovery.master-url`
-- `axelix.sbs.discovery.instance-url`
+- `axelix.sbs.discovery.instance-actuator-url`
 - `axelix.sbs.discovery.instance-name`
 
 The Master-side receiver of these heartbeats — endpoint, eviction timeout, eviction sweep schedule — is documented on the Master page in [Discovery — self-registration](../../installation/configuring-master.mdx#discovery--self-registration). The JWT signing key configured under `axelix.sbs.auth.jwt.signing-key` must match `axelix.master.auth.jwt.signing-key` on Master, otherwise heartbeats are rejected with `401`.
@@ -267,9 +322,19 @@ The Master-side receiver of these heartbeats — endpoint, eviction timeout, evi
 |------------------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.auto`                    | `false` | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                |
 | `axelix.sbs.discovery.master-url`              | *(unset)* <span className={styles.required}>required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
-| `axelix.sbs.discovery.instance-url`            | *(unset)* <span className={styles.required}>required</span> | Base URL of this service as reachable from Master (no `/actuator` suffix). Required when `auto=true`.                        |
+| `axelix.sbs.discovery.instance-actuator-url`            | *(unset)* <span className={styles.required}>required</span> | Base URL of this service as reachable from Master (no `/actuator` suffix). Required when `auto=true`.                        |
 | `axelix.sbs.discovery.instance-name`           | *(unset)* <span className={styles.required}>required</span> | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                |
 | `axelix.sbs.discovery.heartbeat-interval`      | `15s`   | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                   |
+
+</div>
+
+### Endpoint value sanitization
+
+<div className={styles.configTable}>
+
+| Property                                              | Default | Description                                                                                                                                                                                                                          |
+|-------------------------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.endpoints.config.sanitized-properties`    | *(empty list)* | Property keys whose values are masked as `******` for callers without `ENV_VALUES_READ` (for `axelix-env`) or `CONFIG_PROPS_VALUES_READ` (for `axelix-configprops`). Empty list means **all** values are masked. See [Sanitize sensitive property values](#sanitize-sensitive-property-values) for the matching rules. |
 
 </div>
 
