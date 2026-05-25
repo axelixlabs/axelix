@@ -17,7 +17,7 @@ updates:
           - "*"
 
   - package-ecosystem: "npm"
-    directory: "/front-end"
+    directory: "/master/front-end"
     schedule:
       interval: "monthly"
     labels:

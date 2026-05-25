@@ -5,16 +5,16 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version-file: ./front-end/.nvmrc
+        node-version-file: ./master/front-end/.nvmrc
 
     - run: npm ci
-      working-directory: ./front-end
+      working-directory: ./master/front-end
       shell: bash
 
     - run: npm run lint && npm run lint-css && npm run test
-      working-directory: ./front-end
+      working-directory: ./master/front-end
       shell: bash
 
     - run: npm run build
-      working-directory: ./front-end
+      working-directory: ./master/front-end
       shell: bash

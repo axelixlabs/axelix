@@ -14,4 +14,11 @@ gradlePlugin {
             implementationClass = "binary.AxelixPropertiesPlugin"
         }
     }
+
+    plugins {
+        register("axelix-nodejs") {
+            id = "com.axelixlabs.axelix-nodejs"
+            implementationClass = "node.NodeJsBuildPlugin"
+        }
+    }
 }

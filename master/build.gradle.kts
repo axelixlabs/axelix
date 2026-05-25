@@ -1,9 +1,11 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
     id("org.springframework.boot") version "4.0.1"
     id("com.axelixlabs.axelix-internal")
+    id("com.axelixlabs.axelix-nodejs")
 }
 
 val springBootVersion = "4.0.5"
@@ -115,4 +117,16 @@ tasks.processResources {
 
 axelix {
     properties.put("version", version.toString())
+}
+
+nodejs {
+    steps = listOf(
+        "ci",
+        "run lint",
+        "run lint-css",
+        "run test",
+        "run build",
+    )
+
+    sourceDir = project.layout.projectDirectory.dir("front-end").asFile.path
 }

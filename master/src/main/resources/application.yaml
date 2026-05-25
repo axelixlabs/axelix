@@ -30,9 +30,11 @@ management:
       exposure:
         include: [ "health" ]
 
-# TODO: we need to think about the design of properties in general
 axelix:
   master:
+    web:
+      static-resources:
+        location: classpath:/spa
     mcp-server:
       enabled: true
     database:

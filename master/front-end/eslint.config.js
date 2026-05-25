@@ -90,7 +90,7 @@ export default [
                     format: ["UPPER_CASE"],
                 },
             ],
-            "header/header": ["error", "../LICENSE_HEADER"],
+            "header/header": ["error", "../../LICENSE_HEADER"],
             complexity: ["error", 10],
             "max-nested-callbacks": ["error", 2],
             "max-depth": ["error", 2],

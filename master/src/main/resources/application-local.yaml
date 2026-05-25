@@ -1,9 +1,6 @@
 # These are the settings for the local launch of Axelix Master
 axelix:
   master:
-    web:
-      static-resources:
-        location: /application/dist/
     discovery:
       self-registration:
         eviction:
