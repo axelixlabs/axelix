@@ -161,45 +161,41 @@ val commonModules = listOf(
     project(":common:utils")
 )
 
-val starters = listOf(
+val publishableProjects = listOf(
     project(":sbs:axelix-spring-boot-2-starter"),
     project(":sbs:axelix-spring-boot-3-starter")
     // TODO: Uncomment when axelix-spring-boot-4-starter is ready
     // project(":sbs:axelix-spring-boot-4-starter")
 )
 
-val publishableProjects = starters + project(":master")
-
-// Apply publishing and signing plugins to all starter modules and the master project
+// Apply publishing and signing plugins to all starter modules only
 configure(publishableProjects) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
-    if (project in starters) {
-        java {
-            withJavadocJar()
-            withSourcesJar()
-        }
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
-        // Pack shared submodule classes, sources, and docs into a single fat artifact
-        tasks {
-            jar {
-                duplicatesStrategy = DuplicatesStrategy.WARN
-                commonModules.forEach { from(it.sourceSets.main.get().output) }
-            }
-            named<Jar>("sourcesJar") {
-                duplicatesStrategy = DuplicatesStrategy.WARN
-                commonModules.forEach { from(it.sourceSets.main.get().allSource) }
-            }
-            withType<Javadoc> {
-                commonModules.forEach { source(it.sourceSets.main.get().allJava) }
-                classpath = project.configurations.compileClasspath.get()
-            }
-            named<Jar>("javadocJar") {
-                dependsOn(javadoc)
-                duplicatesStrategy = DuplicatesStrategy.WARN
-                from(javadoc.get().destinationDir)
-            }
+    // Pack shared submodule classes, sources, and docs into a single fat artifact
+    tasks {
+        jar {
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            commonModules.forEach { from(it.sourceSets.main.get().output) }
+        }
+        named<Jar>("sourcesJar") {
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            commonModules.forEach { from(it.sourceSets.main.get().allSource) }
+        }
+        withType<Javadoc> {
+            commonModules.forEach { source(it.sourceSets.main.get().allJava) }
+            classpath = project.configurations.compileClasspath.get()
+        }
+        named<Jar>("javadocJar") {
+            dependsOn(javadoc)
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            from(javadoc.get().destinationDir)
         }
     }
 
@@ -229,16 +225,13 @@ configure(publishableProjects) {
                 }
             }
 
-            // We do not publish bootJar to MavenCentral
             // TODO: revisit later
-//            if (project.name != "master") {
-//                maven {
-//                    name = "MavenCentral"
-//                    url = uri("https://central.sonatype.com")
-//                    credentials {
-//                        username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
-//                        password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
-//                    }
+//            maven {
+//                name = "MavenCentral"
+//                url = uri("https://central.sonatype.com")
+//                credentials {
+//                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+//                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
 //                }
 //            }
         }

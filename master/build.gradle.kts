@@ -113,14 +113,6 @@ tasks.processResources {
     exclude("application-local.yaml")
 }
 
-publishing {
-    publications {
-        named<MavenPublication>("main") {
-            artifact(tasks.bootJar.get())
-        }
-    }
-}
-
 axelix {
     properties.put("version", version.toString())
 }
