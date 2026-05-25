@@ -200,10 +200,10 @@ configure(publishableProjects) {
 //            if (project.name != "master") {
 //                maven {
 //                    name = "MavenCentral"
-//                    url = uri("https://sonatype.com")
+//                    url = uri("https://central.sonatype.com")
 //                    credentials {
-//                        username = project.findProperty("sonatype.user") as String? ?: System.getenv("SONATYPE_USER")
-//                        password = project.findProperty("sonatype.password") as String? ?: System.getenv("SONATYPE_PASSWORD")
+//                        username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+//                        password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
 //                    }
 //                }
 //            }
