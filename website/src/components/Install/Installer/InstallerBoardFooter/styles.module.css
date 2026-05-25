@@ -1,0 +1,51 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
+    background-color: rgba(6, 20, 10, 0.55);
+}
+
+.NavButton {
+    color: color-mix(in srgb, #e7eee0 70%, transparent);
+    font-family: var(--axelix-font);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 7px;
+
+    &:disabled {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &:hover {
+        color: #ffffff;
+        background: color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
+    }
+}
+
+.Status {
+    font-family: var(--axelix-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(231, 238, 224, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    &::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--axelix-green-400);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+    }
+}

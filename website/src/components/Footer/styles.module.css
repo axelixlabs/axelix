@@ -21,7 +21,10 @@
   mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, #000 30%, transparent 88%);
 }
 
-.Wrap { position: relative; z-index: 2; }
+.Wrap {
+  position: relative;
+  z-index: 2;
+}
 
 .Top {
   display: grid;
@@ -32,7 +35,12 @@
   border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
 }
 
-@media (max-width: 980px) { .Top { grid-template-columns: 1fr; gap: 48px; } }
+@media (max-width: 980px) {
+  .Top {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
 
 /* Brand lockup */
 .BrandSide {
@@ -53,8 +61,14 @@
   height: auto;
 }
 
-.Brand :global(.wm) { fill: #f5f8ee; }
-.Brand :global(.mk) { fill: var(--axelix-green-400); }
+.Brand :global(.wm) {
+  fill: #f5f8ee;
+}
+
+.Brand :global(.mk) {
+  fill: var(--axelix-green-400);
+}
+
 .Brand :global(.mk-line) {
   fill: none;
   stroke: var(--axelix-green-400);
@@ -88,7 +102,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: color-mix(in srgb, #0a1c04 50%, transparent);
+  background: rgba(10, 28, 4, 0.5);
   border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
   color: color-mix(in srgb, #bdd3a0 80%, transparent);
   transition: background .15s, color .15s, border-color .15s, transform .15s;
@@ -101,7 +115,10 @@
   transform: translateY(-1px);
 }
 
-.Socials a svg { width: 18px; height: 18px; }
+.Socials a svg {
+  width: 18px;
+  height: 18px;
+}
 
 /* Nav columns */
 .NavCols {
@@ -111,7 +128,10 @@
 }
 
 @media (max-width: 640px) {
-  .NavCols { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+  .NavCols {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 24px;
+  }
 }
 
 .Col h4 {
@@ -120,7 +140,7 @@
   font-size: 11px;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: color-mix(in srgb, #bdd3a0 75%, transparent);
+  color: rgba(189, 211, 160, 0.75);
   font-weight: 500;
 }
 
@@ -151,7 +171,7 @@
 .Col a .ExtArr {
   width: 11px;
   height: 11px;
-  color: color-mix(in srgb, #bdd3a0 50%, transparent);
+  color: rgba(189, 211, 160, 0.5);
   transition: color .15s, transform .15s;
 }
 
@@ -197,7 +217,7 @@
   font-family: var(--axelix-mono);
   font-size: 11.5px;
   letter-spacing: .06em;
-  color: color-mix(in srgb, #bdd3a0 70%, transparent);
+  color: rgba(189, 211, 160, 0.7);
 }
 
 .Bottom .Meta {
@@ -211,7 +231,7 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: color-mix(in srgb, #bdd3a0 35%, transparent);
+  background: rgba(189, 211, 160, 0.35);
 }
 
 .Status {
@@ -231,5 +251,11 @@
   animation: pulse 1.8s infinite;
 }
 
-.Bottom a { color: inherit; transition: color .15s; }
-.Bottom a:hover { color: var(--axelix-green-400); }
+.Bottom a {
+  color: inherit;
+  transition: color .15s;
+}
+
+.Bottom a:hover {
+  color: var(--axelix-green-400);
+}

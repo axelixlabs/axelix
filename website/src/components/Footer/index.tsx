@@ -4,9 +4,9 @@ import {
   ExternalLinkIcon,
   GithubIcon,
   LinkedinIcon,
+  LogoIcon,
   XTwitterIcon,
 } from "@/assets";
-import { Logo } from "../Logo";
 import styles from "./styles.module.css";
 
 export const Footer = () => {
@@ -16,7 +16,7 @@ export const Footer = () => {
         <div className={styles.Top}>
           {/* Brand lockup */}
           <div className={styles.BrandSide}>
-            <Logo />
+            <LogoIcon color="#fff" />
             <p className={styles.Tag}>
               AI monitoring for Spring Boot in production.{" "}
               <em>Open-source, MCP-native, never your bottleneck.</em>

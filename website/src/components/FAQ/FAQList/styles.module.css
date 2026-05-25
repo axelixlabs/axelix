@@ -1,0 +1,108 @@
+.MainWrapper {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 56px;
+    max-width: 920px;
+}
+
+.Accordion {
+    border-top: 1px solid var(--axelix-line-2);
+
+    &:last-child {
+        border-bottom: 1px solid var(--axelix-line-2);
+    }
+}
+
+.WrapperButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: 26px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: color 0.3s;
+
+    &:hover {
+        color: var(--axelix-green-700);
+    }
+}
+
+.Question {
+    font-size: clamp(17px, 1.5vw, 20px);
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    line-height: 1.35;
+}
+
+.Icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
+    color: var(--axelix-green-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.3s,
+        background-color 0.3s,
+        color 0.3s,
+        border-color 0.3s;
+}
+
+.Accordion.Open .Icon {
+    transform: rotate(45deg);
+    background: var(--axelix-green-500);
+    color: #ffffff;
+    border-color: var(--axelix-green-500);
+}
+
+.Answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .35s cubic-bezier(.4, 0, .2, 1);
+}
+
+.Accordion.Open .Answer {
+    grid-template-rows: 1fr;
+}
+
+.AccordionContentWrapper {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.Answer p {
+    margin: 0;
+    padding: 0 56px 28px 0;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--axelix-ink-2);
+    max-width: 700px;
+}
+
+.Answer p+p {
+    padding-top: 0;
+}
+
+.Answer code {
+    font-family: var(--axelix-code);
+    font-size: 13.5px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
+    color: var(--axelix-green-800);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-500) 18%, transparent);
+}
+
+.Answer em {
+    font-style: normal;
+    font-weight: 500;
+}

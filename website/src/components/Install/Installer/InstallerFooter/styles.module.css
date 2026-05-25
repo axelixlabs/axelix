@@ -1,0 +1,31 @@
+.Meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    color: var(--axelix-ink-3);
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--axelix-line-2);
+
+    &::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--axelix-green-500);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--axelix-green-500) 18%, transparent);
+    }
+}

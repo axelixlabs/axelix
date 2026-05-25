@@ -8,10 +8,10 @@
   gap: 10px;
   font-family: var(--axelix-mono);
   font-size: 11.5px;
-  letter-spacing: .18em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #cfe2b3;
-  padding: 5px 12px 5px 10px;
+  padding: 5px 10px;
   border-radius: 999px;
   background-color: color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
   border: 1px solid color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
@@ -37,15 +37,14 @@
   text-wrap: balance;
 }
 
-.Accent {
+.AccentedText {
   color: var(--axelix-green-400);
+  font-style: normal;
 }
 
-.Stroke {
-  color: inherit;
-  background-image: linear-gradient(var(--axelix-green-400), var(--axelix-green-400));
-  background-position: 0 92%;
-  background-repeat: no-repeat;
-  background-size: 100% 6px;
-  padding-bottom: 2px;
+.UnderlinedText {
+    text-decoration: underline;
+    text-decoration-color: var(--axelix-green-500);
+    text-decoration-thickness: 6px;
+    text-underline-offset: 6px;
 }

@@ -1,4 +1,4 @@
-.Problem {
+.MainWrapper {
   position: relative;
   padding-block: 128px 136px;
   color: #e7eee0;
@@ -7,7 +7,6 @@
     radial-gradient(ellipse 60% 50% at 95% 100%, color-mix(in srgb, var(--axelix-green-500) 18%, transparent), transparent 65%),
     var(--axelix-green-900);
   overflow: hidden;
-  isolation: isolate;
 
   &::before {
     content: "";
@@ -19,76 +18,23 @@
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 85%);
   }
 
-  @media (width <= 980px) {
+  @media (width <=980px) {
     padding-block: 96px 104px;
   }
 }
 
-.Wrap {
-  position: relative;
-  z-index: 1;
-}
-
-
-.Body {
+.ContentWrapper {
   display: grid;
   grid-template-columns: 1.55fr 1fr;
   gap: 48px;
-  align-items: start;
 
-  @media (width <= 980px) {
+  @media (width <=980px) {
     grid-template-columns: 1fr;
     gap: 40px;
   }
 }
 
-
-
-
-
-/* Right rail */
-.Takeaways {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.Takeaway {
-  position: relative;
-  padding: 20px 22px;
-  border-radius: 12px;
-  background-color: color-mix(in srgb, #0a1c04 55%, transparent);
-  border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
-  backdrop-filter: blur(10px);
-
-  & .N {
-    font-family: var(--axelix-mono);
-    font-size: 11px;
-    letter-spacing: .12em;
-    color: var(--axelix-green-400);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: block;
-  }
-
-  & h3 {
-    margin: 0;
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 1.35;
-    color: #f0f4e6;
-    letter-spacing: -0.01em;
-  }
-
-  & p {
-    margin: 8px 0 0;
-    font-size: 13.5px;
-    line-height: 1.55;
-    color: #b6c5a3;
-  }
-}
-
-.Closer {
+.SectionFooterText {
   margin-top: 56px;
   padding-top: 32px;
   border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
@@ -96,16 +42,16 @@
   line-height: 1.45;
   color: #d9ebbf;
   letter-spacing: -0.012em;
-  max-width: 64ch;
+  max-width: 950px;
+}
 
-  & em {
-    font-style: normal;
-    font-weight: 500;
-    color: #fff;
-  }
+.AccentedText {
+  font-style: normal;
+  font-weight: 500;
+  color: #fff;
+}
 
-  & b {
-    color: #fff;
-    font-weight: 500;
-  }
+.BoldedText {
+  color: #fff;
+  font-weight: 500;
 }

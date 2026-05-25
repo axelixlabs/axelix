@@ -10,22 +10,21 @@
   padding-block: 14px;
   font-family: var(--axelix-mono);
   font-size: 12px;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   color: var(--axelix-green-800);
   white-space: nowrap;
   animation: scroll 50s linear infinite;
 }
 
-.Track span {
+.Tape {
   display: inline-flex;
   align-items: center;
-  column-gap: 50px;
+  column-gap: 100px;
   flex-shrink: 0;
 
   &::after {
     content: "●";
     color: var(--axelix-green-500);
-    margin-left: 50px;
   }
 }
 

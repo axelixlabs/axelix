@@ -6,5 +6,4 @@ export { Footer } from "./Footer";
 export { Header } from "./Header";
 export { Strip } from "./Strip";
 export { Hero } from "./Hero";
-export { Logo } from "./Logo";
 export { FAQ } from "./FAQ";
