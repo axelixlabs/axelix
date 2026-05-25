@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("shared")
-    id("com.axelixlabs.axelix-internal")
     kotlin("jvm") version "2.2.21"
 }
 
