@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Golos_Text, JetBrains_Mono } from "next/font/google";
-import { Footer, Header } from "@/components";
+import { Footer, Header, Metric } from "@/components";
 import "./globals.css";
 
 const golosText = Golos_Text({
@@ -29,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${golosText.variable} ${jetBrainsMono.variable}`}>
       <body>
+        <Metric />
         <Header />
         <main>{children}</main>
         <Footer />

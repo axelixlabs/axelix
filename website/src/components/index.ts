@@ -7,3 +7,4 @@ export { Header } from "./Header";
 export { Strip } from "./Strip";
 export { Hero } from "./Hero";
 export { FAQ } from "./FAQ";
+export { Metric } from "./Metric";
