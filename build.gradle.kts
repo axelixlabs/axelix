@@ -1,5 +1,6 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.io.path.readText
@@ -152,14 +153,22 @@ subprojects {
     }
 }
 
-val publishableProjects = listOf(
-    project(":sbs:axelix-spring-boot-2-starter"),
-    project(":sbs:axelix-spring-boot-3-starter"),
-    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
-    //project(":sbs:axelix-spring-boot-4-starter"),
-    project(":master")
+val commonModules = listOf(
+    project(":sbs:starter-domain"),
+    project(":common:auth"),
+    project(":common:api"),
+    project(":common:domain"),
+    project(":common:utils")
 )
 
+val publishableProjects = listOf(
+    project(":sbs:axelix-spring-boot-2-starter"),
+    project(":sbs:axelix-spring-boot-3-starter")
+    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
+    // project(":sbs:axelix-spring-boot-4-starter")
+)
+
+// Apply publishing and signing plugins to all starter modules only
 configure(publishableProjects) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
@@ -167,6 +176,27 @@ configure(publishableProjects) {
     java {
         withJavadocJar()
         withSourcesJar()
+    }
+
+    // Pack shared submodule classes, sources, and docs into a single fat artifact
+    tasks {
+        jar {
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            commonModules.forEach { from(it.sourceSets.main.get().output) }
+        }
+        named<Jar>("sourcesJar") {
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            commonModules.forEach { from(it.sourceSets.main.get().allSource) }
+        }
+        withType<Javadoc> {
+            commonModules.forEach { source(it.sourceSets.main.get().allJava) }
+            classpath = project.configurations.compileClasspath.get()
+        }
+        named<Jar>("javadocJar") {
+            dependsOn(javadoc)
+            duplicatesStrategy = DuplicatesStrategy.WARN
+            from(javadoc.get().destinationDir)
+        }
     }
 
     publishing {
@@ -195,37 +225,27 @@ configure(publishableProjects) {
                 }
             }
 
-            // We do not publish bootJar to MavenCentral
             // TODO: revisit later
-//            if (project.name != "master") {
-//                maven {
-//                    name = "MavenCentral"
-//                    url = uri("https://central.sonatype.com")
-//                    credentials {
-//                        username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
-//                        password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
-//                    }
+//            maven {
+//                name = "MavenCentral"
+//                url = uri("https://central.sonatype.com")
+//                credentials {
+//                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+//                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
 //                }
 //            }
         }
 
         publications {
 
-            // Publish to Nexus
-            register<MavenPublication>("nexus") {
-                from(components["java"])
-            }
-
-            // Publish to GitHub Package Registry
-            register<MavenPublication>("gpr") {
+            // The 'main' publication. Created for each subproject that is supposed to be published.
+            register<MavenPublication>("main") {
                 from(components["java"])
 
                 // Configure the POM file details
-                // TODO: Remove all TODOs below after configuring for Maven Central publication
-                // TODO: Requirements: https://maven.apache.org/repository/guide-central-repository-upload.html
                 pom {
                     name.set(project.name)
-                    description = "A unified monitoring solution for Java Spring Boot deployments"
+                    description = "An AI-native monitoring solution for Java Spring Boot deployments"
                     url = "https://github.com/axelixlabs/axelix"
                     packaging = "jar"
 
@@ -277,28 +297,32 @@ configure(publishableProjects) {
         }
     }
 
+    val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
+    val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
+
+    val signingKey = System.getenv(gpgSigningKeyIdEnvVariableName)
+    val signingPassword = System.getenv(gpgPassphraseEnvVariableName)
+
     signing {
-        // Signing artifacts only in case publishGprPublicationToGitHubPackagesRepository is present
-        if (gradle.taskGraph.hasTask(":publishGprPublicationToGitHubPackagesRepository")) {
+        if (signingKey != null && signingPassword != null) {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+        }
+        sign(publishing.publications.getByName("main"))
+    }
 
-            val gpgPassphraseEnvVariableName = "PRODUCTION_GPG_SECRET_KEY_PASSPHRASE"
-            val gpgSigningKeyIdEnvVariableName = "PRODUCTION_GPG_SECRET_KEY"
+    gradle.taskGraph.whenReady {
+        val isPublishing = allTasks.any { it is PublishToMavenRepository }
 
-            val signingKey = System.getenv(gpgSigningKeyIdEnvVariableName)
-            val signingPassword = System.getenv(gpgPassphraseEnvVariableName)
+        signing.isRequired = isPublishing
 
-            if (signingKey != null && signingPassword != null) {
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign(publishing.publications["gpr"])
-            } else {
-                throw GradleException(
-                    """
-                    Signing requires:
-                    1. $gpgSigningKeyIdEnvVariableName env var.
-                    2. $gpgPassphraseEnvVariableName env var.
-                    """
-                )
-            }
+        if (signing.isRequired && (signingKey == null || signingPassword == null)) {
+            throw GradleException(
+                """
+                Signing requires:
+                1. $gpgSigningKeyIdEnvVariableName env var.
+                2. $gpgPassphraseEnvVariableName env var.
+                """.trimIndent()
+            )
         }
     }
 }
