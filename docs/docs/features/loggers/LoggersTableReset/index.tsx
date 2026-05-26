@@ -17,7 +17,7 @@ export const LoggersTableReset = () => {
 
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.nucleonforge.axelix
+              com.axelixlabs.axelix
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
@@ -44,7 +44,7 @@ export const LoggersTableReset = () => {
 
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.nucleonforge.axelix.sbs
+              com.axelixlabs.axelix.sbs
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
