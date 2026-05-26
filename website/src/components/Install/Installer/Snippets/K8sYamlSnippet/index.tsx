@@ -4,7 +4,7 @@ interface IProps {
     refEl: any
 }
 
-export const YamlSnippet = ({ refEl }: IProps) => {
+export const K8sYamlSnippet = ({ refEl }: IProps) => {
     return (
         <pre
             className={styles.Snippet}
@@ -35,25 +35,7 @@ export const YamlSnippet = ({ refEl }: IProps) => {
                     <span className={styles.At}>signing-key</span>:{" "}
                     <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
                 </span>
-                <span className={styles.Line}>
-                    {"    "}<span className={styles.At}>discovery</span>:
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>instance-name</span>:{" "}
-                    <span className={styles.St}>my-app</span>
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>instance-url</span>:{" "}
-                    <span className={styles.St}>https://my-app.com/actuator</span>
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>master-url</span>:{" "}
-                    <span className={styles.St}>https://axelix-master.com/api/internal/service/register</span>
-                </span>
             </code>
         </pre>
-    );
-} 
+    )
+}

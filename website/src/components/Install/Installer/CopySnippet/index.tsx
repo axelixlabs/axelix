@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import styles from "./styles.module.css"
-import { CopyIcon } from "@/assets";
+import { CheckIcon, CopyIcon } from "@/assets";
 
 interface IProps {
     activeSnippetRef: any
@@ -31,7 +31,12 @@ export const CopySnippet = ({ activeSnippetRef }: IProps) => {
             title="Copy"
             onClick={copyMain}
         >
-            {copied ? <span>Copied</span> : (
+            {copied ? (
+                <>
+                    <CheckIcon />
+                    <span>Copied!</span>
+                </>
+            ) : (
                 <>
                     <CopyIcon />
                     <span>Copy</span>

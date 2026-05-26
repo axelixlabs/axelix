@@ -23,6 +23,7 @@
 }
 
 .InstallerBoardInnerWrapper {
+    position: relative;
     flex: 1;
     border-radius: 14px;
     background-color: rgba(10, 28, 4, 0.85);

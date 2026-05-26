@@ -1,18 +1,12 @@
 .Snippet {
-    display: none;
-    padding: 0 18px;
+    padding-inline: 18px;
     margin: 0;
     font-family: var(--axelix-code);
     font-size: 13.5px;
     line-height: 1.7;
     color: #e7eee0;
     counter-reset: ln;
-    white-space: normal;
-}
-
-.Snippet.Active {
-    display: block;
-    animation: snippet-in .25s ease;
+    animation: snippet-in 0.3s ease;
 }
 
 @keyframes snippet-in {
@@ -27,54 +21,53 @@
     }
 }
 
-.Snippet .Line {
+.Line {
     display: block;
     position: relative;
-    padding-left: 44px;
+    padding-left: 45px;
     counter-increment: ln;
     white-space: pre;
+
+    &::before {
+        content: counter(ln);
+        position: absolute;
+        left: 0;
+        width: 30px;
+        text-align: right;
+        color: color-mix(in srgb, var(--axelix-green-400) 38%, transparent);
+        font-variant-numeric: tabular-nums;
+    }
 }
 
-.Snippet .Line::before {
-    content: counter(ln);
-    position: absolute;
-    left: 0;
-    width: 28px;
-    text-align: right;
-    color: color-mix(in srgb, var(--axelix-green-400) 38%, transparent);
-    user-select: none;
-    font-variant-numeric: tabular-nums;
-}
-
-.Snippet .Co {
+.Co {
     color: rgba(182, 197, 163, 0.65);
     font-style: italic;
 }
 
-.Snippet .Kw {
+.Kw {
     color: #8fbdf0;
 }
 
-.Snippet .St {
+.St {
     color: #bde08f;
 }
 
-.Snippet .Ar {
+.Ar {
     color: #bdd3a0;
 }
 
-.Snippet .At {
+.At {
     color: #bdd3a0;
 }
 
-.Snippet .Tg {
+.Tg {
     color: #88b8e8;
 }
 
-.Snippet .Nl {
+.Nl {
     color: color-mix(in srgb, var(--axelix-green-400) 35%, transparent);
 }
 
-.Snippet .Cm {
+.Cm {
     color: #f4f7ec;
 }

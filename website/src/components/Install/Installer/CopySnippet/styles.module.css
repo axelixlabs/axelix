@@ -1,33 +1,26 @@
 .CopyFloat {
     position: absolute;
-    top: 8px;
+    top: 60px;
     right: 12px;
     z-index: 2;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(6, 20, 10, 0.78);
+    background-color: rgba(6, 20, 10, 0.78);
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
     color: color-mix(in srgb, var(--axelix-green-400) 80%, transparent);
-    cursor: pointer;
     padding: 5px 9px;
-    border-radius: 7px;
-    font-family: var(--axelix-font);
-    font-size: 12px;
+    border-radius: 8px;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    opacity: 0;
-    transition: opacity .15s, color .15s, background .15s;
-}
+    font-family: var(--axelix-font);
+    font-size: 12px;
+    transition: opacity 0.3s, color 0.3s, background-color 0.3s;
 
-.Codepane:hover .CopyFloat,
-.CopyFloat:focus-visible {
-    opacity: 1;
-}
-
-.CopyFloat:hover {
-    color: var(--axelix-green-400);
-    background: color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
+    &:hover {
+        color: var(--axelix-green-400);
+        background-color: color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
+    }
 }
 
 .CopyFloat svg {
