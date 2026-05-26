@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew clean build
 
   release-artifacts:
-    needs: [build-and-test-backend]
+    needs: [build-and-test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
