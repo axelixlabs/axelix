@@ -48,7 +48,7 @@ export const Help = () => {
             key: "2",
             icon: <BookOutlined className={styles.CommonIcon} />,
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="#">
+                <a target="_blank" rel="noopener noreferrer" href="https://axelix.io/docs">
                     {t("documentation")}
                 </a>
             ),
@@ -62,7 +62,7 @@ export const Help = () => {
             key: "4",
             icon: <CommentOutlined className={styles.CommonIcon} />,
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="#">
+                <a target="_blank" rel="noopener noreferrer" href="https://github.com/axelixlabs/axelix/issues">
                     {t("Header.Help.feedback")}
                 </a>
             ),
