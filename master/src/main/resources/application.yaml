@@ -34,7 +34,7 @@ axelix:
   master:
     web:
       static-resources:
-        location: classpath:/spa
+        location: classpath:/spa/
     mcp-server:
       enabled: true
     database:

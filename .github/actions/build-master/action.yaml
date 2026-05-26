@@ -1,4 +1,4 @@
-name: "Build Backend"
+name: "Build Master"
 inputs:
   deploy-to-nexus:
     description: Whether to deploy the built JAR into Nexus or not

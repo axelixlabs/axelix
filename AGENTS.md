@@ -40,7 +40,7 @@ Below is the full directory overview:
 - `gradle/`: Contains the Gradle wrapper files.
 - `.github/`: GitHub-specific configuration.
   - `.github/workflows/`: CI/CD workflow definitions (`backend_pull_requests.yaml`, `frontend_pull_requests.yaml`, `release.yaml`, `deploy-test.yaml`).
-  - `.github/actions/`: Reusable composite actions (`build-backend/`, `build-frontend/`).
+  - `.github/actions/`: Reusable composite actions (`build-master/`).
   - `.github/ISSUE_TEMPLATE/`: Issue templates.
 
 Notable root-level files:

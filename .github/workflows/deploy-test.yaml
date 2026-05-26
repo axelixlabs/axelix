@@ -50,13 +50,10 @@ jobs:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
       - name: Build Backend
-        uses: ./.github/actions/build-backend
+        uses: ./.github/actions/build-master
         with:
           deploy-to-nexus: true
           gradle-cache-enryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
-
-      - name: Build Frontend
-        uses: ./.github/actions/build-frontend
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5

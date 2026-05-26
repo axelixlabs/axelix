@@ -15,7 +15,7 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.git_tag }}
 
 jobs:
-  build-and-test-backend:
+  build-and-test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -45,12 +45,7 @@ jobs:
       contents: read
       packages: write
     env:
-      VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
-      VITE_APP_ISSUE_TRACKER_LINK: https://github.com/axelixlabs/axelix/issues
-      VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
-      # TODO: Later, change this link for it to point to the overall UI guide page
-      VITE_APP_REFERENCE_GUIDE_LINK: https://axelix.io/docs/features/details
-      VITE_APP_BLOG_LINK: https://axelix.io/blog/
+      VITE_APP_VERSION: ${{ github.event.inputs.git_tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -73,40 +68,6 @@ jobs:
       # and to create the release build from scratch.
       - name: Build Backend
         run: ./gradlew clean build sourcesJar javadocJar
-
-      - name: Install frontend dependencies
-        working-directory: front-end
-        run: npm ci
-
-      - name: Linting source files
-        working-directory: front-end
-        run: npm run lint
-
-      - name: Linting CSS files
-        working-directory: front-end
-        run: npm run lint-css
-
-      - name: Running tests
-        working-directory: front-end
-        run: npm run test
-
-      - name: Create .env file
-        working-directory: front-end
-        run: |
-          echo "VITE_APP_VERSION=${{ github.event.inputs.git_tag }}" >> .env
-          echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
-          echo "VITE_APP_ISSUE_TRACKER_LINK=${{ env.VITE_APP_ISSUE_TRACKER_LINK }}" >> .env
-          echo "VITE_APP_LICENSE_LINK=${{ env.VITE_APP_LICENSE_LINK }}" >> .env.production
-          echo "VITE_APP_REFERENCE_GUIDE_LINK=${{ env.VITE_APP_REFERENCE_GUIDE_LINK }}" >> .env
-          echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
-
-      - name: Build frontend
-        working-directory: front-end
-        run: npm run build
-
-      - name: Clean-up .env
-        working-directory: front-end
-        run: rm .env
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
