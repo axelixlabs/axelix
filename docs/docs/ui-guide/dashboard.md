@@ -43,4 +43,4 @@ Both heap values are rescaled to a readable unit before display, so the card may
 
 - [Wallboard](./wallboard.md)
 - [Service Profile](./service-profile.md)
-- [Details](../features/details.md)
+- [Details](../features/details)

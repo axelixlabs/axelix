@@ -13,7 +13,7 @@ This documentation covers both **Axelix OSS**, released under LGPL 3.0 with sour
 ## Where to go next
 
 - [UI Guide](../ui-guide/dashboard.md): tour of the Axelix web UI.
-- [Features](../features/details.md): per-instance feature reference.
+- [Features](../features/details): per-instance feature reference.
 - [Installation](../installation/configuring-master.mdx): install and run Axelix Master.
 - [Master](../setting-up-master-ui/what-is-master.md): configure Axelix Master.
 - [Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter.md): add the starter to your application.
