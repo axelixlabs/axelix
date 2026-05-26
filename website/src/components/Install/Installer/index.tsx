@@ -14,6 +14,7 @@ import { CopySnippet } from "./CopySnippet";
 import { StarterMini } from "./StarterMini";
 import { InstallerFooter } from "./InstallerFooter";
 import { InstallerBoardFooter } from "./InstallerBoardFooter";
+import { InstallThirdStep } from "./InstallThirdStep";
 
 const SB_ARTIFACT: Record<SbVariant, string> = {
     sb2: "axelix-spring-boot-2-starter",
@@ -80,11 +81,12 @@ export const Installer = () => {
                                 <StarterMini artifact={SB_ARTIFACT[sb]} activeSnippetRef={activeSnippetRef} />
                             )}
 
-                            {step === 3 && cfg === "yaml" && (
-                                <YamlSnippet refEl={activeSnippetRef} />
-                            )}
-                            {step === 3 && cfg === "properties" && (
-                                <PropertiesSnippet refEl={activeSnippetRef} />
+                            {step === 3 && (
+                                <InstallThirdStep
+                                    method={method}
+                                    cfg={cfg}
+                                    activeSnippetRef={activeSnippetRef}
+                                />
                             )}
                         </div>
 

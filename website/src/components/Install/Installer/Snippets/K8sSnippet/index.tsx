@@ -7,7 +7,7 @@ interface IProps {
 export const K8sSnippet = ({ refEl }: IProps) => {
     return (
         <pre
-            className={`${styles.Snippet} ${styles.Active}`}
+            className={styles.Snippet}
             ref={(el) => {
                 refEl.current = el;
             }}
