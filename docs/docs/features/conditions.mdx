@@ -1,0 +1,93 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Conditions
+
+The **Conditions** page shows the Spring Boot auto-configuration report for the managed instance — every
+`@Conditional` evaluation Spring performed at startup, split into two tabs by outcome.
+
+![conditions main page](../../static/img/feature/conditions/conditions-main-page.png)
+***Conditions page as presented in Axelix UI***
+
+The page is read-only and available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and
+**SUPER_ADMIN** can all open it. See
+[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+Two tabs sit at the top — **Negative Matches** (default) and **Positive Matches** — with a single search input above
+them and a counter in the form `<matching> / <total>` reflecting the currently active tab.
+
+Each tab is organized the same way: a list of configuration classes (and, when applicable, the specific `@Bean`
+method inside them). The header of every entry shows:
+
+- **Class:** the fully qualified class that owns the conditional annotation. A copy control next to it copies the
+  full name.
+- **Method:** the `@Bean` method name — shown only when the condition was placed on a method rather than on the
+  class itself.
+
+Under the header sits a list of individual conditions. Each condition is an accordion row whose label is the
+condition's short name (e.g. `OnClassCondition`, `OnPropertyCondition`); expanding it reveals the descriptive
+**message** Spring produced while evaluating it. A status icon on the left of each row indicates the outcome:
+
+- <span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span> — condition matched.
+- <span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span> — condition did not match.
+
+## Negative Matches tab
+
+A scrollable list of configurations Spring evaluated whose overall outcome was *not matched* — i.e. at least one
+required condition failed. For each such configuration the page lists **both** the failing conditions
+(<span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span>) **and**
+the conditions that did happen to match
+(<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), so you can see exactly which check tipped the balance.
+
+![conditions negative matches page](../../static/img/feature/conditions/conditions-not-matches-details-page.png)
+***Conditions negative matches page as presented in Axelix UI***
+
+## Positive Matches tab
+
+A scrollable list of configurations whose overall outcome was *matched* — every required condition passed. Each
+entry shows the matched conditions (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) and the message
+explaining why each one passed.
+
+![conditions matches page](../../static/img/feature/conditions/conditions-matches-details-page.png)
+***Conditions matches page as presented in Axelix UI***
+
+## MCP Tools
+
+The auto-configuration report is also exposed to AI agents through MCP. See the
+[MCP Tools catalog](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
+
+## Properties
+
+The page is backed by the `axelix-conditions` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose
+it through the standard Spring Boot Actuator properties — see
+[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+for the full list of Axelix endpoints and surrounding setup:
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-conditions
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-conditions
+```
+
+  </TabItem>
+</Tabs>
+
+## See also
+
+- [Beans](./beans.mdx) — bean rows link here via **`@AutoConfiguration class`** / **Who defines this bean?**.
+- [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
