@@ -16,7 +16,7 @@ export const LoggersTable = () => {
         <tbody>
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.nucleonforge.axelix
+              com.axelixlabs.axelix
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
@@ -43,7 +43,7 @@ export const LoggersTable = () => {
 
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.nucleonforge.axelix.sbs
+              com.axelixlabs.axelix.sbs
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
@@ -70,7 +70,7 @@ export const LoggersTable = () => {
 
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.nucleonforge.axile.sbs.autoconfiguration.spring
+              com.axelixlabs.axile.sbs.autoconfiguration.spring
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
