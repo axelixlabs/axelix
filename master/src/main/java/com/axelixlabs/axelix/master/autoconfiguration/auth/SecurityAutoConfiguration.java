@@ -89,7 +89,7 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public WebIdentityAccessManager identityAccessManager(
+    public WebIdentityAccessManager webIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }
