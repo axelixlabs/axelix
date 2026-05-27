@@ -230,8 +230,8 @@ configure(publishableProjects) {
                 name = mavenCentral
                 url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
                 credentials {
-                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
                     username = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
+                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
                 }
             }
         }
@@ -331,8 +331,8 @@ configure(publishableProjects) {
             doLast {
                 val endpoint =
                     "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/$projectNamespace"
-                val password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
-                val username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+                val username = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
+                val password = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
 
                 if (username.isNullOrBlank() || password.isNullOrBlank()) {
                     throw GradleException(
