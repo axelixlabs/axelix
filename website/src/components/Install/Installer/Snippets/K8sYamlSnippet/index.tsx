@@ -28,7 +28,7 @@ export const K8sYamlSnippet = ({ refEl }: IProps) => {
                 <span className={styles.Line}>
                     {"        "}
                     <span className={styles.At}>algorithm</span>:{" "}
-                    <span className={styles.St}>HMAC512</span>
+                    <span className={styles.St}>HMAC256</span>
                 </span>
                 <span className={styles.Line}>
                     {"        "}

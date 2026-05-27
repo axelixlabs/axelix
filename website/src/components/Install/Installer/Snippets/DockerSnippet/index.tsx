@@ -28,17 +28,13 @@ export const DockerSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.Co}># Important: change the algorithm and key for production use</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.Ar}>-e</span> AXELIX_AUTH_JWT_ALGORITHM=
+                    <span className={styles.Ar}>-e</span> AXELIX_MASTER_AUTH_JWT_ALGORITHM=
                     <span className={styles.St}>HMAC256</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.Ar}>-e</span> AXELIX_AUTH_JWT_SIGNING_KEY=
+                    <span className={styles.Ar}>-e</span> AXELIX_MASTER_AUTH_JWT_SIGNING_KEY=
                     <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
@@ -55,7 +51,7 @@ export const DockerSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:1.0.0</span>
+                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:v1.0.0-M1</span>
                 </span>
             </code>
         </pre>

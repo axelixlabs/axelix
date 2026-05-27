@@ -20,7 +20,7 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 <span className={styles.Line}>
                     {"    "}
                     <span className={styles.At}>image</span>:{" "}
-                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:1.0.0</span>
+                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:v1.0.0-M1</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -44,12 +44,12 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>AXELIX_AUTH_JWT_ALGORITHM</span>:{" "}
+                    <span className={styles.At}>AXELIX_MASTER_AUTH_JWT_ALGORITHM</span>:{" "}
                     <span className={styles.St}>HMAC256</span>
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>AXELIX_AUTH_JWT_SIGNING_KEY</span>:{" "}
+                    <span className={styles.At}>AXELIX_MASTER_AUTH_JWT_SIGNING_KEY</span>:{" "}
                     <span className={styles.Kw}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
                 </span>
                 <span className={styles.Line}>
@@ -85,17 +85,22 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>- AXELIX_SBS_DISCOVERY_INSTANCE_NAME</span>:{" "}
+                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_AUTO</span>:{" "}
+                    <span className={styles.St}>true</span>
+                </span>
+                <span className={styles.Line}>
+                    {"      "}
+                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_INSTANCE_NAME</span>:{" "}
                     <span className={styles.St}>my-app</span>
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>- AXELIX_SBS_DISCOVERY_INSTANCE_ACTUATOR_URL</span>:{" "}
+                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_INSTANCE_ACTUATOR_URL</span>:{" "}
                     <span className={styles.St}>http://my-app.com/actuator</span>
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>- AXELIX_SBS_DISCOVERY_MASTER_URL</span>:{" "}
+                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_MASTER_URL</span>:{" "}
                     <span className={styles.St}>http://localhost:9444/api/internal/service/register</span>
                 </span>
 

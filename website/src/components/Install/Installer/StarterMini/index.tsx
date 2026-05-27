@@ -18,21 +18,23 @@ export const StarterMini = ({ artifact, activeSnippetRef }: IProps) => {
         null,
     ]);
 
+    const axelixActualVersion = `1.0.0-M1`;
+
     const blocks: { label: string; code: string }[] = [
         {
             label: "Gradle Kotlin DSL",
-            code: `implementation("com.axelixlabs:${artifact}:1.0.0")`,
+            code: `implementation("com.axelixlabs:${artifact}:${axelixActualVersion}")`,
         },
         {
             label: "Gradle Groovy DSL",
-            code: `implementation 'com.axelixlabs:${artifact}:1.0.0'`,
+            code: `implementation 'com.axelixlabs:${artifact}:${axelixActualVersion}'`,
         },
         {
             label: "Maven",
             code: `<dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>${artifact}</artifactId>
-    <version>1.0.0</version>
+    <version>${axelixActualVersion}</version>
 </dependency>`,
         },
     ];

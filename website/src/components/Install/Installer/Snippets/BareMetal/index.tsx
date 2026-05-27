@@ -20,7 +20,7 @@ export const BareMetal = ({ refEl }: IProps) => {
                     <span className={styles.Co}># Important: Please, change the algorithm and the key for production use</span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.Cm}>java -jar axelix-1.0.0.jar</span>{" "}
+                    <span className={styles.Cm}>java -jar master.jar</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
@@ -30,7 +30,7 @@ export const BareMetal = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>--axelix.master.auth.jwt.algorithm=HMAC512</span>{" "}
+                    <span className={styles.St}>--axelix.master.auth.jwt.algorithm=HMAC256</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>

@@ -28,7 +28,7 @@ export const YamlSnippet = ({ refEl }: IProps) => {
                 <span className={styles.Line}>
                     {"        "}
                     <span className={styles.At}>algorithm</span>:{" "}
-                    <span className={styles.St}>HMAC512</span>
+                    <span className={styles.St}>HMAC256</span>
                 </span>
                 <span className={styles.Line}>
                     {"        "}
@@ -40,12 +40,17 @@ export const YamlSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
+                    <span className={styles.At}>auto</span>:{" "}
+                    <span className={styles.St}>true</span>
+                </span>
+                <span className={styles.Line}>
+                    {"      "}
                     <span className={styles.At}>instance-name</span>:{" "}
                     <span className={styles.St}>my-app</span>
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>instance-url</span>:{" "}
+                    <span className={styles.At}>instance-actuator-url</span>:{" "}
                     <span className={styles.St}>https://my-app.com/actuator</span>
                 </span>
                 <span className={styles.Line}>

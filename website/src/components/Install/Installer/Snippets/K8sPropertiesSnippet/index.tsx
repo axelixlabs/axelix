@@ -15,7 +15,7 @@ export const K8sPropertiesSnippet = ({ refEl }: IProps) => {
             <code>
                 <span className={styles.Line}>
                     <span className={styles.At}>axelix.sbs.auth.jwt.algorithm</span>=
-                    <span className={styles.St}>HMAC512</span>
+                    <span className={styles.St}>HMAC256</span>
                 </span>
                 <span className={styles.Line}>
                     <span className={styles.At}>axelix.sbs.auth.jwt.signing-key</span>=
