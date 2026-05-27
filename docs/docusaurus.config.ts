@@ -1,5 +1,6 @@
 import type { Config } from '@docusaurus/types';
 
+import { llmsTxtOptions } from './config/llms-txt-options';
 import { presetOptions } from './config/preset-options';
 import { themeConfig } from './config/theme-config';
 
@@ -46,6 +47,8 @@ const config: Config = {
   },
 
   presets: [['classic', presetOptions]],
+
+  plugins: [['@signalwire/docusaurus-plugin-llms-txt', llmsTxtOptions]],
 
   themeConfig,
 };
