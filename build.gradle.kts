@@ -330,7 +330,7 @@ configure(publishableProjects) {
         if (repository.name == mavenCentral && publication.name == mainPublication) {
             doLast {
                 val endpoint =
-                    "https://ossrh-staging-api.central.sonatype.com/service/local/staging/manual/upload/defaultRepository/$projectNamespace"
+                    "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/$projectNamespace"
                 val password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
                 val username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
 
