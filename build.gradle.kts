@@ -1,8 +1,13 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import java.util.Base64
 import kotlin.io.path.readText
 
 plugins {
@@ -15,8 +20,10 @@ plugins {
     id("test-report-aggregation")
 }
 
+val projectNamespace = "com.axelixlabs"
+
 allprojects {
-    group = "com.axelixlabs"
+    group = projectNamespace
     version = project.findProperty("axelixVersion")!!
 
     repositories {
@@ -169,6 +176,9 @@ val publishableProjects = listOf(
 )
 
 // Apply publishing and signing plugins to all starter modules only
+val mavenCentral = "ossrh-staging-api"
+val mainPublication = "main"
+
 configure(publishableProjects) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
@@ -217,11 +227,11 @@ configure(publishableProjects) {
             }
 
             maven {
-                name = "MavenCentral"
-                url = uri("https://central.sonatype.com")
+                name = mavenCentral
+                url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
-                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
+                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
                 }
             }
         }
@@ -229,7 +239,7 @@ configure(publishableProjects) {
         publications {
 
             // The 'main' publication. Created for each subproject that is supposed to be published.
-            register<MavenPublication>("main") {
+            register<MavenPublication>(mainPublication) {
                 from(components["java"])
 
                 // Configure the POM file details
@@ -297,7 +307,7 @@ configure(publishableProjects) {
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
-        sign(publishing.publications.getByName("main"))
+        sign(publishing.publications.getByName(mainPublication))
     }
 
     gradle.taskGraph.whenReady {
@@ -313,6 +323,39 @@ configure(publishableProjects) {
                 2. $gpgPassphraseEnvVariableName env var.
                 """.trimIndent()
             )
+        }
+    }
+
+    tasks.withType<PublishToMavenRepository>().configureEach {
+        if (repository.name == mavenCentral && publication.name == mainPublication) {
+            doLast {
+                val endpoint =
+                    "https://ossrh-staging-api.central.sonatype.com/service/local/staging/manual/upload/defaultRepository/$projectNamespace"
+                val password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
+                val username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+
+                if (username.isNullOrBlank() || password.isNullOrBlank()) {
+                    throw GradleException(
+                        "Missing OSSRH credentials for manual upload request after publication."
+                    )
+                }
+
+                val credentials = "$username:$password"
+                val basicAuthValue = Base64.getEncoder().encodeToString(credentials.toByteArray(StandardCharsets.UTF_8))
+
+                val request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Authorization", "Bearer $basicAuthValue")
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build()
+
+                val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                if (response.statusCode() !in 200..299) {
+                    throw GradleException(
+                        "Manual OSSRH upload trigger failed with status ${response.statusCode()}: ${response.body()}"
+                    )
+                }
+            }
         }
     }
 }
