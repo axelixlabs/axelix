@@ -44,6 +44,13 @@
     font-style: italic;
 }
 
+.ClickableLink {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
 .Kw {
     color: #8fbdf0;
 }

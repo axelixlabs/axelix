@@ -51,7 +51,7 @@ export const DockerSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:v1.0.0-M1</span>
+                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:v1.0.0-m1</span>
                 </span>
             </code>
         </pre>

@@ -14,7 +14,13 @@ export const BareMetal = ({ refEl }: IProps) => {
         >
             <code>
                 <span className={styles.Line}>
-                    <span className={styles.Co}># Download and run the Axelix Master JAR</span>
+                    <span className={styles.Co}>
+                        #{" "}
+                        <a href="https://github.com/axelixlabs/axelix/releases" className={styles.ClickableLink}>
+                            Download
+                        </a>{" "}
+                        and run the Axelix Master JAR
+                    </span>
                 </span>
                 <span className={styles.Line}>
                     <span className={styles.Co}># Important: Please, change the algorithm and the key for production use</span>
