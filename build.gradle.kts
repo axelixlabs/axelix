@@ -216,15 +216,14 @@ configure(publishableProjects) {
                 }
             }
 
-            // TODO: revisit later
-//            maven {
-//                name = "MavenCentral"
-//                url = uri("https://central.sonatype.com")
-//                credentials {
-//                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
-//                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
-//                }
-//            }
+            maven {
+                name = "MavenCentral"
+                url = uri("https://central.sonatype.com")
+                credentials {
+                    username = System.getenv("PRODUCTION_MAVEN_CENTRAL_PASSWORD")
+                    password = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
+                }
+            }
         }
 
         publications {

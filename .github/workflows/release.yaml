@@ -93,7 +93,3 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: ./gradlew publish
-
-#        // TODO: Uncomment later
-#      - name: Publish to Maven Central
-#        run: ./gradlew publishGprPublicationToMavenCentralRepository
