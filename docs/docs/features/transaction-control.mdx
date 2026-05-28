@@ -3,20 +3,20 @@ import TabItem from '@theme/TabItem';
 
 # Transaction Control
 
-The **Transaction Control** page lists every `@Transactional` method the managed Spring Boot instance has executed
-at least once, with execution timings and the SQL queries run inside each invocation. Use it to spot slow
-transactions and inspect the queries they issued.
+The **Transaction Control** page lists every `@Transactional` method the managed Spring Boot instance has executed at
+least once, with execution timings and the SQL queries run inside each invocation. Use it to spot slow transactions and
+inspect the queries they issued.
 
-![transaction control main page](../../static/img/feature/transaction/transaction-main-page.png)
-***Transaction Control as presented in Axelix UI***
+![transaction control main page](../../static/img/feature/transaction/transaction-main-page.png) ***Transaction Control
+as presented in Axelix UI***
 
-The page is read-only and available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and
-**SUPER_ADMIN** can all open it. See
-[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+The page is read-only and available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
 A scrollable list of every transactional entry point the instance has seen, with a search input above the list and a
-counter in the form `<matching> / <total>`. Each row is an accordion; its header shows:
+counter in the form `<matching> / <total>`. Each row is an accordion, its header shows:
 
 - **Class:** the fully qualified class declaring the `@Transactional` method.
 - **Method:** the name of the `@Transactional` method.
@@ -25,8 +25,8 @@ counter in the form `<matching> / <total>`. Each row is an accordion; its header
 
 Expanding a row reveals a scatter chart of every recorded execution of that method.
 
-![transaction details page](../../static/img/feature/transaction/transaction-details-page.png)
-***Transaction details as presented in Axelix UI***
+![transaction details page](../../static/img/feature/transaction/transaction-details-page.png) ***Transaction details as
+presented in Axelix UI***
 
 - **X axis** — the start time of each execution.
 - **Y axis** — the execution duration in milliseconds.
@@ -43,27 +43,25 @@ Below the chart, the **Duration** row summarises all recorded executions of this
 
 Clicking any point on the chart opens a side panel with the chosen execution's detail.
 
-- **Queries count** — number of JDBC queries this execution issued. If the count is zero, a warning icon is shown:
-  a transactional method that produced no queries is usually a sign the transaction did nothing useful or was
-  short-circuited.
-- **Start time** — when the `@Transactional` method was entered and the transaction
-  began, captured on the monitored JVM in millisecond precision.
-- **End time** — when the `@Transactional` method returned and the transaction was
-  committed or rolled back, captured on the monitored JVM in millisecond precision. The difference between
-  **End time** and **Start time** equals the **Duration** value shown for this point on the chart.
-- **Queries timeline** — a horizontal bar for each query, laid out against the execution's timeline so you can see
-  which query ran when and for how long. **Each bar exposes a preview of the SQL statement on hover.**
+- **Queries count** — number of JDBC queries this execution issued. If the count is zero, a warning icon is shown.
+- **Start time** — when the `@Transactional` method was entered and the transaction began, captured on the monitored JVM
+  in millisecond precision.
+- **End time** — when the `@Transactional` method returned and the transaction was committed or rolled back, captured on
+  the monitored JVM in millisecond precision. The difference between **End time** and **Start time** equals the
+  **Duration** value shown for this point on the chart.
+- **Queries timeline** — a horizontal bar for each query, laid out against the execution's timeline so you can see which
+  query ran when and for how long. **Each bar exposes a preview of the SQL statement on hover.**
 
 How this data is collected: the starter wraps `@Transactional` proxies with a monitoring interceptor and the
-application's `DataSource` with a query-recording proxy, so timings and SQL are captured on the JVM at runtime —
-no agent or APM tool is required.
+application's `DataSource` with a query-recording proxy, so timings and SQL are captured on the JVM at runtime — no
+agent or APM tool is required.
 
 ## Properties
 
 The page is backed by the `axelix-transactions-monitoring` actuator endpoint contributed by the Axelix Spring Boot
-Starter. Expose it through the standard Spring Boot Actuator properties — see
-[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
-for the full list of Axelix endpoints and surrounding setup:
+Starter. Expose it through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) for the full list
+of Axelix endpoints and surrounding setup:
 
 <Tabs groupId="spring-config">
   <TabItem value="properties" label="application.properties">
@@ -90,4 +88,5 @@ management:
 ## See also
 
 - [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
-- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+- [Configuring Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

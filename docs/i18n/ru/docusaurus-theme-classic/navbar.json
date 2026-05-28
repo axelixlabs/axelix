@@ -1,0 +1,46 @@
+{
+  "logo.alt": {
+    "message": "Логотип Axelix",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.Product": {
+    "message": "Продукт",
+    "description": "Navbar item with label Product"
+  },
+  "item.label.UI Guide": {
+    "message": "Гид по UI",
+    "description": "Navbar item with label UI Guide"
+  },
+  "item.label.Features": {
+    "message": "Возможности",
+    "description": "Navbar item with label Features"
+  },
+  "item.label.Installation": {
+    "message": "Установка",
+    "description": "Navbar item with label Installation"
+  },
+  "item.label.Master": {
+    "message": "Master",
+    "description": "Navbar item with label Master"
+  },
+  "item.label.Spring Boot Starter": {
+    "message": "Spring Boot Starter",
+    "description": "Navbar item with label Spring Boot Starter"
+  },
+  "item.label.More": {
+    "message": "Ещё",
+    "description": "Navbar item with label More"
+  },
+  "item.label.Docs": {
+    "message": "Документация",
+    "description": "Navbar item with label Docs"
+  },
+  "item.label.Blog": {
+    "message": "Блог",
+    "description": "Navbar item with label Blog"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  }
+}

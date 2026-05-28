@@ -2,106 +2,132 @@ import styles from './_mcpToolsTable.module.css';
 
 # MCP Tools
 
-This page is the reference list of every tool the bundled MCP server in Axelix Master exposes to AI agents. Each entry covers the tool's name, the annotation tags it advertises, the activation state, the roles allowed to invoke it, and a one-line description of what the tool does. The same catalog is visible in the browser on the [MCP screen](../../ui-guide/mcp.md), this page is the source-of-truth listing for operators planning who should be allowed to call what.
+This page is the reference list of every tool the bundled MCP server in Axelix Master exposes to AI agents. Each entry
+covers the tool's name, the annotation tags it advertises, the activation state, the roles allowed to invoke it, and a
+one-line description of what the tool does. The same catalog is visible in the browser on the [MCP
+screen](../../ui-guide/mcp), this page is the source-of-truth listing for operators planning who should be allowed to
+call what.
 
-The list assumes the MCP server is enabled (`axelix.master.mcp-server.enabled=true`, the default). When the property is set to `false` the server is not registered at all, none of the tools below are reachable, and the **MCP** link is hidden from the UI. See [MCP server configuration](../configuring-master/configuring-master.mdx#mcp-server).
+The list assumes the MCP server is enabled (`axelix.master.mcp-server.enabled=true`, the default). When the property is
+set to `false` the server is not registered at all, none of the tools below are reachable, and the **MCP** link is
+hidden from the UI. See [MCP server configuration](../configuring-master/configuring-master.mdx#mcp-server).
 
 ## Tool state
 
-All tools listed below are bundled with Master and are registered with the MCP server on startup. There is no per-tool enable/disable switch — the catalog is fixed by the build. A tool becomes unreachable only when the MCP server itself is disabled or when the master process is not running. In the [UI catalog](../../ui-guide/mcp.md#the-tool-catalog) the status dot on each card reflects this live registration state: green when the server has registered the tool, red when it is currently unavailable.
+All tools listed below are bundled with Master and are registered with the MCP server on startup. There is no per-tool
+enable/disable switch — the catalog is fixed by the build. A tool becomes unreachable only when the MCP server itself is
+disabled or when the master process is not running. In the [UI catalog](../../ui-guide/mcp#the-tool-catalog) the status
+dot on each card reflects this live registration state: green when the server has registered the tool, red when it is
+currently unavailable.
 
 ## Tool tags
 
-Every tool declares four boolean annotation tags that tell MCP clients what kind of side effects to expect. The tags below are the values Axelix's tools claim — they are hints for the calling agent, not authorization checks enforced by Master.
+Every tool declares four boolean annotation tags that tell MCP clients what kind of side effects to expect. The tags
+below are the values Axelix's tools claim — they are hints for the calling agent, not authorization checks enforced by
+Master.
 
 - **read-only** — the tool does not change any state in the target Spring Boot instance.
 - **idempotent** — calling the tool more than once with the same arguments has the same effect as calling it once.
 - **destructive** — the tool may delete data or apply changes that cannot be undone from the UI.
 - **open-world** — the tool reaches outside Master and the registered Spring Boot instances.
 
-None of the bundled tools are **open-world**: every tool talks only to the master and to the Spring Boot instances already registered with it. Every tool is **idempotent**. The tools that change state are flagged **destructive**; the rest are flagged **read-only**.
-
 ## Role gating
 
-The MCP filter (`McpAuthorizationFilter`) authenticates the agent the same way the UI authenticates a browser session — see [MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication) for the credential schemes.
+The MCP filter (`McpAuthorizationFilter`) authenticates the agent the same way the UI authenticates a browser session —
+see [MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication) for the credential
+schemes.
 
 ## Catalog
 
 :::info
-The catalog below is the current set of MCP tools shipped with Master. More tools are actively being developed and the list will grow with future releases — expect new entries to appear here.
+The catalog below is the current set of MCP tools shipped with Master. More tools are actively being developed and the
+list will grow with future releases — expect new entries to appear here.
 :::
 
 ### Instances
 
-The single tool in this group returns Master's full registry of managed Spring Boot instances. It is the entry point for any task that starts from "find the service by name and get its `instanceId`" — every other tool needs that `instanceId`.
+The single tool in this group returns Master's full registry of managed Spring Boot instances. It is the entry point for
+any task that starts from "find the service by name and get its `instanceId`" — every other tool needs that
+`instanceId`.
 
-Related: [Wallboard UI guide](../../ui-guide/wallboard.md).
+Related: [Wallboard UI guide](../../ui-guide/wallboard).
 
 <div className={styles.mcpToolsTable}>
 
-| Title          | Tool name      | Tags                  | Allowed roles                              | Description                                                                                                                                                                          |
-|----------------|----------------|-----------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Title          | Tool name      | Tags                                                                                                                                                                                                                                                | Allowed roles                                       | Description                                                                                                                                                                          |
+|----------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Instances Feed | `getWallboard` | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Snapshot of every managed instance: human-readable service names mapped to `instanceId`, real-time status (UP/DOWN), Spring Boot/Java versions, deployment duration, Git commit SHA. |
 
 </div>
 
 ### Instance introspection
 
-Read-only views of a single Spring Boot instance: its Spring beans, environment properties, `@ConfigurationProperties` beans, auto-configuration report, and registered scheduled tasks. Every tool in this group takes an `instanceId` resolved via `getWallboard`.
+Read-only views of a single Spring Boot instance: its Spring beans, environment properties, `@ConfigurationProperties`
+beans, auto-configuration report, and registered scheduled tasks. Every tool in this group takes an `instanceId`
+resolved via `getWallboard`.
 
-Related: [Beans](../../features/beans), [Environment Properties](../../features/properties), [Configuration Properties](../../features/configuration-properties), [Conditions](../../features/conditions), [Scheduled Tasks](../../features/scheduled-tasks), [Service profile UI guide](../../ui-guide/service-profile.md).
+Related: [Beans](../../features/beans), [Environment Properties](../../features/properties), [Configuration
+Properties](../../features/configuration-properties), [Conditions](../../features/conditions), [Scheduled
+Tasks](../../features/scheduled-tasks), [Service profile UI guide](../../ui-guide/service-profile).
 
 <div className={styles.mcpToolsTable}>
 
-| Title                 | Tool name                  | Tags                  | Allowed roles                              | Description                                                                                                                                                  |
-|-----------------------|----------------------------|-----------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Beans Feed            | `getInstanceBeans`         | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every Spring bean in the instance with its type and dependencies.                                                                                      |
-| Properties            | `getInstanceEnvironment`   | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns the full environment: application properties, system properties, and environment variables — useful for `@Value` and `@ConditionalOnProperty` questions. |
-| Config Props Beans    | `getInstanceConfigProps`   | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns every `@ConfigurationProperties` bean in the instance with its bound values.                                                                         |
-| `@Conditional` Feed   | `getInstanceConditions`    | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | The auto-configuration report: which Spring Boot and custom configurations were applied or skipped and the reason for each decision.                         |
-| Scheduled Tasks Feed  | `getInstanceScheduledTasks`| read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists `@Scheduled` cron, fixed-rate, fixed-delay, and custom tasks registered in the instance.                                                               |
+| Title                | Tool name                   | Tags                                                                                                                                                                                                                                                | Allowed roles                                       | Description                                                                                                                                                      |
+|----------------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Beans Feed           | `getInstanceBeans`          | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every Spring bean in the instance with its type and dependencies.                                                                                          |
+| Properties           | `getInstanceEnvironment`    | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns the full environment: application properties, system properties, and environment variables — useful for `@Value` and `@ConditionalOnProperty` questions. |
+| Config Props Beans   | `getInstanceConfigProps`    | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns every `@ConfigurationProperties` bean in the instance with its bound values.                                                                             |
+| `@Conditional` Feed  | `getInstanceConditions`     | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | The configuration report: which Spring Boot and custom configurations were applied or skipped and the reason for each decision.                                  |
+| Scheduled Tasks Feed | `getInstanceScheduledTasks` | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists `@Scheduled` cron, fixed-rate, fixed-delay, and custom tasks registered in the instance.                                                                   |
 
 </div>
 
 ### Caches
 
-Inspect every cache manager and cache inside a Spring Boot instance, and evict entries — either all caches across all cache managers at once, or a specific named cache within a chosen cache manager.
+Inspect every cache manager and cache inside a Spring Boot instance, and evict entries — either all caches across all
+cache managers at once, or a specific named cache within a chosen cache manager.
 
 Related: [Caches feature](../../features/caches).
 
 <div className={styles.mcpToolsTable}>
 
-| Title                | Tool name                 | Tags                     | Allowed roles                              | Description                                                                                                                                                                                                                 |
-|----------------------|---------------------------|--------------------------|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Caches Feed          | `getAllCaches`            | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every cache manager in the instance and the caches each one owns, together with the per-cache `enabled` flag. Starting point for any cache-related task — name-to-manager mapping, status checks, ambiguity resolution. |
-| Clear All Cache      | `clearAllCaches`          | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`           | Evicts every entry from every cache in every cache manager for the given instance. Broad destructive operation — meant only for the explicit "clear all caches" request.                                                    |
-| Clear Specific Cache | `clearSpecificCacheEntity`| read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`           | Evicts a single cache entry identified by cache name within a specific cache manager. Other entries are left untouched.                                                                                                     |
+| Title                | Tool name                  | Tags                                                                                                                                                                                                                                                | Allowed roles                                       | Description                                                                                                                                                                                                                   |
+|----------------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Caches Feed          | `getAllCaches`             | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every cache manager in the instance and the caches each one owns, together with the per-cache `enabled` flag. Starting point for any cache-related task — name-to-manager mapping, status checks, ambiguity resolution. |
+| Clear All Cache      | `clearAllCaches`           | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Evicts every entry from every cache in every cache manager for the given instance. Broad destructive operation — meant only for the explicit "clear all caches" request.                                                      |
+| Clear Specific Cache | `clearSpecificCacheEntity` | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN`              | Evicts a single cache entry identified by cache name within a specific cache manager. Other entries are left untouched.                                                                                                       |
 
 </div>
 
 ### Loggers
 
-Read the logger tree of a Spring Boot instance — individual loggers, logger groups, and the set of available log levels — and change levels at runtime: for a single logger, for an entire logger group, or reset a logger to its application-defined default.
+Read the logger tree of a Spring Boot instance — individual loggers, logger groups, and the set of available log levels
+— and change levels at runtime: for a single logger, for an entire logger group, or reset a logger to its
+application-defined default.
 
 Related: [Loggers feature](../../features/loggers/loggers.mdx).
 
 <div className={styles.mcpToolsTable}>
 
-| Title                       | Tool name                        | Tags                     | Allowed roles                              | Description                                                                                                                                                              |
-|-----------------------------|----------------------------------|--------------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Available Logging Levels    | `getAvailableLoggingLevels`      | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns the list of logging levels accepted by the instance (e.g. `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`). Used to validate inputs before changing a level.    |
-| Logger Groups Feed          | `getLoggerGroupsFeed`            | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every configured logger group with its members and the level currently set on the group.                                                                           |
-| Find Logger                 | `findLoggersByName`              | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Looks up one or more individual loggers by exact or partial name. Returns the configured and effective levels for each match.                                            |
-| Find Loggers Group          | `findGroupsByName`               | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Looks up one or more logger groups by exact or partial name. Returns each group's name, level, and member loggers.                                                       |
-| Change Logger Level         | `changeLoggingLevelByLoggerName` | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sets the logging level of a specific individual logger. Use [Find Logger](#loggers) first if the logger name is uncertain.                                               |
-| Change Group Loggers Level  | `changeLoggingLevelByGroupName`  | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sets the logging level of every logger inside a logger group. Use [Find Loggers Group](#loggers) first if the group name is uncertain.                                   |
-| Reset Loggers Level         | `resetLoggingLevelByLoggerName`  | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Resets an individual logger's level to the default declared in the application configuration. Group-level reset is not available.                                        |
+| Title                      | Tool name                        | Tags                                                                                                                                                                                                                                                | Allowed roles                                       | Description                                                                                                                                                           |
+|----------------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Available Logging Levels   | `getAvailableLoggingLevels`      | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Returns the list of logging levels accepted by the instance (e.g. `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `OFF`). Used to validate inputs before changing a level. |
+| Logger Groups Feed         | `getLoggerGroupsFeed`            | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Lists every configured logger group with its members and the level currently set on the group.                                                                        |
+| Find Logger                | `findLoggersByName`              | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Looks up one or more individual loggers by exact or partial name. Returns the configured and effective levels for each match.                                         |
+| Find Loggers Group         | `findGroupsByName`               | read-only: <span className={styles.tagTrue}>true</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagFalse}>false</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Looks up one or more logger groups by exact or partial name. Returns each group's name, level, and member loggers.                                                    |
+| Change Logger Level        | `changeLoggingLevelByLoggerName` | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sets the logging level of a specific individual logger. Use [Find Logger](#loggers) first if the logger name is uncertain.                                            |
+| Change Group Loggers Level | `changeLoggingLevelByGroupName`  | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Sets the logging level of every logger inside a logger group. Use [Find Loggers Group](#loggers) first if the group name is uncertain.                                |
+| Reset Loggers Level        | `resetLoggingLevelByLoggerName`  | read-only: <span className={styles.tagFalse}>false</span><br/>idempotent: <span className={styles.tagTrue}>true</span><br/>destructive: <span className={styles.tagTrue}>true</span><br/>open-world: <span className={styles.tagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Resets an individual logger's level to the default declared in the application configuration. Group-level reset is not available.                                     |
 
 </div>
 
 ## Related
 
-- [MCP catalog screen](../../ui-guide/mcp.md) — the read-only browser view of the same catalog, with per-tool status dots and the annotation popover.
-- [MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication) — how MCP credentials are accepted (`Basic`, `Bearer`) and how the identity is mapped to a role.
-- [Roles and authorities](../authentication/authentication.mdx#roles-and-authorities) — what each authority gates and which built-in role carries it.
-- [MCP server configuration](../configuring-master/configuring-master.mdx#mcp-server) — the `axelix.master.mcp-server.*` property keys.
+- [MCP catalog screen](../../ui-guide/mcp) — the read-only browser view of the same catalog, with per-tool status dots
+  and the annotation popover.
+- [MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication) — how MCP credentials are
+  accepted (`Basic`, `Bearer`) and how the identity is mapped to a role.
+- [Roles and authorities](../authentication/authentication.mdx#roles-and-authorities) — what each authority gates and
+  which built-in role carries it.
+- [MCP server configuration](../configuring-master/configuring-master.mdx#mcp-server) — the `axelix.master.mcp-server.*`
+  property keys.

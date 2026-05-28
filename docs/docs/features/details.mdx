@@ -3,24 +3,24 @@ import TabItem from '@theme/TabItem';
 
 # Details
 
-The Application Details page provides information about a managed Spring Boot application instance.
-This page displays technical metadata, runtime information, and build details in an organized, easy-to-read format.
+The **Details** page provides information about a managed Spring Boot application instance. This page displays technical
+metadata, runtime information, and build details in an organized, easy-to-read format.
 
-![details main page](../../static/img/feature/details/details-main-page.png)
-***Details page as presented in Axelix UI***
+![details main page](../../static/img/feature/details/details-main-page.png) ***Details page as presented in Axelix
+UI***
 
-The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all
-open it and trigger the **Download state** export. Note that the environment-properties and configuration-properties
-files inside the exported archive are still subject to the per-page authority masking: callers without
-`ENV_VALUES_READ` / `CONFIG_PROPS_VALUES_READ` get `******` for those values. See
-[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
+it and trigger the **Download state** export. Note that the environment-properties and configuration-properties files
+inside the exported archive are still subject to the per-page authority masking: callers without `ENV_VALUES_READ` /
+`CONFIG_PROPS_VALUES_READ` get `******` for those values. See [Roles and
+authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
 ## Service Information Inner Header
-- **Instance Name**: The name of the application instance. The postfix may vary depending on the runtime 
-and discovery environment of axelix-master.
+- **Instance Name**: The name of the application instance. The postfix may vary depending on the runtime
+and discovery environment of Axelix Master.
 - **Download state** Export application state as a ZIP archive containing selected diagnostic components.
-The export includes various application state snapshots that can be used for debugging, analysis, or compliance purposes.
+The export includes various application state snapshots that can be used for debugging, analysis.
 
 ### Download state Components
 The download dialog allows you to select which components to include in the export:
@@ -59,12 +59,12 @@ Shows details about the application build (when available):
 ## Runtime Environment Information
 Detailed Java and runtime information:
 
-| Field                 | Description                                        | Example                                    |
-|-----------------------|----------------------------------------------------|--------------------------------------------|
-| **Java Version**      | JVM version                                        | `17.0.17`                                  |
-| **Kotlin Version**    | Kotlin version <br/> (if the instance uses Kotlin) | `1.9.22`                                   |
-| **JDK Vendor**        | Java distribution vendor                           | `Liberica`, `OpenJDK`, `Amazon Corretto`   |
-| **Garbage Collector** | Active GC algorithm                                | `G1`, `ZGC`, `GEN_SHENADOAH`, `EPSILONGC`  |
+| Field                 | Description                                        | Example                                   |
+|-----------------------|----------------------------------------------------|-------------------------------------------|
+| **Java Version**      | JVM version                                        | `17.0.17`                                 |
+| **Kotlin Version**    | Kotlin version <br/> (if the instance uses Kotlin) | `1.9.22`                                  |
+| **JDK Vendor**        | Java distribution vendor                           | `Liberica`, `OpenJDK`, `Amazon Corretto`  |
+| **Garbage Collector** | Active GC algorithm                                | `G1`, `ZGC`, `GEN_SHENADOAH`, `EPSILONGC` |
 
 ## Spring Framework Details
 Spring ecosystem versions:
@@ -87,9 +87,9 @@ System-level details:
 ## Properties
 
 The page is backed by the `axelix-details` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
-through the standard Spring Boot Actuator properties — see
-[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
-for the full list of Axelix endpoints and surrounding setup:
+through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) for the full list
+of Axelix endpoints and surrounding setup:
 
 <Tabs groupId="spring-config">
   <TabItem value="properties" label="application.properties">
@@ -116,4 +116,5 @@ management:
 ## See also
 
 - [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
-- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+- [Configuring Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

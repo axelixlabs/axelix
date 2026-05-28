@@ -7,8 +7,7 @@ The **Caches** page provides access to all configured caches in the Spring Boot 
 hit/total ratio chart, hit and miss counts, the estimated number of entries, allows status management, and supports
 clearing individual caches or all caches at once.
 
-![caches main page](../../static/img/feature/caches/caches-main-page.png)
-***Caches page as presented in Axelix UI***
+![caches main page](../../static/img/feature/caches/caches-main-page.png) ***Caches page as presented in Axelix UI***
 
 The page itself is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can
 all open it and inspect cache statistics. The destructive actions are gated by separate authorities:
@@ -17,12 +16,13 @@ all open it and inspect cache statistics. The destructive actions are gated by s
 - **Status** toggle (enable / disable a cache) requires the `CACHES_TOGGLE` authority.
 
 Both authorities are granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. **VIEWER** sees the
-controls but cannot interact with them. See
-[Roles and authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+controls but cannot interact with them. See [Roles and
+authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
 A scrollable list of all configured `Caches` in the application, grouped by their respective `Cache managers`.
-- **Search**:              Input that filters the list by cache name or cache manager name. (See **Interactive Features**)
+- **Search**:              Input that filters the list by cache name or cache manager name. (See **Interactive
+  Features**)
 - **Clear All Caches**:    Button to clear all caches. (See **Interactive Features**)
 - **Name**:                The name of the cache manager.
 
@@ -32,53 +32,57 @@ Each cache row also shows:
 - **Clear**:     Per-cache button to clear that cache. (See **Interactive Features**)
 - **Status**:    Toggle that enables or disables the cache at runtime. (See **Interactive Features**)
 
-Caches for which lookup statistics are available can be expanded to reveal the **Cache Details** section. Caches
-that do not report lookup statistics are still listed, but cannot be expanded.
+Caches for which lookup statistics are available can be expanded to reveal the **Cache Details** section. Caches that do
+not report lookup statistics are still listed, but cannot be expanded.
 
 ## The Cache Details
-![caches details page](../../static/img/feature/caches/caches-details-page.png)
-***Cache details page as presented in Axelix UI***
+![caches details page](../../static/img/feature/caches/caches-details-page.png) ***Cache details page as presented in
+Axelix UI***
 
-The details section contains a line chart of the **Hits/Total Ratio** — the share of hits within a sliding window
-over the recorded lookup history. The Y axis is always `0..1`. The X axis is the lookup timestamp; its tick
-granularity is selected automatically based on the displayed range (seconds, minutes, hours, days, or months).
+The details section contains a line chart of the **Hits/Total Ratio** — the share of hits within a sliding window over
+the recorded lookup history. The Y axis is always `0..1`. The X axis is the lookup timestamp; its tick granularity is
+selected automatically based on the displayed range (seconds, minutes, hours, days, or months).
 
 Hovering the chart shows the ratio at the corresponding timestamp.
 
 Below the chart, the **Statistics** row summarizes the recorded lookups:
 - **Hits**:             The total number of cache hits, with the share of hits relative to all recorded lookups.
 - **Misses**:           The total number of cache misses, with the share of misses relative to all recorded lookups.
-- **Entries count**:    The estimated number of entries in the native cache. Only displayed when the cache reports
-  a size — currently this is supported for Caffeine `Cache` and `ConcurrentHashMap`-backed caches (such as
+- **Entries count**:    The estimated number of entries in the native cache. Only displayed when the cache reports a
+  size — currently this is supported for Caffeine `Cache` and `ConcurrentHashMap`-backed caches (such as
   `ConcurrentMapCache`).
 
 ## **Interactive Features**
 
 ### Search
-Type into the search input above the list to filter the displayed cache managers. A cache manager is shown when
-either its name or the name of any cache it owns contains the entered text (case-insensitive).
+Type into the search input above the list to filter the displayed cache managers. A cache manager is shown when either
+its name or the name of any cache it owns contains the entered text (case-insensitive).
 
 ### Clear All Caches
-We provide a convenient way to clear all caches in the application. To do so, click the <img src="/img/feature/icons/clear-all-caches-icon.png" alt="clear-all-caches-icon" width="80" height="20"/>
+We provide a convenient way to clear all caches in the application. To do so, click the <img
+src="/img/feature/icons/clear-all-caches-icon.png" alt="clear-all-caches-icon" width="80" height="20"/>
 
 ### Clear cache
-To clear an individual cache, click <img src="/img/feature/icons/clear-single-cache-icon.png" alt="clear-single-cache-icon" width="20" height="20"/> next to the desired cache.
+To clear an individual cache, click <img src="/img/feature/icons/clear-single-cache-icon.png"
+alt="clear-single-cache-icon" width="20" height="20"/> next to the desired cache.
 
 ### Status
-We provide the ability to manage the state of a specific cache. The initial state of each cache is (on) <img src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/>,
-meaning the cache is enabled. To disable it, switch the Status to (off) <img src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon" width="32" height="15"/>.
+We provide the ability to manage the state of a specific cache. The initial state of each cache is (on) <img
+src="/img/feature/icons/switch-on-icon.png" alt="switch-on-icon" width="32" height="15"/>, meaning the cache is enabled.
+To disable it, switch the Status to (off) <img src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon"
+width="32" height="15"/>.
 
 ## MCP Tools
 
-Caches can also be inspected and cleared by an AI agent through MCP — see the
-[MCP Tools catalog](../setting-up-master-ui/mcp/mcp-tools.mdx#caches).
+Caches can also be inspected and cleared by an AI agent through MCP — see the [MCP Tools
+catalog](../setting-up-master-ui/mcp/mcp-tools.mdx#caches).
 
 ## Properties
 
 The page is backed by the `axelix-caches` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
-through the standard Spring Boot Actuator properties — see
-[Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
-for the full list of Axelix endpoints and surrounding setup:
+through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) for the full list
+of Axelix endpoints and surrounding setup:
 
 <Tabs groupId="spring-config">
   <TabItem value="properties" label="application.properties">
@@ -105,4 +109,5 @@ management:
 ## See also
 
 - [Configuring Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
-- [Configuring Spring Boot Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+- [Configuring Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

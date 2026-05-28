@@ -73,6 +73,11 @@ export const navbar: Navbar = {
       className: 'navbar__pill',
     },
     {
+      type: 'localeDropdown',
+      position: 'right',
+      className: 'navbar__pill',
+    },
+    {
       href: 'https://github.com/axelixlabs/axelix',
       label: 'GitHub',
       position: 'right',

@@ -1,0 +1,31 @@
+.signInOptionsTable table {
+  table-layout: fixed;
+}
+
+.signInOptionsTable table th,
+.signInOptionsTable table td {
+  min-width: 82px;
+  word-break: break-word;
+}
+
+.signInOptionsTable table th:nth-child(1),
+.signInOptionsTable table td:nth-child(1) {
+  font-size: 13px;
+  width: 140px;
+}
+
+.signInOptionsTable table th:nth-child(2),
+.signInOptionsTable table td:nth-child(2) {
+  font-size: 13px;
+  width: 140px;
+}
+
+.signInOptionsTable table th:nth-child(3),
+.signInOptionsTable table td:nth-child(3) {
+  font-size: 13px;
+}
+
+.signInOptionsTable table th:nth-child(4),
+.signInOptionsTable table td:nth-child(4) {
+  font-size: 14px;
+}

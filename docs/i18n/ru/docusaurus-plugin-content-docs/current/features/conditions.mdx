@@ -1,0 +1,94 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Условия
+
+На странице **Условия** представлен отчет об автоматической настройке Spring Boot для управляемого сервиса — все
+`@Conditional` оценки, выполненные Spring при запуске, разделены на две вкладки в зависимости от результата.
+
+![главная страница условий](../../../../../static/img/feature/conditions/conditions-main-page.png) ***Страница Условия в
+интерфейсе Axelix***
+
+Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть `VIEWER`, `EDITOR`,
+`ADMIN` и `SUPER_ADMIN`. Полную матрицу ролей и полномочий см. в реазделе [Роли и
+полномочия](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+
+В верхней части расположены две вкладки — **Отрицательные совпадения** (по умолчанию) и **Положительные совпадения** — с
+одним полем поиска над ними и счётчиком вида `<соответствует> / <всего>`, отражающим текущую активную вкладку.
+
+Каждая вкладка организована одинаково: список конфигурационных классов (и, при необходимости, конкретного `@Bean` метода
+внутри них). В заголовке каждой записи указано:
+
+- **Класс:** полное имя класса, которому принадлежит условная аннотация. Рядом с ним отображается элемент управления
+  копированием, который копирует полное имя
+- **Метод:** имя `@Bean` метода — отображается только в том случае, если условие было применено к методу, а не к самому
+  классу.
+
+Под заголовком находится список отдельных условий. Каждое условие представлено в виде строки-аккордеона, метка которой —
+краткое название условия (например, `OnClassCondition`, `OnPropertyCondition`). При раскрытии отображается описательное
+сообщение, сгенерированное Spring при его оценке. Значок состояния слева от каждой строки указывает на результат:
+
+- <span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span> — условие выполнено.
+- <span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span> — условие не выполнено.
+
+## Вкладка «Отрицательные совпадения»
+
+Прокручиваемый список конфигураций, которые оценивала Spring и общий результат которых был **не выполнено**, то есть
+хотя бы одно требуемое условие не выполнилось. Для каждой такой конфигурации на странице перечислены как невыполненные
+условия (<span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span>), так и условия, которые были выполнены (<span
+style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), чтобы вы могли точно увидеть, какая проверка нарушила баланс.
+
+![страница отрицательных совпадений
+условий](../../../../../static/img/feature/conditions/conditions-not-matches-details-page.png) ***Страница отрицательных
+совпадений условий в интерфейсе Axelix***
+
+## Вкладка «Положительные совпадения»
+
+Прокручиваемый список конфигураций, общий результат которых был **выполнено** — все необходимые условия выполнены. В
+каждой записи указаны выполненные условия (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) и сообщение,
+объясняющее, почему каждое из них было выполнено.
+
+![страница положительных совпадений
+условий](../../../../../static/img/feature/conditions/conditions-matches-details-page.png) ***Страница положительных
+совпадений условий в интерфейсе Axelix***
+
+## MCP-инструменты
+
+Отчёт об автоконфигурации также доступен ИИ-агентам через MCP. См. [Каталог
+MCP-инструментов](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
+
+## Свойства
+
+Страница работает поверх actuator-эндпоинта `axelix-conditions`, который добавляет Axelix Spring Boot Starter. Она
+доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек
+см. в разделе [Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx):
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-conditions
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-conditions
+```
+
+  </TabItem>
+</Tabs>
+
+## См. также
+
+- [Бины](./beans) — строки бинов ссылаются сюда через **`@AutoConfiguration class`** / **«Происхождение бина»**.
+- [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Настройка Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

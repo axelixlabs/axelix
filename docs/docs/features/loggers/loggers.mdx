@@ -7,48 +7,47 @@ import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 
 # Loggers
 
-The **Loggers** page provides access to all configured logging mechanisms in a Spring Boot application, 
-logger groups, and allows changing their logging levels.
+The **Loggers** page provides access to all configured logging mechanisms in a Spring Boot application, logger groups,
+and allows changing their logging levels.
 
-![loggers main page](../../../static/img/feature/loggers/loggers-main-page.png)
-***Loggers page as presented in Axelix UI***
+![loggers main page](../../../static/img/feature/loggers/loggers-main-page.png) ***Loggers page as presented in Axelix
+UI***
 
-The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all
-open it, change levels, and reset levels. See
-[Roles and authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the
-full role/authority matrix.
+The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
+it, change levels, and reset levels. See [Roles and
+authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
 
 ## Loggers tab
-A scrollable list displaying all active loggers in the application, with an indicator of their logging levels,
-a search function for easy navigation, and a counter of active loggers in the form `<matching> / <total>`.
+A scrollable list displaying all active loggers in the application, with an indicator of their logging levels, a search
+function for easy navigation, and a counter of active loggers in the form `<matching> / <total>`.
 
 - **Name**:                 The name of the logger.
 - **Logging level**:        The logger's current level. (See **Interactive Features**)
 - **Reset**:                Resets the logging level to its initial value. (See **Interactive Features**)
 
 ## Logger groups tab
-![loggers group main page](../../../static/img/feature/loggers/loggers-main-group-page.png)
-***Loggers group page as presented in Axelix UI***
+![loggers group main page](../../../static/img/feature/loggers/loggers-main-group-page.png) ***Loggers group page as
+presented in Axelix UI***
 
-A scrollable list displaying all logger groups, with an indicator of their logging levels,
-a search function for groups and loggers for easy navigation, and a counter of groups.
+A scrollable list displaying all logger groups, with an indicator of their logging levels, a search function for groups
+and loggers for easy navigation, and a counter of groups.
 
 - **Name**:                 The name of the logger group.
-- **Logging group level**:  The current logging level of the logger group. If no level is highlighted by a color indicator, 
-                            the loggers within the group have different logging levels. (See **Interactive Features**)
+- **Logging group level**:  The current logging level of the logger group. If no level is highlighted by a color
+  indicator, the loggers within the group have different logging levels. (See **Interactive Features**)
 
 ## Interactive Features
 
 We provide the ability to change the logging level of an individual logger as well as a logger group.
 
 ### Loggers
-For example, the logger `com.axelixlabs.axelix.sbs` has a logging level of <INFO /> (starting point).
-To change its level, click on the desired level, for example <WARN />.
-The logger will update, and the selected level will be marked with an icon <TargetThemeIcon />.
-Note that when changing the logging level of `com.axelixlabs.axelix` from <INFO /> to <DEBUG /> (step 2),
-it will also be marked with an icon <TargetThemeIcon />, and all loggers with the prefix `com.axelixlabs.axelix`
-will change their level to <DEBUG /> (step 2). However, they will not be marked with an icon <TargetThemeIcon />,
-because their level matches the parent logger `com.axelixlabs.axelix`.
+For example, the logger `com.axelixlabs.axelix.sbs` has a logging level of <INFO /> (starting point). To change its
+level, click on the desired level, for example <WARN />. The logger will update, and the selected level will be marked
+with an icon <TargetThemeIcon />. Note that when changing the logging level of `com.axelixlabs.axelix` from <INFO /> to
+<DEBUG /> (step 2), it will also be marked with an icon <TargetThemeIcon />, and all loggers with the prefix
+`com.axelixlabs.axelix` will change their level to <DEBUG /> (step 2). However, they will not be marked with an icon
+<TargetThemeIcon />, because their level matches the parent logger `com.axelixlabs.axelix`.
 
 <LoggersTable />
 
@@ -66,16 +65,16 @@ We also provide the ability to reset the logging level for a specific logger:
 
 ## MCP Tools
 
-Reading the logger tree and changing levels at runtime — for a single logger, a logger group, or resetting an
-individual logger — are also exposed to AI agents through MCP. See the
-[MCP Tools catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
+Reading the logger tree and changing levels at runtime — for a single logger, a logger group, or resetting an individual
+logger — are also exposed to AI agents through MCP. See the [MCP Tools
+catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
 
 ## Properties
 
 The page is backed by the `axelix-loggers` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
-through the standard Spring Boot Actuator properties — see
-[Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
-for the full list of Axelix endpoints and surrounding setup:
+through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
+Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) for the full
+list of Axelix endpoints and surrounding setup:
 
 <Tabs groupId="spring-config">
   <TabItem value="properties" label="application.properties">
@@ -102,4 +101,5 @@ management:
 ## See also
 
 - [Configuring Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
-- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
+- [Configuring Spring Boot
+  Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
