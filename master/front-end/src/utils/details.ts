@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { format } from "date-fns";
+import dayjs from "dayjs";
 
 export const VALUE_TRANSFORMERS: { [key: string]: (value: string) => string } = {
     commitTimestamp: (timestamp: string) => {
         const unixEpochTime = Number(timestamp);
         if (Number.isFinite(unixEpochTime)) {
-            return format(new Date(unixEpochTime), "yyyy-MM-dd HH:mm:ss");
+            return dayjs(unixEpochTime).format("YYYY-MM-DD HH:mm:ss");
         } else {
             return timestamp;
         }
