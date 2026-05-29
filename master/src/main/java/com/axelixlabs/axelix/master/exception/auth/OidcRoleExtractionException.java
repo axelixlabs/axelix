@@ -15,26 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.oauth;
-
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
+package com.axelixlabs.axelix.master.exception.auth;
 
 /**
- * A component capable of extracting the user's role from the UserInfo endpoint JSON response.
+ * Exception thrown during the OIDC token exchange flow, specifically when
+ * the user role cannot be successfully resolved from the UserInfo endpoint response.
  *
- * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
-public interface OidcRoleExtractor {
-
-    /**
-     * Extracts the {@link Role} from the provided UserInfo JSON string.
-     *
-     * @param userInfoJson the raw JSON response payload from the UserInfo endpoint.
-     *
-     * @return the role that is extracted. Never {@code null}.
-     * @throws OidcRoleExtractionException if the role cannot be extracted from the JSON response of the UserInfo endpoint
-     */
-    Role extractRole(String userInfoJson) throws OidcRoleExtractionException;
+public class OidcRoleExtractionException extends OAuth2AuthenticationException {
+    public OidcRoleExtractionException(String message) {
+        super(message);
+    }
 }

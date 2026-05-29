@@ -215,8 +215,9 @@ public class SecurityAutoConfiguration {
 
         @Bean
         @ConditionalOnMcpServerEnabled
-        public McpAuthenticationHandler bearerMcpAuthenticationHandler(OidcRoleExtractor oidcRoleExtractor) {
-            return new BearerMcpAuthenticationHandler(oidcRoleExtractor);
+        public McpAuthenticationHandler bearerMcpAuthenticationHandler(
+                OidcClient oidcClient, OidcRoleExtractor oidcRoleExtractor) {
+            return new BearerMcpAuthenticationHandler(oidcClient, oidcRoleExtractor);
         }
 
         @Bean
@@ -244,8 +245,8 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public OidcRoleExtractor oidcRoleExtractor(OidcClient oidcClient, OAuth2Properties oAuth2Properties) {
-            return new JmesPathOidcRoleExtractor(oidcClient, oAuth2Properties.roleAttributePath());
+        public OidcRoleExtractor oidcRoleExtractor(OAuth2Properties oAuth2Properties) {
+            return new JmesPathOidcRoleExtractor(oAuth2Properties.roleAttributePath());
         }
     }
 }

@@ -54,7 +54,7 @@ public interface UserService {
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
-    void create(String username, @Nullable String email, String password, String role, UserOrigin userOrigin);
+    void create(String username, @Nullable String email, @Nullable String password, String role, UserOrigin userOrigin);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.

@@ -63,14 +63,15 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void create(String username, @Nullable String email, String password, String role, UserOrigin userOrigin)
+    public void create(
+            String username, @Nullable String email, @Nullable String password, String role, UserOrigin userOrigin)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         UserEntity userEntity = new UserEntity(
                 UUID.randomUUID().toString(),
                 requireNonBlankTrimmed(username),
                 email == null ? null : requireNonBlankTrimmed(email),
-                passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
                 userOrigin,
                 null);
@@ -123,8 +124,8 @@ public class DatabaseUserService implements UserService {
                 new UserEntity.Roles(validRoles));
     }
 
-    private String requireNonBlankTrimmed(@Nullable String value) throws UserInvalidValueException {
-        if (value != null && !value.isBlank()) {
+    private String requireNonBlankTrimmed(String value) throws UserInvalidValueException {
+        if (!value.isBlank()) {
             return value.trim();
         }
 

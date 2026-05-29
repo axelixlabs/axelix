@@ -155,7 +155,6 @@ public class DefaultOidcClient implements OidcClient {
     }
 
     @Override
-    @Nullable
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public String validateAccessTokenAndExtractUserInfo(String accessToken)
             throws OidcTokenExchangeException, OidcMetadataUnavailableException {
@@ -163,19 +162,19 @@ public class DefaultOidcClient implements OidcClient {
         try {
             String userInfoEndpoint = oidcMetadataProvider.getUserInfoEndpoint();
 
-            String userInfoBody = restClient
+            String userInfoJson = restClient
                     .get()
                     .uri(userInfoEndpoint)
                     .header(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + accessToken)
                     .retrieve()
                     .body(String.class);
 
-            if (userInfoBody == null) {
+            if (userInfoJson == null) {
                 throw new OidcMetadataUnavailableException(
                         "Failed to decode the response from user_info OIDC endpoint");
             }
 
-            return userInfoBody;
+            return userInfoJson;
         } catch (HttpClientErrorException e) {
             if (Set.of((HttpStatusCode) HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN)
                     .contains(e.getStatusCode())) {

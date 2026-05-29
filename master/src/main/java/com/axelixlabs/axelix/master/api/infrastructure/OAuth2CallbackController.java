@@ -19,6 +19,9 @@ package com.axelixlabs.axelix.master.api.infrastructure;
 
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,10 +36,13 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
+import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
@@ -63,16 +69,22 @@ public class OAuth2CallbackController {
     private final CookieService cookieService;
     private final JwtEncoderService jwtEncoderService;
     private final OidcRoleExtractor oidcRoleExtractor;
+    private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     public OAuth2CallbackController(
             OidcClient oidcClient,
             CookieService cookieService,
             JwtEncoderService jwtEncoderService,
-            OidcRoleExtractor oidcRoleExtractor) {
+            OidcRoleExtractor oidcRoleExtractor,
+            UserService userService,
+            ObjectMapper objectMapper) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
         this.jwtEncoderService = jwtEncoderService;
         this.oidcRoleExtractor = oidcRoleExtractor;
+        this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
@@ -89,9 +101,13 @@ public class OAuth2CallbackController {
 
         String username = oidcClient.validateIdTokenAndExtractUsername(tokens.idToken());
 
-        Role role = oidcRoleExtractor.extractRole(tokens.accessToken());
+        String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken());
+
+        Role role = oidcRoleExtractor.extractRole(userInfoJson);
 
         User user = new PasswordlessUser(username, Set.of(role));
+
+        upsertUserUpdateLastLoginAt(user, userInfoJson, role);
 
         String ourToken = jwtEncoderService.generateToken(user);
 
@@ -103,5 +119,32 @@ public class OAuth2CallbackController {
                 .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
                 .header(HttpHeaders.LOCATION, WALLBOARD_PATH)
                 .build();
+    }
+
+    // Always update role & email
+    private void upsertUserUpdateLastLoginAt(User user, String userInfoJson, Role role) {
+        UserEntity entity = userService.findUserByUsername(user.getUsername()).orElse(null);
+
+        String email = extractEmail(userInfoJson);
+
+        if (entity != null) {
+            if (entity.userOrigin() != UserOrigin.OIDC) {
+                throw new BadRequestException("OIDC user conflicts with an existing non-OIDC account");
+            }
+            userService.updateUserPatch(entity.id(), entity.username(), email, null, Set.of(role.getName()));
+        } else {
+            userService.create(user.getUsername(), email, null, role.getName(), UserOrigin.OIDC);
+        }
+        userService.updateLastLoginAt(user.getUsername());
+    }
+
+    @Nullable
+    private String extractEmail(String userInfoJson) {
+        try {
+            String email = objectMapper.readTree(userInfoJson).get("email").asString(null);
+            return (email == null || email.isBlank()) ? null : email;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
