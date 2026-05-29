@@ -37,6 +37,7 @@ export const K8sSnippet = ({ refEl }: IProps) => {
                     {"    "}
                     <span className={styles.Ar}>--set</span>{" "}
                     <span className={styles.St}>axelix.master.auth.jwt.algorithm=HMAC256</span>{" "}
+                    <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
