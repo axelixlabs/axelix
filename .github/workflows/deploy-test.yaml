@@ -14,6 +14,10 @@ on:
       - 'infra/**'
       - '.editorconfig'
       - '.gitignore'
+      - 'docs'
+      - 'website'
+      - '.cursor'
+      - '.coderabbit.yaml'
       - 'CONTRIBUTING.adoc'
 
 jobs:
