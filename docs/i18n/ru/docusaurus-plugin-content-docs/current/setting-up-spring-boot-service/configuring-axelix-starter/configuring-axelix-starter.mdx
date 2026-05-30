@@ -1,0 +1,401 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import styles from './_configuringAxelixStarter.module.css';
+
+# Настройка Spring Boot Starter
+
+На этой странице показано, как подключить Axelix Spring Boot Starter к сервису на [Spring Boot](https://spring.io/),
+чтобы [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) мог обнаруживать его, считывать его состояние и
+взаимодействовать с ним — как через пользовательский интерфейс, так и через встроенный в Master сервер MCP (Model
+Context Protocol), который предоставляет те же данные агентам искусственного интеллекта. Выберите модуль стартера,
+соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам, поделитесь с Master ключом для
+подписи JWT и укажите Master, где найти сервис.
+
+## Прежде чем вы начнёте
+
+Несколько фактов, которые стоит запомнить, прежде чем вы скопируете любой из приведённых ниже фрагментов.
+
+- **Два модуля стартера**, по одному для каждой мажорной версии Spring Boot. Выберите тот, который соответствует версии
+  Boot, которую уже использует ваш сервис:
+    - `com.axelixlabs:axelix-spring-boot-2-starter` — Spring Boot 2.x (собран и протестирован с использованием `2.7.18`,
+      Spring Cloud `2021.0.9`, минимальная версия JDK 11).
+    - `com.axelixlabs:axelix-spring-boot-3-starter` — Spring Boot 3.x (собран и протестирован с использованием `3.0.13`,
+      Spring Cloud `2022.0.4`, минимальная версия JDK 17).
+- **Что добавляет стартер**: набор Axelix-специфичных actuator-эндпоинтов (`axelix-metadata`, `axelix-beans`,
+  `axelix-loggers`, …), JWT-фильтр авторизации, который ограничивает доступ к ним, и опциональный компонент
+  саморегистрации, который объявляет сервис в Master.
+- **Два потребителя одних и тех же данных**: Master отдаёт пользовательский интерфейс Axelix по адресу `/` и сервер MCP
+  по адресу `/api/mcp` (управляется `axelix.master.mcp-server.enabled`, по умолчанию включён). Оба считывают данные с
+  тех же actuator-эндпоинтов, которые публикует стартер, — поэтому подключение стартера делает сервис видимым и для
+  пользователей UI, *и* для MCP-клиентов без дополнительной настройки на стороне стартера.
+- **Что нужно Master для взаимодействия с сервисом**: HTTP-доступность к базовому пути актуатора сервиса (по умолчанию
+  `/actuator`), Axelix-эндпоинты, открытые через `management.endpoints.web.exposure.include`, и ключ для подписи JWT,
+  идентичный тому, который настроен на Master — см. [Аутентификация —
+  JWT](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt) на стороне Master.
+- **Master может найти сервис двумя способами**:
+    - **Автоматическое обнаружение на стороне Master** — Master сканирует свою среду (в настоящее время — Kubernetes
+      Services) и проверяет actuator-эндпоинт каждого из них. Стартеру нужно только предоставить доступ к эндпоинтам,
+      ничего дополнительно настраивать не нужно.
+    - **Самостоятельная регистрация** — стартер отправляет в Master heartbeat через фиксированный интервал. Используйте
+      этот метод, если Master не может просканировать среду сервиса (другая сеть, отсутствие интеграции с платформой,
+      обычные виртуальные машины).
+
+## Добавьте зависимость
+
+Укажите координату стартера, соответствующую мажорной версии Boot.
+
+:::note
+В сниппетах ниже для иллюстрации зафиксирована версия `1.0.0-M1`. Проверьте [Maven
+Central](https://central.sonatype.com/namespace/com.axelixlabs) на актуальный опубликованный тег и используйте эту
+версию в своей сборке.
+:::
+
+<Tabs groupId="spring-boot-major">
+  <TabItem value="sb3" label="Spring Boot 3.x">
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1")
+}
+```
+
+  </TabItem>
+  <TabItem value="gradle-groovy" label="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1'
+}
+```
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-3-starter</artifactId>
+    <version>1.0.0-M1</version>
+  </dependency>
+</dependencies>
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+  <TabItem value="sb2" label="Spring Boot 2.7">
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1")
+}
+```
+
+  </TabItem>
+  <TabItem value="gradle-groovy" label="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1'
+}
+```
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-2-starter</artifactId>
+    <version>1.0.0-M1</version>
+  </dependency>
+</dependencies>
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+</Tabs>
+
+Стартер также зависит от [Spring Boot
+Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator). Если в вашем сервисе ещё
+нет `spring-boot-starter-actuator`, добавьте его рядом.
+
+## Откройте доступ к Axelix actuator-эндпоинтам
+
+По умолчанию Spring Boot скрывает пользовательские actuator-эндпоинты от веб-доступа. Добавьте Axelix-идентификаторы в
+`management.endpoints.web.exposure.include`, чтобы Master мог до них достучаться. `axelix-metadata` <span
+className={styles.required}>обязательное</span> — это эндпоинт, который Master опрашивает в первую очередь, чтобы
+убедиться, что сервис работает. Без него сервис не появится в Master, независимо от того, используете ли вы
+автоматическое обнаружение на стороне Master или саморегистрацию на стороне стартера. Остальные эндпоинты обеспечивают
+работу соответствующих функций в пользовательском интерфейсе.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+          - axelix-transactions-monitoring
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
+```
+
+  </TabItem>
+</Tabs>
+
+`*` тоже работает, но большинство команд предпочитает курируемый список, чтобы случайно не открыть внутренние эндпоинты.
+Эндпоинты, не применимые к вашему сервису (`axelix-feign` без Feign в classpath, `axelix-caches` без `CacheManager`),
+остаются неактивными — стартер активирует каждый только при выполнении его предусловий.
+
+## Поделитесь JWT-ключом подписи с Master
+
+Каждый Axelix actuator-эндпоинт контролируется `JwtAuthorizationFilter`. Фильтр ожидает токен HS256, HS384 или HS512,
+подписанный тем же ключом, который использует Master, поэтому обе стороны должны согласовать алгоритм и секретный ключ.
+Используйте то же значение, которое вы указали для `axelix.master.auth.jwt.signing-key` на Master.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+        duration: 5m
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+axelix.sbs.auth.jwt.duration=5m
+```
+
+  </TabItem>
+</Tabs>
+
+`algorithm` и `signing-key` обязательны — старт сервиса упадёт с понятным сообщением, если любого из них не хватает.
+`duration` определяет, как долго действителен выпущенный стартером токен для heartbeat-сигналов саморегистрации, по
+умолчанию он равен пяти минутам, после чего стартер автоматически его ротирует.
+
+:::warning
+Ключ подписи, общий для Master и каждого мониторируемого сервиса, — конфиденциальный секрет. Инжектируйте его через
+переменную окружения, монтируемый файл или менеджер секретов, а не через YAML, закоммиченный в репозиторий.
+:::
+
+## Дайте Master найти сервис
+
+Выберите один из двух предложенных ниже вариантов. На практике они исключают друг друга — саморегистрация только
+увеличивает задержку, если Master уже может просканировать среду.
+
+### Вариант A — автоматическое обнаружение на стороне Master
+
+Если Master работает в кластере Kubernetes вместе с вашими сервисами, проще всего настроить его так, чтобы он сканировал
+namespace в поисках Services и опрашивал `/actuator/axelix-metadata` каждого из них. На стороне стартера не требуется
+никакой дополнительной настройки, помимо открытия actuator-эндпоинтов и общего JWT-ключа подписи. Настройте сканирование
+на стороне Master через `axelix.master.discovery.auto.*` — см. [Обнаружение —
+автообнаружение](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery) на странице Master.
+
+### Вариант B — Саморегистрация
+
+Если Master не может просканировать среду сервиса — другой кластер, обычная виртуальная машина, изолированная сеть —
+включите саморегистрацию в стартере. Сервис тогда отправляет в Master heartbeat со своим actuator URL через
+фиксированный интервал. Master принимает запрос по адресу `POST /api/internal/service/register` — это же значение
+указывается в `axelix.sbs.discovery.master-url`.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    discovery:
+      auto: true
+      master-url: http://master.internal:8080/api/internal/service/register
+      instance-actuator-url: http://my-app.internal:8080/actuator
+      instance-name: orders-service
+      heartbeat-interval: 15s
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.discovery.auto=true
+axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
+axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
+axelix.sbs.discovery.instance-name=orders-service
+axelix.sbs.discovery.heartbeat-interval=15s
+```
+
+  </TabItem>
+</Tabs>
+
+Несколько деталей, на которых люди спотыкаются:
+
+- `instance-actuator-url` — это **базовый** URL-адрес сервиса, поскольку Master будет обращаться к нему из своей
+  собственной сети — только по имени хоста и порту.
+- `master-url` — это **полный** URL-адрес, включая `/api/internal/service/register`. Стартер отправляет его без
+  изменений.
+- `instance-name` — это имя, которое Master показывает для этого сервиса в пользовательском интерфейсе и в MCP-ответах.
+  Выбирайте имя, которое переживает рестарты и реплики, — как правило, имя сервиса, а не имя пода.
+- Саморегистрация принимается Master из коробки (`axelix.master.discovery.self-registration.enabled` по умолчанию
+  `true`), установите её в `false`, если хотите отказаться от heartbeat-сигналов. Master выселяет сервис после
+  `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` молчания (по умолчанию `45s`), поэтому держите
+  `heartbeat-interval` с запасом меньше этого значения.
+
+## Маскирование чувствительных значений свойств
+
+Эндпоинты Axelix `axelix-env` и `axelix-configprops` возвращают значения свойств в Master. Чтобы секреты не утекали при
+обычных просмотрах, стартер маскирует значения, которые он возвращает вызывающим без соответствующего полномочия.
+Механизм одинаков для обоих эндпоинтов и управляется одним свойством стартера:
+
+`axelix.sbs.endpoints.config.sanitized-properties`
+
+- **Пустой список (по умолчанию)** — каждое значение, возвращаемое `axelix-env` и `axelix-configprops`, заменяется на
+  `******` для вызывающих без соответствующего полномочия. По умолчанию выбран намеренно консервативный вариант: чтобы
+  быть в безопасности, ничего включать не нужно.
+- **Непустой список** — маскируются только перечисленные ключи, всё остальное возвращается вызывающему без изменений.
+  Используйте этот режим, если консервативное поведение по умолчанию слишком агрессивное и вы хотите маскировать только
+  конкретные ключи (пароли, токены, ключи подписи).
+
+Полномочие проверяется по каждому эндпоинту отдельно:
+
+- **`axelix-env`** — полномочие `ENV_VALUES_READ` позволяет вызывающему видеть исходные значения.
+- **`axelix-configprops`** — полномочие `CONFIG_PROPS_VALUES_READ` позволяет вызывающему видеть исходные значения.
+
+Оба полномочия выдаются встроенными в Master ролями `ADMIN` и `SUPER_ADMIN`. `VIEWER` и `EDITOR` всегда проходят через
+функцию маскирования. Полную матрицу см. в [Роли и
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </TabItem>
+</Tabs>
+
+:::note
+Стандартные переключатели маскирования Spring Boot Actuator — `management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize` и их эквиваленты для `configprops` — **не учитываются**.
+:::
+
+## Справочник по конфигурации
+
+Все свойства стартера живут в пространстве имён `axelix.sbs.*`.
+
+### Аутентификация — JWT
+
+<div className={styles.configTable}>
+
+| Свойство                          | По умолчанию                                                        | Описание                                                                                                                                                |
+|-----------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.auth.jwt.algorithm`   | *(не задано)* <span className={styles.required}>обязательное</span> | Алгоритм подписи. Один из `HMAC256`, `HMAC384` или `HMAC512`. Должен совпадать с `axelix.master.auth.jwt.algorithm` на Master.                          |
+| `axelix.sbs.auth.jwt.signing-key` | *(не задано)* <span className={styles.required}>обязательное</span> | Общий секрет, которым проверяются выпущенные Master токены и подписываются heartbeat-сигналы саморегистрации. Должен совпадать с ключом подписи Master. |
+| `axelix.sbs.auth.jwt.duration`    | `5m`                                                                | Срок действия токена саморегистрации, который стартер выпускает сам себе. Токены автоматически ротируются до истечения.                                 |
+
+</div>
+
+### Саморегистрация
+
+Саморегистрация **выключена по умолчанию** (`axelix.sbs.discovery.auto=false`) — оставьте всё как есть, если Master
+может найти сервис через автообнаружение на стороне Master.
+
+Когда `axelix.sbs.discovery.auto=true`, следующие свойства становятся **обязательными**:
+
+- `axelix.sbs.discovery.master-url`
+- `axelix.sbs.discovery.instance-actuator-url`
+- `axelix.sbs.discovery.instance-name`
+
+Приёмник этих heartbeat-сигналов на стороне Master — эндпоинт, таймаут выселения, расписание подметания выселений —
+описан на странице Master в [Обнаружение —
+саморегистрация](../../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--self-registration). JWT-ключ подписи, заданный в
+`axelix.sbs.auth.jwt.signing-key`, должен совпадать с `axelix.master.auth.jwt.signing-key` на Master, иначе
+heartbeat-сигналы будут отклоняться с `401`.
+
+<div className={styles.configTable}>
+
+| Свойство                                     | По умолчанию                                                        | Описание                                                                                                                                           |
+|----------------------------------------------|---------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.discovery.auto`                  | `false`                                                             | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
+| `axelix.sbs.discovery.master-url`            | *(не задано)* <span className={styles.required}>обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:8080/api/internal/service/register`. Обязательно при `auto=true`.    |
+| `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className={styles.required}>обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `auto=true`.                       |
+| `axelix.sbs.discovery.instance-name`         | *(не задано)* <span className={styles.required}>обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `auto=true`.                                                           |
+| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                               | Интервал между heartbeat-сигналами. Должен быть меньше `heartbeat-timeout` выселения на Master.                                                    |
+
+</div>
+
+### Маскирование значений в эндпоинтах
+
+<div className={styles.configTable}>
+
+| Свойство                                           | По умолчанию      | Описание                                                                                                                                                                                                                                                                                                                                                      |
+|----------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.endpoints.config.sanitized-properties` | *(пустой список)* | Ключи свойств, чьи значения маскируются как `******` для вызывающих без `ENV_VALUES_READ` (для `axelix-env`) или `CONFIG_PROPS_VALUES_READ` (для `axelix-configprops`). Пустой список означает, что маскируются **все** значения. См. [Маскирование чувствительных значений свойств](#маскирование-чувствительных-значений-свойств) для правил сопоставления. |
+
+</div>
+
+## См. также
+
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — где задаются ключ подписи, таймаут выселения и
+  сканирование Kubernetes.
+- [Что такое Master?](../../setting-up-master-ui/what-is-master.mdx) — фон того, как Master использует данные, которые
+  публикует стартер.
+- [Аутентификация](../../setting-up-master-ui/authentication/authentication.mdx) — углублённый взгляд на JWT и резолюцию
+  полномочий с обеих сторон.

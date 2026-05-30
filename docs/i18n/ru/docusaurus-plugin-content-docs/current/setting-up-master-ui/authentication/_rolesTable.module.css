@@ -1,0 +1,26 @@
+.rolesTable table {
+  table-layout: fixed;
+}
+
+.rolesTable table th,
+.rolesTable table td {
+  min-width: 82px;
+  word-break: break-word;
+}
+
+.rolesTable table th:nth-child(1),
+.rolesTable table td:nth-child(1) {
+  font-size: 13px;
+  width: 140px;
+}
+
+.rolesTable table th:nth-child(2),
+.rolesTable table td:nth-child(2) {
+  font-size: 13px;
+}
+
+.rolesTable table th:nth-child(3),
+.rolesTable table td:nth-child(3) {
+  font-size: 14px;
+  width: 360px;
+}

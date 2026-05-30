@@ -4,107 +4,151 @@ import oauth2Styles from './_oauth2PropertiesTable.module.css';
 
 # Authentication
 
-This page explains how sign-in to Axelix Master actually works: which authentication options exist, how the browser session is established and verified on each request, the role/authority model that gates the UI, and how the MCP server authenticates AI agents. The property keys themselves live in [Configuring Master](../../installation/configuring-master.mdx#configuration-reference) — the goal here is the mental model.
+This page explains how sign-in to Axelix Master actually works: which authentication options exist, how the browser
+session is established and verified on each request, the role/authority model that gates the UI, and how the MCP server
+authenticates AI agents. The property keys themselves live in [Configuring
+Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#configuration-reference) — the goal here is the mental model.
 
 ## The three sign-in options
 
-Master ships three independent authentication providers. Any combination can be enabled at the same time; the login screen at `/login` renders the controls for whichever ones are active.
+Master ships three independent authentication providers. Any combination can be enabled at the same time; the login
+screen at `/login` renders the controls for whichever ones are active.
 
 <div className={signInOptionsStyles.signInOptionsTable}>
 
-| Option        | Default       | Toggle property                                                                                     | Use it when                                                                            |
-|---------------|---------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| Super-admin   | Always active | (controlled by `axelix.master.auth.options.super-admin.credentials.{username,password}`)            | First-time setup, recovery account, single-operator deployments.                       |
-| Local users   | Off           | `axelix.master.auth.options.local.enabled=true`                                                     | Multiple operators, no external IdP, you want Master to own the password store.        |
-| OAuth2 / OIDC | Off           | `axelix.master.auth.options.oauth2.enabled=true`                                                    | Production. SSO through Keycloak, Auth0, Okta, Google, or any OIDC-compliant provider. |
+| Option        | Default       | Toggle property                                                                          | Use it when                                                                            |
+|---------------|---------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| Super-admin   | Always active | (controlled by `axelix.master.auth.options.super-admin.credentials.{username,password}`) | First-time setup, recovery account, single-operator deployments.                       |
+| Local users   | Off           | `axelix.master.auth.options.local.enabled=true`                                          | Master owns the password storage.                                                      |
+| OAuth2 / OIDC | Off           | `axelix.master.auth.options.oauth2.enabled=true`                                         | Production. SSO through Keycloak, Auth0, Okta, Google, or any OIDC-compliant provider. |
 
 </div>
 
-When more than one option is enabled, the screen stacks them: the username/password form appears for super-admin and local users, followed by a single **Sign in with OAuth2/OIDC Provider** button when OIDC is on.
+When more than one option is enabled, the screen stacks them: the username/password form appears for super-admin and
+local users, followed by a single **Sign in with OAuth2/OIDC Provider** button when OIDC is on.
 
 ### Super-admin
 
-The built-in super-admin is the only account that is always active. Master compares the submitted credentials directly to `axelix.master.auth.options.super-admin.credentials.username` / `.password` — no database, no encoder. Successful sign-in grants the `SUPER_ADMIN` role, which carries every authority Master defines (see [Roles and authorities](#roles-and-authorities)).
+The built-in super-admin is the only account that is always active. Master compares the submitted credentials directly
+to `axelix.master.auth.options.super-admin.credentials.username` / `.password` — no database, no encoder. Successful
+sign-in grants the `SUPER_ADMIN` role, which carries every authority Master defines (see [Roles and
+authorities](#roles-and-authorities)).
 
-This account is meant to bootstrap Master and to recover access when other providers are misconfigured. Override the defaults before exposing Master to anyone — `admin / admin` grants full control over every monitored service.
+This account is meant to bootstrap Master and to recover access when other providers are misconfigured. Override the
+defaults before exposing Master to anyone — `admin / admin` grants full control over every monitored service.
 
 ### Local users
 
-Local users live in Master's own database (`UserEntity`). Passwords are hashed with BCrypt. When `axelix.master.auth.options.local.enabled=true`, `DatabaseUserAuthenticator` looks up the submitted username, BCrypt-verifies the password, and maps the stored role string (`admin`, `editor`, `viewer`) to one of the built-in roles. Unknown role strings raise `UserRoleNotFoundException` at sign-in time.
+Local users live in Master's own database (`UserEntity`). Passwords are hashed with BCrypt. When
+`axelix.master.auth.options.local.enabled=true`, `DatabaseUserAuthenticator` looks up the submitted username,
+BCrypt-verifies the password, and maps the stored role string (`admin`, `editor`, `viewer`) to one of the built-in
+roles. Unknown role strings raise `UserRoleNotFoundException` at sign-in time.
 
-Local users are managed through the **Users** screen in the UI — creating, updating, and deleting them requires the `USERS_MANAGEMENT` authority, which only `SUPER_ADMIN` holds by default.
+Local users are managed through the **Users** screen in the UI — creating, updating, and deleting them requires the
+`USERS_MANAGEMENT` authority, which only `SUPER_ADMIN` holds by default.
 
 ### OAuth2 / OIDC
 
-Master implements the standard Authorization Code Flow. Enable it with `axelix.master.auth.options.oauth2.enabled=true` and supply `issuer-uri`, `client-id`, `client-secret`, and the public `base-url` of this Master deployment.
+Master implements the standard Authorization Code Flow. Enable it with `axelix.master.auth.options.oauth2.enabled=true`
+and supply `issuer-uri`, `client-id`, `client-secret`, and the public `base-url` of this Master deployment.
 
 The end-to-end flow:
 
-1. User clicks **Sign in with OAuth2/OIDC Provider** on `/login`. The browser is redirected to the IdP's authorization endpoint with `client-id` and `redirect_uri` set to `<base-url>/api/external/oauth2/callback`.
+1. User clicks **Sign in with OAuth2/OIDC Provider** on `/login`. The browser is redirected to the IdP's authorization
+   endpoint with `client-id` and `redirect_uri` set to `<base-url>/api/external/oauth2/callback`.
 2. The IdP authenticates the user and redirects back to the callback with a `code`.
-3. `OAuth2CallbackController` exchanges the code for an ID token + access token via the IdP's token endpoint, validates the ID token, and extracts the username.
-4. The role is resolved by evaluating the JMESPath expression in `axelix.master.auth.options.oauth2.role-attribute-path` against the userinfo response. The result is mapped to `admin`, `editor`, or `viewer`. If `role-attribute-path` is left unset, every OIDC user lands on the `VIEWER` role.
-5. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with the session cookies set.
+3. `OAuth2CallbackController` exchanges the code for an ID token + access token via the IdP's token endpoint, validates
+   the ID token, and extracts the username.
+4. The role is resolved by evaluating the JMESPath expression in `axelix.master.auth.options.oauth2.role-attribute-path`
+   against the userinfo response. The result is mapped to `admin`, `editor`, or `viewer`. If `role-attribute-path` is
+   left unset, every OIDC user lands on the `VIEWER` role.
+5. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
+   the session cookies set.
 
-The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses them once to identify the user and then issues its own session JWT.
+The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses
+them once to identify the user and then issues its own session JWT.
 
-**When `axelix.master.auth.options.oauth2.enabled=true`, these properties must be supplied:** `issuer-uri`, `client-id`, `client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes. `role-attribute-path` is optional — leave it unset to map every signed-in user to the `VIEWER` role.
+**When `axelix.master.auth.options.oauth2.enabled=true`, these properties must be supplied:** `issuer-uri`, `client-id`,
+`client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes.
+`role-attribute-path` is optional — leave it unset to map every signed-in user to the `VIEWER` role.
 
 <div className={oauth2Styles.configTable}>
 
-| Property                                                       | Default   | Description                                                                                                                                  |
-|----------------------------------------------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.options.oauth2.enabled`                    | `false`   | Enable OIDC sign-in.                                                                                                                         |
-| `axelix.master.auth.options.oauth2.issuer-uri`                 | *(unset)* <span className={oauth2Styles.required}>required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`. |
-| `axelix.master.auth.options.oauth2.client-id`                  | *(unset)* <span className={oauth2Styles.required}>required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                |
-| `axelix.master.auth.options.oauth2.client-secret`              | *(unset)* <span className={oauth2Styles.required}>required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                    |
-| `axelix.master.auth.options.oauth2.base-url`                   | *(unset)* <span className={oauth2Styles.required}>required</span> | Public base URL of this Master instance; used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.            |
-| `axelix.master.auth.options.oauth2.scopes`                     | `openid`  | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                          |
-| `axelix.master.auth.options.oauth2.role-attribute-path`        | *(unset)* | Optional. JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+| Property                                                | Default                                                           | Description                                                                                                                                                                |
+|---------------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                           | Enable OIDC sign-in.                                                                                                                                                       |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | *(unset)* <span className={oauth2Styles.required}>required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`.                           |
+| `axelix.master.auth.options.oauth2.client-id`           | *(unset)* <span className={oauth2Styles.required}>required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                              |
+| `axelix.master.auth.options.oauth2.client-secret`       | *(unset)* <span className={oauth2Styles.required}>required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                                  |
+| `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className={oauth2Styles.required}>required</span> | Public base URL of this Master instance. Used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                          | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                                         | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
 
 </div>
 
 ## The session: cookies and JWT
 
-Every sign-in path ends the same way: Master mints a JWT and hands it back as a cookie. The same cookie gates every subsequent UI request.
+Every sign-in path ends the same way: Master mints a JWT and hands it back as a cookie. The same cookie gates every
+subsequent UI request.
 
 ### What login produces
 
 `POST /api/external/users/login` (and the OIDC callback) issue two cookies with `Set-Cookie`:
 
-- **`auth_token`** — the JWT itself. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan` (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure` — leave it `false` only over plain-HTTP localhost.
-- **`authorities`** — a Base64-encoded JSON array of the authority names the signed-in user holds, e.g. `["ENV_VALUES_READ","SCHEDULED_TASKS_MODIFY"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons to render. It is purely a UI hint; the backend re-derives authorities from the JWT on every request, so tampering with this cookie only changes what the UI offers, not what the server allows.
+- **`auth_token`** — the JWT itself. `HttpOnly`, `SameSite=Strict`, `Path=/`, `MaxAge=axelix.master.auth.jwt.lifespan`
+  (default `12h`). `Secure` is gated by `axelix.master.auth.cookie.secure` — leave it `false` only over plain-HTTP
+  localhost.
+- **`authorities`** — a Base64-encoded JSON array of the authority names the signed-in user holds, e.g.
+  `["ENV_VALUES_READ","SCHEDULED_TASKS_MODIFY"]`. *Not* `HttpOnly`, because the front-end reads it to know which buttons
+  to render. It is purely a UI hint. The backend re-derives authorities from the JWT on every request, so tampering with
+  this cookie only changes what the UI offers, not what the server allows.
 
-The JWT itself is HMAC-signed (`HMAC256`, `HMAC384`, or `HMAC512`, set via `axelix.master.auth.jwt.algorithm`) with the secret in `axelix.master.auth.jwt.signing-key`. Its claims are the username (`sub`), the issued-at and expiry timestamps, and a `roles` claim that encodes each granted role together with its authorities and nested components.
+The JWT itself is HMAC-signed (`HMAC256`, `HMAC384`, or `HMAC512`, set via `axelix.master.auth.jwt.algorithm`) with the
+secret in `axelix.master.auth.jwt.signing-key`. Its claims are the username (`sub`), the issued-at and expiry
+timestamps, and a `roles` claim that encodes each granted role together with its authorities and nested components.
 
 ### What every request goes through
 
-`CookieBasedJwtAuthorizationFilter` runs on every `/api/...` request except a small whitelist (the login endpoint itself, the OAuth2 callback, the public settings endpoint, the self-registration endpoint, and `/api/mcp/**` — those have their own filters or are intentionally anonymous). For everything else:
+`CookieBasedJwtAuthorizationFilter` runs on every `/api/...` request except a small whitelist (the login endpoint
+itself, the OAuth2 callback, the public settings endpoint, the self-registration endpoint, and `/api/mcp/**` — those
+have their own filters or are intentionally anonymous). For everything else:
 
-1. The filter reads the `auth_token` cookie. Missing or blank → `JwtProcessingException`, which surfaces as `401 Unauthorized`.
-2. `DefaultJwtDecoderService` verifies the signature and expiry against `axelix.master.auth.jwt.signing-key`. A tampered, unsigned, or expired token → `401`.
-3. `MasterAuthorityResolver` looks up the request path + HTTP method in a built-in table of "this endpoint requires this authority" rules. Endpoints that don't appear in the table require only a valid token.
-4. `DefaultAuthorizer` flattens the user's roles into the full authority set and checks it covers the required authorities. Missing one → `AuthorizationException`, surfaced as `403 Forbidden`.
-5. On success the request runs inside a `DefaultSecurityContext` carrying the authenticated `User` and the raw token, so downstream code can read the caller without re-parsing.
+1. The filter reads the `auth_token` cookie. Missing or blank → `JwtProcessingException`, which surfaces as `401
+   Unauthorized`.
+2. `DefaultJwtDecoderService` verifies the signature and expiry against `axelix.master.auth.jwt.signing-key`. A
+   tampered, unsigned, or expired token → `401`.
+3. `MasterAuthorityResolver` looks up the request path + HTTP method in a built-in table of "this endpoint requires this
+   authority" rules. Endpoints that don't appear in the table require only a valid token.
+4. `DefaultAuthorizer` flattens the user's roles into the full authority set and checks it covers the required
+   authorities. Missing one → `AuthorizationException`, surfaced as `403 Forbidden`.
+5. On success the request runs inside a `DefaultSecurityContext` carrying the authenticated `User` and the raw token, so
+   downstream code can read the caller without re-parsing.
 
 ### Logout and rotation
 
-`POST /api/external/users/logout` overwrites both cookies with empty values and `MaxAge=0`, so the browser drops them immediately. The JWT itself remains technically valid until its `exp` claim passes — Master does not maintain a server-side blocklist.
+`POST /api/external/users/logout` overwrites both cookies with empty values and `MaxAge=0`, so the browser drops them
+immediately. The JWT itself remains technically valid until its `exp` claim passes — Master does not maintain a
+server-side blocklist.
 
-To force every active session to end (after a compromised key, a stale shared secret, or a quarterly rotation), change `axelix.master.auth.jwt.signing-key`. Every issued token immediately fails verification on the next request because the signature stops matching the new secret. Users land back on `/login`.
+To force every active session to end (after a compromised key, a stale shared secret, or a quarterly rotation), change
+`axelix.master.auth.jwt.signing-key`. Every issued token immediately fails verification on the next request because the
+signature stops matching the new secret. Users land back on `/login`.
 
 ## Roles and authorities
 
-Master uses a fixed set of roles and a fixed set of authorities. Roles are bundles of authorities, the authorization check is always against authorities, never role names. This means a custom role wired in by the OIDC mapping or the database layer must resolve to one of the built-in names — there is no way today to define a new authority from configuration.
+Master uses a fixed set of roles and a fixed set of authorities. Roles are bundles of authorities, the authorization
+check is always against authorities, never role names. This means a custom role wired in by the OIDC mapping or the
+database layer must resolve to one of the built-in names — there is no way today to define a new authority from
+configuration.
 
 <div className={rolesStyles.rolesTable}>
 
-| Role              | Authorities granted                                                                                                                                              | Who gets it                                                                                          |
-|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `SUPER_ADMIN`     | Every authority defined by Master, including `USERS_VIEW` and `USERS_MANAGEMENT`.                                                                                | The built-in super-admin account.                                                                    |
-| `ADMIN`           | `ENV_VALUES_READ`, `CONFIG_PROPS_VALUES_READ`, `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                   | Local DB users with role `admin`; OIDC users whose `role-attribute-path` resolves to `admin`.        |
-| `EDITOR`          | `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                                                                  | Local DB users with role `editor`; OIDC users whose `role-attribute-path` resolves to `editor`.      |
-| `VIEWER`          | None — read-only view of everything not gated by an authority.                                                                                                   | Local DB users with role `viewer`; OIDC users with no `role-attribute-path` set or unmapped values.  |
+| Role          | Authorities granted                                                                                                            | Who gets it                                                                                         |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `SUPER_ADMIN` | Every authority defined by Master, including `USERS_VIEW` and `USERS_MANAGEMENT`.                                              | The built-in super-admin account.                                                                   |
+| `ADMIN`       | `ENV_VALUES_READ`, `CONFIG_PROPS_VALUES_READ`, `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`. | Local DB users with role `admin`. OIDC users whose `role-attribute-path` resolves to `admin`.       |
+| `EDITOR`      | `SCHEDULED_TASKS_MODIFY`, `CACHES_CLEAR`, `CACHES_TOGGLE`, `GARBAGE_COLLECTOR`.                                                | Local DB users with role `editor`. OIDC users whose `role-attribute-path` resolves to `editor`.     |
+| `VIEWER`      | None — read-only view of everything not gated by an authority.                                                                 | Local DB users with role `viewer`. OIDC users with no `role-attribute-path` set or unmapped values. |
 
 </div>
 
@@ -119,16 +163,26 @@ What each authority gates:
 - **`USERS_VIEW`** — read the Users feed.
 - **`USERS_MANAGEMENT`** — create, update, and delete local users.
 
-`USERS_VIEW` and `USERS_MANAGEMENT` are reserved for `SUPER_ADMIN` today — `ADMIN` cannot manage users without being escalated.
+`USERS_VIEW` and `USERS_MANAGEMENT` are reserved for `SUPER_ADMIN` today — `ADMIN` cannot manage users without being
+escalated.
 
 ## MCP server authentication
 
-The bundled MCP server at `/api/mcp` is gated by its own filter, `McpAuthorizationFilter`, because the credentials carried by MCP clients are not the browser session cookie. The filter parses the `Authorization` header and dispatches to the handler matching the scheme.
+The bundled MCP server at `/api/mcp` is gated by its own filter, `McpAuthorizationFilter`, because the credentials
+carried by MCP clients are not the browser session cookie. The filter parses the `Authorization` header and dispatches
+to the handler matching the scheme.
 
-- **`Basic`** — `BasicMcpAuthenticationHandler` decodes `Authorization: Basic <base64(user:pass)>` and delegates to the same `CompositeUserAuthenticator` the UI uses. Super-admin and local accounts both work; the role mapping is identical to a browser sign-in.
-- **`Bearer`** — `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It runs the token through `JmesPathOidcRoleExtractor` (same path as the browser OIDC flow) to derive a role, then issues a synthetic `PasswordlessUser` named `MCP_AGENT` carrying that role. Only available when `axelix.master.auth.options.oauth2.enabled=true`.
+- **`Basic`** — `BasicMcpAuthenticationHandler` decodes `Authorization: Basic <base64(user:pass)>` and delegates to the
+  same `CompositeUserAuthenticator` the UI uses. Super-admin and local accounts both work. The role mapping is identical
+  to a browser sign-in.
+- **`Bearer`** — `BearerMcpAuthenticationHandler` treats the credential as an OIDC access token. It runs the token
+  through `JmesPathOidcRoleExtractor` (same path as the browser OIDC flow) to derive a role, then issues a synthetic
+  `PasswordlessUser` named `MCP_AGENT` carrying that role. Only available when
+  `axelix.master.auth.options.oauth2.enabled=true`.
 
-Once the user is identified, the filter performs the same authority check as the web filter — per-tool authority requirements are resolved via `McpEndpointResolver` + `McpEndpointAuthorityResolver`. A tool the caller is not entitled to execute returns `403 Forbidden`; an unknown or invalid credential returns `401 Unauthorized`.
+Once the user is identified, the filter performs the same authority check as the web filter — per-tool authority
+requirements are resolved via `McpEndpointResolver` + `McpEndpointAuthorityResolver`. A tool the caller is not entitled
+to execute returns `403 Forbidden`. An unknown or invalid credential returns `401 Unauthorized`.
 
 When OIDC is enabled and a request arrives without an `Authorization` header, the `401` response also carries:
 
@@ -136,10 +190,13 @@ When OIDC is enabled and a request arrives without an `Authorization` header, th
 WWW-Authenticate: Bearer resource_metadata="<base-url>/api/external/mcp-oauth2/.well-known/oauth-protected-resource"
 ```
 
-MCP clients that implement RFC 9728 use that header to discover Master's OAuth2 configuration and walk the user through the authorization flow on their own.
+MCP clients that implement RFC 9728 use that header to discover Master's OAuth2 configuration and walk the user through
+the authorization flow on their own.
 
 ## Related
 
-- [Configuring Master — Authentication properties](../../installation/configuring-master.mdx#authentication--jwt) — every property key and default referenced on this page.
-- [Configuring Spring Boot Starter](../../installation/configuring-spring-boot-starter.mdx) — the starter side of the same JWT signing key.
-- [What is Master?](../what-is-master.md) — broader background on what Master does once the session is live.
+- [Configuring Master — Authentication properties](../../setting-up-master-ui/configuring-master/configuring-master.mdx#authentication--jwt) —
+  every property key and default referenced on this page.
+- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) — the starter side of the
+  same JWT signing key.
+- [What is Master?](../what-is-master.mdx) — broader background on what Master does once the session is live.

@@ -1,0 +1,148 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Окружение
+
+На странице «Окружение» перечислены все свойства, которые сервис Spring Boot определяет во время выполнения,
+сгруппированные по источникам свойств. Для каждого свойства указано значение, отмечен источник, который в данный момент
+определяет свойство, а там, где Spring связывает свойство с бином, — ссылка на `@ConfigurationProperties` и на точки
+инъекции, которые его считывают.
+
+![главная страница окружения](../../../../../static/img/feature/properties/properties-main-page.png) ***Окружение в
+интерфейсе Axelix***
+
+Если в сервисе есть активные профили Spring или профили по умолчанию, они отображаются в верхней части страницы под
+Профили: — чипы объединяют `spring.profiles.default` и `spring.profiles.active`. Блок скрыт, если профиль не задан.
+
+Под профилями расположен прокручиваемый список всех свойств, сгруппированный по источникам свойств. Каждый источник —
+раскрывающаяся секция (по умолчанию развёрнутая), над списком есть поле поиска, фильтрующее источники свойств и записи,
+а также счётчик вида `<соответствует> / <всего>`.
+
+- **Имя источника**: имя источника свойств.
+- **Описание**:      наведите курсор на иконку ![иконка info](../../../../../static/img/feature/icons/info-icon.svg)
+  рядом с названием источника, чтобы увидеть пользовательское описание этого источника свойств, если оно есть.
+- **Свойства**:      список свойств в источнике.
+
+## Подробности свойства
+![страница подробностей свойства](../../../../../static/img/feature/properties/properties-details-page.png)
+***Выпадающий блок свойства в интерфейсе Axelix***
+
+В каждой строке свойств отображается название свойства, кнопка копирования в буфер обмена, разрешенное значение и маркер
+основного источника. При раскрытии строки открывается панель с подробной информацией:
+
+- **Имя**:                       имя свойства.
+- **Значение**:                  значение, полученное из этого источника свойств.
+- **Актуальное значение**:       помечено иконкой короны ![иконка
+  короны](../../../../../static/img/feature/icons/crown-icon.svg) в столбце значений. Корона означает, что это значение
+  является приоритетным при разрешении — если один и тот же ключ присутствует в нескольких источниках свойств, то
+  основным будет считаться только тот источник, к которому среда Spring обратилась первой.
+- **Устаревшее**:                устаревшие свойства выделены красным фоном в заголовке строки, а на панели сведений
+  отображается сообщение об устаревании.
+- **Описание**:                  описание из `spring-configuration-metadata.json`, если доступно.
+- **Configuration Properties**:  `@ConfigurationProperties`компонент, который привязывает это свойство, если таковой
+  имеется. Имя компонента — это ссылка ![ссылка перехода](../../../../../static/img/feature/icons/redirect-icon.png),
+  которая ведет на страницу «Свойства конфигурации» с привязкой к этому компоненту.
+- **Инжектируется в**:           бины, которые потребляют это свойство через `@Value` или аналогичные механизмы. Каждый
+  элемент — это ссылка ![ссылка перехода](../../../../../static/img/feature/icons/redirect-icon.png), которая ведёт на
+  страницу Beans с привязкой к этому компоненту.
+
+:::info
+По умолчанию все значения маскируются как `******` для пользователей, не обладающих полномочиями `ENV_VALUES_READ`. О
+том, как выбрать, какие ключи будут замаскированы, а какие останутся открытыми, см. в разделе [Маскирование
+значений](#маскирование-значений).
+:::
+
+## Маскирование значений
+
+Axelix никогда не полагается на переключатель Spring Boot `management.endpoint.env.show-values` — он всегда просит
+Spring Boot вернуть сырые значения (`Show.ALWAYS`) и поверх применяет собственное маскирование на основе проверки
+полномочий.
+
+**Кто видит исходные значения.** Вызывающие с полномочием `ENV_VALUES_READ` предоставляемыми встроенными ролями `ADMIN`
+и `SUPER_ADMIN` — получают исходные значения. Остальные получают значения, заменённые на `******`. Полную матрицу ролей
+и полномочий см. в разделе [Роли и
+полномочия](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+
+**Какие ключи маскируются.** Одно свойство стартера — `axelix.sbs.endpoints.config.sanitized-properties` — управляет
+этим набором, и оно применяется и к `axelix-env` (эта страница), и к `axelix-configprops` (страница [Configuration
+Properties](./configuration-properties)):
+
+- **Пустой список (по умолчанию)** — все значения маскируются для пользователей без соответствующих полномочий.
+- **Непустой список** — маскируются только указанные ключи, остальные возвращаются без изменений.
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.endpoints.config.sanitized-properties[0]=database.password
+axelix.sbs.endpoints.config.sanitized-properties[1]=spring.datasource.password
+axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    endpoints:
+      config:
+        sanitized-properties:
+          - database.password
+          - spring.datasource.password
+          - jwt.signing-key
+```
+
+  </TabItem>
+</Tabs>
+
+См. [Маскирование чувствительных значений
+свойств](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#sanitize-sensitive-property-values)
+в руководстве по настройке Spring Boot Starter — то же свойство описано рядом с остальными настройками стартера.
+
+:::note
+Стандартные свойства Spring Boot Actuator для маскирования — `management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize` и их эквиваленты для `configprops` — не учитываются. Вместо них используйте
+`axelix.sbs.endpoints.config.sanitized-properties`.
+:::
+
+## MCP-инструменты
+
+Полное окружение управляемого сервиса — свойства приложения, системные свойства и переменные окружения ОС — также
+доступно ИИ-агентам через MCP. См. [Каталог
+MCP-инструментов](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
+
+## Свойства
+
+Страница работает поверх actuator-эндпоинта `axelix-env`, который добавляет Axelix Spring Boot Starter. Она доступна
+через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
+разделе [Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx):
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-env
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-env
+```
+
+  </TabItem>
+</Tabs>
+
+## См. также
+
+- [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Настройка Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)

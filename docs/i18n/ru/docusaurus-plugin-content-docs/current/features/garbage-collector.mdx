@@ -1,0 +1,96 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Сборщик мусора
+
+Страница **Сборщик мусора** позволяет включить GC-логирование JVM на управляемом сервисе на Spring Boot, запустить
+сборку по требованию и скачать полученный файл лога. В продакшене GC-логирование обычно выключено; страница нужна для
+того, чтобы включить его на время прицельного расследования, а затем снова выключить.
+
+![главная страница сборщика мусора](../../../../../static/img/feature/garbage-collector/gc-main-page.png) ***Сборщик
+мусора в интерфейсе Axelix***
+
+## Доступ
+
+Чтение файла GC-лога и проверка статуса логирования доступны любому аутентифицированному пользователю — `VIEWER`,
+`EDITOR`, `ADMIN` и `SUPER_ADMIN` могут открыть страницу и скачать существующий лог. Активные элементы управления
+закрыты отдельным полномочием:
+
+- **Запустить GC**, **Включить Лог Сборщика Мусора** и **Отключить Лог GC** требуют полномочия `GARBAGE_COLLECTOR`.
+
+`GARBAGE_COLLECTOR` выдаётся встроенными ролями `EDITOR`, `ADMIN` и `SUPER_ADMIN`. `VIEWER` видит кнопки, но
+деструктивные остаются недоступными. Полную матрицу ролей и полномочий см. в [Роли и
+полномочия](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+
+## Включение GC-логирования
+
+GC-логирование выключено по умолчанию. Пока логирование не включено, страница показывает пустой стейт с кнопкой
+**Включить Лог Сборщика Мусора**. Клик по ней открывает модальное окно, где выбирается уровень логирования JVM:
+
+<img src="/img/feature/garbage-collector/enable-gc-logging.png" alt="enable-gc-logging" width="490" height="280"/>
+
+Список уровней берётся во время работы по `jcmd VM.log list` на целевом сервисе — как правило, это `error`, `warning`,
+`info`, `debug`, `trace`.
+
+## Работа с логами
+
+Когда логирование включено, в шапке страницы доступны три действия:
+
+1. **Запустить GC** <img src="/img/feature/icons/play-icon.png" width="20" height="20"/> — принудительно запускает
+   сборку, вызывая `System.gc()` на сервисе, чтобы не ждать естественного события GC для появления записей. Требует
+   `GARBAGE_COLLECTOR`.
+2. **Скачать Лог GC** <img src="/img/feature/icons/download-icon.png" width="20" height="20"/> — стримит текущий файл
+   GC-лога в браузер как `text/plain`. Только для чтения — доступно всем.
+3. **Отключить Лог GC** <img src="/img/feature/icons/disable-icon.png" width="20" height="20"/> — выключает
+   GC-логирование, не трогая уже записанный файл лога. Требует `GARBAGE_COLLECTOR`.
+
+Типичная строка из скачанного GC-лога с аннотациями:
+
+```
+[2026-03-02T17:38:55.009+0000][info][gc] GC(428) Pause Full (System.gc()) 29M->28M(97M) 82.955ms
+              │                  │    │    │               │               │    │   │       │
+              │                  │    │    │               │               │    │   │       └─ продолжительность паузы GC
+              │                  │    │    │               │               │    │   └─ общий размер кучи
+              │                  │    │    │               │               │    └─ куча после сборки
+              │                  │    │    │               │               └─ куча до сборки
+              │                  │    │    │               └─ описание события GC
+              │                  │    │    └─ идентификатор события GC
+              │                  │    └─ тег лога (подсистема)
+              │                  └─ уровень логирования
+              └─ временная метка (ISO-8601 с таймзоной)
+```
+
+## Свойства
+
+Страница работает поверх actuator-эндпоинта `axelix-gc`, который добавляет Axelix Spring Boot Starter. Откройте его
+через стандартные свойства Spring Boot Actuator — полный список эндпоинтов Axelix и сопутствующие настройки см. в
+[Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx):
+
+<Tabs groupId="spring-config">
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-gc
+```
+
+  </TabItem>
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-gc
+```
+
+  </TabItem>
+</Tabs>
+
+## См. также
+
+- [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Настройка Spring Boot
+  Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)
