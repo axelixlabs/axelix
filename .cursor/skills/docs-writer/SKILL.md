@@ -285,6 +285,13 @@ If you're tempted to write something you can't substantiate from the code — de
 
 **Semicolons only when they earn their place.** Use `;` to join two independent clauses whose relationship is tight and implicit. If you can replace `;` with `.` (period + space) or `, and` without changing meaning, the simpler punctuation is the better choice. Most pages need zero semicolons.
 
+**Readability metrics.** Apply these targets to every Docusaurus page you write. Check them when drafting and again before handoff.
+
+- **Subheading distribution.** Sections of text under a single heading (`##` or `###`) should not exceed **300 words** without a new subheading to break up the text. Insert `###` (or another `##`) at a natural topic shift before you hit the limit.
+- **Transition words.** At least **30%** of sentences should contain transition words or phrases (e.g. "however", "therefore", "for example", "in addition", "as a result", "next", "because") to keep the flow smooth. Spread them naturally — the goal is readable flow, not a transition in every sentence.
+- **Paragraph length.** A paragraph should not exceed **150 words**. Shorter paragraphs are easier to read on mobile screens. If a paragraph grows past the limit, split it at a logical break.
+- **Sentence length.** You may use a long sentence occasionally, but that is the exception rather than the rule: **80%** of sentences **must** be below **20 words**. After drafting, spot-check: if most sentences need a second read, split them.
+
 ### 9. Standard page skeleton
 
 When a page needs to be built from scratch, this skeleton fits the existing site. Skip sections that don't apply rather than padding them. Outer fences are quadrupled so the inner code blocks render correctly. Remember to register the page id in the category's `_position.ts` — without it the page won't appear in the sidebar (see §3).
