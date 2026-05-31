@@ -64,8 +64,8 @@ export const Footer = () => {
                     GitHub <ExternalLinkIcon className={styles.ExtArr} />
                   </a>
                 </li>
-                <li><a href="#" target="_blank" rel="noopener noreferrer">MCP catalog</a></li>
-                <li><a href="#" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+                <li><a href="https://axelix.io/docs/ui-guide/mcp" target="_blank" rel="noopener noreferrer">MCP catalog</a></li>
+                <li><a href="https://github.com/axelixlabs/axelix/releases" target="_blank" rel="noopener noreferrer">Changelog</a></li>
               </ul>
             </div>
             <div className={styles.Col}>
@@ -80,7 +80,7 @@ export const Footer = () => {
             <div className={styles.Col}>
               <h4>Legal</h4>
               <ul>
-                <li><a href="https://github.com/axelixlabs/axelix?tab=LGPL-3.0-1-ov-file" target="_blank" rel="noopener noreferrer">LGPL-3.0</a></li>
+                <li><a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank" rel="noopener noreferrer">LGPL-3.0</a></li>
                 <li><a href="#" target="_blank" rel="noopener noreferrer">Privacy</a></li>
                 <li><a href="#" target="_blank" rel="noopener noreferrer">Terms</a></li>
                 <li><a href="#" target="_blank" rel="noopener noreferrer">Security</a></li>
