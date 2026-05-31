@@ -131,17 +131,6 @@
   background-color: var(--axelix-active-bg);
 }
 
-/* On blog routes there are no section tabs; collapse the navbar to a single row. */
-html.plugin-blog .navbar__tab,
-html.plugin-blog .navbar__inner::after {
-  display: none;
-}
-
-html.plugin-blog .navbar {
-  height: var(--axelix-navbar-row-1);
-}
-
-
 /* Pill buttons in the navbar (Docs, Blog, GitHub).
  *   outline (default) : transparent bg, bordered, hover → tinted bg
  *   primary           : solid dark bg, used by GitHub

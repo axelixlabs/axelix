@@ -67,7 +67,7 @@ export const navbar: Navbar = {
       className: 'navbar__pill',
     },
     {
-      to: '/blog',
+      href: 'https://axelix.io/blog',
       label: 'Blog',
       position: 'right',
       className: 'navbar__pill',

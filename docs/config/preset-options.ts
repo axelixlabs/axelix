@@ -7,17 +7,7 @@ export const presetOptions: Preset.Options = {
     // Please change this to your repo.
     // Remove this to remove the "edit this page" links.
   },
-  blog: {
-    showReadingTime: true,
-    feedOptions: {
-      type: ['rss', 'atom'],
-      xslt: true,
-    },
-    // Useful options to enforce blogging best practices
-    onInlineTags: 'warn',
-    onInlineAuthors: 'warn',
-    onUntruncatedBlogPosts: 'warn',
-  },
+  blog: false,
   theme: {
     customCss: [
       './src/css/fonts.css',
