@@ -8,9 +8,6 @@ export const ExternalLinks = () => {
             <a href="https://axelix.io/docs/product/introduction" className={styles.ExternalLink} target="_blank" rel="noopener noreferrer">
                 Docs
             </a>
-            <a href="https://axelix.io/blog" className={styles.ExternalLink} target="_blank" rel="noopener noreferrer">
-                Blog
-            </a>
             <a href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer" className={styles.GitHubIcon}>
                 <GithubIcon width="11" height="11" />
                 GitHub
