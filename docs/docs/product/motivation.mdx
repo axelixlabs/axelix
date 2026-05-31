@@ -137,7 +137,7 @@ public interface PermissionsCache {
 @Component
 @ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "in-memory", matchIfMissing = true)
 @ConditionalOnMissingBean(PermissionsCache.class)
-public class InMemoryPermissionsCache {
+public class InMemoryPermissionsCache implements PermissionsCache {
 
     @Override
     public Set<Permission> get(UUID clientId) {
@@ -149,7 +149,7 @@ public class InMemoryPermissionsCache {
 @ConditionalOnProperty(prefix = "permissions.cache", value = "source", havingValue = "redis")
 @ConditionalOnRedisPresent
 @ConditionalOnMissingBean(PermissionsCache.class)
-public class RedisPermissionsCache {
+public class RedisPermissionsCache implements PermissionsCache {
 
     @Override
     public Set<Permission> get(UUID clientId) {

@@ -4,6 +4,7 @@ const prefix = 'more';
 
 const pages: string[] = [
   'glossary',
+  'why-not-spring-boot-admin',
   'compatibility-matrix',
 ].map((id) => `${prefix}/${id}`);
 
