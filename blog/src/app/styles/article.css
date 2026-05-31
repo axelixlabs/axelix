@@ -1,0 +1,237 @@
+/* ===================== ARTICLE PAGE ===================== */
+.art-top {
+  padding: 28px 0 0;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  transition: gap 0.15s, color 0.15s;
+}
+.back-link .arr {
+  transition: transform 0.15s;
+}
+.back-link:hover {
+  color: var(--accent-deep);
+}
+.back-link:hover .arr {
+  transform: translateX(-3px);
+}
+.art-hero {
+  padding: 30px 0 8px;
+  border-bottom: 1px solid var(--line-2);
+}
+.art-hero h1 {
+  margin: 0;
+  font-weight: 500;
+  font-size: clamp(34px, 4.6vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.art-hero .standfirst {
+  margin: 24px 0 0;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+.art-hero .rtags {
+  margin-top: 24px;
+}
+.art-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.art-meta .authors .avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 12px;
+}
+.art-meta .authors .who {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.art-meta .sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+.art-meta .m {
+  font-family: var(--code);
+  font-size: 12.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+}
+.art-cover {
+  margin: 36px 0 0;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 21/9;
+  background: var(--c-green-900);
+}
+.art-cover svg,
+.art-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.art-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 248px;
+  gap: 64px;
+  align-items: start;
+  padding: 48px 0 96px;
+}
+/* Let the article column shrink to its grid cell instead of expanding to the
+   intrinsic width of wide children (e.g. code blocks). Without this, a long
+   code line forces horizontal overflow on narrow screens; the code scrolls
+   inside its own fumadocs viewport once the column is constrained. */
+.art-layout > .prose {
+  min-width: 0;
+}
+/* Body links. The global `a` reset (base.css: color: inherit) leaves fumadocs'
+   bare <a> uncolored, so without this the article body renders links as plain
+   ink-black text. Heading anchors (the <a> fumadocs injects into h2–h6) are
+   reset back to the heading's own color so titles don't turn green. */
+.prose a {
+  color: #448556;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+.prose a:hover {
+  color: #345c10;
+}
+.prose :is(h1, h2, h3, h4, h5, h6) a,
+.prose :is(h1, h2, h3, h4, h5, h6) a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 920px) {
+  .art-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 40px 0 80px;
+  }
+  .toc {
+    display: none !important;
+  }
+}
+
+/* TOC */
+.toc {
+  position: sticky;
+  top: 104px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  /* Recolors fumadocs' active-heading indicator strip (rendered with
+     bg-fd-primary) to the brand green. */
+  --color-fd-primary: #448556;
+}
+.toc h4 {
+  margin: 0 0 4px;
+  font-family: var(--code);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 500;
+}
+.toc nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--line-2);
+}
+.toc a {
+  position: relative;
+  display: block;
+  padding: 6px 0 6px 16px;
+  margin-left: -1px;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.toc a[data-active="true"] {
+  color: #448556;
+}
+.code-group pre {
+  margin: 0;
+  padding: 18px 20px;
+  overflow-x: auto;
+  background: transparent !important;
+  text-shadow: none;
+}
+.code-group code {
+  display: block;
+  background: none;
+  padding: 0;
+  font-family: var(--code);
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre;
+  tab-size: 2;
+}
+/* Light-only: use Shiki's light color for every token. */
+.code-group code span {
+  color: var(--shiki-light, #1d2a1f);
+}
+figure[data-rehype-pretty-code-figure] {
+  margin: 0;
+}
+
+/* article footer */
+.art-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding: 28px 0 0;
+  border-top: 1px solid var(--line-2);
+}
+.art-foot .share {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.art-foot .share button,
+.art-foot .share a {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.art-foot .share button:hover,
+.art-foot .share a:hover {
+  color: var(--accent-deep);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--c-green-100) 50%, transparent);
+}
+.art-foot .share svg {
+  width: 17px;
+  height: 17px;
+}
+

@@ -1,0 +1,18 @@
+/* Active code-block tab: brand-green highlight + underline matching the label
+   width. Scoped via `.axx-code-tabs` (added in mdx-components.tsx) so generic
+   <Tabs> are untouched. fumadocs' own indicator <div> (narrower than the text)
+   is hidden in favour of a box-shadow bar on the label span. */
+.axx-code-tabs [role="tab"] > div {
+  display: none;
+}
+.axx-code-tabs [role="tab"][data-state="active"] {
+  color: #448556;
+}
+.axx-code-tabs [role="tab"] .axx-tab-label {
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+}
+.axx-code-tabs [role="tab"][data-state="active"] .axx-tab-label {
+  border-bottom-color: #448556;
+}
+

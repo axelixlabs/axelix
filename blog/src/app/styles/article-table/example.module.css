@@ -1,0 +1,19 @@
+/* Template per-table CSS Module. Copy this file (any name), tweak the columns,
+   and register it in ArticleTable.tsx. Classes are scoped — no global collisions.
+   Expose a `.table` wrapper class; element selectors under it style the table. */
+.table table {
+  table-layout: fixed;
+  width: auto;
+}
+.table th:nth-child(1),
+.table td:nth-child(1),
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 200px;
+  font-size: 12px;
+}
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 300px;
+  font-size: 14px;
+}

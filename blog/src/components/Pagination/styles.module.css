@@ -1,0 +1,75 @@
+/* pagination */
+.Pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+.Pager .PgNums {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.Pager .PgNum {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-family: var(--code);
+  font-size: 13px;
+  color: var(--ink-3);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.Pager .PgNum:hover {
+  background: color-mix(in srgb, var(--c-green-100) 55%, transparent);
+  color: var(--ink);
+}
+.Pager .PgNum.Active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.Pager .PgEllipsis {
+  font-family: var(--code);
+  font-size: 13px;
+  color: var(--ink-4);
+  padding: 0 2px;
+}
+.Pager .PgArrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.Pager .PgArrow svg {
+  width: 15px;
+  height: 15px;
+}
+.Pager .PgArrow:hover:not([aria-disabled="true"]) {
+  background: color-mix(in srgb, #fff 60%, transparent);
+  border-color: var(--line-3);
+  color: var(--ink);
+}
+.Pager .PgArrow[aria-disabled="true"] {
+  opacity: 0.35;
+  pointer-events: none;
+}
+@media (max-width: 520px) {
+  .Pager .PgArrow span {
+    display: none;
+  }
+  .Pager .PgArrow {
+    padding: 9px 12px;
+  }
+}
