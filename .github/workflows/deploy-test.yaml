@@ -81,7 +81,6 @@ jobs:
           docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
-        # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
         run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR

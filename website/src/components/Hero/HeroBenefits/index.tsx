@@ -8,7 +8,7 @@ export const HeroBenefits = () => {
                 <div className={styles.Value}>
                     Production
                 </div>
-                <div className={styles.SmallValue}>not test stands</div>
+                <div className={styles.SmallValue}>not only sandbox envs</div>
             </div>
             <div>
                 <div className={styles.Label}>Exposed to</div>
@@ -22,7 +22,7 @@ export const HeroBenefits = () => {
                 <div className={styles.Value}>
                     Fast setup
                 </div>
-                <span className={styles.SmallValue}>docker · helmdD</span>
+                <span className={styles.SmallValue}>docker · helm · Jar</span>
             </div>
         </div>
     );

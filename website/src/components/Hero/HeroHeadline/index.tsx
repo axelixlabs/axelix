@@ -4,17 +4,19 @@ export const HeroHeadline = () => {
     return (
         <>
             <h1 className={styles.Title}>
-                Control your <span className={styles.GreenText}>Spring&nbsp;Boot</span>{" "}
-                in production — <span className={styles.UnderlinedText}>not the other way around.</span>
+                {/*Control your <span className={styles.GreenText}>Spring&nbsp;Boot</span>{" "}*/}
+                {/*in production — <span className={styles.UnderlinedText}>not the other way around.</span>*/}
+                Go <span className={styles.GreenText}>AI-Native</span> with <span className={styles.GreenText}>Spring&nbsp;Boot</span>: {" "}
+                The Secret to <span className={styles.UnderlinedText}>Skyrocketing</span> Engineering Velocity
             </h1>
 
             <p className={styles.Lede}>
-                Axelix is the open-source console for{" "}
+                Axelix is the <span className={styles.GreenTextBold}>AI-Native</span>, OSS solution for{" "}
                 <em className={styles.AccentedText}>
                     debugging, observing and operating mission-critical Spring Boot
                     microservices.
                 </em>{" "}
-                Every capability is exposed twice — to engineers through the web,
+                Every capability is exposed twice — to human engineers through the web,
                 and to AI agents through an embedded MCP server.
             </p>
         </>

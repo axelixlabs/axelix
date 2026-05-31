@@ -12,6 +12,11 @@
     color: var(--axelix-green-500);
 }
 
+.GreenTextBold {
+    color: var(--axelix-green-500);
+    font-weight: bold;
+}
+
 .UnderlinedText {
     text-decoration: underline;
     text-decoration-color: var(--axelix-green-500);
