@@ -1,0 +1,124 @@
+# Почему не просто Spring Boot Admin?
+
+Spring Boot Admin (SBA) — часто первый инструмент, к которому приходят команды, когда нужно централизованное решение для
+дебага, тестирования и мониторинга Spring Boot-развёртываний. На этой странице описано, как Axelix соотносится с SBA:
+какие задачи он закрывает и как два продукта сравниваются по возможностям и по эксплуатации.
+
+Если вы выбираете между инструментами, прочитайте эту страницу вместе со справочником ["Возможностей"](../features/details) и
+разделом ["Мотивация"](../product/motivation) — там разобраны повседневные проблемы, на которые ориентирован Axelix.
+
+## Создан инженерами, которые много лет работали с SBA
+
+Прежде всего, [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) — зрелый и широко распространённый
+проект. Он собирает health, metrics, loggers, данные environment и другие поверхности Actuator в одном UI и много лет
+развивается под эгидой Codecentric.
+
+Люди, которые проектируют и разрабатывают ядро Axelix, долго эксплуатировали Spring Boot Admin в реальных средах. Этот
+опыт определяет продукт: болевые точки ниже — не теоретическое сравнение по чек-листу, а повторяющиеся потребности,
+которые стандартный Actuator (а значит и SBA) не закрывал в типичных энтерпрайз-установках.
+
+## Причина 1: SBA ограничен Actuator; а Axelix идёт дальше
+
+Spring Boot Admin работает **поверх** встроенных endpoint'ов Spring Boot/Cloud Actuator-а. Всё, что отдаёт Actuator, SBA
+может показать; всё, чего Actuator не умеет, SBA тоже не сделает без доработок в каждом управляемом приложении.
+
+Эта граница важна при тестировании, отладке и в итоге в production-эксплуатации. В корпоративных парках Spring Boot
+регулярно нужно:
+
+- включать и отключать кэши **в runtime**, а не только очищать записи;
+- **запускать, перенастраивать, включать и отключать** задачи с `@Scheduled` без передеплоя;
+- видеть, **какой SQL выполнялся внутри какого метода с `@Transactional`**, с таймингами по каждому вызову, без
+  развёртывания полноценного APM;
+- разбираться, **почему** существует тот или иной bean (зависимости, origin, qualifiers) и **почему**
+  auto-configuration пошла по конкретному пути.
+
+Такие сценарии требуют кода в мониторируемом приложении: своих endpoint'ов, перехватчиков, расширенных отчётов.
+
+Axelix поставляет эту логику в [Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter) в виде
+отдельных Actuator endpoint'ов `axelix-*`, к которым обращаются Master и UI. Это кстати одна из главных причин появления проекта
+Axelix: **Spring Boot Admin просто не давал той глубины операционной работы, которая нужна при отладке живых сервисов в сложных
+развёртываниях**.
+
+Конкретные примеры такой отладки — в разделе [Мотивация](../product/motivation).
+
+## Причина 2: Axelix готов к установке; SBA нужно собирать самим
+
+Второе крупное отличие — **как вы запускаете и развертываете у себя решение**.
+
+Spring Boot Admin обычно встраивают в приложение, которое **нужно написать самостоятельно**, или выкладывают отдельным
+сервисом, который вы сами упаковываете, сопровождаете, патичте там зависимости и т.д. У SBA upstream-проекта **нет официального Docker-образа или Helm-чарта
+от авторов SBA**. Подключение **OIDC/OAuth2**, корпоративного **LDAP** или детальной авторизации чаще всего означает свою
+конфигурацию Spring Security поверх вашего развёртывания. **Ещё раз - вы будете вынуждены писать это сами и тратить на это время**.
+
+Axelix же специально дизайнился так, чтобы поставляться как **готовый к запуску** продукт:
+
+- **автономный JAR** с встроенным UI и MCP сервером — см. [Настройка Master](../setting-up-master-ui/configuring-master/);
+- **официальный Docker-образ** и примеры **Docker Compose** в том же руководстве;
+- **официальный Helm-чарт** на [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) (исходники:
+  [github.com/axelixlabs/helm-charts](https://github.com/axelixlabs/helm-charts)).
+
+Аутентификация встроена: для простых установок — локальная база пользователей, для production — **OAuth2/OIDC**
+(Keycloak, Auth0, Okta, Google и другие провайдеры) с сопоставлением ролей — см.
+[Аутентификация](../setting-up-master-ui/authentication/). Управляемые приложения защищены JWT между Master и starter;
+authorities на уровне операций (например, `CACHES_TOGGLE`, `SCHEDULED_TASKS_MODIFY`) ограничивают опасные действия в UI
+и через MCP.
+
+Ещё один важный момент: **надёжный, проверенный и поддерживаемый канал аутентификации между Axelix Master и starter'ами
+уже встроен**. С Spring Boot Admin всё это нужно проектировать и реализовывать самим.
+
+Starter по-прежнему добавляется в каждый Spring Boot-сервис, но консоль управления не нужно собирать и защищать с нуля.
+
+## Сравнение возможностей (battle card)
+
+Ниже — сравнение **типичного** поведения Spring Boot Admin 3.x (UI поверх Actuator) с **Axelix OSS**. Важно понимать, что
+**установки SBA различаются**: кто-то добавляет свою безопасность, уведомления или расширения. Теоретически SBA _можно_
+допилить или дописать самим (написать код, упаковать, задеплоить и т.д.), **но в Axelix эти возможности уже входят**.
+
+| Область | Spring Boot Admin | Axelix |
+|---------|-------------------|--------|
+| **Поставка** | | |
+| Официальный Docker-образ от сопровождающих проекта | ❌ (образ собираете сами) | ✅ |
+| Официальный Helm-чарт | ❌ (только community-чарты) | ✅ |
+| UI в одном JAR с сервером | Зависит от развёртывания | ✅ |
+| **Безопасность и доступ** | | |
+| Вход через OAuth2 / OIDC | ❌ (нужно делать самим) | ✅ встроено |
+| Локальные пользователи в консоли | ❌ | ✅ |
+| RBAC на уровне операций над инстансом | ❌ | ✅ роли и authorities |
+| JWT-защита Actuator endpoint'ов инстанса | ❌ | ✅ starter + Master |
+| **Стандартные поверхности Actuator** | | |
+| Health, info, metrics | ✅ | ✅ |
+| Loggers (смена уровней) | ✅ | ✅ ([Loggers](../features/loggers/)) |
+| Environment / config properties (чтение) | ✅ | ✅ ([Properties](../features/properties), [Configuration Properties](../features/configuration-properties)) |
+| Thread dump, heap dump | ✅ | ✅ ([Thread Dump](../features/thread-dump)) |
+| **Сверх стандартного Actuator** | | |
+| Включение / отключение кэшей в runtime | ❌ (только evict/clear через `/actuator/caches`) | ✅ ([Caches](../features/caches)) |
+| Очистка кэшей | ✅ | ✅ |
+| Графики hit/miss и оценка числа записей | ❌ | ✅ |
+| Список задач с `@Scheduled` | ✅ (только чтение через Actuator) | ✅ |
+| Запуск scheduled-задачи по требованию | ❌ | ✅ ([Scheduled Tasks](../features/scheduled-tasks)) |
+| Смена cron / fixed delay / fixed rate в runtime | ❌ | ✅ |
+| Включение / отключение scheduled-задач в runtime | ❌ | ✅ |
+| Мониторинг транзакций (`@Transactional` + timeline SQL) | ❌ | ✅ ([Transaction Control](../features/transaction-control)) |
+| Расширенные beans (зависимости, origin, qualifiers, proxying) | Частично (Actuator `/beans`) | ✅ ([Beans](../features/beans)) |
+| Источник свойства + ссылки «injected in» / `@ConfigurationProperties` | Частично | ✅ ([Properties](../features/properties)) |
+| Отчёт по условиям auto-configuration | ✅ | ✅ ([Conditions](../features/conditions)) |
+| Группировка metrics с живыми графиками и drill-down по тегам | ✅ | ✅ ([Metrics](../features/metrics)) |
+| Вкл./выкл. GC-лога, trigger GC, скачивание GC-лога | ❌ | ✅ ([Garbage Collector](../features/garbage-collector)) |
+| Опрос thread dump в реальном времени + переключатель contention monitoring | ✅ | ✅ ([Thread Dump](../features/thread-dump)) |
+| Обнаружение интеграций Feign client | ❌ | ✅ (endpoint `axelix-feign`) |
+| Экспорт состояния приложения в ZIP в один клик | Частично | ✅ ([Details](../features/details) — Download state) |
+| **AI и автоматизация** | | |
+| MCP-сервер (Model Context Protocol) для AI-агентов | ❌ | ✅ ([MCP](../ui-guide/mcp), [MCP Tools](../setting-up-master-ui/mcp/mcp-tools)) |
+| Те же операции в UI и у MCP-клиентов | ❌ | ✅ |
+| **Обзор парка** | | |
+| Wallboard всех инстансов с health | ✅ | ✅ ([Wallboard](../ui-guide/wallboard)) |
+| Фильтры по версиям (Spring Boot, Java, Framework, Kotlin) | Частично | ✅ |
+| Discovery в Kubernetes / Docker Compose | ✅ (через Spring Cloud / своё) | ✅ ([Что такое Master](../setting-up-master-ui/what-is-master)) |
+
+## См. также
+
+- [Введение](../product/introduction) — что такое Axelix.
+- [Мотивация](../product/motivation) — задачи, ради которых создан Axelix.
+- [Что такое Master](../setting-up-master-ui/what-is-master) — discovery и консоль управления.
+- [Настройка Master](../setting-up-master-ui/configuring-master/) — JAR, Docker, Helm, Compose.
+- [Возможности](../features/details) — справочник по экранам управляемых инстансов.
