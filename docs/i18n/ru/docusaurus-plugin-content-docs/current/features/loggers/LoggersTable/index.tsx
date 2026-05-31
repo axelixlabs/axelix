@@ -70,7 +70,7 @@ export const LoggersTable = () => {
 
           <tr>
             <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.axelixlabs.axile.sbs.autoconfiguration.spring
+              com.axelixlabs.axelix.sbs.autoconfiguration.spring
             </td>
             <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
               <img
