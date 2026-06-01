@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.mcp;
 
-import org.springaicommunity.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpTool;
 
 /**
  * An abstraction that represent the particular MCP Endpoint inside the Axelix Master MCP server.

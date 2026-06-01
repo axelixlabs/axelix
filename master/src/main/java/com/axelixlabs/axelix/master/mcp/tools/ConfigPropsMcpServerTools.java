@@ -19,10 +19,9 @@ package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.nio.charset.StandardCharsets;
 
-import org.springaicommunity.mcp.annotation.McpTool;
-import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
-import org.springaicommunity.mcp.annotation.McpToolParam;
-
+import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpTool.McpAnnotations;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;

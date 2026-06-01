@@ -19,11 +19,11 @@ package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.util.Collection;
 
-import org.springaicommunity.mcp.annotation.McpTool;
-import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
-import org.springaicommunity.mcp.annotation.McpToolParam;
 import tools.jackson.databind.ObjectMapper;
 
+import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpTool.McpAnnotations;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

@@ -3,12 +3,12 @@ import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.0.6"
+    id("org.springframework.boot") version "4.1.0-RC1"
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
 }
 
-val springBootVersion = "4.0.5"
+val springBootVersion = "4.1.0-RC1"
 val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0-M8"
 val testcontainersVersion = "1.21.4"

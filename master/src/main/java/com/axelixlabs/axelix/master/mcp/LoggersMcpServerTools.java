@@ -20,9 +20,8 @@ package com.axelixlabs.axelix.master.mcp;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springaicommunity.mcp.annotation.McpTool;
-import org.springaicommunity.mcp.annotation.McpToolParam;
-
+import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
