@@ -38,11 +38,19 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 public class CachingEndpointProber<T> implements EndpointProber<T> {
 
     private final EndpointProber<T> delegate;
-    private final Cache<InstanceId, T> cache;
+    private final Cache<CacheKey, T> cache;
 
     public CachingEndpointProber(EndpointProber<T> delegate) {
+        this(delegate, defaultCache());
+    }
+
+    CachingEndpointProber(EndpointProber<T> delegate, Cache<CacheKey, T> cache) {
         this.delegate = delegate;
-        this.cache = Caffeine.newBuilder()
+        this.cache = cache;
+    }
+
+    private static <T> Cache<CacheKey, T> defaultCache() {
+        return Caffeine.newBuilder()
                 .expireAfterAccess(Duration.of(15, ChronoUnit.MINUTES))
                 .maximumSize(256L)
                 .softValues()
@@ -52,7 +60,8 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
     @Override
     public @NonNull T invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
-        return cache.get(instanceId, key -> delegate.invoke(key, httpPayload));
+        return cache.get(
+                new CacheKey(instanceId, httpPayload), key -> delegate.invoke(key.instanceId(), key.httpPayload()));
     }
 
     @Override
@@ -65,4 +74,9 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
     public @NonNull ActuatorEndpoint supports() {
         return delegate.supports();
     }
+
+    /**
+     * Caching key for the given Instance.
+     */
+    record CacheKey(InstanceId instanceId, HttpPayload httpPayload) {}
 }
