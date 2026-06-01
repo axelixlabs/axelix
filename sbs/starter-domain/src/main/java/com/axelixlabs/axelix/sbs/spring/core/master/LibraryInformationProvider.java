@@ -82,6 +82,6 @@ public interface LibraryInformationProvider {
      */
     @Nullable
     default String getSpringCloudVersion() {
-        return SpringCloudVersionResolver.resolve();
+        return null;
     }
 }

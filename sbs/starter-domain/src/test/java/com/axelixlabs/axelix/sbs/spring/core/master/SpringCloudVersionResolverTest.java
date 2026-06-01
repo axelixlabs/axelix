@@ -24,18 +24,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Unit tests for {@link SpringCloudVersionResolver}.
  *
- * @author Sergey Cherkasov
+ * @author Aleksei Ermakov
  */
 class SpringCloudVersionResolverTest {
 
     @Test
     void shouldResolveSpringCloudReleaseTrainFromKnownSpringCloudCommonsVersion() {
         // given.
+        var subject = new SpringCloudVersionResolver();
         String springCloudCommonsVersion = "4.0.4";
 
         // when.
-        String springCloudVersion =
-                SpringCloudVersionResolver.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
+        String springCloudVersion = subject.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
 
         // then.
         assertThat(springCloudVersion).isEqualTo("2022.0.4");
@@ -44,11 +44,11 @@ class SpringCloudVersionResolverTest {
     @Test
     void shouldReturnNullForUnknownSpringCloudCommonsVersion() {
         // given.
+        var subject = new SpringCloudVersionResolver();
         String springCloudCommonsVersion = "42.0.0";
 
         // when.
-        String springCloudVersion =
-                SpringCloudVersionResolver.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
+        String springCloudVersion = subject.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
 
         // then.
         assertThat(springCloudVersion).isNull();
@@ -57,11 +57,11 @@ class SpringCloudVersionResolverTest {
     @Test
     void shouldReturnNullForMissingSpringCloudCommonsVersion() {
         // given.
+        var subject = new SpringCloudVersionResolver();
         String springCloudCommonsVersion = null;
 
         // when.
-        String springCloudVersion =
-                SpringCloudVersionResolver.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
+        String springCloudVersion = subject.resolveFromSpringCloudCommonsVersion(springCloudCommonsVersion);
 
         // then.
         assertThat(springCloudVersion).isNull();

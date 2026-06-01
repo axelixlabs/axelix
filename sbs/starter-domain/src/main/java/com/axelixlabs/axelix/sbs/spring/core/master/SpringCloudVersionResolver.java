@@ -26,10 +26,12 @@ import java.util.Properties;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.utils.Lazy;
+
 /**
  * Resolves the Spring Cloud release train version from the Spring Cloud Commons module version.
  *
- * @author Sergey Cherkasov
+ * @author Aleksei Ermakov
  */
 final class SpringCloudVersionResolver {
 
@@ -39,30 +41,29 @@ final class SpringCloudVersionResolver {
     private static final String RELEASE_TRAINS_MAPPING_RESOURCE =
             "META-INF/axelix/spring-cloud-release-trains.properties";
 
-    private static final Map<String, String> RELEASE_TRAIN_BY_COMMONS_VERSION = loadReleaseTrainMappings();
+    private static final Lazy<Map<String, String>> RELEASE_TRAIN_BY_COMMONS_VERSION =
+            Lazy.of(SpringCloudVersionResolver::loadReleaseTrainMappings);
 
-    private SpringCloudVersionResolver() {}
+    SpringCloudVersionResolver() {}
 
-    static @Nullable String resolve() {
+    @Nullable
+    String resolve() {
         Class<?> springCloudCommonsClass = loadSpringCloudCommonsClass();
         if (springCloudCommonsClass == null) {
             return null;
         }
 
         Package springCloudCommonsPackage = springCloudCommonsClass.getPackage();
-        if (springCloudCommonsPackage == null) {
-            return null;
-        }
-
         return resolveFromSpringCloudCommonsVersion(springCloudCommonsPackage.getImplementationVersion());
     }
 
-    static @Nullable String resolveFromSpringCloudCommonsVersion(@Nullable String springCloudCommonsVersion) {
+    @Nullable
+    String resolveFromSpringCloudCommonsVersion(@Nullable String springCloudCommonsVersion) {
         if (springCloudCommonsVersion == null) {
             return null;
         }
 
-        return RELEASE_TRAIN_BY_COMMONS_VERSION.get(springCloudCommonsVersion);
+        return RELEASE_TRAIN_BY_COMMONS_VERSION.require().get(springCloudCommonsVersion);
     }
 
     private static @Nullable Class<?> loadSpringCloudCommonsClass() {
@@ -82,16 +83,13 @@ final class SpringCloudVersionResolver {
 
         try {
             return Class.forName(className, false, classLoader);
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable e) {
             return null;
         }
     }
 
     private static Map<String, String> loadReleaseTrainMappings() {
         ClassLoader classLoader = SpringCloudVersionResolver.class.getClassLoader();
-        if (classLoader == null) {
-            return Map.of();
-        }
 
         try (InputStream inputStream = classLoader.getResourceAsStream(RELEASE_TRAINS_MAPPING_RESOURCE)) {
             if (inputStream == null) {
