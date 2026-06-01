@@ -1,5 +1,6 @@
 import { CheckIcon, ChevronDownIcon } from "@/assets";
-import styles from "./styles.module.css"
+
+import styles from "./styles.module.css";
 
 export interface IProps {
     label: string;
@@ -10,14 +11,7 @@ export interface IProps {
     onPick: (id: string) => void;
 }
 
-export const InstallerSelect = ({
-    label,
-    open,
-    onToggle,
-    options,
-    active,
-    onPick,
-}: IProps) => {
+export const InstallerSelect = ({ label, open, onToggle, options, active, onPick }: IProps) => {
     return (
         <div className={`${styles.MainWrapper} ${open ? styles.ActiveWrapper : ""}`}>
             <button
@@ -47,5 +41,5 @@ export const InstallerSelect = ({
                 ))}
             </div>
         </div>
-    )
-} 
+    );
+};

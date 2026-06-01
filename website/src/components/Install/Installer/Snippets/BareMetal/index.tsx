@@ -1,7 +1,7 @@
-import styles from "../shared.module.css"
+import styles from "../shared.module.css";
 
 interface IProps {
-    refEl: any
+    refEl: any;
 }
 
 export const BareMetal = ({ refEl }: IProps) => {
@@ -23,16 +23,16 @@ export const BareMetal = ({ refEl }: IProps) => {
                     </span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.Co}># Important: Please, change the algorithm and the key for production use</span>
+                    <span className={styles.Co}>
+                        # Important: Please, change the algorithm and the key for production use
+                    </span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.Cm}>java -jar master.jar</span>{" "}
-                    <span className={styles.Nl}>\</span>
+                    <span className={styles.Cm}>java -jar master.jar</span> <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>--server.port=8080</span>{" "}
-                    <span className={styles.Nl}>\</span>
+                    <span className={styles.St}>--server.port=8080</span> <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -41,9 +41,11 @@ export const BareMetal = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>--axelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
+                    <span className={styles.St}>
+                        --axelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
+                    </span>
                 </span>
             </code>
         </pre>
     );
-} 
+};

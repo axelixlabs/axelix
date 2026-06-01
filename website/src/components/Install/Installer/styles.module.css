@@ -9,9 +9,9 @@
     min-height: 540px;
     box-shadow:
         0 1px 0 color-mix(in srgb, var(--axelix-green-400) 14%, transparent) inset,
-        0 24px 60px -28px rgba(15, 30, 5, 0.45);
+        0 24px 60px -28px rgb(15 30 5 / 45%);
 
-    @media (max-width: 980px) {
+    @media (width <= 980px) {
         grid-template-columns: 1fr;
         min-height: auto;
     }
@@ -20,13 +20,14 @@
 .InstallerBoardWrapper {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .InstallerBoardInnerWrapper {
     position: relative;
     flex: 1;
     border-radius: 14px;
-    background-color: rgba(10, 28, 4, 0.85);
+    background-color: rgb(10 28 4 / 85%);
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
     display: flex;
     flex-direction: column;

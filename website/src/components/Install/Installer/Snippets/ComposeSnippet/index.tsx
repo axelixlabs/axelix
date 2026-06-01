@@ -1,7 +1,7 @@
-import styles from "../shared.module.css"
+import styles from "../shared.module.css";
 
 interface IProps {
-    refEl: any
+    refEl: any;
 }
 
 export const ComposeSnippet = ({ refEl }: IProps) => {
@@ -13,9 +13,12 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
             }}
         >
             <code>
-                <span className={styles.Line}><span className={styles.At}>services</span>:</span>
                 <span className={styles.Line}>
-                    {"  "}<span className={styles.At}>axelix</span>:
+                    <span className={styles.At}>services</span>:
+                </span>
+                <span className={styles.Line}>
+                    {"  "}
+                    <span className={styles.At}>axelix</span>:
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -24,8 +27,7 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.At}>container_name</span>:{" "}
-                    <span className={styles.St}>axelix</span>
+                    <span className={styles.At}>container_name</span>: <span className={styles.St}>axelix</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -54,16 +56,14 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.At}>restart</span>:{" "}
-                    <span className={styles.St}>unless-stopped</span>
+                    <span className={styles.At}>restart</span>: <span className={styles.St}>unless-stopped</span>
                 </span>
 
-                <span className={styles.Line}>
-                    {"    "}
-                </span>
+                <span className={styles.Line}>{"    "}</span>
 
                 <span className={styles.Line}>
-                    {"  "}<span className={styles.At}>your-spring-boot-app</span>:
+                    {"  "}
+                    <span className={styles.At}>your-spring-boot-app</span>:
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -76,8 +76,7 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>context</span>:{" "}
-                    <span className={styles.St}>.</span>
+                    <span className={styles.At}>context</span>: <span className={styles.St}>.</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
@@ -103,8 +102,7 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                     <span className={styles.At}>AXELIX_SBS_DISCOVERY_MASTER_URL</span>:{" "}
                     <span className={styles.St}>http://localhost:9444/api/internal/service/register</span>
                 </span>
-
             </code>
         </pre>
-    )
-} 
+    );
+};

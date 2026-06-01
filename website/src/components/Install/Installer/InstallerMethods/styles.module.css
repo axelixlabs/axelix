@@ -33,9 +33,9 @@
 
 .MethodButton.ActiveButton {
     position: relative;
-    background-color: #ffffff;
+    background-color: #fff;
     color: var(--axelix-ink);
-    border-color: #ffffff;
+    border-color: #fff;
 }
 
 .MethodButton.ActiveButton .Icon {
@@ -77,7 +77,7 @@
     gap: 8px;
     font-size: 15px;
     font-weight: 500;
-    color: #ffffff;
+    color: #fff;
     transition: color 0.3s;
 
     &:hover {

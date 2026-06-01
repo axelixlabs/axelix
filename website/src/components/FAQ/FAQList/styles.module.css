@@ -60,7 +60,7 @@
 .Accordion.Open .Icon {
     transform: rotate(45deg);
     background: var(--axelix-green-500);
-    color: #ffffff;
+    color: #fff;
     border-color: var(--axelix-green-500);
 }
 
@@ -88,7 +88,7 @@
     max-width: 700px;
 }
 
-.Answer p+p {
+.Answer p + p {
     padding-top: 0;
 }
 

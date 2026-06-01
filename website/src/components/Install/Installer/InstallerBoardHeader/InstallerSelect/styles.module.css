@@ -57,7 +57,7 @@
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
     border-radius: 10px;
     box-shadow:
-        0 16px 36px -16px rgba(0, 0, 0, 0.55),
+        0 16px 36px -16px rgb(0 0 0 / 55%),
         0 0 0 1px color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
 }
 
@@ -71,7 +71,7 @@
     justify-content: space-between;
     gap: 14px;
     padding: 7px 10px 7px 12px;
-    color: rgba(231, 238, 224, 0.75);
+    color: rgb(231 238 224 / 75%);
     font-family: var(--axelix-code);
     font-size: 12.5px;
     border-radius: 7px;
@@ -79,7 +79,7 @@
     transition: background-color 0.3s, color 0.3s;
 
     &:hover {
-        color: #ffffff;
+        color: #fff;
         background-color: color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
 
     }

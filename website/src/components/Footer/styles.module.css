@@ -35,7 +35,7 @@
   border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
 }
 
-@media (max-width: 980px) {
+@media (width <= 980px) {
   .Top {
     grid-template-columns: 1fr;
     gap: 48px;
@@ -102,7 +102,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: rgba(10, 28, 4, 0.5);
+  background: rgb(10 28 4 / 50%);
   border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
   color: color-mix(in srgb, #bdd3a0 80%, transparent);
   transition: background .15s, color .15s, border-color .15s, transform .15s;
@@ -127,7 +127,7 @@
   gap: 32px;
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .NavCols {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px 24px;
@@ -140,7 +140,7 @@
   font-size: 11px;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: rgba(189, 211, 160, 0.75);
+  color: rgb(189 211 160 / 75%);
   font-weight: 500;
 }
 
@@ -171,7 +171,7 @@
 .Col a .ExtArr {
   width: 11px;
   height: 11px;
-  color: rgba(189, 211, 160, 0.5);
+  color: rgb(189 211 160 / 50%);
   transition: color .15s, transform .15s;
 }
 
@@ -217,7 +217,7 @@
   font-family: var(--axelix-mono);
   font-size: 11.5px;
   letter-spacing: .06em;
-  color: rgba(189, 211, 160, 0.7);
+  color: rgb(189 211 160 / 70%);
 }
 
 .Bottom .Meta {
@@ -231,7 +231,7 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: rgba(189, 211, 160, 0.35);
+  background: rgb(189 211 160 / 35%);
 }
 
 .Status {

@@ -5,7 +5,7 @@
     gap: 12px;
     padding: 10px 12px;
     border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
-    background-color: rgba(6, 20, 10, 0.55);
+    background-color: rgb(6 20 10 / 55%);
 }
 
 .NavButton {
@@ -25,7 +25,7 @@
     }
 
     &:hover {
-        color: #ffffff;
+        color: #fff;
         background: color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
     }
 }
@@ -35,7 +35,7 @@
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(231, 238, 224, 0.5);
+    color: rgb(231 238 224 / 50%);
     display: inline-flex;
     align-items: center;
     gap: 7px;

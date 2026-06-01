@@ -1,23 +1,23 @@
-import styles from "./styles.module.css";
+import { HeroActions } from "./HeroActions";
 import { HeroBackground } from "./HeroBackground";
 import { HeroBenefits } from "./HeroBenefits";
-import { HeroActions } from "./HeroActions";
 import { HeroHeadline } from "./HeroHeadline";
+import styles from "./styles.module.css";
 
 export const Hero = () => {
-  return (
-    <header className={styles.MainWrapper}>
-      <HeroBackground />
+    return (
+        <header className={styles.MainWrapper}>
+            <HeroBackground />
 
-      <div className={`wrap ${styles.InnerWrapper}`}>
-        <div className={styles.ContentWrapper}>
-          <HeroHeadline />
+            <div className={`wrap ${styles.InnerWrapper}`}>
+                <div className={styles.ContentWrapper}>
+                    <HeroHeadline />
 
-          <HeroActions />
+                    <HeroActions />
 
-          <HeroBenefits />
-        </div>
-      </div>
-    </header>
-  );
-}
+                    <HeroBenefits />
+                </div>
+            </div>
+        </header>
+    );
+};

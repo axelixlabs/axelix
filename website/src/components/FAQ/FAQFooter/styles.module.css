@@ -7,7 +7,7 @@
     padding: 30px 35px;
     background: linear-gradient(180deg,
             color-mix(in srgb, var(--axelix-green-100) 80%, transparent),
-            rgba(255, 255, 255, 0.8));
+            rgb(255 255 255 / 80%));
     border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
     border-radius: 16px;
     backdrop-filter: blur(8px);

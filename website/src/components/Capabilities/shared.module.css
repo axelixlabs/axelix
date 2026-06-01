@@ -1,0 +1,20 @@
+.Card {
+    background-color: rgb(255 255 255 / 75%);
+    border: 1px solid var(--axelix-line-2);
+    border-radius: 14px;
+    padding: 24px;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.3s, transform 0.3s;
+
+    &:hover {
+        border-color: color-mix(in srgb, var(--axelix-green-500) 40%, transparent);
+        transform: translateY(-1px);
+    }
+}
+
+.CardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    column-gap: 8px;
+}

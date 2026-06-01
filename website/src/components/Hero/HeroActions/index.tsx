@@ -1,13 +1,11 @@
-import { SparklesIcon } from "@/assets"
-import styles from "./styles.module.css"
+import { SparklesIcon } from "@/assets";
+
+import styles from "./styles.module.css";
 
 export const HeroActions = () => {
     return (
         <div className={styles.ActionsWrapper}>
-            <a
-                href="#install"
-                className={`${styles.ActionButton} ${styles.GreenButton}`}
-            >
+            <a href="#install" className={`${styles.ActionButton} ${styles.GreenButton}`}>
                 Get started free <span className={styles.Arrow}>→</span>
             </a>
             <a href="#enterprise" className={styles.ActionButton}>
@@ -16,5 +14,5 @@ export const HeroActions = () => {
                 <span className={styles.Badge}>In development</span>
             </a>
         </div>
-    )
-}
+    );
+};

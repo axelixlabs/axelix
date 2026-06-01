@@ -10,13 +10,12 @@
   --axelix-green-700: #345c10;
   --axelix-green-800: #1f400a;
   --axelix-green-900: #173404;
-
   --axelix-blue:      #2A6FDB;
   --axelix-blue-tint: #e6efff;
 
   /* Neutrals */
   --axelix-bg:    #F4F4F6;
-  --axelix-paper: #ffffff;
+  --axelix-paper: #fff;
   --axelix-ink:   #0f1410;
   --axelix-ink-2: #2a322b;
   --axelix-ink-3: #5a635c;
@@ -24,11 +23,9 @@
   --axelix-line:  #0f141014;
   --axelix-line-2:#0f14101f;
   --axelix-line-3:#0f141033;
-
   --axelix-font: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --axelix-mono: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --axelix-code: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-
+  --axelix-code: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', menlo, monospace;
   --axelix-maxw: 1320px;
   --axelix-pad:  clamp(20px, 4vw, 56px);
 }
@@ -45,7 +42,7 @@ html, body {
   font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
   scroll-behavior: smooth;
 }
 

@@ -1,6 +1,7 @@
 "use client";
-import styles from "./styles.module.css";
 import { useEffect, useState } from "react";
+
+import styles from "./styles.module.css";
 
 const NAV_LINKS = [
     { href: "#capabilities", label: "Capabilities" },
@@ -10,30 +11,26 @@ const NAV_LINKS = [
 ];
 
 export const NavLinks = () => {
-    const [hash, setHash] = useState<string>("")
+    const [hash, setHash] = useState<string>("");
 
     useEffect(() => {
         const updateHash = () => {
-            setHash(window.location.hash)
-        }
+            setHash(window.location.hash);
+        };
 
-        updateHash()
+        updateHash();
 
-        window.addEventListener('hashchange', updateHash)
+        window.addEventListener("hashchange", updateHash);
 
         return () => {
-            window.removeEventListener('hashchange', updateHash)
-        }
-    }, [])
+            window.removeEventListener("hashchange", updateHash);
+        };
+    }, []);
 
     return (
         <div className={styles.LinksWrapper}>
             {NAV_LINKS.map(({ href, label }) => (
-                <a
-                    key={href}
-                    href={href}
-                    className={`${styles.Link} ${hash === href ? styles.ActiveLink : ""}`}
-                >
+                <a key={href} href={href} className={`${styles.Link} ${hash === href ? styles.ActiveLink : ""}`}>
                     {label}
                 </a>
             ))}

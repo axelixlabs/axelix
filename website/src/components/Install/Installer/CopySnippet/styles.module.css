@@ -6,13 +6,12 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background-color: rgba(6, 20, 10, 0.78);
+    background-color: rgb(6 20 10 / 78%);
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
     color: color-mix(in srgb, var(--axelix-green-400) 80%, transparent);
     padding: 5px 9px;
     border-radius: 8px;
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
     font-family: var(--axelix-font);
     font-size: 12px;
     transition: opacity 0.3s, color 0.3s, background-color 0.3s;

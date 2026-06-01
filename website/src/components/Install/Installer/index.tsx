@@ -1,20 +1,20 @@
-"use client"
-import styles from "./styles.module.css"
-import { useEffect, useRef, useState } from "react";
-import { InstallerMethods } from "./InstallerMethods";
-import { CfgVariant, Method, SbVariant } from "../../../../models";
-import { InstallerBoardHeader } from "./InstallerBoardHeader";
-import { DockerSnippet } from "./Snippets/DockerSnippet";
-import { ComposeSnippet } from "./Snippets/ComposeSnippet";
-import { K8sSnippet } from "./Snippets/K8sSnippet";
+"use client";
 import { BareMetal } from "./Snippets/BareMetal";
-import { YamlSnippet } from "./Snippets/YamlSnippet";
-import { PropertiesSnippet } from "./Snippets/PropertiesSnippet";
+import { ComposeSnippet } from "./Snippets/ComposeSnippet";
+import { DockerSnippet } from "./Snippets/DockerSnippet";
+import { K8sSnippet } from "./Snippets/K8sSnippet";
+import { useEffect, useRef, useState } from "react";
+
+import { CfgVariant, Method, SbVariant } from "../../../../models";
+
 import { CopySnippet } from "./CopySnippet";
-import { StarterMini } from "./StarterMini";
-import { InstallerFooter } from "./InstallerFooter";
-import { InstallerBoardFooter } from "./InstallerBoardFooter";
 import { InstallThirdStep } from "./InstallThirdStep";
+import { InstallerBoardFooter } from "./InstallerBoardFooter";
+import { InstallerBoardHeader } from "./InstallerBoardHeader";
+import { InstallerFooter } from "./InstallerFooter";
+import { InstallerMethods } from "./InstallerMethods";
+import { StarterMini } from "./StarterMini";
+import styles from "./styles.module.css";
 
 const SB_ARTIFACT: Record<SbVariant, string> = {
     sb2: "axelix-spring-boot-2-starter",
@@ -59,34 +59,33 @@ export const Installer = () => {
 
                 <div className={styles.InstallerBoardWrapper}>
                     <div className={styles.InstallerBoardInnerWrapper}>
-                        <InstallerBoardHeader step={step} setStep={setStep} STEP_NAMES={STEP_NAMES} selectRef={selectRef} openSelect={openSelect} setOpenSelect={setOpenSelect} setCfg={setCfg} setSb={setSb} sb={sb} cfg={cfg} />
+                        <InstallerBoardHeader
+                            step={step}
+                            setStep={setStep}
+                            STEP_NAMES={STEP_NAMES}
+                            selectRef={selectRef}
+                            openSelect={openSelect}
+                            setOpenSelect={setOpenSelect}
+                            setCfg={setCfg}
+                            setSb={setSb}
+                            sb={sb}
+                            cfg={cfg}
+                        />
 
                         <div className={styles.InstallerBoard}>
                             {step !== 2 && <CopySnippet activeSnippetRef={activeSnippetRef} />}
 
-                            {step === 1 && method === "docker" && (
-                                <DockerSnippet refEl={activeSnippetRef} />
-                            )}
-                            {step === 1 && method === "compose" && (
-                                <ComposeSnippet refEl={activeSnippetRef} />
-                            )}
-                            {step === 1 && method === "k8s" && (
-                                <K8sSnippet refEl={activeSnippetRef} />
-                            )}
-                            {step === 1 && method === "bare" && (
-                                <BareMetal refEl={activeSnippetRef} />
-                            )}
+                            {step === 1 && method === "docker" && <DockerSnippet refEl={activeSnippetRef} />}
+                            {step === 1 && method === "compose" && <ComposeSnippet refEl={activeSnippetRef} />}
+                            {step === 1 && method === "k8s" && <K8sSnippet refEl={activeSnippetRef} />}
+                            {step === 1 && method === "bare" && <BareMetal refEl={activeSnippetRef} />}
 
                             {step === 2 && (
                                 <StarterMini artifact={SB_ARTIFACT[sb]} activeSnippetRef={activeSnippetRef} />
                             )}
 
                             {step === 3 && (
-                                <InstallThirdStep
-                                    method={method}
-                                    cfg={cfg}
-                                    activeSnippetRef={activeSnippetRef}
-                                />
+                                <InstallThirdStep method={method} cfg={cfg} activeSnippetRef={activeSnippetRef} />
                             )}
                         </div>
 
@@ -96,5 +95,5 @@ export const Installer = () => {
             </div>
             <InstallerFooter />
         </>
-    )
-} 
+    );
+};

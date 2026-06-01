@@ -15,7 +15,7 @@
 
 .Mini {
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
-    background: rgba(6, 20, 10, 0.55);
+    background: rgb(6 20 10 / 55%);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -27,14 +27,14 @@
     gap: 12px;
     padding: 9px 12px 9px 14px;
     border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
-    background: rgba(2, 8, 10, 0.35);
+    background: rgb(2 8 10 / 35%);
 }
 
 .MiniLabel {
     font-family: var(--axelix-font);
     font-size: 13px;
     font-weight: 500;
-    color: #ffffff;
+    color: #fff;
 }
 
 .MiniCopy {
