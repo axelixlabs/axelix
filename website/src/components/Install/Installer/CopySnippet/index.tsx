@@ -1,9 +1,11 @@
-import { useRef, useState } from "react";
-import styles from "./styles.module.css"
 import { CheckIcon, CopyIcon } from "@/assets";
 
+import { useRef, useState } from "react";
+
+import styles from "./styles.module.css";
+
 interface IProps {
-    activeSnippetRef: any
+    activeSnippetRef: any;
 }
 
 export const CopySnippet = ({ activeSnippetRef }: IProps) => {
@@ -25,23 +27,20 @@ export const CopySnippet = ({ activeSnippetRef }: IProps) => {
     }
 
     return (
-        <button
-            className={styles.CopyFloat}
-            type="button"
-            title="Copy"
-            onClick={copyMain}
-        >
-            {copied ? (
-                <>
-                    <CheckIcon />
-                    <span>Copied!</span>
-                </>
-            ) : (
-                <>
-                    <CopyIcon />
-                    <span>Copy</span>
-                </>
-            )}
-        </button>
-    )
-}
+        <div className={styles.MainWrapper}>
+            <button className={styles.CopyFloat} type="button" title="Copy" onClick={copyMain}>
+                {copied ? (
+                    <>
+                        <CheckIcon />
+                        <span>Copied!</span>
+                    </>
+                ) : (
+                    <>
+                        <CopyIcon />
+                        <span>Copy</span>
+                    </>
+                )}
+            </button>
+        </div>
+    );
+};

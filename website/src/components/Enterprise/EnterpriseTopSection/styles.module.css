@@ -5,9 +5,9 @@
   align-items: end;
   margin-bottom: 64px;
 
-  @media (max-width: 980px) {
+  @media (width <= 980px) {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 30px;
   }
 }
 
@@ -57,7 +57,7 @@
   margin: 0;
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(231, 238, 224, 0.8);
+  color: rgb(231 238 224 / 80%);
   max-width: 456px;
 }
 

@@ -40,12 +40,12 @@
 }
 
 .Co {
-    color: rgba(182, 197, 163, 0.65);
+    color: rgb(182 197 163 / 65%);
     font-style: italic;
 }
 
 .ClickableLink {
-    color: #ffffff;
+    color: #fff;
     text-decoration: underline;
     text-underline-offset: 2px;
     cursor: pointer;

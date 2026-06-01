@@ -5,7 +5,7 @@
     gap: 8px;
     padding: 8px;
     border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
-    background-color: rgba(6, 20, 10, 0.7);
+    background-color: rgb(6 20 10 / 70%);
 }
 
 .TabsWrapper {
@@ -19,7 +19,7 @@
     font-family: var(--axelix-font);
     font-size: 13.5px;
     font-weight: 500;
-    color: rgba(231, 238, 224, 0.55);
+    color: rgb(231 238 224 / 55%);
     border: 1px solid transparent;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
@@ -30,8 +30,8 @@
 }
 
 .ActiveTab {
-    background-color: rgba(6, 20, 10, 0.8);
-    color: #ffffff;
+    background-color: rgb(6 20 10 / 80%);
+    color: #fff;
     border-color: color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
 }
 
@@ -43,6 +43,6 @@
 .Label {
     font-family: var(--axelix-code);
     font-size: 12.5px;
-    color: rgba(231, 238, 224, 0.75);
+    color: rgb(231 238 224 / 75%);
     padding: 6px 8px;
 }

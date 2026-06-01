@@ -1,3 +1,11 @@
+import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
+
+import { Dispatch, SetStateAction } from "react";
+
+import { Method } from "../../../../../models";
+
+import styles from "./styles.module.css";
+
 const METHODS: { id: Method; label: string; icon: React.ReactNode }[] = [
     {
         id: "docker",
@@ -21,36 +29,38 @@ const METHODS: { id: Method; label: string; icon: React.ReactNode }[] = [
     },
 ];
 
-const METHODS_DATA: Record<Method, {
-    description: string,
-    href: string;
-}> = {
+const METHODS_DATA: Record<
+    Method,
+    {
+        description: string;
+        href: string;
+    }
+> = {
     k8s: {
-        description: "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-on-kubernetes"
+        description:
+            "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
+        href: "https://axelix.io/docs/installation/configuring-master#run-on-kubernetes",
     },
     compose: {
-        description: "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker-compose"
+        description:
+            "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
+        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker-compose",
     },
     docker: {
-        description: "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker"
+        description:
+            "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
+        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker",
     },
     bare: {
-        description: "Installing Axelix on bare metal without containerization is also possible by directly launching a JAR file",
-        href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar"
-    }
+        description:
+            "Installing Axelix on bare metal without containerization is also possible by directly launching a JAR file",
+        href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar",
+    },
 };
-
-import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
-import styles from "./styles.module.css"
-import { Method } from "../../../../../models";
-import { Dispatch, SetStateAction } from "react";
 
 interface IProps {
     method: Method;
-    setMethod: Dispatch<SetStateAction<Method>>
+    setMethod: Dispatch<SetStateAction<Method>>;
 }
 
 export const InstallerMethods = ({ method, setMethod }: IProps) => {
@@ -63,19 +73,22 @@ export const InstallerMethods = ({ method, setMethod }: IProps) => {
                     type="button"
                     onClick={() => setMethod(id)}
                 >
-                    <span className={styles.Icon}>
-                        {icon}
-                    </span>
+                    <span className={styles.Icon}>{icon}</span>
                     {label}
                 </button>
             ))}
 
             <div className={styles.MethodFooter}>
                 <p className={styles.Description}>{METHODS_DATA[method].description}</p>
-                <a className={styles.Documentations} href={METHODS_DATA[method].href} target="_blank" rel="noopener noreferrer">
+                <a
+                    className={styles.Documentations}
+                    href={METHODS_DATA[method].href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     Read Documentation <span className={styles.Arrow}>→</span>
                 </a>
             </div>
         </aside>
-    )
-} 
+    );
+};

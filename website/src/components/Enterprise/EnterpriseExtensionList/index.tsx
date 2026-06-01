@@ -1,13 +1,6 @@
-import {
-    ComplianceIcon,
-    FleetIcon,
-    OnPremIcon,
-    RbacIcon,
-    SsoIcon,
-    SupportIcon,
-} from "@/assets";
+import { ComplianceIcon, FleetIcon, OnPremIcon, RbacIcon, SsoIcon, SupportIcon } from "@/assets";
 
-import styles from "./styles.module.css"
+import styles from "./styles.module.css";
 
 const EXTENSIONS = [
     {
@@ -17,7 +10,8 @@ const EXTENSIONS = [
     },
     {
         title: "Granular RBAC",
-        description: "Per-action policies, per-service scopes, per-environment guards. One model for humans and agents.",
+        description:
+            "Per-action policies, per-service scopes, per-environment guards. One model for humans and agents.",
         icon: <RbacIcon />,
     },
     {
@@ -32,7 +26,8 @@ const EXTENSIONS = [
     },
     {
         title: "On-prem & air-gapped",
-        description: "Offline install bundle, no telemetry, BYO container registry. For everything that can't leave the network.",
+        description:
+            "Offline install bundle, no telemetry, BYO container registry. For everything that can't leave the network.",
         icon: <OnPremIcon />,
     },
     {
@@ -47,13 +42,11 @@ export const EnterpriseExtensionList = () => {
         <div className={styles.MainWrapper}>
             {EXTENSIONS.map(({ title, icon, description }) => (
                 <article key={title} className={styles.Card}>
-                    <div className={styles.IconWrapper}>
-                        {icon}
-                    </div>
+                    <div className={styles.IconWrapper}>{icon}</div>
                     <h3 className={styles.CardTitle}>{title}</h3>
                     <p className={styles.CardDescription}>{description}</p>
                 </article>
             ))}
         </div>
-    )
-} 
+    );
+};

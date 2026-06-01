@@ -2,11 +2,7 @@ import styles from "./styles.module.css";
 
 export const HeroBackground = () => {
     return (
-        <svg
-            className={styles.HeroBackground}
-            viewBox="0 0 1400 800"
-            preserveAspectRatio="xMidYMid slice"
-        >
+        <svg className={styles.HeroBackground} viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
             <g className="ln">
                 <line x1="80" y1="60" x2="180" y2="120" />
                 <line x1="180" y1="120" x2="260" y2="80" />
@@ -202,26 +198,10 @@ export const HeroBackground = () => {
                     className="route"
                     d="M1240 260 L1180 360 L1240 550 L1100 640 L820 720 L640 700 L460 720 L320 680 L200 400 L110 230"
                 />
-                <path
-                    id="route3"
-                    className="route"
-                    d="M700 260 L780 360 L900 460 L1080 520 L1240 550"
-                />
-                <path
-                    id="route4"
-                    className="route"
-                    d="M260 260 L500 460 L640 540 L800 540 L1020 380 L1100 190"
-                />
-                <path
-                    id="route5"
-                    className="route"
-                    d="M380 50 L540 30 L700 50 L860 30 L1050 60"
-                />
-                <path
-                    id="route6"
-                    className="route"
-                    d="M60 350 L200 400 L380 600 L540 660 L940 660 L1100 640"
-                />
+                <path id="route3" className="route" d="M700 260 L780 360 L900 460 L1080 520 L1240 550" />
+                <path id="route4" className="route" d="M260 260 L500 460 L640 540 L800 540 L1020 380 L1100 190" />
+                <path id="route5" className="route" d="M380 50 L540 30 L700 50 L860 30 L1050 60" />
+                <path id="route6" className="route" d="M60 350 L200 400 L380 600 L540 660 L940 660 L1100 640" />
             </defs>
 
             <g>
@@ -231,56 +211,31 @@ export const HeroBackground = () => {
                     </animateMotion>
                 </circle>
                 <circle className="packet" r="2.2">
-                    <animateMotion
-                        dur="8.5s"
-                        begin="-3s"
-                        repeatCount="indefinite"
-                        rotate="auto"
-                    >
+                    <animateMotion dur="8.5s" begin="-3s" repeatCount="indefinite" rotate="auto">
                         <mpath href="#route2" />
                     </animateMotion>
                 </circle>
                 <circle className="packet" r="2">
-                    <animateMotion
-                        dur="5.5s"
-                        begin="-1.5s"
-                        repeatCount="indefinite"
-                        rotate="auto"
-                    >
+                    <animateMotion dur="5.5s" begin="-1.5s" repeatCount="indefinite" rotate="auto">
                         <mpath href="#route3" />
                     </animateMotion>
                 </circle>
                 <circle className="packet" r="2">
-                    <animateMotion
-                        dur="6.5s"
-                        begin="-4s"
-                        repeatCount="indefinite"
-                        rotate="auto"
-                    >
+                    <animateMotion dur="6.5s" begin="-4s" repeatCount="indefinite" rotate="auto">
                         <mpath href="#route4" />
                     </animateMotion>
                 </circle>
                 <circle className="packet" r="1.8">
-                    <animateMotion
-                        dur="6s"
-                        begin="-2s"
-                        repeatCount="indefinite"
-                        rotate="auto"
-                    >
+                    <animateMotion dur="6s" begin="-2s" repeatCount="indefinite" rotate="auto">
                         <mpath href="#route5" />
                     </animateMotion>
                 </circle>
                 <circle className="packet" r="2.2">
-                    <animateMotion
-                        dur="9s"
-                        begin="-5s"
-                        repeatCount="indefinite"
-                        rotate="auto"
-                    >
+                    <animateMotion dur="9s" begin="-5s" repeatCount="indefinite" rotate="auto">
                         <mpath href="#route6" />
                     </animateMotion>
                 </circle>
             </g>
         </svg>
     );
-}
+};

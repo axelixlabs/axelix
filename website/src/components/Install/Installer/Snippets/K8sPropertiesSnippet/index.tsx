@@ -1,7 +1,7 @@
-import styles from "../shared.module.css"
+import styles from "../shared.module.css";
 
 interface IProps {
-    refEl: any
+    refEl: any;
 }
 
 export const K8sPropertiesSnippet = ({ refEl }: IProps) => {
@@ -23,5 +23,5 @@ export const K8sPropertiesSnippet = ({ refEl }: IProps) => {
                 </span>
             </code>
         </pre>
-    )
-}
+    );
+};

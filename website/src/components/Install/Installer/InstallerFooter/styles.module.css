@@ -1,10 +1,14 @@
-.Meta {
+.MainWrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 14px;
     flex-wrap: wrap;
     margin-top: 32px;
+
+    @media (width <=540px) {
+        flex-direction: column;
+    }
 }
 
 .Chip {
@@ -17,7 +21,7 @@
     color: var(--axelix-ink-3);
     padding: 5px 11px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgb(255 255 255 / 70%);
     border: 1px solid var(--axelix-line-2);
 
     &::before {

@@ -1,4 +1,4 @@
-import styles from "./styles.module.css"
+import styles from "./styles.module.css";
 
 export const ProblemTopSection = () => {
     return (
@@ -10,5 +10,5 @@ export const ProblemTopSection = () => {
                 <span className={styles.UnderlinedText}>You&apos;re the only one with a hose.</span>
             </h2>
         </div>
-    )
-}
+    );
+};

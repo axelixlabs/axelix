@@ -3,6 +3,10 @@
     align-items: center;
     justify-self: center;
     column-gap: 8px;
+
+    @media (width <=980px) {
+        display: none;
+    }
 }
 
 .Link {
@@ -13,18 +17,12 @@
     transition: background-color 0.3s, color 0.3s;
 
     &:hover {
-    background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
-    color: var(--axelix-ink);
+        background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
+        color: var(--axelix-ink);
     }
 }
 
-.Link.ActiveLink {
+.ActiveLink {
     background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
     color: var(--axelix-green-800);
-}
-
-@media (width <=980px) {
-    .LinksWrapper {
-        display: none;
-    }
 }

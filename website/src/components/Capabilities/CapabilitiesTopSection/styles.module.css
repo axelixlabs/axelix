@@ -1,0 +1,69 @@
+.MainWrapper {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 64px;
+  align-items: end;
+  margin-bottom: 64px;
+
+  @media (width <= 980px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.Eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--axelix-mono);
+  font-size: 11.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--axelix-green-700);
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--axelix-green-100) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
+  margin-bottom: 24px;
+}
+
+.Eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--axelix-green-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+}
+
+.Title {
+  margin: 0;
+  font-weight: 500;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  color: var(--axelix-ink);
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.GreenText {
+  color: var(--axelix-green-500);
+}
+
+.BlueText {
+  color: var(--axelix-blue);
+}
+
+.IntroText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--axelix-ink-3);
+  max-width: 420px;
+}
+
+.AccentedText {
+  font-style: normal;
+  color: var(--axelix-ink);
+  font-weight: 500;
+}

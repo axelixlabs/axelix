@@ -1,0 +1,45 @@
+.MainWrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, #fff 75%, transparent);
+    border: 1px solid var(--axelix-line-2);
+    font-family: var(--axelix-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--axelix-ink-3);
+    text-transform: uppercase;
+}
+
+.Label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+}
+
+.Web {
+    &::before {
+        background-color: var(--axelix-green-500);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--axelix-green-500) 20%, transparent);
+    }
+}
+
+.Mcp {
+    &::before {
+        background-color: var(--axelix-blue);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--axelix-blue) 22%, transparent);
+    }
+}
+
+.Separator {
+    color: var(--axelix-ink-4);
+}

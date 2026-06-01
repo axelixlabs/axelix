@@ -1,5 +1,5 @@
-import { IncidentCardHeader } from "./IncidentCardHeader"
-import styles from "./styles.module.css"
+import { IncidentCardHeader } from "./IncidentCardHeader";
+import styles from "./styles.module.css";
 
 export const IncidentCard = () => {
     return (
@@ -22,9 +22,7 @@ export const IncidentCard = () => {
                         <h4 className={styles.EventTitle}>
                             On-call opens six tabs. None of them show <em className={styles.AccentedText}>why</em>.
                         </h4>
-                        <span className={styles.EventText}>
-                            blocked by: dashboards watch, they don&apos;t ask
-                        </span>
+                        <span className={styles.EventText}>blocked by: dashboards watch, they don&apos;t ask</span>
                     </div>
                 </div>
 
@@ -32,8 +30,8 @@ export const IncidentCard = () => {
                     <div className={styles.Time}>02:34</div>
                     <div className={styles.EventWrapper}>
                         <h4 className={styles.EventTitle}>
-                            Needs <code className={styles.Tag}>org.hibernate.SQL</code> at <code className={styles.Tag}>TRACE</code> to see the slow
-                            query.
+                            Needs <code className={styles.Tag}>org.hibernate.SQL</code> at{" "}
+                            <code className={styles.Tag}>TRACE</code> to see the slow query.
                         </h4>
                         <span className={styles.EventText}>blocked by: redeploy required</span>
                     </div>
@@ -50,7 +48,9 @@ export const IncidentCard = () => {
                 <div className={styles.TimelineRow}>
                     <div className={styles.Time}>03:02</div>
                     <div className={styles.EventWrapper}>
-                        <h4 className={styles.EventTitle}>SSH into the pod. Flips a logger by hand. Nothing audits it.</h4>
+                        <h4 className={styles.EventTitle}>
+                            SSH into the pod. Flips a logger by hand. Nothing audits it.
+                        </h4>
                         <span className={styles.EventText}>blocked by: no surface, no trail</span>
                     </div>
                 </div>
@@ -58,7 +58,9 @@ export const IncidentCard = () => {
                 <div className={styles.TimelineRow}>
                     <div className={styles.Time}>03:24</div>
                     <div className={styles.EventWrapper}>
-                        <h4 className={styles.EventTitle}>Logs finally land. A connection pool is exhausted by a retry storm.</h4>
+                        <h4 className={styles.EventTitle}>
+                            Logs finally land. A connection pool is exhausted by a retry storm.
+                        </h4>
                     </div>
                 </div>
 
@@ -69,16 +71,16 @@ export const IncidentCard = () => {
                             Incident closed. <em className={styles.AccentedText}>Customers already saw it.</em>
                         </h4>
                         <span className={`${styles.EventText} ${styles.EventTextSuccess}`}>
-                            root cause found  84 minutes after the alert
+                            root cause found 84 minutes after the alert
                         </span>
                     </div>
                 </div>
             </div>
 
             <div className={styles.Footer}>
-                84 min  6 tools  1 SSH session  0 audit entries
+                84 min 6 tools 1 SSH session 0 audit entries
                 <b className={styles.BoldedText}>The JVM knew the answer the whole time.</b>
             </div>
         </div>
-    )
-}
+    );
+};

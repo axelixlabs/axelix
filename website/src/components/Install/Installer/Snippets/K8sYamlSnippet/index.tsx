@@ -1,7 +1,7 @@
-import styles from "../shared.module.css"
+import styles from "../shared.module.css";
 
 interface IProps {
-    refEl: any
+    refEl: any;
 }
 
 export const K8sYamlSnippet = ({ refEl }: IProps) => {
@@ -17,18 +17,20 @@ export const K8sYamlSnippet = ({ refEl }: IProps) => {
                     <span className={styles.At}>axelix</span>:
                 </span>
                 <span className={styles.Line}>
-                    {"  "}<span className={styles.At}>sbs</span>:
+                    {"  "}
+                    <span className={styles.At}>sbs</span>:
                 </span>
                 <span className={styles.Line}>
-                    {"    "}<span className={styles.At}>auth</span>:
+                    {"    "}
+                    <span className={styles.At}>auth</span>:
                 </span>
                 <span className={styles.Line}>
-                    {"      "}<span className={styles.At}>jwt</span>:
+                    {"      "}
+                    <span className={styles.At}>jwt</span>:
                 </span>
                 <span className={styles.Line}>
                     {"        "}
-                    <span className={styles.At}>algorithm</span>:{" "}
-                    <span className={styles.St}>HMAC256</span>
+                    <span className={styles.At}>algorithm</span>: <span className={styles.St}>HMAC256</span>
                 </span>
                 <span className={styles.Line}>
                     {"        "}
@@ -37,5 +39,5 @@ export const K8sYamlSnippet = ({ refEl }: IProps) => {
                 </span>
             </code>
         </pre>
-    )
-}
+    );
+};

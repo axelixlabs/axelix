@@ -6,12 +6,11 @@
     align-items: center;
     padding: 28px 32px;
     border-radius: 16px;
-    background-color: rgba(10, 28, 4, 0.5);
+    background-color: rgb(10 28 4 / 50%);
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 
-    @media (max-width: 720px) {
+    @media (width <= 720px) {
         grid-template-columns: 1fr;
         gap: 18px;
         padding: 24px;
@@ -52,7 +51,7 @@
     margin: 8px 0 0;
     font-size: 14px;
     line-height: 1.55;
-    color: rgba(189, 211, 160, 0.8);
+    color: rgb(189 211 160 / 80%);
     max-width: 46ch;
 }
 
@@ -84,7 +83,7 @@
     transition: transform .15s;
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .Button {
         justify-self: start;
     }

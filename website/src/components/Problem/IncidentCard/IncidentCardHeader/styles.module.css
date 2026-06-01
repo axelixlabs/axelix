@@ -10,6 +10,10 @@
   letter-spacing: .08em;
   color: #bdd3a0;
   text-transform: uppercase;
+
+  @media (width <=540px) {
+    flex-direction: column;
+  }
 }
 
 .Lhs {
@@ -23,7 +27,7 @@
   height: 8px;
   border-radius: 50%;
   background-color: #ff6b4a;
-  box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.22);
+  box-shadow: 0 0 0 3px rgb(255 107 74 / 22%);
   animation: pulse 1.6s infinite;
 }
 
@@ -31,8 +35,8 @@
   padding: 3px 9px;
   border-radius: 999px;
   color: #ff9c80;
-  background-color: rgba(255, 107, 74, 0.14);
-  border: 1px solid rgba(255, 107, 74, 0.32);
+  background-color: rgb(255 107 74 / 14%);
+  border: 1px solid rgb(255 107 74 / 32%);
   letter-spacing: 0.06em;
 }
 

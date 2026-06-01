@@ -26,14 +26,22 @@
     padding: 22px 24px;
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     display: grid;
     grid-template-columns: 1fr auto;
+    grid-template-areas: "content badge";
     gap: 16px;
     align-items: center;
+
+    @media (width <=540px) {
+        grid-template-columns: 1fr;
+        grid-template-areas: "badge" "content";
+        justify-items: center;
+        text-align: center;
+    }
 }
 
 .CardMainContent {
+    grid-area: content;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -45,7 +53,7 @@
     font-size: 10.5px;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: rgba(189, 211, 160, 0.8);
+    color: rgb(189 211 160 / 80%);
 }
 
 .CardTitle {
@@ -59,10 +67,11 @@
     font-family: var(--axelix-mono);
     font-size: 11.5px;
     letter-spacing: .04em;
-    color: rgba(189, 211, 160, 0.65);
+    color: rgb(189 211 160 / 65%);
 }
 
 .Badge {
+    grid-area: badge;
     align-self: start;
     font-family: var(--axelix-mono);
     font-size: 10.5px;
@@ -72,22 +81,30 @@
     border-radius: 999px;
     font-weight: 500;
     color: var(--axelix-green-400);
-    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent)
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
 }
 
 .ThirdCard .Badge {
-    background: var(--axelix-green-400);
+    background-color: var(--axelix-green-400);
     color: inherit;
 }
 
 .FirstCard {
-    background: color-mix(in srgb, #0a1c04 40%, transparent);
+    background-color: color-mix(in srgb, #0a1c04 40%, transparent);
     margin-right: 32px;
+
+    @media (width <=540px) {
+        margin-right: 0;
+    }
 }
 
 .SecondCard {
-    background: color-mix(in srgb, #0a1c04 60%, transparent);
+    background-color: color-mix(in srgb, #0a1c04 60%, transparent);
     margin-right: 18px;
+
+    @media (width <=540px) {
+        margin-right: 0;
+    }
 }
 
 .ThirdCard {

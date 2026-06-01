@@ -1,16 +1,16 @@
-import styles from "./styles.module.css";
 import { FAQFooter } from "./FAQFooter";
-import { FAQTopSection } from "./FAQTopSection";
 import { FAQList } from "./FAQList";
+import { FAQTopSection } from "./FAQTopSection";
+import styles from "./styles.module.css";
 
 export const FAQ = () => {
-  return (
-    <section className={styles.Faq} id="faq">
-      <div className="wrap">
-        <FAQTopSection />
-        <FAQList />
-        <FAQFooter />
-      </div>
-    </section>
-  );
-}
+    return (
+        <section className={styles.Faq} id="faq">
+            <div className="wrap">
+                <FAQTopSection />
+                <FAQList />
+                <FAQFooter />
+            </div>
+        </section>
+    );
+};

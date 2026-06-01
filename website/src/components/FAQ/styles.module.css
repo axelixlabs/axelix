@@ -4,7 +4,7 @@
   border-top: 1px solid var(--axelix-line);
   background: var(--axelix-bg);
 
-  @media (max-width: 980px) {
+  @media (width <= 980px) {
     padding-block: 96px 104px;
   }
 }

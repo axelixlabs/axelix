@@ -1,22 +1,18 @@
 // artifact: string
+import { CopyIcon } from "@/assets";
 
 import { useRef, useState } from "react";
-import styles from "./styles.module.css"
-import { CopyIcon } from "@/assets";
-import { SbVariant } from "../../../../../models";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     artifact: string;
-    activeSnippetRef: any
+    activeSnippetRef: any;
 }
 
 export const StarterMini = ({ artifact, activeSnippetRef }: IProps) => {
     const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
-    const timers = useRef<Array<ReturnType<typeof setTimeout> | null>>([
-        null,
-        null,
-        null,
-    ]);
+    const timers = useRef<Array<ReturnType<typeof setTimeout> | null>>([null, null, null]);
 
     const axelixActualVersion = `1.0.0-M1`;
 
@@ -62,12 +58,10 @@ export const StarterMini = ({ artifact, activeSnippetRef }: IProps) => {
                     <div key={b.label} className={styles.Mini}>
                         <div className={styles.MiniHead}>
                             <span className={styles.MiniLabel}>{b.label}</span>
-                            <button
-                                type="button"
-                                className={styles.MiniCopy}
-                                onClick={() => copy(i, b.code)}
-                            >
-                                {copiedIdx === i ? <span>Copied</span> : (
+                            <button type="button" className={styles.MiniCopy} onClick={() => copy(i, b.code)}>
+                                {copiedIdx === i ? (
+                                    <span>Copied</span>
+                                ) : (
                                     <>
                                         <CopyIcon />
                                         Copy
@@ -81,4 +75,4 @@ export const StarterMini = ({ artifact, activeSnippetRef }: IProps) => {
             </div>
         </>
     );
-} 
+};

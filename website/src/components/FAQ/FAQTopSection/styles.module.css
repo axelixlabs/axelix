@@ -7,7 +7,7 @@
 
     @media (width <=980px) {
         grid-template-columns: 1fr;
-        column-gap: 30px;
+        gap: 30px;
     }
 }
 
@@ -26,7 +26,7 @@
     border: 1px solid color-mix(in srgb, var(--axelix-green-500) 25%, transparent);
     margin-bottom: 24px;
 
-    &:before {
+    &::before {
         content: "";
         width: 6px;
         height: 6px;

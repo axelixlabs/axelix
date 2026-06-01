@@ -1,4 +1,5 @@
 import { LogoIcon } from "@/assets";
+
 import { ExternalLinks } from "./ExternalLinks";
 import { NavLinks } from "./NavLinks";
 import styles from "./styles.module.css";

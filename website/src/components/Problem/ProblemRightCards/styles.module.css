@@ -7,7 +7,7 @@
 .Card {
     padding: 20px 22px;
     border-radius: 12px;
-    background-color: rgba(10, 28, 4, 0.55);
+    background-color: rgb(10 28 4 / 55%);
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
     backdrop-filter: blur(10px);
 }
