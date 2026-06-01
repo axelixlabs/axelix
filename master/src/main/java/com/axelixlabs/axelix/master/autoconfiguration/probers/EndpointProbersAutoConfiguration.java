@@ -197,8 +197,8 @@ public class EndpointProbersAutoConfiguration {
     // Environment Property
     @Bean
     public EndpointProber<byte[]> getAllEnvironmentEndpointProver() {
-        return new CachingEndpointProber<>(new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, securityContextExecutor));
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, securityContextExecutor);
     }
 
     // HeapDump
@@ -288,8 +288,8 @@ public class EndpointProbersAutoConfiguration {
     // Configuration Properties
     @Bean
     public EndpointProber<byte[]> getConfigPropsProber() {
-        return new CachingEndpointProber<>(new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor));
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor);
     }
 
     // @Transaction monitoring

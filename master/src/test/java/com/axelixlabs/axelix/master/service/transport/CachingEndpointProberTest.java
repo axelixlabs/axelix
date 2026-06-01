@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber.CacheKey;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +42,7 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.SingleValueQueryParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber.CacheKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -142,8 +142,8 @@ class CachingEndpointProberTest {
     void shouldAlwaysDelegateWithoutCaching() {
         // given.
         when(delegate.invoke(eq(BASE_URL), same(NoHttpPayload.INSTANCE)))
-            .thenReturn(CACHED_BODY)
-            .thenReturn(OTHER_BODY);
+                .thenReturn(CACHED_BODY)
+                .thenReturn(OTHER_BODY);
 
         // when.
         byte[] first = subject.invoke(BASE_URL, NoHttpPayload.INSTANCE);
@@ -161,12 +161,12 @@ class CachingEndpointProberTest {
     void shouldNotCacheExceptionalOutcome(Exception toBeThrown) throws Exception {
         // given.
         when(delegate.invoke(eq(INSTANCE_A), same(NoHttpPayload.INSTANCE)))
-            .thenThrow(toBeThrown)
-            .thenReturn(CACHED_BODY);
+                .thenThrow(toBeThrown)
+                .thenReturn(CACHED_BODY);
 
         // when.
         assertThatThrownBy(() -> subject.invoke(INSTANCE_A, NoHttpPayload.INSTANCE))
-            .isInstanceOf(toBeThrown.getClass());
+                .isInstanceOf(toBeThrown.getClass());
         byte[] result = subject.invoke(INSTANCE_A, NoHttpPayload.INSTANCE);
 
         // then.
@@ -190,9 +190,8 @@ class CachingEndpointProberTest {
 
     public static Stream<Arguments> exceptionalOutcome() {
         return Stream.of(
-            of(new EndpointInvocationException("failure")),
-            of(new InstanceNotFoundException()),
-            of(new BadRequestException("failure"))
-        );
+                of(new EndpointInvocationException("failure")),
+                of(new InstanceNotFoundException()),
+                of(new BadRequestException("failure")));
     }
 }

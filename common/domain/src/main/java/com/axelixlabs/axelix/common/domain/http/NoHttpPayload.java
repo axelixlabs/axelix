@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public final class NoHttpPayload implements HttpPayload {
 
-    public final static NoHttpPayload INSTANCE = new NoHttpPayload();
+    public static final NoHttpPayload INSTANCE = new NoHttpPayload();
 
     private NoHttpPayload() {}
 

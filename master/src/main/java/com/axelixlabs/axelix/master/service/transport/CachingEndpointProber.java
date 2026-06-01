@@ -24,10 +24,13 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jspecify.annotations.NonNull;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContext;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 
 /**
  * Caching decorator over the delegated {@link EndpointProber}.
@@ -77,6 +80,14 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
 
     /**
      * Caching key for the given Instance.
+     * <p>
+     * Now, the important note here is that the {@link SecurityContext} is not a part of the caching key.
+     * In general, it needs to be, otherwise it is a security breach, but in our case, the access to {@link CachingEndpointProber}
+     * is guarded by the {@link WebIdentityAccessManager} and {@link McpIdentityAccessManager} abstractions, so when the request
+     * hits the cache, we can be sure, that the access is authorized.
+     *
+     * @implNote <strong>IMPORTANT NOTE:</strong> we cannot reliably cache Config-Props and env feed since that would cause potentially
+     *           sensitive information to be exposed.
      */
     record CacheKey(InstanceId instanceId, HttpPayload httpPayload) {}
 }
