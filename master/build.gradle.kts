@@ -41,6 +41,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto")
 
     implementation("org.slf4j:slf4j-api")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 

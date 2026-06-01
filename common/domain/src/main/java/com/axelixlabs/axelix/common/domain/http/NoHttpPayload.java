@@ -27,9 +27,9 @@ import java.util.Map;
  *
  * @author Mikhail Polivakha
  */
-public class NoHttpPayload implements HttpPayload {
+public final class NoHttpPayload implements HttpPayload {
 
-    public static NoHttpPayload INSTANCE = new NoHttpPayload();
+    public static final NoHttpPayload INSTANCE = new NoHttpPayload();
 
     private NoHttpPayload() {}
 
