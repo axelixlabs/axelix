@@ -23,11 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
-import com.axelixlabs.axelix.master.service.transport.EndpointProber;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

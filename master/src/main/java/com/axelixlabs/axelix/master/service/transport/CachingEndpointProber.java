@@ -20,13 +20,14 @@ package com.axelixlabs.axelix.master.service.transport;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.jspecify.annotations.NonNull;
+
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Caching decorator over the delegated {@link EndpointProber}.
@@ -41,21 +42,22 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
 
     public CachingEndpointProber(EndpointProber<T> delegate) {
         this.delegate = delegate;
-        this.cache = Caffeine
-            .newBuilder()
-            .expireAfterAccess(Duration.of(15, ChronoUnit.MINUTES))
-            .maximumSize(256L)
-            .softValues()
-            .build();
+        this.cache = Caffeine.newBuilder()
+                .expireAfterAccess(Duration.of(15, ChronoUnit.MINUTES))
+                .maximumSize(256L)
+                .softValues()
+                .build();
     }
 
     @Override
-    public @NonNull T invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload) throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
+    public @NonNull T invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
+            throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
         return cache.get(instanceId, key -> delegate.invoke(key, httpPayload));
     }
 
     @Override
-    public @NonNull T invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException, BadRequestException {
+    public @NonNull T invoke(@NonNull String baseUrl, HttpPayload httpPayload)
+            throws EndpointInvocationException, BadRequestException {
         return delegate.invoke(baseUrl, httpPayload);
     }
 

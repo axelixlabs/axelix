@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.probers;
 
-import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -35,6 +34,7 @@ import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMess
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.EndpointProber;
@@ -160,7 +160,7 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getBeansEndpointProber() {
         return new CachingEndpointProber<>(
-            new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor));
+                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor));
     }
 
     // ThreadDump
@@ -197,9 +197,8 @@ public class EndpointProbersAutoConfiguration {
     // Environment Property
     @Bean
     public EndpointProber<byte[]> getAllEnvironmentEndpointProver() {
-        return new CachingEndpointProber<>(
-            new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, securityContextExecutor)
-        );
+        return new CachingEndpointProber<>(new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, securityContextExecutor));
     }
 
     // HeapDump
@@ -282,16 +281,15 @@ public class EndpointProbersAutoConfiguration {
     // Conditions
     @Bean
     public EndpointProber<byte[]> getConditionsProber() {
-        return new CachingEndpointProber<>(
-            new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor));
+        return new CachingEndpointProber<>(new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor));
     }
 
     // Configuration Properties
     @Bean
     public EndpointProber<byte[]> getConfigPropsProber() {
-        return new CachingEndpointProber<>(
-            new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor)
-        );
+        return new CachingEndpointProber<>(new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor));
     }
 
     // @Transaction monitoring
