@@ -3,18 +3,18 @@ import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot") version "4.0.6"
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
 }
 
 val springBootVersion = "4.0.5"
 val springCloudVersion = "2025.1.1"
-val springAiVersion = "2.0.0-M2"
-val testcontainersVersion = "1.21.3"
-val springDocSwaggerVersion = "3.0.1"
-val sqliteVersion = "3.51.2.0"
-val nimbusJoseJwt ="10.8"
+val springAiVersion = "2.0.0-M8"
+val testcontainersVersion = "1.21.4"
+val springDocSwaggerVersion = "3.0.3"
+val sqliteVersion = "3.53.1.0"
+val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 
 dependencies {
@@ -75,7 +75,7 @@ dependencies {
     testImplementation("com.mysql:mysql-connector-j")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.0")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
