@@ -106,12 +106,12 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
-        public EndpointProber<BasicDiscoveryMetadata> managedServiceMetadataEndpointProber(
+        public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
                 InstanceRegistry instanceRegistry,
                 MetadataJacksonMessageDeserializationStrategy deserializationStrategy,
                 SecurityContextExecutor securityContextExecutor) {
-            return new DefaultEndpointProber<>(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor, ActuatorEndpoints.METADATA);
+            return new ManagedServiceMetadataEndpointProber(
+                    instanceRegistry, deserializationStrategy, securityContextExecutor);
         }
 
         @Bean
