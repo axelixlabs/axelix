@@ -356,7 +356,7 @@ Use this when you want a single, immutable artifact that already bundles both Ma
 The release pipeline publishes the image to GitHub Container Registry:
 
 ```
-ghcr.io/axelixlabs/axelix:1.0.0-M1
+ghcr.io/axelixlabs/axelix:v1.0.0-M1
 ```
 
 :::note
@@ -375,7 +375,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:v1.0.0-M1
 ```
 
 A few notes about this command:
