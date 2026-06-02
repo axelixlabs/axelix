@@ -1,4 +1,4 @@
-name: Deploy Docs and Blog
+name: Deploy Docs
 
 on:
   workflow_dispatch:
