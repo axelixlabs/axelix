@@ -2,7 +2,7 @@ name: Deploy Docs
 
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches: [master]
     paths:
       - 'docs/**'

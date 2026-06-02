@@ -25,15 +25,14 @@ const stripDataUrlImages = () => (tree: Root) => {
 export const llmsTxtOptions: PluginOptions = {
   siteTitle: 'Axelix Documentation',
   siteDescription:
-    'Axelix helps developers and QA engineers debug, test, and monitor Spring Boot Java/Kotlin applications.',
+    'Axelix is the AI-Native, OSS solution for debugging, observing and operating mission-critical Spring Boot microservices.',
   content: {
-    enableMarkdownFiles: true,
+    enableMarkdownFiles: false,
     enableLlmsFullTxt: true,
     includeDocs: true,
     includeBlog: false,
     includePages: false,
     relativePaths: false,
-    enableMarkdownFiles: false,
     beforeDefaultRehypePlugins: [stripDataUrlImages],
   },
 };
