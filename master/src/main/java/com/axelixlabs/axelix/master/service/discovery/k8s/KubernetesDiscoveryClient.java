@@ -192,7 +192,7 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
 
         Map<String, String> metadata = Map.of(
                 "namespace", namespace,
-                "servicePortName", port.getName(),
+                "servicePortName", Optional.ofNullable(port.getName()).orElse(""),
                 "protocol", port.getProtocol());
 
         return new KubernetesServiceInstance(
