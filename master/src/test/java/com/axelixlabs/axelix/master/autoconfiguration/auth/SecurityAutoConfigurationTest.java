@@ -76,10 +76,13 @@ class SecurityAutoConfigurationTest {
     private static final String SUPER_ADMIN_USERNAME = "test-super-admin";
     private static final String SUPER_ADMIN_PASSWORD = "test-super-admin-secret";
 
+    private static final String VALID_HMAC_512_SIGNING_KEY =
+            "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
+
     private static String[] jwtPropertyValues() {
         return new String[] {
             "axelix.master.auth.jwt.algorithm=HMAC512",
-            "axelix.master.auth.jwt.signing-key=secret",
+            "axelix.master.auth.jwt.signing-key=" + VALID_HMAC_512_SIGNING_KEY,
             "axelix.master.auth.jwt.lifespan=PT30M",
         };
     }
@@ -141,7 +144,8 @@ class SecurityAutoConfigurationTest {
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
-                            "axelix.master.auth.jwt.signing-key=secret", "axelix.master.auth.jwt.lifespan=PT30M")
+                            "axelix.master.auth.jwt.signing-key=" + VALID_HMAC_512_SIGNING_KEY,
+                            "axelix.master.auth.jwt.lifespan=PT30M")
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
@@ -183,7 +187,8 @@ class SecurityAutoConfigurationTest {
             ApplicationContextRunner contextRunner = new ApplicationContextRunner(
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
-                            "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.signing-key=secret")
+                            "axelix.master.auth.jwt.algorithm=HMAC512",
+                            "axelix.master.auth.jwt.signing-key=" + VALID_HMAC_512_SIGNING_KEY)
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
@@ -210,6 +215,28 @@ class SecurityAutoConfigurationTest {
                             SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=RSA512",
+                            "axelix.master.auth.jwt.signing-key=" + VALID_HMAC_512_SIGNING_KEY,
+                            "axelix.master.auth.jwt.lifespan=PT30M")
+                    .withPropertyValues(superAdminCredentialPropertyValues())
+                    .withConfiguration(AutoConfigurations.of(
+                            ConfigurationPropertiesAutoConfiguration.class,
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+            });
+        }
+
+        @Test
+        void shouldFailWhenJwtSigningKeyIsTooShort() {
+            // given.
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
+                    .withPropertyValues(
+                            "axelix.master.auth.jwt.algorithm=HMAC512",
                             "axelix.master.auth.jwt.signing-key=secret",
                             "axelix.master.auth.jwt.lifespan=PT30M")
                     .withPropertyValues(superAdminCredentialPropertyValues())
@@ -222,6 +249,7 @@ class SecurityAutoConfigurationTest {
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
             });
         }
 

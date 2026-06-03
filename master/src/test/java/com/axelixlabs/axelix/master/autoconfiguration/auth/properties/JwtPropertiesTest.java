@@ -19,27 +19,34 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
 import java.time.Duration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.util.Assert;
+import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
- * JWT configuration properties.
+ * Unit tests for {@link JwtProperties}.
  *
- * @since 11.12.2025
- * @author Mikhail Polivakha
- * @author Nikita Kirillov
+ * @author Mikhail Polivkha
  */
-@ConfigurationProperties(prefix = "axelix.master.auth.jwt")
-public record JwtProperties(JwtAlgorithm algorithm, String signingKey, Duration lifespan) {
+class JwtPropertiesTest {
 
-    private static final String PROPERTIES_PREFIX = "axelix.master.auth.jwt";
+    private static final String VALID_SIGNING_KEY =
+            "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
 
-    public JwtProperties {
-        Assert.notNull(algorithm, "JWT algorithm is required. Set " + PROPERTIES_PREFIX + ".algorithm");
-        Assert.notNull(signingKey, "JWT signing-key is required. Set " + PROPERTIES_PREFIX + ".signing-key");
+    @Test
+    void shouldAcceptValidSigningKey() {
+        // when. // then.
+        assertThatCode(() -> new JwtProperties(JwtAlgorithm.HMAC512, VALID_SIGNING_KEY, Duration.ofHours(1)))
+                .doesNotThrowAnyException();
+    }
 
-        algorithm.validateSigningKey(signingKey, PROPERTIES_PREFIX + ".signing-key");
+    @Test
+    void shouldRejectInsufficientlyShortSigningKey() {
+        // when. // then.
+        assertThatThrownBy(() -> new JwtProperties(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

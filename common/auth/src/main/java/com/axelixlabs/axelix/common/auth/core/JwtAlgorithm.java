@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -24,7 +25,9 @@ import java.util.Arrays;
  * along with their required minimum key lengths.
  *
  * @since 25.07.2025
+ *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public enum JwtAlgorithm {
     HMAC256(32, "HS256"),
@@ -64,5 +67,20 @@ public enum JwtAlgorithm {
 
     public String getAlgorithmName() {
         return algorithmName;
+    }
+
+    /**
+     * Verifies that {@code signingKey} meets the minimum length required by this algorithm.
+     *
+     * @param signingKey   the configured signing key
+     * @param propertyName fully qualified configuration property name to include in error messages
+     */
+    public void validateSigningKey(String signingKey, String propertyName) {
+        int keyBytes = signingKey.getBytes(StandardCharsets.UTF_8).length;
+
+        if (keyBytes < minKeyLength) {
+            throw new IllegalArgumentException("JWT signing-key is too short for " + algorithmName + " (requires at least "
+                    + minKeyLength + " bytes). Set " + propertyName);
+        }
     }
 }
