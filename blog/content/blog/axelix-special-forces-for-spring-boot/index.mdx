@@ -1,0 +1,249 @@
+---
+title: "Axelix: Special Forces for Your Spring Boot Ecosystem"
+date: 2026-06-01
+authors: ["Mikhail Polivakha"]
+tags: ["Spring Boot", "MCP & Agent", "AI", "Enterprise"]
+heroImagePath: /posts/operate-dont-watch/loginLeftImage.png
+description: "After about a year of work we shipped the first milestone of Axelix — an open-source tool that makes debugging, testing and monitoring Spring Boot applications in production dramatically easier. Here is why it exists and how it helps with everyday Spring Boot problems."
+metaDescription: "Axelix is an open-source, Open Core tool with a built-in MCP server that makes debugging, testing and monitoring Spring Boot apps in production far easier — log levels, properties, beans, conditions and N+1 detection."
+---
+
+## Overview
+
+Hello, Habr!
+
+My name is Mikhail Polivakha. I think I'm already relatively well known in the Spring AIO hub. As part of Spring AIO we quite often select technical material and review it. I myself speak at conferences fairly regularly, contribute to Open Source, and so on.
+
+Our materials also usually revolve around Java development and, of course, Spring. And this post, while on one hand strongly tied to Java and the Spring Framework, is nonetheless not like the others.
+
+A rather significant event happened the other day. Over roughly a year, a small team and I built a tool meant to substantially simplify the whole process of debugging, testing and monitoring Spring Boot applications in production. And this project has finally reached its first Milestone Release.
+
+The project is called [Axelix](https://axelix.io/).
+
+I think it's important to note right away: **the core of the Axelix project is an Open Source product and is [available on GitHub](https://github.com/axelixlabs/axelix). The project follows the Open Core model.** So you can freely install it inside your own perimeter the same way you install, say, Grafana.
+
+In this post I want to tell the story of the project, why it's needed, and how we actually arrived at it. It will include an analysis of the reasons Axelix appeared and a deep dive into a concrete case of solving everyday problems when developing on Spring Boot.
+
+I hope you'll find it interesting. Well then, let's begin :)
+
+## The State of the Enterprise Software Industry
+
+A typical enterprise has a lot of internal software. This software solves different tasks and is usually written in several programming languages — Java, Go, C#, and so on. One of the most popular languages for server-side/backend applications in large companies is [Java](https://en.wikipedia.org/wiki/Programming_languages_used_in_most_popular_websites). There are many historical reasons for that, but the fact remains.
+
+In addition, the most popular framework for writing backend applications in Java is unquestionably Spring Boot. Very simplified: it's an additional layer on top of the [Spring Framework](https://spring.io/) that simplifies its configuration (although Spring Boot today is much more than just auto-configuration). For a number of reasons it's the undisputed most popular choice in enterprise. For example, Netflix [migrated its ecosystem (more than 3000 applications) to Spring Boot 3 and plans to stay on Spring Boot](https://www.youtube.com/watch?v=IMGcD08rdVw).
+
+Bottom line: **Spring Boot won.** It's a very popular backend choice when developing in Java. It's what we have today, and it's strange to argue with that.
+
+## Motivation and Pain Point
+
+What's interesting: the Spring Framework originally started as an IoC container with dependency injection as its main feature, and now it's something completely different — much, much more. Today the Spring Framework / Spring Boot is an entire ecosystem that supports the whole technology stack of our application:
+
+* Handling HTTP requests
+* Working with RDBMS — from transaction management to ORM
+* Sending messages to message brokers, and a lot more
+
+**As a result, the Spring Framework ecosystem has grown substantially in complexity.** In modern Spring Boot microservices we have a great many moving parts. For example:
+
+* Applications have many beans. Some come from Spring Boot and auto-configuration, some from internal platform libraries we use across the company, and some we create ourselves.
+* We have quite a lot of properties that can come from different sources: the `application.yaml` file, Spring Cloud Config, environment variables inside Pods in K8S, command-line arguments, and so on.
+* And of course, we have lots of proxies! And they all work with each other: transactional proxies, proxies for OpenFeign clients, proxies for Kafka listeners, etc.
+
+The idea is that the Spring Framework has become quite large and has spawned many interconnected parts, where each one affects the other (for example, properties affect bean creation, the created beans can pull in more properties, and so on). There's even an opinion that, because of all this, the Spring Framework has turned into a big, untamable monster.
+
+Think about it: at almost any Java conference — both inside Russia and even abroad (I say this as a speaker at international conferences, too) — a good half of the talks are dedicated to the Spring Framework, how it works, or similar topics.
+
+**Why? Because Spring is a) everywhere, and b) it's complex!**
+
+And following from that, after years of writing Spring Boot applications, I can say with almost 100% certainty: when we, Java developers on Spring Boot, deploy applications to any environment, we run into the same problems again and again. For example:
+
+1. We make HTTP requests inside transactions and exhaust the DB connection pool.
+2. We create N + 1 and run into lazy loading problems in Spring Data JPA.
+3. We debug situations where the wrong property got pulled into `@Value` / `@ConfigurationProperties`.
+4. We debug cases where our `@Bean` was "suppressed" because of some bean from `@AutoConfiguration` or a platform library, and so on…
+
+**All of these problems are real.** If you've been writing Spring Boot applications for even a couple of years, I'm sure at least some of them are familiar to you.
+
+And now: **what if I told you that the pain of developing Spring Boot backends can be eased?**
+
+Think about it: today, hundreds upon hundreds of teams around the world are writing Spring Boot backends and fighting the same problems over and over again.
+
+Can this be solved somehow? Let's try to figure it out with an example.
+
+## A Typical Day of a Spring Boot Developer
+
+To understand more deeply what exactly Axelix is trying to solve, let's walk through a couple of Java code examples. Imagine the application contains the code below. We have a Spring bean that we use to obtain the set of permissions a hypothetical client has:
+
+```java
+@Slf4j
+@Service
+public class PermissionsResolver {
+
+    @Value("${permission.caching.enabled:true}")
+    private boolean cacheLookupsEnabled;
+
+    @Autowired
+    private ExternalPermissionsResolver delegate;
+
+    @Autowired
+    private PermissionsCache cache;
+
+    @Autowired
+    private DetailsResolver detailsResolver;
+
+    @PostConstruct
+    void init() {
+        log.debug("Permissions cache lookup enabled: {}", cacheLookupsEnabled);
+    }
+
+    @Transactional
+    public Set<PermissionDto> resolveClientPermissions(Client client) {
+        try {
+            Set<PermissionDto> permissions = delegate.resolve(client);
+
+            for (Permission permission : permissions) {
+                PermissionDetails details = detailsResolver.resolvePermissionDetails(permission);
+                permission.setDetails(details);
+            }
+
+            return permissions;
+        } catch (SomeExpectedException e) {
+            if (cacheLookupsEnabled && client.getStatus() == ClientStatus.EXISTING) {
+                log.debug("For the client '{}' taking permissions from the cache", client.getId());
+                return cache.get(client.getId());
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+```
+
+This is classic Java code on the Spring Boot stack. Let's be honest: we've all seen code like this. We've all debugged code like this, and we've all reworked code like this many, many times.
+
+And during regression testing, a QA engineer comes over and says:
+
+> Hi! On the dev/qa/sandbox/pre-prod environment I can't create XYZ — it says my client doesn't have the required permissions.
+
+You open the IDE (or an AI Agent, why not 😈) and try to make sense of the codebase. You look for what could be going wrong.
+
+### Part 1. Changing the Logging Level
+
+And there's a **whole truckload** of things that could go wrong in a Spring Boot application.
+
+For example, it might turn out that we're taking clients from the cache. Well, at least the cache should be enabled, right? Or not… And, as always, the log we need is at `DEBUG`, not `INFO`. And, of course, logback — the default logging system under Spring Boot — filters it out and won't let it through.
+
+Wouldn't it be great to temporarily raise the logging level for this class to `DEBUG`? Without a redeploy, literally for 10 minutes? [Axelix lets you temporarily change the logging level](https://axelix.io/docs/features/loggers/) — just for debugging — and then roll it back. By the way, very soon Axelix will be able to roll the logging level back on its own, without the developer having to manually restore everything.
+
+### Part 2. The Mysterious Property Value
+
+You dig deeper and realize: the behavior is incorrect because on pre-prod we shouldn't be taking clients from the cache at all. We should fail and return the appropriate status code.
+
+Now the question is: why on earth is the cache even enabled? We explicitly disabled it via an environment variable… Maybe there's another property somewhere (for example, from Spring Cloud Config) that overrides ours? And what if Spring didn't even see our environment variable that disables the cache?
+
+These are open questions, and believe me, **you're not the only one.** A lot of people run into this.
+
+[Axelix can not only show](https://axelix.io/docs/features/properties) which properties Spring knows about, but also tell you which property ultimately won and suppressed the rest — and where it came from.
+
+### Part 3. The Bean Zoo
+
+Okay, you've figured out that the property actually came from VCS via Spring Cloud Config, and that some engineer simply changed it and forgot to mention it (oops, how awkward). Grinning, you disabled caching and asked QA to rerun the scenario. The `Client` is obviously still without permissions, but at least now we return an error rather than a response from the fallback cache.
+
+Now you need to understand why there are no permissions. QA swears on their mother that they added them to the database or asked someone to do it. You trust them, but (not 100%, of course) and again open the IDE. And here's what you find:
+
+```java
+public interface ExternalPermissionsResolver {
+
+    Set<PermissionDto> resolve(Client client);
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.resolver", value = "source", havingValue = "legacy", matchIfMissing = true)
+@ConditionalOnMissingBean(ExternalPermissionsResolver.class)
+public class LegacySystemPermissionsResolver implements ExternalPermissionsResolver {
+
+    @Override
+    public Set<PermissionDto> get(Client client) {
+        // implementation
+    }
+}
+
+@Component
+@ConditionalOnProperty(prefix = "permissions.resolver", value = "source", havingValue = "database")
+@ConditionalOnDatabaseAvailable
+@ConditionalOnMissingBean(ExternalPermissionsResolver.class)
+public class DatabaseSystemPermissionsResolver implements ExternalPermissionsResolver {
+
+    @Override
+    public Set<PermissionDto> get(Client client) {
+        // implementation
+    }
+}
+```
+
+So, on pre-prod we don't want to use the old `LegacySystemPermissionsResolver` — we're getting rid of it. Is there a chance it's still being used? At the very least, we can look at the properties and their actual values — Axelix already helps with that. However, this still doesn't answer the main question: are we 100% sure we're using `DatabaseSystemPermissionsResolver`? And what if we aren't?
+
+Here, [Axelix can not only tell you](https://axelix.io/docs/features/beans) which beans are actually active, but also explain where they came from. Moreover, [**Axelix can explain**](https://axelix.io/docs/features/conditions) **why beans we expected to be created were, in fact, not created.**
+
+For example, our `DatabaseSystemPermissionsResolver` might not have been created because the custom conditional annotation `@ConditionalOnDatabaseAvailable` didn't pass — and the fallback `LegacySystemPermissionsResolver` was created instead.
+
+### Part 4. Hibernate Is Always There to Ruin Everything
+
+Already worn out, exhausted, you poor thing, you've solved this problem too. The cause of the broken permissions was using the wrong `ExternalPermissionsResolver`. Testing on pre-prod is finally done. **So much time spent debugging — it's just insane!** But that's what developers exist for — to suffer. You accept it and get back to work.
+
+You'd just gathered your thoughts and sat down with the ticket — and a report comes in from load testing:
+
+> The 95th percentile latency shot into space: 5–6 seconds! You can't ship that to prod!
+
+Under load, the application starts slowing down for some reason. You don't know why. But since we only changed the permission-resolution logic, the problem must be somewhere in there.
+
+You look carefully at the code again and realize:
+
+> Damn! N + 1 again! `DatabaseSystemPermissionsResolver` returns the entity without a JOIN FETCH-ed permissions collection!
+
+Devil! And the thing about the N + 1 problem is that it's insidious — it's not so easy to catch in tests! Sure, Hibernate provides statistics for detecting it, but **nobody bothered to write tests with deep analysis of Hibernate statistics!**
+
+And this code successfully passed:
+
+1. Code Review
+2. Quality Gate
+3. Functional testing by QA
+4. Security checks from SonarQube, etc.
+
+All the barriers cleared! And now… Now we have to change the code, merge, retest, and rerun the security scan. **What a pain!** In agony, you start to feel that you hate your job, and Hibernate even more, because everything is so non-obvious!
+
+But don't worry — [Axelix can help](https://axelix.io/docs/features/transaction-control#execution-chart). Axelix can detect N + 1 queries on testing/qa/sandbox environments long before deploying to pre-prod or a load-testing stand.
+
+That's it. Moreover, not only can you detect N + 1 queries, you can also tell exactly which queries Hibernate executed under the hood within this `@Transactional` and how long it took.
+
+Finally, if you don't want to use the Axelix UI, in the near future you'll be able to configure exporting this data to any APM solution to your taste — from a simple export of additional Prometheus Metrics to modern OpenTelemetry — and view the same Axelix data in, say, your usual Grafana.
+
+## AI Integration. MCP Server.
+
+The features above are roughly ~30% of what Axelix can do right now; there's a lot more. I'm not listing everything, otherwise the article would get very long. But there's another elephant in the room that can't be ignored — **AI**.
+
+Today we all use AI Agents: Cursor, Codex, Claude, etc. Let's be honest: they take up a significant part of our lives as Software Engineers. At Axelix we understand this perfectly; for us, AI:
+
+* Helps review code in the monorepo
+* Helps write internationalized documentation, and so on
+
+We acknowledge the impact and value of AI. That's why **a built-in MCP server ships in all Axelix distributions**, exposing all the capabilities described above (and more) to an AI Agent through the embedded MCP server. Want to debug problems through an AI Agent — go ahead.
+
+The rule we follow: _everything available to a human through the UI is also available to AI Agents through the MCP server._
+
+## Comparison with Spring Boot Admin
+
+I'm sure experienced developers have heard of Spring Boot Admin. This tool works as a proxy to the existing Spring Boot Actuator endpoints and provides some of the capabilities Axelix has.
+
+We've explained how Axelix differs from Spring Boot Admin _so often_ that we even made [a dedicated page in the documentation](https://axelix.io/docs/more/why-not-spring-boot-admin) explaining what problems we see with Spring Boot Admin and what role Axelix plays in the bigger picture. Read it if you're interested.
+
+## Conclusion. What's Next
+
+Let me repeat: we've just released the [first milestone](https://github.com/axelixlabs/axelix/releases). There's no GA release yet, but we're planning it for the second half of summer 2026. To stay in the loop, we've created a [Telegram channel](https://t.me/axelix_official) for news about features and releases. Subscribe if you want to follow the project.
+
+We already have pilot teams that have installed Axelix in their environments — as a Helm Chart, a Docker image, or even just a JAR. We're still actively processing feedback from the pilot teams. If you want to install Axelix, you can already do so — [the documentation is available in Russian and English](https://axelix.io/docs/product/architecture). **In that case you'll be able to give feedback and significantly influence the development of Axelix.**
+
+We're actively polishing the documentation; if you need help, write directly to the administrators of the Axelix project's Telegram channel. We'll help with the installation.
+
+I hope the article was interesting. If you're curious how it's built — [the Axelix Core sources are on GitHub](https://github.com/axelixlabs/axelix). Explore to your heart's content!
+
+P.S.: We welcome contributors! If you'd like to help, take a look at our project's [contribution guidelines](https://github.com/axelixlabs/axelix/blob/master/CONTRIBUTING.adoc). We'd be glad to see a PR/Issue from you someday!

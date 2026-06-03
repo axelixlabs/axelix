@@ -1,0 +1,60 @@
+/* ===================== PAGE HEAD (home hero) ===================== */
+.BlogHero {
+  position: relative;
+  padding: 64px 0 8px;
+  overflow: hidden;
+  text-align: center;
+}
+/* Carried verbatim from hero.css; the .Eyebrow markup is not currently
+   rendered by the home page, so these rules are inert (kept for parity). */
+.BlogHero .Eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--code);
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-green-100) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  margin-bottom: 22px;
+}
+.BlogHero .Eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.BlogHero h1 {
+  margin: 0;
+  font-weight: 500;
+  font-size: clamp(40px, 5.4vw, 72px);
+  line-height: 0.98;
+  letter-spacing: -0.034em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.BlogHero h1 .Accent {
+  color: var(--accent);
+}
+.BlogHero p.Lede {
+  margin: 22px 0 0;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 54ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: pretty;
+}
+/* Moved here from index-feed.css (was a cross-file override). */
+@media (max-width: 640px) {
+  .BlogHero {
+    padding: 40px 0 4px;
+  }
+}

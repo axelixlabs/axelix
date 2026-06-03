@@ -1,0 +1,66 @@
+name: Deploy Blog
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'blog/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: blog
+
+      - name: Build
+        run: npm run build
+        working-directory: blog
+
+      - name: Copy global resources to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
+          key: ${{ env.PRODUCTION_WEBSITE_PRIVATE_KEY }}
+          source: "docker-compose.yml,infra/nginx"
+          target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}"
+
+      - name: Prepare Standalone Folder
+        working-directory: blog
+        run: |
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+
+      - name: Copy build resources to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
+          key: ${{ env.PRODUCTION_WEBSITE_PRIVATE_KEY }}
+          source: "blog/.next/standalone,blog/Dockerfile"
+          target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}/axelix-blog"
+          strip_components: 1
+
+      - name: Build Docker image on server and restart container
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ env.PRODUCTION_WEBSITE_HOST }}
+          username: ${{ env.PRODUCTION_WEBSITE_USER }}
+          key: ${{ env.PRODUCTION_WEBSITE_PRIVATE_KEY }}
+          script: |
+            set -eux
+            cd /home/${{ env.PRODUCTION_WEBSITE_USER }}
+            sudo docker compose rm -f -s blog
+            sudo docker compose up --build -d blog

@@ -36,6 +36,15 @@ services:
     networks:
       - webnet
 
+  blog:
+    build: axelix-blog
+    container_name: axelix-blog
+    restart: unless-stopped
+    expose:
+      - "3000"
+    networks:
+      - webnet
+
 networks:
   webnet:
     driver: bridge

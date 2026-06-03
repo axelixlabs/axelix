@@ -1,0 +1,40 @@
+
+/* =========================================================================
+   AXELIX BLOG — design tokens + presentation, ported from the design
+   prototype (blog.css + article.css). Light-only.
+   ========================================================================= */
+:root {
+  --c-green-50: #f6faef;
+  --c-green-100: #eaf3de;
+  --c-green-200: #d4e7b5;
+  --c-green-300: #b6d684;
+  --c-green-400: #8fbd4b;
+  --c-green-500: #639922;
+  --c-green-600: #4d7c19;
+  --c-green-700: #345c10;
+  --c-green-800: #1f400a;
+  --c-green-900: #173404;
+
+  --c-blue: #2a6fdb;
+  --c-blue-tint: #e6efff;
+
+  --bg: #f4f4f6;
+  --paper: #ffffff;
+  --ink: #0f1410;
+  --ink-2: #2a322b;
+  --ink-3: #5a635c;
+  --ink-4: #8a918b;
+  --line: #0f141014;
+  --line-2: #0f14101f;
+  --line-3: #0f141033;
+
+  --font: var(--font-golos), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --code: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --maxw: 1320px;
+  --pad: clamp(20px, 4vw, 56px);
+
+  --accent: var(--c-green-500);
+  --accent-deep: var(--c-green-700);
+}
+

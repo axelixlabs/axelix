@@ -1,0 +1,9 @@
+/* Shared tag row — rendered by TagRow (home/post cards) and as a literal
+   `.rtags` on the article page (`.art-hero .rtags` in article.css positions it).
+   Kept global because it is part of the cross-surface atom contract. */
+.rtags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
