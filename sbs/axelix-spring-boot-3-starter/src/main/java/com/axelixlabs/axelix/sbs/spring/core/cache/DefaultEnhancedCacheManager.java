@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -87,20 +86,14 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
+        return caches.computeIfAbsent(name, s -> {
             Cache cache = delegate.getCache(s);
             return cache != null ? new DefaultEnhancedCache(cache, metricsPublisher) : null;
         });
-
-        if (enhancedCache != null && metricsPublisher != null) {
-            metricsPublisher.registerCacheStatusGauge(name, new AtomicBoolean(enhancedCache.isEnabled()));
-        }
-
-        return enhancedCache;
     }
 
     @Override
-    @NonNull
+
     public Collection<String> getCacheNames() {
         return delegate.getCacheNames();
     }

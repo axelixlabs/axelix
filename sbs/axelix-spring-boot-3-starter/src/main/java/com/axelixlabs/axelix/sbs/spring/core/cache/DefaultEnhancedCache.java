@@ -53,6 +53,10 @@ public class DefaultEnhancedCache implements EnhancedCache {
         // TODO: We need to find a way to allow for configuring those values
         this.cacheLookupHistory = new SlidingWindow<>(200);
         this.metricsPublisher = metricsPublisher;
+
+        if (metricsPublisher != null) {
+            metricsPublisher.registerCacheStatusGauge(delegate.getName(), this.enabled);
+        }
     }
 
     @Override
