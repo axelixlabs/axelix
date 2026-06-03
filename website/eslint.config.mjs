@@ -24,6 +24,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import licenseHeader from "@tony.ganchev/eslint-plugin-header";
 
 export default defineConfig([
     globalIgnores([
@@ -44,6 +45,7 @@ export default defineConfig([
         plugins: {
             prettier: eslintPluginPrettier,
             jsdoc: jsdoc,
+            header: licenseHeader,
         },
     },
 
@@ -85,6 +87,7 @@ export default defineConfig([
             "react/no-unknown-property": "error",
             "react/jsx-curly-newline": ["error", "consistent"],
             "react/no-unstable-nested-components": "error",
+            "header/header": ["error", "../LICENSE_HEADER"],
         },
     },
 
