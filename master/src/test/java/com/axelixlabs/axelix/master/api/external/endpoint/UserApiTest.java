@@ -132,7 +132,7 @@ class UserApiTest {
         assertThat(cookieHeader).isNotNull();
         assertThat(cookieHeader).contains(cookieProperties.getAuthCookieName());
         assertThat(cookieHeader)
-                .contains(String.valueOf(jwtProperties.getLifespan().getSeconds()));
+                .contains(String.valueOf(jwtProperties.lifespan().getSeconds()));
         assertThat(cookieHeader).contains("HttpOnly");
         assertThat(cookieHeader).contains("SameSite=Strict");
     }

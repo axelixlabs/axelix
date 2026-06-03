@@ -80,8 +80,8 @@ public class TestRestTemplateBuilder {
             JwtEncoderService defaultJwtEncoderService) {
         this.cookieProperties = cookieProperties;
         this.defaultJwtEncoderService = defaultJwtEncoderService;
-        this.expiredJwtEncoderService = new DefaultJwtEncoderService(
-                jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), Duration.ZERO);
+        this.expiredJwtEncoderService =
+                new DefaultJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
     }
 
     public TestRestTemplate asViewer() {

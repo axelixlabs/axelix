@@ -169,8 +169,9 @@ class DefaultJwtDecoderServiceTest {
 
         PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
 
-        assertThat(decodedUser.getRoles()).first().satisfies(r -> assertThat(r.getAuthorities())
-                .hasSize(0));
+        assertThat(decodedUser.getRoles())
+                .first()
+                .satisfies(r -> assertThat(r.getAuthorities()).hasSize(0));
     }
 
     @Test

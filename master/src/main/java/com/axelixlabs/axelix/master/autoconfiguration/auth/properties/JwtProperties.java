@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
 import java.time.Duration;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 
 /**
@@ -29,36 +31,5 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
  * @author Nikita Kirillov
  */
 @SuppressWarnings("NullAway.Init")
-public class JwtProperties {
-
-    private JwtAlgorithm algorithm;
-    private String signingKey;
-    private Duration lifespan;
-
-    public JwtProperties setAlgorithm(JwtAlgorithm algorithm) {
-        this.algorithm = algorithm;
-        return this;
-    }
-
-    public JwtProperties setSigningKey(String signingKey) {
-        this.signingKey = signingKey;
-        return this;
-    }
-
-    public JwtProperties setLifespan(Duration lifespan) {
-        this.lifespan = lifespan;
-        return this;
-    }
-
-    public JwtAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    public String getSigningKey() {
-        return signingKey;
-    }
-
-    public Duration getLifespan() {
-        return lifespan;
-    }
-}
+@ConfigurationProperties(prefix = "axelix.master.auth.jwt")
+public record JwtProperties(JwtAlgorithm algorithm, String signingKey, Duration lifespan) {}

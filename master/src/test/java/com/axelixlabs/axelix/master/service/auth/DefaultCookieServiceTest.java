@@ -44,8 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest
-@TestPropertySource(
-        properties = {"axelix.master.auth.cookie.domain=example.com", "axelix.master.auth.jwt.lifespan=12h"})
+@TestPropertySource(properties = {"axelix.master.auth.jwt.lifespan=12h"})
 class DefaultCookieServiceTest {
 
     @Autowired
@@ -72,7 +71,7 @@ class DefaultCookieServiceTest {
             assertThat(cookie.isHttpOnly()).isTrue();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
     }
 
@@ -93,7 +92,7 @@ class DefaultCookieServiceTest {
             assertThat(cookie.isHttpOnly()).isFalse();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
         assertThat(decodedValue).startsWith("[").endsWith("]");
         assertThat(decodedValue).contains(DefaultAuthority.CACHES_TOGGLE.name());
@@ -116,7 +115,7 @@ class DefaultCookieServiceTest {
             assertThat(cookie.isHttpOnly()).isFalse();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
+            assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
         assertThat(decodedValue).isEqualTo("[]");
     }

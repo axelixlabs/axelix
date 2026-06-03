@@ -111,10 +111,12 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
         selfRegistrationInstanceEvictionScheduler.evictStaleInstances();
 
         // then
-        assertThat(staleIds).allSatisfy(instanceId -> assertThat(instanceRegistry.get(InstanceId.of(instanceId)))
-                .isEmpty());
-        assertThat(freshIds).allSatisfy(instanceId -> assertThat(instanceRegistry.get(InstanceId.of(instanceId)))
-                .isNotEmpty());
+        assertThat(staleIds)
+                .allSatisfy(instanceId -> assertThat(instanceRegistry.get(InstanceId.of(instanceId)))
+                        .isEmpty());
+        assertThat(freshIds)
+                .allSatisfy(instanceId -> assertThat(instanceRegistry.get(InstanceId.of(instanceId)))
+                        .isNotEmpty());
     }
 
     private void registerInstance(String instanceId, Instant latestHeartBeat) {

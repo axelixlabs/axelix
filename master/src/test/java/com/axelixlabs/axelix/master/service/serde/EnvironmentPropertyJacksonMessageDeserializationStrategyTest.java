@@ -108,7 +108,8 @@ class EnvironmentPropertyJacksonMessageDeserializationStrategyTest {
         assertThat(configSource.property().value()).isEqualTo("Java Virtual Machine Specification");
         assertThat(configSource.property().origin()).isNull();
 
-        sources.stream().filter(s -> !s.sourceName().equals("systemProperties")).forEach(s -> assertThat(s.property())
-                .isNull());
+        sources.stream()
+                .filter(s -> !s.sourceName().equals("systemProperties"))
+                .forEach(s -> assertThat(s.property()).isNull());
     }
 }

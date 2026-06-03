@@ -103,8 +103,9 @@ class EnhancedCacheManagerTest {
 
         // then.
         assertThat(cache.get(keyToRemove)).isNull();
-        assertThat(cache.get(keyToKeep)).isNotNull().satisfies(cacheValue -> assertThat(cacheValue.get())
-                .isEqualTo("value2"));
+        assertThat(cache.get(keyToKeep))
+                .isNotNull()
+                .satisfies(cacheValue -> assertThat(cacheValue.get()).isEqualTo("value2"));
     }
 
     @Test

@@ -23,7 +23,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -120,23 +119,18 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for the JWT-related part.
      */
     @AutoConfiguration
+    @EnableConfigurationProperties(JwtProperties.class)
     public static class JwtAutoConfiguration {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.master.auth.jwt")
-        public JwtProperties jwtProperties() {
-            return new JwtProperties();
-        }
 
         @Bean
         public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
             return new DefaultJwtEncoderService(
-                    jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
+                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
         }
 
         @Bean
         public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
-            return new DefaultJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
+            return new DefaultJwtDecoderService(jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 
@@ -144,13 +138,8 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for cookie.
      */
     @AutoConfiguration(after = JwtAutoConfiguration.class)
+    @EnableConfigurationProperties(CookieProperties.class)
     public static class CookieAutoConfiguration {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.master.auth.cookie")
-        public CookieProperties cookieProperties() {
-            return new CookieProperties();
-        }
 
         @Bean
         public CookieService cookieService(CookieProperties cookieProperties, JwtProperties jwtProperties) {

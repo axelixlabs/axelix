@@ -71,7 +71,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.87.0")
+            palantirJavaFormat("2.90.0")
             target("src/**/*.java")
             importOrder(
                 "java",

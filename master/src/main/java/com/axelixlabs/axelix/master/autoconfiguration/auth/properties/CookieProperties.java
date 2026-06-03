@@ -17,12 +17,15 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 /**
  * Cookie configuration properties.
  *
  * @since 11.12.2025
  * @author Nikita Kirillov
  */
+@ConfigurationProperties(prefix = "axelix.master.auth.cookie")
 public class CookieProperties {
 
     private final String authCookieName = "auth_token";

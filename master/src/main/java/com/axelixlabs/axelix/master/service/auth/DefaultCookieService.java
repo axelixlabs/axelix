@@ -48,7 +48,7 @@ public class DefaultCookieService implements CookieService {
 
     @Override
     public ResponseCookie buildAuthCookie(String token) {
-        return buildAuthCookie(token, jwtProperties.getLifespan().toSeconds());
+        return buildAuthCookie(token, jwtProperties.lifespan().toSeconds());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DefaultCookieService implements CookieService {
                 .encodeToString(authoritiesJsonArray.getBytes(StandardCharsets.UTF_8));
 
         return buildAuthoritiesMetadataCookie(
-                base64EncodedAuthoritiesMetadata, jwtProperties.getLifespan().getSeconds());
+                base64EncodedAuthoritiesMetadata, jwtProperties.lifespan().getSeconds());
     }
 
     @Override
