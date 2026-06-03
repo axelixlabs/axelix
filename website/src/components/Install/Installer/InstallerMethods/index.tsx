@@ -19,7 +19,7 @@ import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
 
 import { Dispatch, SetStateAction } from "react";
 
-import { Method } from "../../../../../models";
+import { Method } from "../../../../models";
 
 import styles from "./styles.module.css";
 

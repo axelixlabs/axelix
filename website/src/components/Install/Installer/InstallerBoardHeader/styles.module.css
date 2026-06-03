@@ -2,16 +2,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: 16px 8px;
     padding: 8px;
     border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
     background-color: rgb(6 20 10 / 70%);
+
+    @media (width <=650px) {
+        flex-direction: column;
+    }
 }
 
 .TabsWrapper {
     display: flex;
     gap: 4px;
-    flex-wrap: wrap;
+
+    @media (width <=650px) {
+        width: 100%;
+    }
+
+    @media (width <=470px) {
+        flex-direction: column;
+    }
 }
 
 .Tab {
@@ -23,6 +34,10 @@
     border: 1px solid transparent;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+
+    @media (width <=650px) {
+        flex: 1;
+    }
 
     &:hover {
         color: #e7eee0;
@@ -38,6 +53,10 @@
 .FileInfo {
     padding-inline: 10px;
     border-left: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
+
+    @media (width <=650px) {
+        border-left: none;
+    }
 }
 
 .Label {

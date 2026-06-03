@@ -17,24 +17,35 @@
  */
 import { GithubIcon } from "@/assets";
 
+import { DOCS_URL, GITHUB_URL } from "../../../utils";
+
 import styles from "./styles.module.css";
 
-export const ExternalLinks = () => {
+interface IProps {
+    onLinkClick?: () => void;
+    fullWidth?: boolean;
+}
+
+export const ExternalLinks = ({ onLinkClick, fullWidth }: IProps) => {
+    const linkClassName = fullWidth ? styles.LinkFullWidth : "";
+
     return (
-        <div className={styles.ExternalLinksWrapper}>
+        <div className={`${styles.MainWrapper} ${fullWidth ? styles.MainWrapperFullWidth : ""}`}>
             <a
-                href="https://axelix.io/docs/product/introduction"
-                className={styles.ExternalLink}
+                href={DOCS_URL}
+                className={`${styles.DocsLink} ${linkClassName}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={onLinkClick}
             >
                 Docs
             </a>
             <a
-                href="https://github.com/axelixlabs/axelix"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={styles.GitHubIcon}
+                className={`${styles.GitHubIcon} ${linkClassName}`}
+                onClick={onLinkClick}
             >
                 <GithubIcon width="11" height="11" />
                 GitHub

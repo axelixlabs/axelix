@@ -10,7 +10,7 @@
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
     backdrop-filter: blur(10px);
 
-    @media (width <= 720px) {
+    @media (width <=720px) {
         grid-template-columns: 1fr;
         gap: 18px;
         padding: 24px;
@@ -55,6 +55,10 @@
     max-width: 46ch;
 }
 
+.Arrow {
+    transition: transform .15s;
+}
+
 .Button {
     display: inline-flex;
     align-items: center;
@@ -79,11 +83,7 @@
     }
 }
 
-.Arrow {
-    transition: transform .15s;
-}
-
-@media (width <= 720px) {
+@media (width <=720px) {
     .Button {
         justify-self: start;
     }

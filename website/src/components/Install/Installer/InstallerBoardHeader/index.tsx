@@ -17,7 +17,7 @@
  */
 import { Dispatch, SetStateAction } from "react";
 
-import { CfgVariant, SbVariant } from "../../../../../models";
+import { CfgVariant, SbVariant } from "../../../../models";
 
 import { InstallerSelect } from "./InstallerSelect";
 import styles from "./styles.module.css";

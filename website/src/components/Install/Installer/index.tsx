@@ -22,7 +22,7 @@ import { DockerSnippet } from "./Snippets/DockerSnippet";
 import { K8sSnippet } from "./Snippets/K8sSnippet";
 import { useEffect, useRef, useState } from "react";
 
-import { CfgVariant, Method, SbVariant } from "../../../../models";
+import { CfgVariant, Method, SbVariant } from "../../../models";
 
 import { CopySnippet } from "./CopySnippet";
 import { InstallThirdStep } from "./InstallThirdStep";

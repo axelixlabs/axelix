@@ -15,24 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LogoIcon } from "@/assets";
+import { INavLink } from "../models";
 
-import { BurgerMenu } from "./BurgerMenu";
-import { ExternalLinks } from "./ExternalLinks";
-import { NavLinks } from "./NavLinks";
-import styles from "./styles.module.css";
+export const NAV_LINKS: INavLink[] = [
+    { href: "#capabilities", label: "Capabilities" },
+    { href: "#install", label: "Install" },
+    { href: "#enterprise", label: "Enterprise" },
+    { href: "#faq", label: "FAQ" },
+];
 
-export const Header = () => {
-    return (
-        <nav className={`MainContainer ${styles.MainWrapper}`}>
-            <div className={styles.InnerWrapper}>
-                <LogoIcon className={styles.LogoIcon} />
-                <NavLinks />
-                <div className={styles.ExternalLinksWrapper}>
-                    <ExternalLinks />
-                </div>
-                <BurgerMenu />
-            </div>
-        </nav>
-    );
-};
+export const DOCS_URL = "https://axelix.io/docs/product/introduction";
+export const GITHUB_URL = "https://github.com/axelixlabs/axelix";

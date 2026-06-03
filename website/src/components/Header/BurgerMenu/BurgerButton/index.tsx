@@ -15,24 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LogoIcon } from "@/assets";
-
-import { BurgerMenu } from "./BurgerMenu";
-import { ExternalLinks } from "./ExternalLinks";
-import { NavLinks } from "./NavLinks";
 import styles from "./styles.module.css";
 
-export const Header = () => {
+interface IProps {
+    isOpen: boolean;
+    onClick: () => void;
+}
+
+export const BurgerButton = ({ isOpen, onClick }: IProps) => {
     return (
-        <nav className={`MainContainer ${styles.MainWrapper}`}>
-            <div className={styles.InnerWrapper}>
-                <LogoIcon className={styles.LogoIcon} />
-                <NavLinks />
-                <div className={styles.ExternalLinksWrapper}>
-                    <ExternalLinks />
-                </div>
-                <BurgerMenu />
-            </div>
-        </nav>
+        <button className={styles.Button} onClick={onClick}>
+            <span className={`${styles.Line} ${isOpen ? styles.Line1Open : ""}`} />
+            <span className={`${styles.Line} ${isOpen ? styles.Line2Open : ""}`} />
+            <span className={`${styles.Line} ${isOpen ? styles.Line3Open : ""}`} />
+        </button>
     );
 };
