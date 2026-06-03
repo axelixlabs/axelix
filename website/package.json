@@ -12,30 +12,30 @@
     "lint:css:fix": "stylelint \"src/**/*.css\" --fix"
   },
   "dependencies": {
-    "next": "16.2.6",
-    "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@eslint/js": "9.20.0",
+    "@eslint/js": "9.39.4",
     "@stylistic/stylelint-plugin": "^5.2.0",
     "@svgr/webpack": "^8.1.0",
     "@tony.ganchev/eslint-plugin-header": "^3.4.4",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "24.12.4",
-    "@types/react": "19.2.15",
+    "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.6",
+    "eslint-config-next": "^16.2.7",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^63.0.0",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-jsdoc": "^63.0.1",
+    "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.6.0",
     "prettier": "^3.8.3",
     "stylelint": "^17.12.0",
     "stylelint-config-standard": "^40.0.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.60.0"
+    "typescript-eslint": "^8.60.1"
   }
 }
