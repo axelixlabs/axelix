@@ -79,8 +79,8 @@ public enum JwtAlgorithm {
         int keyBytes = signingKey.getBytes(StandardCharsets.UTF_8).length;
 
         if (keyBytes < minKeyLength) {
-            throw new IllegalArgumentException("JWT signing-key is too short for " + algorithmName + " (requires at least "
-                    + minKeyLength + " bytes). Set " + propertyName);
+            throw new IllegalArgumentException("JWT signing-key is too short for " + algorithmName
+                    + " (requires at least " + minKeyLength + " bytes). Set " + propertyName);
         }
     }
 }
