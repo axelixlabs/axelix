@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
  * to enable real-time transaction monitoring and statistics collection.
@@ -60,12 +62,16 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
     public TransactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector statsCollector, QueriesRecorder queriesCollector) {
+            TransactionStatsCollector statsCollector,
+            QueriesRecorder queriesCollector,
+            @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
+        this.metricsPublisher = metricsPublisher;
     }
 
     @Override
@@ -137,8 +143,8 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setTarget(bean);
         proxyFactory.setProxyTargetClass(true);
 
-        TransactionMonitoringInterceptor interceptor =
-                new TransactionMonitoringInterceptor(propagationCache, statsCollector, queriesCollector);
+        TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
+                propagationCache, statsCollector, queriesCollector, metricsPublisher);
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);

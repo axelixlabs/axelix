@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -28,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -116,8 +118,9 @@ class AxelixCachesEndpointAutoConfigurationTest {
     @TestConfiguration
     static class CustomCacheManagerBeanPostProcessorConfig {
         @Bean
-        public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CustomCacheManagerBeanPostProcessor();
+        public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
+                ObjectProvider<AxelixMetricsPublisher> objectProvider) {
+            return new CustomCacheManagerBeanPostProcessor(objectProvider);
         }
     }
 
@@ -135,5 +138,9 @@ class AxelixCachesEndpointAutoConfigurationTest {
         }
     }
 
-    static class CustomCacheManagerBeanPostProcessor extends CacheManagerBeanPostProcessor {}
+    static class CustomCacheManagerBeanPostProcessor extends CacheManagerBeanPostProcessor {
+        public CustomCacheManagerBeanPostProcessor(ObjectProvider<AxelixMetricsPublisher> objectProvider) {
+            super(objectProvider.getIfAvailable());
+        }
+    }
 }

@@ -18,12 +18,15 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cache.CacheManager;
+
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
  * BeanPostProcessor that wraps existing CacheManager beans with EnhancedCacheManager
@@ -35,6 +38,12 @@ import org.springframework.cache.CacheManager;
  */
 public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
+
+    public CacheManagerBeanPostProcessor(@Nullable AxelixMetricsPublisher metricsPublisher) {
+        this.metricsPublisher = metricsPublisher;
+    }
+
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         if (!(bean instanceof CacheManager) || bean instanceof EnhancedCacheManager) {
@@ -44,7 +53,7 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
     }
 
     private Object createEnhancedCacheManagerProxy(CacheManager target, String beanName) {
-        DefaultEnhancedCacheManager delegate = new DefaultEnhancedCacheManager(beanName, target);
+        DefaultEnhancedCacheManager delegate = new DefaultEnhancedCacheManager(beanName, target, metricsPublisher);
 
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(target);

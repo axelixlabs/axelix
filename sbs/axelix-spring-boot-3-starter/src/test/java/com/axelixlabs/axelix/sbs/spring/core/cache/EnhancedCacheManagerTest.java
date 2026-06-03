@@ -17,12 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -42,7 +46,8 @@ class EnhancedCacheManagerTest {
     @BeforeEach
     void setUp() {
         CacheManager cacheManager = new ConcurrentMapCacheManager();
-        subject = new DefaultEnhancedCacheManager("testCacheManagerBeanName", cacheManager);
+        AxelixMetricsPublisher axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(new SimpleMeterRegistry());
+        subject = new DefaultEnhancedCacheManager("testCacheManagerBeanName", cacheManager, axelixMetricsPublisher);
     }
 
     @Test

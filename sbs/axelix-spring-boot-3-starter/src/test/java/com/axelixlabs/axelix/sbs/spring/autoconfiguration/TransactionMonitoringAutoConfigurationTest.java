@@ -193,7 +193,7 @@ class TransactionMonitoringAutoConfigurationTest {
 
         public CustomTransactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            super(transactionStatsCollector, queriesCollector);
+            super(transactionStatsCollector, queriesCollector, null);
         }
     }
 

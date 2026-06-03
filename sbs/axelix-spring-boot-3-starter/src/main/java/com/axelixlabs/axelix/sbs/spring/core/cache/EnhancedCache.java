@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.cache.Cache;
 
@@ -54,6 +55,11 @@ public interface EnhancedCache extends Cache {
      * @return {@code true} if this cache is enabled, {@code false} otherwise.
      */
     boolean isEnabled();
+
+    /**
+     * Returns the internal enabled flag for metrics integration.
+     */
+    AtomicBoolean getEnabledFlag();
 
     /**
      * @return the estimated number of cache misses.

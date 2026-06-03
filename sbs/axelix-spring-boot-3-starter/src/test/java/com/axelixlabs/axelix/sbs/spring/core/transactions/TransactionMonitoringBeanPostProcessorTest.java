@@ -27,12 +27,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +47,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -132,8 +137,11 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+                TransactionStatsCollector transactionStatsCollector,
+                QueriesRecorder queriesCollector,
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+            return new TransactionMonitoringBeanPostProcessor(
+                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider.getIfAvailable());
         }
 
         @Bean
@@ -157,6 +165,11 @@ class TransactionMonitoringBeanPostProcessorTest {
         public PropagationTestService propagationTestService(
                 OwnerRepository ownerRepository, PropagationTestHelper helper) {
             return new PropagationTestService(ownerRepository, helper);
+        }
+
+        @Bean
+        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+            return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
     }
 
