@@ -19,9 +19,14 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Map;
 
+import io.micrometer.core.instrument.MeterRegistry;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +37,8 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.CacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 /**
  * Auto-configuration class for the caches custom actuator endpoint.
@@ -40,7 +47,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = {CacheAutoConfiguration.class})
+@AutoConfiguration(after = {CacheAutoConfiguration.class, CompositeMeterRegistryAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = AxelixCachesEndpoint.class)
 public class AxelixCachesEndpointAutoConfiguration {
 
@@ -67,7 +74,15 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-        return new CacheManagerBeanPostProcessor();
+    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+        return new CacheManagerBeanPostProcessor(metricsPublisherObjectProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(MeterRegistry.class)
+    public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+        return new DefaultAxelixMetricsPublisher(meterRegistry);
     }
 }

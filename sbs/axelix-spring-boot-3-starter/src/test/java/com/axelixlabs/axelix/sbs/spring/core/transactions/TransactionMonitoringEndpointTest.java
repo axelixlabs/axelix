@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -33,9 +34,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import com.jayway.jsonpath.JsonPath;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,10 +57,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
+import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_DURATION;
+import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_QUERIES;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -73,6 +82,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Import({TransactionMonitoringEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
 class TransactionMonitoringEndpointTest {
 
+    private final String expectedClassName = PropagationTestHelper.class.getSimpleName();
+
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
@@ -84,6 +95,9 @@ class TransactionMonitoringEndpointTest {
 
     @Autowired
     private OwnerRepository ownerRepository;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     @BeforeEach
     void cleanUp() {
@@ -143,6 +157,9 @@ class TransactionMonitoringEndpointTest {
         assertThatJson(responseBody)
                 .node("entrypoints[0].executionStats.medianDurationMs")
                 .isNumber();
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "saveRequiresNew", "success", 1);
     }
 
     @Test
@@ -220,6 +237,9 @@ class TransactionMonitoringEndpointTest {
             assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
             assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
         }
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "testSaveMultipleOwners", "success", 3);
     }
 
     @Test
@@ -282,6 +302,9 @@ class TransactionMonitoringEndpointTest {
             assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
             assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
         }
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "findOwnerById", "success", 2);
     }
 
     @Test
@@ -342,6 +365,9 @@ class TransactionMonitoringEndpointTest {
             assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
             assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
         }
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "updateOwner", "success", 2);
     }
 
     @Test
@@ -380,6 +406,9 @@ class TransactionMonitoringEndpointTest {
                   } ]
                 }
             """);
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "testRollbackScenario", "error", 1);
     }
 
     @Test
@@ -441,6 +470,36 @@ class TransactionMonitoringEndpointTest {
                   } ]
                 }
             """);
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry(expectedClassName, "testNested", "success", 1);
+    }
+
+    private void checkMeterRegistry(
+            String expectedClassName, String expectedMethodName, String status, int expectedQueryCount) {
+        // given when. Verify Transaction Duration Timer
+        Timer transactionTimer = meterRegistry
+                .find(TRANSACTION_DURATION)
+                .tag("class", expectedClassName)
+                .tag("method", expectedMethodName)
+                .tag("status", status)
+                .timer();
+
+        // then.
+        assertThat(transactionTimer).isNotNull();
+        assertThat(transactionTimer.count()).isEqualTo(1);
+        assertThat(transactionTimer.totalTime(TimeUnit.NANOSECONDS)).isGreaterThan(0);
+
+        // given when. Verify SQL Queries Counter
+        Counter queriesCounter = meterRegistry
+                .find(TRANSACTION_QUERIES)
+                .tag("class", expectedClassName)
+                .tag("method", expectedMethodName)
+                .counter();
+
+        // then.
+        assertThat(queriesCounter).isNotNull();
+        assertThat(queriesCounter.count()).isEqualTo(expectedQueryCount);
     }
 
     @ProtectedEndpointTests(
@@ -479,8 +538,11 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+                TransactionStatsCollector transactionStatsCollector,
+                QueriesRecorder queriesCollector,
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+            return new TransactionMonitoringBeanPostProcessor(
+                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider.getIfAvailable());
         }
 
         @Bean
@@ -497,6 +559,11 @@ class TransactionMonitoringEndpointTest {
         @Bean
         public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
             return new PropagationTestHelper(ownerRepository);
+        }
+
+        @Bean
+        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+            return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
     }
 

@@ -17,13 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import io.micrometer.core.instrument.MeterRegistry;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
@@ -42,7 +49,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration
+@AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
 
@@ -83,8 +90,11 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+            TransactionStatsCollector transactionStatsCollector,
+            QueriesRecorder queriesCollector,
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+        return new TransactionMonitoringBeanPostProcessor(
+                transactionStatsCollector, queriesCollector, metricsPublisherObjectProvider.getIfAvailable());
     }
 
     @Bean
@@ -98,5 +108,12 @@ public class TransactionMonitoringAutoConfiguration {
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             QueriesRecorder queriesCollector) {
         return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(MeterRegistry.class)
+    public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+        return new DefaultAxelixMetricsPublisher(meterRegistry);
     }
 }

@@ -21,12 +21,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
  * Default {@link EnhancedCacheManager} implementation that delegates the core
@@ -44,10 +47,13 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     private final String cacheManagerBeanName;
     private final CacheManager delegate;
     private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
-    public DefaultEnhancedCacheManager(String cacheManagerBeanName, CacheManager delegate) {
+    public DefaultEnhancedCacheManager(
+            String cacheManagerBeanName, CacheManager delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.delegate = delegate;
         this.cacheManagerBeanName = cacheManagerBeanName;
+        this.metricsPublisher = metricsPublisher;
     }
 
     @Override
@@ -81,11 +87,16 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        return caches.computeIfAbsent(name, s -> {
+        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
             Cache cache = delegate.getCache(s);
-
-            return cache != null ? new DefaultEnhancedCache(cache) : null;
+            return cache != null ? new DefaultEnhancedCache(cache, metricsPublisher) : null;
         });
+
+        if (enhancedCache != null && metricsPublisher != null) {
+            metricsPublisher.registerCacheStatusGauge(name, new AtomicBoolean(enhancedCache.isEnabled()));
+        }
+
+        return enhancedCache;
     }
 
     @Override
