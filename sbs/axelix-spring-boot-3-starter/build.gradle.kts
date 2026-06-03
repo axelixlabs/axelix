@@ -5,7 +5,7 @@ plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
     // What version of Kotlin are we going to use here...?
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.0"
 }
 
 val springBootVersion = "3.0.13"
