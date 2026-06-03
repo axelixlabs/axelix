@@ -15,92 +15,88 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Dispatch, SetStateAction } from "react";
+import { EInstallConfigurationVariant, EInstallOpenSelect, ESpringBootVariant } from "@/models";
+import { installConfigurationOptions, installSpringBootOptions, installStepNames } from "@/utils";
 
-import { CfgVariant, SbVariant } from "../../../../models";
+import { Dispatch, SetStateAction } from "react";
 
 import { InstallerSelect } from "./InstallerSelect";
 import styles from "./styles.module.css";
 
-const SB_OPTIONS: { id: SbVariant; label: string }[] = [
-    { id: "sb2", label: "Spring Boot 2" },
-    { id: "sb3", label: "Spring Boot 3" },
-    { id: "sb4", label: "Spring Boot 4" },
-];
-
-const CFG_OPTIONS: { id: CfgVariant; label: string }[] = [
-    { id: "yaml", label: "yaml" },
-    { id: "properties", label: "properties" },
-];
-
 interface IProps {
-    step: 1 | 2 | 3;
-    setStep: Dispatch<SetStateAction<1 | 2 | 3>>;
-    STEP_NAMES: Record<number, string>;
+    installStep: 1 | 2 | 3;
+    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3>>;
     selectRef: any;
-    openSelect: null | "sb" | "cfg";
-    setOpenSelect: Dispatch<SetStateAction<null | "sb" | "cfg">>;
-    setCfg: Dispatch<SetStateAction<CfgVariant>>;
-    cfg: CfgVariant;
-    sb: SbVariant;
-    setSb: Dispatch<SetStateAction<SbVariant>>;
+    openSelect: EInstallOpenSelect;
+    setOpenSelect: Dispatch<SetStateAction<EInstallOpenSelect>>;
+    setInstallConfiguration: Dispatch<SetStateAction<EInstallConfigurationVariant>>;
+    installConfiguration: EInstallConfigurationVariant;
+    springBootVariant: ESpringBootVariant;
+    setSpringBootVariant: Dispatch<SetStateAction<ESpringBootVariant>>;
 }
 
 export const InstallerBoardHeader = ({
-    step,
-    setStep,
-    STEP_NAMES,
+    installStep,
+    setInstallStep,
     selectRef,
     openSelect,
     setOpenSelect,
-    setCfg,
-    setSb,
-    sb,
-    cfg,
+    setInstallConfiguration,
+    setSpringBootVariant,
+    springBootVariant,
+    installConfiguration,
 }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.TabsWrapper}>
-                {([1, 2, 3] as const).map((s) => (
+                {([1, 2, 3] as const).map((step) => (
                     <button
-                        key={s}
+                        key={step}
                         type="button"
-                        className={`${styles.Tab} ${step === s ? styles.ActiveTab : ""}`}
-                        onClick={() => setStep(s)}
+                        className={`${styles.Tab} ${installStep === step ? styles.ActiveTab : ""}`}
+                        onClick={() => setInstallStep(step)}
                     >
-                        {s}. {STEP_NAMES[s]}
+                        {step}. {installStepNames[step]}
                     </button>
                 ))}
             </div>
             <div className={styles.FileInfo} ref={selectRef}>
-                {step === 1 && <span className={styles.Label}>Shell</span>}
-                {step === 2 && (
+                {installStep === 1 && <span className={styles.Label}>Shell</span>}
+                {installStep === 2 && (
                     <InstallerSelect
-                        label={SB_OPTIONS.find((o) => o.id === sb)!.label}
-                        open={openSelect === "sb"}
+                        label={installSpringBootOptions.find((o) => o.key === springBootVariant)!.label}
+                        open={openSelect === EInstallOpenSelect.SPRING_BOOT}
                         onToggle={() => {
-                            setOpenSelect(openSelect === "sb" ? null : "sb");
+                            setOpenSelect(
+                                openSelect === EInstallOpenSelect.SPRING_BOOT
+                                    ? EInstallOpenSelect.NULL
+                                    : EInstallOpenSelect.SPRING_BOOT,
+                            );
                         }}
-                        options={SB_OPTIONS}
-                        active={sb}
+                        options={installSpringBootOptions}
+                        active={springBootVariant}
                         onPick={(id) => {
-                            setSb(id as SbVariant);
-                            setOpenSelect(null);
+                            setSpringBootVariant(id as ESpringBootVariant);
+                            setOpenSelect(EInstallOpenSelect.NULL);
                         }}
                     />
                 )}
-                {step === 3 && (
+                {installStep === 3 && (
                     <InstallerSelect
-                        label={cfg}
-                        open={openSelect === "cfg"}
+                        label={installConfiguration}
+                        open={openSelect === EInstallOpenSelect.CONFIGURATION}
                         onToggle={() => {
-                            setOpenSelect(openSelect === "cfg" ? null : "cfg");
+                            setOpenSelect(
+                                openSelect === EInstallOpenSelect.CONFIGURATION
+                                    ? EInstallOpenSelect.NULL
+                                    : EInstallOpenSelect.CONFIGURATION,
+                            );
                         }}
-                        options={CFG_OPTIONS}
-                        active={cfg}
+                        options={installConfigurationOptions}
+                        active={installConfiguration}
                         onPick={(id) => {
-                            setCfg(id as CfgVariant);
-                            setOpenSelect(null);
+                            setInstallConfiguration(id as EInstallConfigurationVariant);
+                            setOpenSelect(EInstallOpenSelect.NULL);
                         }}
                     />
                 )}

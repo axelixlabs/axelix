@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { CheckIcon, ChevronDownIcon } from "@/assets";
+import { IInstallConfigurationOptions, IInstallSpringBootOptions } from "@/models";
 
 import styles from "./styles.module.css";
 
@@ -23,7 +24,7 @@ export interface IProps {
     label: string;
     open: boolean;
     onToggle: () => void;
-    options: { id: string; label: string }[];
+    options: IInstallSpringBootOptions[] | IInstallConfigurationOptions[];
     active: string;
     onPick: (id: string) => void;
 }
@@ -43,13 +44,13 @@ export const InstallerSelect = ({ label, open, onToggle, options, active, onPick
                 <ChevronDownIcon className={styles.Arrow} />
             </button>
             <div className={styles.Menu}>
-                {options.map(({ id, label }) => (
+                {options.map(({ key, label }) => (
                     <button
-                        key={id}
-                        className={`${styles.Option} ${active === id ? styles.ActiveOption : ""}`}
+                        key={key}
+                        className={`${styles.Option} ${active === key ? styles.ActiveOption : ""}`}
                         type="button"
                         onClick={() => {
-                            onPick(id);
+                            onPick(key);
                         }}
                     >
                         {label}

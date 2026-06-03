@@ -32,7 +32,7 @@ export const CopySnippet = ({ activeSnippetRef }: IProps) => {
     async function copyMain() {
         const el = activeSnippetRef.current;
         if (!el) return;
-        const text = (el.innerText || "").replace(/ /g, " ");
+        const text = (el.innerText || "").replace(/ /g, " ");
         try {
             await navigator.clipboard.writeText(text);
             setCopied(true);

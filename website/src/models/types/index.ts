@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export type Method = "docker" | "compose" | "k8s" | "bare";
-export type SbVariant = "sb2" | "sb3" | "sb4";
-export type CfgVariant = "yaml" | "properties";
-export type SnippetProps = { refEl: React.RefObject<HTMLElement | null> };
+import { EInstallMethod, ESpringBootVariant } from "../enums";
+import { IInstallMethodData } from "../interfaces";
+
+export type TInstallSpringBootArtifact = Record<ESpringBootVariant, string>;
+export type TInstallStepNames = Record<1 | 2 | 3, string>;
+export type TInstallMethodData = Record<EInstallMethod, IInstallMethodData>;
