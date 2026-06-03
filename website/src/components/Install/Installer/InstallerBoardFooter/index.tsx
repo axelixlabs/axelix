@@ -29,7 +29,7 @@ export const InstallerBoardFooter = ({ step, setStep, STEP_NAMES }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
             <button
-                className={styles.NavButton}
+                className={`${styles.NavButton} ${styles.BackButton}`}
                 type="button"
                 disabled={step <= 1}
                 onClick={() => {
@@ -40,16 +40,16 @@ export const InstallerBoardFooter = ({ step, setStep, STEP_NAMES }: IProps) => {
             >
                 ← {step > 1 ? STEP_NAMES[(step - 1) as 1 | 2 | 3] : "Previous"}
             </button>
-            <span className={styles.Status}>Step {step} of 3</span>
+            <div className={styles.Status}>Step {step} of 3</div>
             <button
-                className={`${styles.NavButton} ${styles.Next}`}
+                className={`${styles.NavButton} ${styles.NextButton}`}
                 type="button"
                 disabled={step === 3}
                 onClick={() => {
                     setStep((step + 1) as 1 | 2 | 3);
                 }}
             >
-                Next: {STEP_NAMES[(step + 1) as 1 | 2 | 3]} →
+                {STEP_NAMES[(step + 1) as 1 | 2 | 3]} →
             </button>
         </div>
     );

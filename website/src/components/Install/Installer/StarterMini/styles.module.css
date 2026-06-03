@@ -41,7 +41,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: none;
+    background-color: transparent;
     border: 1px solid color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
     color: color-mix(in srgb, var(--axelix-green-400) 85%, transparent);
     font-family: var(--axelix-font);
@@ -49,12 +49,12 @@
     padding: 4px 10px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background .15s, color .15s, border-color .15s;
+    transition: background-color .15s, color .15s, border-color .15s;
 }
 
 .MiniCopy:hover {
     color: var(--axelix-green-400);
-    background: color-mix(in srgb, var(--axelix-green-400) 12%, transparent);
+    background-color: color-mix(in srgb, var(--axelix-green-400) 12%, transparent);
     border-color: color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
 }
 

@@ -35,7 +35,7 @@
   border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
 }
 
-@media (width <= 980px) {
+@media (width <=980px) {
   .Top {
     grid-template-columns: 1fr;
     gap: 48px;
@@ -108,6 +108,21 @@
   transition: background .15s, color .15s, border-color .15s, transform .15s;
 }
 
+.Col a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: #e7eee0;
+  transition: color .15s, transform .15s;
+}
+
+.Bottom a {
+  color: inherit;
+  transition: color .15s;
+}
+
 .Socials a:hover {
   color: var(--axelix-green-400);
   border-color: color-mix(in srgb, var(--axelix-green-400) 45%, transparent);
@@ -127,7 +142,7 @@
   gap: 32px;
 }
 
-@media (width <= 640px) {
+@media (width <=640px) {
   .NavCols {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px 24px;
@@ -151,16 +166,6 @@
   display: flex;
   flex-direction: column;
   gap: 11px;
-}
-
-.Col a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 14.5px;
-  line-height: 1.4;
-  color: #e7eee0;
-  transition: color .15s, transform .15s;
 }
 
 .Col a:hover {
@@ -249,11 +254,6 @@
   background: var(--axelix-green-400);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
   animation: pulse 1.8s infinite;
-}
-
-.Bottom a {
-  color: inherit;
-  transition: color .15s;
 }
 
 .Bottom a:hover {

@@ -1,0 +1,55 @@
+.MainWrapper {
+    display: none;
+    justify-content: flex-end;
+
+    @media (width <= 768px) {
+        display: flex;
+    }
+}
+
+.MobileMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    padding: 6px;
+    border-radius: 16px;
+    background-color: var(--axelix-paper);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+    box-shadow:
+        0 1px 0 color-mix(in srgb, #fff 80%, transparent) inset,
+        0 8px 32px color-mix(in srgb, var(--axelix-ink) 12%, transparent),
+        0 2px 8px color-mix(in srgb, var(--axelix-ink) 6%, transparent);
+}
+
+.NavLinks {
+    display: flex;
+    flex-direction: column;
+}
+
+.NavLink {
+    font-size: 14px;
+    color: var(--axelix-ink-2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
+        color: var(--axelix-ink);
+    }
+}
+
+.NavLinkActive {
+    background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
+    color: var(--axelix-green-800);
+}
+
+.Divider {
+    height: 1px;
+    background-color: color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+    margin-block: 4px;
+}
+

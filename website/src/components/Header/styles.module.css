@@ -7,6 +7,7 @@
 }
 
 .InnerWrapper {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -20,6 +21,16 @@
     0 1px 0 color-mix(in srgb, #fff 80%, transparent) inset,
     0 1px 0 color-mix(in srgb, var(--axelix-green-500) 10%, transparent);
   margin: 0 auto;
+
+  @media (width <=768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ExternalLinksWrapper {
+  @media (width <= 768px) {
+    display: none;
+  }
 }
 
 .LogoIcon {

@@ -1,11 +1,14 @@
 .MainWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     padding: 10px 12px;
     border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 14%, transparent);
     background-color: rgb(6 20 10 / 55%);
+
+    @media (width <=550px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .NavButton {
@@ -13,11 +16,8 @@
     font-family: var(--axelix-font);
     font-size: 13px;
     font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
     padding: 6px 10px;
-    border-radius: 7px;
+    border-radius: 8px;
 
     &:disabled {
         opacity: 0;
@@ -26,8 +26,16 @@
 
     &:hover {
         color: #fff;
-        background: color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
+        background-color: color-mix(in srgb, var(--axelix-green-400) 8%, transparent);
     }
+}
+
+.BackButton {
+    justify-self: start;
+}
+
+.NextButton {
+    justify-self: end;
 }
 
 .Status {
@@ -36,9 +44,10 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgb(231 238 224 / 50%);
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
+    justify-self: center;
 
     &::before {
         content: "";
@@ -47,5 +56,10 @@
         border-radius: 50%;
         background-color: var(--axelix-green-400);
         box-shadow: 0 0 0 2px color-mix(in srgb, var(--axelix-green-400) 22%, transparent);
+    }
+
+    @media (width <=550px) {
+        order: 1;
+        grid-column: 1 / -1;
     }
 }

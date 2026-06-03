@@ -1,12 +1,14 @@
-.ExternalLinksWrapper {
+.MainWrapper {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     column-gap: 8px;
 }
 
-.ExternalLink,
+.DocsLink,
 .GitHubIcon {
+    display: flex;
+    align-items: center;
     padding: 4px 12px;
     border-radius: 999px;
     font-family: var(--axelix-font);
@@ -15,20 +17,29 @@
     font-weight: 500;
 }
 
-.ExternalLink {
+.MainWrapperFullWidth {
+    justify-content: stretch;
+}
+
+.LinkFullWidth {
+    flex: 1;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 9px 12px;
+}
+
+.DocsLink {
     border: 1px solid color-mix(in srgb, var(--axelix-ink) 18%, transparent);
     color: var(--axelix-ink);
     transition: background-color 0.3s, border-color 0.3s;
-}
 
-.ExternalLink:hover {
-    background-color: color-mix(in srgb, var(--axelix-ink) 6%, transparent);
-    border-color: color-mix(in srgb, var(--axelix-ink) 35%, transparent);
+    &:hover {
+        background-color: color-mix(in srgb, var(--axelix-ink) 6%, transparent);
+        border-color: color-mix(in srgb, var(--axelix-ink) 35%, transparent);
+    }
 }
 
 .GitHubIcon {
-    display: flex;
-    align-items: center;
     column-gap: 8px;
     background-color: var(--axelix-ink);
     color: #fff;

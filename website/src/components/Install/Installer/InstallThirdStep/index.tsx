@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CfgVariant, Method } from "../../../../../models";
+import { CfgVariant, Method } from "../../../../models";
 import { K8sPropertiesSnippet } from "../Snippets/K8sPropertiesSnippet";
 import { K8sYamlSnippet } from "../Snippets/K8sYamlSnippet";
 import { PropertiesSnippet } from "../Snippets/PropertiesSnippet";

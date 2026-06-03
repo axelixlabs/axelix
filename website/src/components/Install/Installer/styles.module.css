@@ -11,7 +11,7 @@
         0 1px 0 color-mix(in srgb, var(--axelix-green-400) 14%, transparent) inset,
         0 24px 60px -28px rgb(15 30 5 / 45%);
 
-    @media (width <= 980px) {
+    @media (width <= 950px) {
         grid-template-columns: 1fr;
         min-height: auto;
     }
@@ -24,7 +24,6 @@
 }
 
 .InstallerBoardInnerWrapper {
-    position: relative;
     flex: 1;
     border-radius: 14px;
     background-color: rgb(10 28 4 / 85%);
@@ -35,6 +34,7 @@
 }
 
 .InstallerBoard {
+    position: relative;
     flex: 1;
     padding-block: 16px;
     overflow: auto;

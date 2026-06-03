@@ -15,24 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LogoIcon } from "@/assets";
-
-import { BurgerMenu } from "./BurgerMenu";
-import { ExternalLinks } from "./ExternalLinks";
-import { NavLinks } from "./NavLinks";
-import styles from "./styles.module.css";
-
-export const Header = () => {
-    return (
-        <nav className={`MainContainer ${styles.MainWrapper}`}>
-            <div className={styles.InnerWrapper}>
-                <LogoIcon className={styles.LogoIcon} />
-                <NavLinks />
-                <div className={styles.ExternalLinksWrapper}>
-                    <ExternalLinks />
-                </div>
-                <BurgerMenu />
-            </div>
-        </nav>
-    );
-};
+export interface INavLink {
+    href: string;
+    label: string;
+}

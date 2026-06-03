@@ -18,14 +18,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import styles from "./styles.module.css";
+import { NAV_LINKS } from "../../../utils";
 
-const NAV_LINKS = [
-    { href: "#capabilities", label: "Capabilities" },
-    { href: "#install", label: "Install" },
-    { href: "#enterprise", label: "Enterprise" },
-    { href: "#faq", label: "FAQ" },
-];
+import styles from "./styles.module.css";
 
 export const NavLinks = () => {
     const [hash, setHash] = useState<string>("");
@@ -45,7 +40,7 @@ export const NavLinks = () => {
     }, []);
 
     return (
-        <div className={styles.LinksWrapper}>
+        <div className={styles.MainWrapper}>
             {NAV_LINKS.map(({ href, label }) => (
                 <a key={href} href={href} className={`${styles.Link} ${hash === href ? styles.ActiveLink : ""}`}>
                     {label}

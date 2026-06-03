@@ -70,6 +70,11 @@
     text-align: center;
 }
 
+.Arrow {
+    color: var(--axelix-green-400);
+    transition: transform 0.3s;
+}
+
 .Documentations {
     display: inline-flex;
     align-items: center;
@@ -87,9 +92,4 @@
     &:hover .Arrow {
         transform: translateX(3px);
     }
-}
-
-.Arrow {
-    color: var(--axelix-green-400);
-    transition: transform 0.3s;
 }
