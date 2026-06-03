@@ -80,7 +80,7 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
     }
 
     public void setInstanceActuatorUrl(String instanceActuatorUrl) {
-        validateUrl(instanceActuatorUrl, "axelix.sbs.discovery.instance-url");
+        validateUrl(instanceActuatorUrl, "axelix.sbs.discovery.instance-actuator-url");
         this.instanceActuatorUrl = cleanInstanceActuatorUrl(instanceActuatorUrl);
     }
 
@@ -97,7 +97,7 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
     @Override
     public void validate() {
         validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
-        validateRequiredProperty(instanceActuatorUrl, "axelix.sbs.discovery.instance-url");
+        validateRequiredProperty(instanceActuatorUrl, "axelix.sbs.discovery.instance-actuator-url");
         validateRequiredProperty(instanceName, "axelix.sbs.discovery.instance-name");
     }
 
