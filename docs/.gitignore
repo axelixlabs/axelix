@@ -1,2 +1,5 @@
+# IDE
+.idea
+
 node_modules
 .docusaurus
