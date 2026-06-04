@@ -68,7 +68,7 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
 
     // Looks up for the pattern that uses property source name indexed usage, such as
     // "#{systemProperties['server.port']}"
-    private final Pattern SYSTEM_PROPERTIES_ACCESS_PATTERN = Pattern.compile("\\[\\s*['\"]([^'\"]+)['\"]\\s*]");
+    private static final Pattern SYSTEM_PROPERTIES_ACCESS_PATTERN = Pattern.compile("\\[\\s*['\"]([^'\"]+)['\"]\\s*]");
 
     public ValueInjectionTrackerBeanPostProcessor(PropertyNameNormalizer propertyNameNormalizer) {
         this.propertyNameNormalizer = propertyNameNormalizer;

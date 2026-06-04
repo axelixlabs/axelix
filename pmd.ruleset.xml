@@ -20,6 +20,13 @@
         </properties>
     </rule>
 
+    <rule ref="category/java/codestyle.xml/FieldNamingConventions">
+      <properties>
+        <property name="enumConstantPattern" value="[A-Z][A-Z_0-9]*" />
+        <property name="constantPattern" value="[A-Za-z_0-9]*" />
+      </properties>
+    </rule>
+
     <rule ref="category/java/codestyle.xml/ClassNamingConventions"/>
     <rule ref="category/java/codestyle.xml/PackageCase"/>
 

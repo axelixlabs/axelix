@@ -61,7 +61,8 @@ public class AxelixMetricsEndpoint {
     private final Map<BaseUnit, BaseUnitValueTransformer> baseUnitValueTransformers;
     private final BaseUnitParser baseUnitParser;
 
-    private final Set<Statistic> ACTUAL_VALUE_STATISTICS = Set.of(Statistic.VALUE, Statistic.TOTAL, Statistic.COUNT);
+    private static final Set<Statistic> ACTUAL_VALUE_STATISTICS =
+            Set.of(Statistic.VALUE, Statistic.TOTAL, Statistic.COUNT);
 
     public AxelixMetricsEndpoint(
             MeterRegistry registry,
