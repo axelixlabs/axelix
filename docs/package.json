@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build",
+    "build": "docusaurus build && node scripts/move-llms-into-docs.mjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -27,7 +27,10 @@
     "@docusaurus/module-type-aliases": "3.10.1",
     "@docusaurus/tsconfig": "3.10.1",
     "@docusaurus/types": "3.10.1",
-    "typescript": "~5.9.3"
+    "@signalwire/docusaurus-plugin-llms-txt": "1.2.2",
+    "@types/hast": "^3.0.4",
+    "typescript": "~5.9.3",
+    "unist-util-visit": "^5.1.0"
   },
   "browserslist": {
     "production": [
