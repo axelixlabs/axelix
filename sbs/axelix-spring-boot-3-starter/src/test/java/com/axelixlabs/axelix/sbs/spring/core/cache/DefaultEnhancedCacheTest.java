@@ -19,15 +19,26 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import java.util.concurrent.Callable;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.cache.Cache;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+
+import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_ENABLED;
+import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_REQUESTS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,25 +50,41 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link DefaultEnhancedCache}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @ExtendWith(MockitoExtension.class)
 class DefaultEnhancedCacheTest {
 
     private static final String KEY = "testKey";
     private static final String VALUE = "testValue";
+    private static final String CACHE_NAME = "testCacheName";
+
+    private MeterRegistry meterRegistry;
+    private AxelixMetricsPublisher axelixMetricsPublisher;
 
     @Mock
     private Cache delegate;
 
-    private DefaultEnhancedCache enhancedCache;
+    private EnhancedCache enhancedCache;
 
     @BeforeEach
     void setUp() {
-        enhancedCache = new DefaultEnhancedCache(delegate);
+        meterRegistry = new SimpleMeterRegistry();
+        axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
+
+        Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
+        enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);
     }
 
     @Nested
     class EnableDisable {
+
+        @BeforeEach
+        void setUp() {
+            EnhancedCacheManager enhancedCacheManager = new DefaultEnhancedCacheManager(
+                    "cacheManager", new ConcurrentMapCacheManager(CACHE_NAME), axelixMetricsPublisher);
+            enhancedCache = enhancedCacheManager.getCache(CACHE_NAME);
+        }
 
         @Test
         void shouldBeEnabledByDefault() {
@@ -69,18 +96,21 @@ class DefaultEnhancedCacheTest {
 
             // then.
             assertThat(isEnabled).isTrue();
+            checkMeterRegistryCacheStatusGauge(isEnabled);
         }
 
         @Test
         void shouldDisableCache() {
             // given.
             assertThat(enhancedCache.isEnabled()).isTrue();
+            checkMeterRegistryCacheStatusGauge(true);
 
             // when.
             enhancedCache.disable();
 
             // then.
             assertThat(enhancedCache.isEnabled()).isFalse();
+            checkMeterRegistryCacheStatusGauge(false);
         }
 
         @Test
@@ -88,24 +118,28 @@ class DefaultEnhancedCacheTest {
             // given.
             enhancedCache.disable();
             assertThat(enhancedCache.isEnabled()).isFalse();
+            checkMeterRegistryCacheStatusGauge(false);
 
             // when.
             enhancedCache.enable();
 
             // then.
             assertThat(enhancedCache.isEnabled()).isTrue();
+            checkMeterRegistryCacheStatusGauge(true);
         }
 
         @Test
         void shouldBeNoOpWhenCacheIsAlreadyEnabled() {
             // given.
             assertThat(enhancedCache.isEnabled()).isTrue();
+            checkMeterRegistryCacheStatusGauge(true);
 
             // when.
             enhancedCache.enable();
 
             // then.
             assertThat(enhancedCache.isEnabled()).isTrue();
+            checkMeterRegistryCacheStatusGauge(true);
         }
 
         @Test
@@ -113,12 +147,14 @@ class DefaultEnhancedCacheTest {
             // given.
             enhancedCache.disable();
             assertThat(enhancedCache.isEnabled()).isFalse();
+            checkMeterRegistryCacheStatusGauge(false);
 
             // when.
             enhancedCache.disable();
 
             // then.
             assertThat(enhancedCache.isEnabled()).isFalse();
+            checkMeterRegistryCacheStatusGauge(false);
         }
     }
 
@@ -461,6 +497,8 @@ class DefaultEnhancedCacheTest {
             assertThat(enhancedCache.getCacheLookups())
                     .extracting(CacheLookup::outcome)
                     .containsOnly(CacheLookup.Outcome.HIT);
+            // and then.
+            checkMeterRegistryCacheLookup(3d, 0d);
         }
 
         @Test
@@ -480,6 +518,8 @@ class DefaultEnhancedCacheTest {
             assertThat(enhancedCache.getCacheLookups())
                     .extracting(CacheLookup::outcome)
                     .containsOnly(CacheLookup.Outcome.MISS);
+            // and then.
+            checkMeterRegistryCacheLookup(0d, 3d);
         }
 
         @Test
@@ -521,6 +561,42 @@ class DefaultEnhancedCacheTest {
                             CacheLookup.Outcome.HIT,
                             CacheLookup.Outcome.MISS,
                             CacheLookup.Outcome.HIT);
+            // and then.
+            checkMeterRegistryCacheLookup(3d, 2d);
+        }
+    }
+
+    private void checkMeterRegistryCacheStatusGauge(boolean cacheEnabled) {
+        Gauge gauge = meterRegistry.find(CACHE_ENABLED).tag("cache", CACHE_NAME).gauge();
+
+        assertThat(gauge).isNotNull();
+        // The value is returned as a double (1.0 for enabled, 0.0 for disabled)
+        assertThat(gauge.value()).isEqualTo(cacheEnabled ? 1.0 : 0.0);
+    }
+
+    private void checkMeterRegistryCacheLookup(double expectedHits, double expectedMisses) {
+        // 1. Verify Cache Hits
+        Counter cacheHitsCounter = meterRegistry
+                .find(CACHE_REQUESTS)
+                .tag("cache", CACHE_NAME)
+                .tag("result", CacheLookup.Outcome.HIT.getValue())
+                .counter();
+
+        if (expectedHits != 0.0) {
+            assertThat(cacheHitsCounter).isNotNull();
+            assertThat(cacheHitsCounter.count()).isEqualTo(expectedHits);
+        }
+
+        // 2. Verify Cache Misses
+        Counter cacheMissesCounter = meterRegistry
+                .find(CACHE_REQUESTS)
+                .tag("cache", CACHE_NAME)
+                .tag("result", CacheLookup.Outcome.MISS.getValue())
+                .counter();
+
+        if (expectedMisses != 0.0) {
+            assertThat(cacheMissesCounter).isNotNull();
+            assertThat(cacheMissesCounter.count()).isEqualTo(expectedMisses);
         }
     }
 }

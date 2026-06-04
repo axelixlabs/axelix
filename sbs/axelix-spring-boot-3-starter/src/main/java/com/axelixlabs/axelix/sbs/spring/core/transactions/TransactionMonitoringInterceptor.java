@@ -28,6 +28,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+
 /**
  * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
  *
@@ -42,14 +44,17 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
-            QueriesRecorder queriesCollector) {
+            QueriesRecorder queriesCollector,
+            @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
+        this.metricsPublisher = metricsPublisher;
     }
 
     @Override
@@ -67,14 +72,37 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
             queriesCollector.clearAll();
 
+            // METRICS. Create transaction status
+            TransactionStatus transactionStatus = TransactionStatus.SUCCESS;
+
             try {
                 return invocation.proceed();
+            } catch (Throwable e) {
+
+                // METRICS. Change transaction status
+                transactionStatus = TransactionStatus.ERROR;
+
+                throw e;
             } finally {
-                long duration = System.nanoTime() - txStartTime;
+
+                long durationNano = System.nanoTime() - txStartTime;
+                long durationMillis = durationNano / 1_000_000;
                 List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
 
-                statsCollector.recordTransaction(
-                        key, new TransactionRecord(duration / 1_000_000, startTimestampMs, queries));
+                statsCollector.recordTransaction(key, new TransactionRecord(durationMillis, startTimestampMs, queries));
+
+                // METRICS. Publish metrics in MeterRegistry
+                try {
+                    if (metricsPublisher != null) {
+                        metricsPublisher.publishTransactionMetrics(
+                                declaringClass.getSimpleName(),
+                                method.getName(),
+                                durationMillis,
+                                transactionStatus,
+                                queries.size());
+                    }
+                } catch (Exception ignored) {
+                }
             }
         }
 

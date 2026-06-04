@@ -43,8 +43,18 @@ public class CacheLookup {
     }
 
     public enum Outcome {
-        HIT,
-        MISS
+        HIT("hit"),
+        MISS("miss");
+
+        private final String value;
+
+        Outcome(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public Outcome outcome() {
