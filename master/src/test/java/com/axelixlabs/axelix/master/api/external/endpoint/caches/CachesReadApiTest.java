@@ -64,7 +64,7 @@ public class CachesReadApiTest {
     private static final String activeInstanceIdEmptyCaches = UUID.randomUUID().toString();
 
     // language=json
-    String EXPECTED_ALL_CACHES_JSON = """
+    private static final String EXPECTED_ALL_CACHES_JSON = """
     {
       "cacheManagers": [
         {

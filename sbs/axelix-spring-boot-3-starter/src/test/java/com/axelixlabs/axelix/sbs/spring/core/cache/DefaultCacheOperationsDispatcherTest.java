@@ -48,12 +48,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class DefaultCacheOperationsDispatcherTest {
 
     // Cache Manager 1
-    private final String TEST_CACHE_MANAGER_1 = "cacheManager1";
-    private final String TEST_CACHE_1 = "cache1";
-    private final String TEST_CACHE_2 = "cache2";
+    private static final String TEST_CACHE_MANAGER_1 = "cacheManager1";
+    private static final String TEST_CACHE_1 = "cache1";
+    private static final String TEST_CACHE_2 = "cache2";
 
     // Cache Manager 2
-    private final String TEST_CACHE_MANAGER_2 = "cacheManager2";
+    private static final String TEST_CACHE_MANAGER_2 = "cacheManager2";
 
     private CacheManager cacheManager1;
     private CacheManager cacheManager2;
