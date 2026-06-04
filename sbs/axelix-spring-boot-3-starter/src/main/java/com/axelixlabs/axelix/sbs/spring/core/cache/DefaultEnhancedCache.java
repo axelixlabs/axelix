@@ -95,13 +95,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
             cacheLookupHistory.put(CacheLookup.miss());
 
             if (metricsPublisher != null) {
-                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS.getValue());
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
             }
         } else {
             cacheLookupHistory.put(CacheLookup.hit());
 
             if (metricsPublisher != null) {
-                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT.getValue());
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
             }
         }
         return result;
@@ -134,13 +134,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
                 cacheLookupHistory.put(CacheLookup.miss());
 
                 if (metricsPublisher != null) {
-                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS.getValue());
+                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
                 }
             } else {
                 cacheLookupHistory.put(CacheLookup.hit());
 
                 if (metricsPublisher != null) {
-                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT.getValue());
+                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
                 }
             }
         }
@@ -176,11 +176,6 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     public List<CacheLookup> getCacheLookups() {
         return cacheLookupHistory.get();
-    }
-
-    @Override
-    public AtomicBoolean getEnabledFlag() {
-        return this.enabled;
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {

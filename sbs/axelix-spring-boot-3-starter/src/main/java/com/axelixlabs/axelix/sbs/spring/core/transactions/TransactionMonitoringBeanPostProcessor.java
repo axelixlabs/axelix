@@ -36,6 +36,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
@@ -62,16 +63,16 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
-    private final @Nullable AxelixMetricsPublisher metricsPublisher;
+    private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
 
     public TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector,
             QueriesRecorder queriesCollector,
-            @Nullable AxelixMetricsPublisher metricsPublisher) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
-        this.metricsPublisher = metricsPublisher;
+        this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
     }
 
     @Override
@@ -144,7 +145,7 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setProxyTargetClass(true);
 
         TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, queriesCollector, metricsPublisher);
+                propagationCache, statsCollector, queriesCollector, metricsPublisherObjectProvider.getIfAvailable());
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);

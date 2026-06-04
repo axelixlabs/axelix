@@ -30,9 +30,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
-import static com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus.error;
-import static com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus.success;
-
 /**
  * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
  *
@@ -76,28 +73,35 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
             queriesCollector.clearAll();
 
             // METRICS. Create transaction status
-            String status = success.name();
+            TransactionStatus transactionStatus = TransactionStatus.SUCCESS;
 
             try {
                 return invocation.proceed();
             } catch (Throwable e) {
 
                 // METRICS. Change transaction status
-                status = error.name();
+                transactionStatus = TransactionStatus.ERROR;
 
                 throw e;
             } finally {
 
                 long durationNano = System.nanoTime() - txStartTime;
+                long durationMillis = durationNano / 1_000_000;
                 List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
 
-                statsCollector.recordTransaction(
-                        key, new TransactionRecord(durationNano / 1_000_000, startTimestampMs, queries));
+                statsCollector.recordTransaction(key, new TransactionRecord(durationMillis, startTimestampMs, queries));
 
                 // METRICS. Publish metrics in MeterRegistry
-                if (metricsPublisher != null) {
-                    metricsPublisher.publishTransactionMetrics(
-                            declaringClass.getSimpleName(), method.getName(), durationNano, status, queries.size());
+                try {
+                    if (metricsPublisher != null) {
+                        metricsPublisher.publishTransactionMetrics(
+                                declaringClass.getSimpleName(),
+                                method.getName(),
+                                durationMillis,
+                                transactionStatus,
+                                queries.size());
+                    }
+                } catch (Exception ignored) {
                 }
             }
         }

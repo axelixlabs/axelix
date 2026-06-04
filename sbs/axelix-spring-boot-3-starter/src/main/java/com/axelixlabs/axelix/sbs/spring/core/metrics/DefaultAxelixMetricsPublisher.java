@@ -19,12 +19,15 @@ package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
+
+import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
+import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus;
 
 /**
  * Default implementation of {@link AxelixMetricsPublisher}
@@ -43,15 +46,15 @@ public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
 
     @Override
     public void publishTransactionMetrics(
-            String className, String methodName, long durationNano, String status, int queryCount) {
+            String className, String methodName, long durationMillis, TransactionStatus status, int queryCount) {
         Timer.builder(AxelixMetricNames.TRANSACTION_DURATION)
                 .description("Duration of transactions")
                 .tag("class", className)
                 .tag("method", methodName)
-                .tag("status", status)
+                .tag("status", status.getValue())
                 .publishPercentiles(0.5, 0.95, 0.99)
                 .register(meterRegistry)
-                .record(durationNano, TimeUnit.NANOSECONDS);
+                .record(durationMillis, TimeUnit.MILLISECONDS);
 
         Counter.builder(AxelixMetricNames.TRANSACTION_QUERIES)
                 .description("Total number of SQL queries executed inside transactions")
@@ -62,22 +65,25 @@ public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
     }
 
     @Override
-    public void incrementCacheLookup(String cacheName, String outcome) {
-        String counterKey = cacheName + ":" + outcome;
+    public void incrementCacheLookup(String cacheName, CacheLookup.Outcome outcome) {
+        String outcomeValue = outcome.getValue();
+        String counterKey = cacheName + ":" + outcomeValue;
 
         cacheCounters
-                .computeIfAbsent(counterKey, key -> Counter.builder(AxelixMetricNames.CACHE_REQUESTS)
-                        .description("Total number of cache lookups")
-                        .tag("cache", cacheName)
-                        .tag("result", outcome)
-                        .register(meterRegistry))
+                .computeIfAbsent(
+                        counterKey,
+                        key -> Counter.builder(AxelixMetricNames.CACHE_REQUESTS)
+                                .description("Total number of cache lookups")
+                                .tag("cache", cacheName)
+                                .tag("result", outcomeValue)
+                                .register(meterRegistry))
                 .increment();
     }
 
     @Override
-    public void registerCacheStatusGauge(String cacheName, AtomicBoolean enabledFlag) {
-        Tags cacheTags = Tags.of("cache", cacheName);
+    public void registerCacheStatusGauge(EnhancedCache enhancedCache) {
+        Tags cacheTags = Tags.of("cache", enhancedCache.getName());
 
-        meterRegistry.gauge(AxelixMetricNames.CACHE_ENABLED, cacheTags, enabledFlag, flag -> flag.get() ? 1.0 : 0.0);
+        meterRegistry.gauge(AxelixMetricNames.CACHE_ENABLED, cacheTags, enhancedCache, c -> c.isEnabled() ? 1.0 : 0.0);
     }
 }

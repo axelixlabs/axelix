@@ -23,6 +23,16 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
  * @author Nikita Kirillov
  */
 public enum TransactionStatus {
-    success,
-    error
+    SUCCESS("success"),
+    ERROR("error");
+
+    private final String value;
+
+    TransactionStatus(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

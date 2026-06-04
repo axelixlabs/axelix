@@ -94,7 +94,7 @@ public class TransactionMonitoringAutoConfiguration {
             QueriesRecorder queriesCollector,
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
         return new TransactionMonitoringBeanPostProcessor(
-                transactionStatsCollector, queriesCollector, metricsPublisherObjectProvider.getIfAvailable());
+                transactionStatsCollector, queriesCollector, metricsPublisherObjectProvider);
     }
 
     @Bean

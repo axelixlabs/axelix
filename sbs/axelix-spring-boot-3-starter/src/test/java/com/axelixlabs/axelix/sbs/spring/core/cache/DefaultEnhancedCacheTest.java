@@ -28,9 +28,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.cache.Cache;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
@@ -57,22 +59,32 @@ class DefaultEnhancedCacheTest {
     private static final String VALUE = "testValue";
     private static final String CACHE_NAME = "testCacheName";
 
-    private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
-    private final AxelixMetricsPublisher axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
+    private MeterRegistry meterRegistry;
+    private AxelixMetricsPublisher axelixMetricsPublisher;
 
     @Mock
     private Cache delegate;
 
-    private DefaultEnhancedCache enhancedCache;
+    private EnhancedCache enhancedCache;
 
     @BeforeEach
     void setUp() {
-        when(delegate.getName()).thenReturn(CACHE_NAME);
+        meterRegistry = new SimpleMeterRegistry();
+        axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
+
+        Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
         enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);
     }
 
     @Nested
     class EnableDisable {
+
+        @BeforeEach
+        void setUp() {
+            EnhancedCacheManager enhancedCacheManager = new DefaultEnhancedCacheManager(
+                    "cacheManager", new ConcurrentMapCacheManager(CACHE_NAME), axelixMetricsPublisher);
+            enhancedCache = enhancedCacheManager.getCache(CACHE_NAME);
+        }
 
         @Test
         void shouldBeEnabledByDefault() {
@@ -571,6 +583,7 @@ class DefaultEnhancedCacheTest {
                 .counter();
 
         if (expectedHits != 0.0) {
+            assertThat(cacheHitsCounter).isNotNull();
             assertThat(cacheHitsCounter.count()).isEqualTo(expectedHits);
         }
 

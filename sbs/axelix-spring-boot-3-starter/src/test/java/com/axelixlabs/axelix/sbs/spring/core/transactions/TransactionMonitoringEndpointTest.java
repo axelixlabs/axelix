@@ -102,6 +102,7 @@ class TransactionMonitoringEndpointTest {
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearAllStats();
+        meterRegistry.clear();
     }
 
     @Test
@@ -542,7 +543,7 @@ class TransactionMonitoringEndpointTest {
                 QueriesRecorder queriesCollector,
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider.getIfAvailable());
+                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider);
         }
 
         @Bean

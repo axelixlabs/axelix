@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
+import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus;
 
 /**
  * Interface responsible for publishing application-level metrics to the underlying metrics system.
@@ -29,14 +31,14 @@ public interface AxelixMetricsPublisher {
     /**
      * Publishes aggregated transaction statistics.
      *
-     * @param className    the simple name of the target class executing the transaction
-     * @param methodName   the name of the target method executing the transaction
-     * @param durationNano transaction execution duration in nanoseconds
-     * @param status       the final outcome status of the transaction (e.g., "success" or "error")
-     * @param queryCount   the total number of SQL queries executed inside the transaction scope
+     * @param className      the simple name of the target class executing the transaction
+     * @param methodName     the name of the target method executing the transaction
+     * @param durationMillis transaction execution duration in milliseconds
+     * @param status         the final outcome status of the transaction (e.g., "success" or "error")
+     * @param queryCount     the total number of SQL queries executed inside the transaction scope
      */
     void publishTransactionMetrics(
-            String className, String methodName, long durationNano, String status, int queryCount);
+            String className, String methodName, long durationMillis, TransactionStatus status, int queryCount);
 
     /**
      * Increments the cache lookup counter based on the operation result type.
@@ -44,13 +46,13 @@ public interface AxelixMetricsPublisher {
      * @param cacheName  the name of the cache being queried
      * @param outcome    the outcome of the cache lookup (strictly "hit" or "miss")
      */
-    void incrementCacheLookup(String cacheName, String outcome);
+    void incrementCacheLookup(String cacheName, CacheLookup.Outcome outcome);
 
     /**
      * Registers a gauge to dynamically monitor the current cache execution status (enabled or disabled).
      *
-     * @param cacheName   the name of the cache to monitor
-     * @param enabledFlag the thread-safe flag indicating whether the cache is currently enabled
+     * @see   EnhancedCache
+     * @param enhancedCache the enhanced cache instance to monitor
      */
-    void registerCacheStatusGauge(String cacheName, AtomicBoolean enabledFlag);
+    void registerCacheStatusGauge(EnhancedCache enhancedCache);
 }

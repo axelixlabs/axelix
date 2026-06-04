@@ -538,7 +538,7 @@ class AxelixCachesEndpointTest {
         @Bean
         public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider.getIfAvailable());
+            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
         }
 
         @Bean(name = MAIN_CACHE_MANAGER)

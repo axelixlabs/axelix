@@ -140,7 +140,7 @@ class AxelixCachesEndpointAutoConfigurationTest {
 
     static class CustomCacheManagerBeanPostProcessor extends CacheManagerBeanPostProcessor {
         public CustomCacheManagerBeanPostProcessor(ObjectProvider<AxelixMetricsPublisher> objectProvider) {
-            super(objectProvider.getIfAvailable());
+            super(objectProvider);
         }
     }
 }

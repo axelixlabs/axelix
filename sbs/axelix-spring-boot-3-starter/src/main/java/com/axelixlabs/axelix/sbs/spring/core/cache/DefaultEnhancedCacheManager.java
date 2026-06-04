@@ -86,16 +86,18 @@ public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
     @Override
     @Nullable
     public EnhancedCache getCache(@NonNull String name) {
-        EnhancedCache enhancedCache = caches.computeIfAbsent(name, s -> {
+        return caches.computeIfAbsent(name, s -> {
             Cache cache = delegate.getCache(s);
-            return cache != null ? new DefaultEnhancedCache(cache, metricsPublisher) : null;
+            if (cache == null) {
+                return null;
+            }
+
+            EnhancedCache enhancedCache = new DefaultEnhancedCache(cache, metricsPublisher);
+            if (metricsPublisher != null) {
+                metricsPublisher.registerCacheStatusGauge(enhancedCache);
+            }
+            return enhancedCache;
         });
-
-        if (enhancedCache != null && metricsPublisher != null) {
-            metricsPublisher.registerCacheStatusGauge(name, enhancedCache.getEnabledFlag());
-        }
-
-        return enhancedCache;
     }
 
     @Override

@@ -141,7 +141,7 @@ class TransactionMonitoringBeanPostProcessorTest {
                 QueriesRecorder queriesCollector,
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider.getIfAvailable());
+                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider);
         }
 
         @Bean

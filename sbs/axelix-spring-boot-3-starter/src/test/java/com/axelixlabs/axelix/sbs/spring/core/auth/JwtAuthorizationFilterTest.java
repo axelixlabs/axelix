@@ -455,7 +455,7 @@ class JwtAuthorizationFilterTest {
         @Bean
         public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider.getIfAvailable());
+            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
         }
 
         @Bean

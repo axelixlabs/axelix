@@ -76,7 +76,7 @@ public class AxelixCachesEndpointAutoConfiguration {
     @ConditionalOnMissingBean
     public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
-        return new CacheManagerBeanPostProcessor(metricsPublisherObjectProvider.getIfAvailable());
+        return new CacheManagerBeanPostProcessor(metricsPublisherObjectProvider);
     }
 
     @Bean
