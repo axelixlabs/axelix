@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.AxelixTransactionTracer;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
@@ -49,7 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
+@AutoConfiguration(after = {CompositeMeterRegistryAutoConfiguration.class, AxelixTracingAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
 
@@ -92,9 +93,13 @@ public class TransactionMonitoringAutoConfiguration {
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             QueriesRecorder queriesCollector,
-            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
+            ObjectProvider<AxelixTransactionTracer> transactionTracerObjectProvider) {
         return new TransactionMonitoringBeanPostProcessor(
-                transactionStatsCollector, queriesCollector, metricsPublisherObjectProvider);
+                transactionStatsCollector,
+                queriesCollector,
+                metricsPublisherObjectProvider,
+                transactionTracerObjectProvider);
     }
 
     @Bean

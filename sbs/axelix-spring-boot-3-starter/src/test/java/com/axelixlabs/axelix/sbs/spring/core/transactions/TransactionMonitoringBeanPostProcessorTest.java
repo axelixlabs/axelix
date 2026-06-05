@@ -28,6 +28,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.tracing.Tracer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -139,9 +140,13 @@ class TransactionMonitoringBeanPostProcessorTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector,
                 QueriesRecorder queriesCollector,
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider,
+                ObjectProvider<AxelixTransactionTracer> axelixTransactionTracerObjectProvider) {
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider);
+                    transactionStatsCollector,
+                    queriesCollector,
+                    axelixMetricsPublisherObjectProvider,
+                    axelixTransactionTracerObjectProvider);
         }
 
         @Bean
@@ -170,6 +175,11 @@ class TransactionMonitoringBeanPostProcessorTest {
         @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
+        }
+
+        @Bean
+        public AxelixTransactionTracer axelixTransactionTracer(Tracer tracer) {
+            return new DefaultAxelixTransactionTracer(tracer);
         }
     }
 

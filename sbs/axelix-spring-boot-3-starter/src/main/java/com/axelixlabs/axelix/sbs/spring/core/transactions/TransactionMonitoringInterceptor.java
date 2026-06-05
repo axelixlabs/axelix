@@ -45,16 +45,19 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
+    private final @Nullable AxelixTransactionTracer transactionTracer;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
             QueriesRecorder queriesCollector,
-            @Nullable AxelixMetricsPublisher metricsPublisher) {
+            @Nullable AxelixMetricsPublisher metricsPublisher,
+            @Nullable AxelixTransactionTracer transactionTracer) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
         this.metricsPublisher = metricsPublisher;
+        this.transactionTracer = transactionTracer;
     }
 
     @Override
@@ -72,18 +75,35 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
             queriesCollector.startNewContext();
 
+            // TRACING. Initialize parent transaction span and active context scope
+            TransactionTraceContext traceContext = null;
+            if (transactionTracer != null) {
+                traceContext = transactionTracer.startTransaction(declaringClass.getSimpleName(), method.getName());
+            }
+
             // METRICS. Create transaction status
             TransactionStatus transactionStatus = TransactionStatus.SUCCESS;
 
             try {
                 return invocation.proceed();
             } catch (Throwable e) {
+                // TRACING: Log exception metadata to the active transaction span
+                if (transactionTracer != null && traceContext != null) {
+                    transactionTracer.logException(traceContext, e);
+                }
 
                 // METRICS. Change transaction status
                 transactionStatus = TransactionStatus.ERROR;
 
                 throw e;
             } finally {
+                // TRACING: Clean up active contexts and finalize the transaction span
+                try {
+                    if (transactionTracer != null && traceContext != null) {
+                        transactionTracer.completeTransaction(traceContext);
+                    }
+                } catch (Exception ignored) {
+                }
 
                 long durationNano = System.nanoTime() - txStartTime;
                 long durationMillis = durationNano / 1_000_000;
