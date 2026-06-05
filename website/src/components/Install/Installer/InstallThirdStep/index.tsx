@@ -33,7 +33,7 @@ export const InstallThirdStep = ({ installMethod, installConfiguration, activeSn
         return <K8sYamlSnippet refEl={activeSnippetRef} />;
     }
 
-    if (installMethod === EInstallMethod.K8S && EInstallConfigurationVariant.PROPERTIES) {
+    if (installMethod === EInstallMethod.K8S && installConfiguration === EInstallConfigurationVariant.PROPERTIES) {
         return <K8sPropertiesSnippet refEl={activeSnippetRef} />;
     }
 
