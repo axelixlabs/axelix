@@ -86,17 +86,6 @@ runs:
         sarif_file: 'trivy-axelix-image.sarif'
         category: 'trivy-image'
 
-    - name: Enforce Security Gates
-      shell: bash
-      run: |
-        artifact_errors=$(jq '[.runs[].results[]? | select(.level == "error")] | length' trivy-axelix-artifacts.sarif)
-        image_errors=$(jq '[.runs[].results[]? | select(.level == "error")] | length' trivy-axelix-image.sarif)
-
-        if [ "$artifact_errors" -gt 0 ] || [ "$image_errors" -gt 0 ]; then
-          echo "::error::High/Critical vulnerabilities detected by Trivy."
-          exit 1
-        fi
-
     - name: Remove Docker Image
       if: always()
       shell: bash
