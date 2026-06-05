@@ -71,7 +71,7 @@ runs:
       run: docker build --tag axelix-local:security-scan --file Dockerfile .
 
     - name: Scan Docker Image (OS + Java JARs)
-      uses: aquasecurity/trivy-action@18f259c25ff746428d0dad4368da262b45cf0243
+      uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: 'axelix-local:security-scan'
         scan-type: 'image'
