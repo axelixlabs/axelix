@@ -17,32 +17,61 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
  * Service providing access to queries in transaction monitoring data and statistics.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public final class DefaultQueriesRecorder implements QueriesRecorder {
 
-    private final ThreadLocal<List<SqlQueryRecord>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
+    private final ThreadLocal<Deque<List<SqlQueryRecord>>> threadLocalStack = new ThreadLocal<>();
+
+    @Override
+    public void startNewContext() {
+        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
+
+        if (stack == null) {
+            stack = new ArrayDeque<>();
+            threadLocalStack.set(stack);
+        }
+
+        stack.push(new ArrayList<>());
+    }
 
     @Override
     public void recordQuery(SqlQueryRecord query) {
-        threadLocal.get().add(query);
+        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
+
+        if (stack == null) {
+            return;
+        }
+
+        List<SqlQueryRecord> currentTxQueries = stack.peek();
+        if (currentTxQueries != null) {
+            currentTxQueries.add(query);
+        }
     }
 
     @Override
     public List<SqlQueryRecord> popAllRecords() {
-        List<SqlQueryRecord> queries = new ArrayList<>(threadLocal.get());
-        threadLocal.remove();
-        return queries;
-    }
+        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
 
-    @Override
-    public void clearAll() {
-        threadLocal.remove();
+        if (stack == null || stack.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<SqlQueryRecord> queries = stack.pop();
+
+        if (stack.isEmpty()) {
+            threadLocalStack.remove();
+        }
+
+        return queries;
     }
 }

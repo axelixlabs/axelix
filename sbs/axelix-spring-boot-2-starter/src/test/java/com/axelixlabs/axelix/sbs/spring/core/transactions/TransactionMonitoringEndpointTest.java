@@ -42,6 +42,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
@@ -58,6 +59,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -369,6 +371,109 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Test
+    void nestedRequiresNewPropagationIsMonitoredSeparately() {
+        // given.
+        propagationTestHelper.outerRequiredMethod("ParentOwner");
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody)
+                .when(IGNORING_ARRAY_ORDER)
+                .isEqualTo("{\n" + "  \"entrypoints\" : [\n"
+                        + "    {\n"
+                        + "      \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                        + "      \"methodName\" : \"saveRequiresNew\",\n"
+                        + "      \"executions\" : [\n"
+                        + "        {\n"
+                        + "          \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"queries\" : [\n"
+                        + "            {\n"
+                        + "              \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                        + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                        + "            }\n"
+                        + "          ]\n"
+                        + "        }\n"
+                        + "      ],\n"
+                        + "      \"executionStats\" : {\n"
+                        + "        \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                        + "      }\n"
+                        + "    },\n"
+                        + "    {\n"
+                        + "      \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                        + "      \"methodName\" : \"outerRequiredMethod\",\n"
+                        + "      \"executions\" : [\n"
+                        + "        {\n"
+                        + "          \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"queries\" : [\n"
+                        + "            {\n"
+                        + "              \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                        + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                        + "            },\n"
+                        + "            {\n"
+                        + "              \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                        + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                        + "            }\n"
+                        + "          ]\n"
+                        + "        }\n"
+                        + "      ],\n"
+                        + "      \"executionStats\" : {\n"
+                        + "        \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                        + "      }\n"
+                        + "    }\n"
+                        + "  ]\n"
+                        + "}");
+    }
+
+    @Test
+    void nestedPropagationIsMonitored() {
+        // given.
+        propagationTestHelper.testNested();
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody)
+                // language=json
+                .isEqualTo("{\n" + "  \"entrypoints\" : [\n"
+                        + "    {\n"
+                        + "      \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                        + "      \"methodName\" : \"testNested\",\n"
+                        + "      \"executions\" : [\n"
+                        + "        {\n"
+                        + "          \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "          \"queries\" : [\n"
+                        + "            {\n"
+                        + "              \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                        + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                        + "            }\n"
+                        + "          ]\n"
+                        + "        }\n"
+                        + "      ],\n"
+                        + "      \"executionStats\" : {\n"
+                        + "        \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                        + "      }\n"
+                        + "    }\n"
+                        + "  ]\n"
+                        + "}");
+    }
+
+    @Test
     void notSupportedPropagationIsNotMonitored() {
         // given.
         propagationTestHelper.testNotSupported("Rodriquez");
@@ -406,19 +511,6 @@ class TransactionMonitoringEndpointTest {
 
         // then.
         assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
-    }
-
-    @Test
-    void nestedPropagationIsMonitored() {
-        // given.
-        propagationTestHelper.testNested();
-
-        // when.
-        String responseBody = getMonitoringResponse();
-        List<String> methodNames = JsonPath.read(responseBody, "$.entrypoints[*].methodName");
-
-        // then.
-        assertThat(methodNames).contains("testNested");
     }
 
     @ProtectedEndpointTests(
@@ -473,8 +565,9 @@ class TransactionMonitoringEndpointTest {
         }
 
         @Bean
-        public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
-            return new PropagationTestHelper(ownerRepository);
+        public PropagationTestHelper propagationTestHelper(
+                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            return new PropagationTestHelper(ownerRepository, self);
         }
     }
 
@@ -545,9 +638,21 @@ class TransactionMonitoringEndpointTest {
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
 
-        public PropagationTestHelper(OwnerRepository ownerRepository) {
+        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
             this.ownerRepository = ownerRepository;
+            this.self = self;
+        }
+
+        // IMPORTANT: Calling via 'self' proxy is required to properly test the REQUIRED -> REQUIRES_NEW stack behavior.
+        @Transactional(propagation = Propagation.REQUIRED)
+        public void outerRequiredMethod(String outerName) {
+            ownerRepository.save(new Owner().setLastName(outerName));
+
+            self.saveRequiresNew("SomeName");
+
+            ownerRepository.save(new Owner().setLastName(outerName));
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)

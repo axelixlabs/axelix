@@ -70,7 +70,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
             long startTimestampMs = System.currentTimeMillis();
             long txStartTime = System.nanoTime();
 
-            queriesCollector.clearAll();
+            queriesCollector.startNewContext();
 
             // METRICS. Create transaction status
             TransactionStatus transactionStatus = TransactionStatus.SUCCESS;

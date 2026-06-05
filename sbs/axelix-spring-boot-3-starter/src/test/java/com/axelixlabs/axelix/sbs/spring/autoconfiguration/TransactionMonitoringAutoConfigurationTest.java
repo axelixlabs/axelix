@@ -164,15 +164,15 @@ class TransactionMonitoringAutoConfigurationTest {
     static class CustomDefaultQueriesRecorder implements QueriesRecorder {
 
         @Override
+        public void startNewContext() {}
+
+        @Override
         public void recordQuery(SqlQueryRecord query) {}
 
         @Override
         public List<SqlQueryRecord> popAllRecords() {
             return List.of();
         }
-
-        @Override
-        public void clearAll() {}
     }
 
     static class CustomTransactionMonitoringService extends DefaultTransactionMonitoringService {
