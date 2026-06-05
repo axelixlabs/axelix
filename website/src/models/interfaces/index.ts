@@ -15,8 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./interfaces";
+import { ReactNode } from "react";
 
-export * from "./types";
+import { EInstallConfigurationVariant, EInstallMethod, ESpringBootVariant } from "../enums";
 
-export * from "./enums";
+export interface INavLink {
+    href: string;
+    label: string;
+}
+
+export interface IInstallSpringBootOptions {
+    key: ESpringBootVariant;
+    label: string;
+}
+
+export interface IInstallConfigurationOptions {
+    key: EInstallConfigurationVariant;
+    label: string;
+}
+
+export interface IInstallMethods {
+    key: EInstallMethod;
+    label: string;
+    icon: ReactNode;
+}
+
+export interface IInstallMethodData {
+    description: string;
+    href: string;
+}

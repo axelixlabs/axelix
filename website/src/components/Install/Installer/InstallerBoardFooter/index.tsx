@@ -15,41 +15,42 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { installStepNames } from "@/utils";
+
 import { Dispatch, SetStateAction } from "react";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    step: 1 | 2 | 3;
-    setStep: Dispatch<SetStateAction<1 | 2 | 3>>;
-    STEP_NAMES: any;
+    installStep: 1 | 2 | 3;
+    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3>>;
 }
 
-export const InstallerBoardFooter = ({ step, setStep, STEP_NAMES }: IProps) => {
+export const InstallerBoardFooter = ({ installStep, setInstallStep }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
             <button
                 className={`${styles.NavButton} ${styles.BackButton}`}
                 type="button"
-                disabled={step <= 1}
+                disabled={installStep <= 1}
                 onClick={() => {
-                    if (step > 1) {
-                        setStep((step - 1) as 1 | 2 | 3);
+                    if (installStep > 1) {
+                        setInstallStep((installStep - 1) as 1 | 2 | 3);
                     }
                 }}
             >
-                ← {step > 1 ? STEP_NAMES[(step - 1) as 1 | 2 | 3] : "Previous"}
+                ← {installStep > 1 ? installStepNames[(installStep - 1) as 1 | 2 | 3] : "Previous"}
             </button>
-            <div className={styles.Status}>Step {step} of 3</div>
+            <div className={styles.Status}>Step {installStep} of 3</div>
             <button
                 className={`${styles.NavButton} ${styles.NextButton}`}
                 type="button"
-                disabled={step === 3}
+                disabled={installStep === 3}
                 onClick={() => {
-                    setStep((step + 1) as 1 | 2 | 3);
+                    setInstallStep((installStep + 1) as 1 | 2 | 3);
                 }}
             >
-                {STEP_NAMES[(step + 1) as 1 | 2 | 3]} →
+                {installStepNames[(installStep + 1) as 1 | 2 | 3]} →
             </button>
         </div>
     );

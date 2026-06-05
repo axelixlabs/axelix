@@ -15,14 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { INavLink } from "../models";
+export enum EInstallMethod {
+    DOCKER = "DOCKER",
+    COMPOSE = "COMPOSE",
+    K8S = "K8S",
+    BARE = "BARE",
+}
 
-export const NAV_LINKS: INavLink[] = [
-    { href: "#capabilities", label: "Capabilities" },
-    { href: "#install", label: "Install" },
-    { href: "#enterprise", label: "Enterprise" },
-    { href: "#faq", label: "FAQ" },
-];
+export enum ESpringBootVariant {
+    SPRING_BOOT_2 = "SPRING_BOOT_2",
+    SPRING_BOOT_3 = "SPRING_BOOT_3",
+    SPRING_BOOT_4 = "SPRING_BOOT_4",
+}
 
-export const DOCS_URL = "https://axelix.io/docs/product/introduction";
-export const GITHUB_URL = "https://github.com/axelixlabs/axelix";
+export enum EInstallConfigurationVariant {
+    YAML = "YAML",
+    PROPERTIES = "PROPERTIES",
+}
+
+export enum EInstallOpenSelect {
+    NULL = "NULL",
+    SPRING_BOOT = "SPRING_BOOT",
+    CONFIGURATION = "CONFIGURATION",
+}
