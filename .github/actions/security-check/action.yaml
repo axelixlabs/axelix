@@ -1,0 +1,103 @@
+name: Security Check
+description: Performs CodeQL and Trivy security checks for the repository
+
+# The calling workflow must check out the repository before invoking this action.
+# The calling job must also grant at least:
+#   - contents: read
+#   - actions: read
+#   - security-events: write
+
+runs:
+  using: composite
+  steps:
+    - name: Set up JDK 25
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'liberica'
+        java-version: '25'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: ./master/front-end/.nvmrc
+
+    # CodeQL: source code security scan
+
+    - name: Grant execution access to Gradle wrapper
+      run: chmod +x ./gradlew
+      shell: bash
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: 'java-kotlin, javascript-typescript'
+
+    - name: Autobuild Java Code
+      uses: github/codeql-action/autobuild@v4 # Automatically runs maven/gradle
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+
+    # Trivy: container image vulnerability scan
+
+    - name: Assemble JVM artifacts for Trivy scans
+      shell: bash
+      run: ./gradlew assemble
+
+    # This is for scanning the JAR files, primarily starters
+    - name: Scan built JVM artifacts
+      uses: aquasecurity/trivy-action@18f259c25ff746428d0dad4368da262b45cf0243
+      with:
+        scan-type: 'rootfs'
+        scan-ref: '.'
+        vuln-type: 'library'
+        format: 'sarif'
+        output: 'trivy-axelix-artifacts.sarif'
+
+    - name: Upload Artifact Results
+      uses: github/codeql-action/upload-sarif@v4
+      if: always()
+      with:
+        sarif_file: 'trivy-axelix-artifacts.sarif'
+        category: 'trivy-artifacts'
+
+    # And finally, scanning the docker image
+
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v5
+
+    - name: Build Docker Image
+      shell: bash
+      run: docker build --tag axelix-local:security-scan --file Dockerfile .
+
+    - name: Scan Docker Image (OS + Java JARs)
+      uses: aquasecurity/trivy-action@18f259c25ff746428d0dad4368da262b45cf0243
+      with:
+        image-ref: 'axelix-local:security-scan'
+        scan-type: 'image'
+        vuln-type: 'os,library'
+        format: 'sarif'
+        output: 'trivy-axelix-image.sarif'
+
+    - name: Upload Image Results
+      uses: github/codeql-action/upload-sarif@v4
+      if: always()
+      with:
+        sarif_file: 'trivy-axelix-image.sarif'
+        category: 'trivy-image'
+
+    - name: Enforce Security Gates
+      shell: bash
+      run: |
+        artifact_errors=$(jq '[.runs[].results[]? | select(.level == "error")] | length' trivy-axelix-artifacts.sarif)
+        image_errors=$(jq '[.runs[].results[]? | select(.level == "error")] | length' trivy-axelix-image.sarif)
+
+        if [ "$artifact_errors" -gt 0 ] || [ "$image_errors" -gt 0 ]; then
+          echo "::error::High/Critical vulnerabilities detected by Trivy."
+          exit 1
+        fi
+
+    - name: Remove Docker Image
+      if: always()
+      shell: bash
+      run: docker image inspect axelix-local:security-scan >/dev/null 2>&1 && docker rmi axelix-local:security-scan || true

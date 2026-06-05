@@ -38,8 +38,24 @@ jobs:
       - name: Build and Test
         run: ./gradlew clean build
 
+  security-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+
+      - name: Running Security Check
+        uses: ./.github/actions/security-check
+
   release-artifacts:
-    needs: [build-and-test]
+    needs: [build-and-test, security-check]
     runs-on: ubuntu-latest
     permissions:
       contents: read

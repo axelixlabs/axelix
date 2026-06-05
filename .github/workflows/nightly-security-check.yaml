@@ -1,0 +1,20 @@
+name: Nightly Security Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  run-nightly-security-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Running Security Check
+        uses: ./.github/actions/security-check
