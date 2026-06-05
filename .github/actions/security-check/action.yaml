@@ -46,7 +46,7 @@ runs:
 
     # This is for scanning the JAR files, primarily starters
     - name: Scan built JVM artifacts
-      uses: aquasecurity/trivy-action@18f259c25ff746428d0dad4368da262b45cf0243
+      uses: aquasecurity/trivy-action@v0.36.0
       with:
         scan-type: 'rootfs'
         scan-ref: '.'
