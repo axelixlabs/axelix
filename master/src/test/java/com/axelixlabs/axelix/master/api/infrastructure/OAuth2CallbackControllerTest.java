@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -206,9 +205,7 @@ class OAuth2CallbackControllerTest {
         assertThat(updated.email()).isEqualTo(updatedEmail);
         assertThat(updated.roles().values()).containsOnly(DefaultRole.EDITOR.getName());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
-        assertThat(updated.lastLoginAt())
-                .isNotNull()
-                .isBetween(beforeLogin, afterLogin);
+        assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
     }
 
     @Test

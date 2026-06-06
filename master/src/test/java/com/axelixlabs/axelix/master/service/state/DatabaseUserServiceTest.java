@@ -92,7 +92,7 @@ abstract class DatabaseUserServiceTest {
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
         assertThat(saved.email()).isNull();
-        assertThat(passwordEncoder.matches("plainPass", saved.password())).isTrue();
+        assertThat(saved.password()).isNull();
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.OIDC);
     }
 
