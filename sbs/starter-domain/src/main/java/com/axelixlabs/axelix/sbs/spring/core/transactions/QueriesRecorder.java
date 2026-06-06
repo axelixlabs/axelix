@@ -21,15 +21,23 @@ import java.util.List;
 
 /**
  * Recorder of the SQL queries. It assumes that all sequentially related queries
- * are executed within a single Thread.
+ * are executed within a single Thread. Implementations must support nested transaction isolation levels
+ * by treating query registration context as a stack hierarchy.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public interface QueriesRecorder {
 
     /**
-     * Records a query execution for statistics collection.
+     * Initializes a new isolated context layer for query collection.
+     * Must be called at the start of a transaction scope to protect parent transaction data from being overwritten.
+     */
+    void startNewContext();
+
+    /**
+     * Records a query execution for statistics collection within the current transaction scope.
      *
      * @param query the query execution record
      */
@@ -39,12 +47,7 @@ public interface QueriesRecorder {
      * Pops all query statistics collected within the particular transaction
      * (i.e. the history of queries is removed from {@link QueriesRecorder})
      *
-     * @return list ща query statistics
+     * @return list of query statistics
      */
     List<SqlQueryRecord> popAllRecords();
-
-    /**
-     * Clears all collected query statistics.
-     */
-    void clearAll();
 }
