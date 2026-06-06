@@ -13,6 +13,7 @@ val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0-M8"
 val testcontainersVersion = "1.21.4"
 val springDocSwaggerVersion = "3.0.3"
+val tomcatVersion = "11.0.22"
 val sqliteVersion = "3.53.1.0"
 val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
@@ -28,6 +29,11 @@ dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
     implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
+    constraints {
+        implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
+        implementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
+        implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+    }
 
     // Boot Starters
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
