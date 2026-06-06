@@ -30,7 +30,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
@@ -46,6 +45,7 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
     private final WebProperties webProperties;
     private final Resource indexHtmlLocation;
     private static final Map<String, MediaType> MEDIA_TYPES_CACHE;
+    private static final String INDEX_HTML_FILENAME = "index.html";
 
     static {
         // It is okay to just use HashMap here, there is no writing under contention here.
@@ -58,7 +58,7 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
     public SpaStaticResourcesServingFilter(WebProperties webProperties) throws IOException {
         this.webProperties = webProperties;
-        this.indexHtmlLocation = webProperties.getLocation().createRelative("index.html");
+        this.indexHtmlLocation = webProperties.getLocation().createRelative(INDEX_HTML_FILENAME);
     }
 
     @Override
@@ -95,45 +95,18 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
     }
 
     private Resource resolveResourceToReturn(String contextPath) throws IOException {
-        String relativePath = sanitizeRelativePath(contextPath);
-        Resource relative = webProperties.getLocation().createRelative(relativePath);
+        boolean isSafe = SpaStaticResourcePathSanitizer.isSafe(contextPath);
 
-        try {
-            return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
-        } catch (IllegalArgumentException e) { // spring throws in certain scenarios
+        if (isSafe) {
+            Resource relative = webProperties.getLocation().createRelative(contextPath);
+
+            try {
+                return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
+            } catch (IllegalArgumentException e) { // spring throws in certain scenarios
+                return indexHtmlLocation;
+            }
+        } else {
             return indexHtmlLocation;
         }
-    }
-
-    static String sanitizeRelativePath(String contextPath) {
-        if (!StringUtils.hasText(contextPath) || "/".equals(contextPath)) {
-            return "index.html";
-        }
-
-        String relativePath = StringUtils.trimLeadingCharacter(contextPath, '/');
-        if (containsUnsafePathTokens(relativePath)) {
-            return "index.html";
-        }
-
-        String cleanedRelativePath = StringUtils.cleanPath(relativePath);
-        if (isUnsafeCleanedPath(relativePath, cleanedRelativePath)) {
-            return "index.html";
-        }
-
-        return cleanedRelativePath;
-    }
-
-    private static boolean containsUnsafePathTokens(String relativePath) {
-        return !StringUtils.hasText(relativePath)
-                || relativePath.contains("\\")
-                || relativePath.contains(":")
-                || relativePath.contains("//");
-    }
-
-    private static boolean isUnsafeCleanedPath(String relativePath, String cleanedRelativePath) {
-        return !StringUtils.hasText(cleanedRelativePath)
-                || cleanedRelativePath.startsWith("../")
-                || cleanedRelativePath.startsWith("/")
-                || !cleanedRelativePath.equals(relativePath);
     }
 }

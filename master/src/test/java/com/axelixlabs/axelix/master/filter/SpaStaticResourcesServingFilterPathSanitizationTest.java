@@ -18,28 +18,28 @@
 package com.axelixlabs.axelix.master.filter;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Unit tests for {@link SpaStaticResourcePathSanitizer}.
+ *
+ * @author Mikhail Polivakha
+ */
 class SpaStaticResourcesServingFilterPathSanitizationTest {
 
     @ParameterizedTest
-    @CsvSource({
-        "/assets/main.js,assets/main.js",
-        "/assets/main-ABC.123.js,assets/main-ABC.123.js",
-        "/wallboard,wallboard",
-    })
-    void shouldKeepSafeRelativePaths(String contextPath, String expectedRelativePath) {
-        // given.
-        String inputPath = contextPath;
+    @ValueSource(
+            strings = {
+                "/assets/main.js",
+                "/assets/main-ABC.123.js",
+                "/wallboard",
+            })
+    void shouldReportSafePaths(String contextPath) {
 
-        // when.
-        String sanitizedPath = SpaStaticResourcesServingFilter.sanitizeRelativePath(inputPath);
-
-        // then.
-        assertThat(sanitizedPath).isEqualTo(expectedRelativePath);
+        // when/then.
+        assertThat(SpaStaticResourcePathSanitizer.isSafe(contextPath)).isTrue();
     }
 
     @ParameterizedTest
@@ -55,13 +55,7 @@ class SpaStaticResourcesServingFilterPathSanitizationTest {
                 "/assets:main.js",
             })
     void shouldFallbackToIndexHtmlForUnsafePaths(String contextPath) {
-        // given.
-        String inputPath = contextPath;
-
-        // when.
-        String sanitizedPath = SpaStaticResourcesServingFilter.sanitizeRelativePath(inputPath);
-
-        // then.
-        assertThat(sanitizedPath).isEqualTo("index.html");
+        // when/then.
+        assertThat(SpaStaticResourcePathSanitizer.isSafe(contextPath)).isFalse();
     }
 }
