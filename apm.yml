@@ -1,0 +1,26 @@
+name: axelix
+version: 1.0.0
+description: APM project for axelix
+targets:
+- claude
+- cursor
+- gemini
+dependencies:
+  apm:
+  - ./.agents/skills/backlog-refiner
+  - ./.agents/skills/docs-writer
+  - ./.agents/skills/external-contributor-issues
+  - ./.agents/skills/housekeeper
+  - anthropics/skills/skills/skill-creator
+  mcp:
+  - name: github
+    registry: false
+    transport: stdio
+    command: npx
+    args:
+    - -y
+    - '@modelcontextprotocol/server-github'
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_PAT}"
+includes: auto
+scripts: {}

@@ -54,3 +54,13 @@ bin/
 ### Mac OS ###
 .DS_Store
 /.idea/inspectionProfiles/Project_Default.xml
+
+
+# APM dependencies
+apm_modules/
+
+# We use APM to install skills, mcp servers and etc for the ai agents,
+# so we do not really want .claude/.cursor or any other directory to be commited,
+# since we expect the developer to just 'apm install --target ${TARGET}'
+.claude/
+.cursor/
