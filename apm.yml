@@ -7,10 +7,13 @@ targets:
 - gemini
 dependencies:
   apm:
-  - ./.agents/skills/backlog-refiner
-  - ./.agents/skills/docs-writer
-  - ./.agents/skills/external-contributor-issues
-  - ./.agents/skills/housekeeper
+  # Custom
+  - ./.agent_skills/backlog-refiner
+  - ./.agent_skills/docs-writer
+  - ./.agent_skills/external-contributor-issues
+  - ./.agent_skills/housekeeper
+  - ./.agent_skills/security-vulnerabilities-patcher
+  # External
   - anthropics/skills/skills/skill-creator
   mcp:
   - name: github

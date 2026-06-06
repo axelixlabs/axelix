@@ -64,3 +64,4 @@ apm_modules/
 # since we expect the developer to just 'apm install --target ${TARGET}'
 .claude/
 .cursor/
+.agents/

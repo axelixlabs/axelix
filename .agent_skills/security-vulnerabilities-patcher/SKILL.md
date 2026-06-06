@@ -233,7 +233,9 @@ The subagent's job is to:
 4. commit the change,
 5. push the branch,
 6. open the PR as the AI-authored remediation branch for that single vulnerability,
-7. assign the `security` label to that PR.
+7. assign the `security` label to that PR,
+8. commit the change with the actual AI agent as the git commit author,
+9. explicitly identify in the PR body which AI agent created the PR.
 
 Do **not** launch multiple fixing subagents in parallel unless the user explicitly asks for multiple independent PRs and the repository state makes that safe.
 
@@ -261,6 +263,9 @@ Chosen vulnerability:
 
 Constraints:
 - Use the `GITHUB_PAT` environment variable for all GitHub access. If it is missing or empty, stop immediately and report that back to the parent agent without attempting any GitHub API call.
+- Attribute the PR to the actual AI agent that created it, for example `Cursor`, `Claude`, `Codex`, or `Gemini`. Do not use a generic `AI` label when the runtime identity is known.
+- The git commit author must also be that actual AI agent identity. Do not leave the commit authored by a human account or local default identity.
+- Do not modify git config to achieve this. Use per-commit author metadata such as `git commit --author="ACTUAL_AI_AGENT_NAME <ACTUAL_AI_AGENT_NAME@local>"`.
 - Fix only this vulnerability or the tightly coupled occurrences of the same vulnerability.
 - Keep the change safe for a patch release.
 - Do not introduce public API or public contract changes.
@@ -273,7 +278,7 @@ Required work:
 2. Implement the minimal safe fix.
 3. Run targeted verification that is appropriate for the touched modules.
 4. Confirm the public API and public contract remain unchanged.
-5. Commit, push, open a PR, and assign the `security` label to it.
+5. Commit using the actual AI agent as the git author, push, open a PR, assign the `security` label to it, and include explicit AI-agent attribution in the PR body.
 
 Branch naming:
 - Prefer `security/cve-2026-12345-high` or a similarly clear branch name.
@@ -285,6 +290,14 @@ PR labeling:
 - Add the `security` label immediately after creating the PR.
 - Prefer `gh pr edit --add-label "security"` with `GH_TOKEN="$GITHUB_PAT"` in the environment.
 
+PR authorship:
+- The git commit author must name the actual AI agent that created the patch.
+- Prefer `git commit --author="Cursor <cursor@local>"` or `git commit --author="Claude <claude@local>"` with the truthful agent name for the current runtime.
+- Use a clearly non-human local or noreply-style address if needed, but do not pretend to be a human contributor.
+- The PR body must contain an `Authored by` line naming the actual AI agent that opened the PR.
+- Prefer a line such as `Authored by: Cursor` or `Authored by: Claude`.
+- If the runtime provides a more specific truthful name, include it. Do not pretend the PR was authored by a human.
+
 PR body must include:
 ## Summary
 - what vulnerability is fixed
@@ -295,11 +308,16 @@ PR body must include:
 - [x] list each verification command actually run
 - [x] state explicitly that no public API or contract changes were introduced
 
+## Attribution
+- `Authored by: ACTUAL_AI_AGENT_NAME`
+
 Return to the parent agent with:
 - branch name
+- commit author used
 - commit SHA
 - PR URL
 - confirmation that the `security` label was applied
+- confirmation of the AI agent name used in the PR attribution
 - verification summary
 - any remaining risk or follow-up
 ```
@@ -339,6 +357,8 @@ If no safely fixable candidate exists, say so clearly and explain the blocker in
 - Do not attempt any GitHub API call before verifying that `GITHUB_PAT` is present.
 - Do not batch unrelated alerts into one PR.
 - Do not leave a security remediation PR unlabeled; it must carry the `security` label.
+- Do not leave the PR attribution generic when the actual agent identity is known.
+- Do not create the commit with a human author identity or the ambient local git identity.
 - Do not pick a GHSA-only alert and pretend it has a CVE.
 - Do not silently move to a major upgrade when a patch release guarantee was requested.
 - Do not change public contracts just because the scanner output is noisy.
