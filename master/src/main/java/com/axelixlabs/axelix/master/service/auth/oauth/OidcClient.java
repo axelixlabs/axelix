@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
@@ -75,7 +73,6 @@ public interface OidcClient {
      * @throws OidcTokenExchangeException       if the token is invalid, expired or malformed
      * @throws OidcMetadataUnavailableException if userinfo_endpoint is unavailable
      */
-    @Nullable
     String validateAccessTokenAndExtractUserInfo(String accessToken)
             throws OidcTokenExchangeException, OidcMetadataUnavailableException;
 }

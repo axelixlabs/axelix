@@ -27,7 +27,6 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
-import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
 
@@ -46,7 +45,7 @@ public class McpOAuth2MetadataController {
     private final String scopes;
 
     public McpOAuth2MetadataController(OAuth2Properties oAuth2Properties) {
-        this.mcpServerFullPath = oAuth2Properties.baseUrl() + WebAutoConfiguration.EXTERNAL_API_PATH + "/api/mcp";
+        this.mcpServerFullPath = oAuth2Properties.baseUrl() + "/api/mcp";
         this.issuerUri = oAuth2Properties.issuerUri();
         this.scopes = oAuth2Properties.scopes();
     }

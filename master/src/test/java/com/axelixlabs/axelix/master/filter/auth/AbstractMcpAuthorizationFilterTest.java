@@ -53,10 +53,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.UserService;
@@ -73,6 +73,8 @@ import static org.mockito.Mockito.when;
  *
  * @author Mikhail Polivakha
  */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(McpAutoConfiguration.class)
 abstract class AbstractMcpAuthorizationFilterTest {
 
     private static final String MCP_PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version";
@@ -150,8 +152,6 @@ abstract class AbstractMcpAuthorizationFilterTest {
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
                 "axelix.master.mcp-server.enabled=true",
@@ -187,8 +187,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "test-user";
             String password = "test-password";
 
-            userService.create(
-                    username, "test-email@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, "test-email@example.com", password, DefaultRole.VIEWER.getName());
 
             // and.
             registerInstanceForBeansTool(activeInstanceId);
@@ -240,8 +239,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String activeInstanceId = UUID.randomUUID().toString();
             String username = "viewer-user";
             String password = "viewer-password";
-            userService.create(
-                    username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, username + "@example.com", password, DefaultRole.VIEWER.getName());
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -261,8 +259,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             // given.
             String username = "viewer-user";
             String password = "viewer-password";
-            userService.create(
-                    username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, username + "@example.com", password, DefaultRole.VIEWER.getName());
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -276,8 +273,6 @@ abstract class AbstractMcpAuthorizationFilterTest {
         }
     }
 
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @Import(McpAutoConfiguration.class)
     @TestPropertySource(
             properties = {
                 "axelix.master.mcp-server.enabled=true",
@@ -290,16 +285,21 @@ abstract class AbstractMcpAuthorizationFilterTest {
     static class BearerAuthTest extends AbstractMcpAuthorizationFilterTest {
 
         @MockitoBean
+        private OidcClient oidcClient;
+
+        @MockitoBean
         private OidcRoleExtractor oidcRoleExtractor;
 
         @Test
         void shouldAuthenticateAndProxyMcpToolCallEndToEnd() {
             String activeInstanceId = UUID.randomUUID().toString();
             String token = "editor-access-token";
+            String userInfoJson = "someJson";
 
             // given.
             registerInstanceForBeansTool(activeInstanceId);
-            when(oidcRoleExtractor.extractRole(token)).thenReturn(DefaultRole.VIEWER);
+            when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
+            when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.VIEWER);
             HttpHeaders headers = bearerAuthHeaders(token);
             String mcpSessionId = initializeMcpSession(restTemplate, headers);
             headers.set(MCP_SESSION_ID_HEADER, mcpSessionId);
@@ -310,6 +310,24 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             // then.
             assertSuccessfulToolCallResponse(response);
+        }
+
+        @Test
+        void shouldReturnOkWhenViewerIsTryingToListMcpEndpoints() {
+            // given.
+            String token = "viewer-access-token";
+            String userInfoJson = "someJson";
+
+            when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
+            when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.VIEWER);
+            HttpHeaders headers = bearerAuthHeaders(token);
+
+            // when.
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "/api/mcp", new HttpEntity<>(buildInitializeRequest(), headers), String.class);
+
+            // then.
+            assertSuccessfulInitializeResponse(response);
         }
 
         @ParameterizedTest
@@ -336,7 +354,8 @@ abstract class AbstractMcpAuthorizationFilterTest {
         void shouldReturnUnauthorizedWhenBearerTokenIsInvalid(String request) {
             // given.
             String token = "malformed-token";
-            when(oidcRoleExtractor.extractRole(token)).thenThrow(new OidcTokenExchangeException("Malformed token"));
+            when(oidcClient.validateAccessTokenAndExtractUserInfo(token))
+                    .thenThrow(new OidcTokenExchangeException("Malformed token"));
             HttpHeaders headers = bearerAuthHeaders(token);
 
             // when.
@@ -357,7 +376,10 @@ abstract class AbstractMcpAuthorizationFilterTest {
             // given.
             String activeInstanceId = UUID.randomUUID().toString();
             String token = "viewer-access-token";
-            when(oidcRoleExtractor.extractRole(token)).thenReturn(DefaultRole.VIEWER);
+            String userInfoJson = "someJson";
+
+            when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
+            when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.VIEWER);
             HttpHeaders headers = bearerAuthHeaders(token);
 
             // when.
@@ -368,21 +390,6 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-        }
-
-        @Test
-        void shouldReturnOkWhenViewerIsTryingToListMcpEndpoints() {
-            // given.
-            String token = "viewer-access-token";
-            when(oidcRoleExtractor.extractRole(token)).thenReturn(DefaultRole.VIEWER);
-            HttpHeaders headers = bearerAuthHeaders(token);
-
-            // when.
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    "/api/mcp", new HttpEntity<>(buildInitializeRequest(), headers), String.class);
-
-            // then.
-            assertSuccessfulInitializeResponse(response);
         }
 
         private HttpHeaders bearerAuthHeaders(String token) {

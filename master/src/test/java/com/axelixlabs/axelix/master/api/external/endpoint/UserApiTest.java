@@ -154,7 +154,7 @@ class UserApiTest {
 
     @Test
     void shouldAuthenticateUserFromDatabase() {
-        userService.create("db-user", "db-user@example.com", "db-password", "VIEWER", UserOrigin.LOCAL);
+        userService.createLocal("db-user", "db-user@example.com", "db-password", "VIEWER");
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
@@ -173,8 +173,7 @@ class UserApiTest {
 
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
-        userService.create(
-                "db-user", "db-user@example.com", "db-password", DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+        userService.createLocal("db-user", "db-user@example.com", "db-password", DefaultRole.VIEWER.getName());
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 

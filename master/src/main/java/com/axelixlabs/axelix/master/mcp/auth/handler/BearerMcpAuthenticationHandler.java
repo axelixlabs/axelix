@@ -25,7 +25,8 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
-import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 
 /**
@@ -35,9 +36,11 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
  */
 public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler {
 
+    private final OidcClient oidcClient;
     private final OidcRoleExtractor roleExtractor;
 
-    public BearerMcpAuthenticationHandler(OidcRoleExtractor roleExtractor) {
+    public BearerMcpAuthenticationHandler(OidcClient oidcClient, OidcRoleExtractor roleExtractor) {
+        this.oidcClient = oidcClient;
         this.roleExtractor = roleExtractor;
     }
 
@@ -45,9 +48,10 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
     public User handleAuthentication(String credential) throws AuthenticationException {
         // credential is expected to be an access token
         try {
-            Role role = roleExtractor.extractRole(credential);
-            return new PasswordlessUser("MCP_AGENT", Set.of(role));
-        } catch (OidcTokenExchangeException e) {
+            String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(credential);
+            Role role = roleExtractor.extractRole(userInfoJson);
+            return new PasswordlessUser("AI_AGENT", Set.of(role));
+        } catch (OAuth2AuthenticationException e) {
             throw new AuthenticationException(e);
         }
     }

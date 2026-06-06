@@ -17,9 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api.infrastructure;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,11 +44,15 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
+import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,6 +80,8 @@ class OAuth2CallbackControllerTest {
 
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
+    private static final String ACCESS_TOKEN = "test-access-token";
+    private static final Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
     @LocalServerPort
     private int port;
@@ -88,25 +97,43 @@ class OAuth2CallbackControllerTest {
     @Autowired
     private JwtDecoderService jwtDecoderService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
+
     @BeforeEach
     void prepare() {
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
+        userRepository.deleteAll();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        userRepository.deleteAll();
     }
 
     @Test
     void happyPath() {
         // given.
         String username = "test-user";
-        var tokens = new Tokens(ID_TOKEN, "access-token");
+        String email = "example@gmail.com";
+        // language=json
+        String userInfoJson = "{\"email\": \"%s\"}".formatted(email);
 
         // and.
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
-        when(oidcRoleExtractor.extractRole(tokens.accessToken())).thenReturn(DefaultRole.EDITOR);
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
+        when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.EDITOR);
+        Instant beforeLogin = Instant.now();
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        Instant afterLogin = Instant.now();
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
@@ -140,6 +167,71 @@ class OAuth2CallbackControllerTest {
                 .doesNotContain(
                         DefaultAuthority.ENV_VALUES_READ.getName(),
                         DefaultAuthority.CONFIG_PROPS_VALUES_READ.getName());
+
+        // Verify that the OIDC user was correctly provisioned and persisted in the database
+        UserEntity userEntity = userRepository.findByUsername(username).get();
+        assertThat(userEntity.id()).isNotNull();
+        assertThat(userEntity.username()).isEqualTo(username);
+        assertThat(userEntity.email()).isEqualTo(email);
+        assertThat(userEntity.password()).isNull();
+        assertThat(userEntity.roles().values()).hasSize(1).containsOnly("EDITOR");
+        assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.OIDC);
+        assertThat(userEntity.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
+    }
+
+    @Test
+    void shouldUpdateLastLoginAtForExistingOidcUser() {
+        // given.
+        String username = "test-user";
+        String updatedEmail = "updated@gmail.com";
+        userService.createFromOidc(username, "original@gmail.com", DefaultRole.VIEWER.getName());
+
+        // and.
+        String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
+        when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.EDITOR);
+        Instant beforeLogin = Instant.now();
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+        Instant afterLogin = Instant.now();
+
+        // then.
+        UserEntity updated = userRepository.findByUsername(username).orElseThrow();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(updated.email()).isEqualTo(updatedEmail);
+        assertThat(updated.roles().values()).containsOnly(DefaultRole.EDITOR.getName());
+        assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
+        assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
+    }
+
+    @Test
+    void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
+        // given.
+        String username = "test-user";
+        userService.createLocal(username, null, "test-password", "ADMIN");
+
+        // and.
+        String userInfoJson = "someJson";
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
+        when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.EDITOR);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        Optional<UserEntity> userInDb = userRepository.findByUsername(username);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userInDb).isPresent().hasValueSatisfying(userEntity -> {
+            assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.LOCAL);
+            assertThat(userEntity.roles().values()).containsOnly("ADMIN");
+        });
     }
 
     @Test
@@ -165,7 +257,7 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn401WhenIdTokenValidationFails() {
-        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(new Tokens(ID_TOKEN, "access-token"));
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
         when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN))
                 .thenThrow(new InvalidJwtTokenException("invalid token"));
 
@@ -179,8 +271,8 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn502WhenUserInfoEndpointUnavailable() {
-        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(new Tokens(ID_TOKEN, "access-token"));
-        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN))
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                 .thenThrow(new OidcMetadataUnavailableException("metadata unavailable"));
 
         // when.

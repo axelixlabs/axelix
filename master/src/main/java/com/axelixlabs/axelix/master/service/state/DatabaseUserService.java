@@ -63,7 +63,7 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void create(String username, @Nullable String email, String password, String role, UserOrigin userOrigin)
+    public void createLocal(String username, @Nullable String email, String password, String role)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         UserEntity userEntity = new UserEntity(
@@ -72,8 +72,23 @@ public class DatabaseUserService implements UserService {
                 email == null ? null : requireNonBlankTrimmed(email),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
-                userOrigin,
+                UserOrigin.LOCAL,
                 null);
+
+        jdbcAggregateTemplate.insert(userEntity);
+    }
+
+    @Override
+    public void createFromOidc(String username, @Nullable String email, String role) {
+
+        UserEntity userEntity = new UserEntity(
+                UUID.randomUUID().toString(),
+                requireNonBlankTrimmed(username),
+                email == null ? null : requireNonBlankTrimmed(email),
+                null,
+                new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
+                UserOrigin.OIDC,
+                Instant.now()); // the assumption is that the user is created during the initial login
 
         jdbcAggregateTemplate.insert(userEntity);
     }
@@ -105,7 +120,12 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void updateUserPatch(
-            String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
+            String id,
+            String username,
+            @Nullable String email,
+            @Nullable String password,
+            Set<String> roles,
+            @Nullable Instant lastLoginAt)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         if (roles.isEmpty()) {
@@ -120,11 +140,12 @@ public class DatabaseUserService implements UserService {
                 requireNonBlankTrimmed(username),
                 email == null ? null : requireNonBlankTrimmed(email),
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(validRoles));
+                new UserEntity.Roles(validRoles),
+                lastLoginAt);
     }
 
-    private String requireNonBlankTrimmed(@Nullable String value) throws UserInvalidValueException {
-        if (value != null && !value.isBlank()) {
+    private String requireNonBlankTrimmed(String value) throws UserInvalidValueException {
+        if (!value.isBlank()) {
             return value.trim();
         }
 

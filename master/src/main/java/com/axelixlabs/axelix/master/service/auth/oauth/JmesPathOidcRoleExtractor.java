@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
-import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
 
 /**
- * Extracts user role from OIDC tokens using a JMESPath expression.
+ * An {@link OidcRoleExtractor} implementation that extracts the user's role
+ * from the UserInfo JSON payload using a JMESPath expression.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -44,11 +44,7 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     @Nullable
     private final Expression<JsonNode> jmesPathExpression;
 
-    private final OidcClient oidcClient;
-
-    public JmesPathOidcRoleExtractor(OidcClient oidcClient, @Nullable String roleAttributePath) {
-        this.oidcClient = oidcClient;
-
+    public JmesPathOidcRoleExtractor(@Nullable String roleAttributePath) {
         if (roleAttributePath != null && !roleAttributePath.isEmpty()) {
             this.jmesPathExpression = new JacksonRuntime().compile(roleAttributePath);
         } else {
@@ -57,37 +53,20 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     }
 
     @Override
-    public Role extractRole(String accessToken) throws OidcTokenExchangeException {
+    public Role extractRole(String userInfoJson) throws OidcRoleExtractionException {
         if (jmesPathExpression == null) {
             return DefaultRole.VIEWER;
         }
 
-        Role role = extractRoleFromUserInfo(accessToken);
+        Role role = extractRoleFromJson(userInfoJson);
 
         if (role == null) {
-            throw new OidcTokenExchangeException(String.format(
-                    "Failed to extract role from tokens. JMES path expression: '%s' - role not found in ID token nor UserInfo endpoint",
+            throw new OidcRoleExtractionException(String.format(
+                    "Failed to extract role from UserInfo JSON payload using JMESPath expression: '%s'",
                     jmesPathExpression));
         }
 
         return role;
-    }
-
-    @Nullable
-    private Role extractRoleFromUserInfo(String accessToken) {
-        try {
-            String userInfo = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
-
-            if (userInfo == null) {
-                return null;
-            }
-
-            return extractRoleFromJson(userInfo);
-        } catch (OidcTokenExchangeException | OidcMetadataUnavailableException e) {
-            log.debug("Failed to extract role from UserInfo: {}", e.getMessage());
-        }
-
-        return null;
     }
 
     @Nullable
