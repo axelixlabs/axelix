@@ -61,6 +61,23 @@ runs:
         sarif_file: 'trivy-axelix-artifacts.sarif'
         category: 'trivy-artifacts'
 
+    # Yes, we're doing second run for the libraries (JAR files, starters essentially) because trivy is
+    # demanding the second iteration to block the build in case of CRITICAL/HIGH CVEs being found. I know
+    # it is crazy - logically, that seems can be done in a single step, but this is the way it works
+
+    - name: Fail build on HIGH/CRITICAL artifact vulnerabilities
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: 'rootfs'
+        scan-ref: '.'
+        vuln-type: 'library'
+        format: 'table'
+        severity: 'HIGH,CRITICAL'
+        ignore-unfixed: true
+        exit-code: '1'
+        # Trivy is already installed by the previous invocation.
+        skip-setup-trivy: true
+
     # And finally, scanning the docker image
 
     - name: Set up Docker
@@ -85,6 +102,19 @@ runs:
       with:
         sarif_file: 'trivy-axelix-image.sarif'
         category: 'trivy-image'
+
+    - name: Fail build on HIGH/CRITICAL image vulnerabilities
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        image-ref: 'axelix-local:security-scan'
+        scan-type: 'image'
+        vuln-type: 'os,library'
+        format: 'table'
+        severity: 'HIGH,CRITICAL'
+        ignore-unfixed: true
+        exit-code: '1'
+        # Trivy is already installed by the previous invocation.
+        skip-setup-trivy: true
 
     - name: Remove Docker Image
       if: always()

@@ -48,7 +48,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: v${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
       - name: Running Security Check
