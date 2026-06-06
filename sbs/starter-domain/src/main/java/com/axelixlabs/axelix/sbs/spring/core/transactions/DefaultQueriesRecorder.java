@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 /**
