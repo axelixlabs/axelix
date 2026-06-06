@@ -488,7 +488,7 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Test
-    void supportsPropagationWithExistingTransaction() {
+    void supportsPropagationWithExistingTransactionShouldNotOpenATransaction() {
         // given.
         transactionTemplate.executeWithoutResult(status -> {
             propagationTestHelper.testSupports("Rodriquez");

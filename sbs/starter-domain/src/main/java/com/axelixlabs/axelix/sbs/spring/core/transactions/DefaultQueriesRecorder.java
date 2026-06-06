@@ -27,17 +27,18 @@ import java.util.List;
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public final class DefaultQueriesRecorder implements QueriesRecorder {
 
-    private final ThreadLocal<Deque<List<SqlQueryRecord>>> threadLocalStack = new ThreadLocal<>();
+    private static final ThreadLocal<QueriesStack> threadLocalStack = new ThreadLocal<>();
 
     @Override
     public void startNewContext() {
-        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
+        QueriesStack stack = threadLocalStack.get();
 
         if (stack == null) {
-            stack = new ArrayDeque<>();
+            stack = new QueriesStack();
             threadLocalStack.set(stack);
         }
 
@@ -46,13 +47,14 @@ public final class DefaultQueriesRecorder implements QueriesRecorder {
 
     @Override
     public void recordQuery(SqlQueryRecord query) {
-        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
+        QueriesStack stack = threadLocalStack.get();
 
         if (stack == null) {
             return;
         }
 
         List<SqlQueryRecord> currentTxQueries = stack.peek();
+
         if (currentTxQueries != null) {
             currentTxQueries.add(query);
         }
@@ -60,7 +62,7 @@ public final class DefaultQueriesRecorder implements QueriesRecorder {
 
     @Override
     public List<SqlQueryRecord> popAllRecords() {
-        Deque<List<SqlQueryRecord>> stack = threadLocalStack.get();
+        QueriesStack stack = threadLocalStack.get();
 
         if (stack == null || stack.isEmpty()) {
             return new ArrayList<>();
@@ -73,5 +75,20 @@ public final class DefaultQueriesRecorder implements QueriesRecorder {
         }
 
         return queries;
+    }
+
+    /**
+     * A convenient type-alias for the stack-like data structure of sql queries, executed within the given transactions.
+     * <p>
+     * We need a stack to account for REQUIRES_NEW transaction isolation level.
+     *
+     * @author Mikhail Polivakha
+     * @author Nikita Kirillov
+     */
+    static class QueriesStack extends ArrayDeque<List<SqlQueryRecord>> {
+
+        public QueriesStack() {
+            super(1); // assume no REQUIRES_NEW transactions by default
+        }
     }
 }

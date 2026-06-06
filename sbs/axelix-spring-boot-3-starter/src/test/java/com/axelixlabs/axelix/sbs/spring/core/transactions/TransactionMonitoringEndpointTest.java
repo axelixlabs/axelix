@@ -521,7 +521,7 @@ class TransactionMonitoringEndpointTest {
 
     @Test
     @Transactional
-    void supportsPropagationWithExistingTransaction() {
+    void supportsPropagationWithExistingTransactionShouldNotOpenATransaction() {
         // given.
         propagationTestHelper.testSupports("Rodriquez");
 

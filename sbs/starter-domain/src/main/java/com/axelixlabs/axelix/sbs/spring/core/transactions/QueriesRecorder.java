@@ -47,7 +47,7 @@ public interface QueriesRecorder {
      * Pops all query statistics collected within the particular transaction
      * (i.e. the history of queries is removed from {@link QueriesRecorder})
      *
-     * @return list ща query statistics
+     * @return list of query statistics
      */
     List<SqlQueryRecord> popAllRecords();
 }
