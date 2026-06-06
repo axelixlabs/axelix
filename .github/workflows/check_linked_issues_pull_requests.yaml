@@ -21,4 +21,4 @@ jobs:
       - name: Check for linked issues
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
-          exclude-labels: "refactoring, dependencies, docs"
+          exclude-labels: "refactoring, dependencies, docs, security"
