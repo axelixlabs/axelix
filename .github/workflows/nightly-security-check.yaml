@@ -6,7 +6,7 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  run-nightly-security-check:
+  run-security-check:
     runs-on: ubuntu-latest
     permissions:
       contents: read
