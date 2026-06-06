@@ -112,9 +112,8 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
             return "index.html";
         }
 
-        String[] segments = StringUtils.delimitedListToStringArray(
-                StringUtils.trimLeadingCharacter(contextPath, '/'),
-                "/");
+        String[] segments =
+                StringUtils.delimitedListToStringArray(StringUtils.trimLeadingCharacter(contextPath, '/'), "/");
 
         for (String segment : segments) {
             if (!StringUtils.hasText(segment)

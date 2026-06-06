@@ -43,14 +43,15 @@ class SpaStaticResourcesServingFilterPathSanitizationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "",
-        "/",
-        "/../secrets.txt",
-        "/assets/../../secrets.txt",
-        "/assets\\main.js",
-        "/assets:main.js",
-    })
+    @ValueSource(
+            strings = {
+                "",
+                "/",
+                "/../secrets.txt",
+                "/assets/../../secrets.txt",
+                "/assets\\main.js",
+                "/assets:main.js",
+            })
     void shouldFallbackToIndexHtmlForUnsafePaths(String contextPath) {
         // given.
         String inputPath = contextPath;
