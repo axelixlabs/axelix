@@ -70,7 +70,7 @@ public class DatabaseUserService implements UserService {
                 UUID.randomUUID().toString(),
                 requireNonBlankTrimmed(username),
                 email == null ? null : requireNonBlankTrimmed(email),
-                password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
                 UserOrigin.LOCAL,
                 null);

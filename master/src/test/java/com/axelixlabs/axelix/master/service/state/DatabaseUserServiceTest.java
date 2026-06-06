@@ -43,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Base class for integration tests of {@link DatabaseUserService}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest
 abstract class DatabaseUserServiceTest {
@@ -63,7 +65,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldPersistUser() {
+    void createLocal_shouldPersistUser() {
         // when.
         userService.createLocal("alice", "alice@example.com", "plainPass", "ADMIN");
 
@@ -83,9 +85,9 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldAllowNullEmail() {
+    void createFroOidc_shouldAllowNullEmail() {
         // when.
-        userService.createLocal("bob", null, "plainPass", "VIEWER");
+        userService.createFromOidc("bob", null, "VIEWER");
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
@@ -95,7 +97,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldThrowWhenRoleIsNotAllowed() {
+    void createLocal_shouldThrowWhenRoleIsNotAllowed() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("alice", "alice@example.com", "p", "SUPER_ADMIN"))
                 // then.
@@ -103,8 +105,8 @@ abstract class DatabaseUserServiceTest {
         assertThat(userRepository.findAll()).isEmpty();
     }
 
-    @Test
-    void create_Local_shouldThrowWhenRoleDoesNotExist() {
+    @Test // TODO: This test should be revisited since in enterprise we're going to be able to supply many roles
+    void createLocal_shouldThrowWhenRoleDoesNotExist() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("alice", "alice@example.com", "p", "NOT_A_ROLE"))
                 // then.
@@ -113,7 +115,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldThrowWhenUsernameIsBlank() {
+    void createLocal_shouldThrowWhenUsernameIsBlank() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("   ", "alice@example.com", "p", "VIEWER"))
                 // then.
@@ -122,7 +124,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldThrowWhenEmailIsBlank() {
+    void createLocal_shouldThrowWhenEmailIsBlank() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("alice", "   ", "p", "VIEWER"))
                 // then.
@@ -131,7 +133,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldThrowWhenPasswordIsBlank() {
+    void createLocal_shouldThrowWhenPasswordIsBlank() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("alice", "alice@example.com", "   ", "VIEWER"))
                 // then.
@@ -140,7 +142,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void create_Local_shouldThrowWhenRoleIsBlank() {
+    void createLocal_shouldThrowWhenRoleIsBlank() {
         // when.
         assertThatThrownBy(() -> userService.createLocal("alice", "alice@example.com", "p", "   "))
                 // then.
@@ -169,7 +171,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void findAll_shouldReturnAllUsers() {
         userService.createLocal("alice", "a@example.com", "p", "VIEWER");
-        userService.createLocal("bob", "b@example.com", "p", "ADMIN");
+        userService.createFromOidc("bob", "b@example.com", "ADMIN");
 
         // when.
         List<UserEntity> all = userService.findAll();

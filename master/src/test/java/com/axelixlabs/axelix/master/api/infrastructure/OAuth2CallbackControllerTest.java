@@ -17,8 +17,11 @@
  */
 package com.axelixlabs.axelix.master.api.infrastructure;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -125,10 +128,13 @@ class OAuth2CallbackControllerTest {
         when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
         when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.EDITOR);
+        Instant beforeLogin = Instant.now();
 
         // when.
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        Instant afterLogin = Instant.now();
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
@@ -171,14 +177,45 @@ class OAuth2CallbackControllerTest {
         assertThat(userEntity.password()).isNull();
         assertThat(userEntity.roles().values()).hasSize(1).containsOnly("EDITOR");
         assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.OIDC);
-        assertThat(userEntity.lastLoginAt()).isNotNull();
+        assertThat(userEntity.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
+    }
+
+    @Test
+    void shouldUpdateLastLoginAtForExistingOidcUser() {
+        // given.
+        String username = "test-user";
+        String updatedEmail = "updated@gmail.com";
+        userService.createFromOidc(username, "original@gmail.com", DefaultRole.VIEWER.getName());
+
+        // and.
+        String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(username);
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
+        when(oidcRoleExtractor.extractRole(userInfoJson)).thenReturn(DefaultRole.EDITOR);
+        Instant beforeLogin = Instant.now();
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+        Instant afterLogin = Instant.now();
+
+        // then.
+        UserEntity updated = userRepository.findByUsername(username).orElseThrow();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(updated.email()).isEqualTo(updatedEmail);
+        assertThat(updated.roles().values()).containsOnly(DefaultRole.EDITOR.getName());
+        assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
+        assertThat(updated.lastLoginAt())
+                .isNotNull()
+                .isBetween(beforeLogin, afterLogin);
     }
 
     @Test
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.createLocal(username, null, null, "ADMIN");
+        userService.createLocal(username, null, "test-password", "ADMIN");
 
         // and.
         String userInfoJson = "someJson";
@@ -191,7 +228,13 @@ class OAuth2CallbackControllerTest {
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
 
+        Optional<UserEntity> userInDb = userRepository.findByUsername(username);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userInDb).isPresent().hasValueSatisfying(userEntity -> {
+            assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.LOCAL);
+            assertThat(userEntity.roles().values()).containsOnly("ADMIN");
+        });
     }
 
     @Test

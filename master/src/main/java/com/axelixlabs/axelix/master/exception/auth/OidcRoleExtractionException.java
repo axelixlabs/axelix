@@ -24,6 +24,7 @@ package com.axelixlabs.axelix.master.exception.auth;
  * @author Nikita Kirillov
  */
 public class OidcRoleExtractionException extends OAuth2AuthenticationException {
+
     public OidcRoleExtractionException(String message) {
         super(message);
     }
