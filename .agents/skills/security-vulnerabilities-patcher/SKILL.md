@@ -1,5 +1,5 @@
 ---
-name: security-fix-prs
+name: security-vulnerabilities-patcher
 description: Create isolated pull requests for GitHub security findings in `axelixlabs/axelix`, one vulnerability at a time. Use this skill whenever the user asks to fix CodeQL, Trivy, SARIF, Dependabot, SAST, SCA, CVE, GHSA, or `security-check` findings for the Axelix repository, especially when the goal is to query GitHub security alerts, summarize severities, delegate a single vulnerability to a subagent, and open a patch-release-safe PR that names the CVE and severity.
 ---
 
