@@ -53,7 +53,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -188,8 +187,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "test-user";
             String password = "test-password";
 
-            userService.create(
-                    username, "test-email@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, "test-email@example.com", password, DefaultRole.VIEWER.getName());
 
             // and.
             registerInstanceForBeansTool(activeInstanceId);
@@ -241,8 +239,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String activeInstanceId = UUID.randomUUID().toString();
             String username = "viewer-user";
             String password = "viewer-password";
-            userService.create(
-                    username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, username + "@example.com", password, DefaultRole.VIEWER.getName());
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -262,8 +259,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             // given.
             String username = "viewer-user";
             String password = "viewer-password";
-            userService.create(
-                    username, username + "@example.com", password, DefaultRole.VIEWER.getName(), UserOrigin.LOCAL);
+            userService.createLocal(username, username + "@example.com", password, DefaultRole.VIEWER.getName());
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));

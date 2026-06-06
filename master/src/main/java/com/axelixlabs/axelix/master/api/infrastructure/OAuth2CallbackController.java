@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.infrastructure;
 
+import java.time.Instant;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -129,13 +130,14 @@ public class OAuth2CallbackController {
 
         if (entity != null) {
             if (entity.userOrigin() != UserOrigin.OIDC) {
-                throw new BadRequestException("OIDC user conflicts with an existing non-OIDC account");
+                throw new BadRequestException("OIDC user with username '" + user.getUsername()
+                        + "' conflicts with an existing non-OIDC account");
             }
-            userService.updateUserPatch(entity.id(), entity.username(), email, null, Set.of(role.getName()));
+            userService.updateUserPatch(
+                    entity.id(), entity.username(), email, null, Set.of(role.getName()), Instant.now());
         } else {
-            userService.create(user.getUsername(), email, null, role.getName(), UserOrigin.OIDC);
+            userService.createFromOidc(user.getUsername(), email, role.getName());
         }
-        userService.updateLastLoginAt(user.getUsername());
     }
 
     @Nullable

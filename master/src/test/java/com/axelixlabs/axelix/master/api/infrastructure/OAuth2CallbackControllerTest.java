@@ -178,7 +178,7 @@ class OAuth2CallbackControllerTest {
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.create(username, null, null, "ADMIN", UserOrigin.LOCAL);
+        userService.createLocal(username, null, null, "ADMIN");
 
         // and.
         String userInfoJson = "someJson";

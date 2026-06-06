@@ -43,18 +43,29 @@ import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 public interface UserService {
 
     /**
-     * Creates a new managed user from a Users Management API request.
+     * Creates a new {@link UserOrigin#LOCAL} user.
      *
-     * @param username   Login username of the new user. Must be unique.
-     * @param email      Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
-     * @param password   Plain-text password (must be hashed server-side before persistence).
-     * @param role       Role name to assign to the new user. Must not be blank or {@code null}.
-     * @param userOrigin Origin of the account (e.g. {@link UserOrigin#OIDC} or {@link UserOrigin#LOCAL}).
+     * @param username Login username of the new user. Must be unique.
+     * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
+     * @param password Plain-text password (must be hashed server-side before persistence).
+     * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
-    void create(String username, @Nullable String email, @Nullable String password, String role, UserOrigin userOrigin);
+    void createLocal(String username, @Nullable String email, String password, String role);
+
+    /**
+     * Creates a new {@link UserOrigin#OIDC} user.
+     *
+     * @param username Login username of the new user. Must be unique.
+     * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
+     * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
+     *
+     * @throws UserRoleNotFoundException if the provided role does not exist in the service.
+     * @throws UserInvalidValueException if any of the provided string fields is blank.
+     */
+    void createFromOidc(String username, @Nullable String email, String role);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.
@@ -113,7 +124,24 @@ public interface UserService {
      * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
-    void updateUserPatch(
+    default void updateUserPatch(
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
+            throws UserRoleNotFoundException, UserInvalidValueException {
+
+        updateUserPatch(id, username, email, password, roles, null);
+    }
+
+    /**
+     * Same contract as the sibling {@link #updateUserPatch(String, String, String, String, Set)} with the exception
+     * that this method also allows to update the {@link UserEntity#lastLoginAt()}. Passing {@code null} means the
+     * {@link UserEntity#lastLoginAt()} should not be updated.
+     */
+    void updateUserPatch(
+            String id,
+            String username,
+            @Nullable String email,
+            @Nullable String password,
+            Set<String> roles,
+            @Nullable Instant lastLoginAt)
             throws UserRoleNotFoundException, UserInvalidValueException;
 }

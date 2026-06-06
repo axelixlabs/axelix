@@ -37,7 +37,6 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.service.state.UserService;
@@ -69,8 +68,7 @@ public class UserManagementApi {
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request) {
         try {
 
-            userService.create(
-                    request.username(), request.email(), request.password(), request.role(), UserOrigin.LOCAL);
+            userService.createLocal(request.username(), request.email(), request.password(), request.role());
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (UserInvalidValueException
