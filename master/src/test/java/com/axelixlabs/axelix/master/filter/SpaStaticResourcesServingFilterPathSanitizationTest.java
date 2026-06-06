@@ -49,6 +49,8 @@ class SpaStaticResourcesServingFilterPathSanitizationTest {
                 "/",
                 "/../secrets.txt",
                 "/assets/../../secrets.txt",
+                "/assets/./main.js",
+                "/assets//main.js",
                 "/assets\\main.js",
                 "/assets:main.js",
             })

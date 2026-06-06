@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.filter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +43,6 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
 @Order(FiltersOrder.SPA_STATIC_RESOURCES_SERVING_FILTER)
 public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
-    private static final Pattern SAFE_PATH_SEGMENT = Pattern.compile("[A-Za-z0-9._-]+");
     private final WebProperties webProperties;
     private final Resource indexHtmlLocation;
     private static final Map<String, MediaType> MEDIA_TYPES_CACHE;
@@ -112,18 +110,30 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
             return "index.html";
         }
 
-        String[] segments =
-                StringUtils.delimitedListToStringArray(StringUtils.trimLeadingCharacter(contextPath, '/'), "/");
-
-        for (String segment : segments) {
-            if (!StringUtils.hasText(segment)
-                    || ".".equals(segment)
-                    || "..".equals(segment)
-                    || !SAFE_PATH_SEGMENT.matcher(segment).matches()) {
-                return "index.html";
-            }
+        String relativePath = StringUtils.trimLeadingCharacter(contextPath, '/');
+        if (containsUnsafePathTokens(relativePath)) {
+            return "index.html";
         }
 
-        return String.join("/", segments);
+        String cleanedRelativePath = StringUtils.cleanPath(relativePath);
+        if (isUnsafeCleanedPath(relativePath, cleanedRelativePath)) {
+            return "index.html";
+        }
+
+        return cleanedRelativePath;
+    }
+
+    private static boolean containsUnsafePathTokens(String relativePath) {
+        return !StringUtils.hasText(relativePath)
+                || relativePath.contains("\\")
+                || relativePath.contains(":")
+                || relativePath.contains("//");
+    }
+
+    private static boolean isUnsafeCleanedPath(String relativePath, String cleanedRelativePath) {
+        return !StringUtils.hasText(cleanedRelativePath)
+                || cleanedRelativePath.startsWith("../")
+                || cleanedRelativePath.startsWith("/")
+                || !cleanedRelativePath.equals(relativePath);
     }
 }
