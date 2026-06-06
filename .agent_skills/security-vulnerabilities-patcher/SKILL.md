@@ -1,13 +1,20 @@
 ---
 name: security-vulnerabilities-patcher
-description: Create isolated pull requests for GitHub security findings in `axelixlabs/axelix`, one vulnerability at a time. Use this skill whenever the user asks to fix CodeQL, Trivy, SARIF, Dependabot, SAST, SCA, CVE, GHSA, or `security-check` findings for the Axelix repository, especially when the goal is to query GitHub security alerts, summarize severities, delegate a single vulnerability to a subagent, and open a patch-release-safe PR that names the CVE and severity.
+description: Create batched Dependabot-style pull requests for GitHub security findings in `axelixlabs/axelix`, grouped by dependency surface such as `master/front-end`, `master/build.gradle.kts`, or starter Gradle builds. Use this skill whenever the user asks to fix CodeQL, Trivy, SARIF, Dependabot, SAST, SCA, CVE, GHSA, or `security-check` findings for the Axelix repository and wants patch-release-safe PRs that bundle related vulnerabilities by manifest or module area instead of one PR per CVE.
 ---
 
-# Security Fix PRs
+# Security Vulnerabilities Patcher
 
-Turn GitHub security alerts into narrowly scoped pull requests.
+Turn GitHub security alerts into **batched, Dependabot-style pull requests** for **`axelixlabs/axelix`**.
 
-The important constraint is **isolation**: do not try to clear the whole security backlog in one go. Work on **one vulnerability at a time**, open **one PR per vulnerability**, and keep each fix small enough that maintainers can confidently ship it in a **patch release**.
+The key idea is **batch by Axelix dependency surface**, not by individual CVE. The desired shape is:
+
+- one PR for `master/front-end` dependency updates,
+- one PR for `master/build.gradle.kts` and directly coupled master backend build files,
+- one PR for starter Gradle build files,
+- and separate PRs for other clearly distinct dependency surfaces when needed.
+
+The goal is still patch-release safety: each PR should stay locally understandable and safe to review, but it may fix several vulnerabilities at once if they belong to the same surface.
 
 ## What this skill is for
 
@@ -22,23 +29,48 @@ This skill is intentionally **Axelix-specific**. It assumes the target repositor
 
 ## Core operating rules
 
-1. **One vulnerability per PR.**
-   If a single minimal fix remediates the same CVE in several files or manifests, that is still one PR. Do not batch unrelated CVEs together.
+1. **Batch by dependency surface, not by CVE.**
+   Group vulnerabilities that are fixed by the same manifest, lockfile, Gradle build, or tightly coupled module area.
 
-2. **Prefer patch-safe remediations.**
+2. **Do not batch across unrelated Axelix surfaces.**
+   `master/front-end` does not belong in the same PR as starter Gradle files. `master/build.gradle.kts` does not belong in the same PR as Docker base image remediation unless the same build surface truly requires it.
+
+3. **Prefer patch-safe remediations.**
    Favor:
    - same-major dependency upgrades,
+   - lockfile refreshes that follow from those upgrades,
    - minimal container base image bumps,
    - tiny local hardening patches that do not alter public behavior.
 
-3. **Do not break public APIs or contracts.**
+4. **Do not break public APIs or contracts.**
    The fix must be safe for a patch release. Avoid changes to public DTOs, REST contracts, starter configuration contracts, public Java APIs, or user-facing workflows unless the user explicitly accepts that risk.
 
-4. **Do not hide the problem.**
+5. **Do not hide the problem.**
    Do not "fix" alerts by suppressing them, loosening the scanner, or adding ignores unless the user explicitly asks for that path and understands the trade-off.
 
-5. **Do not invent vulnerability identifiers.**
-   Prefer alerts that have a real **CVE** identifier. If an alert only has a GHSA and no CVE alias, say so explicitly instead of fabricating a CVE.
+6. **Do not invent vulnerability identifiers.**
+   Prefer real CVE identifiers when they exist. If some findings are GHSA-only, say so plainly instead of fabricating CVEs.
+
+## Preferred Axelix batch boundaries
+
+Use these batch boundaries by default unless the live alert data strongly suggests a better split:
+
+1. **`master/front-end`**
+   Group vulnerabilities remediated through `master/front-end/package.json`, `master/front-end/package-lock.json`, or equivalent front-end dependency files.
+
+2. **Master backend Gradle**
+   Group vulnerabilities remediated through `master/build.gradle.kts`, root Gradle version catalogs or shared Gradle declarations that primarily affect master backend dependencies.
+
+3. **Starters Gradle**
+   Group vulnerabilities remediated through `sbs/build.gradle.kts`, `sbs/axelix-spring-boot-2/build.gradle.kts`, `sbs/axelix-spring-boot-3/build.gradle.kts`, or directly coupled starter build files.
+
+4. **Shared/common Gradle**
+   If vulnerabilities live primarily in `common/` modules or shared build logic, use a separate PR when that keeps the blast radius smaller and clearer.
+
+5. **Docker/image surface**
+   If Trivy image findings are fixed via Docker base image changes rather than application manifests, keep that in its own PR unless the user explicitly wants it combined.
+
+When in doubt, ask: "Would a maintainer naturally review these updates together like a single Dependabot PR?" If not, split them.
 
 ## Supported alert sources
 
@@ -117,8 +149,6 @@ Preferred pattern:
 export GH_TOKEN="$GITHUB_PAT"
 ```
 
-Then use `gh` commands with that token in the environment.
-
 Resolve `OWNER/REPO` from git first:
 
 ```bash
@@ -139,7 +169,8 @@ You need enough access to:
 - read security alerts,
 - read repository contents,
 - push a branch,
-- create a PR.
+- create a PR,
+- edit PR labels.
 
 If authentication is missing or insufficient, stop and explain what permission is needed rather than guessing.
 
@@ -154,7 +185,7 @@ gh repo view OWNER/REPO --json defaultBranchRef
 
 Fetch open alerts from every supported source that applies.
 
-Before choosing anything to fix, summarize counts by:
+Before choosing what to fix, summarize counts by:
 
 - source,
 - severity,
@@ -174,29 +205,33 @@ And then a short source breakdown such as:
 - `code-scanning / Trivy`
 - `dependabot`
 
-The point of the summary is to show the user the queue shape before you pick the next candidate. If there are `5 critical`, `10 high`, and `15 medium`, say so plainly.
+Also produce a **surface grouping summary**. For each alert, map it to the most likely Axelix batch boundary:
 
-## Step 3 - Select exactly one candidate to remediate
+- `master/front-end`
+- `master backend gradle`
+- `starters gradle`
+- `common/shared gradle`
+- `docker/image`
+- `other / needs review`
+
+The point of the summary is to show both the severity queue and the likely Dependabot-style PR buckets before you start fixing anything.
+
+## Step 3 - Choose one batch to remediate
+
+Do **not** choose a single vulnerability. Choose **one batch**.
 
 Selection order:
 
-1. Prefer **CRITICAL** over **HIGH**, **HIGH** over **MEDIUM**, and **MEDIUM** over **LOW**.
-2. Within the same severity, prefer an alert with:
-   - a concrete **CVE** identifier,
-   - a clear remediation path,
-   - a minimal, patch-safe fix,
-   - a localized blast radius.
-3. Prefer fixes that can be implemented as:
-   - same-major dependency upgrades,
-   - isolated Docker base image updates,
-   - narrowly scoped code changes.
-4. Skip candidates that appear to require:
+1. Prefer the batch containing the highest-severity fixable alerts.
+2. Prefer batches with a clear, local remediation path in one dependency surface.
+3. Prefer batches that can be fixed with same-major upgrades and lockfile refreshes.
+4. Skip batches that appear to require:
    - a major-version upgrade,
    - a breaking public API change,
-   - broad refactoring across unrelated modules,
+   - a broad cross-surface refactor,
    - speculative redesign.
 
-If the most severe finding is not safely fixable under patch-release constraints, explain why and move to the next eligible candidate. Do not force a risky fix just to satisfy the queue order.
+If the most severe batch is not safely fixable under patch-release constraints, explain why and move to the next eligible batch. Do not force a risky fix just to satisfy queue order.
 
 ## Step 4 - Build the handoff package for the fixing subagent
 
@@ -204,16 +239,17 @@ Do not send the subagent in blind. Collect and pass the exact context it needs:
 
 - repository: `OWNER/REPO`
 - default branch
-- chosen alert source and alert URL
-- raw alert facts:
+- chosen batch name, for example `master/front-end` or `starters gradle`
+- why the alerts belong in the same batch
+- raw alert facts for every alert in the batch:
   - severity,
   - CVE,
   - GHSA if present,
   - package or rule id,
   - affected path / manifest / module / image,
   - current version,
-  - first patched version if available
-- why this candidate looks patch-safe
+  - first patched version if available,
+  - alert URL
 - the exact files likely involved
 - any current dirty-worktree warning in the parent workspace
 - required verification commands
@@ -221,70 +257,71 @@ Do not send the subagent in blind. Collect and pass the exact context it needs:
 
 If the workspace is dirty, prefer an **isolated worktree subagent** so the remediation branch does not interfere with unrelated local changes.
 
-## Step 5 - Launch one subagent for one vulnerability
+## Step 5 - Launch one subagent for one batch
 
-Prefer a `best-of-n-runner` subagent when available because it works in an isolated git worktree and is a better fit for one-branch-per-fix security work. If that is unavailable, use a normal writable subagent and be careful around local changes.
+Prefer a `best-of-n-runner` subagent when available because it works in an isolated git worktree and is a good fit for one-branch-per-batch security work. If that is unavailable, use a normal writable subagent and be careful around local changes.
 
 The subagent's job is to:
 
-1. create a dedicated branch,
-2. implement the smallest safe fix,
+1. create a dedicated branch for the chosen batch,
+2. implement the smallest safe grouped fix for that surface,
 3. run focused verification,
-4. commit the change,
+4. commit the change with the actual AI agent as git author,
 5. push the branch,
-6. open the PR as the AI-authored remediation branch for that single vulnerability,
+6. open the PR,
 7. assign the `security` label to that PR,
-8. commit the change with the actual AI agent as the git commit author,
-9. explicitly identify in the PR body which AI agent created the PR.
+8. identify in the PR body which AI agent created the PR.
 
-Do **not** launch multiple fixing subagents in parallel unless the user explicitly asks for multiple independent PRs and the repository state makes that safe.
+Do **not** launch multiple fixing subagents in parallel unless the user explicitly asks for multiple independent batched PRs and the repository state makes that safe.
 
 ## Subagent prompt template
 
-Use a prompt in this shape, filling in the real alert details:
+Use a prompt in this shape, filling in the real batch details:
 
 ```text
-You are fixing exactly one GitHub security vulnerability in an isolated branch.
+You are fixing one batched security update for axelixlabs/axelix in an isolated branch.
 
 Repository: OWNER/REPO
 Base branch: DEFAULT_BRANCH
 
-Chosen vulnerability:
-- Source: code-scanning | dependabot
-- Severity: HIGH
-- CVE: CVE-2026-12345
-- GHSA: GHSA-xxxx-yyyy-zzzz
-- Alert URL: https://github.com/OWNER/REPO/security/...
-- Package or rule: PACKAGE_OR_RULE
-- Current version: CURRENT_VERSION
-- First patched version: PATCHED_VERSION
+Chosen batch:
+- Batch name: master/front-end | master backend gradle | starters gradle | common/shared gradle | docker/image
+- Why this batch is grouped together: REASON
 - Affected files: FILES
-- Why this is the chosen candidate: REASON
+
+Alerts in this batch:
+- ALERT 1: severity, CVE/GHSA, package or rule, current version, patched version, alert URL
+- ALERT 2: severity, CVE/GHSA, package or rule, current version, patched version, alert URL
+- ...
 
 Constraints:
 - Use the `GITHUB_PAT` environment variable for all GitHub access. If it is missing or empty, stop immediately and report that back to the parent agent without attempting any GitHub API call.
 - Attribute the PR to the actual AI agent that created it, for example `Cursor`, `Claude`, `Codex`, or `Gemini`. Do not use a generic `AI` label when the runtime identity is known.
 - The git commit author must also be that actual AI agent identity. Do not leave the commit authored by a human account or local default identity.
 - Do not modify git config to achieve this. Use per-commit author metadata such as `git commit --author="ACTUAL_AI_AGENT_NAME <ACTUAL_AI_AGENT_NAME@local>"`.
-- Fix only this vulnerability or the tightly coupled occurrences of the same vulnerability.
+- Fix only this dependency surface. Do not opportunistically update unrelated manifests or modules.
 - Keep the change safe for a patch release.
 - Do not introduce public API or public contract changes.
-- Prefer the smallest same-major dependency upgrade or similarly low-risk patch.
+- Prefer the smallest same-major dependency upgrades or similarly low-risk grouped patch.
 - If the only fix appears to require a breaking change, stop and report that instead of opening a PR.
-- Do not suppress or ignore the alert.
+- Do not suppress or ignore the alerts.
 
 Required work:
-1. Inspect the relevant files and understand the vulnerability.
-2. Implement the minimal safe fix.
+1. Inspect the relevant files and understand the batch of vulnerabilities.
+2. Implement the minimal safe grouped fix for this surface.
 3. Run targeted verification that is appropriate for the touched modules.
 4. Confirm the public API and public contract remain unchanged.
 5. Commit using the actual AI agent as the git author, push, open a PR, assign the `security` label to it, and include explicit AI-agent attribution in the PR body.
 
 Branch naming:
-- Prefer `security/cve-2026-12345-high` or a similarly clear branch name.
+- Prefer `security/master-front-end-batch`
+- Or `security/master-gradle-batch`
+- Or `security/starters-gradle-batch`
 
 PR title format:
-- `[SECURITY][HIGH] Fix CVE-2026-12345 in PACKAGE_OR_RULE`
+- `[SECURITY][BATCH] Update master/front-end dependencies`
+- `[SECURITY][BATCH] Update master backend Gradle dependencies`
+- `[SECURITY][BATCH] Update starter Gradle dependencies`
 
 PR labeling:
 - Add the `security` label immediately after creating the PR.
@@ -295,13 +332,12 @@ PR authorship:
 - Prefer `git commit --author="Cursor <cursor@local>"` or `git commit --author="Claude <claude@local>"` with the truthful agent name for the current runtime.
 - Use a clearly non-human local or noreply-style address if needed, but do not pretend to be a human contributor.
 - The PR body must contain an `Authored by` line naming the actual AI agent that opened the PR.
-- Prefer a line such as `Authored by: Cursor` or `Authored by: Claude`.
-- If the runtime provides a more specific truthful name, include it. Do not pretend the PR was authored by a human.
 
 PR body must include:
 ## Summary
-- what vulnerability is fixed
-- what change was made
+- what dependency surface was updated
+- which vulnerabilities or packages were addressed
+- why this batch belongs together
 - why this is safe for a patch release
 
 ## Test plan
@@ -326,8 +362,9 @@ Return to the parent agent with:
 
 The subagent should verify the narrowest thing that gives real confidence:
 
-- For Gradle dependency changes, run targeted Gradle tests for the affected module or modules.
-- For front-end dependency changes, run the relevant package checks from that app.
+- For `master/front-end` dependency changes, run the relevant package checks from that app.
+- For master backend Gradle changes, run targeted Gradle checks for the affected backend modules.
+- For starters Gradle changes, run targeted Gradle checks for the touched starter modules.
 - For Docker or image updates, run the narrowest build or smoke check that proves the image still builds and the packaging contract still holds.
 
 Do not add broad, expensive verification if a focused check is sufficient. Do not skip verification if any focused check is available.
@@ -345,21 +382,21 @@ Patch-release safety means:
 After the subagent finishes, report:
 
 1. the backlog summary,
-2. the single alert that was chosen and why,
+2. the batch that was chosen and why,
 3. the PR URL,
 4. the validation that was run,
-5. the next highest-priority remaining candidate, if useful.
+5. the next highest-priority remaining batch, if useful.
 
-If no safely fixable candidate exists, say so clearly and explain the blocker instead of opening a risky PR.
+If no safely fixable batch exists, say so clearly and explain the blocker instead of opening a risky PR.
 
 ## Pitfalls to avoid
 
 - Do not attempt any GitHub API call before verifying that `GITHUB_PAT` is present.
-- Do not batch unrelated alerts into one PR.
+- Do not batch unrelated dependency surfaces into one PR.
 - Do not leave a security remediation PR unlabeled; it must carry the `security` label.
 - Do not leave the PR attribution generic when the actual agent identity is known.
 - Do not create the commit with a human author identity or the ambient local git identity.
-- Do not pick a GHSA-only alert and pretend it has a CVE.
+- Do not pretend every alert needs its own PR; this skill is intentionally batch-oriented.
 - Do not silently move to a major upgrade when a patch release guarantee was requested.
 - Do not change public contracts just because the scanner output is noisy.
 - Do not ignore the repo's current dirty state; isolate the fixing branch when possible.
