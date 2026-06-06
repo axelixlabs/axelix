@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.filter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
@@ -42,6 +44,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
 @Order(FiltersOrder.SPA_STATIC_RESOURCES_SERVING_FILTER)
 public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
+    private static final Pattern SAFE_PATH_SEGMENT = Pattern.compile("[A-Za-z0-9._-]+");
     private final WebProperties webProperties;
     private final Resource indexHtmlLocation;
     private static final Map<String, MediaType> MEDIA_TYPES_CACHE;
@@ -94,12 +97,34 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
     }
 
     private Resource resolveResourceToReturn(String contextPath) throws IOException {
-        Resource relative = webProperties.getLocation().createRelative(contextPath);
+        String relativePath = sanitizeRelativePath(contextPath);
+        Resource relative = webProperties.getLocation().createRelative(relativePath);
 
         try {
             return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
         } catch (IllegalArgumentException e) { // spring throws in certain scenarios
             return indexHtmlLocation;
         }
+    }
+
+    static String sanitizeRelativePath(String contextPath) {
+        if (!StringUtils.hasText(contextPath) || "/".equals(contextPath)) {
+            return "index.html";
+        }
+
+        String[] segments = StringUtils.delimitedListToStringArray(
+                StringUtils.trimLeadingCharacter(contextPath, '/'),
+                "/");
+
+        for (String segment : segments) {
+            if (!StringUtils.hasText(segment)
+                    || ".".equals(segment)
+                    || "..".equals(segment)
+                    || !SAFE_PATH_SEGMENT.matcher(segment).matches()) {
+                return "index.html";
+            }
+        }
+
+        return String.join("/", segments);
     }
 }
