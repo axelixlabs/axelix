@@ -45,6 +45,7 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
     private final WebProperties webProperties;
     private final Resource indexHtmlLocation;
     private static final Map<String, MediaType> MEDIA_TYPES_CACHE;
+    private static final String INDEX_HTML_FILENAME = "index.html";
 
     static {
         // It is okay to just use HashMap here, there is no writing under contention here.
@@ -57,7 +58,7 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
     public SpaStaticResourcesServingFilter(WebProperties webProperties) throws IOException {
         this.webProperties = webProperties;
-        this.indexHtmlLocation = webProperties.getLocation().createRelative("index.html");
+        this.indexHtmlLocation = webProperties.getLocation().createRelative(INDEX_HTML_FILENAME);
     }
 
     @Override
@@ -94,11 +95,17 @@ public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
     }
 
     private Resource resolveResourceToReturn(String contextPath) throws IOException {
-        Resource relative = webProperties.getLocation().createRelative(contextPath);
+        boolean isSafe = SpaStaticResourcePathSanitizer.isSafe(contextPath);
 
-        try {
-            return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
-        } catch (IllegalArgumentException e) { // spring throws in certain scenarios
+        if (isSafe) {
+            Resource relative = webProperties.getLocation().createRelative(contextPath);
+
+            try {
+                return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
+            } catch (IllegalArgumentException e) { // spring throws in certain scenarios
+                return indexHtmlLocation;
+            }
+        } else {
             return indexHtmlLocation;
         }
     }

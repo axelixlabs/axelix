@@ -20,7 +20,10 @@ val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
+val postgresqlVersion = "42.7.11"
+val nettyVersion = "4.2.15.Final"
 val tomcatVersion = "11.0.22"
+val vertxVersion = "4.5.28"
 
 dependencies {
     // Self
@@ -35,7 +38,11 @@ dependencies {
     implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Security Patches
+    implementation(platform("io.netty:netty-bom:${nettyVersion}"))
+    implementation(platform("io.vertx:vertx-stack-depchain:${vertxVersion}"))
+
     constraints {
+        implementation("org.postgresql:postgresql:$postgresqlVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
