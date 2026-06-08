@@ -1,3 +1,48 @@
+axelix:
+  sbs:
+    auth:
+      jwt:
+        lifespan: 3h
+        algorithm: "HMAC512"
+        signing-key: "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff"
+
+spring:
+  info:
+    git:
+      location: classpath:other/git.properties
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - env
+          - configprops
+          - axelix-loggers
+          - axelix-thread-dump
+          - axelix-gc
+          - axelix-metrics
+          - axelix-heap-dump
+          - axelix-caches
+          - axelix-scheduled
+          - axelix-metadata
+          - axelix-details
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-beans
+          - axelix-env
+          - axelix-transactions-monitoring
+
 logging:
   level:
     org.apache.kafka: WARN
