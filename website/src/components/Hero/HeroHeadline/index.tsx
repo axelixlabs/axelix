@@ -23,12 +23,12 @@ export const HeroHeadline = () => {
             <h1 className={styles.Title}>
                 Go <span className={styles.GreenText}>AI-Native</span> with{" "}
                 <span className={styles.GreenText}>Spring&nbsp;Boot</span>: The Secret to{" "}
-                <span className={styles.UnderlinedText}>Skyrocketing</span> Engineering Velocity
+                <span className="UnderlinedText">Skyrocketing</span> Engineering Velocity
             </h1>
 
             <p className={styles.Lede}>
                 Axelix is the <span className={styles.GreenTextBold}>AI-Native</span>, OSS solution for{" "}
-                <em className={styles.AccentedText}>
+                <em className={`AccentText ${styles.AccentText}`}>
                     debugging, observing and operating mission-critical Spring Boot microservices.
                 </em>{" "}
                 Every capability is exposed twice — to human engineers through the web, and to AI agents through an

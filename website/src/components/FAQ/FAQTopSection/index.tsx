@@ -23,7 +23,7 @@ export const FAQTopSection = () => {
             <div>
                 <span className={styles.Eyebrow}>FAQ</span>
                 <h2 className={styles.Title}>
-                    Questions, <span className={styles.UnderlinedText}>answered.</span>
+                    Questions, <span className="UnderlinedText">answered.</span>
                 </h2>
             </div>
             <p className={styles.IntroText}>

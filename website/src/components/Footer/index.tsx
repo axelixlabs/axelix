@@ -22,7 +22,7 @@ import styles from "./styles.module.css";
 export const Footer = () => {
     return (
         <footer className={styles.Footer}>
-            <div className={`wrap ${styles.Wrap}`}>
+            <div className={`MainContainer ${styles.Wrap}`}>
                 <div className={styles.Top}>
                     {/* Brand lockup */}
                     <div className={styles.BrandSide}>

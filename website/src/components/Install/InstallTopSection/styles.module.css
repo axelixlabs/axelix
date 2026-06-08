@@ -5,7 +5,7 @@
   align-items: end;
   margin-bottom: 48px;
 
-  @media (width <= 980px) {
+  @media (width <=980px) {
     grid-template-columns: 1fr;
     gap: 32px;
   }
@@ -55,15 +55,6 @@
   max-width: 420px;
 }
 
-.UnderlinedText {
-  text-decoration: underline;
-  text-decoration-color: var(--axelix-green-500);
-  text-decoration-thickness: 8px;
-  text-underline-offset: 6px;
-}
-
-.AccentedText {
-  font-style: normal;
+.AccentText {
   color: var(--axelix-ink);
-  font-weight: 500;
 }

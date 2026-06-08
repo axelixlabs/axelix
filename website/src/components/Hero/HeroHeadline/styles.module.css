@@ -8,20 +8,13 @@
     color: var(--axelix-ink);
 }
 
-.GreenText {
+.GreenText,
+.GreenTextBold {
     color: var(--axelix-green-500);
 }
 
 .GreenTextBold {
-    color: var(--axelix-green-500);
     font-weight: bold;
-}
-
-.UnderlinedText {
-    text-decoration: underline;
-    text-decoration-color: var(--axelix-green-500);
-    text-decoration-thickness: 8px;
-    text-underline-offset: 6px;
 }
 
 .Lede {
@@ -30,9 +23,4 @@
     line-height: 1.45;
     color: var(--axelix-ink-2);
     max-width: 680px;
-}
-
-.AccentedText {
-    font-style: normal;
-    font-weight: 500;
 }

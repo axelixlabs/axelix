@@ -45,14 +45,6 @@
     color: var(--axelix-ink);
 }
 
-
-.UnderlinedText {
-    text-decoration: underline;
-    text-decoration-color: var(--axelix-green-500);
-    text-decoration-thickness: 6px;
-    text-underline-offset: 6px;
-}
-
 .IntroText {
     margin: 0;
     font-size: 16px;

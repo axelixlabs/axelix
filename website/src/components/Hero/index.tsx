@@ -26,7 +26,7 @@ export const Hero = () => {
         <header className={styles.MainWrapper}>
             <HeroBackground />
 
-            <div className={`wrap ${styles.InnerWrapper}`}>
+            <div className={`MainContainer ${styles.InnerWrapper}`}>
                 <div className={styles.ContentWrapper}>
                     <HeroHeadline />
 

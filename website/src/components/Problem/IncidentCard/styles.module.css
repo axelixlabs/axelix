@@ -71,10 +71,8 @@
   }
 }
 
-.AccentedText {
-  font-style: normal;
+.AccentText {
   color: #f5f8ee;
-  font-weight: 500;
 }
 
 .EventTitle {
@@ -143,7 +141,7 @@
   font-size: 11.5px;
   color: #a3b88a;
   letter-spacing: 0.06em;
-  
+
   @media (width <=540px) {
     flex-direction: column;
   }

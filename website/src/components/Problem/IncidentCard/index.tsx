@@ -37,7 +37,8 @@ export const IncidentCard = () => {
                     <div className={styles.Time}>02:21</div>
                     <div className={styles.EventWrapper}>
                         <h4 className={styles.EventTitle}>
-                            On-call opens six tabs. None of them show <em className={styles.AccentedText}>why</em>.
+                            On-call opens six tabs. None of them show{" "}
+                            <em className={`AccentText ${styles.AccentText}`}>why</em>.
                         </h4>
                         <span className={styles.EventText}>blocked by: dashboards watch, they don&apos;t ask</span>
                     </div>
@@ -85,7 +86,8 @@ export const IncidentCard = () => {
                     <div className={styles.Time}>03:38</div>
                     <div className={styles.EventWrapper}>
                         <h4 className={styles.EventTitle}>
-                            Incident closed. <em className={styles.AccentedText}>Customers already saw it.</em>
+                            Incident closed.{" "}
+                            <em className={`AccentText ${styles.AccentText}`}>Customers already saw it.</em>
                         </h4>
                         <span className={`${styles.EventText} ${styles.EventTextSuccess}`}>
                             root cause found 84 minutes after the alert

@@ -24,7 +24,7 @@ import styles from "./styles.module.css";
 export const Enterprise = () => {
     return (
         <section className={styles.MainWrapper} id="enterprise">
-            <div className="wrap">
+            <div className="MainContainer">
                 <EnterpriseTopSection />
 
                 <div className={styles.ContentWrapper}>
