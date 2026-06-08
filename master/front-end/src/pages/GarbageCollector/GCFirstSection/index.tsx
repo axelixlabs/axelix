@@ -21,11 +21,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
+import { InfoTooltipDisabled } from "components";
 import { downloadFile, extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
 import { disableGCLogging, getGCLogFile, triggerGC } from "services";
 
+import { GCActionButton } from "./GCActionButton";
 import styles from "./styles.module.css";
 
 import { DownloadIcon, OnOffIcon, RunIcon } from "assets";
@@ -111,29 +113,46 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                                     className={styles.ActionButton}
                                 />
                             </Tooltip>
-                            <Tooltip title={t("GC.disable")}>
-                                <Button
-                                    icon={<OnOffIcon />}
-                                    type="primary"
-                                    loading={disableGCData.loading}
-                                    onClick={disableGCHandler}
-                                    danger
-                                    className={styles.ActionButton}
-                                    disabled={!gcAccess}
-                                />
-                            </Tooltip>
+
+                            {!gcAccess ? (
+                                <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!gcAccess}>
+                                    <GCActionButton
+                                        loading={disableGCData.loading}
+                                        clickHandler={disableGCHandler}
+                                        icon={<OnOffIcon />}
+                                        danger
+                                    />
+                                </InfoTooltipDisabled>
+                            ) : (
+                                <Tooltip title={t("GC.disable")}>
+                                    <GCActionButton
+                                        loading={disableGCData.loading}
+                                        clickHandler={disableGCHandler}
+                                        icon={<OnOffIcon />}
+                                        danger
+                                    />
+                                </Tooltip>
+                            )}
                         </>
                     )}
-                    <Tooltip title={t("GC.triggerButtonText")}>
-                        <Button
-                            icon={<RunIcon />}
-                            type="primary"
-                            loading={triggerGBData.loading}
-                            onClick={triggerGBHandler}
-                            className={styles.ActionButton}
-                            disabled={!gcAccess}
-                        />
-                    </Tooltip>
+
+                    {!gcAccess ? (
+                        <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!gcAccess}>
+                            <GCActionButton
+                                loading={triggerGBData.loading}
+                                clickHandler={triggerGBHandler}
+                                icon={<RunIcon />}
+                            />
+                        </InfoTooltipDisabled>
+                    ) : (
+                        <Tooltip title={t("GC.triggerButtonText")}>
+                            <GCActionButton
+                                loading={triggerGBData.loading}
+                                clickHandler={triggerGBHandler}
+                                icon={<RunIcon />}
+                            />
+                        </Tooltip>
+                    )}
                 </div>
             </div>
         </>

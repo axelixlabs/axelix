@@ -1,0 +1,10 @@
+.TooltipContentWrapper {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 8px;
+    color: var(--axelix-primary-white);
+}
+
+.InfoIcon {
+    margin-top: 3px;
+}

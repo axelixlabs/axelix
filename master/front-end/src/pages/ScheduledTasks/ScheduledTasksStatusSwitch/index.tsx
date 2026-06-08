@@ -21,6 +21,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
+import { InfoTooltipDisabled } from "components";
 import { extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IErrorResponse, type IRunnable, StatelessRequest } from "models";
@@ -63,14 +64,16 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
 
     return (
         <>
-            <Switch
-                checkedChildren={t("on")}
-                unCheckedChildren={t("off")}
-                onChange={() => switchTaskStatus()}
-                loading={mutationRequest.loading}
-                checked={runnable.enabled}
-                disabled={!scheduledTasksAccess}
-            />
+            <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!scheduledTasksAccess}>
+                <Switch
+                    checkedChildren={t("on")}
+                    unCheckedChildren={t("off")}
+                    onChange={() => switchTaskStatus()}
+                    loading={mutationRequest.loading}
+                    checked={runnable.enabled}
+                    disabled={!scheduledTasksAccess}
+                />
+            </InfoTooltipDisabled>
         </>
     );
 };
