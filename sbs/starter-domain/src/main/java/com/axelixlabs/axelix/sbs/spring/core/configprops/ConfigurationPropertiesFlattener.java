@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.api.KeyValue;
 
 /**
@@ -40,7 +42,7 @@ public interface ConfigurationPropertiesFlattener {
      *
      * @return flattened key-value pairs, or an empty list when there is nothing to flatten.
      */
-    default List<KeyValue> flatten(Map<String, Object> map) {
+    default List<KeyValue> flatten(Map<String, ? extends @Nullable Object> map) {
         return flatten("", map);
     }
 
@@ -55,5 +57,5 @@ public interface ConfigurationPropertiesFlattener {
      *
      * @return flattened key-value pairs, or an empty list when there is nothing to flatten.
      */
-    List<KeyValue> flatten(String key, Map<String, Object> map);
+    List<KeyValue> flatten(String key, Map<String, ? extends @Nullable Object> map);
 }
