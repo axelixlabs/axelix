@@ -13,7 +13,6 @@ val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0-M8"
 
 // Not Managed by Spring BOM
-val testcontainersVersion = "1.21.4"
 val springDocSwaggerVersion = "3.0.3"
 val sqliteVersion = "3.53.1.0"
 val nimbusJoseJwt ="10.9.1"
@@ -87,11 +86,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
 
-    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.testcontainers:mysql:$testcontainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-    testImplementation("org.postgresql:postgresql")
-    testImplementation("com.mysql:mysql-connector-j")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("org.testcontainers:testcontainers-mysql")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
