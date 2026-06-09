@@ -115,7 +115,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                             </Tooltip>
 
                             {!gcAccess ? (
-                                <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!gcAccess}>
+                                <InfoTooltipDisabled disabled={!gcAccess}>
                                     <GCActionButton
                                         loading={disableGCData.loading}
                                         clickHandler={disableGCHandler}
@@ -137,7 +137,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                     )}
 
                     {!gcAccess ? (
-                        <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!gcAccess}>
+                        <InfoTooltipDisabled disabled={!gcAccess}>
                             <GCActionButton
                                 loading={triggerGBData.loading}
                                 clickHandler={triggerGBHandler}

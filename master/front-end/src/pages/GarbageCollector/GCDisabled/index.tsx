@@ -54,7 +54,7 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                     <InfoIcon className={styles.InfoIcon} />
                     <div className={`TextLarge ${styles.Title}`}>{t("GC.disableTitle")}</div>
                     <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
-                    <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!gcAccess}>
+                    <InfoTooltipDisabled disabled={!gcAccess}>
                         <Button
                             icon={<OnOffIcon />}
                             type="primary"

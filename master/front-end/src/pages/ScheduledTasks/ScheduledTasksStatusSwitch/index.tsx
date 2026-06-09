@@ -64,7 +64,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
 
     return (
         <>
-            <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!scheduledTasksAccess}>
+            <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
                 <Switch
                     checkedChildren={t("on")}
                     unCheckedChildren={t("off")}

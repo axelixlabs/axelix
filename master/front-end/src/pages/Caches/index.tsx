@@ -81,7 +81,7 @@ const Caches = () => {
             <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
                 <div className={styles.TopSection}>
                     <PageSearch setSearch={setSearch} />
-                    <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!cachesClearAccess}>
+                    <InfoTooltipDisabled disabled={!cachesClearAccess}>
                         <Button
                             type="primary"
                             onClick={clearAllCachesClickHandler}

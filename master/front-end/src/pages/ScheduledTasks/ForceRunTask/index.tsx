@@ -63,7 +63,7 @@ export const ForceRunTask = ({ trigger }: IProps) => {
 
     return (
         <>
-            <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!scheduledTasksAccess}>
+            <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
                 <Button
                     icon={<RunIcon />}
                     type="primary"

@@ -84,7 +84,7 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
                         </div>
                     </div>
                 </div>
-                <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!cachesClearAccess}>
+                <InfoTooltipDisabled disabled={!cachesClearAccess}>
                     <Button
                         icon={<ReloadOutlined />}
                         type="primary"

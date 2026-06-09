@@ -17,6 +17,7 @@
  */
 import { Tooltip } from "antd";
 import type { HTMLAttributes, PropsWithChildren } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
@@ -24,17 +25,14 @@ import { InfoIcon } from "assets";
 
 interface IProps extends HTMLAttributes<HTMLSpanElement> {
     /**
-     * Info tooltip text
-     */
-    text: string;
-
-    /**
      * Whether wrapped element is disabled
      */
     disabled: boolean;
 }
 
-export const InfoTooltipDisabled = ({ children, text, disabled, ...props }: PropsWithChildren<IProps>) => {
+export const InfoTooltipDisabled = ({ children, disabled, ...props }: PropsWithChildren<IProps>) => {
+    const { t } = useTranslation();
+
     const wrappedChildren = <span {...props}>{children}</span>;
 
     if (!disabled) {
@@ -49,7 +47,7 @@ export const InfoTooltipDisabled = ({ children, text, disabled, ...props }: Prop
                         <div>
                             <InfoIcon className={styles.InfoIcon} />
                         </div>
-                        {text}
+                        {t("notEnoughAuthorities")}
                     </div>
                 }
             >

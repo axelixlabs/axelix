@@ -138,7 +138,7 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
                     }}
                     trigger="click"
                 >
-                    <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!scheduledTasksAccess}>
+                    <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
                         <Button icon={<EditOutlined />} disabled={!scheduledTasksAccess} type="primary" />
                     </InfoTooltipDisabled>
                 </Popover>

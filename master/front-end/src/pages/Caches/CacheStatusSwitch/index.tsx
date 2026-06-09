@@ -71,7 +71,7 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
 
     return (
         <>
-            <InfoTooltipDisabled text={t("notEnoughAuthorities")} disabled={!cachesToggleAccess}>
+            <InfoTooltipDisabled disabled={!cachesToggleAccess}>
                 <Switch
                     checkedChildren={t("on")}
                     unCheckedChildren={t("off")}
