@@ -58,17 +58,26 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/enable")
     public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskToggleRequest request) {
-        taskService.enableTask(request.getTrigger());
-        return ResponseEntity.noContent().build();
+        try {
+            taskService.enableTask(request.getTrigger());
+            return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/disable")
     public ResponseEntity<Void> disableTask(
             @RequestBody ScheduledTaskToggleRequest request,
             @RequestParam(value = "force", defaultValue = "false") boolean force) {
-
-        taskService.disableTask(request.getTrigger(), force);
-        return ResponseEntity.noContent().build();
+        try {
+            taskService.disableTask(request.getTrigger(), force);
+            return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/modify/cron-expression")
@@ -95,7 +104,12 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/execute")
     public ResponseEntity<Void> executeScheduledTask(@RequestBody ScheduledTaskExecuteRequest request) {
-        taskService.executeScheduledTask(request.getTrigger());
-        return ResponseEntity.noContent().build();
+        try {
+            taskService.executeScheduledTask(request.getTrigger());
+            return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

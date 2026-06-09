@@ -52,7 +52,6 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @since 14.10.2025
  */
 @AutoConfiguration
-@ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
@@ -75,6 +74,7 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
     public TaskRescheduler intervalBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
         TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
 
@@ -82,6 +82,7 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
     public TaskRescheduler triggerBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
         TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
 
