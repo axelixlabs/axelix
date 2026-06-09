@@ -22,6 +22,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
+import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
@@ -70,14 +71,16 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
 
     return (
         <>
-            <Switch
-                checkedChildren={t("on")}
-                unCheckedChildren={t("off")}
-                onChange={(checked, event) => switchTaskStatus(event)}
-                loading={mutationRequest.loading}
-                checked={cache.enabled}
-                disabled={!cachesToggleAccess}
-            />
+            <NoRequiredAuthorityTooltip disabled={!cachesToggleAccess}>
+                <Switch
+                    checkedChildren={t("on")}
+                    unCheckedChildren={t("off")}
+                    onChange={(_, event) => switchTaskStatus(event)}
+                    loading={mutationRequest.loading}
+                    checked={cache.enabled}
+                    disabled={!cachesToggleAccess}
+                />
+            </NoRequiredAuthorityTooltip>
         </>
     );
 };

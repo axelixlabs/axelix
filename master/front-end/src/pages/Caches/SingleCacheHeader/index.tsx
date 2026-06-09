@@ -23,7 +23,7 @@ import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { TooltipWithCopy } from "components";
+import { NoRequiredAuthorityTooltip, TooltipWithCopy } from "components";
 import { extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
@@ -84,7 +84,7 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
                         </div>
                     </div>
                 </div>
-                <div>
+                <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
                     <Button
                         icon={<ReloadOutlined />}
                         type="primary"
@@ -92,7 +92,7 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
                         onClick={clearCacheClickHandler}
                         disabled={!cachesClearAccess}
                     />
-                </div>
+                </NoRequiredAuthorityTooltip>
                 <div>
                     <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
                 </div>

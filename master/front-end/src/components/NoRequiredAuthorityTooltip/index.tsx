@@ -16,26 +16,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tooltip } from "antd";
-import type { TooltipPlacement } from "antd/es/tooltip";
-import type { PropsWithChildren } from "react";
+import type { HTMLAttributes, PropsWithChildren } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
-import { InfoIcon, QuestionIcon } from "assets";
+import { InfoIcon } from "assets";
 
-interface IProps {
+interface IProps extends HTMLAttributes<HTMLSpanElement> {
     /**
-     * Info tooltip text
+     * Whether wrapped element is disabled
      */
-    text: string;
-
-    /**
-     * Tooltip position relative to the target.
-     */
-    placement?: TooltipPlacement;
+    disabled: boolean;
 }
 
-export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithChildren<IProps>) => {
+export const NoRequiredAuthorityTooltip = ({ children, disabled, ...props }: PropsWithChildren<IProps>) => {
+    const { t } = useTranslation();
+
+    const wrappedChildren = <span {...props}>{children}</span>;
+
+    if (!disabled) {
+        return wrappedChildren;
+    }
+
     return (
         <>
             <Tooltip
@@ -44,13 +47,11 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
                         <div>
                             <InfoIcon className={styles.InfoIcon} />
                         </div>
-                        {text}
+                        {t("notEnoughAuthorities")}
                     </div>
                 }
-                placement={placement}
-                color="#1890ff"
             >
-                {children ?? <QuestionIcon color="#00ab55" className={styles.QuestionIcon} />}
+                {wrappedChildren}
             </Tooltip>
         </>
     );

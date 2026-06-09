@@ -15,6 +15,7 @@
     "unknownError": "Unknown error. Try to refresh the page.",
     "username": "Username",
     "password": "Password",
+    "notEnoughAuthorities": "You don't have enough authorities",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",

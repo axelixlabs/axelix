@@ -15,6 +15,7 @@
     "unknownError": "Неизвестная ошибка. Попробуйте обновить страницу.",
     "username": "Имя пользователя",
     "password": "Пароль",
+    "notEnoughAuthorities": "У вас недостаточно полномочий",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
