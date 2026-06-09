@@ -22,9 +22,9 @@ The top section gives you three ways to narrow the table:
   you can see how many users are currently visible compared to the full list.
 - **Roles** — multi-select drop-down. Picking one or more roles keeps only users that have at least one of the selected
   roles.
-- **Origin** — multi-select drop-down with two values: `LOCAL` and `OIDC`. In the current release every account in this
-  table is `LOCAL` — OIDC sessions are authenticated per request and are not persisted to the users database, so the
-  `OIDC` filter returns an empty list today.
+- **Origin** — multi-select drop-down with two values: `LOCAL` and `OIDC`. Accounts created in Master appear as
+  `LOCAL`. Accounts that sign in through OIDC appear as `OIDC` after their first successful browser sign-in, so the
+  filter returns only OIDC users who have logged in at least once.
 
 Below the filters, the table lists every visible user with these columns:
 
@@ -32,7 +32,7 @@ Below the filters, the table lists every visible user with these columns:
 - **Email** — the email address attached to the account. May be blank.
 - **Last login** — the timestamp of the most recent successful sign-in, formatted as `DD.MM.YYYY HH:mm`. Accounts that
   have never signed in show **Not logged in**.
-- **Origin** — `LOCAL` for every persisted account today. See the **Origin** filter note above.
+- **Origin** — `LOCAL` for accounts created in Master, `OIDC` for accounts materialized by the OIDC sign-in flow.
 - **Roles** — coloured tags for each role granted to the user (`ADMIN`, `EDITOR`, `VIEWER`).
 
 Click any row to open the [User Profile](#user-profile) for that account.
@@ -86,15 +86,17 @@ restore.
 
 ## OIDC sessions
 
-When OIDC is enabled, sign-ins through your identity provider work without an account in this table. Master derives the
-role from `axelix.master.auth.options.oauth2.role-attribute-path` on every request and never writes the user to its
-database. As a result, OIDC users do not show up on this screen and cannot be managed from it — all role management for
-them lives in your identity provider.
+When OIDC is enabled, a successful browser sign-in creates or updates an `OIDC` user row in Master's database. Master
+updates **Last login**, stores the email from the OIDC `userinfo` payload when one is present, and shows the account in
+this table with origin `OIDC`.
 
-:::info
-Persisting OIDC users in the Master database is on the roadmap. Once that lands, accounts that sign in through the
-identity provider will appear in this table alongside `LOCAL` users, and the `OIDC` origin filter will start returning
-results. Until then, OIDC accounts remain session-only.
+On every OIDC sign-in, Master re-evaluates `axelix.master.auth.options.oauth2.role-attribute-path` and refreshes the
+stored role assignment from that result. As a result, OIDC accounts do show up on this screen, but their effective role
+still comes from your identity-provider mapping.
+
+:::warning
+If an OIDC username matches an existing non-OIDC account, Master rejects the sign-in instead of merging the identities.
+Resolve the collision in the identity provider or rename the local account first.
 :::
 
 For the full picture of how authentication is wired, see

@@ -1,35 +1,40 @@
 lockfile_version: '1'
-generated_at: '2026-06-06T15:57:00.260560+00:00'
+generated_at: '2026-06-09T10:05:07.241939+00:00'
 apm_version: 0.14.1
 dependencies:
 - repo_url: _local/backlog-refiner
   package_type: claude_skill
   deployed_files:
   - .agents/skills/backlog-refiner
+  - .claude/skills/backlog-refiner
   source: local
   local_path: ./.agent_skills/backlog-refiner
 - repo_url: _local/docs-writer
   package_type: claude_skill
   deployed_files:
   - .agents/skills/docs-writer
+  - .claude/skills/docs-writer
   source: local
   local_path: ./.agent_skills/docs-writer
 - repo_url: _local/external-contributor-issues
   package_type: claude_skill
   deployed_files:
   - .agents/skills/external-contributor-issues
+  - .claude/skills/external-contributor-issues
   source: local
   local_path: ./.agent_skills/external-contributor-issues
 - repo_url: _local/housekeeper
   package_type: claude_skill
   deployed_files:
   - .agents/skills/housekeeper
+  - .claude/skills/housekeeper
   source: local
   local_path: ./.agent_skills/housekeeper
 - repo_url: _local/security-vulnerabilities-patcher
   package_type: claude_skill
   deployed_files:
   - .agents/skills/security-vulnerabilities-patcher
+  - .claude/skills/security-vulnerabilities-patcher
   source: local
   local_path: ./.agent_skills/security-vulnerabilities-patcher
 - repo_url: anthropics/skills
@@ -40,6 +45,7 @@ dependencies:
   package_type: claude_skill
   deployed_files:
   - .agents/skills/skill-creator
+  - .claude/skills/skill-creator
   content_hash: sha256:b2bfe91d69ca99994c0566baede889e7d2b9bb8791c6b6106c5d387392f717f6
 mcp_servers:
 - github

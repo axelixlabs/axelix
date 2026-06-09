@@ -180,14 +180,29 @@ management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,ax
 Эндпоинты, не применимые к вашему сервису (`axelix-feign` без Feign в classpath, `axelix-caches` без `CacheManager`),
 остаются неактивными — стартер активирует каждый только при выполнении его предусловий.
 
+## Экспорт метрик Axelix через Micrometer
+
+Actuator-эндпоинт `axelix-metrics` нужен для пользовательского интерфейса Axelix. Кроме того, Axelix Spring Boot Starter
+может публиковать небольшой набор Axelix-специфичных метрик в `MeterRegistry` вашего приложения.
+
+Этот путь экспорта включается автоматически, когда в приложении есть бин `MeterRegistry`. Отдельного свойства Axelix
+для включения данного функционала нет. Стартер регистрирует такие метрики:
+
+| Метрика | Тип | Теги | Значение |
+|--------|-----|------|----------|
+| `axelix_transaction_duration` | `Timer` | `class`, `method`, `status` | Длительность каждого мониторируемого выполнения `@Transactional`. Таймер также публикует перцентили `0.5`, `0.95` и `0.99`. |
+| `axelix_transaction_queries` | `Counter` | `class`, `method` | Общее количество SQL-запросов, выполненных внутри мониторируемых транзакций. |
+| `axelix_cache_requests` | `Counter` | `cache`, `result` | Общее количество обращений к кэшу, записанных Axelix-enhanced кэшами. |
+| `axelix_cache_enabled` | `Gauge` | `cache` | Текущее runtime-состояние каждого enhanced-кэша: `1`, когда кэш включён, и `0`, когда выключен. |
+
+Эти метрики дополняют UI-ориентированные actuator-эндпоинты, а не заменяют их. Пользовательский интерфейс по-прежнему
+читает `axelix-metrics`, `axelix-caches` и `axelix-transactions-monitoring`.
+
 ## Поделитесь JWT-ключом подписи с Master
 
 Каждый Axelix actuator-эндпоинт контролируется `JwtAuthorizationFilter`. Фильтр ожидает токен HS256, HS384 или HS512,
 подписанный тем же ключом, который использует Master, поэтому обе стороны должны согласовать алгоритм и секретный ключ.
 Используйте то же значение, которое вы указали для `axelix.master.auth.jwt.signing-key` на Master.
-
-<Tabs groupId="spring-config">
-  <TabItem value="yaml" label="application.yaml">
 
 ```yaml
 axelix:

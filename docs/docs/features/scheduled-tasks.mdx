@@ -63,6 +63,9 @@ The actions below — running a task on demand, modifying its schedule, and togg
 `SCHEDULED_TASKS_MODIFY` authority, granted by the built-in **EDITOR**, **ADMIN**, and **SUPER_ADMIN** roles. Users
 without this authority see the same controls but cannot interact with them.
 
+When a control button is visible but your account lacks this authority, Axelix keeps it disabled and shows a tooltip with the
+corresponding message on hover.
+
 ### Run
 We provide the ability to trigger a task manually without affecting its schedule. To do so, simply click <img
 src="/img/feature/icons/play-icon.png" alt="play-icon" width="20" height="20"/>, and the task will be executed

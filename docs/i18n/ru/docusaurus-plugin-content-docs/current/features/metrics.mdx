@@ -17,6 +17,21 @@ Axelix***
 `ADMIN` и `SUPER_ADMIN` Полную матрицу ролей и полномочий см. в разделе [Роли и
 полномочия](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
 
+## Метрики, публикуемые Axelix
+
+Помимо метрик, которые уже экспортирует само приложение, Axelix Spring Boot Starter может добавлять и собственные метрики Micrometer. Это происходит,
+ если в приложении уже есть бин `MeterRegistry`.
+
+- `axelix_transaction_duration` — `Timer` с тегами `class`, `method` и `status=success|error`.
+- `axelix_transaction_queries` — `Counter` с тегами `class` и `method`.
+- `axelix_cache_requests` — `Counter` с тегами `cache` и `result=hit|miss`.
+- `axelix_cache_enabled` — `Gauge` с тегом `cache`, который возвращает `1` для включённых кэшей и `0` для выключенных.
+
+Эндпоинт `/actuator/prometheus` также будет экспортировать эти метриаи по-умолчанию (если prometheus эндпоинт, конечно, включён). Это означает, что
+впоследствие вы сможете использовать данные метрики для построения своих собственных дашбордов, например, в Grafana.
+
+Больше деталей доступно [в данной секции документации](../installation/configuring-spring-boot-starter#export-axelix-metrics-through-micrometer).
+
 ## Детали метрики
 
 На странице «Детали метрики» представлен подробный анализ отдельных метрик с интерактивными диаграммами, значениями в

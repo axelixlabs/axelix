@@ -65,3 +65,4 @@ apm_modules/
 .claude/
 .cursor/
 .agents/
+.gemini/

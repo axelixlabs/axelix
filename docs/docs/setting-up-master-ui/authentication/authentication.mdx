@@ -62,11 +62,16 @@ The end-to-end flow:
 4. The role is resolved by evaluating the JMESPath expression in `axelix.master.auth.options.oauth2.role-attribute-path`
    against the userinfo response. The result is mapped to `admin`, `editor`, or `viewer`. If `role-attribute-path` is
    left unset, every OIDC user lands on the `VIEWER` role.
-5. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
+5. Before minting the session cookie, Master upserts the user in its own database with origin `OIDC`, refreshes the
+   stored email from userinfo when one is present, and updates `Last login`.
+6. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
    the session cookies set.
 
 The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses
 them once to identify the user and then issues its own session JWT.
+
+Each successful browser sign-in therefore leaves a durable `OIDC` account behind in the **Users** screen. If the same
+username already belongs to a non-OIDC account, Master rejects the sign-in rather than merging the identities.
 
 **When `axelix.master.auth.options.oauth2.enabled=true`, these properties must be supplied:** `issuer-uri`, `client-id`,
 `client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes.

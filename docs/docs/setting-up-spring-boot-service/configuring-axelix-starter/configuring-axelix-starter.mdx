@@ -131,8 +131,7 @@ already include `spring-boot-starter-actuator`, add it alongside.
 ## Expose the Axelix actuator endpoints
 
 Spring Boot hides custom actuator endpoints from web exposure by default. Add the Axelix IDs to
-`management.endpoints.web.exposure.include` so Master can reach them. `axelix-metadata` <span
-className={styles.required}>required</span> is the endpoint Master probes first to confirm the instance is alive —
+`management.endpoints.web.exposure.include` so Master can reach them. The `axelix-metadata` endpoint is the one the Master probes first to confirm the instance is alive —
 without it the instance will not appear in Master, regardless of whether you use Master-side autodiscovery or
 starter-side self-registration. The rest of the endpoints power the corresponding features in the UI.
 
@@ -175,6 +174,27 @@ management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,ax
 `*` works too, but most teams prefer a curated list so internal endpoints aren't accidentally surfaced. Endpoints that
 don't apply to your application (`axelix-feign` without Feign on the classpath, `axelix-caches` without a
 `CacheManager`) stay inert — the starter activates each one only when its prerequisites are met.
+
+## Export Axelix metrics through Micrometer
+
+The `axelix-metrics` actuator endpoint powers the Axelix UI. In addition, the Spring Boot starters can publish a small
+set of Axelix-specific meters into your application's own Micrometer `MeterRegistry`.
+
+This export path switches on automatically when a `MeterRegistry` bean is present. There is no extra Axelix property for
+it. The starter registers these meters:
+
+| Meter | Type | Tags | Meaning |
+|-------|------|------|---------|
+| `axelix_transaction_duration` | `Timer` | `class`, `method`, `status` | Duration of each monitored `@Transactional` execution. The timer also publishes `0.5`, `0.95`, and `0.99` percentiles. |
+| `axelix_transaction_queries` | `Counter` | `class`, `method` | Total number of SQL queries executed inside monitored transactions. |
+| `axelix_cache_requests` | `Counter` | `cache`, `result` | Total number of cache lookups recorded by Axelix-enhanced caches. |
+| `axelix_cache_enabled` | `Gauge` | `cache` | Current runtime state of each enhanced cache: `1` when enabled, `0` when disabled. |
+
+These meters complement the UI-facing actuator endpoints rather than replace them. The UI still reads
+`axelix-metrics`, `axelix-caches`, and `axelix-transactions-monitoring`.
+
+The Spring Boot 2 starter does not publish these extra Axelix meters into Micrometer yet. The `axelix-metrics`
+actuator endpoint still works for the Axelix UI.
 
 ## Share the JWT signing key with Master
 
