@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       git_tag:
-        description: 'Git release tag without `v` prefix (e.g., 1.0.1, not v1.0.1)'
+        description: 'Git release tag WITHOUT `v` prefix (e.g., 1.0.1)'
         required: true
         type: string
 
@@ -16,12 +16,7 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest ]
-        java: [ 17, 21, 25 ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -29,14 +24,64 @@ jobs:
           ref: v${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
-      - name: Set up JDK ${{ matrix.java }}
+      - name: Set up JDK 25
         uses: actions/setup-java@v5
         with:
           distribution: 'liberica'
-          java-version: ${{ matrix.java }}
+          java-version: '25'
 
       - name: Build and Test
         run: ./gradlew clean build
+
+  starter-compatibility-tests:
+    name: ${{ matrix.starter }} on Java ${{ matrix.javaVersion }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - starter: Spring Boot 2 starter
+            javaVersion: 11
+            tasks: :sbs:axelix-spring-boot-2-starter:test
+          - starter: Spring Boot 2 starter
+            javaVersion: 14
+            tasks: :sbs:axelix-spring-boot-2-starter:test
+          - starter: Spring Boot 2 starter
+            javaVersion: 17
+            tasks: :sbs:axelix-spring-boot-2-starter:test
+          - starter: Spring Boot 2 starter
+            javaVersion: 21
+            tasks: :sbs:axelix-spring-boot-2-starter:test
+          - starter: Spring Boot 3 starter
+            javaVersion: 17
+            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+          - starter: Spring Boot 3 starter
+            javaVersion: 21
+            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+          - starter: Spring Boot 3 starter
+            javaVersion: 24
+            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: v${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+
+      - name: Set up starter test JDK and Gradle JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'liberica'
+          java-version: |
+            ${{ matrix.javaVersion }}
+            25
+
+      - name: Run starter compatibility tests
+        run: >-
+          ./gradlew
+          ${{ matrix.tasks }}
+          -Paxelix.starter.tests.java.version=${{ matrix.javaVersion }}
+          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.javaVersion }}_X64,JAVA_HOME_25_X64
 
   security-check:
     runs-on: ubuntu-latest
@@ -55,7 +100,7 @@ jobs:
         uses: ./.github/actions/security-check
 
   release-artifacts:
-    needs: [build-and-test, security-check]
+    needs: [build-and-test, starter-compatibility-tests, security-check]
     runs-on: ubuntu-latest
     permissions:
       contents: read

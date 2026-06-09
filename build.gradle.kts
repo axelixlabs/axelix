@@ -1,6 +1,7 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -160,6 +161,30 @@ subprojects {
     }
 }
 
+// Release compatibility jobs that swap the JVM used to launch starter tests.
+// This property is supposed be supplied only during release builds. If it is not there, then
+// Spring Boot starters will just use the same java version as it is configured in their toolchain
+
+val starterTestJavaVersionPropertyName = "axelix.starter.tests.java.version"
+val starterTestJavaVersion = providers.gradleProperty(starterTestJavaVersionPropertyName).orNull?.toInt()
+
+val starterModules = listOf(
+    project(":sbs:axelix-spring-boot-2-starter"),
+    project(":sbs:axelix-spring-boot-3-starter")
+    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
+    // project(":sbs:axelix-spring-boot-4-starter")
+)
+
+if (starterTestJavaVersion != null) {
+    configure(starterModules) {
+        tasks.withType<Test>().configureEach {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(starterTestJavaVersion)
+            }
+        }
+    }
+}
+
 val commonModules = listOf(
     project(":sbs:starter-domain"),
     project(":common:auth"),
@@ -168,18 +193,12 @@ val commonModules = listOf(
     project(":common:utils")
 )
 
-val publishableProjects = listOf(
-    project(":sbs:axelix-spring-boot-2-starter"),
-    project(":sbs:axelix-spring-boot-3-starter")
-    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
-    // project(":sbs:axelix-spring-boot-4-starter")
-)
-
 // Apply publishing and signing plugins to all starter modules only
 val mavenCentral = "ossrh-staging-api"
 val mainPublication = "main"
 
-configure(publishableProjects) {
+// We only publish the starters to the maven central
+configure(starterModules) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
@@ -326,6 +345,10 @@ configure(publishableProjects) {
         }
     }
 
+    // We're doing that as a hack. The problem is that for now, there is no "good" or standard way of publishing maven-like
+    // artifacts from gradle build system to maven central (surprise!). They're currently working on it being fixed, but in order
+    // to make the standard mavne-publish plugin work, we need to add one more HTTP query to the Maven OSSRH registry. That is what is
+    // actually happening here
     tasks.withType<PublishToMavenRepository>().configureEach {
         if (repository.name == mavenCentral && publication.name == mainPublication) {
             doLast {
