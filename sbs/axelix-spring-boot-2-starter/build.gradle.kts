@@ -40,7 +40,6 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
 
     // Test Runtime
 
