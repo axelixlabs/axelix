@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, InfoTooltipDisabled, Loader, PageSearch } from "components";
+import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
@@ -81,7 +81,7 @@ const Caches = () => {
             <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
                 <div className={styles.TopSection}>
                     <PageSearch setSearch={setSearch} />
-                    <InfoTooltipDisabled disabled={!cachesClearAccess}>
+                    <NoRequiredAuthorityTooltip disabled={!cachesClearAccess}>
                         <Button
                             type="primary"
                             onClick={clearAllCachesClickHandler}
@@ -90,7 +90,7 @@ const Caches = () => {
                         >
                             {t("Caches.clearAll")}
                         </Button>
-                    </InfoTooltipDisabled>
+                    </NoRequiredAuthorityTooltip>
                 </div>
 
                 {effectiveCacheManagers.map((cacheManager) => (

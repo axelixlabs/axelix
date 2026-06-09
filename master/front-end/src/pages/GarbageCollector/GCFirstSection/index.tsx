@@ -21,7 +21,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { InfoTooltipDisabled } from "components";
+import { NoRequiredAuthorityTooltip } from "components";
 import { downloadFile, extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
@@ -115,20 +115,22 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                             </Tooltip>
 
                             {!gcAccess ? (
-                                <InfoTooltipDisabled disabled={!gcAccess}>
+                                <NoRequiredAuthorityTooltip disabled={!gcAccess}>
                                     <GCActionButton
                                         loading={disableGCData.loading}
                                         clickHandler={disableGCHandler}
                                         icon={<OnOffIcon />}
+                                        isClickable={gcAccess}
                                         danger
                                     />
-                                </InfoTooltipDisabled>
+                                </NoRequiredAuthorityTooltip>
                             ) : (
                                 <Tooltip title={t("GC.disable")}>
                                     <GCActionButton
                                         loading={disableGCData.loading}
                                         clickHandler={disableGCHandler}
                                         icon={<OnOffIcon />}
+                                        isClickable={gcAccess}
                                         danger
                                     />
                                 </Tooltip>
@@ -137,18 +139,20 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                     )}
 
                     {!gcAccess ? (
-                        <InfoTooltipDisabled disabled={!gcAccess}>
+                        <NoRequiredAuthorityTooltip disabled={!gcAccess}>
                             <GCActionButton
                                 loading={triggerGBData.loading}
                                 clickHandler={triggerGBHandler}
+                                isClickable={gcAccess}
                                 icon={<RunIcon />}
                             />
-                        </InfoTooltipDisabled>
+                        </NoRequiredAuthorityTooltip>
                     ) : (
                         <Tooltip title={t("GC.triggerButtonText")}>
                             <GCActionButton
                                 loading={triggerGBData.loading}
                                 clickHandler={triggerGBHandler}
+                                isClickable={gcAccess}
                                 icon={<RunIcon />}
                             />
                         </Tooltip>

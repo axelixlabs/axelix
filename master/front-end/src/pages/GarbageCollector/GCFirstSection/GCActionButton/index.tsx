@@ -18,9 +18,6 @@
 import { Button } from "antd";
 import type { HTMLAttributes, ReactNode } from "react";
 
-import { useAuthority } from "hooks";
-import { EAuthorities } from "models";
-
 import styles from "../styles.module.css";
 
 interface IProps extends HTMLAttributes<HTMLSpanElement> {
@@ -43,11 +40,14 @@ interface IProps extends HTMLAttributes<HTMLSpanElement> {
      * Enables Ant Design danger styling
      */
     danger?: boolean;
+
+    /**
+     * Whether this GC action button is clickable
+     */
+    isClickable?: boolean;
 }
 
-export const GCActionButton = ({ loading, clickHandler, icon, danger = false, ...props }: IProps) => {
-    const gcAccess = useAuthority(EAuthorities.GARBAGE_COLLECTOR);
-
+export const GCActionButton = ({ loading, clickHandler, icon, danger = false, isClickable, ...props }: IProps) => {
     return (
         <>
             <span {...props}>
@@ -58,7 +58,7 @@ export const GCActionButton = ({ loading, clickHandler, icon, danger = false, ..
                     onClick={clickHandler}
                     danger={danger}
                     className={styles.ActionButton}
-                    disabled={!gcAccess}
+                    disabled={!isClickable}
                 />
             </span>
         </>

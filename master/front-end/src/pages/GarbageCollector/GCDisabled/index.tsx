@@ -19,7 +19,7 @@ import { Button } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { InfoTooltipDisabled } from "components";
+import { NoRequiredAuthorityTooltip } from "components";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IGCLoggingStatusResponseBody } from "models";
 
@@ -54,7 +54,7 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                     <InfoIcon className={styles.InfoIcon} />
                     <div className={`TextLarge ${styles.Title}`}>{t("GC.disableTitle")}</div>
                     <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
-                    <InfoTooltipDisabled disabled={!gcAccess}>
+                    <NoRequiredAuthorityTooltip disabled={!gcAccess}>
                         <Button
                             icon={<OnOffIcon />}
                             type="primary"
@@ -63,7 +63,7 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                         >
                             {t("GC.enableButtonText")}
                         </Button>
-                    </InfoTooltipDisabled>
+                    </NoRequiredAuthorityTooltip>
                 </div>
                 {isModalOpen && (
                     <GCLogEnableSettings

@@ -30,7 +30,7 @@ interface IProps extends HTMLAttributes<HTMLSpanElement> {
     disabled: boolean;
 }
 
-export const InfoTooltipDisabled = ({ children, disabled, ...props }: PropsWithChildren<IProps>) => {
+export const NoRequiredAuthorityTooltip = ({ children, disabled, ...props }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
     const wrappedChildren = <span {...props}>{children}</span>;

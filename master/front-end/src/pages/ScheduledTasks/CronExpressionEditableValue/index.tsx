@@ -22,7 +22,7 @@ import { type ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { InfoTooltipDisabled } from "components";
+import { NoRequiredAuthorityTooltip } from "components";
 import { getCronDescription } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type ICron } from "models";
@@ -138,9 +138,9 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
                     }}
                     trigger="click"
                 >
-                    <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
+                    <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
                         <Button icon={<EditOutlined />} disabled={!scheduledTasksAccess} type="primary" />
-                    </InfoTooltipDisabled>
+                    </NoRequiredAuthorityTooltip>
                 </Popover>
             </div>
         </>

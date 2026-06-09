@@ -21,7 +21,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { InfoTooltipDisabled } from "components";
+import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
@@ -63,7 +63,7 @@ export const ForceRunTask = ({ trigger }: IProps) => {
 
     return (
         <>
-            <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
+            <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
                 <Button
                     icon={<RunIcon />}
                     type="primary"
@@ -71,7 +71,7 @@ export const ForceRunTask = ({ trigger }: IProps) => {
                     loading={forceRunTaskData.loading}
                     disabled={!scheduledTasksAccess}
                 />
-            </InfoTooltipDisabled>
+            </NoRequiredAuthorityTooltip>
         </>
     );
 };

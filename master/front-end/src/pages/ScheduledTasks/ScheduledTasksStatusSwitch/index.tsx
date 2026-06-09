@@ -21,7 +21,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { InfoTooltipDisabled } from "components";
+import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
 import { useAuthority } from "hooks";
 import { EAuthorities, type IErrorResponse, type IRunnable, StatelessRequest } from "models";
@@ -64,7 +64,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
 
     return (
         <>
-            <InfoTooltipDisabled disabled={!scheduledTasksAccess}>
+            <NoRequiredAuthorityTooltip disabled={!scheduledTasksAccess}>
                 <Switch
                     checkedChildren={t("on")}
                     unCheckedChildren={t("off")}
@@ -73,7 +73,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
                     checked={runnable.enabled}
                     disabled={!scheduledTasksAccess}
                 />
-            </InfoTooltipDisabled>
+            </NoRequiredAuthorityTooltip>
         </>
     );
 };
