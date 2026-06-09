@@ -56,4 +56,9 @@ public class ActuatorEndpoint {
     public HttpMethod httpMethod() {
         return httpMethod;
     }
+
+    @Override
+    public String toString() {
+        return "ActuatorEndpoint{" + "path=" + path + ", httpMethod=" + httpMethod + '}';
+    }
 }
