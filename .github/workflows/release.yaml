@@ -42,25 +42,25 @@ jobs:
         include:
           - starter: Spring Boot 2 starter
             javaVersion: 11
-            tasks: :sbs:axelix-spring-boot-2-starter:test
+            tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
             javaVersion: 14
-            tasks: :sbs:axelix-spring-boot-2-starter:test
+            tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
             javaVersion: 17
-            tasks: :sbs:axelix-spring-boot-2-starter:test
+            tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
             javaVersion: 21
-            tasks: :sbs:axelix-spring-boot-2-starter:test
+            tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 3 starter
             javaVersion: 17
-            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+            tasks: :sbs:axelix-spring-boot-3-starter:build
           - starter: Spring Boot 3 starter
             javaVersion: 21
-            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+            tasks: :sbs:axelix-spring-boot-3-starter:build
           - starter: Spring Boot 3 starter
             javaVersion: 24
-            tasks: :sbs:axelix-spring-boot-3-starter:test :sbs:axelix-spring-boot-3-starter:concurrencyTest
+            tasks: :sbs:axelix-spring-boot-3-starter:build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
