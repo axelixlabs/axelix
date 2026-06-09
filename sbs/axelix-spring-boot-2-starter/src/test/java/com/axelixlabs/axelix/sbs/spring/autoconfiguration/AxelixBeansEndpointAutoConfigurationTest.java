@@ -30,7 +30,6 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfo;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.CachingBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
@@ -57,9 +56,8 @@ class AxelixBeansEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(AxelixBeansEndpoint.class);
             assertThat(context).hasSingleBean(QualifiersPersistencePostProcessor.class);
 
-            assertThat(context).getBeans(BeansFeedBuilder.class).hasSize(2);
+            assertThat(context).getBeans(BeansFeedBuilder.class).hasSize(1);
             assertThat(context).getBean("defaultBeansFeedBuilder").isExactlyInstanceOf(DefaultBeansFeedBuilder.class);
-            assertThat(context).getBean("cachingBeansFeedBuilder").isExactlyInstanceOf(CachingBeansFeedBuilder.class);
         });
     }
 

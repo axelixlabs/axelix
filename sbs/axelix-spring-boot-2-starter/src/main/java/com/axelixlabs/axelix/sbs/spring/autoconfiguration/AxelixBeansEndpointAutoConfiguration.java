@@ -22,12 +22,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.CachingBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
@@ -64,12 +62,6 @@ public class AxelixBeansEndpointAutoConfiguration {
     public BeansFeedBuilder defaultBeansFeedBuilder(
             BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
         return new DefaultBeansFeedBuilder(beanMetaInfoExtractor, context);
-    }
-
-    @Bean
-    @Primary
-    public BeansFeedBuilder cachingBeansFeedBuilder(BeansFeedBuilder defaultBeansFeedBuilder) {
-        return new CachingBeansFeedBuilder(defaultBeansFeedBuilder);
     }
 
     @Bean
