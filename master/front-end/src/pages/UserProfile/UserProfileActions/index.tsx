@@ -20,6 +20,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
+import { EnterpriseFeature } from "components";
 import { extractErrorCode } from "helpers";
 import { StatelessRequest } from "models";
 import { deleteUser } from "services";
@@ -91,7 +92,9 @@ export const UserProfileActions = ({ userId }: IProps) => {
                 {t("Users.deleteUser")}
             </Button>
 
-            <Button disabled>{t("Users.accessLog")}</Button>
+            <EnterpriseFeature docsHref="https://axelix.io/docs/product/introduction">
+                <Button>{t("Users.accessLog")}</Button>
+            </EnterpriseFeature>
         </div>
     );
 };

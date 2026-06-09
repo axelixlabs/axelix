@@ -1,7 +1,11 @@
+.CardWrapper,
 .Card {
     display: grid;
     grid-template-rows: subgrid;
     grid-row: span 3;
+}
+
+.Card {
     border-radius: 16px;
     background-color: #f9fafb;
     box-shadow: var(--axelix-box-shadow-light);
