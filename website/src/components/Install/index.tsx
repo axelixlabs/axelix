@@ -22,7 +22,7 @@ import styles from "./styles.module.css";
 export const Install = () => {
     return (
         <section className={styles.MainWrapper} id="install">
-            <div className="wrap">
+            <div className="MainContainer">
                 <InstallTopSection />
                 <Installer />
             </div>

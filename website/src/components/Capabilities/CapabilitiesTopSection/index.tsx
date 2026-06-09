@@ -28,10 +28,10 @@ export const CapabilitiesTopSection = () => {
                 </h2>
             </div>
             <p className={styles.IntroText}>
-                Every capability is exposed twice. <em className={styles.AccentedText}>Engineers</em> reach it through a
-                web console; <em className={styles.AccentedText}>AI agents</em> reach the same actions through an
-                embedded MCP server. A single role model gates both — each identity, human or agent, sees only the data
-                and actions its role permits.
+                Every capability is exposed twice. <em className={`AccentText ${styles.AccentText}`}>Engineers</em>{" "}
+                reach it through a web console; <em className={`AccentText ${styles.AccentText}`}>AI agents</em> reach
+                the same actions through an embedded MCP server. A single role model gates both — each identity, human
+                or agent, sees only the data and actions its role permits.
             </p>
         </div>
     );

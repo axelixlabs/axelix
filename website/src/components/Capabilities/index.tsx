@@ -23,7 +23,7 @@ import styles from "./styles.module.css";
 export const Capabilities = () => {
     return (
         <section className={styles.MainWrapper} id="capabilities">
-            <div className="wrap">
+            <div className="MainContainer">
                 <CapabilitiesTopSection />
 
                 <CapabilitiesFeaturedCards />

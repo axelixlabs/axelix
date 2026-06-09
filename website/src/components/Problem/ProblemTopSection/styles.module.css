@@ -15,7 +15,7 @@
   border-radius: 999px;
   background-color: color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
   border: 1px solid color-mix(in srgb, var(--axelix-green-400) 40%, transparent);
-  
+
   &::before {
     content: "";
     width: 6px;
@@ -37,14 +37,6 @@
   text-wrap: balance;
 }
 
-.AccentedText {
+.AccentText {
   color: var(--axelix-green-400);
-  font-style: normal;
-}
-
-.UnderlinedText {
-    text-decoration: underline;
-    text-decoration-color: var(--axelix-green-500);
-    text-decoration-thickness: 6px;
-    text-underline-offset: 6px;
 }

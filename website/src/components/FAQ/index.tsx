@@ -23,7 +23,7 @@ import styles from "./styles.module.css";
 export const FAQ = () => {
     return (
         <section className={styles.Faq} id="faq">
-            <div className="wrap">
+            <div className="MainContainer">
                 <FAQTopSection />
                 <FAQList />
                 <FAQFooter />

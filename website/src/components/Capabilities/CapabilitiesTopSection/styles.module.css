@@ -5,7 +5,7 @@
   align-items: end;
   margin-bottom: 64px;
 
-  @media (width <= 980px) {
+  @media (width <=980px) {
     grid-template-columns: 1fr;
     gap: 30px;
   }
@@ -62,8 +62,6 @@
   max-width: 420px;
 }
 
-.AccentedText {
-  font-style: normal;
+.AccentText {
   color: var(--axelix-ink);
-  font-weight: 500;
 }
