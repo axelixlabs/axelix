@@ -28,6 +28,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserNotDeletedException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 
 /**
@@ -68,11 +69,15 @@ public interface UserService {
     void createFromOidc(String username, @Nullable String email, String role);
 
     /**
-     * Deletes the user with the given identifier. No-op if the user does not exist.
+     * Deletes the user with the given identifier, but only if it is a {@link UserOrigin#LOCAL} user.
+     * Throws {@link UserNotDeletedException} if no user exists with the given id or its origin is not
+     * {@link UserOrigin#LOCAL} (e.g. an {@link UserOrigin#OIDC} user is never deleted).
      *
      * @param id Unique identifier of the user to delete.
+     * @throws UserNotDeletedException if no user was deleted because none exists with that id or it is not a
+     *                                 {@link UserOrigin#LOCAL} user.
      */
-    void deleteById(String id);
+    void deleteByIdToLocalUser(String id) throws UserNotDeletedException;
 
     /**
      * Returns all managed users.

@@ -272,6 +272,45 @@ public class UserManagementApiTest {
     }
 
     @Test
+    void shouldReturnBadRequest_whenDeletingNonExistentUser() {
+        // language=json
+        String request = """
+                {
+                  "id":"non-existent-id"
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenDeletingNonLocalUser() {
+        UserEntity user = insertUser("oidcUser", "oidc@example.com", null, Set.of("VIEWER"), UserOrigin.OIDC);
+
+        // language=json
+        String request = """
+                {
+                  "id":"%s"
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findById(user.id())).isPresent();
+    }
+
+    @Test
     void shouldUpdateAllUserFields() {
         // given.
         UserEntity user = insertUser("oldName", "old@example.com", "oldPass", Set.of("VIEWER"), UserOrigin.LOCAL);

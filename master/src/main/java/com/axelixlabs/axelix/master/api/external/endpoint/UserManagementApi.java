@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserNotDeletedException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
@@ -83,9 +84,12 @@ public class UserManagementApi {
     @ApiResponse(description = "No Content", responseCode = "204")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
-
-        userService.deleteById(request.id());
-        return ResponseEntity.noContent().build();
+        try {
+            userService.deleteByIdToLocalUser(request.id());
+            return ResponseEntity.noContent().build();
+        } catch (UserNotDeletedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @DefaultApiResponse(summary = "Update a user")

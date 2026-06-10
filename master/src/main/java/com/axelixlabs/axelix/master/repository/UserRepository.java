@@ -60,4 +60,8 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
             @Param("password") @Nullable String password,
             @Param("roles") UserEntity.Roles roles,
             @Param("lastLoginAt") @Nullable Instant lastLoginAt);
+
+    @Modifying
+    @Query("DELETE FROM users WHERE id = :id AND user_origin = 'LOCAL'")
+    int deleteByIdToLocalUser(@Param("id") String id);
 }

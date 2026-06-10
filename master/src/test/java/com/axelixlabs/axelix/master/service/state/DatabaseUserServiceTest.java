@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserNotDeletedException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 
@@ -151,21 +152,46 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void deleteAllById_shouldRemoveUser() {
+    void deleteByIdToLocalUser_shouldRemoveLocalUser() {
         userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.deleteById(existing.id());
-
-        // then.
+        assertThatCode(() -> userService.deleteByIdToLocalUser(existing.id()))
+                // then.
+                .doesNotThrowAnyException();
         assertThat(userRepository.findById(existing.id())).isEmpty();
     }
 
     @Test
-    void deleteAllById_shouldBeNoOpWhenUserDoesNotExist() {
+    void deleteByIdToLocalUser_shouldNotRemoveOidcUser() {
+        userService.createFromOidc("bob", "bob@example.com", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("bob").orElseThrow();
+
         // when.
-        assertThatCode(() -> userService.deleteById("non-existent-id")).doesNotThrowAnyException();
+        assertThatThrownBy(() -> userService.deleteByIdToLocalUser(existing.id()))
+                // then.
+                .isInstanceOf(UserNotDeletedException.class);
+
+        Optional<UserEntity> stillPresent = userRepository.findById(existing.id());
+        assertThat(stillPresent).isPresent();
+        assertThat(stillPresent.get().userOrigin()).isEqualTo(UserOrigin.OIDC);
+    }
+
+    @Test
+    void deleteByIdToLocalUser_nonExistentId_shouldThrow() {
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        userService.createFromOidc("bob", "bob@example.com", "VIEWER");
+        UserEntity localUser = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity oidcUser = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.deleteByIdToLocalUser("non-existent-id"))
+                // then.
+                .isInstanceOf(UserNotDeletedException.class);
+
+        assertThat(userRepository.findById(localUser.id())).isPresent();
+        assertThat(userRepository.findById(oidcUser.id())).isPresent();
     }
 
     @Test

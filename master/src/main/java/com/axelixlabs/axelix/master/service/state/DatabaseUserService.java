@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserNotDeletedException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 
@@ -94,8 +95,10 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void deleteById(String id) {
-        userRepository.deleteById(id);
+    public void deleteByIdToLocalUser(String id) {
+        if (userRepository.deleteByIdToLocalUser(id) == 0) {
+            throw new UserNotDeletedException(id);
+        }
     }
 
     @Override
