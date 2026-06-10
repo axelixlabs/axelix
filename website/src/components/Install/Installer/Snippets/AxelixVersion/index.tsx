@@ -15,7 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export interface INavLink {
-    href: string;
-    label: string;
+import { IAxelixVersionData } from "@/models";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    axelixVersionData: IAxelixVersionData;
 }
+
+export const AxelixVersion = ({ axelixVersionData }: IProps) => {
+    if (axelixVersionData.loading) {
+        return <span className={styles.VersionSkeleton} />;
+    }
+
+    return <>{axelixVersionData.version}</>;
+};
