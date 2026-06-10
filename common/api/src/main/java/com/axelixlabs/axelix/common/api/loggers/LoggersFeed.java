@@ -34,12 +34,12 @@ public final class LoggersFeed {
 
     private final List<String> levels;
     private final List<SingleLoggerProfile> loggers;
-    private final List<GroupLoggerProfile> groups;
+    private final List<LoggersGroupProfile> groups;
 
     public LoggersFeed(
             @JsonProperty("levels") List<String> levels,
             @JsonProperty("loggers") List<SingleLoggerProfile> loggers,
-            @JsonProperty("groups") List<GroupLoggerProfile> groups) {
+            @JsonProperty("groups") List<LoggersGroupProfile> groups) {
         this.levels = levels;
         this.loggers = loggers;
         this.groups = groups;
@@ -53,7 +53,7 @@ public final class LoggersFeed {
         return loggers;
     }
 
-    public List<GroupLoggerProfile> getGroups() {
+    public List<LoggersGroupProfile> getGroups() {
         return groups;
     }
 

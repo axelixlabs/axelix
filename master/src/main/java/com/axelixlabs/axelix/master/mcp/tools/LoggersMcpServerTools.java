@@ -24,9 +24,9 @@ import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.common.api.loggers.GroupLoggerProfile;
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
+import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
@@ -187,14 +187,14 @@ public class LoggersMcpServerTools {
         try {
             HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
 
-            GroupLoggerProfile logger =
+            LoggersGroupProfile logger =
                     endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
 
             return Map.of(groupName, logger.toString());
         } catch (EndpointInvocationException | BadRequestException e) {
             return getAllLoggers(instanceId).getGroups().stream()
                     .filter(group -> group.getName().contains(groupName))
-                    .collect(Collectors.toMap(GroupLoggerProfile::getName, GroupLoggerProfile::toString));
+                    .collect(Collectors.toMap(LoggersGroupProfile::getName, LoggersGroupProfile::toString));
         }
     }
 

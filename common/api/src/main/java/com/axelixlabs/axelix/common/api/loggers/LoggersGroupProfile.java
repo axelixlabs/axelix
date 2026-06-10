@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Sergey Cherkasov
  */
-public final class GroupLoggerProfile {
+public final class LoggersGroupProfile {
 
     private final String name;
 
@@ -37,7 +37,7 @@ public final class GroupLoggerProfile {
 
     private final List<String> members;
 
-    public GroupLoggerProfile(
+    public LoggersGroupProfile(
             @JsonProperty("name") String name,
             @JsonProperty("configuredLevel") @Nullable String configuredLevel,
             @JsonProperty("members") List<String> members) {
@@ -60,10 +60,10 @@ public final class GroupLoggerProfile {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof GroupLoggerProfile)) {
+        if (!(o instanceof LoggersGroupProfile)) {
             return false;
         }
-        GroupLoggerProfile that = (GroupLoggerProfile) o;
+        LoggersGroupProfile that = (LoggersGroupProfile) o;
         return Objects.equals(name, that.name)
                 && Objects.equals(configuredLevel, that.configuredLevel)
                 && Objects.equals(members, that.members);
