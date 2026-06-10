@@ -64,7 +64,7 @@ public class AxelixScheduledTasksEndpoint {
             taskService.enableTask(request.getTrigger());
             return ResponseEntity.noContent().build();
             // TODO: We need to revisit exception handling here
-        } catch (Exception e) {
+        } catch (ScheduledTaskNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -77,7 +77,7 @@ public class AxelixScheduledTasksEndpoint {
             taskService.disableTask(request.getTrigger(), force);
             return ResponseEntity.noContent().build();
             // TODO: We need to revisit exception handling here
-        } catch (Exception e) {
+        } catch (ScheduledTaskNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -99,7 +99,7 @@ public class AxelixScheduledTasksEndpoint {
             taskService.modifyInterval(request.getTrigger(), Duration.ofMillis(request.getInterval()));
             return ResponseEntity.noContent().build();
             // TODO: We need to revisit exception handling here
-        } catch (Exception e) {
+        } catch (ScheduledTaskNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -110,7 +110,7 @@ public class AxelixScheduledTasksEndpoint {
             taskService.executeScheduledTask(request.getTrigger());
             return ResponseEntity.noContent().build();
             // TODO: We need to revisit exception handling here
-        } catch (Exception e) {
+        } catch (ScheduledTaskNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
     }

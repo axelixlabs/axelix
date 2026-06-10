@@ -97,8 +97,6 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
                     // no scheduling -> reschedulers are not created
                     assertThat(context).getBeans(TaskRescheduler.class).isEmpty();
-                    assertThat(context).doesNotHaveBean(IntervalBasedTaskRescheduler.class);
-                    assertThat(context).doesNotHaveBean(TriggerBasedTaskRescheduler.class);
                 });
     }
 
