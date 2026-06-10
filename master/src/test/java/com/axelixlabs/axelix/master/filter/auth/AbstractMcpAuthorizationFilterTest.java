@@ -117,7 +117,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
     void setUpRestTemplate() {
         instanceRepository.deleteAll();
         userRepository.deleteAll();
-        this.restTemplate = new TestRestTemplate(new RestTemplateBuilder().rootUri("http://localhost:" + port));
+        this.restTemplate = new TestRestTemplate(new RestTemplateBuilder().baseUri("http://localhost:" + port));
     }
 
     protected void registerInstanceForBeansTool(String activeInstanceId) {

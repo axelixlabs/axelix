@@ -22,17 +22,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
 import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
-import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
-import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.CachingEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
@@ -80,24 +74,19 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
-    public DefaultEndpointProber<ServiceLoggers> getAllLoggersEndpointProber(
-            ServiceLoggersJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, securityContextExecutor, ActuatorEndpoints.GET_ALL_LOGGERS);
+    public ProxyingEndpointProber getAllLoggersEndpointProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_ALL_LOGGERS, securityContextExecutor);
     }
 
     @Bean
-    public DefaultEndpointProber<LoggerLevels> getOneLoggerEndpointProber(
-            LoggerLevelsJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, securityContextExecutor, ActuatorEndpoints.GET_ONE_LOGGER);
+    public ProxyingEndpointProber getOneLoggerEndpointProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_ONE_LOGGER, securityContextExecutor);
     }
 
     @Bean
-    public DefaultEndpointProber<LoggerGroup> getLoggerGroupEndpointProber(
-            LoggerGroupJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, securityContextExecutor, ActuatorEndpoints.GET_LOGGER_GROUP);
+    public ProxyingEndpointProber getLoggerGroupEndpointProber() {
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_LOGGER_GROUP, securityContextExecutor);
     }
 
     // Caches

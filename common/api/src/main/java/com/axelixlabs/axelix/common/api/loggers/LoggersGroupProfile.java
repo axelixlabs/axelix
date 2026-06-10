@@ -28,48 +28,57 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Sergey Cherkasov
  */
-public final class LoggerGroup {
+public final class LoggersGroupProfile {
+
+    private final String name;
 
     @Nullable
     private final String configuredLevel;
 
     private final List<String> members;
 
-    public LoggerGroup(
+    public LoggersGroupProfile(
+            @JsonProperty("name") String name,
             @JsonProperty("configuredLevel") @Nullable String configuredLevel,
             @JsonProperty("members") List<String> members) {
+        this.name = name;
         this.configuredLevel = configuredLevel;
         this.members = members;
     }
 
-    @Nullable
-    public String configuredLevel() {
+    public String getName() {
+        return name;
+    }
+
+    public @Nullable String getConfiguredLevel() {
         return configuredLevel;
     }
 
-    public List<String> members() {
+    public List<String> getMembers() {
         return members;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof LoggersGroupProfile)) {
             return false;
         }
-        LoggerGroup that = (LoggerGroup) o;
-        return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(members, that.members);
+        LoggersGroupProfile that = (LoggersGroupProfile) o;
+        return Objects.equals(name, that.name)
+                && Objects.equals(configuredLevel, that.configuredLevel)
+                && Objects.equals(members, that.members);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(configuredLevel, members);
+        return Objects.hash(name, configuredLevel, members);
     }
 
     @Override
     public String toString() {
-        return "LoggerGroup{" + "configuredLevel='" + configuredLevel + '\'' + ", members=" + members + '}';
+        return "GroupLoggerProfile{" + "name='"
+                + name + '\'' + ", configuredLevel='"
+                + configuredLevel + '\'' + ", members="
+                + members + '}';
     }
 }

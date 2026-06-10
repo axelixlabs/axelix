@@ -130,19 +130,19 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate withoutToken() {
-        return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
+        return new TestRestTemplate(new RestTemplateBuilder().baseUri(HOST + testTomcatServerPort));
     }
     // END: Bad token auth scenarios
 
     private TestRestTemplate buildWithToken(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
-                .rootUri(HOST + testTomcatServerPort)
+                .baseUri(HOST + testTomcatServerPort)
                 .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getAuthCookieName(), token)));
     }
 
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
-                .rootUri(HOST + testTomcatServerPort)
+                .baseUri(HOST + testTomcatServerPort)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token));
     }
 

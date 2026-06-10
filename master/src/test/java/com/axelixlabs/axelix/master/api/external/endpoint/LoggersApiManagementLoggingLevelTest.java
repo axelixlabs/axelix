@@ -113,7 +113,7 @@ public class LoggersApiManagementLoggingLevelTest {
     @Test
     void shouldSetLoggingLevelByGroupName() {
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
 
         // when.
         ResponseEntity<String> body = restTemplate
@@ -132,7 +132,7 @@ public class LoggersApiManagementLoggingLevelTest {
     @Test
     void shouldSetLoggingLevelByLoggerName() {
         String loggerName = "logger.name";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG", null);
 
         // when.
         ResponseEntity<String> body = restTemplate
@@ -171,7 +171,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnInternalServerError_OnGroupName() {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
         registry.register(createInstance(instanceId));
 
         // when.
@@ -193,7 +193,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnInternalServerError_OnLoggerName() {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "logger.name";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG", null);
         registry.register(createInstance(instanceId));
 
         // when.
@@ -235,7 +235,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnGroupName() {
         String instanceId = "unregistered-loggers-group-instance";
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -255,7 +255,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnLoggerName() {
         String instanceId = "unregistered-loggers-instance";
         String loggerName = "logger.name";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG", null);
 
         // when.
         ResponseEntity<String> response = restTemplate

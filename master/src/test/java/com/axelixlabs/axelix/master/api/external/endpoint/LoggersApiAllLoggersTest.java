@@ -143,34 +143,49 @@ public class LoggersApiAllLoggersTest {
     void prepare() {
         // language=json
         String jsonResponse = """
-
-                {
-           "levels" : [ "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" ],
-           "loggers" : {
-             "ROOT" : {
-               "configuredLevel" : "INFO",
-               "effectiveLevel" : "INFO"
+         {
+           "levels": [ "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" ],
+           "groups": [
+             {
+               "name": "test",
+               "configuredLevel": "INFO",
+               "members": [ "test.member1", "test.member2" ]
              },
-             "com.example" : {
-               "configuredLevel" : "DEBUG",
-               "effectiveLevel" : "DEBUG"
+             {
+               "name": "web",
+               "members": [
+                 "org.springframework.core.codec",
+                 "org.springframework.http",
+                 "org.springframework.web",
+                 "org.springframework.boot.actuate.endpoint.web",
+                 "org.springframework.boot.web.servlet.ServletContextInitializerBeans"
+               ]
              },
-             "com.example.two" : {
-               "effectiveLevel" : "INFO"
+             {
+               "name": "sql",
+               "members": [
+                 "org.springframework.jdbc.core",
+                 "org.hibernate.SQL",
+                 "org.jooq.tools.LoggerListener"
+               ]
              }
-           },
-           "groups" : {
-             "test" : {
-               "configuredLevel" : "INFO",
-               "members" : [ "test.member1", "test.member2" ]
+           ],
+           "loggers": [
+             {
+               "name": "ROOT",
+               "configuredLevel": "INFO",
+               "effectiveLevel": "INFO"
              },
-             "web" : {
-               "members" : [ "org.springframework.core.codec", "org.springframework.http", "org.springframework.web", "org.springframework.boot.actuate.endpoint.web", "org.springframework.boot.web.servlet.ServletContextInitializerBeans" ]
+             {
+               "name": "com.example",
+               "configuredLevel": "DEBUG",
+               "effectiveLevel": "DEBUG"
              },
-             "sql" : {
-               "members" : [ "org.springframework.jdbc.core", "org.hibernate.SQL", "org.jooq.tools.LoggerListener" ]
+             {
+               "name": "com.example.two",
+               "effectiveLevel": "INFO"
              }
-           }
+           ]
          }
         """;
 
