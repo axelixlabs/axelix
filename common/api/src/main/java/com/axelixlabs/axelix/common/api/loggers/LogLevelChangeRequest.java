@@ -21,46 +21,63 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Request to change the logging level of a logger or a logger group.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public class LogLevelChangeRequest {
 
     private final String configuredLevel;
+    private final @Nullable Long ttlMinutes;
 
     /**
      * Creates a new LogLevelChangeRequest.
      *
-     * @param configuredLevel   The new logging level to apply.
+     * @param configuredLevel The new logging level to apply.
+     * @param ttlMinutes      Optional duration in minutes before reverting to the original level.
+     *                        If {@code null}, the change is permanent.
      */
     @JsonCreator
-    public LogLevelChangeRequest(@JsonProperty("configuredLevel") String configuredLevel) {
+    public LogLevelChangeRequest(
+            @JsonProperty("configuredLevel") String configuredLevel,
+            @JsonProperty("ttlMinutes") @Nullable Long ttlMinutes) {
+        if (ttlMinutes != null && ttlMinutes <= 0) {
+            throw new IllegalArgumentException("ttlMinutes must be positive, got: " + ttlMinutes);
+        }
         this.configuredLevel = configuredLevel;
+        this.ttlMinutes = ttlMinutes;
     }
 
     public String getConfiguredLevel() {
         return configuredLevel;
     }
 
+    public @Nullable Long getTtlMinutes() {
+        return ttlMinutes;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof LogLevelChangeRequest)) {
             return false;
         }
         LogLevelChangeRequest that = (LogLevelChangeRequest) o;
-        return Objects.equals(configuredLevel, that.configuredLevel);
+        return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(ttlMinutes, that.ttlMinutes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(configuredLevel);
+        return Objects.hash(configuredLevel, ttlMinutes);
     }
 
     @Override
     public String toString() {
-        return "LogLevelChangeRequest{" + "configuredLevel='" + configuredLevel + '\'' + '}';
+        return "LogLevelChangeRequest{" + "configuredLevel='"
+                + configuredLevel + '\'' + ", ttlMinutes="
+                + ttlMinutes + '}';
     }
 }

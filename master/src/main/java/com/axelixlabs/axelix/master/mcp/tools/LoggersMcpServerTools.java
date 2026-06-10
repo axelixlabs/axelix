@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.mcp;
+package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,10 +24,10 @@ import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.api.loggers.GroupLoggerProfile;
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
-import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
-import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
-import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
+import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
+import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -38,6 +38,12 @@ import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
+/**
+ * MCP Tools for working with loggers.
+ *
+ * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ */
 @Service
 public class LoggersMcpServerTools {
 
@@ -72,7 +78,7 @@ public class LoggersMcpServerTools {
                             idempotentHint = true,
                             openWorldHint = false))
     public String getAvailableLoggingLevels(@McpToolParam(description = "The instance ID") String instanceId) {
-        return getAllLoggers(instanceId).levels().toString();
+        return getAllLoggers(instanceId).getLevels().toString();
     }
 
     @McpTool(
@@ -95,7 +101,7 @@ public class LoggersMcpServerTools {
                             idempotentHint = true,
                             openWorldHint = false))
     public String getLoggerGroupsFeed(@McpToolParam(description = "The instance ID") String instanceId) {
-        return getAllLoggers(instanceId).groups().toString();
+        return getAllLoggers(instanceId).getGroups().toString();
     }
 
     @McpTool(
@@ -134,15 +140,14 @@ public class LoggersMcpServerTools {
         try {
             HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", loggerName));
 
-            LoggerLevels logger =
+            SingleLoggerProfile logger =
                     endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
 
             return Map.of(loggerName, logger.toString());
         } catch (EndpointInvocationException | BadRequestException e) {
-            return getAllLoggers(instanceId).loggers().entrySet().stream()
-                    .filter(entry -> entry.getKey().contains(loggerName))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, entry -> entry.getValue().toString()));
+            return getAllLoggers(instanceId).getLoggers().stream()
+                    .filter(logger -> logger.getName().contains(loggerName))
+                    .collect(Collectors.toMap(SingleLoggerProfile::getName, SingleLoggerProfile::toString));
         }
     }
 
@@ -182,15 +187,14 @@ public class LoggersMcpServerTools {
         try {
             HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
 
-            LoggerGroup logger =
+            GroupLoggerProfile logger =
                     endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
 
             return Map.of(groupName, logger.toString());
         } catch (EndpointInvocationException | BadRequestException e) {
-            return getAllLoggers(instanceId).groups().entrySet().stream()
-                    .filter(entry -> entry.getKey().contains(groupName))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, entry -> entry.getValue().toString()));
+            return getAllLoggers(instanceId).getGroups().stream()
+                    .filter(group -> group.getName().contains(groupName))
+                    .collect(Collectors.toMap(GroupLoggerProfile::getName, GroupLoggerProfile::toString));
         }
     }
 
@@ -237,7 +241,8 @@ public class LoggersMcpServerTools {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("logger.name", loggerName),
-                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel)));
+                // TODO: implement https://github.com/axelixlabs/axelix/issues/1204
+                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel, null)));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
@@ -284,7 +289,8 @@ public class LoggersMcpServerTools {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("group.name", groupName),
-                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel)));
+                // TODO: implement https://github.com/axelixlabs/axelix/issues/1204
+                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel, null)));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
@@ -332,7 +338,7 @@ public class LoggersMcpServerTools {
                 new DefaultHttpPayload(Map.of("logger.name", loggerName)));
     }
 
-    private ServiceLoggers getAllLoggers(String instanceId) {
+    private LoggersFeed getAllLoggers(String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_LOGGERS, NoHttpPayload.INSTANCE);
     }

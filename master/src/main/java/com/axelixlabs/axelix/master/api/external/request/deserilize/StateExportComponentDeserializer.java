@@ -64,7 +64,7 @@ public class StateExportComponentDeserializer extends ValueDeserializer<List<Sta
 
         for (JsonNode childNode : componentsNode) {
             var stateComponentAsText =
-                    childNode.get(StateComponentSettings.COMPONENT).asText();
+                    childNode.get(StateComponentSettings.COMPONENT).asString();
 
             var stateExportComponent = StateExportComponent.valueOfIgnoreCase(stateComponentAsText);
 

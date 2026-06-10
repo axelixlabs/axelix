@@ -18,52 +18,51 @@
 package com.axelixlabs.axelix.common.api.loggers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The response to loggers actuator endpoint.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-public final class ServiceLoggers {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public final class LoggersFeed {
 
     private final List<String> levels;
-    private final Map<String, LoggerLevels> loggers;
-    private final Map<String, LoggerGroup> groups;
+    private final List<SingleLoggerProfile> loggers;
+    private final List<GroupLoggerProfile> groups;
 
-    public ServiceLoggers(
+    public LoggersFeed(
             @JsonProperty("levels") List<String> levels,
-            @JsonProperty("loggers") Map<String, LoggerLevels> loggers,
-            @JsonProperty("groups") Map<String, LoggerGroup> groups) {
+            @JsonProperty("loggers") List<SingleLoggerProfile> loggers,
+            @JsonProperty("groups") List<GroupLoggerProfile> groups) {
         this.levels = levels;
         this.loggers = loggers;
         this.groups = groups;
     }
 
-    public List<String> levels() {
+    public List<String> getLevels() {
         return levels;
     }
 
-    public Map<String, LoggerLevels> loggers() {
+    public List<SingleLoggerProfile> getLoggers() {
         return loggers;
     }
 
-    public Map<String, LoggerGroup> groups() {
+    public List<GroupLoggerProfile> getGroups() {
         return groups;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof LoggersFeed)) {
             return false;
         }
-        ServiceLoggers that = (ServiceLoggers) o;
+        LoggersFeed that = (LoggersFeed) o;
         return Objects.equals(levels, that.levels)
                 && Objects.equals(loggers, that.loggers)
                 && Objects.equals(groups, that.groups);
@@ -76,6 +75,6 @@ public final class ServiceLoggers {
 
     @Override
     public String toString() {
-        return "ServiceLoggers{" + "levels=" + levels + ", loggers=" + loggers + ", groups=" + groups + '}';
+        return "LoggersFeed{" + "levels=" + levels + ", loggers=" + loggers + ", groups=" + groups + '}';
     }
 }

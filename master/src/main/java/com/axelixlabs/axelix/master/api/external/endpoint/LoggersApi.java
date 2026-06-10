@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Map;
-import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
-import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
-import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
-import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
+import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -44,11 +42,9 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggerProfileResponse;
-import com.axelixlabs.axelix.master.api.external.response.loggers.LoggersResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -66,21 +62,11 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class LoggersApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
-    private final Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter;
-    private final Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public LoggersApi(
-            EndpointInvoker endpointInvoker,
-            Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
-            Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter,
-            Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter,
-            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+            EndpointInvoker endpointInvoker, JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.endpointInvoker = endpointInvoker;
-        this.loggersResponseConverter = loggersResponseConverter;
-        this.groupProfileConverter = groupProfileConverter;
-        this.loggerProfileConverter = loggerProfileConverter;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
@@ -88,15 +74,14 @@ public class LoggersApi {
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content =
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = LoggersResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoggersFeed.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.LoggersApi.INSTANCE_ID)
-    public LoggersResponse getAllLoggers(@PathVariable("instanceId") String instanceId) {
-        ServiceLoggers loggers = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getAllLoggers(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_LOGGERS, NoHttpPayload.INSTANCE);
 
-        return Objects.requireNonNull(loggersResponseConverter.convert(loggers));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(summary = "Returns the profile of the of the requested logger group.")
@@ -110,13 +95,12 @@ public class LoggersApi {
     @InstanceIdParameter
     @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
     @GetMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
-    public GroupProfileResponse getGroupByName(
+    public ResponseEntity<byte[]> getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("name", groupName));
-        LoggerGroup group =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
 
-        return Objects.requireNonNull(groupProfileConverter.convert(group));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(summary = "Returns the details of the requested logger.")
@@ -130,13 +114,12 @@ public class LoggersApi {
     @InstanceIdParameter
     @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     @GetMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
-    public LoggerProfileResponse getLoggerByName(
+    public ResponseEntity<byte[]> getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("name", loggerName));
-        LoggerLevels logger =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
 
-        return Objects.requireNonNull(loggerProfileConverter.convert(logger));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(
