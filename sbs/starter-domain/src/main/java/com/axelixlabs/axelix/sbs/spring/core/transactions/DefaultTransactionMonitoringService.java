@@ -58,11 +58,6 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
         return new TransactionMonitoringFeed(methodStats);
     }
 
-    @Override
-    public void clearAllStats() {
-        transactionStatsCollector.clearAllStats();
-    }
-
     private TransactionalEntrypoint createTransactionalEntrypoint(
             String className, String methodName, List<TransactionRecord> transactions) {
 

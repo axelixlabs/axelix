@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
@@ -43,10 +42,5 @@ public class TransactionMonitoringEndpoint {
     @ReadOperation
     public TransactionMonitoringFeed getTransactionStats() {
         return transactionMonitoringService.getMonitoringFeed();
-    }
-
-    @DeleteOperation
-    public void clearTransactionStats() {
-        transactionMonitoringService.clearAllStats();
     }
 }

@@ -43,9 +43,4 @@ public interface TransactionStatsCollector {
      * @return map of method keys to their transaction statistics
      */
     ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats();
-
-    /**
-     * Clears all collected transaction statistics.
-     */
-    void clearAllStats();
 }

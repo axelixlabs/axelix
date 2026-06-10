@@ -288,12 +288,6 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_GET, securityContextExecutor);
     }
 
-    @Bean
-    public DiscardingAbstractEndpointProber transactionMonitoringDiscardingEndpointProber() {
-        return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_CLEAR, securityContextExecutor);
-    }
-
     // Feign Client
     @Bean
     public ProxyingEndpointProber getFeignClientEndpointProber() {

@@ -18,10 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -38,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -161,9 +157,6 @@ class TransactionMonitoringApiTest {
                     return new MockResponse()
                             .setBody(ACTUAL_AND_EXPECTED_TRANSACTION_MONITORING_JSON)
                             .addHeader("Content-Type", APPLICATION_JSON_VALUE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-transactions-monitoring")
-                        && request.getMethod().equals("DELETE")) {
-                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -199,20 +192,6 @@ class TransactionMonitoringApiTest {
     }
 
     @Test
-    void shouldClearTransactionsMonitoringStats() throws InterruptedException {
-        // when.
-        restTemplate
-                .asViewer()
-                .delete("/api/external/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
-
-        // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest(10l, TimeUnit.SECONDS);
-        assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/axelix-transactions-monitoring");
-    }
-
-    @Test
     void shouldReturnInternalServerError_OnGetTransactionFeed() {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
@@ -221,23 +200,6 @@ class TransactionMonitoringApiTest {
         ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .getForEntity("/api/external/transaction-monitoring/{instanceId}", String.class, instanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    void shouldReturnInternalServerError_OnClearTransactionStats() {
-        String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .exchange(
-                        RequestEntity.delete(URI.create("/api/external/transaction-monitoring/" + instanceId))
-                                .build(),
-                        String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -256,29 +218,8 @@ class TransactionMonitoringApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnClearTransactionStats() {
-        String instanceId = UUID.randomUUID().toString();
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .exchange(
-                        RequestEntity.delete(URI.create("/api/external/transaction-monitoring/" + instanceId))
-                                .build(),
-                        String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
     @ProtectedEndpointTests(
             method = HttpMethod.GET,
             path = "/api/external/transaction-monitoring/00000000-0000-0000-0000-000000000001")
     void negativeAuthTestsOnGetTransactionFeed() {}
-
-    @ProtectedEndpointTests(
-            method = HttpMethod.DELETE,
-            path = "/api/external/transaction-monitoring/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTestsOnClearTransactionStats() {}
 }

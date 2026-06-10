@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -60,14 +59,5 @@ public class TransactionMonitoringApi {
     public byte[] getTransactionFeed(@PathVariable("instanceId") String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.TRANSACTION_STATS_GET, NoHttpPayload.INSTANCE);
-    }
-
-    @DefaultApiResponse(summary = "Clears transaction statistics for the given instance.")
-    @ApiResponse(description = "OK", responseCode = "200")
-    @InstanceIdParameter
-    @DeleteMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID)
-    public void clearTransactionStats(@PathVariable("instanceId") String instanceId) {
-        endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.TRANSACTION_STATS_CLEAR, NoHttpPayload.INSTANCE);
     }
 }

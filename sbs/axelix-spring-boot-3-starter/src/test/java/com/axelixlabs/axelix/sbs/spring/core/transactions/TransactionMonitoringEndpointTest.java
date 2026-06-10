@@ -50,7 +50,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -103,7 +102,7 @@ class TransactionMonitoringEndpointTest {
 
     @BeforeEach
     void cleanUp() {
-        transactionStatsCollector.clearAllStats();
+        transactionStatsCollector.getAllStats().clear();
         meterRegistry.clear();
     }
 
@@ -163,26 +162,6 @@ class TransactionMonitoringEndpointTest {
 
         // and then. Verify that metrics were successfully published to MeterRegistry
         checkMeterRegistry(expectedClassName, "saveRequiresNew", "success", 1);
-    }
-
-    @Test
-    void shouldClearsAllTransactionMonitoringStats() {
-        for (int i = 0; i < 3; i++) {
-            propagationTestHelper.saveRequiresNew("Johnson");
-        }
-
-        var allStats = transactionStatsCollector.getAllStats();
-
-        assertThat(allStats.size()).isGreaterThan(0);
-
-        ResponseEntity<Void> deleteResponse = restTemplate
-                .asViewer()
-                .exchange("/actuator/axelix-transactions-monitoring", HttpMethod.DELETE, null, Void.class);
-
-        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        allStats = transactionStatsCollector.getAllStats();
-        assertThat(allStats).isEmpty();
     }
 
     @Test

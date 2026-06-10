@@ -55,9 +55,4 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
     public ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats() {
         return statsMap;
     }
-
-    @Override
-    public void clearAllStats() {
-        statsMap.clear();
-    }
 }
