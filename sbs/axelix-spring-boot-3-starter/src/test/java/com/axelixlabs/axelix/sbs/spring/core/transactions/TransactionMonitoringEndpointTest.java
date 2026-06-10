@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -37,12 +38,16 @@ import com.jayway.jsonpath.JsonPath;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.tracing.Tracer;
+import io.micrometer.tracing.test.simple.SimpleSpan;
+import io.micrometer.tracing.test.simple.SimpleTracer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -66,6 +71,8 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_DURATION;
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_QUERIES;
+import static com.axelixlabs.axelix.sbs.spring.core.tracing.AxelixTraceNames.TRANSACTION_CHILD_SPAN_NAME;
+import static com.axelixlabs.axelix.sbs.spring.core.tracing.AxelixTraceNames.TRANSACTION_SPAN_NAME;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,6 +89,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
 @Import({TransactionMonitoringEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
+@AutoConfigureObservability
 class TransactionMonitoringEndpointTest {
 
     private final String expectedClassName = PropagationTestHelper.class.getSimpleName();
@@ -101,10 +109,14 @@ class TransactionMonitoringEndpointTest {
     @Autowired
     private MeterRegistry meterRegistry;
 
+    @Autowired
+    private SimpleTracer simpleTracer;
+
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearAllStats();
         meterRegistry.clear();
+        simpleTracer.getSpans().clear();
     }
 
     @Test
@@ -162,7 +174,10 @@ class TransactionMonitoringEndpointTest {
                 .isNumber();
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "saveRequiresNew", "success", 1);
+        checkMeterRegistry("saveRequiresNew", TransactionStatus.SUCCESS, 1L, 1d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        checkTelemetry("saveRequiresNew", 1);
     }
 
     @Test
@@ -183,6 +198,12 @@ class TransactionMonitoringEndpointTest {
 
         allStats = transactionStatsCollector.getAllStats();
         assertThat(allStats).isEmpty();
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry("saveRequiresNew", TransactionStatus.SUCCESS, 3L, 3d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        checkTelemetry("saveRequiresNew", 1);
     }
 
     @Test
@@ -242,7 +263,10 @@ class TransactionMonitoringEndpointTest {
         }
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "testSaveMultipleOwners", "success", 3);
+        checkMeterRegistry("testSaveMultipleOwners", TransactionStatus.SUCCESS, 1L, 3d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        checkTelemetry("testSaveMultipleOwners", 3);
     }
 
     @Test
@@ -307,7 +331,10 @@ class TransactionMonitoringEndpointTest {
         }
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "findOwnerById", "success", 2);
+        checkMeterRegistry("findOwnerById", TransactionStatus.SUCCESS, 1L, 2d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        checkTelemetry("findOwnerById", 2);
     }
 
     @Test
@@ -370,7 +397,11 @@ class TransactionMonitoringEndpointTest {
         }
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "updateOwner", "success", 2);
+        checkMeterRegistry("updateOwner", TransactionStatus.SUCCESS, 1L, 2d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        // queriesCount = testNested()
+        checkTelemetry("updateOwner", 2);
     }
 
     @Test
@@ -411,7 +442,78 @@ class TransactionMonitoringEndpointTest {
             """);
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "testRollbackScenario", "error", 1);
+        checkMeterRegistry("testRollbackScenario", TransactionStatus.ERROR, 1L, 1d);
+
+        // and then. Verify that telemetry spans were correctly recorded
+        checkTelemetry("testRollbackScenario", 1);
+    }
+
+    @Test
+    @Transactional
+    void supportsPropagationWithExistingTransactionShouldNotOpenATransaction() {
+        // given.
+        propagationTestHelper.testSupports("Rodriquez");
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        // Since the test itself is @Transactional, the transaction lifecycle ends after the test method execution.
+        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
+    }
+
+    @Test
+    void supportsWithoutTransactionIsNotMonitored() {
+        // given.
+        propagationTestHelper.testSupportsWithoutTransaction();
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
+    }
+
+    @Test
+    void nestedPropagationIsMonitored() {
+        // given.
+        propagationTestHelper.testNested();
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody)
+                .isEqualTo(
+                        // language=json
+                        """
+                {
+                  "entrypoints" : [ {
+                    "className" : "com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper",
+                    "methodName" : "testNested",
+                    "executions" : [ {
+                      "startTimestampMs" : "#{json-unit.ignore}",
+                      "endTimestampMs" : "#{json-unit.ignore}",
+                      "queries" : [ {
+                        "sql" : "select o1_0.id,o1_0.last_name from owner o1_0 where o1_0.last_name=?",
+                        "startTimestampMs" : "#{json-unit.ignore}",
+                        "endTimestampMs" : "#{json-unit.ignore}"
+                      } ]
+                    } ],
+                    "executionStats" : {
+                      "averageDurationMs" : "#{json-unit.ignore}",
+                      "maxDurationMs" : "#{json-unit.ignore}",
+                      "medianDurationMs" : "#{json-unit.ignore}"
+                    }
+                  } ]
+                }
+            """);
+
+        // and then. Verify that metrics were successfully published to MeterRegistry
+        checkMeterRegistry("testNested", TransactionStatus.SUCCESS, 1L, 1d);
+
+        // and then. Verify that telemetry spans were correctly recorded.
+        checkTelemetry("testNested", 1);
     }
 
     @Test
@@ -478,86 +580,34 @@ class TransactionMonitoringEndpointTest {
           ]
         }
     """);
-    }
-
-    @Test
-    void nestedPropagationIsMonitored() {
-        // given.
-        propagationTestHelper.testNested();
-
-        // when.
-        String responseBody = getMonitoringResponse();
-
-        // then.
-        assertThatJson(responseBody)
-                .isEqualTo(
-                        // language=json
-                        """
-        {
-          "entrypoints" : [ {
-            "className" : "com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper",
-            "methodName" : "testNested",
-            "executions" : [ {
-              "startTimestampMs" : "#{json-unit.ignore}",
-              "endTimestampMs" : "#{json-unit.ignore}",
-              "queries" : [ {
-                "sql" : "select o1_0.id,o1_0.last_name from owner o1_0 where o1_0.last_name=?",
-                "startTimestampMs" : "#{json-unit.ignore}",
-                "endTimestampMs" : "#{json-unit.ignore}"
-              } ]
-            } ],
-            "executionStats" : {
-              "averageDurationMs" : "#{json-unit.ignore}",
-              "maxDurationMs" : "#{json-unit.ignore}",
-              "medianDurationMs" : "#{json-unit.ignore}"
-            }
-          } ]
-        }
-    """);
 
         // and then. Verify that metrics were successfully published to MeterRegistry
-        checkMeterRegistry(expectedClassName, "testNested", "success", 1);
-    }
+        checkMeterRegistry("outerRequiredMethod", TransactionStatus.SUCCESS, 1L, 2d);
+        checkMeterRegistry("saveRequiresNew", TransactionStatus.SUCCESS, 1L, 1d);
 
-    @Test
-    @Transactional
-    void supportsPropagationWithExistingTransactionShouldNotOpenATransaction() {
-        // given.
-        propagationTestHelper.testSupports("Rodriquez");
-
-        // when.
-        String responseBody = getMonitoringResponse();
-
-        // then.
-        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
-    }
-
-    @Test
-    void supportsWithoutTransactionIsNotMonitored() {
-        // given.
-        propagationTestHelper.testSupportsWithoutTransaction();
-
-        // when.
-        String responseBody = getMonitoringResponse();
-
-        // then.
-        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
+        // and then. Verify that telemetry spans were correctly recorded.
+        checkTelemetry("outerRequiredMethod", 2);
+        checkTelemetry("saveRequiresNew", 1);
     }
 
     private void checkMeterRegistry(
-            String expectedClassName, String expectedMethodName, String status, int expectedQueryCount) {
+            String expectedMethodName,
+            TransactionStatus transactionStatus,
+            long expectedTimerCount,
+            double expectedQueryCount) {
         // given when. Verify Transaction Duration Timer
         Timer transactionTimer = meterRegistry
                 .find(TRANSACTION_DURATION)
                 .tag("class", expectedClassName)
                 .tag("method", expectedMethodName)
-                .tag("status", status)
+                .tag("status", transactionStatus.getValue())
                 .timer();
 
         // then.
         assertThat(transactionTimer).isNotNull();
-        assertThat(transactionTimer.count()).isEqualTo(1);
-        assertThat(transactionTimer.totalTime(TimeUnit.NANOSECONDS)).isGreaterThan(0);
+        assertThat(transactionTimer.count())
+                .isEqualTo(expectedTimerCount); // Using >= 0 because the test execution can be too fast (under 1ms)
+        assertThat(transactionTimer.totalTime(TimeUnit.MILLISECONDS)).isGreaterThanOrEqualTo(0);
 
         // given when. Verify SQL Queries Counter
         Counter queriesCounter = meterRegistry
@@ -569,6 +619,47 @@ class TransactionMonitoringEndpointTest {
         // then.
         assertThat(queriesCounter).isNotNull();
         assertThat(queriesCounter.count()).isEqualTo(expectedQueryCount);
+    }
+
+    private void checkTelemetry(String expectedMethodName, int expectedSqlQuerySpansCount) {
+        // given.
+        Deque<SimpleSpan> spans = simpleTracer.getSpans();
+
+        // then.
+        // Includes +2 extra spans: 1 for the getMonitoringResponse() HTTP call and 1 for the parent transaction span
+        assertThat(spans).hasSizeGreaterThanOrEqualTo(expectedSqlQuerySpansCount + 2);
+
+        // given when.
+        // Parent transaction spans
+        List<SimpleSpan> txSpans = spans.stream()
+                .filter(s -> TRANSACTION_SPAN_NAME.equals(s.getName()))
+                .filter(s -> expectedMethodName.equals(s.getTags().get("method")))
+                .toList();
+
+        // and then.
+        assertThat(txSpans).isNotEmpty();
+
+        // all sqlQuerySpans for all txSpans
+        List<SimpleSpan> sqlQuerySpans = spans.stream()
+                .filter(s -> TRANSACTION_CHILD_SPAN_NAME.equals(s.getName()))
+                .toList();
+
+        // and then.
+        for (SimpleSpan txSpan : txSpans) {
+
+            // and then.
+            assertThat(txSpan.getTags())
+                    .containsEntry("class", expectedClassName)
+                    .containsEntry("method", expectedMethodName);
+
+            // filter childSpans for specific txSpan
+            List<SimpleSpan> childSpans = sqlQuerySpans.stream()
+                    .filter(s -> txSpan.getSpanId().equals(s.getParentId()))
+                    .toList();
+
+            // and then.
+            assertThat(childSpans.size()).isEqualTo(expectedSqlQuerySpansCount);
+        }
     }
 
     @ProtectedEndpointTests(
@@ -609,9 +700,13 @@ class TransactionMonitoringEndpointTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector,
                 QueriesRecorder queriesCollector,
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider,
+                ObjectProvider<AxelixTransactionTracer> axelixTransactionTracerObjectProvider) {
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider);
+                    transactionStatsCollector,
+                    queriesCollector,
+                    axelixMetricsPublisherObjectProvider,
+                    axelixTransactionTracerObjectProvider);
         }
 
         @Bean
@@ -634,6 +729,16 @@ class TransactionMonitoringEndpointTest {
         @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
+        }
+
+        @Bean
+        public AxelixTransactionTracer axelixTransactionTracer(Tracer tracer) {
+            return new DefaultAxelixTransactionTracer(tracer);
+        }
+
+        @Bean
+        public SimpleTracer simpleTracer() {
+            return new SimpleTracer();
         }
     }
 
@@ -721,7 +826,7 @@ class TransactionMonitoringEndpointTest {
         public void outerRequiredMethod(String outerName) {
             ownerRepository.save(new Owner().setLastName(outerName));
 
-            self.saveRequiresNew("SomeName");
+            self.saveRequiresNew(outerName);
 
             ownerRepository.save(new Owner().setLastName(outerName));
         }

@@ -21,11 +21,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.AxelixTransactionTracer;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
@@ -143,8 +146,12 @@ class TransactionMonitoringAutoConfigurationTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+                TransactionStatsCollector transactionStatsCollector,
+                QueriesRecorder queriesCollector,
+                ObjectProvider<AxelixMetricsPublisher> metricsPublisher,
+                ObjectProvider<AxelixTransactionTracer> transactionTracer) {
+            return new CustomTransactionMonitoringBeanPostProcessor(
+                    transactionStatsCollector, queriesCollector, metricsPublisher, transactionTracer);
         }
 
         @Bean
@@ -192,8 +199,11 @@ class TransactionMonitoringAutoConfigurationTest {
     static class CustomTransactionMonitoringBeanPostProcessor extends TransactionMonitoringBeanPostProcessor {
 
         public CustomTransactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            super(transactionStatsCollector, queriesCollector, null);
+                TransactionStatsCollector transactionStatsCollector,
+                QueriesRecorder queriesCollector,
+                ObjectProvider<AxelixMetricsPublisher> metricsPublisher,
+                ObjectProvider<AxelixTransactionTracer> transactionTracer) {
+            super(transactionStatsCollector, queriesCollector, metricsPublisher, transactionTracer);
         }
     }
 

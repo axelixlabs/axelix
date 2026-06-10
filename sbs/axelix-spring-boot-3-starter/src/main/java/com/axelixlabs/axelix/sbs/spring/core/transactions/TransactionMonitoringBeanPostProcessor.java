@@ -64,15 +64,18 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
+    private final ObjectProvider<AxelixTransactionTracer> transactionTracerObjectProvider;
 
     public TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector,
             QueriesRecorder queriesCollector,
-            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
+            ObjectProvider<AxelixTransactionTracer> transactionTracerObjectProvider) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
         this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
+        this.transactionTracerObjectProvider = transactionTracerObjectProvider;
     }
 
     @Override
@@ -145,7 +148,11 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setProxyTargetClass(true);
 
         TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, queriesCollector, metricsPublisherObjectProvider.getIfAvailable());
+                propagationCache,
+                statsCollector,
+                queriesCollector,
+                metricsPublisherObjectProvider.getIfAvailable(),
+                transactionTracerObjectProvider.getIfAvailable());
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);

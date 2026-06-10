@@ -41,6 +41,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlTracingBridge.SqlTracingCallback;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlTracingBridge.SqlTracingInterceptor;
+
 /**
  * A {@link PreparedStatement} wrapper that records execution statistics
  * for executed SQL queries.
@@ -640,11 +643,21 @@ public class ProxyingPreparedStatement implements PreparedStatement {
         long startTimestampMs = System.currentTimeMillis();
         long txStartTime = System.nanoTime();
 
+        SqlTracingInterceptor interceptor = SqlTracingBridge.getInterceptor();
+        SqlTracingCallback sqlTracingCallback = null;
+        if (interceptor != null) {
+            sqlTracingCallback = interceptor.startSpan(sql);
+        }
+
         try {
             return action.run();
         } finally {
             long durationNs = System.nanoTime() - txStartTime;
             queriesRecorder.recordQuery(new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs));
+
+            if (sqlTracingCallback != null) {
+                sqlTracingCallback.close();
+            }
         }
     }
 }

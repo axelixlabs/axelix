@@ -27,7 +27,7 @@ dependencies {
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
-    compileOnly("io.micrometer:micrometer-core")
+    compileOnly("io.micrometer:micrometer-tracing")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
@@ -41,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     testImplementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("io.micrometer:micrometer-tracing-test")
     testImplementation("com.h2database:h2")
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
