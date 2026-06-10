@@ -174,6 +174,7 @@ public final class ScheduledTaskService {
 
         } catch (ScheduledTaskNotFoundException e) {
             log.warn("Task '{}' not found, cannot run now", taskId, e);
+            throw e;
         }
     }
 

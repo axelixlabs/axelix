@@ -84,15 +84,19 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @Test
-    void shouldNotActivateAutoConfiguration_whenEndpointDisabled() {
+    void shouldActivateWithoutReschedulers_whenSchedulingNotEnabled() {
         new ApplicationContextRunner()
                 .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
                 .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
                 .run(context -> {
-                    assertThat(context).doesNotHaveBean(ScheduledTaskManagementAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(ScheduledTasksRegistry.class);
-                    assertThat(context).doesNotHaveBean(ScheduledTaskService.class);
-                    assertThat(context).doesNotHaveBean(AxelixScheduledTasksEndpoint.class);
+                    // read path is available even without @EnableScheduling
+                    assertThat(context).hasSingleBean(ScheduledTasksRegistry.class);
+                    assertThat(context).hasSingleBean(ScheduledTaskService.class);
+                    assertThat(context).hasSingleBean(ScheduledTasksAssembler.class);
+                    assertThat(context).hasSingleBean(AxelixScheduledTasksEndpoint.class);
+
+                    // no scheduling -> reschedulers are not created
+                    assertThat(context).getBeans(TaskRescheduler.class).isEmpty();
                 });
     }
 

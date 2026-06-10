@@ -101,6 +101,8 @@ class AxelixScheduledTasksEndpointTest {
 
     private static final String CUSTOM_TRIGGER = "CustomTestTrigger";
 
+    private static final String NON_EXISTENT_TASK_ID = "com.example.NonExistentTask.doWork";
+
     private static volatile boolean cronFlag = false;
 
     private static volatile boolean fixedDelayFlag = false;
@@ -299,7 +301,7 @@ class AxelixScheduledTasksEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_modifyCronExpressionForCronTask() {
+    void shouldReturnBadRequest_modifyCronExpressionForCronTask_toInvalidValue() {
         // language=json
         String request = """
             {
@@ -338,12 +340,12 @@ class AxelixScheduledTasksEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_modifyIntervalForFixedDelay() {
+    void shouldReturnBadRequest_modifyIntervalForFixedDelay_toInvalidValue() {
         // language=json
         String request = """
                 {
                   "trigger" : "%s",
-                  "cronExpression": "invalid value"
+                  "interval": "invalid value"
                 }
                 """.formatted(FIXED_DELAY_TASK_ID_FOR_MODIFY);
 
@@ -375,12 +377,12 @@ class AxelixScheduledTasksEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_modifyIntervalForFixedRate() {
+    void shouldReturnBadRequest_modifyIntervalForFixedRate_toInvalidValue() {
         // language=json
         String request = """
                 {
                   "trigger" : "%s",
-                  "cronExpression": "invalid value"
+                  "interval": "invalid value"
                 }
                 """.formatted(FIXED_RATE_TASK_ID_FOR_MODIFY);
 
@@ -425,6 +427,103 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
         assertThat(fixedRateFlag).isTrue();
+    }
+
+    @Test
+    void shouldReturnBadRequest_enableForNonExistentTask() {
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s"
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/enable", defaultJsonEntity(request), Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
+    void shouldReturnBadRequest_disableForNonExistentTask() {
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s"
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/disable", defaultJsonEntity(request), Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
+    void shouldReturnBadRequest_executeForNonExistentTask() {
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s"
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
+    void shouldReturnBadRequest_modifyCronExpressionForNonExistentTask() {
+        // given
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s",
+                  "cronExpression": "*/5 * * * * *"
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
+    void shouldReturnBadRequest_modifyIntervalForNonExistentTask() {
+        // language=json
+        String request = """
+                {
+                  "trigger": "%s",
+                  "interval": 555555
+                }
+                """.formatted(NON_EXISTENT_TASK_ID);
+
+        // when
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        // then
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-scheduled-tasks")

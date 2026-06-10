@@ -19,9 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
-
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -29,7 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
@@ -51,7 +47,6 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @since 14.10.2025
  */
 @AutoConfiguration
-@ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
@@ -74,17 +69,15 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    public TaskRescheduler intervalBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
-        TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
-
-        return new IntervalBasedTaskRescheduler(taskScheduler);
+    @ConditionalOnBean(TaskScheduler.class)
+    public TaskRescheduler intervalBasedTaskRescheduler(TaskScheduler scheduler) {
+        return new IntervalBasedTaskRescheduler(scheduler);
     }
 
     @Bean
-    public TaskRescheduler triggerBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
-        TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
-
-        return new TriggerBasedTaskRescheduler(taskScheduler);
+    @ConditionalOnBean(TaskScheduler.class)
+    public TaskRescheduler triggerBasedTaskRescheduler(TaskScheduler scheduler) {
+        return new TriggerBasedTaskRescheduler(scheduler);
     }
 
     @Bean
@@ -98,19 +91,6 @@ public class ScheduledTaskManagementAutoConfiguration {
     @ConditionalOnMissingBean
     public ScheduledTasksAssembler scheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
-    }
-
-    @NonNull
-    private static TaskScheduler requireTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
-        TaskScheduler taskScheduler = scheduler.getIfAvailable();
-
-        if (taskScheduler == null) {
-            throw new NoSuchBeanDefinitionException(
-                    "For @Scheduled-related abilities to work, Axelix requires a bean of type %s that cannot be found"
-                            .formatted(TaskScheduler.class.getName()));
-        }
-
-        return taskScheduler;
     }
 
     private static ThreadPoolTaskExecutor createThreadPoolExecutor() {
