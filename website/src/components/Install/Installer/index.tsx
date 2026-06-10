@@ -16,7 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 "use client";
-import { EInstallConfigurationVariant, EInstallMethod, EInstallOpenSelect, ESpringBootVariant } from "@/models";
+import {
+    EInstallConfigurationVariant,
+    EInstallMethod,
+    EInstallOpenSelect,
+    ESpringBootVariant,
+    IAxelixVersionData,
+    IGithubReleaseResponseBody,
+} from "@/models";
 import { installSpringBootArtifact } from "@/utils";
 
 import { BareMetal } from "./Snippets/BareMetal";
@@ -46,6 +53,10 @@ export const Installer = () => {
     const activeSnippetRef = useRef<HTMLElement>(null);
 
     const [openSelect, setOpenSelect] = useState<EInstallOpenSelect>(EInstallOpenSelect.NULL);
+    const [axelixVersionData, setAxelixVersionData] = useState<IAxelixVersionData>({
+        version: null,
+        loading: true,
+    });
 
     const selectRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +72,44 @@ export const Installer = () => {
         }
         document.addEventListener("click", onClick);
         return () => document.removeEventListener("click", onClick);
+    }, []);
+
+    // TODO: In the future, split this component into smaller components
+    useEffect(() => {
+        async function fetchAxelixVersion() {
+            try {
+                setAxelixVersionData((prev) => ({
+                    ...prev,
+                    loading: true,
+                }));
+
+                const response = await fetch("https://api.github.com/repos/axelixlabs/axelix/releases/latest");
+
+                if (!response.ok) {
+                    throw new Error();
+                }
+
+                const data: IGithubReleaseResponseBody = await response.json();
+                const version = data.tag_name;
+
+                setAxelixVersionData((prev) => ({
+                    ...prev,
+                    version: version,
+                }));
+            } catch {
+                setAxelixVersionData((prev) => ({
+                    ...prev,
+                    version: "<VERSION>",
+                }));
+            } finally {
+                setAxelixVersionData((prev) => ({
+                    ...prev,
+                    loading: false,
+                }));
+            }
+        }
+
+        fetchAxelixVersion();
     }, []);
 
     return (
@@ -88,10 +137,10 @@ export const Installer = () => {
                             )}
 
                             {installStep === 1 && installMethod === EInstallMethod.DOCKER && (
-                                <DockerSnippet refEl={activeSnippetRef} />
+                                <DockerSnippet refEl={activeSnippetRef} axelixVersionData={axelixVersionData} />
                             )}
                             {installStep === 1 && installMethod === EInstallMethod.COMPOSE && (
-                                <ComposeSnippet refEl={activeSnippetRef} />
+                                <ComposeSnippet refEl={activeSnippetRef} axelixVersionData={axelixVersionData} />
                             )}
                             {installStep === 1 && installMethod === EInstallMethod.K8S && (
                                 <K8sSnippet refEl={activeSnippetRef} />

@@ -44,3 +44,12 @@ export interface IInstallMethodData {
     description: string;
     href: string;
 }
+
+export interface IGithubReleaseResponseBody {
+    tag_name: string;
+}
+
+export interface IAxelixVersionData {
+    version: string | null;
+    loading: boolean;
+}
