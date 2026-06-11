@@ -56,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.AxelixTestProperties;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(
         classes = Main.class,

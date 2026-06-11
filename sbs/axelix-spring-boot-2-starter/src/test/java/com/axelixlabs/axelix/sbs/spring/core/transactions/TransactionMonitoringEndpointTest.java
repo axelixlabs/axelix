@@ -17,9 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -31,23 +42,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -438,7 +435,7 @@ class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest 
                         + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "          \"queries\" : [\n"
                         + "            {\n"
-                        + "              \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                        + "              \"sql\" : \"select transactio0_.id as id1_1_, transactio0_.last_name as last_nam2_1_ from owner transactio0_ where transactio0_.last_name=?\",\n"
                         + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                         + "            }\n"
@@ -574,9 +571,11 @@ class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest 
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
 
-        public PropagationTestHelper(OwnerRepository ownerRepository) {
+        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
             this.ownerRepository = ownerRepository;
+            this.self = self;
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -623,6 +622,15 @@ class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest 
         public void testRollbackScenario(String lastName) {
             ownerRepository.findByLastName(lastName);
             throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        public void outerRequiredMethod(String outerName) {
+            ownerRepository.save(new Owner().setLastName(outerName));
+
+            self.saveRequiresNew("SomeName");
+
+            ownerRepository.save(new Owner().setLastName(outerName));
         }
     }
 }

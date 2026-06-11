@@ -41,6 +41,8 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
  *
  * <p>The annotations below are the union of the configuration previously declared by the
  * individual master tests.
+ *
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import({

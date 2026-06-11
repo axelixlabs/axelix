@@ -50,6 +50,8 @@ import java.util.List;
  *
  * <p>The annotations below are the union of the configuration previously declared by the
  * individual schedule tests.
+ *
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import({AbstractScheduledIntegrationTest.ScheduledTestConfiguration.class})

@@ -52,6 +52,8 @@ public class ScheduledTasksEndpointTestConfiguration implements SchedulingConfig
 
     static final String CUSTOM_TRIGGER = "CustomTestTrigger";
 
+    static final String NON_EXISTENT_TASK_ID = "com.example.NonExistentTask.doWork";
+
     static volatile boolean cronFlag = false;
 
     static volatile boolean fixedDelayFlag = false;

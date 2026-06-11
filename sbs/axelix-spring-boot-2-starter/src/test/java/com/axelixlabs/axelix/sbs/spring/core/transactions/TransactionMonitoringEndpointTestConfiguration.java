@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest.Owner;
@@ -74,7 +75,7 @@ public class TransactionMonitoringEndpointTestConfiguration {
     }
 
     @Bean
-    public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
-        return new PropagationTestHelper(ownerRepository);
+    public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+        return new PropagationTestHelper(ownerRepository, self);
     }
 }

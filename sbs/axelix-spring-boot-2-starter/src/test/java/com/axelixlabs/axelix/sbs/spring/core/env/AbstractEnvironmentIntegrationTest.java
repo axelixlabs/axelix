@@ -33,6 +33,7 @@ import org.springframework.test.context.TestPropertySource;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(args = "--fooBar=fromArgs")
 @TestPropertySource(

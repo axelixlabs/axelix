@@ -52,6 +52,8 @@ import java.util.Objects;
  *
  * <p>The annotations below are the union of the configuration previously declared by the
  * individual configprops tests.
+ *
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,

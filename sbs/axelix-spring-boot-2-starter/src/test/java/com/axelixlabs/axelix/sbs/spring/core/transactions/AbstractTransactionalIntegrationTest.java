@@ -47,6 +47,8 @@ import java.util.List;
  *
  * <p>The annotations below are the union of the configuration previously declared by the
  * individual transactional tests.
+ *
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import({AbstractTransactionalIntegrationTest.TransactionalConfiguration.class})
