@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,7 +55,7 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
 
     @Override
     public Map<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats() {
-        return Map.copyOf(statsMap);
+        return Collections.unmodifiableMap(statsMap);
     }
 
     @Override
