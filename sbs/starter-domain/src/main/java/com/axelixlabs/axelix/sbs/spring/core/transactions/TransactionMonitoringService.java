@@ -31,9 +31,4 @@ public interface TransactionMonitoringService {
      * Returns a complete monitoring feed with transaction execution statistics.
      */
     TransactionMonitoringFeed getMonitoringFeed();
-
-    /**
-     * Clears all collected transaction statistics.
-     */
-    void clearAllStats();
 }

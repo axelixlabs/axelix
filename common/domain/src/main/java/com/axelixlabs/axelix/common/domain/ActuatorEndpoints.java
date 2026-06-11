@@ -131,8 +131,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // @Transaction monitoring
     public static final ActuatorEndpoint TRANSACTION_STATS_GET =
             endpoint("/axelix-transactions-monitoring", HttpMethod.GET);
-    public static final ActuatorEndpoint TRANSACTION_STATS_CLEAR =
-            endpoint("/axelix-transactions-monitoring", HttpMethod.DELETE);
 
     // Feign Client
     public static final ActuatorEndpoint GET_FEIGN_CLIENT = endpoint("/axelix-feign", HttpMethod.GET);
