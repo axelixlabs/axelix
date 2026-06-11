@@ -102,7 +102,7 @@ class TransactionMonitoringEndpointTest {
 
     @BeforeEach
     void cleanUp() {
-        transactionStatsCollector.getAllStats().clear();
+        transactionStatsCollector.clearStats();
         meterRegistry.clear();
     }
 

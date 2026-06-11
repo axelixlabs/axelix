@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 
@@ -38,9 +38,14 @@ public interface TransactionStatsCollector {
     void recordTransaction(MethodClassKey key, TransactionRecord transactionRecord);
 
     /**
-     * Returns all collected transaction statistics.
+     * Returns the copy of all collected transaction statistics.
      *
      * @return map of method keys to their transaction statistics
      */
-    ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats();
+    Map<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats();
+
+    /**
+     * Clears the stats
+     */
+    void clearStats();
 }
