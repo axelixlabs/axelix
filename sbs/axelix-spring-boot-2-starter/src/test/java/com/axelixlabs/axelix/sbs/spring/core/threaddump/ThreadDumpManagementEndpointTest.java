@@ -23,14 +23,10 @@ import java.lang.management.ThreadMXBean;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -42,9 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(JwtAuthTestConfiguration.class)
-public class ThreadDumpManagementEndpointTest {
+public class ThreadDumpManagementEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -84,18 +78,4 @@ public class ThreadDumpManagementEndpointTest {
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-thread-dump")
     void negativeAuthTests() {}
-
-    @TestConfiguration
-    static class ThreadDumpManagementEndpointTestConfiguration {
-        @Bean
-        public ThreadDumpContentionMonitoringManagement management() {
-            return new DefaultThreadDumpContentionMonitoringManagement();
-        }
-
-        @Bean
-        public ThreadDumpManagementEndpoint threadDumpManagementEndpoint(
-                ThreadDumpContentionMonitoringManagement management) {
-            return new ThreadDumpManagementEndpoint(management);
-        }
-    }
 }

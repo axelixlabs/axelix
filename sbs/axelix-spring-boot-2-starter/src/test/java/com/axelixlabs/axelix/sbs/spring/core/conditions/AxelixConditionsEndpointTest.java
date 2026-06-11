@@ -20,18 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -42,52 +35,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans", "axelix.conditions.test.flag=enabled"})
-@Import(JwtAuthTestConfiguration.class)
-class AxelixConditionsEndpointTest {
+class AxelixConditionsEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired
     private TestRestTemplateBuilder testRestTemplate;
 
-    @TestConfiguration
-    static class AxelixConditionsEndpointTestConfiguration {
-        @Bean
-        public ConditionalTargetUnwrapper conditionalNameUnwrap() {
-            return new DefaultConditionalTargetUnwrapper();
-        }
-
-        @Bean
-        public ConditionalFeedBuilder conditionalFeedBuilder(
-                ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalTargetUnwrapper conditionalTargetUnwrapper) {
-            return new DefaultConditionalFeedBuilder(configurableApplicationContext, conditionalTargetUnwrapper);
-        }
-
-        @Bean
-        public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
-            return new AxelixConditionsEndpoint(conditionalFeedBuilder);
-        }
-
-        @Bean
-        @ConditionalOnProperty(name = "axelix.conditions.test.flag", havingValue = "enabled")
-        public String positiveConditionBean() {
-            return "positive";
-        }
-
-        @Bean
-        @ConditionalOnProperty(name = "axelix.conditions.test.flag", havingValue = "disabled")
-        public String negativeConditionBean() {
-            return "negative";
-        }
-    }
-
     @Test
     void shouldReturnConditionsFeed() {
         // given.
-        String className = AxelixConditionsEndpointTest.class.getSimpleName()
-                + "."
-                + AxelixConditionsEndpointTestConfiguration.class.getSimpleName();
+        String className = ConditionsEndpointTestConfiguration.class.getSimpleName();
         String positiveMethodName = "positiveConditionBean";
         String negativeMethodName = "negativeConditionBean";
 
