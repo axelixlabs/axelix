@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button } from "antd";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+
+import { App, Button, Modal } from "antd";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -55,22 +57,30 @@ const Caches = () => {
     }
 
     const clearAllCachesClickHandler = (): void => {
-        if (instanceId) {
-            setClearAllCaches(StatelessRequest.loading());
+        Modal.confirm({
+            icon: <ExclamationCircleFilled />,
+            title: t("Caches.clearAllCachesTitle"),
+            content: t("Caches.clearAllCachesDescription"),
+            centered: true,
+            onOk() {
+                if (instanceId) {
+                    setClearAllCaches(StatelessRequest.loading());
 
-            clearAllCachesData(instanceId)
-                .then((value) => {
-                    if (value.status === 200) {
-                        setClearAllCaches(StatelessRequest.success());
-                        message.success(t("Caches.cleared"));
-                    } else {
-                        setClearAllCaches(StatelessRequest.error(""));
-                    }
-                })
-                .catch((error: AxiosError<IErrorResponse>) => {
-                    setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-                });
-        }
+                    clearAllCachesData(instanceId)
+                        .then((value) => {
+                            if (value.status === 200) {
+                                setClearAllCaches(StatelessRequest.success());
+                                message.success(t("Caches.cleared"));
+                            } else {
+                                setClearAllCaches(StatelessRequest.error(""));
+                            }
+                        })
+                        .catch((error: AxiosError<IErrorResponse>) => {
+                            setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                        });
+                }
+            },
+        });
     };
 
     const requiredCacheManagers = cacheData.response!.cacheManagers;

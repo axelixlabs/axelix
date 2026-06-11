@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ReloadOutlined } from "@ant-design/icons";
+import { ExclamationCircleFilled, ReloadOutlined } from "@ant-design/icons";
 
-import { App, Button } from "antd";
+import { App, Button, Modal } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -56,19 +56,28 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
-        setClearSingleCache(StatelessRequest.loading());
-        clearCacheData({
-            instanceId: instanceId!,
-            cacheName: cache.name,
-            cacheManager: cacheManagerName,
-        })
-            .then(() => {
-                setClearSingleCache(StatelessRequest.success());
-                message.success(t("Caches.cleared"));
-            })
-            .catch((error: AxiosError<IErrorResponse>) => {
-                setClearSingleCache(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            });
+
+        Modal.confirm({
+            icon: <ExclamationCircleFilled />,
+            title: t("Caches.clearThisCacheTitle"),
+            content: t("Caches.clearThisCacheDescription"),
+            centered: true,
+            onOk() {
+                setClearSingleCache(StatelessRequest.loading());
+                clearCacheData({
+                    instanceId: instanceId!,
+                    cacheName: cache.name,
+                    cacheManager: cacheManagerName,
+                })
+                    .then(() => {
+                        setClearSingleCache(StatelessRequest.success());
+                        message.success(t("Caches.cleared"));
+                    })
+                    .catch((error: AxiosError<IErrorResponse>) => {
+                        setClearSingleCache(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                    });
+            },
+        });
     };
 
     return (
