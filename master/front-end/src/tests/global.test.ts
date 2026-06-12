@@ -86,6 +86,17 @@ describe("getCookie", () => {
 
         expect(getCookie("authorities")).toBe("");
     });
+
+    it("Should return the correct value when cookies are separated by a semicolon with a space", () => {
+        // given.
+        document.cookie = "theme=dark; token=random_token; lang=en";
+
+        // when.
+        const result = getCookie("token");
+
+        // then.
+        expect(result).toBe("random_token");
+    });
 });
 
 describe("parseAuthorities", () => {

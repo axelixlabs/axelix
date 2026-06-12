@@ -133,7 +133,7 @@ export const createWallboardFilterSearchParam = (
 export const getCookie = (name: string): string | undefined => {
     for (const cookie of document.cookie.split(";")) {
         const separator = cookie.indexOf("=");
-        const cookieName = cookie.substring(0, separator);
+        const cookieName = cookie.substring(0, separator).trim();
 
         if (cookieName === name) {
             return cookie.substring(separator + 1);
