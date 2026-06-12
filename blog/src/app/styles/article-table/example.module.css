@@ -5,6 +5,7 @@
   table-layout: fixed;
   width: auto;
 }
+
 .table th:nth-child(1),
 .table td:nth-child(1),
 .table th:nth-child(2),
@@ -12,6 +13,7 @@
   width: 200px;
   font-size: 12px;
 }
+
 .table th:nth-child(3),
 .table td:nth-child(3) {
   width: 300px;

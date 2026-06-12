@@ -1,14 +1,26 @@
-import remarkDirective from "remark-directive";
-import {
-  remarkDirectiveAdmonition,
-  remarkImage,
-  remarkMdxFiles,
-  remarkMdxMermaid,
-} from "fumadocs-core/mdx-plugins";
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+import { remarkDirectiveAdmonition, remarkImage, remarkMdxFiles, remarkMdxMermaid } from "fumadocs-core/mdx-plugins";
 import { defineCollections, defineConfig, frontmatterSchema } from "fumadocs-mdx/config";
 import lastModified from "fumadocs-mdx/plugins/last-modified";
-import { z } from "zod";
 import convert from "npm-to-yarn";
+import remarkDirective from "remark-directive";
+import { z } from "zod";
 
 /**
  * Frontmatter fields available in `content/blog/<slug>/index.mdx`.
@@ -38,61 +50,61 @@ import convert from "npm-to-yarn";
  *                  `heroImagePath` is absent (see getCardImageSrc).
  */
 export const blogPosts = defineCollections({
-  type: "doc",
-  dir: "content/blog",
-  schema: frontmatterSchema.extend({
-    authors: z.array(z.string()),
-    date: z.coerce.date(),
-    tags: z.array(z.string()).optional(),
-    heroImagePath: z.string().optional(),
-    metaTitle: z.string().optional(),
-    metaDescription: z.string().optional(),
-    metaImagePath: z.string().optional(),
-  }),
-  // Exposes page.data.getText("processed") for RSS and the future LLM endpoints.
-  postprocess: { includeProcessedMarkdown: true },
+    type: "doc",
+    dir: "content/blog",
+    schema: frontmatterSchema.extend({
+        authors: z.array(z.string()),
+        date: z.coerce.date(),
+        tags: z.array(z.string()).optional(),
+        heroImagePath: z.string().optional(),
+        metaTitle: z.string().optional(),
+        metaDescription: z.string().optional(),
+        metaImagePath: z.string().optional(),
+    }),
+    // Exposes page.data.getText("processed") for RSS and the future LLM endpoints.
+    postprocess: { includeProcessedMarkdown: true },
 });
 
 export default defineConfig({
-  plugins: [lastModified()],
-  // MDX pipeline mirrored 1:1 from the reference blog (my-assets/blog). These
-  // remark plugins MERGE with fumadocs' defaults (Shiki highlighting, heading
-  // slugs, TOC, GFM, code tabs): `:::` admonitions, image/basePath handling,
-  // .mdx includes, ```mermaid blocks, and npm→pnpm/yarn/bun command conversion.
-  mdxOptions: {
-    remarkPlugins: [
-      remarkDirective,
-      remarkDirectiveAdmonition,
-      [remarkImage, { useImport: false }],
-      remarkMdxFiles,
-      remarkMdxMermaid,
-    ],
-    remarkCodeTabOptions: { parseMdx: true },
-    remarkNpmOptions: {
-      persist: { id: "package-manager" },
-      // Custom package managers to add --bun flag for bunx commands.
-      packageManagers: [
-        {
-          command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "npm"),
-          name: "npm",
+    plugins: [lastModified()],
+    // MDX pipeline mirrored 1:1 from the reference blog (my-assets/blog). These
+    // remark plugins MERGE with fumadocs' defaults (Shiki highlighting, heading
+    // slugs, TOC, GFM, code tabs): `:::` admonitions, image/basePath handling,
+    // .mdx includes, ```mermaid blocks, and npm→pnpm/yarn/bun command conversion.
+    mdxOptions: {
+        remarkPlugins: [
+            remarkDirective,
+            remarkDirectiveAdmonition,
+            [remarkImage, { useImport: false }],
+            remarkMdxFiles,
+            remarkMdxMermaid,
+        ],
+        remarkCodeTabOptions: { parseMdx: true },
+        remarkNpmOptions: {
+            persist: { id: "package-manager" },
+            // Custom package managers to add --bun flag for bunx commands.
+            packageManagers: [
+                {
+                    command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "npm"),
+                    name: "npm",
+                },
+                {
+                    command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "pnpm"),
+                    name: "pnpm",
+                },
+                {
+                    command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "yarn"),
+                    name: "yarn",
+                },
+                {
+                    command: (cmd: string) => {
+                        const converted = convert(cmd.replace(/^npm init -y$/, "npm init"), "bun");
+                        if (!converted) return undefined;
+                        return converted.replace(/^bun x /, "bunx --bun ");
+                    },
+                    name: "bun",
+                },
+            ],
         },
-        {
-          command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "pnpm"),
-          name: "pnpm",
-        },
-        {
-          command: (cmd: string) => convert(cmd.replace(/^npm init -y$/, "npm init"), "yarn"),
-          name: "yarn",
-        },
-        {
-          command: (cmd: string) => {
-            const converted = convert(cmd.replace(/^npm init -y$/, "npm init"), "bun");
-            if (!converted) return undefined;
-            return converted.replace(/^bun x /, "bunx --bun ");
-          },
-          name: "bun",
-        },
-      ],
     },
-  },
 });

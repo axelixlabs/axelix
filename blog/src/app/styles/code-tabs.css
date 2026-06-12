@@ -5,13 +5,16 @@
 .axx-code-tabs [role="tab"] > div {
   display: none;
 }
+
 .axx-code-tabs [role="tab"][data-state="active"] {
   color: #448556;
 }
+
 .axx-code-tabs [role="tab"] .axx-tab-label {
   padding-bottom: 5px;
   border-bottom: 2px solid transparent;
 }
+
 .axx-code-tabs [role="tab"][data-state="active"] .axx-tab-label {
   border-bottom-color: #448556;
 }

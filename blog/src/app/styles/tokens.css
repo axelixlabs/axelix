@@ -14,12 +14,10 @@
   --c-green-700: #345c10;
   --c-green-800: #1f400a;
   --c-green-900: #173404;
-
   --c-blue: #2a6fdb;
   --c-blue-tint: #e6efff;
-
   --bg: #f4f4f6;
-  --paper: #ffffff;
+  --paper: #fff;
   --ink: #0f1410;
   --ink-2: #2a322b;
   --ink-3: #5a635c;
@@ -27,13 +25,10 @@
   --line: #0f141014;
   --line-2: #0f14101f;
   --line-3: #0f141033;
-
   --font: var(--font-golos), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --code: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
-
+  --code: var(--font-jetbrains), ui-monospace, "SFMono-Regular", menlo, monospace;
   --maxw: 1320px;
   --pad: clamp(20px, 4vw, 56px);
-
   --accent: var(--c-green-500);
   --accent-deep: var(--c-green-700);
 }

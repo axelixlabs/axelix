@@ -1,0 +1,28 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    column-gap: 8px;
+
+    @media (width <= 768px) {
+        display: none;
+    }
+}
+
+.Link {
+    font-size: 13.5px;
+    color: var(--axelix-ink-2);
+    padding: 4px 12px;
+    border-radius: 999px;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--axelix-green-100) 60%, transparent);
+        color: var(--axelix-ink);
+    }
+}
+
+.ActiveLink {
+    background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
+    color: var(--axelix-green-800);
+}

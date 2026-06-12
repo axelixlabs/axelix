@@ -1,0 +1,13 @@
+@import url("./styles/tokens.css");
+@import url("./styles/base.css");
+@import url("./styles/feed.css");
+@import url("./styles/index-feed.css");
+@import url("./styles/article.css");
+@import url("./styles/code-tabs.css");
+@import url("./styles/motion.css");
+
+.WideContainer {
+   margin: 0 auto;
+   max-width: 1400px;
+   padding-inline: 25px;
+}

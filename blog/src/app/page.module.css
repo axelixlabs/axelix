@@ -5,6 +5,7 @@
   overflow: hidden;
   text-align: center;
 }
+
 /* Carried verbatim from hero.css; the .Eyebrow markup is not currently
    rendered by the home page, so these rules are inert (kept for parity). */
 .BlogHero .Eyebrow {
@@ -22,6 +23,7 @@
   border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   margin-bottom: 22px;
 }
+
 .BlogHero .Eyebrow::before {
   content: "";
   width: 6px;
@@ -30,6 +32,7 @@
   background: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
+
 .BlogHero h1 {
   margin: 0;
   font-weight: 500;
@@ -39,9 +42,11 @@
   color: var(--ink);
   text-wrap: balance;
 }
+
 .BlogHero h1 .Accent {
   color: var(--accent);
 }
+
 .BlogHero p.Lede {
   margin: 22px 0 0;
   font-size: clamp(16px, 1.4vw, 19px);
@@ -52,8 +57,9 @@
   margin-right: auto;
   text-wrap: pretty;
 }
+
 /* Moved here from index-feed.css (was a cross-file override). */
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .BlogHero {
     padding: 40px 0 4px;
   }

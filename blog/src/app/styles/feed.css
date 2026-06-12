@@ -8,11 +8,13 @@
   font-weight: 500;
   padding: 5px 12px;
   border-radius: 999px;
+
   /* Inactive chip: no fill — only the dot and text carry the tag color (--cat). */
   color: color-mix(in srgb, var(--cat, var(--accent)) 60%, var(--ink));
   background: transparent;
   border: 1px solid var(--line-2);
 }
+
 .tag::before {
   content: "";
   width: 7px;
@@ -20,16 +22,19 @@
   border-radius: 50%;
   background: var(--cat, var(--accent));
 }
+
 a.tag-link {
   text-decoration: none;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
+
 a.tag-link:hover {
   color: color-mix(in srgb, var(--cat, var(--accent)) 75%, var(--ink));
   border-color: color-mix(in srgb, var(--cat, var(--accent)) 45%, transparent);
   background: color-mix(in srgb, var(--cat, var(--accent)) 18%, transparent);
 }
+
 /* The "+N" overflow chip carries no tag color — keep it neutral. */
 .tag.tag-more {
   color: var(--ink-3);
@@ -39,9 +44,11 @@ a.tag-link:hover {
   font-size: 11.5px;
   letter-spacing: 0.02em;
 }
+
 .tag.tag-more::before {
   display: none;
 }
+
 .avatar {
   width: 26px;
   height: 26px;
@@ -55,9 +62,11 @@ a.tag-link:hover {
   font-weight: 500;
   color: #fff;
   letter-spacing: 0.02em;
+
   /* When the avatar is the convention <img> photo, crop it to the circle. */
   object-fit: cover;
 }
+
 .authors {
   display: flex;
   align-items: center;
@@ -65,16 +74,20 @@ a.tag-link:hover {
   font-size: 13px;
   color: var(--ink-2);
 }
+
 .authors .avatars {
   display: inline-flex;
 }
+
 .authors .avatars .avatar {
   margin-left: -8px;
   box-shadow: 0 0 0 2px var(--paper);
 }
+
 .authors .avatars .avatar:first-child {
   margin-left: 0;
 }
+
 .authors .who {
   font-weight: 500;
 }

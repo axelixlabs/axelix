@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+export interface INavLink {
+    href: string;
+    label: string;
+}
+
+export interface IAuthor {
+    name: string;
+    /** URL-safe id derived from the name; also the avatar filename. */
+    slug: string;
+    /** Fallback circle text when the photo is missing. */
+    initials: string;
+    /** Fallback circle color (deterministic from the name). */
+    color: string;
+}
+
+/** Shape consumed by the home-page cards/rows. */
+export interface IBlogCardItem {
+    slug: string;
+    /** In-app path (no basePath); pass straight to next/link. */
+    href: string;
+    title: string;
+    description: string;
+    tags: string[];
+    authors: string[];
+    /** ISO date string. */
+    date: string;
+    /** Hero image src (basePath-prefixed) or null → no image yet. */
+    coverSrc: string | null;
+    readingMinutes: number;
+}
+
+export interface IBlogPostingInput {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    modified?: string;
+    authors: string[];
+    image?: string | null;
+}

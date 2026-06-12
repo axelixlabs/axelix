@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
 }
+
 html,
 body {
   margin: 0;
@@ -12,20 +13,24 @@ body {
   font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
 }
+
 html {
   scroll-behavior: smooth;
 }
+
 a {
   color: inherit;
   text-decoration: none;
 }
+
 img,
 svg {
   display: block;
   max-width: 100%;
 }
+
 button {
   font: inherit;
   color: inherit;
@@ -34,15 +39,18 @@ button {
   padding: 0;
   cursor: pointer;
 }
+
 ::selection {
   background: var(--accent);
   color: #fff;
 }
+
 .wrap {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 var(--pad);
 }
+
 .mono {
   font-family: var(--code);
 }
