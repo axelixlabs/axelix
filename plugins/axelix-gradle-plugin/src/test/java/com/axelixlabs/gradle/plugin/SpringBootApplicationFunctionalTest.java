@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.jar.JarFile;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
@@ -90,33 +91,36 @@ class SpringBootApplicationFunctionalTest {
     void springBoot4GeneratesProfilerReport() throws IOException {
         // given.
         writeSpringBootApplicationSources();
-        writeFile(
-                "build.gradle",
-                "plugins {\n"
-                        + "    id 'com.axelixlabs.axelix'\n"
-                        + "}\n"
-                        + "apply plugin: 'java'\n"
-                        + "\n"
-                        + "repositories { mavenCentral() }\n"
-                        + "\n"
-                        + "dependencies {\n"
-                        + "    implementation platform('org.springframework.boot:spring-boot-dependencies:"
-                        + SPRING_BOOT_4_VERSION
-                        + "')\n"
-                        + "    implementation 'org.springframework.boot:spring-boot-starter'\n"
-                        + "    testImplementation 'org.springframework.boot:spring-boot-starter-test'\n"
-                        // Gradle 9 requires the launcher on the test runtime classpath; the Boot
-                        // BOM supplies its version via the imported junit-bom.
-                        + "    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'\n"
-                        + "}\n"
-                        + "\n"
-                        + "test { useJUnitPlatform() }\n");
+        writeFile("build.gradle", springBoot4BuildScript());
 
         // when.
         BuildResult result = createRunner("test", "--stacktrace").build();
 
         // then.
         assertProfilerReportGenerated(result);
+    }
+
+    @Test
+    void buildCopiesProfilerReportOntoApplicationClasspathAndIntoJar() throws IOException {
+        // given.
+        writeSpringBootApplicationSources();
+        writeFile("build.gradle", springBoot4BuildScript());
+
+        // when.
+        BuildResult result = createRunner("build", "--stacktrace").build();
+
+        // then.
+        assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome())
+                .isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(projectDir.resolve("build/resources/main/spring-test-profiler/latest.html"))
+                .exists();
+
+        Path jar = projectDir.resolve("build/libs/axelix-spring-boot-test.jar");
+        assertThat(jar).exists();
+        try (JarFile jarFile = new JarFile(jar.toFile())) {
+            assertThat(jarFile.getEntry("spring-test-profiler/latest.html")).isNotNull();
+        }
     }
 
     private GradleRunner createRunner(String... arguments) {
@@ -131,6 +135,28 @@ class SpringBootApplicationFunctionalTest {
         assertThat(result.task(":generateAxelixSpringFactories").getOutcome())
                 .isEqualTo(TaskOutcome.SUCCESS);
         assertThat(projectDir.resolve("build/spring-test-profiler/latest.html")).exists();
+    }
+
+    private static String springBoot4BuildScript() {
+        return "plugins {\n"
+                + "    id 'com.axelixlabs.axelix'\n"
+                + "}\n"
+                + "apply plugin: 'java'\n"
+                + "\n"
+                + "repositories { mavenCentral() }\n"
+                + "\n"
+                + "dependencies {\n"
+                + "    implementation platform('org.springframework.boot:spring-boot-dependencies:"
+                + SPRING_BOOT_4_VERSION
+                + "')\n"
+                + "    implementation 'org.springframework.boot:spring-boot-starter'\n"
+                + "    testImplementation 'org.springframework.boot:spring-boot-starter-test'\n"
+                // Gradle 9 requires the launcher on the test runtime classpath; the Boot
+                // BOM supplies its version via the imported junit-bom.
+                + "    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'\n"
+                + "}\n"
+                + "\n"
+                + "test { useJUnitPlatform() }\n";
     }
 
     private void writeSpringBootApplicationSources() throws IOException {
