@@ -1,0 +1,54 @@
+.MainWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.DocsLink,
+.GitHubIcon,
+.BlogLink {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-family: var(--axelix-font);
+    font-size: 12.5px;
+    line-height: 1;
+    font-weight: 500;
+}
+
+.MainWrapperFullWidth {
+    justify-content: stretch;
+}
+
+.LinkFullWidth {
+    flex: 1;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 9px 12px;
+}
+
+.DocsLink {
+    border: 1px solid color-mix(in srgb, var(--axelix-ink) 18%, transparent);
+    color: var(--axelix-ink);
+    transition: background-color 0.3s, border-color 0.3s;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--axelix-ink) 6%, transparent);
+        border-color: color-mix(in srgb, var(--axelix-ink) 35%, transparent);
+    }
+}
+
+.GitHubIcon {
+    column-gap: 8px;
+    background-color: #0f1410;
+    color: #fff;
+    border: 1px solid #0f1410;
+}
+
+.BlogLink {
+    background: color-mix(in srgb, var(--c-green-500) 14%, transparent);
+    border-color: color-mix(in srgb, var(--c-green-500) 30%, transparent);
+    color: var(--c-green-800);
+}

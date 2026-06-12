@@ -7,15 +7,19 @@
   border-top: 1px solid var(--line-2);
   transition: background 0.18s;
 }
+
 .PostRow:last-child {
   border-bottom: 1px solid var(--line-2);
 }
+
 .PostRow:hover h3 {
   color: var(--accent-deep);
 }
+
 .PostRow:hover .Rcover img {
   transform: scale(1.04);
 }
+
 .PostRow .Rcover {
   width: 100%;
   aspect-ratio: 16/10;
@@ -25,6 +29,7 @@
   flex: 0 0 auto;
   background: var(--c-green-900);
 }
+
 .PostRow .Rcover img {
   position: absolute;
   inset: 0;
@@ -33,16 +38,19 @@
   object-fit: cover;
   transition: transform 0.4s ease;
 }
+
 /* Neutral placeholder shown until a post's PNG/SVG cover is added. */
 .PostRow .Rcover.CoverPh {
   background: color-mix(in srgb, var(--ink) 7%, var(--paper));
 }
+
 .PostRow .Rbody {
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
 }
+
 .PostRow h3 {
   margin: 0;
   font-size: clamp(21px, 2vw, 26px);
@@ -53,6 +61,7 @@
   transition: color 0.15s;
   text-wrap: pretty;
 }
+
 .PostRow p.Exc {
   margin: 0;
   font-size: 14.5px;
@@ -61,23 +70,28 @@
   text-wrap: pretty;
   max-width: 54ch;
 }
+
 .PostRow :global(.authors) {
   margin-top: 6px;
 }
-@media (max-width: 720px) {
+
+@media (width <= 720px) {
   .PostRow {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 22px 0;
   }
+
   .PostRow .Rcover {
     order: -1;
   }
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
   .PostRow {
     grid-template-columns: 1fr;
   }
+
   .PostRow .Rcover {
     display: none;
   }

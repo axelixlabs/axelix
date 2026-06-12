@@ -7,12 +7,14 @@
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
+
 .Toolbar .Row {
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
 }
+
 .Cats {
   display: flex;
   align-items: center;
@@ -21,6 +23,7 @@
   flex: 1;
   min-width: 0;
 }
+
 .Cat {
   display: inline-flex;
   align-items: center;
@@ -29,6 +32,7 @@
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
+
   /* Inactive chip: no fill — only the dot and text carry the tag color (--cat). */
   color: color-mix(in srgb, var(--cat, var(--accent)) 60%, var(--ink));
   background: transparent;
@@ -36,6 +40,7 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
+
 .Cat .Cdot {
   width: 7px;
   height: 7px;
@@ -43,16 +48,19 @@
   background: var(--cat, currentColor);
   opacity: 0.85;
 }
+
 .Cat:hover {
   background: color-mix(in srgb, var(--cat, var(--accent)) 18%, transparent);
   border-color: color-mix(in srgb, var(--cat, var(--accent)) 40%, transparent);
   color: color-mix(in srgb, var(--cat, var(--accent)) 75%, var(--ink));
 }
+
 .Cat.Active {
   background: var(--ink);
   border-color: var(--ink);
   color: #fff;
 }
+
 /* The selected tag's dot pulses (auto-disabled under prefers-reduced-motion
    via motion.css). */
 @keyframes tagDotPulse {
@@ -60,10 +68,12 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.2;
   }
 }
+
 .Cat.Active .Cdot {
   opacity: 1;
   animation: tagDotPulse 1s ease-in-out infinite;
@@ -74,10 +84,12 @@
   position: relative;
   display: inline-flex;
 }
+
 .CatMoreTrigger {
   cursor: pointer;
   font: inherit;
 }
+
 .CatMoreTrigger .Chev {
   width: 14px;
   height: 14px;
@@ -85,17 +97,21 @@
   color: var(--ink-4);
   transition: transform 0.15s;
 }
+
 .CatMoreTrigger.Active .Chev {
-  color: currentColor;
+  color: currentcolor;
 }
+
 .CatMore.Open .CatMoreTrigger .Chev {
   transform: rotate(180deg);
 }
+
 .CatMore .CatMenu {
   left: 0;
   right: auto;
   min-width: 190px;
 }
+
 .Search {
   display: inline-flex;
   align-items: center;
@@ -108,32 +124,38 @@
   border: 1px solid var(--line-2);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
+
 .Search:focus-within,
 .Search:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
   outline: none;
 }
+
 /* The search box is now a button that opens the full-text dialog. */
 button.Search {
   cursor: pointer;
   font: inherit;
   text-align: left;
 }
+
 .Search:hover {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
 }
+
 .Search svg {
   width: 15px;
   height: 15px;
   color: var(--ink-4);
   flex: 0 0 auto;
 }
+
 .Search .Ph {
   flex: 1;
   font-size: 14px;
   color: var(--ink-4);
 }
+
 .Search kbd {
   flex: 0 0 auto;
   font-family: var(--code);
@@ -145,6 +167,7 @@ button.Search {
   border: 1px solid var(--line-2);
   color: var(--ink-4);
 }
+
 /* ---- Mobile tag selector (hidden on desktop) ---- */
 .CatSelect {
   display: none;
@@ -152,6 +175,7 @@ button.Search {
   flex: 1;
   min-width: 0;
 }
+
 .CatTrigger {
   display: inline-flex;
   align-items: center;
@@ -168,6 +192,7 @@ button.Search {
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
+
 .CatTrigger .Cdot {
   width: 8px;
   height: 8px;
@@ -175,6 +200,7 @@ button.Search {
   background: var(--cat, currentColor);
   flex: 0 0 auto;
 }
+
 .CatTrigger .Lbl {
   flex: 1;
   text-align: left;
@@ -182,6 +208,7 @@ button.Search {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .CatTrigger .Chev {
   width: 16px;
   height: 16px;
@@ -189,13 +216,16 @@ button.Search {
   flex: 0 0 auto;
   transition: transform 0.15s;
 }
+
 .CatSelect.Open .CatTrigger {
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
+
 .CatSelect.Open .CatTrigger .Chev {
   transform: rotate(180deg);
 }
+
 .CatMenu {
   position: absolute;
   top: calc(100% + 6px);
@@ -209,8 +239,9 @@ button.Search {
   border-radius: 14px;
   background: var(--paper);
   border: 1px solid var(--line-2);
-  box-shadow: 0 12px 30px -12px rgba(15, 20, 16, 0.28);
+  box-shadow: 0 12px 30px -12px rgb(15 20 16 / 28%);
 }
+
 .CatOpt {
   display: flex;
   align-items: center;
@@ -222,6 +253,7 @@ button.Search {
   color: color-mix(in srgb, var(--cat, var(--accent)) 60%, var(--ink));
   transition: background 0.12s, color 0.12s;
 }
+
 .CatOpt .Cdot {
   width: 8px;
   height: 8px;
@@ -229,20 +261,23 @@ button.Search {
   background: var(--cat, currentColor);
   flex: 0 0 auto;
 }
+
 .CatOpt:hover {
   background: color-mix(in srgb, var(--cat, var(--accent)) 12%, transparent);
   color: color-mix(in srgb, var(--cat, var(--accent)) 75%, var(--ink));
 }
+
 .CatOpt.Active {
   background: var(--ink);
   color: #fff;
 }
+
 .CatOpt.Active .Cdot {
   animation: tagDotPulse 1s ease-in-out infinite;
 }
 
 /* Tablet: keep the pill row, let the search box fill the wrapped line. */
-@media (max-width: 760px) and (min-width: 641px) {
+@media (width <= 760px) and (width >= 641px) {
   .Search {
     width: auto;
     flex: 1;
@@ -250,29 +285,35 @@ button.Search {
 }
 
 /* Phone: pills → selector, search → magnifier-only button on the right. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .Toolbar .Row {
     flex-wrap: nowrap;
     gap: 10px;
   }
+
   .Cats {
     display: none;
   }
+
   .CatSelect {
     display: block;
   }
+
   .Tools {
     flex: 0 0 auto;
   }
+
   .Search {
     width: auto;
     flex: 0 0 auto;
     padding: 9px;
   }
+
   .Search svg {
     width: 16px;
     height: 16px;
   }
+
   .Search .Ph,
   .Search kbd {
     display: none;

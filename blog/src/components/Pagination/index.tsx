@@ -1,83 +1,115 @@
-import Link from "next/link";
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 import { getPaginationSequence } from "@/lib/pagination";
 import { SHOW_ALL } from "@/lib/tags";
+
+import Link from "next/link";
+
 import styles from "./styles.module.css";
 
 function hrefFor(tag: string, page: number): string {
-  const params = new URLSearchParams();
-  if (tag !== SHOW_ALL) params.set("tag", tag);
-  if (page > 1) params.set("page", String(page));
-  const query = params.toString();
-  return query ? `/?${query}` : "/";
+    const params = new URLSearchParams();
+    if (tag !== SHOW_ALL) params.set("tag", tag);
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `/?${query}` : "/";
 }
 
 interface IProps {
-  tag: string;
-  currentPage: number;
-  totalPages: number;
+    tag: string;
+    currentPage: number;
+    totalPages: number;
 }
 
 const PREV_ICON = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 6l-6 6l6 6" />
-  </svg>
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M15 6l-6 6l6 6" />
+    </svg>
 );
 const NEXT_ICON = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 6l6 6l-6 6" />
-  </svg>
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M9 6l6 6l-6 6" />
+    </svg>
 );
 
 export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
-  if (totalPages <= 1) return null;
-  const sequence = getPaginationSequence(totalPages, currentPage);
-  const prevDisabled = currentPage <= 1;
-  const nextDisabled = currentPage >= totalPages;
+    if (totalPages <= 1) return null;
+    const sequence = getPaginationSequence(totalPages, currentPage);
+    const prevDisabled = currentPage <= 1;
+    const nextDisabled = currentPage >= totalPages;
 
-  return (
-    <nav className={styles.Pager} aria-label="Pagination">
-      {prevDisabled ? (
-        <span className={styles.PgArrow} aria-disabled="true">
-          {PREV_ICON}
-          <span>Prev</span>
-        </span>
-      ) : (
-        <Link className={styles.PgArrow} href={hrefFor(tag, currentPage - 1)} aria-label="Previous page">
-          {PREV_ICON}
-          <span>Prev</span>
-        </Link>
-      )}
+    return (
+        <nav className={styles.Pager}>
+            {prevDisabled ? (
+                <span className={styles.PgArrow}>
+                    {PREV_ICON}
+                    <span>Prev</span>
+                </span>
+            ) : (
+                <Link className={styles.PgArrow} href={hrefFor(tag, currentPage - 1)}>
+                    {PREV_ICON}
+                    <span>Prev</span>
+                </Link>
+            )}
 
-      <div className={styles.PgNums}>
-        {sequence.map((entry, index) =>
-          entry === "ellipsis" ? (
-            <span key={`e-${index}`} className={styles.PgEllipsis}>
-              …
-            </span>
-          ) : (
-            <Link
-              key={entry}
-              className={`${styles.PgNum}${entry === currentPage ? ` ${styles.Active}` : ""}`}
-              href={hrefFor(tag, entry)}
-              aria-current={entry === currentPage ? "page" : undefined}
-            >
-              {String(entry).padStart(2, "0")}
-            </Link>
-          ),
-        )}
-      </div>
+            <div className={styles.PgNums}>
+                {sequence.map((entry, index) =>
+                    entry === "ellipsis" ? (
+                        <span key={`e-${index}`} className={styles.PgEllipsis}>
+                            …
+                        </span>
+                    ) : (
+                        <Link
+                            key={entry}
+                            className={`${styles.PgNum}${entry === currentPage ? ` ${styles.Active}` : ""}`}
+                            href={hrefFor(tag, entry)}
+                        >
+                            {String(entry).padStart(2, "0")}
+                        </Link>
+                    ),
+                )}
+            </div>
 
-      {nextDisabled ? (
-        <span className={styles.PgArrow} aria-disabled="true">
-          <span>Next</span>
-          {NEXT_ICON}
-        </span>
-      ) : (
-        <Link className={styles.PgArrow} href={hrefFor(tag, currentPage + 1)} aria-label="Next page">
-          <span>Next</span>
-          {NEXT_ICON}
-        </Link>
-      )}
-    </nav>
-  );
+            {nextDisabled ? (
+                <span className={styles.PgArrow}>
+                    <span>Next</span>
+                    {NEXT_ICON}
+                </span>
+            ) : (
+                <Link className={styles.PgArrow} href={hrefFor(tag, currentPage + 1)}>
+                    <span>Next</span>
+                    {NEXT_ICON}
+                </Link>
+            )}
+        </nav>
+    );
 };

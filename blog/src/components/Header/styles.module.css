@@ -1,0 +1,38 @@
+.MainWrapper {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+.InnerWrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: rgb(255 255 255 / 55%);
+  border: 1px solid color-mix(in srgb, var(--axelix-green-500) 22%, transparent);
+  backdrop-filter: saturate(160%) blur(18px);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 80%, transparent) inset,
+    0 1px 0 color-mix(in srgb, var(--axelix-green-500) 10%, transparent);
+  margin: 0 auto;
+
+  @media (width <=768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ExternalLinksWrapper {
+  @media (width <= 768px) {
+    display: none;
+  }
+}
+
+.LogoIcon {
+  width: 120px;
+}
