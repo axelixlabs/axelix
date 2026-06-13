@@ -27,7 +27,6 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.bundling.Jar;
 
 /**
@@ -53,7 +52,7 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     static final String PROFILER_DEPENDENCY =
             "digital.pragmatech.testing:spring-test-profiler:0.1.2";
 
-    static final String REQUIRED_THYMELEAF_VERSION = "3.1.3.RELEASE";
+    static final String THYMELEAF_DEPENDENCY = "org.thymeleaf:thymeleaf:3.1.3.RELEASE";
 
     static final String SPRING_FACTORIES_CONTENT =
             "org.springframework.test.context.TestExecutionListener=\\\n"
@@ -68,6 +67,7 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
     private void configure(Project project) {
         project.getDependencies().add("testRuntimeOnly", PROFILER_DEPENDENCY);
+        project.getDependencies().add("testImplementation", THYMELEAF_DEPENDENCY);
 
         final File generatedDir = new File(BuildDirCompat.buildDir(project), "generated/axelix");
 
@@ -91,8 +91,6 @@ public class AxelixGradlePlugin implements Plugin<Project> {
                 .add("testRuntimeOnly", project.files(generatedDir).builtBy(generateTask));
 
         configureReportCopy(project);
-
-        project.afterEvaluate(AxelixGradlePlugin::counteractThymeleafDowngrade);
     }
 
     /**
@@ -127,40 +125,6 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
         project.getTasks().getByName("build").dependsOn(copyTask);
         project.getTasks().withType(Jar.class).all(jar -> jar.mustRunAfter(copyTask));
-    }
-
-    /**
-     * The Spring Boot 2 BOM manages Thymeleaf at 3.0.x, and when it is applied through the
-     * {@code io.spring.dependency-management} plugin it overrides (Maven semantics) the 3.1.x
-     * version that spring-test-profiler needs to render its HTML report — the report generation
-     * then dies silently in its JVM shutdown hook. Bump Thymeleaf back, but only on the test
-     * runtime classpath and only when something pinned it below 3.1: Spring Boot 3/4 BOMs already
-     * manage 3.1+, and without a forcing BOM Gradle's own conflict resolution picks 3.1.x anyway,
-     * so this rule is a no-op everywhere except Spring Boot 2.
-     *
-     * <p>Registered in {@code afterEvaluate} so the rule runs after (and thus overrides) the
-     * dependency-management plugin's own resolution rule.
-     */
-    private static void counteractThymeleafDowngrade(Project project) {
-        Configuration testRuntimeClasspath =
-                project.getConfigurations().findByName("testRuntimeClasspath");
-        if (testRuntimeClasspath == null) {
-            return;
-        }
-        testRuntimeClasspath
-                .getResolutionStrategy()
-                .eachDependency(
-                        details -> {
-                            if ("org.thymeleaf".equals(details.getTarget().getGroup())
-                                    && "thymeleaf".equals(details.getTarget().getName())
-                                    && isOlderThanThymeleaf31(details.getTarget().getVersion())) {
-                                details.useVersion(REQUIRED_THYMELEAF_VERSION);
-                            }
-                        });
-    }
-
-    private static boolean isOlderThanThymeleaf31(String version) {
-        return version != null && (version.startsWith("2.") || version.startsWith("3.0."));
     }
 
     private static void writeSpringFactories(File generatedDir) {

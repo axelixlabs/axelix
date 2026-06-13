@@ -47,8 +47,8 @@ class SpringBootApplicationFunctionalTest {
 
     /**
      * The realistic Spring Boot 2 setup: the io.spring.dependency-management plugin applies the
-     * Boot BOM with Maven semantics, downgrading the profiler's Thymeleaf to 3.0.x — without the
-     * plugin's counteracting resolution rule the report silently fails to render.
+     * Boot BOM with Maven semantics, managing Thymeleaf at 3.0.x — without the plugin's explicit
+     * Thymeleaf 3.1 test dependency the report silently fails to render.
      */
     @Test
     void springBoot2WithDependencyManagementGeneratesProfilerReport() throws IOException {
