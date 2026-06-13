@@ -28,6 +28,11 @@ FROM eclipse-temurin:25-jre-alpine AS final
 
 VOLUME /tmp
 
+RUN apk add --no-cache --upgrade \
+    "openssl>=3.5.7-r0" \
+    "libssl3>=3.5.7-r0" \
+    "libcrypto3>=3.5.7-r0"
+
 # Configure non-root user
 RUN adduser -S axelix
 USER axelix
