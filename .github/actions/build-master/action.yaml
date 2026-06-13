@@ -6,8 +6,7 @@ inputs:
     default: "false"
   gradle-cache-encryption-key:
     description: Gradle configuration cache encryption key
-    required: false
-    default: ""
+    required: true
 
 runs:
   using: composite
