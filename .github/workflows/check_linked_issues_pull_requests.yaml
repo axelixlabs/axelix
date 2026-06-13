@@ -6,7 +6,6 @@ on:
       - 'master/**'
       - 'sbs/**'
       - 'common/**'
-      - 'front-end/**'
     branches: [ master ]
 
 concurrency:

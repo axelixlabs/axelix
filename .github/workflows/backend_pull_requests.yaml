@@ -2,11 +2,28 @@ name: Backend Pull Requests
 
 on:
   pull_request:
+    branches: [ master ]
     paths:
+      # Build logic, and application modules
       - 'master/**'
+      - '!master/front-end/**'
       - 'sbs/**'
       - 'common/**'
-    branches: [ master ]
+
+      # Core Gradle build configuration
+      - 'buildSrc/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+
+      # Code quality, formatting, and license configurations
+      - 'pmd.ruleset.xml'
+      - '.editorconfig'
+      - 'LICENSE'
+      - 'LICENSE_HEADER'
 
 concurrency:
   # Unique ID of the concurrency group, which cancels an already running workflow for this PR (if any)
@@ -40,12 +57,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Loading Secrets
-        uses: ./.github/actions/bitwarden
-        with:
-          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
       - name: Build Backend
         uses: ./.github/actions/build-master
         with:
-          gradle-cache-enryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
+          gradle-cache-encryption-key: ''

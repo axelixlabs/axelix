@@ -4,9 +4,10 @@ inputs:
     description: Whether to deploy the built JAR into Nexus or not
     required: false
     default: "false"
-  gradle-cache-enryption-key:
-    description: Gradle cache encryption key
+  gradle-cache-encryption-key:
+    description: Gradle configuration cache encryption key
     required: true
+
 runs:
   using: composite
   steps:
@@ -24,8 +25,8 @@ runs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
-        # Configuration Cache in encrypted with this key
-        cache-encryption-key: ${{ inputs.gradle-cache-enryption-key }}
+        # Configuration Cache in encrypted with this key.
+        cache-encryption-key: ${{ inputs.gradle-cache-encryption-key }}
         # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
         cache-read-only: false
 

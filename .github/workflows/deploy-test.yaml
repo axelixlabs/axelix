@@ -10,15 +10,33 @@ on:
         default: 'main'
   push:
     branches: [ master ]
-    paths-ignore:
-      - 'infra/**'
+    paths:
+      # CI/CD configuration
+      - '.github/**'
+
+      # Docker
+      - 'Dockerfile'
+
+      # Build logic, and application modules
+      - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
+      - 'common/**'
+      - 'master/**'
+      - 'sbs/**'
+
+      # Core Gradle build configuration
+      - 'buildSrc/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+
+      # Code quality, formatting, and license configurations
+      - 'pmd.ruleset.xml'
       - '.editorconfig'
-      - '.gitignore'
-      - 'docs'
-      - 'website'
-      - '.cursor'
-      - '.coderabbit.yaml'
-      - 'CONTRIBUTING.adoc'
+      - 'LICENSE'
+      - 'LICENSE_HEADER'
 
 jobs:
   build-deploy-source:
@@ -57,7 +75,7 @@ jobs:
         uses: ./.github/actions/build-master
         with:
           deploy-to-nexus: true
-          gradle-cache-enryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
+          gradle-cache-encryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
