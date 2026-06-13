@@ -75,6 +75,7 @@ jobs:
         uses: ./.github/actions/build-master
         with:
           deploy-to-nexus: true
+          gradle-cache-encryption-key: ${{ env.SANDBOX_GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
