@@ -21,10 +21,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
@@ -201,22 +199,12 @@ class AxelixGradlePluginFunctionalTest {
         if (override != null && !override.isEmpty()) {
             return override;
         }
-        Path candidates = Paths.get(System.getProperty("user.home"), ".sdkman/candidates/java");
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(candidates, "8.*")) {
-            for (Path candidate : stream) {
-                if (Files.isExecutable(candidate.resolve("bin/java"))) {
-                    return candidate.toString();
-                }
-            }
-        } catch (IOException ignored) {
-            // Fall through to the failure below.
-        }
         throw new IllegalStateException(
                 "No JDK 8 found for the Gradle "
                         + MIN_GRADLE_VERSION
                         + " functional tests. Install Liberica JDK 8 via sdkman:\n"
                         + "  source ~/.sdkman/bin/sdkman-init.sh && echo n | sdk install java"
                         + " 8.0.492-librca\n"
-                        + "or point AXELIX_TEST_JDK8_HOME at an existing JDK 8 installation.");
+                        + "and point AXELIX_TEST_JDK8_HOME at the JDK 8 installation.");
     }
 }
