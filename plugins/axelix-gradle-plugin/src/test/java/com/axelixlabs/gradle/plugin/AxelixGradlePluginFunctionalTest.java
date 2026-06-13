@@ -78,7 +78,10 @@ class AxelixGradlePluginFunctionalTest {
         assertThat(result.task(":generateAxelixSpringFactories").getOutcome())
                 .isEqualTo(TaskOutcome.SUCCESS);
         assertThat(result.getOutput()).contains("spring-test-profiler-0.1.2.jar");
-        assertThat(result.getOutput().lines().filter(line -> line.startsWith("TRC>> ")))
+        assertThat(
+                        result.getOutput().lines()
+                                .filter(line -> line.startsWith("TRC>> "))
+                                .map(line -> line.replace('\\', '/')))
                 .anySatisfy(line -> assertThat(line).endsWith("build/generated/axelix"));
 
         Path springFactories =
