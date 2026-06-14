@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ExclamationCircleFilled } from "@ant-design/icons";
-
-import { App, Button, Modal } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,7 +23,7 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
@@ -38,6 +36,7 @@ const Caches = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [search, setSearch] = useState<string>("");
 
@@ -57,11 +56,9 @@ const Caches = () => {
     }
 
     const clearAllCachesClickHandler = (): void => {
-        Modal.confirm({
-            icon: <ExclamationCircleFilled />,
+        confirmAction({
             title: t("Caches.clearAllCachesTitle"),
             content: t("Caches.clearAllCachesDescription"),
-            centered: true,
             onOk() {
                 if (instanceId) {
                     setClearAllCaches(StatelessRequest.loading());

@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ExclamationCircleFilled, ReloadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 
-import { App, Button, Modal } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,7 +25,7 @@ import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip, TooltipWithCopy } from "components";
 import { extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { clearCacheData } from "services";
 
@@ -51,17 +51,16 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [clearSingleCache, setClearSingleCache] = useState(StatelessRequest.inactive());
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
 
-        Modal.confirm({
-            icon: <ExclamationCircleFilled />,
+        confirmAction({
             title: t("Caches.clearThisCacheTitle"),
             content: t("Caches.clearThisCacheDescription"),
-            centered: true,
             onOk() {
                 setClearSingleCache(StatelessRequest.loading());
                 clearCacheData({

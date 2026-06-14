@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ExclamationCircleFilled } from "@ant-design/icons";
-
-import { App, Button, Modal } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,7 +23,7 @@ import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
 import { forceRunTask } from "services";
 
@@ -44,15 +42,14 @@ export const ForceRunTask = ({ trigger }: IProps) => {
 
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [forceRunTaskData, setForceRunTaskData] = useState(StatelessRequest.inactive());
 
     const forceRunClickHandler = (): void => {
-        Modal.confirm({
-            icon: <ExclamationCircleFilled />,
+        confirmAction({
             title: t("ScheduledTasks.runThisTaskTitle"),
             content: t("ScheduledTasks.runThisTaskDescription"),
-            centered: true,
             onOk() {
                 setForceRunTaskData(StatelessRequest.loading());
 

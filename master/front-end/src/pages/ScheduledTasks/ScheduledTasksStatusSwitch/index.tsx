@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ExclamationCircleFilled } from "@ant-design/icons";
-
-import { App, Modal, Switch } from "antd";
+import { App, Switch } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,7 +23,7 @@ import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type IErrorResponse, type IRunnable, StatelessRequest } from "models";
 import { updateScheduledTasksStatus } from "services";
 
@@ -42,19 +40,18 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
 
     const switchTaskStatus = () => {
-        Modal.confirm({
-            icon: <ExclamationCircleFilled />,
+        confirmAction({
             title: runnable.enabled
                 ? t("ScheduledTasks.disableThisTaskTitle")
                 : t("ScheduledTasks.enableThisTaskTitle"),
             content: runnable.enabled
                 ? t("ScheduledTasks.disableThisTaskDescription")
                 : t("ScheduledTasks.enableThisTaskDescription"),
-            centered: true,
             onOk() {
                 setMutationRequest(StatelessRequest.loading());
 
