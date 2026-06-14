@@ -47,7 +47,7 @@ final class SpringCloudVersionResolver {
     SpringCloudVersionResolver() {}
 
     @Nullable
-    String resolve() {
+    public String resolve() {
         Class<?> springCloudCommonsClass = loadSpringCloudCommonsClass();
         if (springCloudCommonsClass == null) {
             return null;

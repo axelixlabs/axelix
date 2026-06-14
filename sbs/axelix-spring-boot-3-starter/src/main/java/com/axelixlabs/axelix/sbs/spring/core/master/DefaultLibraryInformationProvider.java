@@ -29,21 +29,18 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNul
  * Default implementation {@link LibraryInformationProvider}.
  *
  * @author Sergey Cherkasov
+ * @author Aleksei Ermakov
+ * @author Mikhail Polivakha
  */
 public class DefaultLibraryInformationProvider implements LibraryInformationProvider {
 
     private static final ClassLoader CLASS_LOADER = DefaultLibraryInformationProvider.class.getClassLoader();
-
     private static final boolean KOTLIN_VERSION_PRESENT = ClassUtils.isPresent("kotlin.KotlinVersion", CLASS_LOADER);
 
     private final SpringCloudVersionResolver springCloudVersionResolver;
 
     public DefaultLibraryInformationProvider() {
-        this(new SpringCloudVersionResolver());
-    }
-
-    DefaultLibraryInformationProvider(SpringCloudVersionResolver springCloudVersionResolver) {
-        this.springCloudVersionResolver = springCloudVersionResolver;
+        this.springCloudVersionResolver = new SpringCloudVersionResolver();
     }
 
     @Override
