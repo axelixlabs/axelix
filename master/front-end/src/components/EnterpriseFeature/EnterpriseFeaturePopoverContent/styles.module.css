@@ -1,0 +1,16 @@
+.MainWrapper {
+    font-weight: 600;
+}
+
+.Title {
+    margin-bottom: 8px;
+}
+
+.SeeDocsWrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.SeeDocs {
+    color: var(--axelix-primary-green);
+}

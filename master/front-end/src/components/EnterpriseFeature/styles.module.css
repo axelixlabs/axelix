@@ -1,0 +1,16 @@
+.ChildrenWrapper {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+
+    & > * {
+        pointer-events: none;
+    }
+}
+
+.EnterpriseCrownIcon {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    z-index: 1;
+}
