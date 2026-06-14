@@ -5,6 +5,7 @@
     "copyFailed": "Failed to copy",
     "propertyChangedSuccessfully": "Property Changed",
     "saved": "Saved",
+    "confirm": "Confirm",
     "cancel": "Cancel",
     "status": "Status",
     "on": "ON",
@@ -111,7 +112,15 @@
         "enabled": "Cache is enabled at runtime",
         "disabled": "Cache is disabled at runtime",
         "estimatedEntrySize": "Entries count",
-        "statistics": "Statistics"
+        "statistics": "Statistics",
+        "clearAllCachesTitle": "Clear all caches?",
+        "clearAllCachesDescription": "Are you sure you want to clear all caches?",
+        "disableThisCacheTitle": "Disable this cache?",
+        "enableThisCacheTitle": "Enable this cache?",
+        "disableThisCacheDescription": "Are you sure you want to disable this cache?",
+        "enableThisCacheDescription": "Are you sure you want to enable this cache?",
+        "clearThisCacheTitle": "Clear this cache?",
+        "clearThisCacheDescription": "Are you sure you want to clear this cache?"
     },
     "Authentication": {
         "welcome": "Welcome",
@@ -176,7 +185,13 @@
         "fixedTaskIntervalChangeSuccess": "The interval has been changed",
         "cronExpressionChangeSuccess": "Cron expression has been changed",
         "enterNewCron": "Enter New Cron",
-        "enterNewInterval": "Enter new Interval"
+        "enterNewInterval": "Enter new Interval",
+        "runThisTaskTitle": "Run this task?",
+        "runThisTaskDescription": "Are you sure you want to run this scheduled task?",
+        "disableThisTaskTitle": "Disable this task?",
+        "enableThisTaskTitle": "Enable this task?",
+        "disableThisTaskDescription": "Are you sure you want to disable this scheduled task?",
+        "enableThisTaskDescription": "Are you sure you want to enable this scheduled task?"
     },
     "Error": {
         "title": "Error",

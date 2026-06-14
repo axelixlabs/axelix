@@ -23,7 +23,7 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
@@ -36,6 +36,7 @@ const Caches = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [search, setSearch] = useState<string>("");
 
@@ -55,22 +56,28 @@ const Caches = () => {
     }
 
     const clearAllCachesClickHandler = (): void => {
-        if (instanceId) {
-            setClearAllCaches(StatelessRequest.loading());
+        confirmAction({
+            title: t("Caches.clearAllCachesTitle"),
+            content: t("Caches.clearAllCachesDescription"),
+            onOk() {
+                if (instanceId) {
+                    setClearAllCaches(StatelessRequest.loading());
 
-            clearAllCachesData(instanceId)
-                .then((value) => {
-                    if (value.status === 200) {
-                        setClearAllCaches(StatelessRequest.success());
-                        message.success(t("Caches.cleared"));
-                    } else {
-                        setClearAllCaches(StatelessRequest.error(""));
-                    }
-                })
-                .catch((error: AxiosError<IErrorResponse>) => {
-                    setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-                });
-        }
+                    clearAllCachesData(instanceId)
+                        .then((value) => {
+                            if (value.status === 200) {
+                                setClearAllCaches(StatelessRequest.success());
+                                message.success(t("Caches.cleared"));
+                            } else {
+                                setClearAllCaches(StatelessRequest.error(""));
+                            }
+                        })
+                        .catch((error: AxiosError<IErrorResponse>) => {
+                            setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                        });
+                }
+            },
+        });
     };
 
     const requiredCacheManagers = cacheData.response!.cacheManagers;

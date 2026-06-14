@@ -23,7 +23,7 @@ import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
 import { forceRunTask } from "services";
 
@@ -42,23 +42,30 @@ export const ForceRunTask = ({ trigger }: IProps) => {
 
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
 
     const [forceRunTaskData, setForceRunTaskData] = useState(StatelessRequest.inactive());
 
     const forceRunClickHandler = (): void => {
-        setForceRunTaskData(StatelessRequest.loading());
+        confirmAction({
+            title: t("ScheduledTasks.runThisTaskTitle"),
+            content: t("ScheduledTasks.runThisTaskDescription"),
+            onOk() {
+                setForceRunTaskData(StatelessRequest.loading());
 
-        forceRunTask({
-            instanceId: instanceId!,
-            trigger: trigger,
-        })
-            .then(() => {
-                setForceRunTaskData(StatelessRequest.success());
-                message.success(t("ScheduledTasks.runSuccess"));
-            })
-            .catch((error: AxiosError<IErrorResponse>) => {
-                setForceRunTaskData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            });
+                forceRunTask({
+                    instanceId: instanceId!,
+                    trigger: trigger,
+                })
+                    .then(() => {
+                        setForceRunTaskData(StatelessRequest.success());
+                        message.success(t("ScheduledTasks.runSuccess"));
+                    })
+                    .catch((error: AxiosError<IErrorResponse>) => {
+                        setForceRunTaskData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                    });
+            },
+        });
     };
 
     return (

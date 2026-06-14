@@ -17,14 +17,13 @@
  */
 import { App, Switch } from "antd";
 import type { AxiosError } from "axios";
-import { type MouseEvent, useState } from "react";
-import * as React from "react";
+import { type KeyboardEvent, type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { NoRequiredAuthorityTooltip } from "components";
 import { extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
+import { useAuthority, useConfirmableAction } from "hooks";
 import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { disableCache, enableCache } from "services";
 
@@ -46,27 +45,35 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
+    const confirmAction = useConfirmableAction();
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
 
-    const switchTaskStatus = (e: MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLButtonElement>) => {
+    const switchTaskStatus = (e: MouseEvent<HTMLElement> | KeyboardEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        setMutationRequest(StatelessRequest.loading());
 
-        const requestBody = {
-            instanceId: instanceId!,
-            cacheManagerName: cacheManagerName,
-            cacheName: cache.name,
-        };
+        confirmAction({
+            title: cache.enabled ? t("Caches.disableThisCacheTitle") : t("Caches.enableThisCacheTitle"),
+            content: cache.enabled ? t("Caches.disableThisCacheDescription") : t("Caches.enableThisCacheDescription"),
+            onOk() {
+                setMutationRequest(StatelessRequest.loading());
 
-        (cache.enabled ? disableCache(requestBody) : enableCache(requestBody))
-            .then(() => {
-                message.success(cache.enabled ? t("Caches.disabled") : t("Caches.enabled"));
-                cache.enabled = !cache.enabled;
-                setMutationRequest(StatelessRequest.success());
-            })
-            .catch((error: AxiosError<IErrorResponse>) => {
-                setMutationRequest(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            });
+                const requestBody = {
+                    instanceId: instanceId!,
+                    cacheManagerName: cacheManagerName,
+                    cacheName: cache.name,
+                };
+
+                (cache.enabled ? disableCache(requestBody) : enableCache(requestBody))
+                    .then(() => {
+                        message.success(cache.enabled ? t("Caches.disabled") : t("Caches.enabled"));
+                        cache.enabled = !cache.enabled;
+                        setMutationRequest(StatelessRequest.success());
+                    })
+                    .catch((error: AxiosError<IErrorResponse>) => {
+                        setMutationRequest(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+                    });
+            },
+        });
     };
 
     return (

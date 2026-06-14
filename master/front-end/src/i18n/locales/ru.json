@@ -5,6 +5,7 @@
     "copyFailed": "Не удалось скопировать",
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
+    "confirm": "Подтвердить",
     "cancel": "Отмена",
     "status": "Статус",
     "on": "ВКЛ",
@@ -111,7 +112,15 @@
         "ratio": "Соотношение hits/total",
         "disabled": "Кэш выключен",
         "estimatedEntrySize": "Количество записей",
-        "statistics": "Статистика"
+        "statistics": "Статистика",
+        "clearAllCachesTitle": "Очистить весь кэш?",
+        "clearAllCachesDescription": "Вы уверены, что хотите очистить весь кэш?",
+        "disableThisCacheTitle": "Отключить этот кэш?",
+        "enableThisCacheTitle": "Включить этот кэш?",
+        "disableThisCacheDescription": "Вы уверены, что хотите отключить этот кэш?",
+        "enableThisCacheDescription": "Вы уверены, что хотите включить этот кэш?",
+        "clearThisCacheTitle": "Очистить этот кэш?",
+        "clearThisCacheDescription": "Вы уверены, что хотите очистить этот кэш?"
     },
     "Authentication": {
         "welcome": "Добро пожаловать",
@@ -176,7 +185,13 @@
         "fixedTaskIntervalChangeSuccess": "Интервал был изменён",
         "cronExpressionChangeSuccess": "Cron-выражение было изменено",
         "enterNewCron": "Введите новый Cron",
-        "enterNewInterval": "Введите новый интервал"
+        "enterNewInterval": "Введите новый интервал",
+        "runThisTaskTitle": "Запустить эту задачу?",
+        "runThisTaskDescription": "Вы уверены, что хотите запустить эту запланированную задачу?",
+        "disableThisTaskTitle": "Отключить эту задачу?",
+        "enableThisTaskTitle": "Включить эту задачу?",
+        "disableThisTaskDescription": "Вы уверены, что хотите отключить эту задачу?",
+        "enableThisTaskDescription": "Вы уверены, что хотите включить эту задачу?"
     },
     "Error": {
         "title": "Ошибка",
