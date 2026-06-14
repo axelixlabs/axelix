@@ -75,10 +75,6 @@ public interface LibraryInformationProvider {
         return "";
     }
 
-    // TODO Currently we cannot get the current Spring Cloud version like we do for Spring/Spring Boot
-    // "SpringBootVersion.getVersion()". We hope this capability will be available in the future.
-    // https://github.com/spring-cloud/spring-cloud-release/issues/451
-    // We also have our own ideas for how to solve this problem https://github.com/axelixlabs/axelix/issues/935
     /**
      * Returns the Spring Cloud version.
      *

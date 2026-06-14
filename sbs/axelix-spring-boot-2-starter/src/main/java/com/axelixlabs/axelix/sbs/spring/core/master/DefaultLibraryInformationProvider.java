@@ -36,6 +36,16 @@ public class DefaultLibraryInformationProvider implements LibraryInformationProv
 
     private static final boolean KOTLIN_VERSION_PRESENT = ClassUtils.isPresent("kotlin.KotlinVersion", CLASS_LOADER);
 
+    private final SpringCloudVersionResolver springCloudVersionResolver;
+
+    public DefaultLibraryInformationProvider() {
+        this(new SpringCloudVersionResolver());
+    }
+
+    DefaultLibraryInformationProvider(SpringCloudVersionResolver springCloudVersionResolver) {
+        this.springCloudVersionResolver = springCloudVersionResolver;
+    }
+
     @Override
     public @Nullable String getKotlinVersion() {
         if (!KOTLIN_VERSION_PRESENT) {
@@ -59,5 +69,10 @@ public class DefaultLibraryInformationProvider implements LibraryInformationProv
     @Override
     public String getSpringVersion() {
         return emptyIfNull(SpringVersion.getVersion());
+    }
+
+    @Override
+    public @Nullable String getSpringCloudVersion() {
+        return springCloudVersionResolver.resolve();
     }
 }

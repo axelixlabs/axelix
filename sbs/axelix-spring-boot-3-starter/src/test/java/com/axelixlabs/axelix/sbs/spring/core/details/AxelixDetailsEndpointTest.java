@@ -87,7 +87,8 @@ class AxelixDetailsEndpointTest {
                 .isObject()
                 .contains(
                         entry("springBootVersion", SpringBootVersion.getVersion()),
-                        entry("springFrameworkVersion", SpringVersion.getVersion()));
+                        entry("springFrameworkVersion", SpringVersion.getVersion()),
+                        entry("springCloudVersion", "2022.0.4"));
 
         assertThatJson(responseBody)
                 .inPath("runtime")

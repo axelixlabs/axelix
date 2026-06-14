@@ -77,7 +77,7 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(spring).isNotNull();
         assertThat(spring.getSpringBootVersion()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(spring.getSpringFrameworkVersion()).isEqualTo(SpringVersion.getVersion());
-        assertThat(spring.getSpringCloudVersion()).isNull();
+        assertThat(spring.getSpringCloudVersion()).isEqualTo("2021.0.9");
 
         RuntimeDetails runtime = result.getRuntime();
         assertThat(runtime).isNotNull();
