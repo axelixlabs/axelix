@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
@@ -136,7 +138,7 @@ public class AxelixGradlePlugin implements Plugin<Project> {
         if (!parent.isDirectory() && !parent.mkdirs()) {
             throw new GradleException("Cannot create directory " + parent);
         }
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(target), "UTF-8")) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(target.toPath()), StandardCharsets.UTF_8)) {
             writer.write(SPRING_FACTORIES_CONTENT);
         } catch (IOException e) {
             throw new GradleException("Failed to write " + target, e);
