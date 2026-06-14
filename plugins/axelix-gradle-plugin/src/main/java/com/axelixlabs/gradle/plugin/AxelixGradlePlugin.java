@@ -116,12 +116,15 @@ public class AxelixGradlePlugin implements Plugin<Project> {
         // Copying from a nonexistent source dir is a silent no-op, so projects whose tests
         // produce no report still build fine.
         copyTask.doLast(
-                task ->
-                        project.copy(
-                                spec -> {
-                                    spec.from(reportDir);
-                                    spec.into(destinationDir);
-                                }));
+                task -> {
+                    project.delete(destinationDir);
+
+                    project.copy(
+                        spec -> {
+                            spec.from(reportDir);
+                            spec.into(destinationDir);
+                        });
+                });
 
         project.getTasks().getByName("build").dependsOn(copyTask);
         project.getTasks().withType(Jar.class).all(jar -> jar.mustRunAfter(copyTask));
