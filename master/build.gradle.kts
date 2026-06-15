@@ -10,11 +10,11 @@ plugins {
 
 val springBootVersion = "4.1.0-RC1"
 val springCloudVersion = "2025.1.1"
-val springAiVersion = "2.0.0-M8"
+val springAiVersion = "2.0.0-RC1"
 
 // Not Managed by Spring BOM
 val springDocSwaggerVersion = "3.0.3"
-val sqliteVersion = "3.53.1.0"
+val sqliteVersion = "3.53.2.0"
 val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 
@@ -91,7 +91,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.2")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
