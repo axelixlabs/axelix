@@ -21,48 +21,20 @@ import { PAGE_SIZE } from "@/lib/pagination";
 import { SHOW_ALL } from "@/lib/tags";
 import { IBlogCardItem } from "@/models";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { Authors } from "../Authors";
-import { DateMeta } from "../DateMeta";
 import { Pagination } from "../Pagination";
 import { PostRow } from "../PostRow";
-import { TagRow } from "../TagRow";
 import { Toolbar } from "../Toolbar";
 
+import { BlogMeta } from "./BlogMeta";
+import { FeaturedPost } from "./FeaturedPost";
 import styles from "./styles.module.css";
 
 function parsePage(value: string | null): number {
     const parsed = Number.parseInt(value ?? "1", 10);
     return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
 }
-
-interface IFeaturedPostProps {
-    item: IBlogCardItem;
-}
-
-const FeaturedPost = ({ item }: IFeaturedPostProps) => {
-    return (
-        <Link className={styles.Featured} href={item.href}>
-            {item.coverSrc ? (
-                <div className={styles.Cover}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.coverSrc} alt="" />
-                </div>
-            ) : (
-                <div className={`${styles.Cover} ${styles.CoverPh}`} />
-            )}
-            <div className={styles.Body}>
-                <TagRow tags={item.tags} />
-                <DateMeta date={item.date} readingMinutes={item.readingMinutes} />
-                <h2>{item.title}</h2>
-                {item.description && <p>{item.description}</p>}
-                <Authors authors={item.authors} />
-            </div>
-        </Link>
-    );
-};
 
 interface IProps {
     items: IBlogCardItem[];
@@ -96,14 +68,9 @@ export const BlogHomeClient = ({ items }: IProps) => {
             <Toolbar currentTag={currentTag} tags={allTags} />
             <main className={styles.Feed}>
                 <div className="wrap">
-                    {showMeta && (
-                        <div className={styles.ResultMeta}>
-                            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged{" "}
-                            <b>{currentTag}</b>
-                        </div>
-                    )}
+                    {showMeta && <BlogMeta byTag={byTag} currentTag={currentTag} />}
 
-                    {byTag.length === 0 ? (
+                    {byTag.length ? (
                         <div className={styles.Empty}>
                             <b>No articles found</b>
                             Nothing here yet. Try another topic.

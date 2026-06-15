@@ -15,17 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { BlogHomeClient } from "@/components";
-import { BLOG_HOME_DESCRIPTION } from "@/lib/blog-metadata";
+import { BlogHomeClient, Hero } from "@/components";
 import { getSortedCardItems } from "@/lib/source";
 
 import { Suspense } from "react";
 
-import styles from "./page.module.css";
-
-// Fully static: we never read `searchParams` here (that would force dynamic
-// rendering with `Cache-Control: private`). Filtering/pagination happen on the
-// client from the URL; the whole dataset ships in the RSC payload.
 export const revalidate = false;
 
 export default async function HomePage() {
@@ -33,14 +27,7 @@ export default async function HomePage() {
 
     return (
         <>
-            <header className={styles.BlogHero}>
-                <div className="wrap">
-                    <h1>
-                        Axelix <span className={styles.Accent}>Blog</span>
-                    </h1>
-                    <p className={styles.Lede}>{BLOG_HOME_DESCRIPTION}</p>
-                </div>
-            </header>
+            <Hero />
             <Suspense>
                 <BlogHomeClient items={items} />
             </Suspense>

@@ -15,10 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { default as ExternalLinkIcon } from "./icons/external-link.svg";
-export { default as XTwitterIcon } from "./icons/x-twitter.svg";
-export { default as LinkedinIcon } from "./icons/linkedin.svg";
-export { default as DiscordIcon } from "./icons/discord.svg";
-export { default as GithubIcon } from "./icons/github.svg";
-export { default as EmailIcon } from "./icons/email.svg";
-export { default as LogoIcon } from "./icons/logo.svg";
+import { BLOG_HOME_DESCRIPTION } from "@/lib/blog-metadata";
+
+import styles from "./styles.module.css";
+
+export const Hero = () => {
+    return (
+        <header className={styles.MainWrapper}>
+            <div className="wrap">
+                <h1>
+                    Axelix <span className={styles.AccentText}>Blog</span>
+                </h1>
+                <p className={styles.Lede}>{BLOG_HOME_DESCRIPTION}</p>
+            </div>
+        </header>
+    );
+};

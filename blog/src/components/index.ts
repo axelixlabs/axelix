@@ -18,7 +18,6 @@
 export { BlogHomeClient } from "./BlogHomeClient";
 export { ReadProgress } from "./ReadProgress";
 export { ReadingTime } from "./ReadingTime";
-export { SiteFooter } from "./SiteFooter";
 export { Pagination } from "./Pagination";
 export { BlogShare } from "./BlogShare";
 export { PlainTag } from "./PlainTag";
@@ -30,4 +29,6 @@ export { Authors } from "./Authors";
 export { Header } from "./Header";
 export { TagRow } from "./TagRow";
 export { Avatar } from "./Avatar";
+export { Footer } from "./Footer";
 export { Logo } from "./Logo";
+export { Hero } from "./Hero";

@@ -6,8 +6,96 @@
 @import url("./styles/code-tabs.css");
 @import url("./styles/motion.css");
 
+/* TODO: Maybe we need to remove most of these CSS variables */
+:root {
+   /* Brand greens */
+   --axelix-green-50: #f6faef;
+   --axelix-green-100: #EAF3DE;
+   --axelix-green-200: #d4e7b5;
+   --axelix-green-300: #b6d684;
+   --axelix-green-400: #8fbd4b;
+   --axelix-green-500: #639922;
+   --axelix-green-600: #4d7c19;
+   --axelix-green-700: #345c10;
+   --axelix-green-800: #1f400a;
+   --axelix-green-900: #173404;
+   --axelix-blue: #2A6FDB;
+   --axelix-blue-tint: #e6efff;
+
+   /* Neutrals */
+   --axelix-bg: #F4F4F6;
+   --axelix-paper: #fff;
+   --axelix-ink: #0f1410;
+   --axelix-ink-2: #2a322b;
+   --axelix-ink-3: #5a635c;
+   --axelix-ink-4: #8a918b;
+   --axelix-line: #0f141014;
+   --axelix-line-2: #0f14101f;
+   --axelix-line-3: #0f141033;
+   --axelix-font: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
+   --axelix-mono: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
+   --axelix-code: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', menlo, monospace;
+}
+
+*,
+*::before,
+*::after {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+}
+
+html,
+body {
+   background-color: var(--axelix-bg);
+   color: var(--axelix-ink);
+   font-family: var(--axelix-font);
+   font-size: 16px;
+   font-weight: 400;
+   line-height: 1.5;
+   -webkit-font-smoothing: antialiased;
+   text-rendering: optimizelegibility;
+   scroll-behavior: smooth;
+}
+
+a {
+   color: inherit;
+   text-decoration: none;
+}
+
+img,
+svg {
+   display: block;
+   max-width: 100%;
+}
+
+button {
+   font: inherit;
+   color: inherit;
+   background: none;
+   border: 0;
+   padding: 0;
+   cursor: pointer;
+}
+
+::selection {
+   background-color: var(--axelix-green-500);
+   color: #fff;
+}
+
+ul,
+ol {
+   list-style: none;
+}
+
 .WideContainer {
    margin: 0 auto;
    max-width: 1400px;
    padding-inline: 25px;
+}
+
+.MainContainer {
+   max-width: 1320px;
+   margin: 0 auto;
+   padding-inline: clamp(20px, 4vw, 56px);
 }

@@ -15,10 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { default as ExternalLinkIcon } from "./icons/external-link.svg";
-export { default as XTwitterIcon } from "./icons/x-twitter.svg";
-export { default as LinkedinIcon } from "./icons/linkedin.svg";
-export { default as DiscordIcon } from "./icons/discord.svg";
-export { default as GithubIcon } from "./icons/github.svg";
-export { default as EmailIcon } from "./icons/email.svg";
-export { default as LogoIcon } from "./icons/logo.svg";
+import { IBlogCardItem } from "@/models";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    byTag: IBlogCardItem[];
+    currentTag: string;
+}
+
+export const BlogMeta = ({ byTag, currentTag }: IProps) => {
+    return (
+        <div className={styles.ResultMeta}>
+            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
+        </div>
+    );
+};

@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Authors } from "@/components/Authors";
+import { DateMeta } from "@/components/DateMeta";
+import { TagRow } from "@/components/TagRow";
 import { IBlogCardItem } from "@/models";
 
 import Link from "next/link";
-
-import { Authors } from "../Authors";
-import { DateMeta } from "../DateMeta";
-import { TagRow } from "../TagRow";
 
 import styles from "./styles.module.css";
 
@@ -29,26 +28,26 @@ interface IProps {
     item: IBlogCardItem;
 }
 
-export const PostRow = ({ item }: IProps) => {
+export const FeaturedPost = ({ item }: IProps) => {
     const { href, coverSrc, tags, readingMinutes, description, authors, date, title } = item;
 
     return (
-        <Link className={styles.PostRow} href={href}>
-            <div className={styles.Rbody}>
-                <TagRow tags={tags} />
-                <DateMeta date={date} readingMinutes={readingMinutes} />
-                <h3>{title}</h3>
-                {description && <p className={styles.Exc}>{description}</p>}
-                <Authors authors={authors} />
-            </div>
+        <Link className={styles.Featured} href={href}>
             {coverSrc ? (
-                <div className={styles.Rcover}>
+                <div className={styles.Cover}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={coverSrc} alt="" />
                 </div>
             ) : (
-                <div className={`${styles.Rcover} ${styles.CoverPh}`} />
+                <div className={`${styles.Cover} ${styles.CoverPh}`} />
             )}
+            <div className={styles.Body}>
+                <TagRow tags={tags} />
+                <DateMeta date={date} readingMinutes={readingMinutes} />
+                <h2>{title}</h2>
+                {description && <p>{description}</p>}
+                <Authors authors={authors} />
+            </div>
         </Link>
     );
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Header, SiteFooter } from "@/components";
+import { Footer, Header } from "@/components";
 
 import type { Metadata } from "next";
 import { Golos_Text, JetBrains_Mono } from "next/font/google";
@@ -52,7 +52,7 @@ export default function RootLayout({
             <body>
                 <Header />
                 <main className={styles.ChildrenWrapper}>{children}</main>
-                <SiteFooter />
+                <Footer />
             </body>
         </html>
     );

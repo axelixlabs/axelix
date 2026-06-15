@@ -1,0 +1,15 @@
+
+.ResultMeta {
+  display: block;
+  margin-bottom: 24px;
+  font-family: var(--code);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ResultMeta b {
+  color: var(--ink);
+  font-weight: 600;
+}
