@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { IBlogCardItem } from "@/models";
+import { IArticle } from "@/models";
 
 import Link from "next/link";
 
@@ -26,7 +26,7 @@ import { TagRow } from "../TagRow";
 import styles from "./styles.module.css";
 
 interface IProps {
-    item: IBlogCardItem;
+    item: IArticle;
 }
 
 export const PostRow = ({ item }: IProps) => {

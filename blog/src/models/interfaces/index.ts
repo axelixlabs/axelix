@@ -32,7 +32,7 @@ export interface IAuthor {
 }
 
 /** Shape consumed by the home-page cards/rows. */
-export interface IBlogCardItem {
+export interface IArticle {
     slug: string;
     /** In-app path (no basePath); pass straight to next/link. */
     href: string;

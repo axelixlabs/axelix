@@ -15,19 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { IBlogCardItem } from "@/models";
+import { IArticle } from "@/models";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    byTag: IBlogCardItem[];
+    filteredArticles: IArticle[];
     currentTag: string;
 }
 
-export const BlogMeta = ({ byTag, currentTag }: IProps) => {
+export const BlogMeta = ({ filteredArticles, currentTag }: IProps) => {
+    const articlesLength = filteredArticles.length;
+
     return (
         <div className={styles.ResultMeta}>
-            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
+            <b>{articlesLength}</b> {articlesLength === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
         </div>
     );
 };

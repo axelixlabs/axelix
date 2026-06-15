@@ -19,7 +19,7 @@
 
 import { PAGE_SIZE } from "@/lib/pagination";
 import { SHOW_ALL } from "@/lib/tags";
-import { IBlogCardItem } from "@/models";
+import { IArticle } from "@/models";
 
 import { useSearchParams } from "next/navigation";
 
@@ -37,29 +37,32 @@ function parsePage(value: string | null): number {
 }
 
 interface IProps {
-    items: IBlogCardItem[];
+    articles: IArticle[];
 }
 
-export const BlogHomeClient = ({ items }: IProps) => {
+export const BlogHomeClient = ({ articles }: IProps) => {
     const searchParams = useSearchParams();
 
-    // Tags are open: the filter vocabulary is just the union of tags across posts.
-    const allTags = Array.from(new Set(items.flatMap((item) => item.tags))).sort();
+    const allTagsFromArticles = articles.flatMap(({ tags }) => tags);
+    const uniqueTags = new Set(allTagsFromArticles);
+    const uniqueTagsArray = Array.from(uniqueTags);
+    const allTags = uniqueTagsArray.sort();
 
-    const tagParam = searchParams.get("tag") ?? "";
-    const currentTag = allTags.includes(tagParam) ? tagParam : SHOW_ALL;
+    const tagFromUrl = searchParams.get("tag") ?? "";
+    const currentTag = allTags.includes(tagFromUrl) ? tagFromUrl : SHOW_ALL;
 
-    const byTag = currentTag === SHOW_ALL ? items : items.filter((item) => item.tags.includes(currentTag));
+    const filteredArticles =
+        currentTag === SHOW_ALL ? articles : articles.filter(({ tags }) => tags.includes(currentTag));
 
-    const isDefault = currentTag === SHOW_ALL;
-    const totalPages = Math.max(1, Math.ceil(byTag.length / PAGE_SIZE));
+    const isAllTagsSelected = currentTag === SHOW_ALL;
+    const totalPages = Math.max(1, Math.ceil(filteredArticles.length / PAGE_SIZE));
     const currentPage = Math.max(1, Math.min(parsePage(searchParams.get("page")), totalPages));
 
-    const showFeatured = isDefault && currentPage === 1 && byTag.length > 0;
-    const featured = showFeatured ? byTag[0] : undefined;
+    const showFeatured = isAllTagsSelected && currentPage === 1 && filteredArticles.length;
+    const featured = showFeatured ? filteredArticles[0] : undefined;
     const posts = showFeatured
-        ? byTag.slice(1, PAGE_SIZE)
-        : byTag.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+        ? filteredArticles.slice(1, PAGE_SIZE)
+        : filteredArticles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     const showMeta = currentTag !== SHOW_ALL;
 
@@ -68,9 +71,9 @@ export const BlogHomeClient = ({ items }: IProps) => {
             <Toolbar currentTag={currentTag} tags={allTags} />
             <main className={styles.Feed}>
                 <div className="wrap">
-                    {showMeta && <BlogMeta byTag={byTag} currentTag={currentTag} />}
+                    {showMeta && <BlogMeta filteredArticles={filteredArticles} currentTag={currentTag} />}
 
-                    {byTag.length ? (
+                    {!filteredArticles.length ? (
                         <div className={styles.Empty}>
                             <b>No articles found</b>
                             Nothing here yet. Try another topic.

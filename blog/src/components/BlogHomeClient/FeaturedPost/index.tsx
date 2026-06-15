@@ -18,14 +18,14 @@
 import { Authors } from "@/components/Authors";
 import { DateMeta } from "@/components/DateMeta";
 import { TagRow } from "@/components/TagRow";
-import { IBlogCardItem } from "@/models";
+import { IArticle } from "@/models";
 
 import Link from "next/link";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    item: IBlogCardItem;
+    item: IArticle;
 }
 
 export const FeaturedPost = ({ item }: IProps) => {

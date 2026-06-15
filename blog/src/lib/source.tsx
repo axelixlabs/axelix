@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { IBlogCardItem } from "@/models";
+import { IArticle } from "@/models";
 
 import { blogPosts } from "../../.source/server";
 import { computeReadingTime } from "./reading-time";
@@ -60,7 +60,7 @@ export function getSortedPosts(): BlogPage[] {
     return [...blog.getPages()].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
-export async function toCardItem(page: BlogPage): Promise<IBlogCardItem> {
+export async function toCardItem(page: BlogPage): Promise<IArticle> {
     const raw = await page.data.getText("raw");
     return {
         slug: page.slugs.join("/"),
@@ -76,6 +76,6 @@ export async function toCardItem(page: BlogPage): Promise<IBlogCardItem> {
 }
 
 /** All posts as card items, newest first. */
-export async function getSortedCardItems(): Promise<IBlogCardItem[]> {
+export async function getSortedCardItems(): Promise<IArticle[]> {
     return Promise.all(getSortedPosts().map(toCardItem));
 }

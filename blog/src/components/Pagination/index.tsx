@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { ChevronLeftIcon, ChevronRightIcon } from "@/assets";
 import { getPaginationSequence } from "@/lib/pagination";
 import { SHOW_ALL } from "@/lib/tags";
 
@@ -36,31 +37,6 @@ interface IProps {
     totalPages: number;
 }
 
-const PREV_ICON = (
-    <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <path d="M15 6l-6 6l6 6" />
-    </svg>
-);
-const NEXT_ICON = (
-    <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <path d="M9 6l6 6l-6 6" />
-    </svg>
-);
-
 export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
     if (totalPages <= 1) return null;
     const sequence = getPaginationSequence(totalPages, currentPage);
@@ -71,12 +47,12 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
         <nav className={styles.Pager}>
             {prevDisabled ? (
                 <span className={styles.PgArrow}>
-                    {PREV_ICON}
+                    <ChevronLeftIcon />
                     <span>Prev</span>
                 </span>
             ) : (
                 <Link className={styles.PgArrow} href={hrefFor(tag, currentPage - 1)}>
-                    {PREV_ICON}
+                    <ChevronLeftIcon />
                     <span>Prev</span>
                 </Link>
             )}
@@ -102,12 +78,12 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
             {nextDisabled ? (
                 <span className={styles.PgArrow}>
                     <span>Next</span>
-                    {NEXT_ICON}
+                    <ChevronRightIcon />
                 </span>
             ) : (
                 <Link className={styles.PgArrow} href={hrefFor(tag, currentPage + 1)}>
                     <span>Next</span>
-                    {NEXT_ICON}
+                    <ChevronRightIcon />
                 </Link>
             )}
         </nav>

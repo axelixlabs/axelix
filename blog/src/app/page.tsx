@@ -23,13 +23,13 @@ import { Suspense } from "react";
 export const revalidate = false;
 
 export default async function HomePage() {
-    const items = await getSortedCardItems();
+    const articles = await getSortedCardItems();
 
     return (
         <>
             <Hero />
             <Suspense>
-                <BlogHomeClient items={items} />
+                <BlogHomeClient articles={articles} />
             </Suspense>
         </>
     );

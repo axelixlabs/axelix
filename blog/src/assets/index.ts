@@ -15,10 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+export { default as ChevronRightIcon } from "./icons/chevron-right.svg";
 export { default as ExternalLinkIcon } from "./icons/external-link.svg";
+export { default as ChevronLeftIcon } from "./icons/chevron-left.svg";
+export { default as ChevronDownIcon } from "./icons/chevron-down.svg";
 export { default as XTwitterIcon } from "./icons/x-twitter.svg";
 export { default as LinkedinIcon } from "./icons/linkedin.svg";
 export { default as DiscordIcon } from "./icons/discord.svg";
 export { default as GithubIcon } from "./icons/github.svg";
+export { default as SearchIcon } from "./icons/search.svg";
 export { default as EmailIcon } from "./icons/email.svg";
 export { default as LogoIcon } from "./icons/logo.svg";
+export { default as CheckIcon } from "./icons/check.svg";
+export { default as LinkIcon } from "./icons/link.svg";
