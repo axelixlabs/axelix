@@ -51,7 +51,7 @@ public final class SingleLoggerProfile {
     /**
      * The initial logging level before any temporary modifications were applied.
      */
-    private final String originalLevel;
+    private final boolean isOriginalLevel;
 
     /**
      * The timestamp indicating when the temporary logging level was activated.
@@ -71,13 +71,13 @@ public final class SingleLoggerProfile {
             @JsonProperty("name") String name,
             @JsonProperty("configuredLevel") @Nullable String configuredLevel,
             @JsonProperty("effectiveLevel") String effectiveLevel,
-            @JsonProperty("originalLevel") String originalLevel,
+            @JsonProperty("isOriginalLevel") boolean isOriginalLevel,
             @JsonProperty("temporaryLevelAppliedAt") @Nullable String temporaryLevelAppliedAt,
             @JsonProperty("temporaryLevelExpiresAt") @Nullable String temporaryLevelExpiresAt) {
         this.name = name;
         this.configuredLevel = configuredLevel;
         this.effectiveLevel = effectiveLevel;
-        this.originalLevel = originalLevel;
+        this.isOriginalLevel = isOriginalLevel;
         this.temporaryLevelAppliedAt = temporaryLevelAppliedAt;
         this.temporaryLevelExpiresAt = temporaryLevelExpiresAt;
     }
@@ -94,8 +94,8 @@ public final class SingleLoggerProfile {
         return effectiveLevel;
     }
 
-    public String getOriginalLevel() {
-        return originalLevel;
+    public boolean isOriginalLevel() {
+        return isOriginalLevel;
     }
 
     public @Nullable String getTemporaryLevelAppliedAt() {
@@ -115,7 +115,7 @@ public final class SingleLoggerProfile {
         return Objects.equals(name, that.name)
                 && Objects.equals(configuredLevel, that.configuredLevel)
                 && Objects.equals(effectiveLevel, that.effectiveLevel)
-                && Objects.equals(originalLevel, that.originalLevel)
+                && Objects.equals(isOriginalLevel, that.isOriginalLevel)
                 && Objects.equals(temporaryLevelAppliedAt, that.temporaryLevelAppliedAt)
                 && Objects.equals(temporaryLevelExpiresAt, that.temporaryLevelExpiresAt);
     }
@@ -123,7 +123,12 @@ public final class SingleLoggerProfile {
     @Override
     public int hashCode() {
         return Objects.hash(
-                name, configuredLevel, effectiveLevel, originalLevel, temporaryLevelAppliedAt, temporaryLevelExpiresAt);
+                name,
+                configuredLevel,
+                effectiveLevel,
+                isOriginalLevel,
+                temporaryLevelAppliedAt,
+                temporaryLevelExpiresAt);
     }
 
     @Override
@@ -131,8 +136,8 @@ public final class SingleLoggerProfile {
         return "SingleLoggerProfile{" + "name='"
                 + name + '\'' + ", configuredLevel='"
                 + configuredLevel + '\'' + ", effectiveLevel='"
-                + effectiveLevel + '\'' + ", originalLevel='"
-                + originalLevel + '\'' + ", temporaryLevelAppliedAt='"
+                + effectiveLevel + '\'' + ", isOriginalLevel="
+                + isOriginalLevel + ", temporaryLevelAppliedAt='"
                 + temporaryLevelAppliedAt + '\'' + ", temporaryLevelExpiresAt='"
                 + temporaryLevelExpiresAt + '\'' + '}';
     }

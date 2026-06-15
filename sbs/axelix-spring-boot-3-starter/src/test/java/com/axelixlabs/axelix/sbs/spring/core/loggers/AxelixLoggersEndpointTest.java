@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +45,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration;
@@ -92,6 +95,11 @@ public class AxelixLoggersEndpointTest {
         loggingSystem.setLogLevel(AB_RESET_LOGGER, LogLevel.WARN);
         loggingSystem.setLogLevel(ABC_RESET_LOGGER, null);
         loggingSystem.setLogLevel(ABCD_RESET_LOGGER, null);
+
+        ResponseEntity<Void> resetResponse = testRestTemplate
+                .asAdmin()
+                .postForEntity("/actuator/axelix-loggers/logger/%s/reset".formatted(LOGGER), null, Void.class);
+        assertThat(resetResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -273,6 +281,210 @@ public class AxelixLoggersEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
+    // Temporary override log level
+    @Test
+    void shouldContainOverrideInfo_WhenTemporaryLevelIsSet() {
+        // language=json
+        String request = """
+    {
+      "configuredLevel": "debug",
+      "ttlMinutes": 30
+    }
+    """;
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        // when.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity("/actuator/axelix-loggers/logger/%s".formatted(LOGGER), SingleLoggerProfile.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelAppliedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelExpiresAt()).isNotNull();
+        assertThat(loggerProfile.isOriginalLevel()).isFalse();
+    }
+
+    @Test
+    void shouldNotContainOverrideInfo_WhenPermanentLevelIsSet() {
+        // language=json
+        String request = """
+     {
+       "configuredLevel": "debug"
+     }
+     """;
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        // when.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity("/actuator/axelix-loggers/logger/%s".formatted(LOGGER), SingleLoggerProfile.class);
+
+        // then.
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelAppliedAt()).isNull();
+        assertThat(loggerProfile.getTemporaryLevelExpiresAt()).isNull();
+        assertThat(loggerProfile.isOriginalLevel()).isFalse();
+    }
+
+    @Test
+    void shouldCancelOverride_WhenPermanentChangeAppliedAfterTemporary() {
+        // language=json
+        String temporaryRequest = """
+    {
+      "configuredLevel": "debug",
+      "ttlMinutes": 30
+    }
+    """;
+        // language=json
+        String permanentRequest = """
+    {
+      "configuredLevel": "trace"
+    }
+    """;
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(temporaryRequest),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        // when. — permanent over temporary
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(permanentRequest),
+                        Void.class);
+
+        // then. — override should disappear
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity("/actuator/axelix-loggers/logger/%s".formatted(LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.TRACE);
+        assertThat(loggerProfile.getTemporaryLevelAppliedAt()).isNull();
+        assertThat(loggerProfile.getTemporaryLevelExpiresAt()).isNull();
+    }
+
+    @Test
+    void shouldClearOverride_WhenResetCalled() {
+        // language=json
+        String request = """
+    {
+      "configuredLevel": "debug",
+      "ttlMinutes": 30
+    }
+    """;
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        // when.
+        testRestTemplate
+                .asAdmin()
+                .postForEntity("/actuator/axelix-loggers/logger/%s/reset".formatted(LOGGER), null, Void.class);
+
+        // then.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity("/actuator/axelix-loggers/logger/%s".formatted(LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.WARN);
+        assertThat(loggerProfile.getTemporaryLevelAppliedAt()).isNull();
+        assertThat(loggerProfile.getTemporaryLevelExpiresAt()).isNull();
+    }
+
+    @Test
+    void shouldReplaceActiveOverride_WhenNewTemporaryRequestComes() {
+        // language=json
+        String firstRequest = """
+    {
+      "configuredLevel": "debug",
+      "ttlMinutes": 30
+    }
+    """;
+        // language=json
+        String secondRequest = """
+    {
+      "configuredLevel": "trace",
+      "ttlMinutes": 60
+    }
+    """;
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(firstRequest),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        Instant beforeSecondRequest = Instant.now();
+
+        // when.
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-loggers/logger/%s/change-level".formatted(LOGGER),
+                        defaultJsonEntity(secondRequest),
+                        Void.class);
+
+        Instant afterSecondRequest = Instant.now();
+
+        // then.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity("/actuator/axelix-loggers/logger/%s".formatted(LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.TRACE);
+
+        assertThat(loggerProfile.getTemporaryLevelAppliedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelExpiresAt()).isNotNull();
+        Instant appliedAt = Instant.parse(loggerProfile.getTemporaryLevelAppliedAt());
+        Instant expiresAt = Instant.parse(loggerProfile.getTemporaryLevelExpiresAt());
+
+        // appliedAt must be at the time of the second request
+        assertThat(appliedAt).isBetween(beforeSecondRequest, afterSecondRequest);
+
+        // expiresAt should be approximately 60 minutes (±10 sec for margin of error)
+        assertThat(expiresAt)
+                .isBetween(
+                        beforeSecondRequest.plus(60, ChronoUnit.MINUTES),
+                        afterSecondRequest.plus(60, ChronoUnit.MINUTES).plusSeconds(10));
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-loggers")
     void negativeAuthTests() {}
 
@@ -294,9 +506,13 @@ public class AxelixLoggersEndpointTest {
     static class AxelixLoggersEndpointTestConfiguration {
 
         @Bean
-        public AxelixLoggersEndpoint axelixLoggersEndpoint(
-                LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
-            return new AxelixLoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
+        public AxelixLoggersEndpoint axelixLoggersEndpoint(LoggersService loggersService) {
+            return new AxelixLoggersEndpoint(loggersService);
+        }
+
+        @Bean
+        public LoggersService loggersService(LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
+            return new DefaultLoggersService(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
         }
     }
 }
