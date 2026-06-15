@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -47,6 +48,7 @@ import static com.axelixlabs.axelix.common.auth.core.DefaultRole.SUPER_ADMIN;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.DELETE;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.POST;
 import static com.axelixlabs.axelix.common.domain.http.HttpMethod.PUT;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -337,6 +339,66 @@ public class UserManagementApiTest {
     }
 
     @Test
+    void shouldReturnBadRequest_WhenUpdateRequestUsernameIsDuplicate() {
+        // given.
+        insertUser("alice", "alice@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity bob = insertUser("bob", "bob@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+
+        // language=json
+        String request = """
+                {
+                  "id": "%s",
+                  "username": "alice",
+                  "email": "bob@example.com",
+                  "roles": ["VIEWER"],
+                  "password": null
+                }
+                """.formatted(bob.id());
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThatJson(response.getBody()).isEqualTo(duplicateValueError());
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.username()).isEqualTo("bob");
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenUpdateRequestEmailIsDuplicate() {
+        // given.
+        insertUser("alice", "alice@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity bob = insertUser("bob", "bob@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+
+        // language=json
+        String request = """
+                {
+                  "id": "%s",
+                  "username": "bob",
+                  "email": "alice@example.com",
+                  "roles": ["VIEWER"],
+                  "password": null
+                }
+                """.formatted(bob.id());
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .withRole(SUPER_ADMIN)
+                .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThatJson(response.getBody()).isEqualTo(duplicateValueError());
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.email()).isEqualTo("bob@example.com");
+    }
+
+    @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainSuperAdmin() {
         UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
@@ -490,6 +552,15 @@ public class UserManagementApiTest {
                     }
                     """)
     void negativeAuthTestsOnUpdateUser() {}
+
+    private static String duplicateValueError() {
+        // language=json
+        return """
+                {
+                  "errorCode": "%s"
+                }
+                """.formatted(ApiErrorCodes.USER_DUPLICATE_VALUE.getErrorCode());
+    }
 
     private HttpEntity<String> defaultEntity(String body) {
         HttpHeaders headers = new HttpHeaders();

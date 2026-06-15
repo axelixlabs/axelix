@@ -31,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.UserDuplicateValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -148,6 +149,54 @@ abstract class DatabaseUserServiceTest {
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void createLocal_shouldThrowWhenUsernameIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createLocal("alice", "other@example.com", "p", "VIEWER"))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void createLocal_shouldThrowWhenEmailIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createLocal("bob", "alice@example.com", "p", "VIEWER"))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void createFromOidc_shouldThrowWhenUsernameIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createFromOidc("alice", "other@example.com", "VIEWER"))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void createFromOidc_shouldThrowWhenEmailIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createFromOidc("bob", "alice@example.com", "VIEWER"))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
     }
 
     @Test
@@ -372,6 +421,40 @@ abstract class DatabaseUserServiceTest {
 
         UserEntity untouched = userRepository.findById(existing.id()).orElseThrow();
         assertThat(untouched.roles().values()).containsExactly("VIEWER");
+    }
+
+    @Test
+    void updateUserPatch_shouldThrowWhenUsernameIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        userService.createLocal("bob", "bob@example.com", "p", "VIEWER");
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(
+                        () -> userService.updateUserPatch(bob.id(), "alice", "bob@example.com", null, Set.of("VIEWER")))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.username()).isEqualTo("bob");
+    }
+
+    @Test
+    void updateUserPatch_shouldThrowWhenEmailIsDuplicate() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        userService.createLocal("bob", "bob@example.com", "p", "VIEWER");
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(
+                        () -> userService.updateUserPatch(bob.id(), "bob", "alice@example.com", null, Set.of("VIEWER")))
+                // then.
+                .isInstanceOf(UserDuplicateValueException.class);
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.email()).isEqualTo("bob@example.com");
     }
 
     @Test
