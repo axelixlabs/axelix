@@ -51,4 +51,8 @@ public class SqlQueryRecord {
     public long getStartTimestampMs() {
         return startTimestampMs;
     }
+
+    public long getEndTimestampMs() {
+        return startTimestampMs + durationMs;
+    }
 }

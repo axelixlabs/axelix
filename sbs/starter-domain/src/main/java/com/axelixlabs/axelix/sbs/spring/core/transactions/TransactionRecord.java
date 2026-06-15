@@ -24,26 +24,31 @@ import java.util.List;
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class TransactionRecord {
 
-    private final long durationMs;
+    private final long endTimestampMs;
     private final long startTimestampMs;
     private final List<SqlQueryRecord> queries;
 
     /**
-     * @param durationMs       transaction execution duration in milliseconds
-     * @param startTimestampMs transaction start timestamp in milliseconds since epoch
+     * @param endTimestampMs   transaction end timestamp in milliseconds since epoch.
+     * @param startTimestampMs transaction start timestamp in milliseconds since epoch.
      * @param queries          the list of queries executed during a particular transaction.
      */
-    public TransactionRecord(long durationMs, long startTimestampMs, List<SqlQueryRecord> queries) {
+    public TransactionRecord(long endTimestampMs, long startTimestampMs, List<SqlQueryRecord> queries) {
         this.queries = queries;
-        this.durationMs = durationMs;
+        this.endTimestampMs = TransactionUtils.calculateTransactionEndTimestamp(endTimestampMs, queries);
         this.startTimestampMs = startTimestampMs;
     }
 
+    public long getEndTimestampMs() {
+        return endTimestampMs;
+    }
+
     public long getDurationMs() {
-        return durationMs;
+        return endTimestampMs - startTimestampMs;
     }
 
     public long getStartTimestampMs() {

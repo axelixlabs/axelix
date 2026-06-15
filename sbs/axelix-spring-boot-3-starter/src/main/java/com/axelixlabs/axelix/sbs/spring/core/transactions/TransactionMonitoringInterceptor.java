@@ -68,7 +68,6 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
         if (propagation != null && shouldCreateNewTransaction(propagation)) {
             long startTimestampMs = System.currentTimeMillis();
-            long txStartTime = System.nanoTime();
 
             queriesCollector.startNewContext();
 
@@ -85,11 +84,13 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                 throw e;
             } finally {
 
-                long durationNano = System.nanoTime() - txStartTime;
-                long durationMillis = durationNano / 1_000_000;
+                long endTimestampMs = System.currentTimeMillis();
+
                 List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
 
-                statsCollector.recordTransaction(key, new TransactionRecord(durationMillis, startTimestampMs, queries));
+                TransactionRecord transactionRecord = new TransactionRecord(endTimestampMs, startTimestampMs, queries);
+
+                statsCollector.recordTransaction(key, transactionRecord);
 
                 // METRICS. Publish metrics in MeterRegistry
                 try {
@@ -97,7 +98,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                         metricsPublisher.publishTransactionMetrics(
                                 declaringClass.getSimpleName(),
                                 method.getName(),
-                                durationMillis,
+                                transactionRecord.getDurationMs(),
                                 transactionStatus,
                                 queries.size());
                     }
