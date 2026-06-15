@@ -17,18 +17,19 @@
  */
 package com.axelixlabs.gradle.plugin;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
+
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies the plugin end-to-end on empty Spring Boot applications: after running their tests,
@@ -37,13 +38,11 @@ import org.junit.jupiter.api.io.TempDir;
  */
 class SpringBootApplicationFunctionalTest {
 
-    private static final String SPRING_BOOT_2_VERSION = "2.7.18";
-    private static final String SPRING_BOOT_4_VERSION = "4.0.7";
-
     /** Boot-2-era Gradle; the io.spring.dependency-management plugin predates Gradle 9. */
     private static final String SPRING_BOOT_2_GRADLE_VERSION = "8.14";
 
-    @TempDir Path projectDir;
+    @TempDir
+    Path projectDir;
 
     /**
      * The realistic Spring Boot 2 setup: the io.spring.dependency-management plugin applies the
@@ -54,34 +53,12 @@ class SpringBootApplicationFunctionalTest {
     void springBoot2WithDependencyManagementGeneratesProfilerReport() throws IOException {
         // given.
         writeSpringBootApplicationSources();
-        writeFile(
-                "build.gradle",
-                "plugins {\n"
-                        + "    id 'io.spring.dependency-management' version '1.1.7'\n"
-                        + "    id 'com.axelixlabs.axelix'\n"
-                        + "}\n"
-                        + "apply plugin: 'java'\n"
-                        + "\n"
-                        + "repositories { mavenCentral() }\n"
-                        + "\n"
-                        + "dependencyManagement {\n"
-                        + "    imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:"
-                        + SPRING_BOOT_2_VERSION
-                        + "' }\n"
-                        + "}\n"
-                        + "\n"
-                        + "dependencies {\n"
-                        + "    implementation 'org.springframework.boot:spring-boot-starter'\n"
-                        + "    testImplementation 'org.springframework.boot:spring-boot-starter-test'\n"
-                        + "}\n"
-                        + "\n"
-                        + "test { useJUnitPlatform() }\n");
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("spring-boot-2.gradle"));
 
         // when.
-        BuildResult result =
-                createRunner("test", "--stacktrace")
-                        .withGradleVersion(SPRING_BOOT_2_GRADLE_VERSION)
-                        .build();
+        BuildResult result = createRunner("test", "--stacktrace")
+                .withGradleVersion(SPRING_BOOT_2_GRADLE_VERSION)
+                .build();
 
         // then.
         assertProfilerReportGenerated(result);
@@ -111,8 +88,7 @@ class SpringBootApplicationFunctionalTest {
 
         // then.
         assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome())
-                .isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(projectDir.resolve("build/resources/main/spring-test-profiler/latest.html"))
                 .exists();
 
@@ -132,55 +108,22 @@ class SpringBootApplicationFunctionalTest {
 
     private void assertProfilerReportGenerated(BuildResult result) {
         assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.task(":generateAxelixSpringFactories").getOutcome())
-                .isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(projectDir.resolve("build/spring-test-profiler/latest.html")).exists();
     }
 
     private static String springBoot4BuildScript() {
-        return "plugins {\n"
-                + "    id 'com.axelixlabs.axelix'\n"
-                + "}\n"
-                + "apply plugin: 'java'\n"
-                + "\n"
-                + "repositories { mavenCentral() }\n"
-                + "\n"
-                + "dependencies {\n"
-                + "    implementation platform('org.springframework.boot:spring-boot-dependencies:"
-                + SPRING_BOOT_4_VERSION
-                + "')\n"
-                + "    implementation 'org.springframework.boot:spring-boot-starter'\n"
-                + "    testImplementation 'org.springframework.boot:spring-boot-starter-test'\n"
-                // Gradle 9 requires the launcher on the test runtime classpath; the Boot
-                // BOM supplies its version via the imported junit-bom.
-                + "    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'\n"
-                + "}\n"
-                + "\n"
-                + "test { useJUnitPlatform() }\n";
+        return GradleProjectFixtures.buildScript("spring-boot-4.gradle");
     }
 
     private void writeSpringBootApplicationSources() throws IOException {
         writeFile("settings.gradle", "rootProject.name = 'axelix-spring-boot-test'\n");
         writeFile(
                 "src/main/java/com/example/DemoApplication.java",
-                "package com.example;\n"
-                        + "\n"
-                        + "import org.springframework.boot.autoconfigure.SpringBootApplication;\n"
-                        + "\n"
-                        + "@SpringBootApplication\n"
-                        + "public class DemoApplication {}\n");
+                GradleProjectFixtures.javaSource("DemoApplication.java"));
         writeFile(
                 "src/test/java/com/example/DemoApplicationTest.java",
-                "package com.example;\n"
-                        + "\n"
-                        + "import org.junit.jupiter.api.Test;\n"
-                        + "import org.springframework.boot.test.context.SpringBootTest;\n"
-                        + "\n"
-                        + "@SpringBootTest\n"
-                        + "class DemoApplicationTest {\n"
-                        + "    @Test\n"
-                        + "    void contextLoads() {}\n"
-                        + "}\n");
+                GradleProjectFixtures.javaSource("DemoApplicationTest.java"));
     }
 
     private void writeFile(String relativePath, String content) throws IOException {

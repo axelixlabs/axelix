@@ -17,18 +17,19 @@
  */
 package com.axelixlabs.gradle.plugin;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AxelixGradlePluginFunctionalTest {
 
@@ -41,54 +42,71 @@ class AxelixGradlePluginFunctionalTest {
                     + "org.springframework.context.ApplicationContextInitializer=\\\n"
                     + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
 
-    @TempDir Path projectDir;
+    @TempDir
+    Path projectDir;
 
     @ParameterizedTest
     @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
-    void addsProfilerDependencyAndGeneratesSpringFactories(String gradleVersion)
-            throws IOException {
+    void addsProfilerDependencyAndGeneratesSpringFactories(String gradleVersion) throws IOException {
         // given.
         writeCommonProjectFiles(gradleVersion);
-        writeFile(
-                "build.gradle",
-                "plugins {\n"
-                        + "    id 'com.axelixlabs.axelix'\n"
-                        + "}\n"
-                        // Applied after our plugin on purpose: exercises the withPlugin reaction.
-                        + "apply plugin: 'java'\n"
-                        + "\n"
-                        + "repositories { mavenCentral() }\n"
-                        + "\n"
-                        + "task printTestRuntimeClasspath {\n"
-                        + "    dependsOn configurations.testRuntimeClasspath\n"
-                        + "    doLast {\n"
-                        + "        configurations.testRuntimeClasspath.files.each { f ->\n"
-                        + "            println 'TRC>> ' + f.absolutePath\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n");
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("profiler-dependency.gradle"));
+
+        // when.
+        BuildResult result = createRunner(gradleVersion, "printTestRuntimeClasspath", "--stacktrace")
+                .build();
+
+        // then.
+        assertThat(result.task(":printTestRuntimeClasspath").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.getOutput()).contains("spring-test-profiler-0.1.2.jar");
+        assertThat(result.getOutput()
+                        .lines()
+                        .filter(line -> line.startsWith("TRC>> "))
+                        .map(line -> line.replace('\\', '/')))
+                .anySatisfy(line -> assertThat(line).endsWith("build/generated/axelix"));
+
+        Path springFactories = projectDir.resolve("build/generated/axelix/META-INF/spring.factories");
+        assertThat(springFactories).exists();
+        assertThat(new String(Files.readAllBytes(springFactories), UTF_8)).isEqualTo(EXPECTED_SPRING_FACTORIES);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
+    void doesNotContributeProfilerOrThymeleafWhenAlreadyDeclared(String gradleVersion) throws IOException {
+        // given.
+        writeCommonProjectFiles(gradleVersion);
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("preexisting-versions.gradle"));
 
         // when.
         BuildResult result =
-                createRunner(gradleVersion, "printTestRuntimeClasspath", "--stacktrace").build();
+                createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
 
         // then.
-        assertThat(result.task(":printTestRuntimeClasspath").getOutcome())
-                .isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.task(":generateAxelixSpringFactories").getOutcome())
-                .isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.getOutput()).contains("spring-test-profiler-0.1.2.jar");
-        assertThat(
-                        result.getOutput().lines()
-                                .filter(line -> line.startsWith("TRC>> "))
-                                .map(line -> line.replace('\\', '/')))
-                .anySatisfy(line -> assertThat(line).endsWith("build/generated/axelix"));
+        assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.getOutput())
+                .contains("DEP>> digital.pragmatech.testing:spring-test-profiler:0.1.1")
+                .doesNotContain("digital.pragmatech.testing:spring-test-profiler:0.1.2")
+                .contains("DEP>> org.thymeleaf:thymeleaf:3.1.5.RELEASE")
+                .doesNotContain("org.thymeleaf:thymeleaf:3.1.3.RELEASE");
+    }
 
-        Path springFactories =
-                projectDir.resolve("build/generated/axelix/META-INF/spring.factories");
-        assertThat(springFactories).exists();
-        assertThat(new String(Files.readAllBytes(springFactories), UTF_8))
-                .isEqualTo(EXPECTED_SPRING_FACTORIES);
+    @ParameterizedTest
+    @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
+    void bumpsThymeleafWhenDeclaredVersionIsBelowMinimum(String gradleVersion) throws IOException {
+        // given.
+        writeCommonProjectFiles(gradleVersion);
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("outdated-thymeleaf.gradle"));
+
+        // when.
+        BuildResult result =
+                createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
+
+        // then.
+        assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.getOutput())
+                .contains("DEP>> org.thymeleaf:thymeleaf:3.0.15.RELEASE")
+                .contains("DEP>> org.thymeleaf:thymeleaf:3.1.3.RELEASE");
     }
 
     @ParameterizedTest
@@ -96,49 +114,11 @@ class AxelixGradlePluginFunctionalTest {
     void springFactoriesIsVisibleToTestsAtRuntime(String gradleVersion) throws IOException {
         // given.
         writeCommonProjectFiles(gradleVersion);
-        writeFile(
-                "build.gradle",
-                "plugins {\n"
-                        + "    id 'com.axelixlabs.axelix'\n"
-                        + "}\n"
-                        + "apply plugin: 'java'\n"
-                        + "\n"
-                        + "repositories { mavenCentral() }\n"
-                        + "\n"
-                        + "dependencies { testImplementation 'junit:junit:4.13.2' }\n");
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("spring-factories-visible.gradle"));
         // The test source must stay Java-8 compatible: on Gradle 4.0 it is compiled by JDK 8.
         writeFile(
                 "src/test/java/FactoriesVisibleTest.java",
-                "import java.io.BufferedReader;\n"
-                        + "import java.io.InputStreamReader;\n"
-                        + "import java.net.URL;\n"
-                        + "import java.util.Enumeration;\n"
-                        + "import org.junit.Test;\n"
-                        + "import static org.junit.Assert.assertTrue;\n"
-                        + "\n"
-                        + "public class FactoriesVisibleTest {\n"
-                        + "    @Test\n"
-                        + "    public void factoriesOnClasspath() throws Exception {\n"
-                        + "        Enumeration<URL> urls = getClass().getClassLoader()\n"
-                        + "                .getResources(\"META-INF/spring.factories\");\n"
-                        + "        boolean found = false;\n"
-                        + "        while (urls.hasMoreElements()) {\n"
-                        + "            BufferedReader reader = new BufferedReader(new InputStreamReader(\n"
-                        + "                    urls.nextElement().openStream(), \"UTF-8\"));\n"
-                        + "            StringBuilder content = new StringBuilder();\n"
-                        + "            String line;\n"
-                        + "            while ((line = reader.readLine()) != null) {\n"
-                        + "                content.append(line).append('\\n');\n"
-                        + "            }\n"
-                        + "            reader.close();\n"
-                        + "            if (content.toString().contains(\n"
-                        + "                    \"digital.pragmatech.testing.SpringTestProfilerListener\")) {\n"
-                        + "                found = true;\n"
-                        + "            }\n"
-                        + "        }\n"
-                        + "        assertTrue(found);\n"
-                        + "    }\n"
-                        + "}\n");
+                GradleProjectFixtures.javaSource("FactoriesVisibleTest.java"));
 
         // when.
         BuildResult result = createRunner(gradleVersion, "test", "--stacktrace").build();
@@ -152,22 +132,16 @@ class AxelixGradlePluginFunctionalTest {
     void buildSucceedsWhenNoProfilerReportWasProduced(String gradleVersion) throws IOException {
         // given.
         writeCommonProjectFiles(gradleVersion);
-        writeFile(
-                "build.gradle",
-                "plugins {\n"
-                        + "    id 'com.axelixlabs.axelix'\n"
-                        + "}\n"
-                        + "apply plugin: 'java'\n"
-                        + "\n"
-                        + "repositories { mavenCentral() }\n");
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("bare-java.gradle"));
 
         // when.
-        BuildResult result = createRunner(gradleVersion, "build", "--stacktrace").build();
+        BuildResult result =
+                createRunner(gradleVersion, "build", "--stacktrace").build();
 
         // then.
-        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome())
-                .isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(projectDir.resolve("build/resources/main/spring-test-profiler")).doesNotExist();
+        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(projectDir.resolve("build/resources/main/spring-test-profiler"))
+                .doesNotExist();
     }
 
     private GradleRunner createRunner(String gradleVersion, String... arguments) {
@@ -186,8 +160,7 @@ class AxelixGradlePluginFunctionalTest {
             // Gradle 4.0 daemons cannot run on Java 9+, so fork them on a JDK 8.
             writeFile(
                     "gradle.properties",
-                    "org.gradle.java.home=" + locateJdk8Home() + "\n"
-                            + "org.gradle.jvmargs=-Xmx512m\n");
+                    "org.gradle.java.home=" + locateJdk8Home() + "\n" + "org.gradle.jvmargs=-Xmx512m\n");
         }
     }
 
@@ -202,12 +175,11 @@ class AxelixGradlePluginFunctionalTest {
         if (override != null && !override.isEmpty()) {
             return override;
         }
-        throw new IllegalStateException(
-                "No JDK 8 found for the Gradle "
-                        + MIN_GRADLE_VERSION
-                        + " functional tests. Install Liberica JDK 8 via sdkman:\n"
-                        + "  source ~/.sdkman/bin/sdkman-init.sh && echo n | sdk install java"
-                        + " 8.0.492-librca\n"
-                        + "and point AXELIX_TEST_JDK8_HOME at the JDK 8 installation.");
+        throw new IllegalStateException("No JDK 8 found for the Gradle "
+                + MIN_GRADLE_VERSION
+                + " functional tests. Install Liberica JDK 8 via sdkman:\n"
+                + "  source ~/.sdkman/bin/sdkman-init.sh && echo n | sdk install java"
+                + " 8.0.492-librca\n"
+                + "and point AXELIX_TEST_JDK8_HOME at the JDK 8 installation.");
     }
 }

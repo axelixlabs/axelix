@@ -12,4 +12,5 @@ include(
     ":common:auth",
     ":common:domain",
     ":common:utils",
+    ":plugins:axelix-gradle-plugin"
 )
