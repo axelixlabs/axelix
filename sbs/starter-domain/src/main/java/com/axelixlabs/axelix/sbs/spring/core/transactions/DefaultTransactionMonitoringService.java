@@ -107,7 +107,8 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
     private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
         List<Query> queries = convertToQueries(record.getQueries());
         long startTimestamp = record.getStartTimestampMs();
-        long endTimestamp = startTimestamp + record.getDurationMs();
+        long endTimestamp = record.getEndTimestampMs();
+
         return new TransactionExecution(startTimestamp, endTimestamp, queries);
     }
 

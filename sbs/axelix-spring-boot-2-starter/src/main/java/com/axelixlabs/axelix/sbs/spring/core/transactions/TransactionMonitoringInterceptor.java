@@ -63,18 +63,17 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
         if (propagation != null && shouldCreateNewTransaction(propagation)) {
             long startTimestampMs = System.currentTimeMillis();
-            long txStartTime = System.nanoTime();
 
             queriesCollector.startNewContext();
 
             try {
                 return invocation.proceed();
             } finally {
-                long duration = System.nanoTime() - txStartTime;
+                long endTimestampMs = System.currentTimeMillis();
+
                 List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
 
-                statsCollector.recordTransaction(
-                        key, new TransactionRecord(duration / 1_000_000, startTimestampMs, queries));
+                statsCollector.recordTransaction(key, new TransactionRecord(endTimestampMs, startTimestampMs, queries));
             }
         }
 

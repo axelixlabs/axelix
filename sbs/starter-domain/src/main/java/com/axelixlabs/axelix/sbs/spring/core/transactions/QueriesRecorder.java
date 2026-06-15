@@ -45,7 +45,11 @@ public interface QueriesRecorder {
 
     /**
      * Pops all query statistics collected within the particular transaction
-     * (i.e. the history of queries is removed from {@link QueriesRecorder})
+     * (i.e. the history of queries is removed from {@link QueriesRecorder}).
+     * <p>
+     * The implementation <strong>must guarantee</strong> that the returned {@link List}
+     * of recorded queries is chronologically sorted, i.e. the transaction on the X element
+     * of the {@link List} is guaranteed to happen BEFORE transaction under X + 1 element.
      *
      * @return list of query statistics
      */
