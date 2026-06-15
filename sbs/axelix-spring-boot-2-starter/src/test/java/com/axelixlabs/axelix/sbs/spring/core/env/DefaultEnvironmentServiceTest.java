@@ -17,23 +17,17 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
@@ -41,6 +35,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -58,14 +53,33 @@ class DefaultEnvironmentServiceTest {
     private static final ThreadLocalSecurityContextExecutor securityContextExecutor =
             new ThreadLocalSecurityContextExecutor();
 
-    @SpringBootTest
-    @TestPropertySource(properties = {"management.endpoint.env.keys-to-sanitize= "})
     @Nested
-    @Import(TestConfigWithAllPropertiesSanitized.class)
-    class WithoutExplicitSanitizationProperties {
+    class WithoutExplicitSanitizationProperties extends AbstractEnvironmentIntegrationTest {
 
         @Autowired
+        private Environment environment;
+
+        @Autowired
+        private EnvPropertyEnricher envPropertyEnricher;
+
+        @Autowired
+        private RequiredAuthorityCheckService requiredAuthorityCheckService;
+
+        @Autowired
+        private PropertyNameNormalizer propertyNameNormalizer;
+
         private EnvironmentService environmentService;
+
+        @BeforeEach
+        void setUp() {
+            // The shared context defines a SmartSanitizingFunction with an explicit sanitization
+            // list, so the sanitize-all subject is constructed manually from the shared beans.
+            environmentService = new DefaultEnvironmentService(
+                    environment,
+                    new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer),
+                    envPropertyEnricher,
+                    requiredAuthorityCheckService);
+        }
 
         @Test
         void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
@@ -104,24 +118,8 @@ class DefaultEnvironmentServiceTest {
         }
     }
 
-    @TestConfiguration
-    @Import(EnvironmentTestConfig.class)
-    static class TestConfigWithAllPropertiesSanitized {
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
-        }
-    }
-
-    @SpringBootTest(
-            properties = {
-                "axelix.prop.test.tags.forSanitization=toBeSanitized",
-                "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized"
-            })
     @Nested
-    @Import(TestConfigWithExplicitSanitizationProperties.class)
-    class WithExplicitSanitizationProperties {
+    class WithExplicitSanitizationProperties extends AbstractEnvironmentIntegrationTest {
 
         @Autowired
         private EnvironmentService environmentService;
@@ -163,33 +161,6 @@ class DefaultEnvironmentServiceTest {
 
             assertThat(values).doesNotContain("******");
             assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
-        }
-    }
-
-    @TestConfiguration
-    @EnableConfigurationProperties(AxelixConfigurationProperties.class)
-    @Import(EnvironmentTestConfig.class)
-    static class TestConfigWithExplicitSanitizationProperties {
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
-                    propertyNameNormalizer);
-        }
-    }
-
-    @ConfigurationProperties(prefix = "axelix.prop.test")
-    static class AxelixConfigurationProperties {
-
-        private Map<String, String> tags;
-
-        public Map<String, String> getTags() {
-            return tags;
-        }
-
-        public void setTags(Map<String, String> tags) {
-            this.tags = tags;
         }
     }
 }

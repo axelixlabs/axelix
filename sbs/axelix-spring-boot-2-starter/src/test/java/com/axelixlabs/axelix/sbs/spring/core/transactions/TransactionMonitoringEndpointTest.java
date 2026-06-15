@@ -17,9 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -31,31 +42,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -69,10 +58,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
-@Import({TransactionMonitoringEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-class TransactionMonitoringEndpointTest {
+class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest {
+
+    // The end timestamps are reconstructed as 'startTimestampMs + duration', where the duration
+    // is truncated to whole milliseconds independently for the transaction and for each query.
+    // For sub-millisecond transactions the query end may therefore exceed the execution end by
+    // up to 2 ms, hence the tolerance.
+    private static final long TIMESTAMP_TOLERANCE_MS = 2;
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -132,8 +124,10 @@ class TransactionMonitoringEndpointTest {
 
         assertThat(executionStartTimestampMs).isLessThanOrEqualTo(executionEndTimestampMs);
         assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
-        assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
-        assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+        assertThat(queryStartTimestampMs)
+                .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
+        assertThat(queryEndTimestampMs)
+                .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
 
         assertThatJson(responseBody).node("entrypoints[0].executionStats").isObject();
         assertThatJson(responseBody)
@@ -196,8 +190,10 @@ class TransactionMonitoringEndpointTest {
             Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
 
             assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
-            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
-            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryStartTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
+            assertThat(queryEndTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
         }
     }
 
@@ -225,11 +221,11 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_0_, transactio0_.last_name as last_nam2_1_0_ from owner transactio0_ where transactio0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      }, {\n"
-                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_1_0_, pets0_.id as id1_1_0_, pets0_.id as id1_1_1_, pets0_.name as name2_1_1_, pets0_.owner_id as owner_id3_1_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
+                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_2_0_, pets0_.id as id1_2_0_, pets0_.id as id1_2_1_, pets0_.name as name2_2_1_, pets0_.owner_id as owner_id3_2_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -254,8 +250,10 @@ class TransactionMonitoringEndpointTest {
             Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
 
             assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
-            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
-            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryStartTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
+            assertThat(queryEndTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
         }
     }
 
@@ -281,7 +279,7 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_0_, transactio0_.last_name as last_nam2_1_0_ from owner transactio0_ where transactio0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      }, {\n"
@@ -310,8 +308,10 @@ class TransactionMonitoringEndpointTest {
             Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
 
             assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
-            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
-            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryStartTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
+            assertThat(queryEndTimestampMs)
+                    .isBetween(executionStartTimestampMs, executionEndTimestampMs + TIMESTAMP_TOLERANCE_MS);
         }
     }
 
@@ -335,7 +335,7 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_, transactio0_.last_name as last_nam2_1_ from owner transactio0_ where transactio0_.last_name=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -435,7 +435,7 @@ class TransactionMonitoringEndpointTest {
                         + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "          \"queries\" : [\n"
                         + "            {\n"
-                        + "              \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                        + "              \"sql\" : \"select transactio0_.id as id1_1_, transactio0_.last_name as last_nam2_1_ from owner transactio0_ where transactio0_.last_name=?\",\n"
                         + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                         + "            }\n"
@@ -502,52 +502,6 @@ class TransactionMonitoringEndpointTest {
                 restTemplate.asViewer().getForEntity("/actuator/axelix-transactions-monitoring", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         return response.getBody();
-    }
-
-    @TestConfiguration
-    @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = {Owner.class, Pet.class})
-    static class TransactionMonitoringEndpointTestConfiguration {
-
-        @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-                TransactionMonitoringService transactionMonitoringService) {
-            return new TransactionMonitoringEndpoint(transactionMonitoringService);
-        }
-
-        @Bean
-        public TransactionMonitoringService transactionMonitoringService(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new DefaultTransactionMonitoringService(transactionStatsCollector);
-        }
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30);
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
-        }
-
-        @Bean
-        public QueriesRecorder queriesStatsCollector() {
-            return new DefaultQueriesRecorder();
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
-        }
-
-        @Bean
-        public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
-        }
     }
 
     @Entity
@@ -624,16 +578,6 @@ class TransactionMonitoringEndpointTest {
             this.self = self;
         }
 
-        // IMPORTANT: Calling via 'self' proxy is required to properly test the REQUIRED -> REQUIRES_NEW stack behavior.
-        @Transactional(propagation = Propagation.REQUIRED)
-        public void outerRequiredMethod(String outerName) {
-            ownerRepository.save(new Owner().setLastName(outerName));
-
-            self.saveRequiresNew("SomeName");
-
-            ownerRepository.save(new Owner().setLastName(outerName));
-        }
-
         @Transactional(propagation = Propagation.REQUIRES_NEW)
         public void saveRequiresNew(String lastName) {
             ownerRepository.save(new Owner().setLastName(lastName));
@@ -678,6 +622,15 @@ class TransactionMonitoringEndpointTest {
         public void testRollbackScenario(String lastName) {
             ownerRepository.findByLastName(lastName);
             throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        public void outerRequiredMethod(String outerName) {
+            ownerRepository.save(new Owner().setLastName(outerName));
+
+            self.saveRequiresNew("SomeName");
+
+            ownerRepository.save(new Owner().setLastName(outerName));
         }
     }
 }

@@ -27,10 +27,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,16 +34,13 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpointTest.AxelixGcEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({AxelixGcEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-class AxelixGcEndpointTest {
+class AxelixGcEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -168,24 +161,5 @@ class AxelixGcEndpointTest {
                 restTemplate.asEditor().getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
 
         return response.getBody();
-    }
-
-    @TestConfiguration
-    static class AxelixGcEndpointTestConfiguration {
-
-        @Bean
-        public JcmdExecutor jcmdExecutor() {
-            return new JcmdExecutor();
-        }
-
-        @Bean
-        public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
-            return new DefaultGcLogService(jcmdExecutor);
-        }
-
-        @Bean
-        public AxelixGcEndpoint gcLogEndpoint(GcLogService gcLogService) {
-            return new AxelixGcEndpoint(gcLogService);
-        }
     }
 }

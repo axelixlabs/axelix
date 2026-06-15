@@ -17,59 +17,33 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
+import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.common.api.BeansFeed.ComponentVariant;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.sql.DataSource;
-
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.api.BeansFeed.ComponentVariant;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
-
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.ANONYMOUS_BEAN;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.CONFIGURATION_BEAN;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.CUSTOM_DATABASE_QUALIFIER_BEAN;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.LAZY_COMPONENT;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.LAZY_PRIMARY_BEAN_METHOD;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.PRIMARY_COMPONENT;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.QUALIFIED_BEAN_METHOD;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.QUALIFIED_COMPONENT;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.REGULAR_COMPONENT;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.SPRING_DATA_REPOSITORY;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.STATIC_BFPP_BEAN;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.SYNTHETIC_BEAN_DEFINITION;
+import static com.axelixlabs.axelix.sbs.spring.core.beans.AbstractBeansIntegrationTest.BeansTestConfiguration.TRANSACTIONAL_BEAN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -79,8 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
-class DefaultBeanMetaInfoExtractorTest {
+class DefaultBeanMetaInfoExtractorTest extends AbstractBeansIntegrationTest {
 
     @Autowired
     private BeanMetaInfoExtractor metaInfoExtractor;
@@ -91,7 +64,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractForSimpleServiceBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.REGULAR_COMPONENT, testBeanFactory);
+                metaInfoExtractor.extract(REGULAR_COMPONENT, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -138,7 +111,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractLazyServiceBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.LAZY_COMPONENT, testBeanFactory);
+                metaInfoExtractor.extract(LAZY_COMPONENT, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
@@ -153,7 +126,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractPrimaryComponentBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.PRIMARY_COMPONENT, testBeanFactory);
+                metaInfoExtractor.extract(PRIMARY_COMPONENT, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -168,14 +141,14 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractQualifiedServiceBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT, testBeanFactory);
+                metaInfoExtractor.extract(QUALIFIED_COMPONENT, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT);
+            assertThat(it.getQualifiers()).contains(QUALIFIED_COMPONENT);
             assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
@@ -183,7 +156,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractLazyPrimaryBeanMethod() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.LAZY_PRIMARY_BEAN_METHOD, testBeanFactory);
+                metaInfoExtractor.extract(LAZY_PRIMARY_BEAN_METHOD, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
@@ -193,8 +166,8 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
             assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(bs -> {
-                assertThat(bs.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-                assertThat(bs.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
+                assertThat(bs.getEnclosingClassName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getSimpleName());
+                assertThat(bs.getEnclosingClassFullName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getName());
                 assertThat(bs.getMethodName()).isEqualTo("lazyPrimaryBean");
             });
         });
@@ -203,19 +176,19 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractQualifiedBeanMethod() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD, testBeanFactory);
+                metaInfoExtractor.extract(QUALIFIED_BEAN_METHOD, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD);
+            assertThat(it.getQualifiers()).contains(QUALIFIED_BEAN_METHOD);
             assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
             assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(bs -> {
-                assertThat(bs.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-                assertThat(bs.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
-                assertThat(bs.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD);
+                assertThat(bs.getEnclosingClassName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getSimpleName());
+                assertThat(bs.getEnclosingClassFullName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getName());
+                assertThat(bs.getMethodName()).isEqualTo(QUALIFIED_BEAN_METHOD);
             });
         });
     }
@@ -223,7 +196,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractSpringDataRepositoryBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.SPRING_DATA_REPOSITORY, testBeanFactory);
+                metaInfoExtractor.extract(SPRING_DATA_REPOSITORY, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -241,13 +214,13 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractCustomQualifierAnnotations() {
         BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(
-                DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN, testBeanFactory);
+                CUSTOM_DATABASE_QUALIFIER_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN);
+            assertThat(it.getQualifiers()).contains(CUSTOM_DATABASE_QUALIFIER_BEAN);
             assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
             assertThat(it.getAutoConfigurationRef()).isNull();
         });
@@ -256,7 +229,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractConfigurationBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN, testBeanFactory);
+                metaInfoExtractor.extract(CONFIGURATION_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -270,7 +243,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractTransactionalBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.TRANSACTIONAL_BEAN, testBeanFactory);
+                metaInfoExtractor.extract(TRANSACTIONAL_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -284,7 +257,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @Test
     void shouldExtractBeanFromAnonymousClass() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN, testBeanFactory);
+                metaInfoExtractor.extract(ANONYMOUS_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
@@ -294,16 +267,16 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.getAutoConfigurationRef()).isNull();
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.getBeanSource();
-            assertThat(source.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-            assertThat(source.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
-            assertThat(source.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN);
+            assertThat(source.getEnclosingClassName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getSimpleName());
+            assertThat(source.getEnclosingClassFullName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getName());
+            assertThat(source.getMethodName()).isEqualTo(ANONYMOUS_BEAN);
         });
     }
 
     @Test
     void shouldExtractInfoForStaticBeanFactoryPostProcessorBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN, testBeanFactory);
+                metaInfoExtractor.extract(STATIC_BFPP_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
@@ -313,16 +286,16 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.getAutoConfigurationRef()).isNull();
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.getBeanSource();
-            assertThat(source.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-            assertThat(source.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
-            assertThat(source.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN);
+            assertThat(source.getEnclosingClassName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getSimpleName());
+            assertThat(source.getEnclosingClassFullName()).isEqualTo(AbstractBeansIntegrationTest.BeansTestConfiguration.class.getName());
+            assertThat(source.getMethodName()).isEqualTo(STATIC_BFPP_BEAN);
         });
     }
 
     @Test
     void shouldExtractInfoForSyntheticallyGeneratedBean() {
         BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.SYNTHETIC_BEAN_DEFINITION, testBeanFactory);
+                metaInfoExtractor.extract(SYNTHETIC_BEAN_DEFINITION, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
@@ -335,178 +308,6 @@ class DefaultBeanMetaInfoExtractorTest {
 
     @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
     @Retention(RetentionPolicy.RUNTIME)
-    @Qualifier(DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN)
+    @Qualifier(CUSTOM_DATABASE_QUALIFIER_BEAN)
     public @interface CustomDatabaseQualifier {}
-
-    /**
-     * Static nested configuration class for {@link DefaultBeanMetaInfoExtractorTest}.
-     */
-    @TestConfiguration
-    @EnableJpaRepositories(
-            basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
-            considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = DefaultBeanAnalyzerTestConfig.MyEntity.class)
-    public static class DefaultBeanAnalyzerTestConfig {
-
-        static final String PRIMARY_COMPONENT = "primaryComponent";
-
-        static final String LAZY_COMPONENT = "lazyComponentAnnotation";
-
-        static final String REGULAR_COMPONENT = "fromServiceAnnotation";
-
-        static final String QUALIFIED_COMPONENT = "qualifiedService";
-
-        static final String LAZY_PRIMARY_BEAN_METHOD = "lazyPrimaryBeanMethod";
-
-        static final String QUALIFIED_BEAN_METHOD = "qualifiedBeanMethod";
-
-        static final String CONFIGURATION_BEAN = "configurationBean";
-
-        static final String TRANSACTIONAL_BEAN = "transactionalBean";
-
-        static final String SPRING_DATA_REPOSITORY = "MyRepository";
-
-        static final String CUSTOM_DATABASE_QUALIFIER_BEAN = "CustomDatabaseQualifierBean";
-
-        static final String ANONYMOUS_BEAN = "anonymousBean";
-
-        static final String STATIC_BFPP_BEAN = "staticBFPPBean";
-
-        static final String BEAN_DEFINITION_REGISTRY_BEAN = "BEAN_DEFINITION_REGISTRY_BEAN";
-
-        static final String SYNTHETIC_BEAN_DEFINITION = "SYNTHETIC_BEAN_DEFINITION";
-
-        @Service(REGULAR_COMPONENT)
-        static class FromServiceAnnotation {}
-
-        @Component(LAZY_COMPONENT)
-        @Lazy
-        static class LazyComponentAnnotation {}
-
-        @Component(PRIMARY_COMPONENT)
-        @Primary
-        static class PrimaryComponent {}
-
-        @Service(QUALIFIED_COMPONENT)
-        @Qualifier(QUALIFIED_COMPONENT)
-        static class QualifiedService {}
-
-        @Bean(LAZY_PRIMARY_BEAN_METHOD)
-        @Lazy
-        @Primary
-        public String lazyPrimaryBean() {
-            return LAZY_PRIMARY_BEAN_METHOD;
-        }
-
-        @Bean
-        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
-            return new QualifiersPersistencePostProcessor();
-        }
-
-        @Bean
-        public DataSource dataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .build();
-        }
-
-        @Bean
-        public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-            LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-            emf.setDataSource(dataSource);
-            emf.setPackagesToScan(MyEntity.class.getPackageName());
-
-            JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-            emf.setJpaVendorAdapter(vendorAdapter);
-
-            emf.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "create-drop");
-            return emf;
-        }
-
-        @Bean
-        public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
-            return new JpaTransactionManager(emf);
-        }
-
-        @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
-        public BeanMetaInfoExtractor beanMetaInfoExtractor(
-                ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
-        }
-
-        @Entity
-        @Table(name = "my_entity")
-        public static class MyEntity {
-            @Id
-            @GeneratedValue(strategy = GenerationType.AUTO)
-            private Long id;
-        }
-
-        @Repository(SPRING_DATA_REPOSITORY)
-        public interface MyRepository extends JpaRepository<MyEntity, Long> {}
-
-        @Bean
-        @Qualifier(QUALIFIED_BEAN_METHOD)
-        public String qualifiedBeanMethod() {
-            return QUALIFIED_BEAN_METHOD;
-        }
-
-        @Configuration(CONFIGURATION_BEAN)
-        public static class ConfigurationBean {}
-
-        @Service(TRANSACTIONAL_BEAN)
-        public static class TransactionalClass {
-
-            @Autowired
-            private JdbcTemplate jdbcTemplate;
-
-            @Transactional
-            public void execute() {
-                // code
-            }
-        }
-
-        @Service(CUSTOM_DATABASE_QUALIFIER_BEAN)
-        @CustomDatabaseQualifier
-        static class CustomDatabaseQualifierBean {}
-
-        // IMPORTANT! Intentionally using explicit anonymous class `new Runnable()`
-        // instead of lambda to ensure Class.isAnonymousClass() returns true.
-        @Bean(ANONYMOUS_BEAN)
-        public Runnable anonymousBean() {
-            return new Runnable() {
-                @Override
-                public void run() {}
-            };
-        }
-
-        @Bean(STATIC_BFPP_BEAN)
-        public static BeanFactoryPostProcessor staticBFPPBean() {
-            return beanFactory -> {};
-        }
-
-        @Bean(BEAN_DEFINITION_REGISTRY_BEAN)
-        public static BeanDefinitionRegistryPostProcessor beanDefinitionRegistryPostProcessor() {
-
-            return new BeanDefinitionRegistryPostProcessor() {
-
-                @Override
-                public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-                    RootBeanDefinition beanDefinition = new RootBeanDefinition();
-                    beanDefinition.setSynthetic(true);
-                    beanDefinition.setBeanClass(Object.class);
-                    registry.registerBeanDefinition(SYNTHETIC_BEAN_DEFINITION, beanDefinition);
-                }
-
-                @Override
-                public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {}
-            };
-        }
-    }
 }

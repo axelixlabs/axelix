@@ -30,15 +30,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -49,7 +42,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
-import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,22 +61,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @since 24.06.2025
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@Import({
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
-    AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
-})
-class AxelixCachesEndpointTest {
+class AxelixCachesEndpointTest extends AbstractEndpointIntegrationTest {
 
     // Cache names under test
-    private static final String TEST_CACHE_1 = "cache1";
-    private static final String TEST_CACHE_2 = "cache2";
+    private static final String TEST_CACHE_1 = CachesEndpointTestConfiguration.TEST_CACHE_1;
+    private static final String TEST_CACHE_2 = CachesEndpointTestConfiguration.TEST_CACHE_2;
 
-    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
-    private static final String CLEAR_CACHE_MANAGER = "clearCacheManager";
-    private static final String ENABLE_CACHE_MANAGER = "enableCacheManager";
-    private static final String DISABLE_CACHE_MANAGER = "disableCacheManager";
+    private static final String MAIN_CACHE_MANAGER = CachesEndpointTestConfiguration.MAIN_CACHE_MANAGER;
+    private static final String CLEAR_CACHE_MANAGER = CachesEndpointTestConfiguration.CLEAR_CACHE_MANAGER;
+    private static final String ENABLE_CACHE_MANAGER = CachesEndpointTestConfiguration.ENABLE_CACHE_MANAGER;
+    private static final String DISABLE_CACHE_MANAGER = CachesEndpointTestConfiguration.DISABLE_CACHE_MANAGER;
 
     private EnhancedCacheManager mainCacheManager;
     private EnhancedCacheManager clearCacheManager;
@@ -515,41 +502,5 @@ class AxelixCachesEndpointTest {
                 .filter(cm -> cacheManagerName.equals(cm.getName()))
                 .findFirst()
                 .orElseThrow();
-    }
-
-    @TestConfiguration
-    public static class CacheDispatcherEndpointTestConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CacheManagerBeanPostProcessor();
-        }
-
-        @Bean(name = MAIN_CACHE_MANAGER)
-        @Primary
-        public CacheManager testSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
-        }
-
-        @Bean(name = CLEAR_CACHE_MANAGER)
-        public CacheManager clearSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
-        }
-
-        @Bean(name = ENABLE_CACHE_MANAGER)
-        public CacheManager enableSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
-        }
-
-        @Bean(name = DISABLE_CACHE_MANAGER)
-        public CacheManager disableSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
-        }
     }
 }

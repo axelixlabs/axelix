@@ -17,45 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-
-import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.test.context.TestPropertySource;
-
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import static com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksEndpointTestConfiguration.NON_EXISTENT_TASK_ID;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,48 +46,34 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduled-tasks"})
-@Import({AxelixScheduledTasksEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-class AxelixScheduledTasksEndpointTest {
+class AxelixScheduledTasksEndpointTest extends AbstractEndpointIntegrationTest {
 
     // Cron
     private static final String CRON_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTask";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTask";
     private static final String CRON_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModify";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testCronTaskForModify";
 
     // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTask";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTask";
     private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForModify";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForModify";
     private static final String FIXED_DELAY_TASK_ID_FOR_EXECUTE =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute";
 
     // FixedRate
     private static final String FIXED_RATE_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTask";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTask";
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForModify";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForModify";
     private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
-            AxelixScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForExecute";
+            ScheduledTasksEndpointTestConfiguration.class.getName() + ".testFixedRateTaskForExecute";
 
     // Custom
-    private static final String CUSTOM_TASK_ID =
-            AxelixScheduledTasksEndpointTestConfiguration.CustomTestTask.class.getName();
+    private static final String CUSTOM_TASK_ID = ScheduledTasksEndpointTestConfiguration.CUSTOM_TASK_ID;
 
-    private static final String CUSTOM_TRIGGER = "CustomTestTrigger";
-
-    private static final String NON_EXISTENT_TASK_ID = "com.example.NonExistentTask.doWork";
-
-    private static volatile boolean cronFlag = false;
-
-    private static volatile boolean fixedDelayFlag = false;
-
-    private static volatile boolean fixedRateFlag = false;
-
-    private static volatile boolean customTaskFlag = false;
+    private static final String CUSTOM_TRIGGER = ScheduledTasksEndpointTestConfiguration.CUSTOM_TRIGGER;
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -120,9 +84,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        cronFlag = false;
+        ScheduledTasksEndpointTestConfiguration.cronFlag = false;
         Thread.sleep(1200);
-        assertThat(cronFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -136,9 +100,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        cronFlag = false;
+        ScheduledTasksEndpointTestConfiguration.cronFlag = false;
         Thread.sleep(1200);
-        assertThat(cronFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -147,7 +111,7 @@ class AxelixScheduledTasksEndpointTest {
 
         enableScheduledTask(taskId);
         Thread.sleep(1200);
-        assertThat(cronFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.cronFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -161,9 +125,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        fixedDelayFlag = false;
+        ScheduledTasksEndpointTestConfiguration.fixedDelayFlag = false;
         Thread.sleep(200);
-        assertThat(fixedDelayFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -177,9 +141,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        fixedDelayFlag = false;
+        ScheduledTasksEndpointTestConfiguration.fixedDelayFlag = false;
         Thread.sleep(200);
-        assertThat(fixedDelayFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -188,7 +152,7 @@ class AxelixScheduledTasksEndpointTest {
 
         enableScheduledTask(taskId);
         Thread.sleep(200);
-        assertThat(fixedDelayFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedDelayFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -202,9 +166,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        fixedRateFlag = false;
+        ScheduledTasksEndpointTestConfiguration.fixedRateFlag = false;
         Thread.sleep(200);
-        assertThat(fixedRateFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -218,9 +182,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        fixedRateFlag = false;
+        ScheduledTasksEndpointTestConfiguration.fixedRateFlag = false;
         Thread.sleep(200);
-        assertThat(fixedRateFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -229,7 +193,7 @@ class AxelixScheduledTasksEndpointTest {
 
         enableScheduledTask(taskId);
         Thread.sleep(200);
-        assertThat(fixedRateFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedRateFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -243,9 +207,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        customTaskFlag = false;
+        ScheduledTasksEndpointTestConfiguration.customTaskFlag = false;
         Thread.sleep(200);
-        assertThat(customTaskFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -260,9 +224,9 @@ class AxelixScheduledTasksEndpointTest {
 
         forceDisableTask(taskId);
         Thread.sleep(200);
-        customTaskFlag = false;
+        ScheduledTasksEndpointTestConfiguration.customTaskFlag = false;
         Thread.sleep(200);
-        assertThat(customTaskFlag).isFalse();
+        assertThat(ScheduledTasksEndpointTestConfiguration.customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -271,7 +235,7 @@ class AxelixScheduledTasksEndpointTest {
 
         enableScheduledTask(taskId);
         Thread.sleep(200);
-        assertThat(customTaskFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.customTaskFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
             assertThatJson(task).node("runnable.target").isEqualTo(taskId);
@@ -400,7 +364,7 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
-        assertThat(fixedDelayFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedDelayFlag).isTrue();
     }
 
     @Test
@@ -417,7 +381,7 @@ class AxelixScheduledTasksEndpointTest {
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
-        assertThat(fixedRateFlag).isTrue();
+        assertThat(ScheduledTasksEndpointTestConfiguration.fixedRateFlag).isTrue();
     }
 
     @Test
@@ -525,116 +489,5 @@ class AxelixScheduledTasksEndpointTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(request, headers);
-    }
-
-    @TestConfiguration
-    @EnableScheduling
-    static class AxelixScheduledTasksEndpointTestConfiguration implements SchedulingConfigurer {
-
-        @Bean
-        public TaskScheduler taskScheduler() {
-            return new ConcurrentTaskScheduler();
-        }
-
-        @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
-        }
-
-        @Bean
-        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new TriggerBasedTaskRescheduler(taskScheduler);
-        }
-
-        @Bean
-        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new IntervalBasedTaskRescheduler(taskScheduler);
-        }
-
-        @Bean
-        public ScheduledTaskService scheduledTaskService(
-                ScheduledTasksRegistry registry,
-                List<TaskRescheduler> taskReschedulers,
-                ThreadPoolTaskExecutor taskExecutor) {
-            return new ScheduledTaskService(registry, taskReschedulers, taskExecutor);
-        }
-
-        @Bean
-        public ScheduledTasksAssembler serviceScheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
-            return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
-        }
-
-        @Bean
-        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
-            return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
-        }
-
-        // Cron tasks
-        @Scheduled(cron = "*/1 * * * * *")
-        public void testCronTask() {
-            cronFlag = true;
-        }
-
-        @Scheduled(cron = "*/2 * * * * *")
-        public void testCronTaskForModify() {}
-
-        // FixedDelay tasks
-        @Scheduled(fixedDelay = 100)
-        public void testFixedDelayTask() {
-            fixedDelayFlag = true;
-        }
-
-        @Scheduled(fixedDelay = 20000000)
-        public void testFixedDelayTaskForModify() {}
-
-        @Scheduled(fixedDelay = 2000000000)
-        public void testFixedDelayTaskForExecute() {
-            fixedDelayFlag = true;
-        }
-
-        // FixedRate tasks
-        @Scheduled(fixedRate = 100, initialDelay = 50)
-        public void testFixedRateTask() {
-            fixedRateFlag = true;
-        }
-
-        @Scheduled(fixedRate = 20000000)
-        public void testFixedRateTaskForModify() {}
-
-        @Scheduled(fixedRate = 2000000000)
-        public void testFixedRateTaskForExecute() {
-            fixedRateFlag = true;
-        }
-
-        // Custom task
-        @Override
-        public void configureTasks(ScheduledTaskRegistrar registrar) {
-            registrar.addTriggerTask(new CustomTestTask(), new CustomTestTrigger());
-        }
-
-        static class CustomTestTask implements Runnable {
-            @Override
-            public void run() {
-                customTaskFlag = true;
-            }
-
-            @Override
-            public String toString() {
-                return CUSTOM_TASK_ID;
-            }
-        }
-
-        static class CustomTestTrigger implements Trigger {
-            @Override
-            public Date nextExecutionTime(@NonNull TriggerContext triggerContext) {
-                return Date.from(Instant.now().plusMillis(100));
-            }
-
-            @Override
-            public String toString() {
-                return CUSTOM_TRIGGER;
-            }
-        }
     }
 }

@@ -30,27 +30,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.AbstractEndpointIntegrationTest;
+import com.axelixlabs.axelix.sbs.spring.core.utils.AxelixTestProperties;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -65,37 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        args = {"--axelix.env.test.prop3=fromCommandLine"},
-        properties = {
-            "axelix.env.test.prop2=systemValue2",
-        })
-@TestPropertySource(
-        properties = {
-            // properties -> shouldSelectPrimaryPropertyFromHighestPrecedenceSource
-            "axelix.env.test.prop1=fromTestSource",
-            "axelix.env.test.toBeSanitized=shouldBeSanitized",
-
-            // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
-            "axelix.prop.test.tags.environment=test",
-            "axelix.prop.test.tags.version=1.0.0",
-            "axelix.prop.test.enabled-contexts=user-service,payment-service",
-            "axelix.prop.test.http-client.requests[0].name=user-api",
-            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axelix.prop.test.http-client.requests[0].methods[1].type=POST",
-            "axelix.prop.test.http-client.requests[1].name=payment-api",
-            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
-            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
-        })
-@EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
-@Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class})
-class AxelixEnvironmentEndpointTest {
+class AxelixEnvironmentEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -109,11 +68,6 @@ class AxelixEnvironmentEndpointTest {
         environment.getSystemProperties().put("axelix.env.test.prop2", "systemValue");
         environment.getSystemProperties().put("axelix.env.test.prop3", "systemValue");
         environment.getSystemProperties().put("AXELIX_FOR_SANITIZATION", "shouldBeSanitized");
-    }
-
-    @DynamicPropertySource
-    static void registerDynamic(DynamicPropertyRegistry registry) {
-        registry.add("axelix.env.test.prop2", () -> "dynamicValue");
     }
 
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
@@ -203,7 +157,7 @@ class AxelixEnvironmentEndpointTest {
 
         assertThat(propertyAppearances)
                 .extracting(e -> e.getValue().getConfigPropsBeanName())
-                .containsOnly(AxelixPropTest.class.getName());
+                .containsOnly(AxelixTestProperties.class.getName());
     }
 
     @ParameterizedTest
@@ -276,128 +230,5 @@ class AxelixEnvironmentEndpointTest {
                         .filter(p -> p.getName().equals(propertyName))
                         .map(p -> Map.entry(src.getName(), p)))
                 .collect(Collectors.toList());
-    }
-
-    @ConstructorBinding
-    @ConfigurationProperties(prefix = "axelix.prop.test")
-    public static final class AxelixPropTest {
-        private final Map<String, String> tags;
-        private final List<String> enabledContexts;
-        private final HttpClient httpClient;
-
-        public AxelixPropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
-            this.tags = tags;
-            this.enabledContexts = enabledContexts;
-            this.httpClient = httpClient;
-        }
-
-        public Map<String, String> getTags() {
-            return tags;
-        }
-
-        public List<String> getEnabledContexts() {
-            return enabledContexts;
-        }
-
-        public HttpClient getHttpClient() {
-            return httpClient;
-        }
-
-        @ConstructorBinding
-        public static final class HttpClient {
-            private final List<Request> requests;
-
-            public HttpClient(List<Request> requests) {
-                this.requests = requests;
-            }
-
-            public List<Request> getRequests() {
-                return requests;
-            }
-        }
-
-        @ConstructorBinding
-        public static final class Request {
-            private final String name;
-            private final String baseUrl;
-            private final List<Method> methods;
-
-            public Request(String name, String baseUrl, List<Method> methods) {
-                this.name = name;
-                this.baseUrl = baseUrl;
-                this.methods = methods;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public String getBaseUrl() {
-                return baseUrl;
-            }
-
-            public List<Method> getMethods() {
-                return methods;
-            }
-        }
-
-        @ConstructorBinding
-        public static final class Method {
-            private final String type;
-            private final List<Retry> retries;
-
-            public Method(String type, List<Retry> retries) {
-                this.type = type;
-                this.retries = retries;
-            }
-
-            public String getType() {
-                return type;
-            }
-
-            public List<Retry> getRetries() {
-                return retries;
-            }
-        }
-
-        @ConstructorBinding
-        public static final class Retry {
-            private final Integer count;
-            private final Map<String, Object> parameters;
-
-            public Retry(Integer count, Map<String, Object> parameters) {
-                this.count = count;
-                this.parameters = parameters;
-            }
-
-            public Integer getCount() {
-                return count;
-            }
-
-            public Map<String, Object> getParameters() {
-                return parameters;
-            }
-        }
-    }
-
-    @TestConfiguration
-    static class AxelixEnvironmentEndpointTestConfiguration {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-            return new EndpointsConfigurationProperties();
-        }
-
-        @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
-            return new AxelixEnvironmentEndpoint(environmentService);
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.env.test.toBeSanitized", "AXELIX_FOR_SANITIZATION"), propertyNameNormalizer);
-        }
     }
 }
