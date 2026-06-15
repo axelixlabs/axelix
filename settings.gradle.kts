@@ -1,7 +1,5 @@
 rootProject.name = "axelix"
 
-includeBuild("plugins/axelix-gradle-plugin")
-
 include(
     ":master",
     ":sbs:axelix-spring-boot-2-starter",
