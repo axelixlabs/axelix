@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.api.KeyValue;
 
 /**
@@ -31,12 +33,12 @@ import com.axelixlabs.axelix.common.api.KeyValue;
 public class DefaultConfigurationPropertiesFlattener implements ConfigurationPropertiesFlattener {
 
     @Override
-    public List<KeyValue> flatten(String key, Map<String, Object> map) {
+    public List<KeyValue> flatten(String key, Map<String, ? extends @Nullable Object> map) {
         if (map == null || map.isEmpty()) {
             return List.of();
         }
         List<KeyValue> result = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, ? extends @Nullable Object> entry : map.entrySet()) {
             String fullKey = key.isEmpty() ? entry.getKey() : key + "." + entry.getKey();
             result.addAll(flattenEntry(fullKey, entry.getValue()));
         }
@@ -44,11 +46,11 @@ public class DefaultConfigurationPropertiesFlattener implements ConfigurationPro
     }
 
     @SuppressWarnings("unchecked")
-    private List<KeyValue> flattenEntry(String key, Object value) {
+    private List<KeyValue> flattenEntry(String key, @Nullable Object value) {
 
         if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            return flattenMap(key, (Map<String, Object>) map);
+            Map<?, ? extends @Nullable Object> map = (Map<?, ?>) value;
+            return flattenMap(key, (Map<String, @Nullable Object>) map);
         }
 
         if (value instanceof List) {
@@ -59,7 +61,7 @@ public class DefaultConfigurationPropertiesFlattener implements ConfigurationPro
         return List.of(new KeyValue(key, String.valueOf(value)));
     }
 
-    private List<KeyValue> flattenMap(String key, Map<String, Object> map) {
+    private List<KeyValue> flattenMap(String key, Map<String, @Nullable Object> map) {
         return map.isEmpty() ? List.of(new KeyValue(key, null)) : flatten(key, map);
     }
 
