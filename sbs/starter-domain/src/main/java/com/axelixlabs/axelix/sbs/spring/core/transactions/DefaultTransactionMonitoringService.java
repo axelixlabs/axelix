@@ -108,7 +108,15 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
         List<Query> queries = convertToQueries(record.getQueries());
         long startTimestamp = record.getStartTimestampMs();
         long endTimestamp = startTimestamp + record.getDurationMs();
-        return new TransactionExecution(startTimestamp, endTimestamp, queries);
+
+        // The execution end and each query end are synthesized from currentTimeMillis() plus a
+        // nanoTime-based duration truncated to whole milliseconds. A query is always nested inside
+        // the execution in real time, so make the reported execution end cover the latest query end
+        // to keep that invariant after millisecond rounding.
+        long maxQueryEndTimestamp =
+                queries.stream().mapToLong(Query::getEndTimestampMs).max().orElse(endTimestamp);
+
+        return new TransactionExecution(startTimestamp, Math.max(endTimestamp, maxQueryEndTimestamp), queries);
     }
 
     private List<Query> convertToQueries(List<SqlQueryRecord> queriesRecords) {
