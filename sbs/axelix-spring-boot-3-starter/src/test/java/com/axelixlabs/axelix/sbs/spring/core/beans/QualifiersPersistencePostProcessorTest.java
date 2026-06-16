@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Mikhail Polivakha
  */
-class QualifiersPersistencePostProcessorTest extends AbstractSharedBeansContextTest {
+class QualifiersPersistencePostProcessorTest extends AbstractBeansSharedContextTest {
 
     @Test
     void shouldDetectAnnotationQualifiers() {

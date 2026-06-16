@@ -60,6 +60,11 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
 @TestConfiguration
 public class EnvSharedTestConfig {
 
+    public static final String SAMPLE_BEAN_NAME = "testBeanWithCustomAnnotations";
+
+    private static final String SANITIZE_ALL_SMART_SANITIZATION_FUNCTION = "sanitizeAllSmartSanitizingFunction";
+    private static final String EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION = "explicitSmartSanitizingFunction";
+
     @Bean
     public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
         return new DefaultConfigurationPropertiesFlattener();
@@ -104,11 +109,12 @@ public class EnvSharedTestConfig {
      * (including the {@code @Value} sample beans below).
      */
     @Bean
-    public static ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor() {
-        return new ValueInjectionTrackerBeanPostProcessor(new DefaultPropertyNameNormalizer());
+    public static ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 
-    @Bean
+    @Bean(SANITIZE_ALL_SMART_SANITIZATION_FUNCTION)
     public SmartSanitizingFunction sanitizeAllSmartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
     }
@@ -122,7 +128,8 @@ public class EnvSharedTestConfig {
 
     @Bean
     public ConfigurationPropertiesService configurationPropertiesService(
-            @Qualifier("explicitSmartSanitizingFunction") SmartSanitizingFunction smartSanitizingFunction,
+            @Qualifier(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
+                    SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter,
             RequiredAuthorityCheckService requiredAuthorityCheckService) {
@@ -151,7 +158,7 @@ public class EnvSharedTestConfig {
     @Bean
     public EnvironmentService sanitizeAllEnvironmentService(
             Environment environment,
-            @Qualifier("sanitizeAllSmartSanitizingFunction") SmartSanitizingFunction smartSanitizingFunction,
+            @Qualifier(SANITIZE_ALL_SMART_SANITIZATION_FUNCTION) SmartSanitizingFunction smartSanitizingFunction,
             EnvPropertyEnricher envPropertyEnricher,
             RequiredAuthorityCheckService requiredAuthorityCheckService) {
         return new DefaultEnvironmentService(
@@ -161,14 +168,15 @@ public class EnvSharedTestConfig {
     @Bean
     public EnvironmentService explicitSanitizeEnvironmentService(
             Environment environment,
-            @Qualifier("explicitSmartSanitizingFunction") SmartSanitizingFunction smartSanitizingFunction,
+            @Qualifier(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
+                    SmartSanitizingFunction smartSanitizingFunction,
             EnvPropertyEnricher envPropertyEnricher,
             RequiredAuthorityCheckService requiredAuthorityCheckService) {
         return new DefaultEnvironmentService(
                 environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
     }
 
-    @Bean
+    @Bean(SAMPLE_BEAN_NAME)
     public TestBeanWithCustomAnnotations testBeanWithCustomAnnotations() {
         return new TestBeanWithCustomAnnotations("appName", "connectionTimeout");
     }

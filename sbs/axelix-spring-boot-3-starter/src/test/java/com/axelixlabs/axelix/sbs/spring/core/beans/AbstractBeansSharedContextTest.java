@@ -41,4 +41,4 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
     QualifiersPersistencePostProcessorTest.ComponentMethodDeclarations.class,
     QualifiersPersistencePostProcessorTest.ConfigurationClassesDeclarations.class
 })
-abstract class AbstractSharedBeansContextTest {}
+abstract class AbstractBeansSharedContextTest {}

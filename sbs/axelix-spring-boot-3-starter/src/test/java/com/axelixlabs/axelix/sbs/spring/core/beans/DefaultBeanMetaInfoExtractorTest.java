@@ -77,7 +77,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-class DefaultBeanMetaInfoExtractorTest extends AbstractSharedBeansContextTest {
+class DefaultBeanMetaInfoExtractorTest extends AbstractBeansSharedContextTest {
 
     @Autowired
     private BeanMetaInfoExtractor metaInfoExtractor;

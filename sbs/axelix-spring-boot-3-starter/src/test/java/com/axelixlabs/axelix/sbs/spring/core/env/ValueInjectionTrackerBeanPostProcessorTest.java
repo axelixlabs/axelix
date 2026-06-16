@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
 
+import static com.axelixlabs.axelix.sbs.spring.core.env.EnvSharedTestConfig.SAMPLE_BEAN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,8 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artemiy Degtyarev
  */
 class ValueInjectionTrackerBeanPostProcessorTest extends AbstractEnvSharedContextTest {
-
-    private static final String SAMPLE_BEAN_NAME = "testBeanWithCustomAnnotations";
 
     @Autowired
     private ValueInjectionTrackerBeanPostProcessor subject;
