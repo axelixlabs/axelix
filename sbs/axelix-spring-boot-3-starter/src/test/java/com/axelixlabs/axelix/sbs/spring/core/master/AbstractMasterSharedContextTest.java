@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Import({
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
