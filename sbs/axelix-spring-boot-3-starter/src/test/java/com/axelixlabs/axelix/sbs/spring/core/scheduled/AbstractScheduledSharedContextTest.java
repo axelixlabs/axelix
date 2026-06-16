@@ -45,9 +45,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  * <p>The shared context is keyed by the merged context configuration of this class. Because
  * Spring's TestContext framework merges inherited class-level annotations, every concrete
  * subclass that adds no further context configuration produces an identical cache key and
- * therefore reuses the very same cached context. The {@link AxelixScheduledTasksEndpointTest}
- * deliberately does <em>not</em> extend this class: it runs on a real web server with its own
- * property source and security configuration, so it keeps a separate context.
+ * therefore reuses the very same cached context.
  *
  * @since 16.06.2026
  * @author Nikita Kirillov
@@ -55,8 +53,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  * @author Artemiy Degtyarev
  */
 @SpringBootTest
-@Import(AbstractScheduledTasksIntegrationTest.SharedScheduledTasksTestConfiguration.class)
-abstract class AbstractScheduledTasksIntegrationTest {
+@Import(AbstractScheduledSharedContextTest.SharedScheduledTasksTestConfiguration.class)
+abstract class AbstractScheduledSharedContextTest {
 
     static volatile boolean cronFlag = false;
 

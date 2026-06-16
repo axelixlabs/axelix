@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-class ScheduledTasksRegistryTest extends AbstractScheduledTasksIntegrationTest {
+class ScheduledTasksRegistryTest extends AbstractScheduledSharedContextTest {
 
     private static final String CRON_TASK_ID =
             SharedScheduledTasksTestConfiguration.class.getName() + ".testCronTask";
