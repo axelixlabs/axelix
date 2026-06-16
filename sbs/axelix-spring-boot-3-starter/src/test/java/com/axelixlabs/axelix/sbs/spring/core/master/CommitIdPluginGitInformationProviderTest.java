@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link CommitIdPluginGitInformationProvider}.
  *
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 class CommitIdPluginGitInformationProviderTest extends AbstractMasterContextTest {
 

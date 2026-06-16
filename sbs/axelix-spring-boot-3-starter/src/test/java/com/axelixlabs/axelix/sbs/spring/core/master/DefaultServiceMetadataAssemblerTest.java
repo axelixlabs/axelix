@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link DefaultServiceMetadataAssembler}.
  *
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 class DefaultServiceMetadataAssemblerTest extends AbstractMasterContextTest {
 

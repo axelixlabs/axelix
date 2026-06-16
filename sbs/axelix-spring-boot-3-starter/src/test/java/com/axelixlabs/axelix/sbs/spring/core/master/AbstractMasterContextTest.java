@@ -37,6 +37,9 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
  *
  * <p>{@link AxelixMetadataEndpointTest} intentionally does not extend this class: it starts a real web server and its
  * own JWT stack, so it keeps a separate context.
+ *
+ * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import({
