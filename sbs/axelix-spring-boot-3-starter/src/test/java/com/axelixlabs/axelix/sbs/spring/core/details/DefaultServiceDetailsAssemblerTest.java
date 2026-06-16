@@ -52,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 30.10.2025
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import(DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class)

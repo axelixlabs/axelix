@@ -42,6 +42,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
  * Integration tests for {@link AxelixBeansEndpoint}.
  *
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 public class AxelixBeansEndpointTest extends AbstractEndpointIntegrationTest {
 

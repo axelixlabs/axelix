@@ -50,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixFeignEndpoint}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class AxelixFeignEndpointTest extends AbstractEndpointIntegrationTest {
 

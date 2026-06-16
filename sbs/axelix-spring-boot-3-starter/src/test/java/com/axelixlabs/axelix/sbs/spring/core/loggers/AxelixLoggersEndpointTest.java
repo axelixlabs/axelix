@@ -51,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixLoggersEndpoint}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class AxelixLoggersEndpointTest extends AbstractEndpointIntegrationTest {
 

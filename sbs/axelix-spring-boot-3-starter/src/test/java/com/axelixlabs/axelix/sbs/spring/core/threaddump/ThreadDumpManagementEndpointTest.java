@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 public class ThreadDumpManagementEndpointTest extends AbstractEndpointIntegrationTest {
 

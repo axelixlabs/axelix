@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixConditionsEndpoint}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class AxelixConditionsEndpointTest extends AbstractEndpointIntegrationTest {
 

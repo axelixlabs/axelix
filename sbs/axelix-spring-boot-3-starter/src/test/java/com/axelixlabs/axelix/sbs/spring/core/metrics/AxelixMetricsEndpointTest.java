@@ -49,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class AxelixMetricsEndpointTest extends AbstractEndpointIntegrationTest {
 

@@ -71,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 public class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest {
 

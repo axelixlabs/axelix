@@ -61,6 +61,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  * @since 14.10.2025
  */
 public class AxelixScheduledTasksEndpointTest extends AbstractEndpointIntegrationTest {

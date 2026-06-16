@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixMetadataEndpoint}.
  *
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 public class AxelixMetadataEndpointTest extends AbstractEndpointIntegrationTest {
 

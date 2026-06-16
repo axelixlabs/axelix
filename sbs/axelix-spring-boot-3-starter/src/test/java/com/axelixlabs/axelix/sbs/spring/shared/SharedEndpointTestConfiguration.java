@@ -69,6 +69,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringE
  * assertions reading physical/enclosing class names keep working) and are pulled in here by reference.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 @Configuration
 @Import({

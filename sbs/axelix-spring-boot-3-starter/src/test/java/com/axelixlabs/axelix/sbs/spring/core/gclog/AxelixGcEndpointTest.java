@@ -42,6 +42,9 @@ import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Artemiy Degtyarev
+ */
 public class AxelixGcEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired

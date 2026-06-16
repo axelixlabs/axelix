@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
  * {@code application.yaml}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,

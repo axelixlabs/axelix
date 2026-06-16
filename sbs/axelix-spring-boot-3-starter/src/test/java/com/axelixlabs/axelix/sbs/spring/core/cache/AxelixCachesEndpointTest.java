@@ -65,6 +65,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  * @since 24.06.2025
  */
 public class AxelixCachesEndpointTest extends AbstractEndpointIntegrationTest {

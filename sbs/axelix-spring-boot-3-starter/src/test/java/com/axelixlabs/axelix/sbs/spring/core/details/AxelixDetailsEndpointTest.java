@@ -37,6 +37,7 @@ import static org.assertj.core.data.MapEntry.entry;
  *
  * @since 30.10.2025
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 public class AxelixDetailsEndpointTest extends AbstractEndpointIntegrationTest {
 
