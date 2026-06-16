@@ -25,11 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.StandardEnvironment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
@@ -38,9 +33,6 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricherTest.CurrentTestConfig;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,10 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
-@SpringBootTest(args = "--fooBar=fromArgs")
-@Import({EnvironmentTestConfig.class, CurrentTestConfig.class})
-class DefaultEnvPropertyEnricherTest {
+class DefaultEnvPropertyEnricherTest extends AbstractEnvSharedContextTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
@@ -66,21 +57,6 @@ class DefaultEnvPropertyEnricherTest {
 
     @Autowired
     private EnvPropertyEnricher enricher;
-
-    @TestConfiguration
-    static class CurrentTestConfig {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-            return new EndpointsConfigurationProperties();
-        }
-
-        @Bean
-        SmartSanitizingFunction smartSanitizingFunction() {
-            return new SmartSanitizingFunction(List.of(), new DefaultPropertyNameNormalizer());
-        }
-    }
 
     @BeforeAll
     static void beforeAll() {

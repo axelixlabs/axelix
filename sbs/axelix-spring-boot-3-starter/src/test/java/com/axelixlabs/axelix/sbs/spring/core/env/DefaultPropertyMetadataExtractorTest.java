@@ -21,12 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,18 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link DefaultPropertyMetadataExtractor}
  *
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  * @since 05.12.2025
  */
-@TestPropertySource(
-        properties = {
-            "prop.test.server.port=test",
-            "prop.test.logging.level.root=test",
-            "custom.test.without.reason.property=test",
-            "custom.test.without.replacement.property=test"
-        })
-@SpringBootTest
-@Import(DefaultPropertyMetadataExtractorTest.DefaultPropertyMetadataExtractorTestConfiguration.class)
-class DefaultPropertyMetadataExtractorTest {
+class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest {
 
     @Autowired
     private PropertyMetadataExtractor extractor;
@@ -101,20 +87,5 @@ class DefaultPropertyMetadataExtractorTest {
     void shouldNotExtractPropertyMetadataWithoutDeprecated() {
         PropertyMetadata nonExistentMetadata = extractor.getMetadata("non.existent.property");
         assertThat(nonExistentMetadata).isNull();
-    }
-
-    @TestConfiguration
-    static class DefaultPropertyMetadataExtractorTestConfiguration {
-
-        @Bean
-        public PropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultPropertyNameNormalizer();
-        }
-
-        @Bean
-        public PropertyMetadataExtractor propertyMetadataExtractor(
-                ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
-            return new DefaultPropertyMetadataExtractor(configurableEnvironment, propertyNameNormalizer);
-        }
     }
 }
