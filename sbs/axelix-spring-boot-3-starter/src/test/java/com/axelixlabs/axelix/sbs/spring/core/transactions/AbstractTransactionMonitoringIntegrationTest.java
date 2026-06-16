@@ -49,6 +49,8 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
  * single cached {@link org.springframework.context.ApplicationContext}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import(AbstractTransactionMonitoringIntegrationTest.SharedTransactionTestConfiguration.class)

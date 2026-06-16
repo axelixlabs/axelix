@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link ProxyingDataSourceBeanPostProcessor}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringIntegrationTest {
 

@@ -40,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 22.01.2026
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMonitoringIntegrationTest {
 
