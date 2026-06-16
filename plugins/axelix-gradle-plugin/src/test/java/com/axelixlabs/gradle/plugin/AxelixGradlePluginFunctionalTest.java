@@ -127,6 +127,23 @@ class AxelixGradlePluginFunctionalTest {
         assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
+    void buildSucceedsWhenNoProfilerReportWasProduced(String gradleVersion) throws IOException {
+        // given.
+        writeCommonProjectFiles(gradleVersion);
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("bare-java.gradle"));
+
+        // when.
+        BuildResult result =
+                createRunner(gradleVersion, "build", "--stacktrace").build();
+
+        // then.
+        assertThat(result.task(":copyAxelixTestProfilerReport").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(projectDir.resolve("build/resources/main/spring-test-profiler"))
+                .doesNotExist();
+    }
+
     private GradleRunner createRunner(String gradleVersion, String... arguments) {
         // Never call withDebug(true) here: a debug run executes the build in-process on the
         // current (modern) JVM, bypassing the JDK 8 daemon required by Gradle 4.0.

@@ -44,5 +44,6 @@ public class AxelixGradlePlugin implements Plugin<Project> {
         // already carry them, leaving a project's chosen version untouched.
         project.afterEvaluate(TestDependencyContributor::contributeMissingTestDependencies);
         SpringFactoriesGenerator.configure(project);
+        TestProfilerReportCopy.configure(project);
     }
 }
