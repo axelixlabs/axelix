@@ -42,19 +42,19 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 /**
- * Base class for the transaction-monitoring integration tests that exercise the
- * {@link TransactionMonitoringBeanPostProcessor} / {@link ProxyingDataSourceBeanPostProcessor}
- * machinery. It owns the {@link SpringBootTest} declaration and the shared {@link TestConfiguration},
+ * Base Spring Boot Test context class for the transaction-monitoring integration tests.
+ * It owns the {@link SpringBootTest} declaration and the shared {@link TestConfiguration},
  * so that all subclasses resolve to an identical merged context configuration and therefore share a
  * single cached {@link org.springframework.context.ApplicationContext}.
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
 @SpringBootTest
-@Import(AbstractTransactionMonitoringIntegrationTest.SharedTransactionTestConfiguration.class)
-abstract class AbstractTransactionMonitoringIntegrationTest {
+@Import(AbstractTransactionMonitoringSharedContextTest.SharedTransactionTestConfiguration.class)
+abstract class AbstractTransactionMonitoringSharedContextTest {
 
     @TestConfiguration
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)

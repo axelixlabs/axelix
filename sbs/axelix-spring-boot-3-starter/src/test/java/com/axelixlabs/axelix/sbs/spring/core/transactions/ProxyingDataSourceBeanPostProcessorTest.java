@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
  */
-class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringIntegrationTest {
+class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringSharedContextTest {
 
     @Autowired
     private DataSource dataSource;

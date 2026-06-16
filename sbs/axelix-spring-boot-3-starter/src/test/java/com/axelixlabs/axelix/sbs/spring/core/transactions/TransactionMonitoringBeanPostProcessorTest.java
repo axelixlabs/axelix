@@ -42,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
  */
-class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMonitoringIntegrationTest {
+class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMonitoringSharedContextTest {
 
     @Autowired
     private OwnerRepository ownerRepository;
