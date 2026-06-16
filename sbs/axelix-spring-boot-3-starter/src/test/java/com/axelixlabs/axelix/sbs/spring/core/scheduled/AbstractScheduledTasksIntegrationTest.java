@@ -51,6 +51,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  *
  * @since 16.06.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest
 @Import(AbstractScheduledTasksIntegrationTest.SharedScheduledTasksTestConfiguration.class)

@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 class ScheduledTasksRegistryTest extends AbstractScheduledTasksIntegrationTest {
 
