@@ -55,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @Import(DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class)
-class DefaultServiceDetailsAssemblerTest {
+public class DefaultServiceDetailsAssemblerTest {
 
     @Autowired
     private ServiceDetailsAssembler serviceDetailsAssembler;
@@ -100,7 +100,7 @@ class DefaultServiceDetailsAssemblerTest {
     }
 
     @TestConfiguration
-    static class DefaultServiceDetailsAssemblerTestConfig {
+    public static class DefaultServiceDetailsAssemblerTestConfig {
 
         @Bean
         @Primary

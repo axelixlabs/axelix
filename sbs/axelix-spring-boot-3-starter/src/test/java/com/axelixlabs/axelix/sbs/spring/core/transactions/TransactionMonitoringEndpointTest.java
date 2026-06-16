@@ -43,25 +43,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_DURATION;
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.TRANSACTION_QUERIES;
@@ -78,15 +72,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
-@Import({TransactionMonitoringEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-class TransactionMonitoringEndpointTest {
+public class TransactionMonitoringEndpointTest extends AbstractEndpointIntegrationTest {
 
     private final String expectedClassName = PropagationTestHelper.class.getSimpleName();
-
-    @Autowired
-    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private PropagationTestHelper propagationTestHelper;
@@ -103,7 +91,15 @@ class TransactionMonitoringEndpointTest {
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearStats();
-        meterRegistry.clear();
+        // Only remove this endpoint's own meters: the registry is shared with the metrics endpoint test, whose
+        // MeterBinder-registered meters are bound once at context startup and would not be re-registered if cleared.
+        meterRegistry.getMeters().stream()
+                .filter(meter -> {
+                    String name = meter.getId().getName();
+                    return TRANSACTION_DURATION.equals(name) || TRANSACTION_QUERIES.equals(name);
+                })
+                .toList()
+                .forEach(meterRegistry::remove);
     }
 
     @Test
@@ -557,7 +553,7 @@ class TransactionMonitoringEndpointTest {
 
     private String getMonitoringResponse() {
         ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-transactions-monitoring", String.class);
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-transactions-monitoring", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         return response.getBody();
     }
@@ -565,7 +561,7 @@ class TransactionMonitoringEndpointTest {
     @TestConfiguration
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
     @EntityScan(basePackageClasses = {Owner.class, Pet.class})
-    static class TransactionMonitoringEndpointTestConfiguration {
+    public static class TransactionMonitoringEndpointTestConfiguration {
 
         @Bean
         public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
@@ -608,11 +604,6 @@ class TransactionMonitoringEndpointTest {
         public PropagationTestHelper propagationTestHelper(
                 OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
             return new PropagationTestHelper(ownerRepository, self);
-        }
-
-        @Bean
-        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-            return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
     }
 

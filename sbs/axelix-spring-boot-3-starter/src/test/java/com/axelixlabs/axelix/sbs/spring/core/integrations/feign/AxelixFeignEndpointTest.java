@@ -24,15 +24,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,11 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "management.endpoints.web.exposure.include=axelix-feign")
-@Import({AxelixFeignEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-public class AxelixFeignEndpointTest {
+public class AxelixFeignEndpointTest extends AbstractEndpointIntegrationTest {
 
     private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION = "service-1";
     private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION = "service-2";
@@ -71,9 +62,6 @@ public class AxelixFeignEndpointTest {
 
     private static final String NETWORK_ADDRESS_1 = "http://service1-api";
     private static final String NETWORK_ADDRESS_2 = "http://service1-api";
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
 
     @Test
     void shouldReturnService_WithPathInFeignAnnotation() {
@@ -196,7 +184,7 @@ public class AxelixFeignEndpointTest {
     }
 
     @TestConfiguration
-    static class AxelixFeignEndpointTestConfiguration {
+    public static class AxelixFeignEndpointTestConfiguration {
 
         @Bean
         public AxelixFeignEndpoint axelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {

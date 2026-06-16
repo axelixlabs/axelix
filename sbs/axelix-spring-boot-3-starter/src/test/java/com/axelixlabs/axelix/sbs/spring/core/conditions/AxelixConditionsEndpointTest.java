@@ -19,22 +19,17 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,16 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans", "axelix.conditions.test.flag=enabled"})
-@Import(JwtAuthTestConfiguration.class)
-public class AxelixConditionsEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
+public class AxelixConditionsEndpointTest extends AbstractEndpointIntegrationTest {
 
     @TestConfiguration
-    static class AxelixConditionsEndpointTestConfiguration {
+    public static class AxelixConditionsEndpointTestConfiguration {
         @Bean
         public ConditionalTargetUnwrapper conditionalNameUnwrap() {
             return new DefaultConditionalTargetUnwrapper();

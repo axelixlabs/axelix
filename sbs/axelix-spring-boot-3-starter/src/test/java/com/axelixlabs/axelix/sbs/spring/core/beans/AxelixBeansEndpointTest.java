@@ -21,26 +21,19 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
@@ -50,20 +43,11 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest(
-        classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans"})
-@Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class, JwtAuthTestConfiguration.class
-})
-class AxelixBeansEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
+public class AxelixBeansEndpointTest extends AbstractEndpointIntegrationTest {
 
     @TestConfiguration(value = "testCurrentConfiguration")
     @EnableConfigurationProperties(AxelixPropTest.class)
-    static class CurrentConfiguration {
+    public static class CurrentConfiguration {
 
         static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
         static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";

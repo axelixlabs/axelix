@@ -30,25 +30,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
-import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
-import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
-import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,20 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({
-    AxelixMetricsEndpoint.class,
-    MetricsEndpoint.class,
-    DefaultServiceMetricsGroupsAssembler.class,
-    BaseUnitParser.class,
-    KilobytesMemoryBaseUnitValueTransformer.class,
-    BytesMemoryBaseUnitValueTransformer.class,
-    JwtAuthTestConfiguration.class
-})
-class AxelixMetricsEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
+public class AxelixMetricsEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Test
     void shouldProduceOnlyValidCombinationsOfTags() {
@@ -203,7 +182,7 @@ class AxelixMetricsEndpointTest {
     void negativeAuthTests() {}
 
     @TestConfiguration
-    static class AxelixMetricsEndpointTestConfiguration {
+    public static class AxelixMetricsEndpointTestConfiguration {
 
         @Bean
         public MeterBinder groupingMetrics() {

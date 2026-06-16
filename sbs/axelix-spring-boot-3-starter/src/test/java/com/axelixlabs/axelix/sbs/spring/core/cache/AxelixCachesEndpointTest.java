@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,13 +32,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -51,10 +48,8 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
-import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,13 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @since 24.06.2025
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@Import({
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
-    AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
-})
-class AxelixCachesEndpointTest {
+public class AxelixCachesEndpointTest extends AbstractEndpointIntegrationTest {
 
     // Cache names under test
     private static final String TEST_CACHE_1 = "cache1";
@@ -123,9 +112,6 @@ class AxelixCachesEndpointTest {
 
     @Autowired
     private Map<String, CacheManager> allCacheManagers;
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
 
     @BeforeEach
     void setUp() {
@@ -528,11 +514,6 @@ class AxelixCachesEndpointTest {
         @ConditionalOnMissingBean
         public CacheSizeProvider cacheSizeProvider() {
             return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
-        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-            return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
 
         @Bean

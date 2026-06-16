@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.loggers;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,22 +33,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,19 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(
-        properties = {
-            "logging.group.axelix.logger.group=axelix.logger.test",
-            "logging.level.axelix.logger.test=WARN",
-            "logging.level.a.b=WARN",
-            "logging.level.a.b.c.d.e=DEBUG"
-        })
-@Import({AxelixLoggersEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-public class AxelixLoggersEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
+public class AxelixLoggersEndpointTest extends AbstractEndpointIntegrationTest {
 
     @Autowired
     private LoggingSystem loggingSystem;
@@ -85,6 +69,19 @@ public class AxelixLoggersEndpointTest {
 
     private static final Logger abc_reset_logger = LoggerFactory.getLogger(ABC_RESET_LOGGER);
     private static final Logger abcd_reset_logger = LoggerFactory.getLogger(ABCD_RESET_LOGGER);
+
+    @BeforeEach
+    void establishBaselineLogLevels() {
+        // This test relies on the levels configured for the shared context (a.b=WARN, a.b.c.d.e=DEBUG, ...).
+        // Those are applied to the JVM-global LoggingSystem at context init, but other test contexts in the
+        // suite re-initialise that same LoggingSystem; since the shared context is never re-created, re-establish
+        // the expected levels before every method so the test is independent of suite execution order.
+        loggingSystem.setLogLevel(LOGGER, LogLevel.WARN);
+        loggingSystem.setLogLevel(AB_RESET_LOGGER, LogLevel.WARN);
+        loggingSystem.setLogLevel(ABCDE_RESET_LOGGER, LogLevel.DEBUG);
+        loggingSystem.setLogLevel(ABC_RESET_LOGGER, null);
+        loggingSystem.setLogLevel(ABCD_RESET_LOGGER, null);
+    }
 
     @AfterEach
     void resetLogLevels() {
@@ -291,7 +288,7 @@ public class AxelixLoggersEndpointTest {
     }
 
     @TestConfiguration
-    static class AxelixLoggersEndpointTestConfiguration {
+    public static class AxelixLoggersEndpointTestConfiguration {
 
         @Bean
         public AxelixLoggersEndpoint axelixLoggersEndpoint(

@@ -25,30 +25,23 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,43 +53,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(
-        properties = {
-            "axelix.prop.test.tags.forSanitization=toBeSanitized",
-            "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized",
-            "axelix.prop.test.tags.version=1.0.0",
-            "axelix.prop.test.enabled-contexts=user-service, payment-service",
-            "axelix.prop.test.http-client.requests[0].name=user-api",
-            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axelix.prop.test.http-client.requests[0].methods[1].type=POST",
-            "axelix.prop.test.http-client.requests[1].name=payment-api",
-            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
-            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
-        })
-@EnableConfigurationProperties({AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class})
-@Import(JwtAuthTestConfiguration.class)
-public class AxelixConfigurationPropertiesEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder restTemplate;
+public class AxelixConfigurationPropertiesEndpointTest extends AbstractEndpointIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("propertiesFeed")
     void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
-        ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
+        ResponseEntity<ConfigurationPropertiesFeed> response = testRestTemplate
                 .withRole(role)
                 .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        // The shared context binds the 'axelix.prop.test' prefix with several @ConfigurationProperties beans
+        // (this record plus the beans/env endpoints' fixtures), so scope the feed to this test's own bean.
         List<KeyValue> properties = response.getBody().getBeans().stream()
                 .filter(beans -> beans.getPrefix().equals("axelix.prop.test"))
+                .filter(beans -> beans.getBeanName().contains(AxelixConfigurationProperties.class.getName()))
                 .flatMap(bean -> bean.getProperties().stream())
                 .toList();
 
@@ -152,38 +124,17 @@ public class AxelixConfigurationPropertiesEndpointTest {
     }
 
     @TestConfiguration
-    static class AxelixConfigurationPropertiesEndpointTestConfiguration {
+    @EnableConfigurationProperties(AxelixConfigurationProperties.class)
+    public static class AxelixConfigurationPropertiesEndpointTestConfiguration {
 
-        @Bean
-        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
-            return new DefaultConfigurationPropertiesFlattener();
-        }
+        // The flattener / converter / propertyNameNormalizer / requiredAuthorityCheckService and the merged
+        // SmartSanitizingFunction are provided by the shared configuration (EnvironmentTestConfig +
+        // SharedEndpointTestConfiguration), so only this endpoint's own service + endpoint beans remain here.
 
+        // @Primary so it wins over EnvironmentTestConfig#configurationPropertiesService for any
+        // ConfigurationPropertiesService-by-type injection (e.g. the env property enricher's ObjectProvider).
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter(
-                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-        }
-
-        @Bean
-        public PropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultPropertyNameNormalizer();
-        }
-
-        @Bean
-        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
-                    propertyNameNormalizer);
-        }
-
-        @Bean
-        public RequiredAuthorityCheckService requiredAuthorityCheckService(
-                SecurityContextExecutor securityContextExecutor) {
-            return new RequiredAuthorityCheckService(securityContextExecutor);
-        }
-
-        @Bean
+        @Primary
         public DefaultConfigurationPropertiesService configurationPropertiesCache(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,

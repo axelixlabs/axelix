@@ -22,19 +22,15 @@ import java.lang.management.ManagementFactory;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.sbs.spring.shared.AbstractEndpointIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,22 +39,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({
-    AxelixMetadataEndpoint.class,
-    AxelixMetadataEndpointTest.CurrentConfig.class,
-    DefaultServiceMetadataAssembler.class,
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class,
-    JwtAuthTestConfiguration.class
-})
-class AxelixMetadataEndpointTest {
-
-    @Autowired
-    private TestRestTemplateBuilder testRestTemplate;
+public class AxelixMetadataEndpointTest extends AbstractEndpointIntegrationTest {
 
     @TestConfiguration
-    static class CurrentConfig {
+    public static class CurrentConfig {
 
         @Bean
         VMFeaturesProvider vmFeaturesProvider() {
@@ -74,11 +58,6 @@ class AxelixMetadataEndpointTest {
         @Bean
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
-        }
-
-        @Bean
-        public LibraryInformationProvider libraryInformationProvider() {
-            return new DefaultLibraryInformationProvider();
         }
     }
 
