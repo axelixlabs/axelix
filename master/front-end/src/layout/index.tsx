@@ -22,7 +22,7 @@ import { Outlet } from "react-router";
 import { AccessProvider } from "components";
 
 import { AdminHeader } from "./AdminHeader";
-import { InstanceSiderMenu } from "./Siders";
+import { InstanceSiderMenu } from "./siders";
 import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
