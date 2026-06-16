@@ -54,6 +54,12 @@ class AxelixGradlePluginFunctionalTest {
                 .collect(Collectors.toList());
     }
 
+    private static final String EXPECTED_SPRING_FACTORIES =
+            "org.springframework.test.context.TestExecutionListener=\\\n"
+                    + "digital.pragmatech.testing.SpringTestProfilerListener\n"
+                    + "org.springframework.context.ApplicationContextInitializer=\\\n"
+                    + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
+
     @TempDir
     Path projectDir;
 
@@ -71,10 +77,10 @@ class AxelixGradlePluginFunctionalTest {
 
         // then.
         assertThat(result.task(":printTestRuntimeClasspath").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.getOutput())
-                .contains(AxelixGradlePlugin.PROFILER_NAME + "-" + AxelixGradlePlugin.PROFILER_VERSION + ".jar");
-        assertThat(result.getOutput())
-                .contains(AxelixGradlePlugin.THYMELEAF_NAME + "-" + AxelixGradlePlugin.THYMELEAF_VERSION + ".jar");
+        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        Path springFactories = projectDir.resolve("build/generated/axelix/META-INF/spring.factories");
+        assertThat(springFactories).exists();
+        assertThat(new String(Files.readAllBytes(springFactories), UTF_8)).isEqualTo(EXPECTED_SPRING_FACTORIES);
     }
 
     @ParameterizedTest

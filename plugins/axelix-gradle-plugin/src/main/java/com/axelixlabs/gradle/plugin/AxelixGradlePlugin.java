@@ -81,6 +81,9 @@ public class AxelixGradlePlugin implements Plugin<Project> {
                             "Everything's good, Spring Boot Test profiler of version {} is already included",
                             springBootTestProfiler.getVersion());
         }
+
+        //
+        SpringFactoriesGenerator.configure(project);
     }
 
     private static void addJustSpringBootTestProfiler(Project project) {
