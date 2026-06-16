@@ -30,12 +30,9 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
  * <p>{@link Main} is pinned via the {@code classes} attribute (rather than left to Spring Boot's
  * auto-detection) so both subclasses resolve an identical, deterministic configuration — this is
  * what makes the cached context shareable, and it also keeps auto-configuration (e.g. the embedded
- * {@code DataSource}) active. The imported configurations are the union of the fixtures required by
- * {@link DefaultBeanMetaInfoExtractorTest} and {@link QualifiersPersistencePostProcessorTest}.
+ * {@code DataSource}) active.
  *
- * <p>{@code QualifiersPersistencePostProcessor} is intentionally not listed here — it is already
- * provided by {@link DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig} as a static
- * {@code @Bean}.
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(classes = Main.class)
 @Import({
