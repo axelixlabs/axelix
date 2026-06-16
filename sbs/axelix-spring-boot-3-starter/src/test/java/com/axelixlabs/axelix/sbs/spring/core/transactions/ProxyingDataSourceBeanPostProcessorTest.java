@@ -22,10 +22,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,10 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link ProxyingDataSourceBeanPostProcessor}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
-@SpringBootTest
-@Import(ProxyingDataSourceBeanPostProcessorTest.ProxyingDataSourceBeanPostProcessorTestConfiguration.class)
-class ProxyingDataSourceBeanPostProcessorTest {
+class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringIntegrationTest {
 
     @Autowired
     private DataSource dataSource;
@@ -64,20 +59,5 @@ class ProxyingDataSourceBeanPostProcessorTest {
         Object result = subject.postProcessAfterInitialization(alreadyProxied, "dataSource");
 
         assertThat(result).isSameAs(alreadyProxied);
-    }
-
-    @TestConfiguration
-    static class ProxyingDataSourceBeanPostProcessorTestConfiguration {
-
-        @Bean
-        public QueriesRecorder queriesRecorder() {
-            return new DefaultQueriesRecorder();
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor proxyingDataSourceBeanPostProcessor(
-                QueriesRecorder queriesRecorder) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesRecorder);
-        }
     }
 }
