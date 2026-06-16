@@ -62,6 +62,7 @@ public class SelfRegisteredApi {
 
         Instance instance = instanceFactory.createInstance(
                 request.getInstanceId(),
+                request.getApplicationId(),
                 request.getInstanceName(),
                 request.getDeploymentAt(),
                 Instant.now(),

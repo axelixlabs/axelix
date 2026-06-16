@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents extended service instance metadata supplied as part of the self-registration process.
@@ -33,6 +34,7 @@ public class SelfRegistrationMetadata {
 
     private final BasicDiscoveryMetadata basicDiscoveryMetadata;
     private final String instanceId;
+    private final @Nullable String applicationId;
     private final String instanceName;
     private final String instanceActuatorUrl;
     private final String deploymentAt;
@@ -42,6 +44,10 @@ public class SelfRegistrationMetadata {
      *
      * @param basicDiscoveryMetadata    the basic metadata of a service instance
      * @param instanceId                unique identifier (uid) of the service
+     * @param applicationId             identifier of the application this instance belongs to — a hash of the
+     *                                  service build coordinates (GAV). Instances sharing the same
+     *                                  {@code applicationId} are grouped as one application. May be {@code null}
+     *                                  when build information is unavailable.
      * @param instanceName              name of the service
      * @param instanceActuatorUrl       the URL of the service, including the postfix for the actuator path,
      *                                  e.g. {@code https://my-app:6061/actuator}.
@@ -51,11 +57,13 @@ public class SelfRegistrationMetadata {
     public SelfRegistrationMetadata(
             @JsonProperty("basicDiscoveryMetadata") BasicDiscoveryMetadata basicDiscoveryMetadata,
             @JsonProperty("instanceId") String instanceId,
+            @JsonProperty("applicationId") @Nullable String applicationId,
             @JsonProperty("instanceName") String instanceName,
             @JsonProperty("instanceActuatorUrl") String instanceActuatorUrl,
             @JsonProperty("deploymentAt") String deploymentAt) {
         this.basicDiscoveryMetadata = basicDiscoveryMetadata;
         this.instanceId = instanceId;
+        this.applicationId = applicationId;
         this.instanceName = instanceName;
         this.instanceActuatorUrl = instanceActuatorUrl;
         this.deploymentAt = deploymentAt;
@@ -67,6 +75,10 @@ public class SelfRegistrationMetadata {
 
     public String getInstanceId() {
         return instanceId;
+    }
+
+    public @Nullable String getApplicationId() {
+        return applicationId;
     }
 
     public String getInstanceName() {
@@ -89,6 +101,7 @@ public class SelfRegistrationMetadata {
         SelfRegistrationMetadata that = (SelfRegistrationMetadata) o;
         return Objects.equals(basicDiscoveryMetadata, that.basicDiscoveryMetadata)
                 && Objects.equals(instanceId, that.instanceId)
+                && Objects.equals(applicationId, that.applicationId)
                 && Objects.equals(instanceName, that.instanceName)
                 && Objects.equals(instanceActuatorUrl, that.instanceActuatorUrl)
                 && Objects.equals(deploymentAt, that.deploymentAt);
@@ -96,7 +109,8 @@ public class SelfRegistrationMetadata {
 
     @Override
     public int hashCode() {
-        return Objects.hash(basicDiscoveryMetadata, instanceId, instanceName, instanceActuatorUrl, deploymentAt);
+        return Objects.hash(
+                basicDiscoveryMetadata, instanceId, applicationId, instanceName, instanceActuatorUrl, deploymentAt);
     }
 
     @Override
@@ -106,6 +120,9 @@ public class SelfRegistrationMetadata {
                 + basicDiscoveryMetadata
                 + ", instanceId='"
                 + instanceId
+                + '\''
+                + ", applicationId='"
+                + applicationId
                 + '\''
                 + ", instanceName='"
                 + instanceName

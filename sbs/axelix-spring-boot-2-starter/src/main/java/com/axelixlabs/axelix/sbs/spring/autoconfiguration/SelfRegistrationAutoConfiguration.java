@@ -20,15 +20,19 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
+import com.axelixlabs.axelix.sbs.spring.core.master.BuildInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
@@ -41,6 +45,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  *
  * @since 04.02.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
@@ -61,12 +66,19 @@ public class SelfRegistrationAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public BuildInfoProvider buildInfoProvider(ObjectProvider<BuildProperties> buildPropertiesProvider) {
+        return new DefaultBuildInfoProvider(buildPropertiesProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            BuildInfoProvider buildInfoProvider) {
 
         return new DefaultSelfRegistrationMetadataAssembler(
-                serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                serviceMetadataAssembler, selfRegistrationConfigurationProperties, buildInfoProvider);
     }
 
     @Bean

@@ -31,6 +31,8 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.master.BuildInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
@@ -59,6 +61,7 @@ class SelfRegistrationAutoConfigurationTest {
             assertThat(context).hasSingleBean(SelfRegistrationAutoConfiguration.class);
             assertThat(context).hasSingleBean(ValidationListener.class);
             assertThat(context).hasSingleBean(SelfRegistrationConfigurationProperties.class);
+            assertThat(context).hasSingleBean(BuildInfoProvider.class);
             assertThat(context).hasSingleBean(SelfRegistrationMetadataAssembler.class);
             assertThat(context).hasSingleBean(SelfRegistrationService.class);
             assertThat(context).hasSingleBean(SelfRegistrationLifecycleListener.class);
@@ -123,6 +126,11 @@ class SelfRegistrationAutoConfigurationTest {
         public JwtEncoderService jwtEncoderService() {
             return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
         }
+
+        @Bean
+        public BuildInfoProvider buildInfoProvider() {
+            return new DefaultBuildInfoProvider(null);
+        }
     }
 
     @TestConfiguration
@@ -130,9 +138,10 @@ class SelfRegistrationAutoConfigurationTest {
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                BuildInfoProvider buildInfoProvider) {
             return new CustomSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, buildInfoProvider);
         }
     }
 
@@ -148,8 +157,9 @@ class SelfRegistrationAutoConfigurationTest {
     static class CustomSelfRegistrationMetadataAssembler extends DefaultSelfRegistrationMetadataAssembler {
         public CustomSelfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-            super(serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                BuildInfoProvider buildInfoProvider) {
+            super(serviceMetadataAssembler, selfRegistrationConfigurationProperties, buildInfoProvider);
         }
     }
 

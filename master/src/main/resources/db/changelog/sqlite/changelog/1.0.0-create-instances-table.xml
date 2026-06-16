@@ -17,6 +17,9 @@
       <column name="instance_id" type="TEXT">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_instances"/>
       </column>
+      <column name="application_id" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
       <column name="name" type="TEXT">
         <constraints nullable="false"/>
       </column>

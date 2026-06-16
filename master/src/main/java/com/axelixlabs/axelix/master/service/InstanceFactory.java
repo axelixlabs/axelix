@@ -36,6 +36,8 @@ public interface InstanceFactory {
      * The method for creating a new {@link Instance}.
      *
      * @param instanceId          unique identifier (uid) of the service
+     * @param applicationId       identifier of the application this instance belongs to, shared by sibling
+     *                            instances, or {@code null} if it could not be derived
      * @param instanceName        name of the service
      * @param instanceActuatorUrl the URL of the service, including the postfix with actuator path, e.g. {@code https://my-app:6061/actuator}.
      *                            This postfix qualification is required, since actuator path is not guaranteed to always be {@code /actuator}
@@ -46,6 +48,7 @@ public interface InstanceFactory {
      */
     Instance createInstance(
             String instanceId,
+            @Nullable String applicationId,
             String instanceName,
             String deploymentAt,
             @Nullable Instant latestHeartBeat,

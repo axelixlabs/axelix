@@ -71,6 +71,7 @@ abstract class DatabaseInstanceRegistryTest {
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-1"),
+                "app-id-1",
                 "name",
                 "1.0.0",
                 "java-17",
@@ -109,6 +110,7 @@ abstract class DatabaseInstanceRegistryTest {
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-2"),
+                "app-id-2",
                 "name",
                 "1.0.0",
                 "java-17",
@@ -130,6 +132,7 @@ abstract class DatabaseInstanceRegistryTest {
         // when.
         Instance updated = new Instance(
                 instance.id(),
+                "app-id-2",
                 "updated-name",
                 "1.0.1",
                 "java-21",
@@ -258,6 +261,7 @@ abstract class DatabaseInstanceRegistryTest {
     private Instance createInstanceWithHeap(String instanceId, double heap) {
         return new Instance(
                 InstanceId.of(instanceId),
+                "app-id-heap",
                 "updated-name",
                 "1.0.1",
                 "java-21",

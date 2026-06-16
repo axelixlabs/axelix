@@ -51,6 +51,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
 
     public Instance createInstance(
             String instanceId,
+            @Nullable String applicationId,
             String instanceName,
             String deploymentAt,
             @Nullable Instant latestHeartBeat,
@@ -58,6 +59,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
             BasicDiscoveryMetadata metadata) {
         return new Instance(
                 InstanceId.of(instanceId),
+                applicationId,
                 instanceName,
                 metadata.getServiceVersion(),
                 metadata.getSoftwareVersions().getJava(),

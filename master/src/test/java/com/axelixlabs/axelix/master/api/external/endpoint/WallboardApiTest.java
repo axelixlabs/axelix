@@ -109,6 +109,7 @@ public class WallboardApiTest {
                       "instances": [
                         {
                           "instanceId": "%s",
+                          "applicationId": "test-object-factory-application",
                           "name": "app-one",
                           "serviceVersion": "1.2.3-classifer-test",
                           "commitShaShort": "df027cf",
@@ -121,6 +122,7 @@ public class WallboardApiTest {
                         },
                         {
                           "instanceId": "%s",
+                          "applicationId": "test-object-factory-application",
                           "name": "app-two",
                           "serviceVersion": "1.2.3-classifer-test",
                           "commitShaShort": "df027cf",

@@ -17,8 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
+
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
@@ -32,8 +35,8 @@ import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfiguratio
 public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistrationMetadataAssembler {
 
     private final SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
-
     private final ServiceMetadataAssembler serviceMetadataAssembler;
+    private final BuildInfoProvider buildInfoProvider;
 
     private final String instanceId;
 
@@ -41,9 +44,11 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     public DefaultSelfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            BuildInfoProvider buildInfoProvider) {
         this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
+        this.buildInfoProvider = buildInfoProvider;
         this.instanceId = UUID.randomUUID().toString();
         this.deploymentAt = Instant.now().toString();
     }
@@ -53,8 +58,24 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
         return new SelfRegistrationMetadata(
                 serviceMetadataAssembler.assemble(),
                 instanceId,
+                buildHashApplicationId(),
                 selfRegistrationConfigurationProperties.getInstanceName(),
                 selfRegistrationConfigurationProperties.getInstanceActuatorUrl(),
                 deploymentAt);
+    }
+
+    @Nullable
+    private String buildHashApplicationId() {
+        String artifact = buildInfoProvider.getArtifact();
+        String group = buildInfoProvider.getGroup();
+        String version = buildInfoProvider.getVersion();
+
+        if (artifact.isEmpty() && group.isEmpty() && version.isEmpty()) {
+            return null;
+        }
+
+        String applicationId = artifact + ":" + group + ":" + version;
+
+        return String.valueOf(UUID.nameUUIDFromBytes(applicationId.getBytes(StandardCharsets.UTF_8)));
     }
 }

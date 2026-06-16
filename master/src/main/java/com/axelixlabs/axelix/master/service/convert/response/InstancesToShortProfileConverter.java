@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.master.service.convert.utils.DateTimeFormattingUtil
  * Converter that is capable to translate the given {@link Instance} to the {@link InstanceShortProfile}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @Service
 public class InstancesToShortProfileConverter implements Converter<Instance, InstanceShortProfile> {
@@ -42,6 +43,7 @@ public class InstancesToShortProfileConverter implements Converter<Instance, Ins
     public @NonNull InstanceShortProfile convertInternal(@NonNull Instance instance) {
         return new InstanceShortProfile(
                 instance.id().instanceId(),
+                instance.applicationId(),
                 instance.name(),
                 instance.serviceVersion(),
                 instance.commitShaShort(),

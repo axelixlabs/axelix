@@ -133,12 +133,18 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
+        public BuildInfoProvider buildInfoProvider() {
+            return new TestBuildInfoProvider();
+        }
+
+        @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                BuildInfoProvider buildInfoProvider) {
 
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, buildInfoProvider);
         }
 
         @Bean

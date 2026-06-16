@@ -30,6 +30,9 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
  *                                managed by this Axelix Master.
+ * @param applicationId           Identifier of the application this instance belongs to. Instances of the same
+ *                                application share it. Derived from the K8S Service UID (auto-discovery) or a hash
+ *                                of the service build coordinates (self-registration). May be {@code null}.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
  * @param javaVersion             Version of the Java Platform used inside the service
@@ -48,6 +51,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("instances")
 public record Instance(
         @Id InstanceId id,
+        @Nullable String applicationId,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -90,6 +94,7 @@ public record Instance(
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
                 this.id,
+                this.applicationId,
                 this.name,
                 this.serviceVersion,
                 this.javaVersion,

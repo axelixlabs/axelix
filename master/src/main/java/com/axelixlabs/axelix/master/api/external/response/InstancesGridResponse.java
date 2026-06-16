@@ -25,18 +25,22 @@ import org.jspecify.annotations.Nullable;
  * The grid of {@link InstanceShortProfile instances}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public record InstancesGridResponse(Collection<InstanceShortProfile> instances) {
 
     /**
      * The short profile of the particular Instance, managed by this master deployment.
      *
+     * @param applicationId identifier of the application this instance belongs to; instances of the same
+     *                      application share it. May be {@code null}.
      * @param deployedFor a String representation for how long the service has been already deployed for.
      *
      * @author Mikhail Polivakha
      */
     public record InstanceShortProfile(
             String instanceId,
+            @Nullable String applicationId,
             String name,
             String serviceVersion,
             String commitShaShort,

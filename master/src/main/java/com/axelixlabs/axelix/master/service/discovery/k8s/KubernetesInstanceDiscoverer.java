@@ -63,6 +63,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
         if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
             return instanceFactory.createInstance(
                     k8sInstance.getInstanceId(),
+                    k8sInstance.serviceId(),
                     k8sInstance.podName(),
                     k8sInstance.getDeploymentAt(),
                     // Instances that are discovered by DiscoveryClient

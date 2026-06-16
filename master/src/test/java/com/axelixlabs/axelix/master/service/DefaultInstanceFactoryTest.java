@@ -41,6 +41,7 @@ public class DefaultInstanceFactoryTest {
         // when.
         Instance instance = instanceFactory.createInstance(
                 "3c994958-924f-4a12-87d0-a8782e97af10",
+                "petclinic-application",
                 "petclinic",
                 "2025-02-03T13:29:29Z",
                 Instant.parse("2025-04-03T13:29:29Z"),
@@ -50,6 +51,7 @@ public class DefaultInstanceFactoryTest {
         // then.
         assertThat(instance).isNotNull();
         assertThat(instance.id().instanceId()).isEqualTo("3c994958-924f-4a12-87d0-a8782e97af10");
+        assertThat(instance.applicationId()).isEqualTo("petclinic-application");
         assertThat(instance.name()).isEqualTo("petclinic");
         assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(instance.javaVersion()).isEqualTo("25");

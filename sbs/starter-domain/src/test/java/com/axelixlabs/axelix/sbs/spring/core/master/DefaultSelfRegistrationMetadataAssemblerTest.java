@@ -18,8 +18,10 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,11 +80,17 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         }
 
         @Bean
+        public BuildInfoProvider buildInfoProvider() {
+            return new TestBuildInfoProvider();
+        }
+
+        @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                BuildInfoProvider buildInfoProvider) {
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, buildInfoProvider);
         }
 
         @Bean
@@ -127,6 +135,10 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
         assertThat(metadata.getInstanceName()).isEqualTo("testApp");
+        assertThat(metadata.getApplicationId())
+                .isEqualTo(UUID.nameUUIDFromBytes(
+                                "petclinic:org.springframework.samples:1.0.0".getBytes(StandardCharsets.UTF_8))
+                        .toString());
         assertThat(metadata.getInstanceActuatorUrl()).isEqualTo("http://localhost:8089/actuator");
         assertThat(metadata.getDeploymentAt()).isNotBlank();
         assertThat(Instant.parse(metadata.getDeploymentAt()).isBefore(Instant.now()))

@@ -103,6 +103,7 @@ public final class TestObjectFactory {
             double memoryUsage) {
         return new Instance(
                 InstanceId.of(id),
+                "test-object-factory-application",
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 java,
@@ -165,6 +166,7 @@ public final class TestObjectFactory {
     public static Instance createInstanceWithHeartbeat(String id, @Nullable Instant instant) {
         return new Instance(
                 InstanceId.of(id),
+                "test-object-factory-application",
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 "25",
@@ -194,6 +196,7 @@ public final class TestObjectFactory {
             Instance.VmFeatures vmFeatures) {
         return new Instance(
                 InstanceId.of(id),
+                "test-object-factory-application",
                 name,
                 "1.2.3-classifer-test",
                 java,
