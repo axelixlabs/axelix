@@ -33,8 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies the plugin end-to-end on empty Spring Boot applications: after running their tests,
- * the Spring Test Profiler must have produced its HTML report. The profiler requires Java 17+,
- * so these builds run on the current JVM.
+ * the Spring Test Profiler must have produced its HTML report. The profiler requires Java 17+.
+ * The Boot 4 builds run on the current JVM under Gradle 9.5.1; the Boot 2 build is pinned to
+ * Gradle 8.14, which cannot run on JDK 25, so its daemon is forked onto a JDK in the 17-24 range.
  */
 class SpringBootApplicationFunctionalTest {
 
@@ -54,6 +55,8 @@ class SpringBootApplicationFunctionalTest {
         // given.
         writeSpringBootApplicationSources();
         writeFile("build.gradle", GradleProjectFixtures.buildScript("spring-boot-2.gradle"));
+        // Gradle 8.14 cannot run on JDK 25, so fork its daemon onto a JDK 17-24.
+        writeFile("gradle.properties", "org.gradle.java.home=" + locateGradle8JdkHome() + "\n");
 
         // when.
         BuildResult result = createRunner("test", "--stacktrace")
@@ -130,5 +133,18 @@ class SpringBootApplicationFunctionalTest {
         Path file = projectDir.resolve(relativePath);
         Files.createDirectories(file.getParent());
         Files.write(file, content.getBytes(UTF_8));
+    }
+
+    private static String locateGradle8JdkHome() {
+        String override = System.getenv("AXELIX_TEST_JDK17_HOME");
+        if (override != null && !override.isEmpty()) {
+            return override;
+        }
+        throw new IllegalStateException("No JDK 17-24 found for the Gradle "
+                + SPRING_BOOT_2_GRADLE_VERSION
+                + " functional test. Gradle 8.14 cannot run on JDK 25, and the Spring Test"
+                + " Profiler requires JDK 17+. Install a JDK in the 17-24 range, e.g. via sdkman:\n"
+                + "  source ~/.sdkman/bin/sdkman-init.sh && echo n | sdk install java 21.0.10-librca\n"
+                + "and point AXELIX_TEST_JDK17_HOME at the JDK installation.");
     }
 }
