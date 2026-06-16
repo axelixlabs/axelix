@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hand-written Maven plugin descriptor. The @axelixVersion@ token is replaced at build time by the
+  Gradle processResources task; Maven's own ${...} expressions are intentionally left untouched.
+-->
+<plugin>
+  <name>Axelix Maven Plugin</name>
+  <description>Wires the Axelix spring-test-profiler diagnostics into Spring Boot test builds.</description>
+  <groupId>com.axelixlabs</groupId>
+  <artifactId>axelix-maven-plugin</artifactId>
+  <version>@axelixVersion@</version>
+  <goalPrefix>axelix</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>prepare-test-profiler</goal>
+      <description>Merges the Axelix spring.factories entries into the test output directory.</description>
+      <requiresDependencyResolution>test</requiresDependencyResolution>
+      <requiresProject>true</requiresProject>
+      <threadSafe>true</threadSafe>
+      <phase>process-test-resources</phase>
+      <implementation>com.axelixlabs.maven.plugin.PrepareTestProfilerMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The Maven project being built.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+      </configuration>
+    </mojo>
+  </mojos>
+</plugin>

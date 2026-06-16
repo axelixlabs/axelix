@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Registers the Axelix lifecycle participant. When the plugin is declared with
+  <extensions>true</extensions>, Maven exposes this component to the build and invokes
+  afterProjectsRead(...) before dependency resolution.
+-->
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
+      <role-hint>com.axelixlabs.maven.plugin.TestProfilerDependencyInjector</role-hint>
+      <implementation>com.axelixlabs.maven.plugin.TestProfilerDependencyInjector</implementation>
+    </component>
+  </components>
+</component-set>
