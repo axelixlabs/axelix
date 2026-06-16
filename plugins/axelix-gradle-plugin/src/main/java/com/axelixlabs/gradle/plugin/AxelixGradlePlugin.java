@@ -43,5 +43,6 @@ public class AxelixGradlePlugin implements Plugin<Project> {
         // the profiler and Thymeleaf are only contributed when the test classpath does not
         // already carry them, leaving a project's chosen version untouched.
         project.afterEvaluate(TestDependencyContributor::contributeMissingTestDependencies);
+        SpringFactoriesGenerator.configure(project);
     }
 }

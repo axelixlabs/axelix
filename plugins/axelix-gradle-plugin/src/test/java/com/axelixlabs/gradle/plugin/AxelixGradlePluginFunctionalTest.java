@@ -36,12 +36,18 @@ class AxelixGradlePluginFunctionalTest {
     private static final String MIN_GRADLE_VERSION = "4.0";
     private static final String MAX_GRADLE_VERSION = "9.5.1";
 
+    private static final String EXPECTED_SPRING_FACTORIES =
+            "org.springframework.test.context.TestExecutionListener=\\\n"
+                    + "digital.pragmatech.testing.SpringTestProfilerListener\n"
+                    + "org.springframework.context.ApplicationContextInitializer=\\\n"
+                    + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
+
     @TempDir
     Path projectDir;
 
     @ParameterizedTest
     @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
-    void addsProfilerDependencyToTestRuntimeClasspath(String gradleVersion) throws IOException {
+    void addsProfilerDependencyAndGeneratesSpringFactories(String gradleVersion) throws IOException {
         // given.
         writeCommonProjectFiles(gradleVersion);
         writeFile("build.gradle", GradleProjectFixtures.buildScript("profiler-dependency.gradle"));
@@ -52,7 +58,17 @@ class AxelixGradlePluginFunctionalTest {
 
         // then.
         assertThat(result.task(":printTestRuntimeClasspath").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(result.getOutput()).contains("spring-test-profiler-0.1.2.jar");
+        assertThat(result.getOutput()
+                        .lines()
+                        .filter(line -> line.startsWith("TRC>> "))
+                        .map(line -> line.replace('\\', '/')))
+                .anySatisfy(line -> assertThat(line).endsWith("build/generated/axelix"));
+
+        Path springFactories = projectDir.resolve("build/generated/axelix/META-INF/spring.factories");
+        assertThat(springFactories).exists();
+        assertThat(new String(Files.readAllBytes(springFactories), UTF_8)).isEqualTo(EXPECTED_SPRING_FACTORIES);
     }
 
     @ParameterizedTest
@@ -91,6 +107,24 @@ class AxelixGradlePluginFunctionalTest {
         assertThat(result.getOutput())
                 .contains("DEP>> org.thymeleaf:thymeleaf:3.0.15.RELEASE")
                 .contains("DEP>> org.thymeleaf:thymeleaf:3.1.3.RELEASE");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
+    void springFactoriesIsVisibleToTestsAtRuntime(String gradleVersion) throws IOException {
+        // given.
+        writeCommonProjectFiles(gradleVersion);
+        writeFile("build.gradle", GradleProjectFixtures.buildScript("spring-factories-visible.gradle"));
+        // The test source must stay Java-8 compatible: on Gradle 4.0 it is compiled by JDK 8.
+        writeFile(
+                "src/test/java/FactoriesVisibleTest.java",
+                GradleProjectFixtures.javaSource("FactoriesVisibleTest.java"));
+
+        // when.
+        BuildResult result = createRunner(gradleVersion, "test", "--stacktrace").build();
+
+        // then.
+        assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
     }
 
     private GradleRunner createRunner(String gradleVersion, String... arguments) {
