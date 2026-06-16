@@ -27,29 +27,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesServiceTest.WithExplicitSanitizationProperties.AxelixConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesServiceTest.WithExplicitSanitizationProperties.TestConfigWithExplicitSanitizationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesServiceTest.WithoutExplicitSanitizationProperties.TestConfigWithAllPropertiesSanitized;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,16 +48,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
-public class DefaultConfigurationPropertiesServiceTest {
+public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPropsIntegrationTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
-    @SpringBootTest
     @Nested
-    @Import(TestConfigWithAllPropertiesSanitized.class)
     class WithoutExplicitSanitizationProperties {
 
         @Autowired
+        @Qualifier("sanitizeAllConfigurationPropertiesService")
         private ConfigurationPropertiesService configurationPropertiesService;
 
         @Test
@@ -80,7 +65,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             User user = createUserWithAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+                    configurationPropertiesService::getConfigProps, securityContext);
 
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
@@ -101,7 +86,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+                    configurationPropertiesService::getConfigProps, securityContext);
 
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
@@ -111,30 +96,13 @@ public class DefaultConfigurationPropertiesServiceTest {
 
             assertThat(values).doesNotContain("******");
         }
-
-        @TestConfiguration
-        @Import(ConfigurationPropertiesServiceTestConfiguration.class)
-        static class TestConfigWithAllPropertiesSanitized {
-
-            @Bean
-            public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-                return new SmartSanitizingFunction(
-                        EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
-            }
-        }
     }
 
-    @SpringBootTest(
-            properties = {
-                "axelix.prop.test.tags.forSanitization=toBeSanitized",
-                "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized"
-            })
     @Nested
-    @EnableConfigurationProperties(AxelixConfigurationProperties.class)
-    @Import(TestConfigWithExplicitSanitizationProperties.class)
     class WithExplicitSanitizationProperties {
 
         @Autowired
+        @Qualifier("explicitlySanitizedConfigurationPropertiesService")
         private ConfigurationPropertiesService configurationPropertiesService;
 
         @Test
@@ -143,7 +111,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             User user = createUserWithAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+                    configurationPropertiesService::getConfigProps, securityContext);
 
             // then.
             Map<String, String> sanitizedProperties = configProps.getBeans().stream()
@@ -152,7 +120,7 @@ public class DefaultConfigurationPropertiesServiceTest {
                     .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue));
 
             assertThat(sanitizedProperties)
-                    .containsOnlyKeys("tags.forSanitization", "tags.FOR_SANITIZATION")
+                    .containsOnlyKeys("tags.environment", "tags.version")
                     .containsValues("******", "******");
 
             List<KeyValue> nonSanitizedProps = configProps.getBeans().stream()
@@ -162,8 +130,8 @@ public class DefaultConfigurationPropertiesServiceTest {
                     .toList();
 
             assertThat(nonSanitizedProps)
-                    .allMatch(prop -> !prop.getKey().contains("forSanitization")
-                            && !prop.getKey().contains("FOR_SANITIZATION"));
+                    .allMatch(prop -> !prop.getKey().contains("tags.environment")
+                            && !prop.getKey().contains("tags.version"));
         }
 
         @Test
@@ -172,7 +140,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
-                    () -> configurationPropertiesService.getConfigProps(), securityContext);
+                    configurationPropertiesService::getConfigProps, securityContext);
 
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
@@ -181,70 +149,6 @@ public class DefaultConfigurationPropertiesServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
-        }
-
-        @TestConfiguration
-        @Import(ConfigurationPropertiesServiceTestConfiguration.class)
-        static class TestConfigWithExplicitSanitizationProperties {
-
-            @Bean
-            public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-                return new SmartSanitizingFunction(
-                        List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
-                        propertyNameNormalizer);
-            }
-        }
-
-        @ConfigurationProperties(prefix = "axelix.prop.test")
-        public record AxelixConfigurationProperties(Map<String, String> tags) {}
-    }
-
-    static class ConfigurationPropertiesServiceTestConfiguration {
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
-            return new EndpointsConfigurationProperties();
-        }
-
-        @Bean
-        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
-            return new DefaultConfigurationPropertiesFlattener();
-        }
-
-        @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter(
-                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-        }
-
-        @Bean
-        public PropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultPropertyNameNormalizer();
-        }
-
-        @Bean
-        public SecurityContextExecutor securityContextExecutor() {
-            return new ThreadLocalSecurityContextExecutor();
-        }
-
-        @Bean
-        public RequiredAuthorityCheckService requiredAuthorityCheckService(
-                SecurityContextExecutor securityContextExecutor) {
-            return new RequiredAuthorityCheckService(securityContextExecutor);
-        }
-
-        @Bean
-        public ConfigurationPropertiesService configurationPropertiesService(
-                SmartSanitizingFunction smartSanitizingFunction,
-                ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter,
-                RequiredAuthorityCheckService requiredAuthorityCheckService) {
-            return new DefaultConfigurationPropertiesService(
-                    smartSanitizingFunction,
-                    applicationContext,
-                    configurationPropertiesConverter,
-                    requiredAuthorityCheckService);
         }
     }
 }
