@@ -21,49 +21,151 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.model.Dependency;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestDependencyPlannerTest {
 
     private static final String PROFILER_VERSION = "0.1.2";
+    private static final String THYMELEAF_VERSION = "3.1.5";
+    private static final String THYMELEAF_MIN_VERSION = "3.1.3";
 
-    private final TestDependencyPlanner subject = new TestDependencyPlanner(PROFILER_VERSION);
+    private final TestDependencyPlanner subject =
+            new TestDependencyPlanner(PROFILER_VERSION, THYMELEAF_VERSION, THYMELEAF_MIN_VERSION);
 
-    @Test
-    void addsProfilerWhenAbsent() {
-        // given
-        ResolvedClasspath classpath = classpathOf();
+    @Nested
+    class SpringTestProfiler {
 
-        // when
-        List<Dependency> additions = subject.plan(classpath);
+        @Test
+        void addsProfilerWhenAbsent() {
+            // given
+            ResolvedClasspath classpath = classpathOf(thymeleaf("3.1.5"));
 
-        // then
-        assertThat(additions)
-                .singleElement()
-                .satisfies(dependency -> assertTestDependency(
-                        dependency,
-                        TestDependencyPlanner.SPRING_TEST_PROFILER_GROUP_ID,
-                        TestDependencyPlanner.SPRING_TEST_PROFILER_ARTIFACT_ID,
-                        PROFILER_VERSION));
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(additions)
+                    .anySatisfy(dependency -> assertTestDependency(
+                            dependency,
+                            TestDependencyPlanner.SPRING_TEST_PROFILER_GROUP_ID,
+                            TestDependencyPlanner.SPRING_TEST_PROFILER_ARTIFACT_ID,
+                            PROFILER_VERSION));
+        }
+
+        @Test
+        void doesNotAddProfilerWhenAlreadyPresent() {
+            // given
+            ResolvedClasspath classpath = classpathOf(profiler("0.1.1"), thymeleaf("3.1.5"));
+
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(coordinatesOf(additions))
+                    .doesNotContain(TestDependencyPlanner.SPRING_TEST_PROFILER_GROUP_ID + ":"
+                            + TestDependencyPlanner.SPRING_TEST_PROFILER_ARTIFACT_ID);
+        }
     }
 
-    @Test
-    void doesNotAddProfilerWhenAlreadyPresent() {
-        // given
-        ResolvedClasspath classpath = classpathOf(profiler("0.1.1"));
+    @Nested
+    class Thymeleaf {
 
-        // when
-        List<Dependency> additions = subject.plan(classpath);
+        @Test
+        void addsThymeleafWhenAbsent() {
+            // given
+            ResolvedClasspath classpath = classpathOf(profiler("0.1.2"));
 
-        // then
-        assertThat(additions).isEmpty();
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(additions)
+                    .anySatisfy(dependency -> assertTestDependency(
+                            dependency,
+                            TestDependencyPlanner.THYMELEAF_GROUP_ID,
+                            TestDependencyPlanner.THYMELEAF_ARTIFACT_ID,
+                            THYMELEAF_VERSION));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"3.0.15", "3.1.0", "3.1.2"})
+        void addsThymeleafWhenResolvedBelowMinimum(String resolvedVersion) {
+            // given
+            ResolvedClasspath classpath = classpathOf(profiler("0.1.2"), thymeleaf(resolvedVersion));
+
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(additions)
+                    .anySatisfy(dependency -> assertTestDependency(
+                            dependency,
+                            TestDependencyPlanner.THYMELEAF_GROUP_ID,
+                            TestDependencyPlanner.THYMELEAF_ARTIFACT_ID,
+                            THYMELEAF_VERSION));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"3.1.3", "3.1.5", "3.1.6", "3.2.0"})
+        void doesNotAddThymeleafWhenResolvedAtOrAboveMinimum(String resolvedVersion) {
+            // given
+            ResolvedClasspath classpath = classpathOf(profiler("0.1.2"), thymeleaf(resolvedVersion));
+
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(coordinatesOf(additions))
+                    .doesNotContain(TestDependencyPlanner.THYMELEAF_GROUP_ID + ":"
+                            + TestDependencyPlanner.THYMELEAF_ARTIFACT_ID);
+        }
+    }
+
+    @Nested
+    class Combined {
+
+        @Test
+        void addsBothWhenProfilerAbsentAndThymeleafOutdated() {
+            // given
+            ResolvedClasspath classpath = classpathOf(thymeleaf("3.0.15"));
+
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(coordinatesOf(additions))
+                    .containsExactlyInAnyOrder(
+                            TestDependencyPlanner.SPRING_TEST_PROFILER_GROUP_ID + ":"
+                                    + TestDependencyPlanner.SPRING_TEST_PROFILER_ARTIFACT_ID,
+                            TestDependencyPlanner.THYMELEAF_GROUP_ID + ":"
+                                    + TestDependencyPlanner.THYMELEAF_ARTIFACT_ID);
+            assertThat(additions)
+                    .allSatisfy(dependency ->
+                            assertThat(dependency.getScope()).isEqualTo(TestDependencyPlanner.TEST_SCOPE));
+        }
+
+        @Test
+        void addsNothingWhenBothPresentAndUpToDate() {
+            // given
+            ResolvedClasspath classpath = classpathOf(profiler("0.1.2"), thymeleaf("3.1.6"));
+
+            // when
+            List<Dependency> additions = subject.plan(classpath);
+
+            // then
+            assertThat(additions).isEmpty();
+        }
     }
 
     private static Artifact profiler(String version) {
@@ -71,6 +173,10 @@ class TestDependencyPlannerTest {
                 TestDependencyPlanner.SPRING_TEST_PROFILER_GROUP_ID,
                 TestDependencyPlanner.SPRING_TEST_PROFILER_ARTIFACT_ID,
                 version);
+    }
+
+    private static Artifact thymeleaf(String version) {
+        return artifact(TestDependencyPlanner.THYMELEAF_GROUP_ID, TestDependencyPlanner.THYMELEAF_ARTIFACT_ID, version);
     }
 
     private static Artifact artifact(String groupId, String artifactId, String version) {
@@ -81,6 +187,12 @@ class TestDependencyPlannerTest {
     private static ResolvedClasspath classpathOf(Artifact... artifacts) {
         Set<Artifact> set = new HashSet<>(Arrays.asList(artifacts));
         return new ResolvedClasspath(set);
+    }
+
+    private static List<String> coordinatesOf(List<Dependency> dependencies) {
+        return dependencies.stream()
+                .map(dependency -> dependency.getGroupId() + ":" + dependency.getArtifactId())
+                .collect(Collectors.toList());
     }
 
     private static void assertTestDependency(Dependency dependency, String groupId, String artifactId, String version) {

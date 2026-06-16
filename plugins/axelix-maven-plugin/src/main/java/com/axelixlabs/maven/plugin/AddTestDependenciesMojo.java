@@ -29,8 +29,12 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Injects Axelix's recommended test-scoped dependencies into the building project when they are
- * missing from the resolved test classpath. Currently it adds
- * {@code digital.pragmatech.testing:spring-test-profiler} when it is absent.
+ * missing from (or outdated on) the resolved test classpath:
+ *
+ * <ul>
+ *   <li>{@code digital.pragmatech.testing:spring-test-profiler} — added when absent;</li>
+ *   <li>{@code org.thymeleaf:thymeleaf} — added when absent or resolved below {@code thymeleafMinVersion}.</li>
+ * </ul>
  *
  * <p>The goal binds to {@code initialize} and requires test-scope dependency resolution, so it can
  * inspect the fully resolved (transitive) classpath via {@link MavenProject#getArtifacts()} and add
@@ -49,6 +53,12 @@ public class AddTestDependenciesMojo extends AbstractMojo {
     @Parameter(property = "axelix.springTestProfiler.version", defaultValue = "0.1.2")
     private String springTestProfilerVersion;
 
+    @Parameter(property = "axelix.thymeleaf.version", defaultValue = "3.1.5")
+    private String thymeleafVersion;
+
+    @Parameter(property = "axelix.thymeleaf.minVersion", defaultValue = "3.1.3")
+    private String thymeleafMinVersion;
+
     @Parameter(property = "axelix.addTestDependencies.skip", defaultValue = "false")
     private boolean skip;
 
@@ -60,7 +70,8 @@ public class AddTestDependenciesMojo extends AbstractMojo {
         }
 
         ResolvedClasspath classpath = new ResolvedClasspath(project.getArtifacts());
-        TestDependencyPlanner planner = new TestDependencyPlanner(springTestProfilerVersion);
+        TestDependencyPlanner planner =
+                new TestDependencyPlanner(springTestProfilerVersion, thymeleafVersion, thymeleafMinVersion);
 
         List<Dependency> additions = planner.plan(classpath);
         if (additions.isEmpty()) {
