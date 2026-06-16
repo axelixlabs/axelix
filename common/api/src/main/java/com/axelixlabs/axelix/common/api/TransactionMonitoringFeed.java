@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The feed of transactions inside a given application.
@@ -220,10 +222,14 @@ public final class TransactionMonitoringFeed {
     /**
      * The query executed during a particular transaction.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static final class Query {
         private final String sql;
         private final Long startTimestampMs;
         private final Long endTimestampMs;
+
+        @Nullable
+        private final Boolean inMemoryPaginated;
 
         /**
          * Creates a new Query.
@@ -231,15 +237,19 @@ public final class TransactionMonitoringFeed {
          * @param sql               the executed SQL statement
          * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
          * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
+         * @param inMemoryPaginated whether Hibernate applied pagination in memory for this query,
+         *                          or {@code null} if pagination was performed at the database level
          */
         @JsonCreator
         public Query(
                 @JsonProperty("sql") String sql,
                 @JsonProperty("startTimestampMs") Long startTimestampMs,
-                @JsonProperty("endTimestampMs") Long endTimestampMs) {
+                @JsonProperty("endTimestampMs") Long endTimestampMs,
+                @JsonProperty("inMemoryPaginated") @Nullable Boolean inMemoryPaginated) {
             this.sql = sql;
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
+            this.inMemoryPaginated = inMemoryPaginated;
         }
 
         public String getSql() {
@@ -254,6 +264,11 @@ public final class TransactionMonitoringFeed {
             return endTimestampMs;
         }
 
+        @Nullable
+        public Boolean isInMemoryPaginated() {
+            return inMemoryPaginated;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) {
@@ -262,20 +277,22 @@ public final class TransactionMonitoringFeed {
             Query that = (Query) o;
             return Objects.equals(sql, that.sql)
                     && Objects.equals(startTimestampMs, that.startTimestampMs)
-                    && Objects.equals(endTimestampMs, that.endTimestampMs);
+                    && Objects.equals(endTimestampMs, that.endTimestampMs)
+                    && Objects.equals(inMemoryPaginated, that.inMemoryPaginated);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(sql, startTimestampMs, endTimestampMs);
+            return Objects.hash(sql, startTimestampMs, endTimestampMs, inMemoryPaginated);
         }
 
         @Override
         public String toString() {
             return "Query{" + "sql='"
-                    + sql + '\'' + ", durationMs="
+                    + sql + '\'' + ", startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
-                    + endTimestampMs + '}';
+                    + endTimestampMs + ", inMemoryPaginated="
+                    + inMemoryPaginated + '}';
         }
     }
 

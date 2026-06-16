@@ -28,16 +28,19 @@ public class SqlQueryRecord {
     private final String sql;
     private final long durationMs;
     private final long startTimestampMs;
+    private final boolean inMemoryPaginated;
 
     /**
      * @param sql               the executed SQL statement
      * @param durationMs        query execution duration in milliseconds.
      * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started.
+     * @param inMemoryPaginated whether Hibernate applied pagination in memory for this query.
      */
-    public SqlQueryRecord(String sql, long durationMs, long startTimestampMs) {
+    public SqlQueryRecord(String sql, long durationMs, long startTimestampMs, boolean inMemoryPaginated) {
         this.sql = sql;
         this.durationMs = durationMs;
         this.startTimestampMs = startTimestampMs;
+        this.inMemoryPaginated = inMemoryPaginated;
     }
 
     public String getSql() {
@@ -54,5 +57,9 @@ public class SqlQueryRecord {
 
     public long getEndTimestampMs() {
         return startTimestampMs + durationMs;
+    }
+
+    public boolean isInMemoryPaginated() {
+        return inMemoryPaginated;
     }
 }

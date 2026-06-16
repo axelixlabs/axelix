@@ -48,6 +48,12 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+configurations.testRuntimeClasspath {
+    resolutionStrategy.force("org.slf4j:slf4j-api:1.7.36")
+    resolutionStrategy.force("ch.qos.logback:logback-classic:1.2.12")
+    resolutionStrategy.force("ch.qos.logback:logback-core:1.2.12")
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
     options.release = 11

@@ -17,8 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import ch.qos.logback.classic.LoggerContext;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigu
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppender;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
@@ -98,5 +104,25 @@ public class TransactionMonitoringAutoConfiguration {
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             QueriesRecorder queriesCollector) {
         return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+    public InMemoryPaginationAppender inMemoryPaginationAppender() {
+        ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+        if (!(factory instanceof LoggerContext)) {
+            return null;
+        }
+        LoggerContext context = (LoggerContext) factory;
+
+        InMemoryPaginationAppender appender = new InMemoryPaginationAppender();
+        appender.setContext(context);
+        appender.start();
+
+        // Hibernate 5.x (Spring Boot 2)
+        context.getLogger("org.hibernate.hql.internal.ast.QueryTranslatorImpl").addAppender(appender);
+
+        return appender;
     }
 }

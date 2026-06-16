@@ -33,12 +33,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.jayway.jsonpath.JsonPath;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -523,6 +529,27 @@ class TransactionMonitoringEndpointTest {
         assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
     }
 
+    @Test
+    void shouldDetectInMemoryPagination() {
+        // given.
+        Owner owner = new Owner();
+        owner.addPet(new Pet("Rodriquez", owner));
+        ownerRepository.save(owner);
+
+        // when.
+        propagationTestHelper.findAllWithPetsPageable();
+
+        // then.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("findAllWithPetsPageable");
+
+        List<Boolean> inMemoryPaginatedFlags =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[*].inMemoryPaginated");
+
+        assertThat(inMemoryPaginatedFlags).contains(true);
+    }
+
     private void checkMeterRegistry(
             String expectedClassName, String expectedMethodName, String status, int expectedQueryCount) {
         // given when. Verify Transaction Duration Timer
@@ -614,6 +641,20 @@ class TransactionMonitoringEndpointTest {
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
+
+        @Bean
+        public InMemoryPaginationAppender inMemoryPaginationAppender() {
+            LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+            InMemoryPaginationAppender appender = new InMemoryPaginationAppender();
+            appender.setContext(context);
+            appender.start();
+
+            // Hibernate 6+ (Spring Boot 3)
+            context.getLogger("org.hibernate.orm.query").addAppender(appender);
+
+            return appender;
+        }
     }
 
     @Entity
@@ -683,6 +724,12 @@ class TransactionMonitoringEndpointTest {
         default List<Owner> findAll() {
             return List.of(new Owner());
         }
+
+        @Transactional
+        @Query(
+                value = "SELECT o FROM TransactionMonitoringEndpointTest$Owner o JOIN FETCH o.pets",
+                countQuery = "SELECT COUNT(o) FROM TransactionMonitoringEndpointTest$Owner o")
+        Page<Owner> findAllWithPets(Pageable pageable);
     }
 
     static class PropagationTestHelper {
@@ -744,6 +791,11 @@ class TransactionMonitoringEndpointTest {
         public void testRollbackScenario(String lastName) {
             ownerRepository.findByLastName(lastName);
             throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void findAllWithPetsPageable() {
+            ownerRepository.findAllWithPets(PageRequest.of(0, 5));
         }
     }
 }
