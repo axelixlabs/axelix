@@ -17,21 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,45 +31,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import({
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class,
-    DefaultServiceMetadataAssembler.class,
-    DefaultServiceMetadataAssemblerTest.CurrentConfig.class
-})
-class DefaultServiceMetadataAssemblerTest {
+class DefaultServiceMetadataAssemblerTest extends AbstractMasterContextTest {
 
     @Autowired
     private DefaultServiceMetadataAssembler subject;
-
-    @MockBean
-    private HealthEndpoint healthEndpoint;
-
-    @TestConfiguration
-    static class CurrentConfig {
-
-        @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
-
-        @Bean
-        HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
-        }
-
-        @Bean
-        AxelixVersionDiscoverer axelixVersionDiscoverer() {
-            return () -> "1.1.3";
-        }
-
-        @Bean
-        public LibraryInformationProvider libraryInformationProvider() {
-            return new DefaultLibraryInformationProvider();
-        }
-    }
 
     @Test
     void shouldAssembleTheMetadataAboutGivenService() {
