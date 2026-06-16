@@ -1,0 +1,2 @@
+org.springframework.test.context.TestExecutionListener=com.app.AppListener
+org.springframework.boot.SpringApplicationRunListener=com.app.AppRunListener

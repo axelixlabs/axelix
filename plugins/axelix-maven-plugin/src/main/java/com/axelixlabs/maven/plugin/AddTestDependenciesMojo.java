@@ -17,10 +17,15 @@
  */
 package com.axelixlabs.maven.plugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,6 +44,11 @@ import org.apache.maven.project.MavenProject;
  * <p>The goal binds to {@code initialize} and requires test-scope dependency resolution, so it can
  * inspect the fully resolved (transitive) classpath via {@link MavenProject#getArtifacts()} and add
  * the dependencies to the model before the test-compile and test phases run.
+ *
+ * <p>After resolving the dependencies the goal also registers a {@code META-INF/spring.factories} on
+ * the test classpath (via a generated test resource) that wires spring-test-profiler's
+ * {@code TestExecutionListener} and diagnostic {@code ApplicationContextInitializer}, merging with any
+ * {@code spring.factories} the project already provides.
  */
 @Mojo(
         name = "add-test-dependencies",
@@ -63,7 +73,7 @@ public class AddTestDependenciesMojo extends AbstractMojo {
     private boolean skip;
 
     @Override
-    public void execute() {
+    public void execute() throws MojoExecutionException {
         if (skip) {
             getLog().info("axelix:add-test-dependencies skipped (axelix.addTestDependencies.skip=true)");
             return;
@@ -76,14 +86,53 @@ public class AddTestDependenciesMojo extends AbstractMojo {
         List<Dependency> additions = planner.plan(classpath);
         if (additions.isEmpty()) {
             getLog().info("No test dependencies need to be added; classpath already satisfies the requirements.");
-            return;
+        } else {
+            for (Dependency dependency : additions) {
+                project.getDependencies().add(dependency);
+                getLog().info(String.format(
+                        "Added test dependency %s:%s:%s",
+                        dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()));
+            }
         }
 
-        for (Dependency dependency : additions) {
-            project.getDependencies().add(dependency);
-            getLog().info(String.format(
-                    "Added test dependency %s:%s:%s",
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()));
+        registerSpringFactories();
+    }
+
+    /**
+     * Writes {@code META-INF/spring.factories} into a generated test-resources directory and registers
+     * it on the project so {@code process-test-resources} copies it onto the test classpath. Any
+     * {@code spring.factories} the project already declares on a test-resource root is merged in.
+     */
+    private void registerSpringFactories() throws MojoExecutionException {
+        List<File> existing = new ArrayList<>();
+        File rootDir = new File(project.getBuild().getDirectory(), "generated-test-resources/axelix");
+        for (Resource resource : project.getTestResources()) {
+            if (resource.getDirectory() == null || rootDir.getAbsolutePath().equals(resource.getDirectory())) {
+                continue;
+            }
+            File candidate = new File(resource.getDirectory(), SpringFactoriesWriter.RELATIVE_PATH);
+            if (candidate.isFile()) {
+                existing.add(candidate);
+            }
         }
+
+        File written;
+        try {
+            written = new SpringFactoriesWriter().write(rootDir, existing);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write " + SpringFactoriesWriter.RELATIVE_PATH, e);
+        }
+
+        Resource resource = new Resource();
+        resource.setDirectory(rootDir.getAbsolutePath());
+        resource.addInclude(SpringFactoriesWriter.RELATIVE_PATH);
+        resource.setFiltering(false);
+        project.addTestResource(resource);
+
+        getLog().info(String.format(
+                "Registered Axelix %s on the test classpath at %s%s",
+                SpringFactoriesWriter.RELATIVE_PATH,
+                written,
+                existing.isEmpty() ? "" : " (merged with existing project declarations)"));
     }
 }
