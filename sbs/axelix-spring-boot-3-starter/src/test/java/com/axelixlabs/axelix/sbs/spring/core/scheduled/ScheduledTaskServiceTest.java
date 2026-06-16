@@ -18,29 +18,11 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.IntervalTask;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,48 +34,37 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-@Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
-class ScheduledTaskServiceTest {
+class ScheduledTaskServiceTest extends AbstractScheduledTasksIntegrationTest {
 
     // Cron
-    private static final String CRON_TASK_ID = ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTask";
+    private static final String CRON_TASK_ID =
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testCronTask";
     private static final String CRON_TASK_ID_FOR_MODIFY =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTaskForModify";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testCronTaskForModify";
 
     // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedDelayTask";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testFixedDelayTask";
     private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedDelayTaskForModify";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testFixedDelayTaskForModify";
 
     // FixedRate
     private static final String FIXED_RATE_TASK_ID =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedRateTask";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testFixedRateTask";
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedRateTaskForModify";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testFixedRateTaskForModify";
     private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testFixedDelayTaskForExecute";
 
     // Custom
     private static final String CUSTOM_TASK_ID =
-            ScheduledTaskServiceTestConfiguration.class.getName() + ".testCustomTask";
+            SharedScheduledTasksTestConfiguration.class.getName() + ".testCustomTask";
 
     @Autowired
     private ScheduledTaskService taskService;
 
     @Autowired
     private ScheduledTasksRegistry taskRegistry;
-
-    private static volatile boolean cronFlag = false;
-
-    private static volatile boolean fixedDelayFlag = false;
-
-    private static volatile boolean fixedRateFlag = false;
-
-    private static volatile boolean fixedRateFlagForExecute = false;
-
-    private static volatile boolean customTaskFlag = false;
 
     @Test
     void shouldDisabledTask_testCronTask() throws InterruptedException {
@@ -260,96 +231,5 @@ class ScheduledTaskServiceTest {
         // then task exists and was executed
         taskRegistry.find(FIXED_RATE_TASK_ID_FOR_EXECUTE).orElseThrow();
         assertThat(fixedRateFlagForExecute).isTrue();
-    }
-
-    @TestConfiguration
-    @EnableScheduling
-    static class ScheduledTaskServiceTestConfiguration implements SchedulingConfigurer {
-
-        @Bean
-        public TaskScheduler taskScheduler() {
-            return new ConcurrentTaskScheduler();
-        }
-
-        @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
-        }
-
-        @Bean
-        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new TriggerBasedTaskRescheduler(taskScheduler);
-        }
-
-        @Bean
-        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
-            return new IntervalBasedTaskRescheduler(taskScheduler);
-        }
-
-        @Bean
-        public ScheduledTaskService scheduledTaskService(
-                ScheduledTasksRegistry registry,
-                List<TaskRescheduler> taskReschedulers,
-                ThreadPoolTaskExecutor taskExecutor) {
-            return new ScheduledTaskService(registry, taskReschedulers, taskExecutor);
-        }
-
-        // Cron
-        @Scheduled(cron = "*/1 * * * * *")
-        public void testCronTask() {
-            cronFlag = true;
-        }
-
-        @Scheduled(cron = "*/2 * * * * *")
-        public void testCronTaskForModify() {}
-
-        // FixedDelay
-        @Scheduled(fixedDelay = 100)
-        public void testFixedDelayTask() {
-            fixedDelayFlag = true;
-        }
-
-        @Scheduled(fixedDelay = 200)
-        public void testFixedDelayTaskForModify() {}
-
-        // FixedRate
-        @Scheduled(fixedRate = 100, initialDelay = 50)
-        public void testFixedRateTask() {
-            fixedRateFlag = true;
-        }
-
-        @Scheduled(fixedRate = 200)
-        public void testFixedRateTaskForModify() {}
-
-        @Scheduled(fixedRate = 2000000000)
-        public void testFixedDelayTaskForExecute() {
-            fixedRateFlagForExecute = true;
-        }
-
-        // Custom
-        @Override
-        public void configureTasks(ScheduledTaskRegistrar registrar) {
-            registrar.addTriggerTask(new CustomTestTask(), new CustomTestTrigger());
-        }
-
-        static class CustomTestTask implements Runnable {
-            @Override
-            public void run() {
-                customTaskFlag = true;
-            }
-
-            @Override
-            public String toString() {
-                return CUSTOM_TASK_ID;
-            }
-        }
-
-        static class CustomTestTrigger implements Trigger {
-            @Override
-            @Nullable
-            public Instant nextExecution(@NonNull TriggerContext triggerContext) {
-                return Instant.now().plusMillis(100);
-            }
-        }
     }
 }
