@@ -54,6 +54,7 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
         })
 @Import(ConfigPropsTestSupportConfiguration.class)
 public abstract class AbstractConfigPropsSharedContextTest {
+
     @Autowired
     protected ConfigurationPropertiesConverter converter;
 }

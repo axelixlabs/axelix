@@ -51,8 +51,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 @TestConfiguration
 @EnableConfigurationProperties(SharedAxelixConfigurationProperties.class)
 public class ConfigPropsTestSupportConfiguration {
-    public static final String SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE = "sanitizeAllConfigurationPropertiesService";
 
+    public static final String SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE = "sanitizeAllConfigurationPropertiesService";
     public static final String EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE = "explicitlySanitizedConfigurationPropertiesService";
 
     @Bean
