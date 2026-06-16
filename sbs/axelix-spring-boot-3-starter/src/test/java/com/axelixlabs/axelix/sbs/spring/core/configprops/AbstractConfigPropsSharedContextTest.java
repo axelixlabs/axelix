@@ -53,7 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
             "axelix.prop.test.http-client.requests[0].methods[1].type=POST"
         })
 @Import(ConfigPropsTestSupportConfiguration.class)
-public abstract class AbstractConfigPropsIntegrationTest {
+public abstract class AbstractConfigPropsSharedContextTest {
 
     @Autowired
     protected ConfigurationPropertiesConverter converter;

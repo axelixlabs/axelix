@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
  */
-public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigPropsIntegrationTest {
+public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigPropsSharedContextTest {
 
     @Autowired
     private ConfigurationPropertiesReportEndpoint endpoint;

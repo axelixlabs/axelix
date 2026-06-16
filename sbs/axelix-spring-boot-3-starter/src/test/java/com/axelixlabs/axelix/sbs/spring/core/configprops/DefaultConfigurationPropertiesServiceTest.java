@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPropsIntegrationTest {
+public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPropsSharedContextTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
