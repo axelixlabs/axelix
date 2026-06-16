@@ -20,9 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 
@@ -32,10 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link CommitIdPluginShortBuildInfoProvider}.
  *
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
-@SpringBootTest
-@Import({CommitIdPluginShortBuildInfoProvider.class, ProjectInfoAutoConfiguration.class})
-class CommitIdPluginShortBuildInfoProviderTest {
+class CommitIdPluginShortBuildInfoProviderTest extends AbstractMasterSharedContextTest {
 
     @Autowired
     private CommitIdPluginShortBuildInfoProvider subject;
