@@ -44,6 +44,9 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * cached Spring context.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 @TestConfiguration
 @EnableConfigurationProperties(SharedAxelixConfigurationProperties.class)

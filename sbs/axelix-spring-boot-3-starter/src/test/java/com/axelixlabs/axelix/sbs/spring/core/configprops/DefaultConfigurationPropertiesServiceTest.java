@@ -47,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPropsIntegrationTest {
 

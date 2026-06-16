@@ -34,6 +34,9 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
  * {@link ConfigPropsTestSupportConfiguration}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 @SpringBootTest(classes = Main.class)
 @TestPropertySource(

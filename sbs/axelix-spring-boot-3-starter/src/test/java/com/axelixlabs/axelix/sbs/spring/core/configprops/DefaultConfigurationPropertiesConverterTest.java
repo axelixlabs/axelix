@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link DefaultConfigurationPropertiesConverter}.
  *
  * @author Sergey Cherkasov
+ * @author Artemiy Degtyarev
  */
 public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigPropsIntegrationTest {
 
