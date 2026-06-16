@@ -21,8 +21,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 /**
- * Axelix Gradle plugin entry point. The configuration it performs is built up incrementally; this
- * is the module skeleton and is currently a no-op once the {@code java} plugin is applied.
+ * Axelix Gradle plugin entry point.
  *
  * <p>Compatible with Gradle 4.0 through 9.x. Only APIs present in BOTH Gradle 4.0 and 9.x may be
  * used here: no {@code tasks.register} (added in 4.9), no lazy {@code Provider}/{@code Property}
