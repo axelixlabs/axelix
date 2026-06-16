@@ -27,11 +27,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -40,14 +38,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import({
-    QualifiersPersistencePostProcessorTest.BeanMethodDeclarations.class,
-    QualifiersPersistencePostProcessorTest.ComponentMethodDeclarations.class,
-    QualifiersPersistencePostProcessorTest.ConfigurationClassesDeclarations.class,
-    QualifiersPersistencePostProcessor.class
-})
-class QualifiersPersistencePostProcessorTest {
+class QualifiersPersistencePostProcessorTest extends AbstractSharedBeansContextTest {
 
     @Test
     void shouldDetectAnnotationQualifiers() {
