@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
  */
-class CommitIdPluginGitInformationProviderTest extends AbstractMasterContextTest {
+class CommitIdPluginGitInformationProviderTest extends AbstractMasterSharedContextTest {
 
     @Autowired
     private CommitIdPluginGitInformationProvider subject;

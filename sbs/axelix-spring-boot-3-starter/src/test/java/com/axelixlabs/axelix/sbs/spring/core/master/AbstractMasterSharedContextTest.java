@@ -35,8 +35,6 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
  * unioned context here and having every subclass inherit it unchanged, the Spring TestContext framework resolves the
  * same context cache key for all of them, so they share one cached {@link org.springframework.context.ApplicationContext}.
  *
- * <p>{@link AxelixMetadataEndpointTest} intentionally does not extend this class: it starts a real web server and its
- * own JWT stack, so it keeps a separate context.
  *
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
@@ -47,9 +45,9 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
     CommitIdPluginShortBuildInfoProvider.class,
     ProjectInfoAutoConfiguration.class,
     DefaultServiceMetadataAssembler.class,
-    AbstractMasterContextTest.SharedConfig.class
+    AbstractMasterSharedContextTest.SharedConfig.class
 })
-abstract class AbstractMasterContextTest {
+abstract class AbstractMasterSharedContextTest {
 
     @MockBean
     private HealthEndpoint healthEndpoint;

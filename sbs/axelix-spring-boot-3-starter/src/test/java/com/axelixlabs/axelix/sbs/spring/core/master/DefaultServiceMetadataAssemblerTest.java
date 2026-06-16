@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
  */
-class DefaultServiceMetadataAssemblerTest extends AbstractMasterContextTest {
+class DefaultServiceMetadataAssemblerTest extends AbstractMasterSharedContextTest {
 
     @Autowired
     private DefaultServiceMetadataAssembler subject;
