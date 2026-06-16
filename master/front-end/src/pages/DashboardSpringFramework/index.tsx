@@ -15,21 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { JSX } from "react";
+const DashboardSpringFramework = () => {
+    return "DashboardSpringFramework";
+};
 
-export interface IMenuItem {
-    /**
-     * Route path that the menu item links to.
-     */
-    path: string;
-
-    /**
-     * Icon displayed alongside the menu item.
-     */
-    icon: JSX.Element;
-
-    /**
-     * Label displayed for the menu item.
-     */
-    label: string;
-}
+export default DashboardSpringFramework;

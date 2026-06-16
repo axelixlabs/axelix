@@ -21,10 +21,14 @@ import { Navigate, Route, Routes } from "react-router";
 import Loadable from "components";
 import { useAppSelector } from "hooks";
 import { MainLayout } from "layout";
+import { DashboardSiderMenu } from "layout/siders";
 
+const DashboardSpringFramework = Loadable(lazy(() => import("pages/DashboardSpringFramework")));
+const DashboardPersistence = Loadable(lazy(() => import("pages/DashboardPersistence")));
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("pages/Transactional")));
+const DashboardJava = Loadable(lazy(() => import("pages/DashboardJava")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
 const UserProfile = Loadable(lazy(() => import("pages/UserProfile")));
@@ -49,9 +53,16 @@ export const MainRoutes = () => {
                 <Route path="/" element={<MainLayout hideSider />}>
                     <Route index element={<Navigate to="/wallboard" replace />} />
                     <Route path="/wallboard" element={<Wallboard />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
                     {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
+                </Route>
+
+                <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
+                    <Route index element={<Navigate to="overview" replace />} />
+                    <Route path="overview" element={<Dashboard />} />
+                    <Route path="java" element={<DashboardJava />} />
+                    <Route path="persistence" element={<DashboardPersistence />} />
+                    <Route path="spring-framework" element={<DashboardSpringFramework />} />
                 </Route>
 
                 <Route path="/" element={<MainLayout hideSider />}>
