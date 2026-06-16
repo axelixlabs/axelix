@@ -43,7 +43,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -78,8 +77,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
-class DefaultBeanMetaInfoExtractorTest {
+class DefaultBeanMetaInfoExtractorTest extends AbstractSharedBeansContextTest {
 
     @Autowired
     private BeanMetaInfoExtractor metaInfoExtractor;
