@@ -238,7 +238,7 @@ public final class TransactionMonitoringFeed {
          * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
          * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
          * @param inMemoryPaginated whether Hibernate applied pagination in memory for this query,
-         *                          or {@code null} if pagination was performed at the database level
+         *                          or {@code null} if in-memory pagination did not take place inside this query.
          */
         @JsonCreator
         public Query(

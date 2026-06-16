@@ -23,18 +23,15 @@ import ch.qos.logback.core.AppenderBase;
 
 /**
  * Logback appender that detects Hibernate's in-memory pagination by intercepting
- * the {@code HHH90003004} warning emitted by Hibernate 6.x–7.3.x when {@code firstResult/maxResults}
+ * the {@code HHH000104} warning emitted by Hibernate 5.x when {@code firstResult/maxResults}
  * is specified with a collection fetch.
- *
- * <p>Note: starting from Hibernate 7.4, in-memory pagination is no longer applied,
- * so this appender will never trigger on Hibernate 7.4 and above.
  *
  * @author Nikita Kirillov
  */
-public class InMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
+public class LogbackInMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
 
-    // Only for Hibernate 6.x – 7.3.x (Spring Boot 3.x and 4.0.x).
-    private static final String HHH90003004 = "HHH90003004";
+    // Only for Hibernate 5.x (Spring Boot 2.x).
+    private static final String HHH000104 = "HHH000104";
 
     @Override
     protected void append(ILoggingEvent event) {
@@ -42,7 +39,7 @@ public class InMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
             return;
         }
         String message = event.getMessage();
-        if (message != null && (message.contains(HHH90003004))) {
+        if (message != null && (message.contains(HHH000104))) {
             InMemoryPaginationHolder.mark();
         }
     }

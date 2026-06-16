@@ -17,26 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
-
 /**
- * Logback appender that detects Hibernate's in-memory pagination by intercepting
- * the {@code HHH000104} warning emitted by Hibernate 5.x when {@code firstResult/maxResults}
- * is specified with a collection fetch.
+ * Registers InMemoryPaginationAppender with the active logging backend.
  *
  * @author Nikita Kirillov
  */
-public class InMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
+public interface InMemoryPaginationAppenderRegistrar {
 
-    // Only for Hibernate 5.x (Spring Boot 2.x).
-    private static final String HHH000104 = "HHH000104";
-
-    @Override
-    protected void append(ILoggingEvent event) {
-        String message = event.getMessage();
-        if (message != null && (message.contains(HHH000104))) {
-            InMemoryPaginationHolder.mark();
-        }
-    }
+    /**
+     * Registers the appender with the active logging backend.
+     * If the backend is not supported, this method should return silently.
+     */
+    void register();
 }

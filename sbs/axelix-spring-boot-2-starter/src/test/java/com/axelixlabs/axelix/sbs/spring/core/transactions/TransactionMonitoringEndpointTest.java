@@ -32,19 +32,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -576,19 +576,9 @@ class TransactionMonitoringEndpointTest {
             return new PropagationTestHelper(ownerRepository, self);
         }
 
-        @Bean
-        public InMemoryPaginationAppender inMemoryPaginationAppender() {
-            LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-
-            InMemoryPaginationAppender appender = new InMemoryPaginationAppender();
-            appender.setContext(context);
-            appender.start();
-
-            // Hibernate 5.x (Spring Boot 2.7.x)
-            context.getLogger("org.hibernate.hql.internal.ast.QueryTranslatorImpl")
-                    .addAppender(appender);
-
-            return appender;
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
         }
     }
 
