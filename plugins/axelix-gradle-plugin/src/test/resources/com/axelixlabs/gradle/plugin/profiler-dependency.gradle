@@ -1,0 +1,16 @@
+plugins {
+    id 'com.axelixlabs.axelix'
+}
+// Applied after our plugin on purpose: exercises the withPlugin reaction.
+apply plugin: 'java'
+
+repositories { mavenCentral() }
+
+task printTestRuntimeClasspath {
+    dependsOn configurations.testRuntimeClasspath
+    doLast {
+        configurations.testRuntimeClasspath.files.each { f ->
+            println 'TRC>> ' + f.absolutePath
+        }
+    }
+}
