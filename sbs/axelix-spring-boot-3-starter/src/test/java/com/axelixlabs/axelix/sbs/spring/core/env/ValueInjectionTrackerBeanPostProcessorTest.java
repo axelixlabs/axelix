@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 16.12.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 class ValueInjectionTrackerBeanPostProcessorTest extends AbstractEnvSharedContextTest {
 

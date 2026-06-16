@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link DefaultEnvironmentService}
  *
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
 class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
 

@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 class DefaultEnvPropertyEnricherTest extends AbstractEnvSharedContextTest {
 

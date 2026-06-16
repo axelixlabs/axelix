@@ -55,6 +55,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
  */
 @TestConfiguration
 public class EnvSharedTestConfig {

@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for {@link DefaultPropertyMetadataExtractor}
  *
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  * @since 05.12.2025
  */
 class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest {
