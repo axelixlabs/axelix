@@ -43,12 +43,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -523,6 +529,27 @@ class TransactionMonitoringEndpointTest {
         assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
     }
 
+    @Test
+    void shouldDetectInMemoryPagination() {
+        // given.
+        Owner owner = new Owner();
+        owner.addPet(new Pet("Rodriquez", owner));
+        ownerRepository.save(owner);
+
+        // when.
+        propagationTestHelper.findAllWithPetsPageable();
+
+        // then.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("findAllWithPetsPageable");
+
+        List<Boolean> inMemoryPaginatedFlags =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[*].inMemoryPaginated");
+
+        assertThat(inMemoryPaginatedFlags).contains(true);
+    }
+
     private void checkMeterRegistry(
             String expectedClassName, String expectedMethodName, String status, int expectedQueryCount) {
         // given when. Verify Transaction Duration Timer
@@ -614,6 +641,11 @@ class TransactionMonitoringEndpointTest {
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
     }
 
     @Entity
@@ -683,6 +715,12 @@ class TransactionMonitoringEndpointTest {
         default List<Owner> findAll() {
             return List.of(new Owner());
         }
+
+        @Transactional
+        @Query(
+                value = "SELECT o FROM TransactionMonitoringEndpointTest$Owner o JOIN FETCH o.pets",
+                countQuery = "SELECT COUNT(o) FROM TransactionMonitoringEndpointTest$Owner o")
+        Page<Owner> findAllWithPets(Pageable pageable);
     }
 
     static class PropagationTestHelper {
@@ -744,6 +782,11 @@ class TransactionMonitoringEndpointTest {
         public void testRollbackScenario(String lastName) {
             ownerRepository.findByLastName(lastName);
             throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void findAllWithPetsPageable() {
+            ownerRepository.findAllWithPets(PageRequest.of(0, 5));
         }
     }
 }

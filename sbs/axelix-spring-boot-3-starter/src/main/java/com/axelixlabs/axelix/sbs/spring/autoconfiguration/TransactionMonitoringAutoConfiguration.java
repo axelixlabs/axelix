@@ -24,9 +24,13 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
@@ -34,6 +38,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
@@ -115,5 +120,15 @@ public class TransactionMonitoringAutoConfiguration {
     @ConditionalOnBean(MeterRegistry.class)
     public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
         return new DefaultAxelixMetricsPublisher(meterRegistry);
+    }
+
+    @Configuration
+    @ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+    static class LogbackInMemoryPaginationAppenderConfiguration {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
     }
 }

@@ -114,10 +114,11 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
 
     private List<Query> convertToQueries(List<SqlQueryRecord> queriesRecords) {
         return queriesRecords.stream()
-                .map(queries -> {
-                    long startTimestamp = queries.getStartTimestampMs();
-                    long endTimestamp = queries.getDurationMs() + startTimestamp;
-                    return new Query(queries.getSql(), queries.getStartTimestampMs(), endTimestamp);
+                .map(query -> {
+                    Boolean inMemoryPaginated = query.isInMemoryPaginated() ? Boolean.TRUE : null;
+                    long startTimestamp = query.getStartTimestampMs();
+                    long endTimestamp = query.getDurationMs() + startTimestamp;
+                    return new Query(query.getSql(), startTimestamp, endTimestamp, inMemoryPaginated);
                 })
                 .collect(Collectors.toList());
     }

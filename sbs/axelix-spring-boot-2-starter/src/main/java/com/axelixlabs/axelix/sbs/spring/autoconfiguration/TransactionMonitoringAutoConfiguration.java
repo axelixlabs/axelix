@@ -19,14 +19,19 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
@@ -98,5 +103,15 @@ public class TransactionMonitoringAutoConfiguration {
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             QueriesRecorder queriesCollector) {
         return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
+    }
+
+    @Configuration
+    @ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+    static class LogbackInMemoryPaginationAppenderConfiguration {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
     }
 }

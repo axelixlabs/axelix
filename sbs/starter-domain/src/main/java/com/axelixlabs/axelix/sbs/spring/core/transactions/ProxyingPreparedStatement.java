@@ -644,7 +644,10 @@ public class ProxyingPreparedStatement implements PreparedStatement {
             return action.run();
         } finally {
             long durationNs = System.nanoTime() - txStartTime;
-            queriesRecorder.recordQuery(new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs));
+            boolean inMemoryPaginated = InMemoryPaginationHolder.isMarked();
+            InMemoryPaginationHolder.clear();
+            queriesRecorder.recordQuery(
+                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated));
         }
     }
 }
