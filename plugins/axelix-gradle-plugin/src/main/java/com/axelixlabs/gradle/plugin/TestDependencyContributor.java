@@ -20,6 +20,7 @@ package com.axelixlabs.gradle.plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.util.GradleVersion;
 
 /**
  * Contributes the Spring Test Profiler and Thymeleaf to the project's test classpath when they are
@@ -39,8 +40,8 @@ final class TestDependencyContributor {
 
     static final String THYMELEAF_NAME = "thymeleaf";
 
-    /** Minimum Thymeleaf version the profiler's HTML report renders on, as {major, minor, patch}. */
-    private static final int[] MIN_THYMELEAF_VERSION = {3, 1, 3};
+    /** Minimum Thymeleaf version the profiler's HTML report renders on. */
+    private static final GradleVersion MIN_THYMELEAF_VERSION = GradleVersion.version("3.1.3");
 
     private TestDependencyContributor() {}
 
@@ -95,36 +96,46 @@ final class TestDependencyContributor {
     }
 
     /**
-     * Whether a declared Thymeleaf version is below {@code 3.1.3}. Only the leading dot-separated
-     * numeric components are compared; a trailing qualifier such as {@code .RELEASE} is ignored. A
-     * {@code null} or non-numeric version is treated as not below the minimum, leaving an
-     * unrecognised version untouched.
+     * Whether a declared Thymeleaf version is below {@code 3.1.3}, using {@link GradleVersion} for
+     * the comparison. Only the leading dot-separated numeric components are compared; a trailing
+     * qualifier such as {@code .RELEASE} is stripped first, since {@link GradleVersion} does not
+     * accept it. A {@code null} or non-numeric version is treated as not below the minimum, leaving
+     * an unrecognised version untouched.
      */
     private static boolean isBelowMinimumThymeleaf(final String version) {
         if (version == null) {
             return false;
         }
-        int[] components = leadingNumericComponents(version);
-        for (int i = 0; i < MIN_THYMELEAF_VERSION.length; i++) {
-            int part = i < components.length ? components[i] : 0;
-            if (part != MIN_THYMELEAF_VERSION[i]) {
-                return part < MIN_THYMELEAF_VERSION[i];
-            }
+        String numericVersion = leadingNumericVersion(version);
+        if (numericVersion == null) {
+            return false;
         }
-        return false;
+        return GradleVersion.version(numericVersion).getBaseVersion().compareTo(MIN_THYMELEAF_VERSION) < 0;
     }
 
-    private static int[] leadingNumericComponents(final String version) {
+    /**
+     * Extracts the leading dot-separated numeric components of a version (e.g. {@code "3.0.15"} from
+     * {@code "3.0.15.RELEASE"}) as a string {@link GradleVersion} can parse, dropping any trailing
+     * qualifier. Returns {@code null} when there is no leading numeric component. A single numeric
+     * component is padded to {@code major.minor} form, which {@link GradleVersion} requires.
+     */
+    private static String leadingNumericVersion(final String version) {
         String[] segments = version.split("\\.");
         int count = 0;
         while (count < segments.length && isNumeric(segments[count])) {
             count++;
         }
-        int[] components = new int[count];
-        for (int i = 0; i < count; i++) {
-            components[i] = Integer.parseInt(segments[i]);
+        if (count == 0) {
+            return null;
         }
-        return components;
+        StringBuilder builder = new StringBuilder(segments[0]);
+        for (int i = 1; i < count; i++) {
+            builder.append('.').append(segments[i]);
+        }
+        if (count == 1) {
+            builder.append(".0");
+        }
+        return builder.toString();
     }
 
     private static boolean isNumeric(final String segment) {
