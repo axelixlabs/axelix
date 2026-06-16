@@ -37,6 +37,8 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
+import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE;
+import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE;
 import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,7 +59,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
     class WithoutExplicitSanitizationProperties {
 
         @Autowired
-        @Qualifier("sanitizeAllConfigurationPropertiesService")
+        @Qualifier(SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE)
         private ConfigurationPropertiesService configurationPropertiesService;
 
         @Test
@@ -103,7 +105,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
     class WithExplicitSanitizationProperties {
 
         @Autowired
-        @Qualifier("explicitlySanitizedConfigurationPropertiesService")
+        @Qualifier(EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
         private ConfigurationPropertiesService configurationPropertiesService;
 
         @Test

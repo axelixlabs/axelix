@@ -51,6 +51,9 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 @TestConfiguration
 @EnableConfigurationProperties(SharedAxelixConfigurationProperties.class)
 public class ConfigPropsTestSupportConfiguration {
+    public static final String SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE = "sanitizeAllConfigurationPropertiesService";
+
+    public static final String EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE = "explicitlySanitizedConfigurationPropertiesService";
 
     @Bean
     public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
@@ -79,7 +82,7 @@ public class ConfigPropsTestSupportConfiguration {
         return new RequiredAuthorityCheckService(securityContextExecutor);
     }
 
-    @Bean
+    @Bean(name = SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE)
     public DefaultConfigurationPropertiesService sanitizeAllConfigurationPropertiesService(
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter,
@@ -94,7 +97,7 @@ public class ConfigPropsTestSupportConfiguration {
                 requiredAuthorityCheckService);
     }
 
-    @Bean
+    @Bean(name = EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
     public DefaultConfigurationPropertiesService explicitlySanitizedConfigurationPropertiesService(
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter,
