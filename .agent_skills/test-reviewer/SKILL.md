@@ -26,6 +26,7 @@ If the PR has **no** test changes, do not apply this skill unless the user expli
 3. **Map contract → cases** — From Javadoc/TSDoc and declared behavior, list required positive and negative test cases before reading assertions.
 4. **Review each test method** against the five standards below.
 5. **Report** using the output format at the end. **Block merge** on any 🔴 finding.
+6. **If blocked** — add the `blocked-by-ai-reviewer` label and post **one** brief PR comment outlining why (see [Blocking a PR](#blocking-a-pr)).
 
 ## Standards
 
@@ -180,6 +181,27 @@ For example, in the JwtDecoderService's case, checking for the exception's messa
 
 Any 🔴 finding means: **we cannot merge such PR** (for test-related defects).
 
+## Blocking a PR
+
+When the review has **one or more 🔴 blocking findings**, take both actions on the PR:
+
+1. **Add the label** `blocked-by-ai-reviewer`:
+2. **Post one PR comment** — a single top-level comment, not multiple threads — briefly listing why the PR is blocked. Use short bullets; do not repeat the full review report.
+
+Example:
+
+```markdown
+## Test review — blocked
+
+This PR cannot be merged until these blocking test issues are fixed:
+
+- [isolation] `FooTest.bar` — shared DB state not cleaned up between tests
+- [AAA] `BazTest.qux` — multiple act/assert cycles in one test
+- [exception message] `QuxTest.fail` — asserts message text instead of exception type only
+```
+
+Do **not** add the label or post a blocking comment when there are only 🟡 suggestions or 🟢 notes.
+
 ## Deriving the contract checklist
 
 For each public entry point under test:
@@ -225,7 +247,9 @@ Use this structure in PR review comments or summary:
 **[Approve tests / Request changes — N blocking issue(s)]**
 ```
 
-For inline GitHub comments, one finding per comment; cite the test method and link the production contract (interface Javadoc or export).
+When the verdict is **Request changes** (any 🔴 findings), also apply [Blocking a PR](#blocking-a-pr): add `blocked-by-ai-reviewer` and post the single brief blocking comment.
+
+For inline GitHub comments on specific lines, one finding per comment is fine; the blocking PR comment must still be **one** summary message only. Cite the test method and link the production contract (interface Javadoc or export).
 
 ## Quick checklist
 
