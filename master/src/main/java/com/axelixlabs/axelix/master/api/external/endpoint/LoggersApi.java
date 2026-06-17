@@ -20,16 +20,13 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
-import com.axelixlabs.axelix.master.service.transport.BadRequestException;
-import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.jspecify.annotations.Nullable;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +44,7 @@ import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
@@ -56,7 +54,9 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
+import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
 /**
  * The API for managing loggers.
@@ -136,7 +136,7 @@ public class LoggersApi {
             summary = "Change the logging level for a given logger by its name across instances.",
             description =
                     "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE")
-    @ApiResponse(description = "OK", responseCode = "200")
+    @ApiResponse(description = "No Content", responseCode = "204")
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_BULK_CHANGE)
     public ResponseEntity<?> setLoggingLevelByLoggerName(@RequestBody LogLevelLoggerBulkChangeRequest request) {
 
@@ -146,15 +146,16 @@ public class LoggersApi {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("name", request.loggerName()),
-                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(request.configuredLevel(), request.ttlMinutes())));
+                jacksonMessageSerializationStrategy.serialize(
+                        new LogLevelChangeRequest(request.configuredLevel(), request.ttlSeconds())));
 
         try {
             endpointInvoker.invokeForInstances(request.instanceIds(), ActuatorEndpoints.SET_ONE_LOGGER, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             return ResponseEntity.badRequest()
-                .body(new SimpleApiError(
-                    ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
+                    .body(new SimpleApiError(
+                            ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -194,7 +195,10 @@ public class LoggersApi {
         return ResponseEntity.noContent().build();
     }
 
-    private boolean isInvalid(@Nullable List<String> instanceIds, @Nullable String name, @Nullable String configuredLevel) {
-        return CollectionUtils.isEmpty(instanceIds) || !StringUtils.hasText(name) || !StringUtils.hasText(configuredLevel);
+    private boolean isInvalid(
+            @Nullable List<String> instanceIds, @Nullable String name, @Nullable String configuredLevel) {
+        return CollectionUtils.isEmpty(instanceIds)
+                || !StringUtils.hasText(name)
+                || !StringUtils.hasText(configuredLevel);
     }
 }

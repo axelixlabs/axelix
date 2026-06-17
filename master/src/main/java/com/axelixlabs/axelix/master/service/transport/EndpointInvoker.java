@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.util.List;
+
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-
-import java.util.List;
 
 /**
  * Abstraction that is capable to invoke the Axelix endpoint on the given instance, given the particular
@@ -78,5 +78,5 @@ public interface EndpointInvoker {
      * @throws BadRequestException in case the invocation failed for all requested instances.
      */
     void invokeForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
-        throws PartiallyUpdatedException, BadRequestException;
+            throws PartiallyUpdatedException, BadRequestException;
 }

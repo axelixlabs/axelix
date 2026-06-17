@@ -19,15 +19,21 @@ package com.axelixlabs.axelix.master.api.external.request.loggers;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Request to change the logging level of a logger across several instances.
  *
  * @param instanceIds     the instances on which to apply the new logging level
  * @param loggerName      the logger name to update
- * @param ttlMinutes      optional time-to-live for the logging level override, in minutes
+ * @param ttlSeconds      Optional duration in seconds before reverting to the original level.
+ *                        If {@code null}, the change is permanent.
  * @param configuredLevel the new logging level to apply
  *
  * @author Sergey Cherkasov
  */
 public record LogLevelLoggerBulkChangeRequest(
-        List<String> instanceIds, String loggerName, Long ttlMinutes, String configuredLevel) {}
+        List<String> instanceIds,
+        String loggerName,
+        @Nullable Long ttlSeconds,
+        String configuredLevel) {}

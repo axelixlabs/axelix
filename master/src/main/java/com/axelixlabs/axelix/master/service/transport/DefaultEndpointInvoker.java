@@ -77,10 +77,8 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     public void invokeForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
             throws PartiallyUpdatedException, BadRequestException {
 
-        List<String> uniqueInstanceIds = instanceIds.stream()
-            .filter(StringUtils::hasText)
-            .distinct()
-            .toList();
+        List<String> uniqueInstanceIds =
+                instanceIds.stream().filter(StringUtils::hasText).distinct().toList();
 
         EndpointProber<?> prober = getEndpointProber(endpoint);
 

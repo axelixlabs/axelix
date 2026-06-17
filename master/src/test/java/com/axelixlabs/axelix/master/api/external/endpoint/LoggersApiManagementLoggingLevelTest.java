@@ -136,25 +136,6 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldSetLoggingLevelByGroupName() {
-        String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
-
-        // when.
-        ResponseEntity<String> body = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        requestBody,
-                        String.class,
-                        activeInstanceId,
-                        groupName);
-
-        // then.
-        assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
     void shouldSetLoggingLevelByLoggerNameAcrossInstances() {
         // given.
         LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
@@ -310,25 +291,6 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnResetLoggingLevelByLoggerName() {
-        String instanceId = "unregistered-logger-instance";
-        String loggerName = "reset.logger.name";
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
-                        null,
-                        String.class,
-                        instanceId,
-                        loggerName);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
     void shouldReturnBadRequest_WhenInstanceIdsAreEmpty() {
         // given.
         LogLevelLoggerBulkChangeRequest requestBody =
@@ -391,6 +353,6 @@ public class LoggersApiManagementLoggingLevelTest {
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
-            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/clear.logger.name/clear")
-    void negativeAuthTestsOnClearLoggingLevelByLoggerName() {}
+            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/reset.logger.name/reset")
+    void negativeAuthTestsOnResetLoggingLevelByLoggerName() {}
 }

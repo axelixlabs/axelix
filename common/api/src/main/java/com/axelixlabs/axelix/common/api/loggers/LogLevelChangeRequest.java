@@ -38,7 +38,7 @@ public class LogLevelChangeRequest {
      * Creates a new LogLevelChangeRequest.
      *
      * @param configuredLevel The new logging level to apply.
-     * @param ttlSeconds      Optional duration in minutes before reverting to the original level.
+     * @param ttlSeconds      Optional duration in seconds before reverting to the original level.
      *                        If {@code null}, the change is permanent.
      */
     @JsonCreator
