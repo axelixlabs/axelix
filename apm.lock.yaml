@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-06-09T10:05:07.241939+00:00'
+generated_at: '2026-06-17T15:04:26.103295+00:00'
 apm_version: 0.14.1
 dependencies:
 - repo_url: _local/backlog-refiner
@@ -37,6 +37,13 @@ dependencies:
   - .claude/skills/security-vulnerabilities-patcher
   source: local
   local_path: ./.agent_skills/security-vulnerabilities-patcher
+- repo_url: _local/test-reviewer
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/test-reviewer
+  - .claude/skills/test-reviewer
+  source: local
+  local_path: ./.agent_skills/test-reviewer
 - repo_url: anthropics/skills
   host: github.com
   resolved_commit: da20c92503b2e8ff1cf28ca81a0df4673debdbf7

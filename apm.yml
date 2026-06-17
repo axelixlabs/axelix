@@ -13,6 +13,7 @@ dependencies:
   - ./.agent_skills/external-contributor-issues
   - ./.agent_skills/housekeeper
   - ./.agent_skills/security-vulnerabilities-patcher
+  - ./.agent_skills/test-reviewer
   # External
   - anthropics/skills/skills/skill-creator
   mcp:

@@ -66,3 +66,4 @@ apm_modules/
 .cursor/
 .agents/
 .gemini/
+.mcp.json
