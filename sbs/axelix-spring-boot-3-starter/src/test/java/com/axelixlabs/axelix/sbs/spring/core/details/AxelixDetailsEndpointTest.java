@@ -21,15 +21,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -42,12 +38,9 @@ import static org.assertj.core.data.MapEntry.entry;
  *
  * @since 30.10.2025
  * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"management.endpoints.web.exposure.include=axelix-details"})
-@Import({DefaultServiceDetailsAssemblerTestConfig.class, AxelixDetailsEndpoint.class, JwtAuthTestConfiguration.class})
-class AxelixDetailsEndpointTest {
+class AxelixDetailsEndpointTest extends AbstractDetailsSharedContextTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
