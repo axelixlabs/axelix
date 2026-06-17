@@ -4,6 +4,7 @@ language: en-US
 tone_instructions: "Focus on logic, bugs, and security."
 early_access: true
 enable_free_tier: true
+
 reviews:
   profile: assertive
   poem: false
@@ -18,3 +19,17 @@ reviews:
   path_instructions:
     - path: "**/src/test/**,**/*.test.ts,**/*.test.tsx"
       instructions: Apply `.claude/skills/test-reviewer/SKILL.md`.
+
+issue_enrichment:
+  auto_enrich:
+    enabled: true
+  labeling:
+    auto_apply_labels: true
+    labeling_instructions:
+      - label: duplicate
+        instructions: >
+          Apply only when CodeRabbit's enrichment comment lists the issue under
+          "Possible Duplicates" (not merely "Related Issues"). The candidate must
+          describe the same underlying problem, not just the same area of the codebase.
+          Require a clear match on symptoms, expected behavior, and affected component.
+          Do not label if the only overlap is a shared keyword or module name.
