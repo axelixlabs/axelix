@@ -28,23 +28,26 @@ import org.jspecify.annotations.Nullable;
  * Inspired by <a href="https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/util/Lazy.html">Spring Data's Lazy</a>.
  *
  * @author Mikhail Polivakha
+ * @author Alexander Tochin
  */
 public class Lazy<T extends @Nullable Object> {
 
+    private final Object lock = new Object();
+    private final @Nullable Supplier<T> supplier;
     private @Nullable T value;
-    private @Nullable Supplier<T> supplier;
-    private boolean resolved;
+    private volatile boolean resolved;
 
     private Lazy(@NonNull Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
     private Lazy(@Nullable T value) {
+        this.supplier = null;
         this.value = value;
         this.resolved = true;
     }
 
-    public static <T> Lazy<T> of(Supplier<T> supplier) {
+    public static <T> Lazy<T> of(@NonNull Supplier<T> supplier) {
         return new Lazy<>(supplier);
     }
 
@@ -55,8 +58,12 @@ public class Lazy<T extends @Nullable Object> {
     @SuppressWarnings("NullAway")
     public @Nullable T get() {
         if (!resolved) {
-            value = supplier.get();
-            resolved = true;
+            synchronized (lock) {
+                if (!resolved) {
+                    value = supplier.get();
+                    resolved = true;
+                }
+            }
         }
         return value;
     }
