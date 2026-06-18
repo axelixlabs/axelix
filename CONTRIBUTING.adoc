@@ -57,6 +57,21 @@ void yourTestMethod() { … }
 6. Make sure you follow the <<commit-messages>> guidelines.
 7. All external contributors must sign a CLA (Contributor License Agreement) before their changes can be accepted into the Axelix Project.
 
+[[ai-agents]]
+=== Using AI agents
+
+This repository uses https://microsoft.github.io/apm/[APM] (Agent Package Manager) to ship skills, MCP servers, and agent context.
+The manifests live in `apm.yml` and `apm.lock.yaml`; generated harness directories (for example `.cursor/`, `.claude/`, `.gemini/`) are not committed.
+
+After cloning the repo, install the dependencies for your agent harness:
+
+[source,shell]
+----
+apm install --target cursor
+----
+
+Replace `cursor` with your AI Agent of choice.
+
 [[participate-in-reviews]]
 === Participate in Reviews
 
