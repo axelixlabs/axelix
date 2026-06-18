@@ -17,24 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 /**
  * Integration test for {@link QualifiersPersistencePostProcessor}.
+ *
+ * <p>The qualifier-bearing beans it asserts on are declared by the {@code *Declarations} test
+ * configurations on the shared parent context ({@link AbstractBeansSharedContextTest}).
  *
  * @author Mikhail Polivakha
  */
@@ -73,87 +63,5 @@ class QualifiersPersistencePostProcessorTest extends AbstractBeansSharedContextT
             sa.assertThat(registry.getQualifiers("mixedTypeQualifierConfigBeanName"))
                     .containsOnly("builtInTypeQualifier", "customQualifier");
         });
-    }
-
-    @Documented
-    @Target({ElementType.TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Qualifier("customQualifier")
-    @interface CustomQualifier {}
-
-    @TestConfiguration
-    static class ComponentMethodDeclarations {
-
-        @Component("noQualifiersBeanName")
-        static class NoQualifiers {}
-
-        @Service("builtInTypeQualifierBeanName")
-        @Qualifier("builtInTypeQualifier")
-        static class BuiltInTypeQualifier {}
-
-        @Service("customTypeQualifierBeanName")
-        @CustomQualifier
-        static class CustomTypeQualifier {}
-
-        @Service("mixedTypeQualifierBeanName")
-        @CustomQualifier
-        @Qualifier("builtInTypeQualifier")
-        static class MixedTypeQualifier {}
-    }
-
-    @TestConfiguration
-    static class BeanMethodDeclarations {
-
-        static class BeanMethodNoQualifiers {}
-
-        static class BeanMethodBuiltInTypeQualifier {}
-
-        static class BeanMethodCustomTypeQualifier {}
-
-        static class BeanMethodMixedTypeQualifier {}
-
-        @Bean("beanMethodNoQualifiersBeanName")
-        public BeanMethodNoQualifiers beanMethodNoQualifiers() {
-            return new BeanMethodNoQualifiers();
-        }
-
-        @Bean("beanMethodBuiltInTypeQualifierBeanName")
-        @Qualifier("builtInTypeQualifier")
-        public BeanMethodBuiltInTypeQualifier builtInTypeQualifier() {
-            return new BeanMethodBuiltInTypeQualifier();
-        }
-
-        @Bean("beanMethodCustomTypeQualifierBeanName")
-        @CustomQualifier
-        public BeanMethodCustomTypeQualifier customTypeQualifier() {
-            return new BeanMethodCustomTypeQualifier();
-        }
-
-        @Bean("beanMethodMixedTypeQualifierBeanName")
-        @CustomQualifier
-        @Qualifier("builtInTypeQualifier")
-        public BeanMethodMixedTypeQualifier mixedTypeQualifier() {
-            return new BeanMethodMixedTypeQualifier();
-        }
-    }
-
-    @Configuration
-    static class ConfigurationClassesDeclarations {
-
-        @Configuration("noQualifiersConfigBeanName")
-        static class NoQualifiers {}
-
-        @Configuration("builtInTypeQualifierConfigBeanName")
-        @Qualifier("builtInTypeQualifier")
-        static class BuiltInTypeQualifier {}
-
-        @Configuration("customTypeQualifierConfigBeanName")
-        @CustomQualifier
-        static class CustomTypeQualifier {}
-
-        @Configuration("mixedTypeQualifierConfigBeanName")
-        @CustomQualifier
-        @Qualifier("builtInTypeQualifier")
-        static class MixedTypeQualifier {}
     }
 }
