@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.utils;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -34,7 +35,13 @@ import org.jspecify.annotations.Nullable;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-public class SemanticVersion {
+public class SemanticVersion implements Comparable<SemanticVersion> {
+
+    private static final Comparator<SemanticVersion> ORDER = Comparator.comparingInt(SemanticVersion::major)
+            .thenComparingInt(SemanticVersion::minor)
+            .thenComparingInt(SemanticVersion::patch)
+            // A qualifier (e.g. a pre-release like -SNAPSHOT) sorts below the same version without one.
+            .thenComparing(version -> version.qualifier == null);
 
     private final int major;
     private final int minor;
@@ -203,5 +210,19 @@ public class SemanticVersion {
      */
     public @Nullable String qualifier() {
         return qualifier;
+    }
+
+    /**
+     * Orders by numeric {@code major.minor.patch}; when those are equal, a version that carries a
+     * qualifier (e.g. a pre-release like {@code -SNAPSHOT}) sorts below the same version without one.
+     * The qualifier text itself is not ordered, so two qualified versions compare as equal — e.g.
+     * {@code 1.0.0-SNAPSHOT} and {@code 1.0.0.RELEASE} are equal, but both are less than {@code 1.0.0}.
+     *
+     * @return a negative integer, zero, or a positive integer as this version is less than, equal to,
+     *         or greater than {@code other}
+     */
+    @Override
+    public int compareTo(SemanticVersion other) {
+        return ORDER.compare(this, other);
     }
 }
