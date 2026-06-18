@@ -1,0 +1,19 @@
+.ContentWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ChartWrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.LegendWrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+}
