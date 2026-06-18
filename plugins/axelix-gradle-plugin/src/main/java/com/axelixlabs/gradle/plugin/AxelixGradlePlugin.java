@@ -28,8 +28,7 @@ import org.gradle.api.Project;
  * wiring, no sourceSets/conventions access ({@code JavaPluginConvention} was removed in Gradle 9,
  * {@code JavaPluginExtension.getSourceSets()} was only added in 7.1).
  *
- * <p>The plugin is a no-op until the {@code java} plugin is applied, because the
- * {@code testRuntimeOnly} configuration only exists once it is.
+ * @author Artemiy Degtyarev
  */
 public class AxelixGradlePlugin implements Plugin<Project> {
 
@@ -39,9 +38,12 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     }
 
     private void configure(Project project) {
-        // Deferred to afterEvaluate so the project's own dependency declarations are visible:
-        // the profiler and Thymeleaf are only contributed when the test classpath does not
-        // already carry them, leaving a project's chosen version untouched.
-        project.afterEvaluate(TestDependencyContributor::contributeMissingTestDependencies);
+        InternalConfiguration configuration = new InternalConfiguration(project);
+
+        TestClasspathDependencyApplier testClasspathDependencyApplier = configuration.getTestClasspathDependencyApplier();
+        project.getConfigurations().getByName("testRuntimeClasspath").withDependencies(testClasspathDependencyApplier);
+
+        CompileClasspathDependencyApplier compileClasspathDependencyApplier = configuration.getCompileClasspathDependencyApplier();
+        project.getConfigurations().getByName("compileClasspath").withDependencies(compileClasspathDependencyApplier);
     }
 }

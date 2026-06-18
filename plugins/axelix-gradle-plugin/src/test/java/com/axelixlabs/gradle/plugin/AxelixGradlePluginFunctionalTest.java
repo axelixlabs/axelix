@@ -47,7 +47,7 @@ class AxelixGradlePluginFunctionalTest {
         writeFile("build.gradle", GradleProjectFixtures.buildScript("profiler-dependency.gradle"));
 
         // when.
-        BuildResult result = createRunner(gradleVersion, "printTestRuntimeClasspath", "--stacktrace")
+        BuildResult result = createRunner(gradleVersion, "printTestRuntimeClasspath", "--stacktrace", "-i")
                 .build();
 
         // then.
@@ -100,7 +100,8 @@ class AxelixGradlePluginFunctionalTest {
                 .withProjectDir(projectDir.toFile())
                 .withPluginClasspath()
                 .withGradleVersion(gradleVersion)
-                .withArguments(arguments);
+                .withArguments(arguments)
+            .withDebug(true);
     }
 
     private void writeCommonProjectFiles(String gradleVersion) throws IOException {

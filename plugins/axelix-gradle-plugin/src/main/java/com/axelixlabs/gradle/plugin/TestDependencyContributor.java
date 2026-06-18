@@ -20,6 +20,13 @@ package com.axelixlabs.gradle.plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.DependencySet;
+import org.gradle.api.artifacts.component.ComponentIdentifier;
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
+import org.gradle.api.artifacts.result.DependencyResult;
+import org.gradle.api.artifacts.result.ResolutionResult;
+import org.gradle.api.artifacts.result.ResolvedComponentResult;
+import org.gradle.api.artifacts.result.ResolvedDependencyResult;
 import org.gradle.util.GradleVersion;
 
 /**
@@ -46,18 +53,36 @@ final class TestDependencyContributor {
     private TestDependencyContributor() {}
 
     /**
-     * Adds the Spring Test Profiler and Thymeleaf to the test classpath. The profiler is added only
-     * when it is not already declared. Thymeleaf is added when it is absent and bumped when a
+     * Adds the Spring Test Profiler to the test classpath. The profiler is added only
+     * when it is not already declared.
+     */
+    static void contributeTestClasspathDependencies(final Project project, final DependencySet dependencies) {
+        ResolutionResult resolvedGraph = getResolvedGraph(project, dependencies);
+
+        if (!isOnClasspath(resolvedGraph, PROFILER_GROUP, PROFILER_NAME)) {
+            project.getDependencies().add("testRuntimeOnly", PROFILER_DEPENDENCY);
+        }
+    }
+
+    /**
+     * Adds the Thymeleaf to the test classpath. Thymeleaf is added when it is absent and bumped when a
      * version older than {@code 3.1.3} is declared, because the profiler's HTML report fails to
      * render on older Thymeleaf; a project already on {@code 3.1.3} or newer is left untouched.
      */
-    static void contributeMissingTestDependencies(final Project project) {
-        if (!isOnTestClasspath(project, PROFILER_GROUP, PROFILER_NAME)) {
-            project.getDependencies().add("testRuntimeOnly", PROFILER_DEPENDENCY);
-        }
-        if (shouldContributeThymeleaf(project)) {
+    static void contributeCompileClasspathDependencies(final Project project, final DependencySet dependencies) {
+        ResolutionResult resolvedGraph = getResolvedGraph(project, dependencies);
+
+        if (shouldContributeThymeleaf(resolvedGraph)) {
             project.getDependencies().add("testImplementation", THYMELEAF_DEPENDENCY);
         }
+    }
+
+    private static ResolutionResult getResolvedGraph(Project project, DependencySet dependencies) {
+        Configuration configurationCopy = project.getConfigurations().detachedConfiguration(
+            dependencies.toArray(new Dependency[0])
+        );
+
+        return configurationCopy.getIncoming().getResolutionResult();
     }
 
     /**
@@ -66,32 +91,44 @@ final class TestDependencyContributor {
      * older version is pinned directly, the contributed dependency wins by Gradle's newest-version
      * conflict resolution; a project already on {@code 3.1.3} or newer is left untouched.
      */
-    private static boolean shouldContributeThymeleaf(final Project project) {
-        Dependency declared = findDeclaredOnTestClasspath(project, THYMELEAF_GROUP, THYMELEAF_NAME);
+    private static boolean shouldContributeThymeleaf(final ResolutionResult resolvedDependencies) {
+        ModuleComponentIdentifier declared = findDeclaredInClasspath(resolvedDependencies, THYMELEAF_GROUP, THYMELEAF_NAME);
         return declared == null || isBelowMinimumThymeleaf(declared.getVersion());
     }
 
-    private static boolean isOnTestClasspath(final Project project, final String group, final String name) {
-        return findDeclaredOnTestClasspath(project, group, name) != null;
+    private static boolean isOnClasspath(final ResolutionResult resolvedDependencies, final String group, final String name) {
+        return findDeclaredInClasspath(resolvedDependencies, group, name) != null;
     }
 
     /**
      * Returns the dependency with the given group and name declared on the test runtime classpath,
      * including dependencies inherited from extended configurations (e.g. an {@code implementation}
      * dependency that propagates to {@code testRuntimeClasspath}), or {@code null} if none is
-     * declared. Only declared dependencies are inspected; the configuration is not resolved.
+     * declared.
      */
-    private static Dependency findDeclaredOnTestClasspath(
-            final Project project, final String group, final String name) {
-        Configuration testRuntimeClasspath = project.getConfigurations().findByName("testRuntimeClasspath");
-        if (testRuntimeClasspath == null) {
-            return null;
+    private static ModuleComponentIdentifier findDeclaredInClasspath(
+        final ResolutionResult resolvedDependencies,
+        final String group,
+        final String name
+    ) {
+        for (DependencyResult component : resolvedDependencies.getAllDependencies()) {
+            if (!(component instanceof ResolvedDependencyResult))
+                continue;
+
+            ResolvedDependencyResult resolvedComponent = (ResolvedDependencyResult) component;
+            ResolvedComponentResult selectedComponent = resolvedComponent.getSelected();
+
+            ComponentIdentifier componentId = selectedComponent.getId();
+            if (!(componentId instanceof ModuleComponentIdentifier))
+                continue;
+
+            ModuleComponentIdentifier moduleComponentId = (ModuleComponentIdentifier) componentId;
+            if (!moduleComponentId.getGroup().equals(group) || !moduleComponentId.getModule().equals(name))
+                continue;
+
+            return moduleComponentId;
         }
-        for (Dependency dependency : testRuntimeClasspath.getAllDependencies()) {
-            if (group.equals(dependency.getGroup()) && name.equals(dependency.getName())) {
-                return dependency;
-            }
-        }
+
         return null;
     }
 

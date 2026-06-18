@@ -16,6 +16,8 @@ dependencies {
 // omits transitives, keeping the assertion focused on declared modules.
 task printDeclaredDeps {
     doLast {
+        configurations.compileClasspath.resolvedConfiguration
+
         configurations.testRuntimeClasspath.allDependencies.each { d ->
             println 'DEP>> ' + d.group + ':' + d.name + ':' + d.version
         }
