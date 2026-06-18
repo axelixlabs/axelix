@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 
 /**
  * Base class for the {@code configprops} integration tests.
@@ -38,21 +39,28 @@ import com.axelixlabs.axelix.sbs.spring.core.Main;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
             "management.endpoint.configprops.show-values=always",
             "axelix.prop.test.tags.environment=test",
             "axelix.prop.test.tags.version=1.0.0",
+            "axelix.prop.test.tags.forSanitization=toBeSanitized",
+            "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized",
             "axelix.prop.test.enabled-contexts=user-service,payment-service",
             "axelix.prop.test.http-client.requests[0].name=user-api",
             "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
             "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
             "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
             "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axelix.prop.test.http-client.requests[0].methods[1].type=POST"
+            "axelix.prop.test.http-client.requests[0].methods[1].type=POST",
+            "axelix.prop.test.http-client.requests[1].name=payment-api",
+            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG"
         })
-@Import(ConfigPropsTestSupportConfiguration.class)
+@Import({ConfigPropsTestSupportConfiguration.class, JwtAuthTestConfiguration.class})
 public abstract class AbstractConfigPropsSharedContextTest {
 
     @Autowired

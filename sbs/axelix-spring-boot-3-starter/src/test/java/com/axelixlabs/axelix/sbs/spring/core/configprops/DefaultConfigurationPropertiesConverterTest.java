@@ -66,6 +66,8 @@ public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigP
                             .containsOnly(
                                     new KeyValue("tags.environment", "test"),
                                     new KeyValue("tags.version", "1.0.0"),
+                                    new KeyValue("tags.forSanitization", "toBeSanitized"),
+                                    new KeyValue("tags.FOR_SANITIZATION", "toBeSanitized"),
                                     new KeyValue("enabledContexts[0]", "user-service"),
                                     new KeyValue("enabledContexts[1]", "payment-service"),
                                     new KeyValue("httpClient.requests[0].name", "user-api"),
@@ -74,11 +76,19 @@ public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigP
                                     new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
                                     new KeyValue(
                                             "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                                    new KeyValue("httpClient.requests[0].methods[1].type", "POST"));
+                                    new KeyValue("httpClient.requests[0].methods[1].type", "POST"),
+                                    new KeyValue("httpClient.requests[1].name", "payment-api"),
+                                    new KeyValue(
+                                            "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
+                                    new KeyValue("httpClient.requests[1].methods[0].type", "PUT"),
+                                    new KeyValue("httpClient.requests[1].methods[0].retries[0].count", "2"),
+                                    new KeyValue(
+                                            "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
+                                            "DEBUG"));
 
                     // inputs
                     assertThat(bean.getInputs())
-                            .hasSize(20)
+                            .hasSize(34)
                             .anyMatch(input -> input.getKey()
                                     .equals("httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"))
                             .anyMatch(p -> p.getKey().equals("httpClient.requests[0].baseUrl.origin"));
