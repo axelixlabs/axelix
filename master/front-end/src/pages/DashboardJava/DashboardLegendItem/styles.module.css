@@ -1,0 +1,22 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.Circle {
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.Label {
+    color: var(--axelix-bold-grey);
+}
+
+.Value {
+    margin-left: auto;
+    font-weight: 600;
+}
