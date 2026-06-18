@@ -18,22 +18,20 @@
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.DisposableBean;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerConfiguration;
 import org.springframework.boot.logging.LoggerGroup;
@@ -44,73 +42,54 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.state.DefaultLoggerChange;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.state.LoggerChange;
 
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.LogLevelNotFoundException.LOG_LEVEL_REQUIRED_MESSAGE;
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.LoggerNotFoundException.LOGGER_GROUP_NOT_FOUND_MESSAGE;
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.LoggerNotFoundException.LOGGER_NOT_FOUND_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException.LOG_LEVEL_REQUIRED_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException.LOGGER_GROUP_NOT_FOUND_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException.LOGGER_NOT_FOUND_MESSAGE;
+import static java.util.Optional.ofNullable;
 
 /**
  * Default implementation of {@link LoggersService}.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class DefaultLoggersService implements LoggersService, DisposableBean {
+public class DefaultLoggersService implements LoggersService {
 
     private final LoggingSystem loggingSystem;
     private final LoggerGroups loggerGroups;
+    private final ConcurrentMap<String, LoggerChange> configuredLevelsCache;
 
-    private final ScheduledExecutorService scheduler;
-    private final ConcurrentMap<String, OriginalLoggerState> cacheOriginalLogLevels;
-    private final ConcurrentMap<String, ScheduledLogLevelOverride> scheduledOverrideLoggers;
-    private final ConcurrentMap<String, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     public DefaultLoggersService(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
         this.loggingSystem = loggingSystem;
         this.loggerGroups = loggerGroups;
-
-        List<LoggerConfiguration> loggerConfigurations = this.loggingSystem.getLoggerConfigurations();
-        // Not critical, but pre-sizes the map to avoid overhead from bucket resizing when loggers are added dynamically
-        this.cacheOriginalLogLevels = new ConcurrentHashMap<>((int) (loggerConfigurations.size() * 1.3f));
-        updateCacheOriginalLogLevels(loggerConfigurations);
-
-        this.scheduledOverrideLoggers = new ConcurrentHashMap<>();
-        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r, "axelix-loggers-expiry");
-            thread.setDaemon(true);
-            return thread;
-        });
+        // assume that end-users will not change that many loggers manually, 5 at most
+        this.configuredLevelsCache = new ConcurrentHashMap<>(5);
     }
 
     @Override
     public LoggersFeed getAllLoggers() {
         List<LoggerConfiguration> loggerConfigurations = loggingSystem.getLoggerConfigurations();
-        if (loggerConfigurations == null || loggerConfigurations.isEmpty()) {
-            return new LoggersFeed(Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-        }
-
-        // Picks up lazily-initialized loggers that weren't present at startup
-        updateCacheOriginalLogLevels(loggerConfigurations);
 
         return new LoggersFeed(getLogLevels(), getLoggers(loggerConfigurations), getLoggerGroups());
     }
 
     @Override
     public SingleLoggerProfile getSingleLogger(String loggerName) throws LoggerNotFoundException {
-        LoggerConfiguration loggerConfiguration = loggingSystem.getLoggerConfiguration(loggerName);
-        if (loggerConfiguration == null) {
-            throw new LoggerNotFoundException(LOGGER_NOT_FOUND_MESSAGE.formatted(loggerName));
-        }
-        updateCacheOriginalLogLevels(List.of(loggerConfiguration));
+        LoggerConfiguration loggerConfiguration = findLoggerByName(loggerName);
 
         return convertToSingleLoggerProfile(loggerConfiguration);
     }
 
     @Override
     public LoggersGroupProfile getLoggerGroup(String groupName) throws LoggerNotFoundException {
-        LoggerGroup loggerGroup = loggerGroups.get(groupName);
-        if (loggerGroup == null) {
-            throw new LoggerNotFoundException(LOGGER_GROUP_NOT_FOUND_MESSAGE.formatted(groupName));
-        }
+        LoggerGroup loggerGroup = findGroupByName(groupName);
 
         return convertToLoggersGroupProfile(groupName, loggerGroup);
     }
@@ -119,80 +98,90 @@ public class DefaultLoggersService implements LoggersService, DisposableBean {
     public void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
 
-        LoggerConfiguration loggerConfiguration = loggingSystem.getLoggerConfiguration(loggerName);
-
-        if (loggerConfiguration == null) {
-            throw new LoggerNotFoundException(LOGGER_NOT_FOUND_MESSAGE.formatted(loggerName));
-        }
+        LoggerConfiguration loggerConfiguration = findLoggerByName(loggerName);
 
         LogLevel targetLevel = convertToLogLevel(changeRequest.getConfiguredLevel());
+        Long ttlSeconds = changeRequest.getTtlSeconds();
 
-        updateCacheOriginalLogLevels(List.of(loggerConfiguration));
+        LoggerChange loggerChange = configuredLevelsCache.remove(loggerName);
+
+        if (loggerChange == null) {
+            LogLevel initiallyConfiguredLevel = loggerConfiguration.getConfiguredLevel();
+
+            configuredLevelsCache.put(
+                    loggerName,
+                    createAnchor(
+                            loggerName,
+                            ttlSeconds,
+                            ofNullable(initiallyConfiguredLevel).map(Enum::name).orElse(null)));
+        } else {
+            // Preserving initial configured level as the one that was prior to any changes
+            // We cannot just take configured level from the logger system, since if we have the change anchor
+            // in the cache, it effectively means we have changed the logging level in runtime already, and
+            // the logging system will have the configuredLevel equal to the initial configured level, but to
+            // the one that Axelix have configured
+            String initiallyConfiguredLevel = loggerChange.getInitialConfiguredLevel();
+
+            // Cancel previously created anchor
+            loggerChange.cancelAutoRollback();
+
+            configuredLevelsCache.put(loggerName, createAnchor(loggerName, ttlSeconds, initiallyConfiguredLevel));
+        }
 
         loggingSystem.setLogLevel(loggerName, targetLevel);
-
-        Long ttlMinutes = changeRequest.getTtlMinutes();
-        if (ttlMinutes != null) {
-            scheduleLogLevelReset(loggerName, ttlMinutes);
-        } else {
-            cancelScheduledTask(loggerName);
-        }
     }
 
     @Override
     public void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
-        LoggerGroup loggerGroup = loggerGroups.get(groupName);
+        LoggerGroup loggerGroup = findGroupByName(groupName);
 
-        if (loggerGroup != null && loggerGroup.hasMembers()) {
+        if (loggerGroup.hasMembers()) {
             String configuredLevel = changeRequest.getConfiguredLevel();
             LogLevel logLevel = convertToLogLevel(configuredLevel);
 
             loggerGroup.configureLogLevel(logLevel, loggingSystem::setLogLevel);
-            return;
         }
-
-        throw new LoggerNotFoundException(LOGGER_GROUP_NOT_FOUND_MESSAGE.formatted(groupName));
     }
 
     @Override
     public void resetLogLevelByLoggerName(String loggerName) throws LoggerNotFoundException, LogLevelNotFoundException {
-        LoggerConfiguration loggerConfiguration = loggingSystem.getLoggerConfiguration(loggerName);
+        LoggerChange loggerChange = configuredLevelsCache.remove(loggerName);
 
-        if (loggerConfiguration == null) {
-            throw new LoggerNotFoundException(LOGGER_NOT_FOUND_MESSAGE.formatted(loggerName));
-        }
-        cancelScheduledTask(loggerName);
-        updateCacheOriginalLogLevels(List.of(loggerConfiguration));
-
-        OriginalLoggerState originalState = cacheOriginalLogLevels.get(loggerName);
-
-        LogLevel targetLevel = (originalState != null && originalState.getConfiguredLevel() != null)
-                ? convertToLogLevel(originalState.getConfiguredLevel())
-                : null;
-
-        // The configured level can be null, which correctly restores the inheritance from its parent logger
-        loggingSystem.setLogLevel(loggerName, targetLevel);
-    }
-
-    private void updateCacheOriginalLogLevels(List<LoggerConfiguration> loggerConfigurations) {
-        if (loggerConfigurations == null || loggerConfigurations.isEmpty()) {
-            return;
+        if (loggerChange == null) {
+            throw new LoggerNotFoundException("Cannot reset logger");
         }
 
-        for (LoggerConfiguration loggerConfig : loggerConfigurations) {
-            LogLevel configuredLevel = loggerConfig.getConfiguredLevel();
-            cacheOriginalLogLevels.putIfAbsent(
-                    loggerConfig.getName(),
-                    new OriginalLoggerState(
-                            loggerConfig.getEffectiveLevel().toString(),
-                            configuredLevel != null ? configuredLevel.toString() : null));
-        }
+        loggerChange.rollbackManually();
     }
 
     private List<String> getLogLevels() {
         Set<LogLevel> levels = new TreeSet<>(loggingSystem.getSupportedLogLevels()).descendingSet();
         return levels.stream().map(Enum::toString).toList();
+    }
+
+    private DefaultLoggerChange createAnchor(
+            String loggerName, @Nullable Long ttlSeconds, @Nullable String initiallyConfiguredLevel) {
+        return new DefaultLoggerChange(
+                () -> {
+                    loggingSystem.setLogLevel(
+                            loggerName,
+                            Optional.ofNullable(initiallyConfiguredLevel)
+                                    .map(LogLevel::valueOf)
+                                    .orElse(null));
+                },
+                ofNullable(ttlSeconds).map(Duration::ofSeconds).orElse(null),
+                ofNullable(initiallyConfiguredLevel).orElse(null));
+    }
+
+    private @NonNull LoggerConfiguration findLoggerByName(String loggerName) {
+        return ofNullable(loggingSystem.getLoggerConfiguration(loggerName))
+                .orElseThrow(() -> new LoggerNotFoundException(LOGGER_NOT_FOUND_MESSAGE.formatted(loggerName)));
+    }
+
+    private @NonNull LoggerGroup findGroupByName(String groupName) {
+        return ofNullable(loggerGroups.get(groupName))
+                .orElseThrow(() -> new LoggerNotFoundException(LOGGER_GROUP_NOT_FOUND_MESSAGE.formatted(groupName)));
     }
 
     private List<SingleLoggerProfile> getLoggers(List<LoggerConfiguration> loggerConfigurations) {
@@ -214,40 +203,34 @@ public class DefaultLoggersService implements LoggersService, DisposableBean {
 
             groups.add(new LoggersGroupProfile(group.getName(), configuredLevel, group.getMembers()));
         });
+
         return groups;
     }
 
     private SingleLoggerProfile convertToSingleLoggerProfile(LoggerConfiguration loggerConfiguration) {
+        LogLevel configuredLevel = loggerConfiguration.getConfiguredLevel();
+        LogLevel effectiveLevel = loggerConfiguration.getEffectiveLevel();
 
-        LogLevel configuredLogLevel = loggerConfiguration.getConfiguredLevel();
         String loggerName = loggerConfiguration.getName();
-        String configuredLevel = configuredLogLevel != null ? configuredLogLevel.toString() : null;
-        String effectiveLevel = loggerConfiguration.getEffectiveLevel().toString();
-
-        boolean isOriginalLevel = false;
-        OriginalLoggerState originalState = cacheOriginalLogLevels.get(loggerName);
-
-        if (originalState != null) {
-            isOriginalLevel = Objects.equals(configuredLevel, originalState.getConfiguredLevel())
-                    && Objects.equals(effectiveLevel, originalState.getEffectiveLevel());
-        }
-
-        String temporaryLevelAppliedAt = null;
-        String temporaryLevelExpiresAt = null;
-
-        ScheduledLogLevelOverride scheduledOverride = scheduledOverrideLoggers.get(loggerName);
-        if (scheduledOverride != null) {
-            temporaryLevelAppliedAt = scheduledOverride.getAppliedAt();
-            temporaryLevelExpiresAt = scheduledOverride.getExpiresAt();
-        }
+        LoggerChange loggerChange = configuredLevelsCache.get(loggerName);
 
         return new SingleLoggerProfile(
                 loggerName,
-                configuredLevel,
-                effectiveLevel,
-                isOriginalLevel,
-                temporaryLevelAppliedAt,
-                temporaryLevelExpiresAt);
+                ofNullable(configuredLevel).map(Enum::name).orElse(null),
+                effectiveLevel.name(),
+                ofNullable(loggerChange)
+                        .map(LoggerChange::getInitialConfiguredLevel)
+                        .orElse(null),
+                ofNullable(loggerChange)
+                        .map(LoggerChange::getInitiatedAt)
+                        .map(it -> it.atOffset(ZoneOffset.UTC))
+                        .map(FORMATTER::format)
+                        .orElse(null),
+                ofNullable(loggerChange)
+                        .map(LoggerChange::getAutoRollsBackAt)
+                        .map(it -> it.atOffset(ZoneOffset.UTC))
+                        .map(FORMATTER::format)
+                        .orElse(null));
     }
 
     private LoggersGroupProfile convertToLoggersGroupProfile(String groupName, LoggerGroup loggerGroup) {
@@ -266,60 +249,6 @@ public class DefaultLoggersService implements LoggersService, DisposableBean {
             return LogLevel.valueOf(level.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new LogLevelNotFoundException(level, getLogLevels(), e);
-        }
-    }
-
-    private void scheduleLogLevelReset(String loggerName, Long ttlMinutes) {
-        ScheduledFuture<?> existingTask = scheduledTasks.get(loggerName);
-        if (existingTask != null) {
-            existingTask.cancel(false);
-            scheduledTasks.remove(loggerName);
-            scheduledOverrideLoggers.remove(loggerName);
-        }
-
-        Instant now = Instant.now();
-        // Guards against stale reset tasks overwriting a newer override, since cancel(false)
-        // cannot interrupt an already-running task.
-        long generation = now.toEpochMilli();
-
-        ScheduledLogLevelOverride override = new ScheduledLogLevelOverride(
-                now.toString(), now.plus(Duration.ofMinutes(ttlMinutes)).toString(), generation);
-
-        scheduledOverrideLoggers.put(loggerName, override);
-
-        ScheduledFuture<?> future = scheduler.schedule(
-                () -> {
-                    ScheduledLogLevelOverride current = scheduledOverrideLoggers.get(loggerName);
-                    if (current != null && current.getGeneration() == generation) {
-                        scheduledOverrideLoggers.remove(loggerName);
-                        scheduledTasks.remove(loggerName);
-                        resetLogLevelByLoggerName(loggerName);
-                    }
-                },
-                ttlMinutes,
-                TimeUnit.MINUTES);
-
-        scheduledTasks.put(loggerName, future);
-    }
-
-    private void cancelScheduledTask(String loggerName) {
-        scheduledOverrideLoggers.remove(loggerName);
-        ScheduledFuture<?> existingTask = scheduledTasks.remove(loggerName);
-        if (existingTask != null) {
-            existingTask.cancel(false);
-        }
-    }
-
-    @Override
-    public void destroy() {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }
