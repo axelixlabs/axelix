@@ -97,7 +97,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
     AbstractBeansSharedContextTest.BeanMethodDeclarations.class,
     AbstractBeansSharedContextTest.ComponentMethodDeclarations.class,
     AbstractBeansSharedContextTest.ConfigurationClassesDeclarations.class,
-    AbstractBeansSharedContextTest.CurrentConfiguration.class,
+    AbstractBeansSharedContextTest.CommonConfiguration.class,
     BeansEndpoint.class,
     AxelixBeansEndpoint.class,
     ConditionsReportEndpoint.class,
@@ -105,11 +105,11 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
 })
 abstract class AbstractBeansSharedContextTest {
 
-    // --- Endpoint integration configuration (AxelixBeansEndpointTest) ---
+    // --- Common Configuration ---
 
     @TestConfiguration(value = "testCurrentConfiguration")
     @EnableConfigurationProperties(AxelixPropTest.class)
-    static class CurrentConfiguration {
+    static class CommonConfiguration {
 
         static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
         static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";

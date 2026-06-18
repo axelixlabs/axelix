@@ -64,15 +64,15 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
     void negativeAuthTests() {}
 
     private static void assertQualifiersPostProcessorBean(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CommonConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
 
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
                 .satisfies(beanMethod -> {
                     assertThat(beanMethod.getMethodName())
-                            .isEqualTo(CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+                            .isEqualTo(CommonConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo(CommonConfiguration.class.getSimpleName());
                 });
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
@@ -86,14 +86,14 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
     }
 
     private static void assertBeanMetaInfoExtractor(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CommonConfiguration.BEAN_META_INFO_EXTRACTOR);
 
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
                 .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+                    assertThat(beanMethod.getMethodName()).isEqualTo(CommonConfiguration.BEAN_META_INFO_EXTRACTOR);
+                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo(CommonConfiguration.class.getSimpleName());
                 });
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
@@ -110,14 +110,14 @@ class AxelixBeansEndpointTest extends AbstractBeansSharedContextTest {
     }
 
     private static void assertCustomBeanSupplier(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.CUSTOM_SUPPLIER);
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CommonConfiguration.CUSTOM_SUPPLIER);
 
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
                 .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.CUSTOM_SUPPLIER);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+                    assertThat(beanMethod.getMethodName()).isEqualTo(CommonConfiguration.CUSTOM_SUPPLIER);
+                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo(CommonConfiguration.class.getSimpleName());
                 });
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
