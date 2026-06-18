@@ -1,0 +1,10 @@
+.MainWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 4px;
+    border-radius: var(--axelix-border-radius-large);
+    padding: 8px 12px;
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-medium-grey);
+}
