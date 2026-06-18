@@ -57,8 +57,6 @@ public class ConfigPropsTestSupportConfiguration {
             "sanitizeAllConfigurationPropertiesService";
     public static final String EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE =
             "explicitlySanitizedConfigurationPropertiesService";
-    public static final String FOR_SANITIZATION_TAGS_CONFIGURATION_PROPERTIES_SERVICE =
-            "forSanitizationTagsConfigurationPropertiesService";
 
     @Bean
     public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
@@ -104,22 +102,11 @@ public class ConfigPropsTestSupportConfiguration {
             RequiredAuthorityCheckService requiredAuthorityCheckService,
             PropertyNameNormalizer propertyNameNormalizer) {
         SmartSanitizingFunction smartSanitizingFunction = new SmartSanitizingFunction(
-                List.of("axelix.prop.test.tags.environment", "axelix.prop.test.tags.version"), propertyNameNormalizer);
-        return new DefaultConfigurationPropertiesService(
-                smartSanitizingFunction,
-                applicationContext,
-                configurationPropertiesConverter,
-                requiredAuthorityCheckService);
-    }
-
-    @Bean(name = FOR_SANITIZATION_TAGS_CONFIGURATION_PROPERTIES_SERVICE)
-    public DefaultConfigurationPropertiesService forSanitizationTagsConfigurationPropertiesService(
-            ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter,
-            RequiredAuthorityCheckService requiredAuthorityCheckService,
-            PropertyNameNormalizer propertyNameNormalizer) {
-        SmartSanitizingFunction smartSanitizingFunction = new SmartSanitizingFunction(
-                List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
+                List.of(
+                        "axelix.prop.test.tags.environment",
+                        "axelix.prop.test.tags.version",
+                        "axelix.prop.test.tags.forSanitization",
+                        "axelix.prop.test.tags.FOR_SANITIZATION"),
                 propertyNameNormalizer);
         return new DefaultConfigurationPropertiesService(
                 smartSanitizingFunction,
@@ -130,7 +117,7 @@ public class ConfigPropsTestSupportConfiguration {
 
     @Bean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            @Qualifier(FOR_SANITIZATION_TAGS_CONFIGURATION_PROPERTIES_SERVICE)
+            @Qualifier(EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE)
                     DefaultConfigurationPropertiesService configurationPropertiesService) {
         return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
     }

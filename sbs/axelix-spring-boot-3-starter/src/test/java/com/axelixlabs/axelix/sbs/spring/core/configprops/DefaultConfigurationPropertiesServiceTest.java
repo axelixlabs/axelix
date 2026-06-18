@@ -123,7 +123,8 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
                     .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue));
 
             assertThat(sanitizedProperties)
-                    .containsOnlyKeys("tags.environment", "tags.version")
+                    .containsOnlyKeys(
+                            "tags.environment", "tags.version", "tags.forSanitization", "tags.FOR_SANITIZATION")
                     .containsValues("******", "******");
 
             List<KeyValue> nonSanitizedProps = configProps.getBeans().stream()

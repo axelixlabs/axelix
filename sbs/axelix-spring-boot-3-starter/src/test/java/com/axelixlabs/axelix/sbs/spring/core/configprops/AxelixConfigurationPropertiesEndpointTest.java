@@ -73,13 +73,18 @@ public class AxelixConfigurationPropertiesEndpointTest extends AbstractConfigPro
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
+                Arguments.of("tags.environment", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.version", "******", DefaultRole.VIEWER),
                 Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
                 Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.environment", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.version", "******", DefaultRole.EDITOR),
                 Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
                 Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.environment", "test", DefaultRole.ADMIN),
+                Arguments.of("tags.version", "1.0.0", DefaultRole.ADMIN),
                 Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
                 Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN),
-                Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
                 Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
                 Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
                 Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
