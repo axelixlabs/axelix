@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.TransformedMetricValue;
 import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
+import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
@@ -41,8 +42,6 @@ import static com.axelixlabs.axelix.master.api.external.response.DashboardRespon
 import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.MemoryUsage;
 import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.MemoryUsageMap;
 import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.Status;
-import static com.axelixlabs.axelix.master.utils.VersionTrimmer.getMajorMinorVersion;
-import static com.axelixlabs.axelix.master.utils.VersionTrimmer.getMajorVersion;
 
 /**
  * Default implementation of {@link DashboardService}.
@@ -84,12 +83,18 @@ public class DefaultDashboardService implements DashboardService {
                 case UNKNOWN -> statuesMap.compute(Status.UNKNOWN, counterIncrementFunction());
             }
 
-            java.addVersion(getMajorVersion(instance.javaVersion()));
-            springBoot.addVersion(getMajorMinorVersion(instance.springBootVersion()));
-            springFramework.addVersion(getMajorMinorVersion(instance.springFrameworkVersion()));
+            int dot = instance.javaVersion().indexOf('.');
+            String javaVersion = dot == -1 ? instance.javaVersion() : instance.javaVersion().substring(0, dot);
+
+            java.addVersion(javaVersion);
+            springBoot.addVersion(
+                    SemanticVersion.parse(instance.springBootVersion()).majorMinor());
+            springFramework.addVersion(
+                    SemanticVersion.parse(instance.springFrameworkVersion()).majorMinor());
 
             if (instance.kotlinVersion() != null) {
-                kotlin.addVersion(getMajorMinorVersion(instance.kotlinVersion()));
+                kotlin.addVersion(
+                        SemanticVersion.parse(instance.kotlinVersion()).majorMinor());
             }
         }
 

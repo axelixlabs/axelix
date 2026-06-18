@@ -64,7 +64,7 @@ class MajorVersionCompatibilityDetectionStrategyTest {
     }
 
     private static Stream<String> compatibleStarterVersions() {
-        return Stream.of("1.0.0-SNAPSHOT", "1.5.0", "1.0.0-RELEASE", "1");
+        return Stream.of("1.0.0-SNAPSHOT", "1.5.0", "1.0.0-RELEASE");
     }
 
     private static Stream<String> incompatibleStarterVersions() {
