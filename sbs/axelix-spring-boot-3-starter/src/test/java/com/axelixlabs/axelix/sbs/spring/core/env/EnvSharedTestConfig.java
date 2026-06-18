@@ -48,10 +48,11 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPro
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
- * Shared test configuration backing a single, cached Spring context for all non-endpoint {@code env}
- * integration tests. The two distinct sanitization behaviours required by these tests are exposed as two
- * separately-named {@link SmartSanitizingFunction} beans (and two matching {@link EnvironmentService} beans),
- * so a single context can satisfy every scenario.
+ * Shared test configuration backing a single, cached Spring context for all {@code env} integration tests,
+ * including {@link AxelixEnvironmentEndpoint}. The two distinct sanitization behaviours required by these
+ * tests are exposed as two separately-named {@link SmartSanitizingFunction} beans (and two matching
+ * {@link EnvironmentService} beans), so a single context can satisfy every scenario. The endpoint is wired
+ * to the explicitly-sanitizing {@link EnvironmentService}.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -61,6 +62,9 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
 public class EnvSharedTestConfig {
 
     public static final String SAMPLE_BEAN_NAME = "testBeanWithCustomAnnotations";
+
+    public static final String SANITIZE_ALL_ENVIRONMENT_SERVICE = "sanitizeAllEnvironmentService";
+    public static final String EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE = "explicitSanitizeEnvironmentService";
 
     private static final String SANITIZE_ALL_SMART_SANITIZATION_FUNCTION = "sanitizeAllSmartSanitizingFunction";
     private static final String EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION = "explicitSmartSanitizingFunction";
@@ -119,10 +123,14 @@ public class EnvSharedTestConfig {
         return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
     }
 
-    @Bean
+    @Bean(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
     public SmartSanitizingFunction explicitSmartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(
-                List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
+                List.of(
+                        "axelix.prop.test.tags.forSanitization",
+                        "axelix.prop.test.tags.FOR_SANITIZATION",
+                        "axelix.env.test.toBeSanitized",
+                        "AXELIX_FOR_SANITIZATION"),
                 propertyNameNormalizer);
     }
 
@@ -155,7 +163,7 @@ public class EnvSharedTestConfig {
                 valueInjectionTrackerBeanPostProcessor);
     }
 
-    @Bean
+    @Bean(SANITIZE_ALL_ENVIRONMENT_SERVICE)
     public EnvironmentService sanitizeAllEnvironmentService(
             Environment environment,
             @Qualifier(SANITIZE_ALL_SMART_SANITIZATION_FUNCTION) SmartSanitizingFunction smartSanitizingFunction,
@@ -165,7 +173,7 @@ public class EnvSharedTestConfig {
                 environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
     }
 
-    @Bean
+    @Bean(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE)
     public EnvironmentService explicitSanitizeEnvironmentService(
             Environment environment,
             @Qualifier(EXPLICITLY_CONFIGURED_SMART_SANITIZATION_FUNCTION)
@@ -174,6 +182,12 @@ public class EnvSharedTestConfig {
             RequiredAuthorityCheckService requiredAuthorityCheckService) {
         return new DefaultEnvironmentService(
                 environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
+    }
+
+    @Bean
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
+            @Qualifier(EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE) EnvironmentService environmentService) {
+        return new AxelixEnvironmentEndpoint(environmentService);
     }
 
     @Bean(SAMPLE_BEAN_NAME)
@@ -187,7 +201,17 @@ public class EnvSharedTestConfig {
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")
-    public record AxelixConfigurationProperties(Map<String, String> tags) {}
+    public record AxelixConfigurationProperties(
+            Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
+
+        public record HttpClient(List<Request> requests) {}
+
+        public record Request(String name, String baseUrl, List<Method> methods) {}
+
+        public record Method(String type, List<Retry> retries) {}
+
+        public record Retry(Integer count, Map<String, Object> parameters) {}
+    }
 
     @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
