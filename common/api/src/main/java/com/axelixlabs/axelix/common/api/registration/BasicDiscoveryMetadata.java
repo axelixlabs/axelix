@@ -386,4 +386,178 @@ public final class BasicDiscoveryMetadata {
             return "MemoryDetails{" + "heap=" + heap + '}';
         }
     }
+
+    /**
+     * Insight information discovered for the given service instance.
+     */
+    public static final class Insight {
+
+        private final HotSpot hotSpot;
+        private final List<InsightFeature> springFramework;
+
+        /**
+         * Creates a new Insight.
+         *
+         * @param hotSpot         the HotSpot-specific insight groups.
+         * @param springFramework the Spring Framework insight features.
+         */
+        @JsonCreator
+        public Insight(
+                @JsonProperty("hotSpot") HotSpot hotSpot,
+                @JsonProperty("springFramework") List<InsightFeature> springFramework) {
+            this.hotSpot = hotSpot;
+            this.springFramework = springFramework;
+        }
+
+        public HotSpot getHotSpot() {
+            return hotSpot;
+        }
+
+        public List<InsightFeature> getSpringFramework() {
+            return springFramework;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Insight insight = (Insight) o;
+            return Objects.equals(hotSpot, insight.hotSpot) && Objects.equals(springFramework, insight.springFramework);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(hotSpot, springFramework);
+        }
+
+        @Override
+        public String toString() {
+            return "Insight{" + "hotSpot=" + hotSpot + ", springFramework=" + springFramework + '}';
+        }
+    }
+
+    /**
+     * HotSpot-specific insight groups.
+     */
+    public static final class HotSpot {
+
+        private final List<InsightFeature> projectLeyden;
+        private final List<InsightFeature> gc;
+        private final List<InsightFeature> projectLilliputh;
+
+        /**
+         * Creates a new HotSpot.
+         *
+         * @param projectLeyden   the Project Leyden insight features.
+         * @param gc              the garbage collection insight features.
+         * @param projectLilliputh the Project Lilliputh insight features.
+         */
+        @JsonCreator
+        public HotSpot(
+                @JsonProperty("projectLeyden") List<InsightFeature> projectLeyden,
+                @JsonProperty("gc") List<InsightFeature> gc,
+                @JsonProperty("projectLilliputh") List<InsightFeature> projectLilliputh) {
+            this.projectLeyden = projectLeyden;
+            this.gc = gc;
+            this.projectLilliputh = projectLilliputh;
+        }
+
+        public List<InsightFeature> getProjectLeyden() {
+            return projectLeyden;
+        }
+
+        public List<InsightFeature> getGc() {
+            return gc;
+        }
+
+        public List<InsightFeature> getProjectLilliputh() {
+            return projectLilliputh;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            HotSpot hotSpot = (HotSpot) o;
+            return Objects.equals(projectLeyden, hotSpot.projectLeyden)
+                    && Objects.equals(gc, hotSpot.gc)
+                    && Objects.equals(projectLilliputh, hotSpot.projectLilliputh);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(projectLeyden, gc, projectLilliputh);
+        }
+
+        @Override
+        public String toString() {
+            return "HotSpot{"
+                    + "projectLeyden="
+                    + projectLeyden
+                    + ", gc="
+                    + gc
+                    + ", projectLilliputh="
+                    + projectLilliputh
+                    + '}';
+        }
+    }
+
+    /**
+     * The specific insight feature discovered for the given service instance.
+     */
+    public static final class InsightFeature {
+
+        private final String name;
+        private final boolean enabled;
+
+        /**
+         * Creates a new InsightFeature.
+         *
+         * @param name    the insight feature name.
+         * @param enabled the enabled state of the insight feature.
+         */
+        @JsonCreator
+        public InsightFeature(@JsonProperty("name") String name, @JsonProperty("enabled") boolean enabled) {
+            this.name = name;
+            this.enabled = enabled;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            InsightFeature that = (InsightFeature) o;
+            return enabled == that.enabled && Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, enabled);
+        }
+
+        @Override
+        public String toString() {
+            return "InsightFeature{" + "name='" + name + '\'' + ", enabled=" + enabled + '}';
+        }
+    }
 }
