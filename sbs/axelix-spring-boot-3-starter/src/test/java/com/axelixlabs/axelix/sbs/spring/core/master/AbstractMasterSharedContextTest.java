@@ -29,22 +29,26 @@ import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 
 /**
- * Shared base for the {@code master} integration tests that do not require a running web server. By defining a single,
- * unioned context here and having every subclass inherit it unchanged, the Spring TestContext framework resolves the
- * same context cache key for all of them, so they share one cached {@link org.springframework.context.ApplicationContext}.
+ * Shared base for the {@code master} integration tests. By defining a single, unioned context here and having every
+ * subclass inherit it unchanged, the Spring TestContext framework resolves the same context cache key for all of them,
+ * so they share one cached {@link org.springframework.context.ApplicationContext}.
  *
  *
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
     ProjectInfoAutoConfiguration.class,
     DefaultServiceMetadataAssembler.class,
+    AxelixMetadataEndpoint.class,
+    JwtAuthTestConfiguration.class,
     AbstractMasterSharedContextTest.SharedConfig.class
 })
 abstract class AbstractMasterSharedContextTest {
