@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.utils;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Nested;
@@ -43,16 +44,16 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("invalidVersions")
         void tryParseReturnsEmpty(String input) {
-            // when.
-            // then.
-            assertThat(SemanticVersion.tryParse(input)).isEmpty();
+            // when
+            Optional<SemanticVersion> actual = SemanticVersion.tryParse(input);
+
+            // then
+            assertThat(actual).isEmpty();
         }
 
         @ParameterizedTest
         @MethodSource("invalidVersions")
         void parseThrows(String input) {
-            // when.
-            // then.
             assertThatThrownBy(() -> SemanticVersion.parse(input)).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -73,10 +74,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("majorCases")
         void major(String input, int expected) {
-            // when.
+            // when
             int actual = SemanticVersion.parse(input).major();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -99,10 +100,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("minorCases")
         void minor(String input, int expected) {
-            // when.
+            // when
             int actual = SemanticVersion.parse(input).minor();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -124,10 +125,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("majorMinorCases")
         void majorMinor(String input, String expected) {
-            // when.
+            // when
             String actual = SemanticVersion.parse(input).majorMinor();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -150,10 +151,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("versionNumberCases")
         void versionNumber(String input, String expected) {
-            // when.
+            // when
             String actual = SemanticVersion.parse(input).versionNumber();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -176,10 +177,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("patchCases")
         void patch(String input, int expected) {
-            // when.
+            // when
             int actual = SemanticVersion.parse(input).patch();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 
@@ -200,10 +201,10 @@ class SemanticVersionTest {
         @ParameterizedTest
         @MethodSource("qualifierCases")
         void qualifier(String input, String expected) {
-            // when.
+            // when
             String actual = SemanticVersion.parse(input).qualifier();
 
-            // then.
+            // then
             assertThat(actual).isEqualTo(expected);
         }
 

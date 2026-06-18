@@ -82,7 +82,15 @@ public class SemanticVersion {
 
         // Substring the leading major.minor.patch numeric run; everything after it is the qualifier.
         int[] numbers = {0, 0, 0};
-        int[] scan = scanNumericSegments(trimmed, numbers);
+
+        int[] scan;
+
+        try {
+            scan = scanNumericSegments(trimmed, numbers);
+        } catch (NumberFormatException ex) {
+            return Optional.empty();
+        }
+
         int numericCount = scan[0];
         int qualifierStart = scan[1];
 
