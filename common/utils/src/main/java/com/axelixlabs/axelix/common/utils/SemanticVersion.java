@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.utils;
 import java.util.Comparator;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,17 +47,12 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
     private final int major;
     private final int minor;
     private final int patch;
-    private final boolean hasMinor;
-    private final boolean hasPatch;
     private final @Nullable String qualifier;
 
-    private SemanticVersion(
-            int major, int minor, int patch, boolean hasMinor, boolean hasPatch, @Nullable String qualifier) {
+    SemanticVersion(int major, int minor, int patch, @Nullable String qualifier) {
         this.major = major;
         this.minor = minor;
         this.patch = patch;
-        this.hasMinor = hasMinor;
-        this.hasPatch = hasPatch;
         this.qualifier = qualifier;
     }
 
@@ -87,76 +83,116 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
 
         String trimmed = version.trim();
 
-        // Substring the leading major.minor.patch numeric run; everything after it is the qualifier.
-        int[] numbers = {0, 0, 0};
+        NumericParsingState result = parseNumeric(trimmed);
+        if (result == null) {
+            return Optional.empty();
+        }
 
-        int[] scan;
+        String qualifier;
 
         try {
-            scan = scanNumericSegments(trimmed, numbers);
-        } catch (NumberFormatException ex) {
+            qualifier = parseQualifier(trimmed, result.getPos());
+        } catch (IllegalArgumentException ex) {
             return Optional.empty();
         }
 
-        int numericCount = scan[0];
-        int qualifierStart = scan[1];
-
-        if (numericCount == 0) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new SemanticVersion(
-                numbers[0],
-                numbers[1],
-                numbers[2],
-                numericCount >= 2,
-                numericCount >= 3,
-                qualifierFrom(trimmed, qualifierStart)));
+        return Optional.of(new SemanticVersion(result.getMajor(), result.getMinor(), result.getPatch(), qualifier));
     }
 
     /**
-     * Reads the leading {@code major.minor.patch} numeric segments into {@code numbers}, splitting on
-     * {@code .} like {@link String#indexOf(int)}.
+     * Parses numeric part from given version string
+     * @param version version string
      *
-     * @return a two-element array of {@code [number of segments read, index where the qualifier starts]}
+     * @return {@link NumericParsingState} or {@code null} when invalid version format
      */
-    private static int[] scanNumericSegments(String version, int[] numbers) {
-        int length = version.length();
-        int count = 0;
-        int pos = 0;
-        while (count < numbers.length && pos < length) {
-            int dot = version.indexOf('.', pos);
-            int segmentEnd = dot == -1 ? length : dot;
-            int digits = leadingDigitCount(version, pos, segmentEnd);
-            if (digits == 0) {
-                break;
-            }
-            numbers[count++] = Integer.parseInt(version.substring(pos, pos + digits));
-            if (pos + digits < segmentEnd) {
-                // A qualifier is glued to this segment without a separator, e.g. "19u" or "0-SNAPSHOT".
-                pos += digits;
-                break;
-            }
-            pos = dot == -1 ? length : dot + 1;
-        }
-        return new int[] {count, pos};
-    }
+    private static @Nullable NumericParsingState parseNumeric(String version) {
+        int majorEnd = version.indexOf('.');
+        int minorEnd = majorEnd == -1 ? -1 : version.indexOf('.', majorEnd + 1);
+        int patchEnd = minorEnd == -1 ? -1 : getLastDigitIdx(version, minorEnd + 1, version.length());
 
-    private static int leadingDigitCount(String version, int start, int end) {
-        int pos = start;
-        while (pos < end && Character.isDigit(version.charAt(pos))) {
-            pos++;
-        }
-        return pos - start;
-    }
-
-    private static @Nullable String qualifierFrom(String version, int pos) {
-        if (pos >= version.length()) {
+        if (majorEnd == -1 || minorEnd == -1 || patchEnd == -1) {
             return null;
         }
-        char separator = version.charAt(pos);
-        int start = separator == '.' || separator == '-' ? pos + 1 : pos;
-        return start < version.length() ? version.substring(start) : null;
+
+        Integer major = parseNumber(version, 0, majorEnd);
+        Integer minor = parseNumber(version, majorEnd + 1, minorEnd);
+        Integer patch = parseNumber(version, minorEnd + 1, patchEnd);
+
+        if (major == null || minor == null || patch == null) {
+            return null;
+        }
+
+        return new NumericParsingState(major, minor, patch, patchEnd);
+    }
+
+    /**
+     * Parses qualifier from given version string
+     * @param version version string
+     * @param pos position of last patch digit
+     *
+     * @return qualifier string
+     *
+     * @throws IllegalArgumentException when version haven't separator between patch and qualifier
+     * @throws IllegalArgumentException when version haven't content after separator
+     */
+    private static @Nullable String parseQualifier(String version, int pos) {
+        String qualifier = null;
+
+        if (pos < version.length()) {
+            if (pos + 2 > version.length()) {
+                throw new IllegalArgumentException("qualifier should have content after separator");
+            }
+
+            char separator = version.charAt(pos);
+
+            if (separator == '#' || Character.isLetter(separator)) {
+                throw new IllegalArgumentException("version must have separator between patch and qualifier");
+            }
+
+            qualifier = version.substring(pos + 1);
+        }
+
+        return qualifier;
+    }
+
+    /**
+     * Parses number from version string
+     *
+     * @param version version string
+     * @param start idx of first digit
+     * @param end idx of last digit
+     *
+     * @return number from version string or {@code null} when invalid number
+     */
+    private static @Nullable Integer parseNumber(String version, int start, int end) {
+        String substr = version.substring(start, end);
+
+        try {
+            return Integer.parseInt(substr);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param version string
+     * @param start first char idx
+     * @param end last char idx
+     * @return idx of last digit in selected range in version string
+     */
+    private static int getLastDigitIdx(@NonNull String version, int start, int end) {
+        int result = start;
+
+        while (result < end) {
+            char c = version.charAt(result);
+
+            if (!Character.isDigit(c)) {
+                break;
+            }
+
+            result++;
+        }
+        return result;
     }
 
     /**
@@ -178,7 +214,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      *         (e.g. {@code "3.0"}, but {@code "11"} for the input {@code "11"})
      */
     public String majorMinor() {
-        return hasMinor ? major + "." + minor : Integer.toString(major);
+        return major + "." + minor;
     }
 
     /**
@@ -187,14 +223,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      *         {@code "11"})
      */
     public String versionNumber() {
-        StringBuilder builder = new StringBuilder(Integer.toString(major));
-        if (hasMinor) {
-            builder.append('.').append(minor);
-        }
-        if (hasPatch) {
-            builder.append('.').append(patch);
-        }
-        return builder.toString();
+        return major + "." + minor + "." + patch;
     }
 
     /**
@@ -222,7 +251,40 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      *         or greater than {@code other}
      */
     @Override
-    public int compareTo(SemanticVersion other) {
+    public int compareTo(@NonNull SemanticVersion other) {
         return ORDER.compare(this, other);
+    }
+
+    /**
+     * State of numeric version parsing process
+     */
+    private static class NumericParsingState {
+        private final int major;
+        private final int minor;
+        private final int patch;
+        private final int pos;
+
+        NumericParsingState(int major, int minor, int patch, int pos) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+            this.pos = pos;
+        }
+
+        public int getMajor() {
+            return major;
+        }
+
+        public int getMinor() {
+            return minor;
+        }
+
+        public int getPatch() {
+            return patch;
+        }
+
+        public int getPos() {
+            return pos;
+        }
     }
 }
