@@ -22,6 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
@@ -40,7 +41,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
+import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -59,36 +64,100 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
  * Shared base test that defines a single Spring {@link org.springframework.context.ApplicationContext}
- * reused by the non-endpoint "beans" tests so they hit the Spring TestContext cache instead of each
- * building its own context.
+ * reused by the "beans" tests so they hit the Spring TestContext cache instead of each building its
+ * own context.
  *
  * <p>{@link Main} is pinned via the {@code classes} attribute (rather than left to Spring Boot's
  * auto-detection) so all subclasses resolve an identical, deterministic configuration — this is
  * what makes the cached context shareable, and it also keeps auto-configuration (e.g. the embedded
  * {@code DataSource}) active.
  *
- * <p>All test configurations consumed by these tests live here, in the parent, as nested classes —
- * so the parent owns the entire shared configuration and never has to reference its subclasses.
+ * <p>The context runs with a {@link SpringBootTest.WebEnvironment#RANDOM_PORT} web server and pulls
+ * in the actuator beans endpoints. <strong>All</strong> test configurations consumed by the "beans"
+ * tests live here, in the parent, as nested classes — so the parent owns the entire shared
+ * configuration and never has to reference its subclasses.
  *
  * @author Artemiy Degtyarev
  */
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans"})
 @Import({
     AbstractBeansSharedContextTest.DefaultBeanAnalyzerTestConfig.class,
     AbstractBeansSharedContextTest.BeanMethodDeclarations.class,
     AbstractBeansSharedContextTest.ComponentMethodDeclarations.class,
-    AbstractBeansSharedContextTest.ConfigurationClassesDeclarations.class
+    AbstractBeansSharedContextTest.ConfigurationClassesDeclarations.class,
+    AbstractBeansSharedContextTest.CurrentConfiguration.class,
+    BeansEndpoint.class,
+    AxelixBeansEndpoint.class,
+    ConditionsReportEndpoint.class,
+    JwtAuthTestConfiguration.class
 })
 abstract class AbstractBeansSharedContextTest {
+
+    // --- Endpoint integration configuration (AxelixBeansEndpointTest) ---
+
+    @TestConfiguration(value = "testCurrentConfiguration")
+    @EnableConfigurationProperties(AxelixPropTest.class)
+    static class CurrentConfiguration {
+
+        static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
+        static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";
+        static final String CUSTOM_SUPPLIER = "customSupplier";
+
+        @Bean
+        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
+            return new DefaultConditionalBeanRefBuilder();
+        }
+
+        @Bean
+        public BeansFeedBuilder testBeansFeedBuilder(
+                BeanMetaInfoExtractor beanMetaInfoExtractor,
+                ConfigurableApplicationContext configurableApplicationContext) {
+            return new DefaultBeansFeedBuilder(beanMetaInfoExtractor, configurableApplicationContext);
+        }
+
+        @Bean(BEAN_META_INFO_EXTRACTOR)
+        public BeanMetaInfoExtractor beanMetaInfoExtractor(
+                ConfigurableApplicationContext configurableApplicationContext,
+                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+        }
+
+        @Bean(QUALIFIERS_PERSISTENCE_POST_PROCESSOR)
+        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+            return new QualifiersPersistencePostProcessor();
+        }
+
+        @Bean(CUSTOM_SUPPLIER)
+        public Supplier<String> customSupplier() {
+            return () -> "value";
+        }
+    }
+
+    @ConfigurationProperties(prefix = "axelix.prop.test")
+    static class AxelixPropTest {
+
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 
     // --- Bean meta-info extraction fixtures (DefaultBeanMetaInfoExtractorTest) ---
 
@@ -159,11 +228,6 @@ abstract class AbstractBeansSharedContextTest {
         }
 
         @Bean
-        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
-            return new QualifiersPersistencePostProcessor();
-        }
-
-        @Bean
         public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
             LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
             emf.setDataSource(dataSource);
@@ -179,18 +243,6 @@ abstract class AbstractBeansSharedContextTest {
         @Bean
         public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
             return new JpaTransactionManager(emf);
-        }
-
-        @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
-        public BeanMetaInfoExtractor beanMetaInfoExtractor(
-                ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
         }
 
         @Entity
