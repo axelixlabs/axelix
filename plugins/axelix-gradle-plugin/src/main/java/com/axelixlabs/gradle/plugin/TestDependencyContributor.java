@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.gradle.plugin;
 
+import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
@@ -27,7 +28,6 @@ import org.gradle.api.artifacts.result.DependencyResult;
 import org.gradle.api.artifacts.result.ResolutionResult;
 import org.gradle.api.artifacts.result.ResolvedComponentResult;
 import org.gradle.api.artifacts.result.ResolvedDependencyResult;
-import org.gradle.util.GradleVersion;
 
 /**
  * Contributes the Spring Test Profiler and Thymeleaf to the project's test classpath when they are
@@ -35,20 +35,24 @@ import org.gradle.util.GradleVersion;
  */
 final class TestDependencyContributor {
 
-    static final String PROFILER_DEPENDENCY = "digital.pragmatech.testing:spring-test-profiler:0.1.2";
-
     static final String PROFILER_GROUP = "digital.pragmatech.testing";
 
     static final String PROFILER_NAME = "spring-test-profiler";
 
-    static final String THYMELEAF_DEPENDENCY = "org.thymeleaf:thymeleaf:3.1.3.RELEASE";
+    static final String PROFILER_VERSION = "0.1.2";
+
+    static final String PROFILER_DEPENDENCY = PROFILER_GROUP + ":" + PROFILER_NAME + ":" + PROFILER_VERSION;
 
     static final String THYMELEAF_GROUP = "org.thymeleaf";
 
     static final String THYMELEAF_NAME = "thymeleaf";
 
+    static final String THYMELEAF_VERSION = "3.1.5.RELEASE";
+
+    static final String THYMELEAF_DEPENDENCY = THYMELEAF_GROUP + ":" + THYMELEAF_NAME + ":" + THYMELEAF_VERSION;
+
     /** Minimum Thymeleaf version the profiler's HTML report renders on. */
-    private static final GradleVersion MIN_THYMELEAF_VERSION = GradleVersion.version("3.1.3");
+    private static final SemanticVersion MIN_THYMELEAF_VERSION = SemanticVersion.parse("3.1.3");
 
     private TestDependencyContributor() {}
 
@@ -133,57 +137,13 @@ final class TestDependencyContributor {
     }
 
     /**
-     * Whether a declared Thymeleaf version is below {@code 3.1.3}, using {@link GradleVersion} for
+     * Whether a declared Thymeleaf version is below {@code 3.1.3}, using {@link SemanticVersion} for
      * the comparison. Only the leading dot-separated numeric components are compared; a trailing
-     * qualifier such as {@code .RELEASE} is stripped first, since {@link GradleVersion} does not
+     * qualifier such as {@code .RELEASE} is stripped first, since {@link SemanticVersion} does not
      * accept it. A {@code null} or non-numeric version is treated as not below the minimum, leaving
      * an unrecognised version untouched.
      */
     private static boolean isBelowMinimumThymeleaf(final String version) {
-        if (version == null) {
-            return false;
-        }
-        String numericVersion = leadingNumericVersion(version);
-        if (numericVersion == null) {
-            return false;
-        }
-        return GradleVersion.version(numericVersion).getBaseVersion().compareTo(MIN_THYMELEAF_VERSION) < 0;
-    }
-
-    /**
-     * Extracts the leading dot-separated numeric components of a version (e.g. {@code "3.0.15"} from
-     * {@code "3.0.15.RELEASE"}) as a string {@link GradleVersion} can parse, dropping any trailing
-     * qualifier. Returns {@code null} when there is no leading numeric component. A single numeric
-     * component is padded to {@code major.minor} form, which {@link GradleVersion} requires.
-     */
-    private static String leadingNumericVersion(final String version) {
-        String[] segments = version.split("\\.");
-        int count = 0;
-        while (count < segments.length && isNumeric(segments[count])) {
-            count++;
-        }
-        if (count == 0) {
-            return null;
-        }
-        StringBuilder builder = new StringBuilder(segments[0]);
-        for (int i = 1; i < count; i++) {
-            builder.append('.').append(segments[i]);
-        }
-        if (count == 1) {
-            builder.append(".0");
-        }
-        return builder.toString();
-    }
-
-    private static boolean isNumeric(final String segment) {
-        if (segment.isEmpty()) {
-            return false;
-        }
-        for (int i = 0; i < segment.length(); i++) {
-            if (!Character.isDigit(segment.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
+        return SemanticVersion.parse(version).compareTo(MIN_THYMELEAF_VERSION) < 0;
     }
 }
