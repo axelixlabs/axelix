@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,7 +52,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
     class WithoutExplicitSanitizationProperties {
 
         @Autowired
-        @Qualifier("sanitizeAllEnvironmentService")
+        @Qualifier(EnvSharedTestConfig.SANITIZE_ALL_ENVIRONMENT_SERVICE)
         private EnvironmentService environmentService;
 
         @Test
@@ -95,7 +94,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
     class WithExplicitSanitizationProperties {
 
         @Autowired
-        @Qualifier("explicitSanitizeEnvironmentService")
+        @Qualifier(EnvSharedTestConfig.EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE)
         private EnvironmentService environmentService;
 
         @Test
@@ -107,14 +106,22 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
 
             // then.
-            Map<String, String> sanitizedProperties = environmentFeed.getPropertySources().stream()
+            Set<String> sanitizedPropertyNames = environmentFeed.getPropertySources().stream()
                     .flatMap(propertySource -> propertySource.getProperties().stream())
                     .filter(property -> "******".equals(property.getValue()))
-                    .collect(Collectors.toMap(Property::getName, Property::getValue));
+                    .map(Property::getName)
+                    .collect(Collectors.toSet());
 
-            assertThat(sanitizedProperties)
-                    .containsOnlyKeys("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION")
-                    .containsValues("******", "******");
+            assertThat(sanitizedPropertyNames)
+                    .contains(
+                            "axelix.prop.test.tags.forSanitization",
+                            "axelix.prop.test.tags.FOR_SANITIZATION",
+                            "axelix.env.test.toBeSanitized")
+                    .isSubsetOf(
+                            "axelix.prop.test.tags.forSanitization",
+                            "axelix.prop.test.tags.FOR_SANITIZATION",
+                            "axelix.env.test.toBeSanitized",
+                            "AXELIX_FOR_SANITIZATION");
         }
 
         @Test
