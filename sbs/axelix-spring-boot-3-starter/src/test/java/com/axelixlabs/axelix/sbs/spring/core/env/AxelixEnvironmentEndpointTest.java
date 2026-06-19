@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,6 +68,14 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
         environment.getSystemProperties().put("axelix.env.test.prop2", "systemValue");
         environment.getSystemProperties().put("axelix.env.test.prop3", "systemValue");
         environment.getSystemProperties().put("AXELIX_FOR_SANITIZATION", "shouldBeSanitized");
+    }
+
+    @AfterEach
+    void tearDown() {
+        environment.getSystemProperties().remove("axelix.env.test.prop1", "systemValue");
+        environment.getSystemProperties().remove("axelix.env.test.prop2", "systemValue");
+        environment.getSystemProperties().remove("axelix.env.test.prop3", "systemValue");
+        environment.getSystemProperties().remove("AXELIX_FOR_SANITIZATION", "shouldBeSanitized");
     }
 
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")

@@ -106,9 +106,6 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
 
             // then.
-            // The explicit sanitizer also covers the endpoint's keys; "axelix.env.test.toBeSanitized" is a static
-            // test property (always present), while "AXELIX_FOR_SANITIZATION" is only set as a system property by the
-            // endpoint test, so its presence is order-dependent — asserted via isSubsetOf rather than an exact set.
             Set<String> sanitizedPropertyNames = environmentFeed.getPropertySources().stream()
                     .flatMap(propertySource -> propertySource.getProperties().stream())
                     .filter(property -> "******".equals(property.getValue()))

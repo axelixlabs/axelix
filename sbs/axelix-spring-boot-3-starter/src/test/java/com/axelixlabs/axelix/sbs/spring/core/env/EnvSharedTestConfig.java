@@ -48,11 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPro
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
- * Shared test configuration backing a single, cached Spring context for all {@code env} integration tests,
- * including {@link AxelixEnvironmentEndpoint}. The two distinct sanitization behaviours required by these
- * tests are exposed as two separately-named {@link SmartSanitizingFunction} beans (and two matching
- * {@link EnvironmentService} beans), so a single context can satisfy every scenario. The endpoint is wired
- * to the explicitly-sanitizing {@link EnvironmentService}.
+ * Shared test configuration backing a single, cached Spring context for all {@code env} integration tests.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
