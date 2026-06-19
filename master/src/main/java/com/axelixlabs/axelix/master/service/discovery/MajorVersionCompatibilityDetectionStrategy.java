@@ -17,12 +17,10 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
-import java.util.Objects;
-
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.utils.VersionTrimmer;
+import com.axelixlabs.axelix.common.utils.SemanticVersion;
 
 /**
  * {@link CompatibilityDetectionStrategy} that considers the provided version of the starter being
@@ -41,9 +39,11 @@ public class MajorVersionCompatibilityDetectionStrategy implements Compatibility
 
     @Override
     public boolean isCompatible(String starterVersion) {
-        String starterMajor = VersionTrimmer.getMajorVersion(starterVersion);
-        String masterMajor = VersionTrimmer.getMajorVersion(axelixVersionDiscoverer.getVersion());
+        int masterMajor =
+                SemanticVersion.parse(axelixVersionDiscoverer.getVersion()).major();
 
-        return Objects.equals(starterMajor, masterMajor);
+        return SemanticVersion.tryParse(starterVersion)
+                .filter(starter -> starter.major() == masterMajor)
+                .isPresent();
     }
 }

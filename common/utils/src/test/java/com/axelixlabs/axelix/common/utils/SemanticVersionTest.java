@@ -193,4 +193,37 @@ class SemanticVersionTest {
                 Arguments.of("1.0.0-SNAPSHOT", "1.0.0", -1),
                 Arguments.of("1.0.0", "1.0.0-SNAPSHOT", 1));
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class Compare {
+
+        @ParameterizedTest
+        @MethodSource("comparisonCases")
+        void compareTo(String left, String right, int expectedSign) {
+            // given
+            SemanticVersion a = SemanticVersion.parse(left);
+            SemanticVersion b = SemanticVersion.parse(right);
+
+            // when
+            int result = a.compareTo(b);
+
+            // then
+            assertThat(Integer.signum(result)).isEqualTo(expectedSign);
+        }
+
+        Stream<Arguments> comparisonCases() {
+            return Stream.of(
+                    Arguments.of("2.5.0", "2.4.9", 1),
+                    Arguments.of("2.4.9", "2.5.0", -1),
+                    Arguments.of("3.0.0", "3.0.0", 0),
+                    Arguments.of("2.0.0", "1.9.9", 1),
+                    Arguments.of("1.2.3", "1.2.4", -1),
+                    Arguments.of("1.2", "1.2.0", 0),
+                    Arguments.of("11", "11.0.0", 0),
+                    Arguments.of("1.0.0-SNAPSHOT", "1.0.0.RELEASE", 0),
+                    Arguments.of("1.0.0-SNAPSHOT", "1.0.0", -1),
+                    Arguments.of("1.0.0", "1.0.0-SNAPSHOT", 1));
+        }
+    }
 }
