@@ -49,37 +49,39 @@ public final class SingleLoggerProfile {
     private final String effectiveLevel;
 
     /**
-     * The initial logging level before any temporary modifications were applied.
+     * The logging level onto which the {@link #configuredLevel} is going to change if this {@link #configuredLevel} is
+     * temporary (i.e. if {@link #temporaryLevelInitiatedAt} is noy {@code null}).
      */
-    private final String originalLevel;
+    @Nullable
+    private final String fallbackLevel;
 
     /**
      * The timestamp indicating when the temporary logging level was activated.
      * Returns {@code null} if the current level is permanent.
      */
     @Nullable
-    private final String temporaryLevelAppliedAt;
+    private final String temporaryLevelInitiatedAt;
 
     /**
      * The timestamp indicating when the temporary logging level will expire and revert.
      * Returns {@code null} if there is no expiration time set.
      */
     @Nullable
-    private final String temporaryLevelExpiresAt;
+    private final String temporaryLevelRollsBackAt;
 
     public SingleLoggerProfile(
             @JsonProperty("name") String name,
             @JsonProperty("configuredLevel") @Nullable String configuredLevel,
             @JsonProperty("effectiveLevel") String effectiveLevel,
-            @JsonProperty("originalLevel") String originalLevel,
-            @JsonProperty("temporaryLevelAppliedAt") @Nullable String temporaryLevelAppliedAt,
-            @JsonProperty("temporaryLevelExpiresAt") @Nullable String temporaryLevelExpiresAt) {
+            @JsonProperty("fallbackLevel") @Nullable String fallbackLevel,
+            @JsonProperty("temporaryLevelInitiatedAt") @Nullable String temporaryLevelInitiatedAt,
+            @JsonProperty("temporaryLevelRollsBackAt") @Nullable String temporaryLevelRollsBackAt) {
         this.name = name;
         this.configuredLevel = configuredLevel;
         this.effectiveLevel = effectiveLevel;
-        this.originalLevel = originalLevel;
-        this.temporaryLevelAppliedAt = temporaryLevelAppliedAt;
-        this.temporaryLevelExpiresAt = temporaryLevelExpiresAt;
+        this.fallbackLevel = fallbackLevel;
+        this.temporaryLevelInitiatedAt = temporaryLevelInitiatedAt;
+        this.temporaryLevelRollsBackAt = temporaryLevelRollsBackAt;
     }
 
     public String getName() {
@@ -94,16 +96,17 @@ public final class SingleLoggerProfile {
         return effectiveLevel;
     }
 
-    public String getOriginalLevel() {
-        return originalLevel;
+    @Nullable
+    public String getFallbackLevel() {
+        return fallbackLevel;
     }
 
-    public @Nullable String getTemporaryLevelAppliedAt() {
-        return temporaryLevelAppliedAt;
+    public @Nullable String getTemporaryLevelInitiatedAt() {
+        return temporaryLevelInitiatedAt;
     }
 
-    public @Nullable String getTemporaryLevelExpiresAt() {
-        return temporaryLevelExpiresAt;
+    public @Nullable String getTemporaryLevelRollsBackAt() {
+        return temporaryLevelRollsBackAt;
     }
 
     @Override
@@ -115,15 +118,14 @@ public final class SingleLoggerProfile {
         return Objects.equals(name, that.name)
                 && Objects.equals(configuredLevel, that.configuredLevel)
                 && Objects.equals(effectiveLevel, that.effectiveLevel)
-                && Objects.equals(originalLevel, that.originalLevel)
-                && Objects.equals(temporaryLevelAppliedAt, that.temporaryLevelAppliedAt)
-                && Objects.equals(temporaryLevelExpiresAt, that.temporaryLevelExpiresAt);
+                && Objects.equals(temporaryLevelInitiatedAt, that.temporaryLevelInitiatedAt)
+                && Objects.equals(temporaryLevelRollsBackAt, that.temporaryLevelRollsBackAt);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                name, configuredLevel, effectiveLevel, originalLevel, temporaryLevelAppliedAt, temporaryLevelExpiresAt);
+                name, configuredLevel, effectiveLevel, temporaryLevelInitiatedAt, temporaryLevelRollsBackAt);
     }
 
     @Override
@@ -131,9 +133,9 @@ public final class SingleLoggerProfile {
         return "SingleLoggerProfile{" + "name='"
                 + name + '\'' + ", configuredLevel='"
                 + configuredLevel + '\'' + ", effectiveLevel='"
-                + effectiveLevel + '\'' + ", originalLevel='"
-                + originalLevel + '\'' + ", temporaryLevelAppliedAt='"
-                + temporaryLevelAppliedAt + '\'' + ", temporaryLevelExpiresAt='"
-                + temporaryLevelExpiresAt + '\'' + '}';
+                + effectiveLevel + '\'' + ", fallbackLevel='"
+                + fallbackLevel + '\'' + ", temporaryLevelInitiatedAt='"
+                + temporaryLevelInitiatedAt + '\'' + ", temporaryLevelRollsBackAt='"
+                + temporaryLevelRollsBackAt + '\'' + '}';
     }
 }

@@ -32,32 +32,32 @@ import org.jspecify.annotations.Nullable;
 public class LogLevelChangeRequest {
 
     private final String configuredLevel;
-    private final @Nullable Long ttlMinutes;
+    private final @Nullable Long ttlSeconds;
 
     /**
      * Creates a new LogLevelChangeRequest.
      *
      * @param configuredLevel The new logging level to apply.
-     * @param ttlMinutes      Optional duration in minutes before reverting to the original level.
+     * @param ttlSeconds      Optional duration in minutes before reverting to the original level.
      *                        If {@code null}, the change is permanent.
      */
     @JsonCreator
     public LogLevelChangeRequest(
             @JsonProperty("configuredLevel") String configuredLevel,
-            @JsonProperty("ttlMinutes") @Nullable Long ttlMinutes) {
-        if (ttlMinutes != null && ttlMinutes <= 0) {
-            throw new IllegalArgumentException("ttlMinutes must be positive, got: " + ttlMinutes);
+            @JsonProperty("ttlSeconds") @Nullable Long ttlSeconds) {
+        if (ttlSeconds != null && ttlSeconds <= 0) {
+            throw new IllegalArgumentException("ttlSeconds must be positive, got: " + ttlSeconds);
         }
         this.configuredLevel = configuredLevel;
-        this.ttlMinutes = ttlMinutes;
+        this.ttlSeconds = ttlSeconds;
     }
 
     public String getConfiguredLevel() {
         return configuredLevel;
     }
 
-    public @Nullable Long getTtlMinutes() {
-        return ttlMinutes;
+    public @Nullable Long getTtlSeconds() {
+        return ttlSeconds;
     }
 
     @Override
@@ -66,18 +66,18 @@ public class LogLevelChangeRequest {
             return false;
         }
         LogLevelChangeRequest that = (LogLevelChangeRequest) o;
-        return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(ttlMinutes, that.ttlMinutes);
+        return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(ttlSeconds, that.ttlSeconds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(configuredLevel, ttlMinutes);
+        return Objects.hash(configuredLevel, ttlSeconds);
     }
 
     @Override
     public String toString() {
         return "LogLevelChangeRequest{" + "configuredLevel='"
-                + configuredLevel + '\'' + ", ttlMinutes="
-                + ttlMinutes + '}';
+                + configuredLevel + '\'' + ", ttlSeconds="
+                + ttlSeconds + '}';
     }
 }
