@@ -84,7 +84,8 @@ public class DefaultDashboardService implements DashboardService {
             }
 
             int dot = instance.javaVersion().indexOf('.');
-            String javaVersion = dot == -1 ? instance.javaVersion() : instance.javaVersion().substring(0, dot);
+            String javaVersion =
+                    dot == -1 ? instance.javaVersion() : instance.javaVersion().substring(0, dot);
 
             java.addVersion(javaVersion);
             springBoot.addVersion(

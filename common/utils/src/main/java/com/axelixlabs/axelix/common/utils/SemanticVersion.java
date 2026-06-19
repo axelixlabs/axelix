@@ -134,7 +134,8 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         }
 
         if (!Set.of('-', '.').contains(version.charAt(pos))) {
-            throw new IllegalArgumentException("Invalid version qualifier - invalid separator"); // like 1.0.0#alpha or 1.0.0+beta1
+            throw new IllegalArgumentException(
+                    "Invalid version qualifier - invalid separator"); // like 1.0.0#alpha or 1.0.0+beta1
         }
 
         return version.substring(pos + 1);
@@ -236,5 +237,4 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
     public int compareTo(@NonNull SemanticVersion other) {
         return ORDER.compare(this, other);
     }
-
 }
