@@ -172,6 +172,7 @@ public class ProxyingPreparedStatement implements PreparedStatement {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
         delegate.setUnicodeStream(parameterIndex, x, length);
     }

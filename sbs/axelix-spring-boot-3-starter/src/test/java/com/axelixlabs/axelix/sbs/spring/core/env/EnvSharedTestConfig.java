@@ -125,7 +125,8 @@ public class EnvSharedTestConfig {
                 List.of(
                         "axelix.prop.test.tags.forSanitization",
                         "axelix.prop.test.tags.FOR_SANITIZATION",
-                        "axelix.env.test.toBeSanitized"),
+                        "axelix.env.test.toBeSanitized",
+                        "AXELIX_FOR_SANITIZATION"),
                 propertyNameNormalizer);
     }
 

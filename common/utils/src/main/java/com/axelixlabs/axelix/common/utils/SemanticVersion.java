@@ -81,6 +81,7 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      * @return the parsed {@link SemanticVersion}, or {@link Optional#empty()} if the version is
      *         {@code null}, blank or the provided {@link String} does not represent a valid Semantic Version.
      */
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public static Optional<SemanticVersion> tryParse(@Nullable String version) {
         if (version == null || version.isBlank()) {
             return Optional.empty();
