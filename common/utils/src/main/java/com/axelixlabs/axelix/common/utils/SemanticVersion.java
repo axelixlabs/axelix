@@ -203,31 +203,28 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
     }
 
     /**
-     * @return the minor version segment, or {@code 0} when none was present
+     * @return the minor version segment
      */
     public int minor() {
         return minor;
     }
 
     /**
-     * @return the {@code major.minor} segments, or just the major when no minor was present
-     *         (e.g. {@code "3.0"}, but {@code "11"} for the input {@code "11"})
+     * @return the {@code major.minor} segments
      */
     public String majorMinor() {
         return major + "." + minor;
     }
 
     /**
-     * @return the numeric {@code major.minor.patch} version with the qualifier stripped; only the
-     *         segments that were present are included (e.g. {@code "3.0.15"}, {@code "2.0"},
-     *         {@code "11"})
+     * @return the numeric {@code major.minor.patch} version with the qualifier stripped
      */
     public String versionNumber() {
         return major + "." + minor + "." + patch;
     }
 
     /**
-     * @return the patch version segment, or {@code 0} when none was present
+     * @return the patch version segment
      */
     public int patch() {
         return patch;
