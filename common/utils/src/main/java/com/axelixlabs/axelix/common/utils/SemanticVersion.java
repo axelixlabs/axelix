@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.utils;
 
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -32,9 +33,13 @@ import org.jspecify.annotations.Nullable;
  * separator. So postfixes such as {@code .RELEASE}, {@code .Final} or {@code -SNAPSHOT} are
  * recognised and stripped from the numeric accessors (e.g. {@code 3.0.15.RELEASE} yields major
  * {@code 3}, minor {@code 0}, patch {@code 15} and qualifier {@code RELEASE}).
+ * <p>
+ * Note, that according to SemVer specification, the semantic version MUST have the major, minor and
+ * the patch. Missing any of those will result in parsing error.
  *
- * @author Nikita Kirillov
  * @author Artemiy Degtyarev
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class SemanticVersion implements Comparable<SemanticVersion> {
 
@@ -74,85 +79,65 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
      *
      * @param version the version string to parse, may be {@code null}
      * @return the parsed {@link SemanticVersion}, or {@link Optional#empty()} if the version is
-     *         {@code null}, blank or does not start with a numeric major segment
+     *         {@code null}, blank or the provided {@link String} does not represent a valid Semantic Version.
      */
     public static Optional<SemanticVersion> tryParse(@Nullable String version) {
         if (version == null || version.isBlank()) {
             return Optional.empty();
         }
 
-        String trimmed = version.trim();
+        version = version.trim();
 
-        NumericParsingState result = parseNumeric(trimmed);
-        if (result == null) {
-            return Optional.empty();
-        }
-
-        String qualifier;
-
-        try {
-            qualifier = parseQualifier(trimmed, result.getPos());
-        } catch (IllegalArgumentException ex) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new SemanticVersion(result.getMajor(), result.getMinor(), result.getPatch(), qualifier));
-    }
-
-    /**
-     * Parses numeric part from given version string
-     * @param version version string
-     *
-     * @return {@link NumericParsingState} or {@code null} when invalid version format
-     */
-    private static @Nullable NumericParsingState parseNumeric(String version) {
         int majorEnd = version.indexOf('.');
         int minorEnd = majorEnd == -1 ? -1 : version.indexOf('.', majorEnd + 1);
         int patchEnd = minorEnd == -1 ? -1 : getLastDigitIdx(version, minorEnd + 1, version.length());
 
         if (majorEnd == -1 || minorEnd == -1 || patchEnd == -1) {
-            return null;
+            return Optional.empty();
         }
 
         Integer major = parseNumber(version, 0, majorEnd);
         Integer minor = parseNumber(version, majorEnd + 1, minorEnd);
         Integer patch = parseNumber(version, minorEnd + 1, patchEnd);
 
-        if (major == null || minor == null || patch == null) {
-            return null;
+        String qualifier;
+
+        try {
+            qualifier = parseQualifier(version, patchEnd);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
         }
 
-        return new NumericParsingState(major, minor, patch, patchEnd);
+        if (major == null || minor == null || patch == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new SemanticVersion(major, minor, patch, qualifier));
     }
 
     /**
-     * Parses qualifier from given version string
-     * @param version version string
-     * @param pos position of last patch digit
+     * Parses qualifier from given version string.
      *
-     * @return qualifier string
+     * @param version version string.
+     * @param pos position where the separator of the qualifier is supposed to start.
      *
-     * @throws IllegalArgumentException when version haven't separator between patch and qualifier
-     * @throws IllegalArgumentException when version haven't content after separator
+     * @return parsed qualifier or {@code null} if there is no.
+     * @throws IllegalArgumentException if the qualifier cannot be parsed.
      */
-    private static @Nullable String parseQualifier(String version, int pos) {
-        String qualifier = null;
-
-        if (pos < version.length()) {
-            if (pos + 2 > version.length()) {
-                throw new IllegalArgumentException("qualifier should have content after separator");
-            }
-
-            char separator = version.charAt(pos);
-
-            if (separator == '#' || Character.isLetter(separator)) {
-                throw new IllegalArgumentException("version must have separator between patch and qualifier");
-            }
-
-            qualifier = version.substring(pos + 1);
+    private static @Nullable String parseQualifier(String version, int pos) throws IllegalArgumentException {
+        if (pos == version.length()) {
+            return null;
         }
 
-        return qualifier;
+        if (pos + 1 >= version.length()) {
+            throw new IllegalArgumentException("Invalid version qualifier - no content"); // like 1.0.0- or 1.0.0.
+        }
+
+        if (!Set.of('-', '.').contains(version.charAt(pos))) {
+            throw new IllegalArgumentException("Invalid version qualifier - invalid separator"); // like 1.0.0#alpha or 1.0.0+beta1
+        }
+
+        return version.substring(pos + 1);
     }
 
     /**
@@ -252,36 +237,4 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         return ORDER.compare(this, other);
     }
 
-    /**
-     * State of numeric version parsing process
-     */
-    private static class NumericParsingState {
-        private final int major;
-        private final int minor;
-        private final int patch;
-        private final int pos;
-
-        NumericParsingState(int major, int minor, int patch, int pos) {
-            this.major = major;
-            this.minor = minor;
-            this.patch = patch;
-            this.pos = pos;
-        }
-
-        public int getMajor() {
-            return major;
-        }
-
-        public int getMinor() {
-            return minor;
-        }
-
-        public int getPatch() {
-            return patch;
-        }
-
-        public int getPos() {
-            return pos;
-        }
-    }
 }
