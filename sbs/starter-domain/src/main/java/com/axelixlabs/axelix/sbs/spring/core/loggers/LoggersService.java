@@ -31,17 +31,54 @@ import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundEx
  */
 public interface LoggersService {
 
+    /**
+     * @return the feed of loggers that exists in this application
+     */
     LoggersFeed getAllLoggers();
 
+    /**
+     * @param loggerName the name of the logger to retrieve.
+     * @return the profile of a single logger.
+     * @throws LoggerNotFoundException in case the logger with such name does not exist.
+     */
     SingleLoggerProfile getSingleLogger(String loggerName) throws LoggerNotFoundException;
 
+    /**
+     * @param groupName the name of the logger group to retrieve.
+     * @return the profile of a logger group with the given group name.
+     * @throws LoggerNotFoundException in case the logger group with such name does not exist.
+     */
     LoggersGroupProfile getLoggerGroup(String groupName) throws LoggerNotFoundException;
 
+    /**
+     * @param loggerName the name of the logger to whose logging level to change at runtime.
+     * @param changeRequest the request that represents the logging level change.
+     *
+     * @throws LoggerNotFoundException in case the logger with the given name cannot be found.
+     * @throws LogLevelNotFoundException in case the log level specified in request cannot be found.
+     */
     void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException;
 
+    /**
+     * @param groupName the name of the logger group to whose logging level to change at runtime.
+     * @param changeRequest the request that represents the logging level change.
+     *
+     * @throws LoggerNotFoundException in case the logger group with the given name cannot be found.
+     * @throws LogLevelNotFoundException in case the log level specified in request cannot be found.
+     */
     void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException;
 
+    /**
+     * Reset the logging level of the logger to the level that it is now supposed to be in. In other words,
+     * resetting means clearing the configured level (or resetting to the original, that was prior to any
+     * modifications from Axelix side) of this exact logger.
+     *
+     * @param loggerName the name of the logger to reset.
+     *
+     * @throws LoggerNotFoundException in case the logger with the given name cannot be found.
+     * @throws LogLevelNotFoundException in case the log level specified in request cannot be found.
+     */
     void resetLogLevelByLoggerName(String loggerName) throws LoggerNotFoundException, LogLevelNotFoundException;
 }

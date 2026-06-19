@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.utils.Lazy;
 
 /**
- *
+ * Default implementation of the {@link LoggerChange}.
  *
  * @author Mikhail Polivakha
  */
