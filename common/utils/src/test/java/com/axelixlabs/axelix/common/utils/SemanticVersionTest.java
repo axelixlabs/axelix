@@ -1,0 +1,196 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.common.utils;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+/**
+ * Unit tests for {@link SemanticVersion}.
+ *
+ * @author Nikita Kirillov
+ * @author Artemiy Degtyarev
+ */
+class SemanticVersionTest {
+
+    @ParameterizedTest
+    @MethodSource("invalidVersions")
+    void tryParseReturnsEmpty(String input) {
+        // when
+        Optional<SemanticVersion> actual = SemanticVersion.tryParse(input);
+
+        // then
+        assertThat(actual).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidVersions")
+    void parseThrows(String input) {
+        assertThatThrownBy(() -> SemanticVersion.parse(input)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    static Stream<Arguments> invalidVersions() {
+        return Stream.of(
+                Arguments.of((String) null),
+                Arguments.of(""),
+                Arguments.of("   "),
+                Arguments.of("abc"),
+                Arguments.of("v1"),
+                Arguments.of("1"),
+                Arguments.of("1.0"),
+                Arguments.of("1.0.0beta"),
+                Arguments.of("1x2x3"),
+                Arguments.of("1-2.3"),
+                Arguments.of("1.2.3-"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("majorCases")
+    void major(String input, int expected) {
+        // when
+        int actual = SemanticVersion.parse(input).major();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> majorCases() {
+        return Stream.of(
+                Arguments.of("3.5.2", 3),
+                Arguments.of("1.2.3.4", 1),
+                Arguments.of("2.5.0-SNAPSHOT", 2),
+                Arguments.of("3.0.0-RELEASE", 3));
+    }
+
+    @ParameterizedTest
+    @MethodSource("minorCases")
+    void minor(String input, int expected) {
+        // when
+        int actual = SemanticVersion.parse(input).minor();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> minorCases() {
+        return Stream.of(Arguments.of("3.5.2", 5), Arguments.of("1.2.3.4", 2), Arguments.of("2.5.0-SNAPSHOT", 5));
+    }
+
+    @ParameterizedTest
+    @MethodSource("majorMinorCases")
+    void majorMinor(String input, String expected) {
+        // when
+        String actual = SemanticVersion.parse(input).majorMinor();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> majorMinorCases() {
+        return Stream.of(
+                Arguments.of("3.5.2", "3.5"),
+                Arguments.of("1.2.3.4", "1.2"),
+                Arguments.of("2.5.0-SNAPSHOT", "2.5"),
+                Arguments.of("3.0.0-RELEASE", "3.0"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("versionNumberCases")
+    void versionNumber(String input, String expected) {
+        // when
+        String actual = SemanticVersion.parse(input).versionNumber();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> versionNumberCases() {
+        return Stream.of(
+                Arguments.of("3.0.15.RELEASE", "3.0.15"),
+                Arguments.of("1.2.0.Final", "1.2.0"),
+                Arguments.of("2.5.0-SNAPSHOT", "2.5.0"),
+                Arguments.of("1.2.3.4", "1.2.3"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("patchCases")
+    void patch(String input, int expected) {
+        // when
+        int actual = SemanticVersion.parse(input).patch();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> patchCases() {
+        return Stream.of(Arguments.of("3.0.15.RELEASE", 15), Arguments.of("1.2.3.4", 3));
+    }
+
+    @ParameterizedTest
+    @MethodSource("qualifierCases")
+    void qualifier(String input, String expected) {
+        // when
+        String actual = SemanticVersion.parse(input).qualifier();
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> qualifierCases() {
+        return Stream.of(
+                Arguments.of("3.0.15.RELEASE", "RELEASE"),
+                Arguments.of("1.2.0.Final", "Final"),
+                Arguments.of("2.5.0-SNAPSHOT", "SNAPSHOT"),
+                Arguments.of("1.2.3.4", "4"),
+                Arguments.of("1.2.0", null),
+                Arguments.of("1.2.0-beta.1", "beta.1"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("comparisonCases")
+    void compareTo(String left, String right, int expectedSign) {
+        // given
+        SemanticVersion a = SemanticVersion.parse(left);
+        SemanticVersion b = SemanticVersion.parse(right);
+
+        // when
+        int result = a.compareTo(b);
+
+        // then
+        assertThat(Integer.signum(result)).isEqualTo(expectedSign);
+    }
+
+    static Stream<Arguments> comparisonCases() {
+        return Stream.of(
+                Arguments.of("2.5.0", "2.4.9", 1),
+                Arguments.of("2.4.9", "2.5.0", -1),
+                Arguments.of("3.0.0", "3.0.0", 0),
+                Arguments.of("2.0.0", "1.9.9", 1),
+                Arguments.of("1.2.3", "1.2.4", -1),
+                Arguments.of("1.0.0-SNAPSHOT", "1.0.0.RELEASE", 0),
+                Arguments.of("1.0.0-SNAPSHOT", "1.0.0", -1),
+                Arguments.of("1.0.0", "1.0.0-SNAPSHOT", 1));
+    }
+}
