@@ -113,15 +113,10 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
                     .collect(Collectors.toSet());
 
             assertThat(sanitizedPropertyNames)
-                    .contains(
+                    .containsOnly(
                             "axelix.prop.test.tags.forSanitization",
                             "axelix.prop.test.tags.FOR_SANITIZATION",
-                            "axelix.env.test.toBeSanitized")
-                    .isSubsetOf(
-                            "axelix.prop.test.tags.forSanitization",
-                            "axelix.prop.test.tags.FOR_SANITIZATION",
-                            "axelix.env.test.toBeSanitized",
-                            "AXELIX_FOR_SANITIZATION");
+                            "axelix.env.test.toBeSanitized");
         }
 
         @Test
