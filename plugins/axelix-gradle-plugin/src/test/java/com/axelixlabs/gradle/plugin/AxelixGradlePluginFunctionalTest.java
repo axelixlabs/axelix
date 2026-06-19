@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AxelixGradlePluginFunctionalTest {
 
-    private static final String MIN_GRADLE_VERSION = "4.0";
+    private static final String MIN_GRADLE_VERSION = "5.0";
     private static final String MAX_GRADLE_VERSION = "9.5.1";
 
     @TempDir
@@ -43,7 +43,7 @@ class AxelixGradlePluginFunctionalTest {
     @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
     void addsProfilerDependencyToTestRuntimeClasspath(String gradleVersion) throws IOException {
         // given.
-        writeCommonProjectFiles(gradleVersion);
+        writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.buildScript("profiler-dependency.gradle"));
 
         // when.
@@ -59,7 +59,7 @@ class AxelixGradlePluginFunctionalTest {
     @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
     void doesNotContributeProfilerOrThymeleafWhenAlreadyDeclared(String gradleVersion) throws IOException {
         // given.
-        writeCommonProjectFiles(gradleVersion);
+        writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.buildScript("preexisting-versions.gradle"));
 
         // when.
@@ -77,9 +77,9 @@ class AxelixGradlePluginFunctionalTest {
 
     @ParameterizedTest
     @ValueSource(strings = {MIN_GRADLE_VERSION, MAX_GRADLE_VERSION})
-    void bumpsThymeleafWhenDeclaredVersionIsBelowMinimum(String gradleVersion) throws IOException {
+    void noOpWhenDeclaredThymeleafVersionIsBelowMinimum(String gradleVersion) throws IOException {
         // given.
-        writeCommonProjectFiles(gradleVersion);
+        writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.buildScript("outdated-thymeleaf.gradle"));
 
         // when.
@@ -90,46 +90,22 @@ class AxelixGradlePluginFunctionalTest {
         assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(result.getOutput())
                 .contains("DEP>> org.thymeleaf:thymeleaf:3.0.15.RELEASE")
-                .contains("DEP>> org.thymeleaf:thymeleaf:3.1.3.RELEASE");
+                .doesNotContain("org.thymeleaf:thymeleaf:3.1.3.RELEASE")
+                .doesNotContain("digital.pragmatech.testing:spring-test-profiler");
     }
 
     private GradleRunner createRunner(String gradleVersion, String... arguments) {
-        // Never call withDebug(true) here: a debug run executes the build in-process on the
-        // current (modern) JVM, bypassing the JDK 8 daemon required by Gradle 4.0.
         return GradleRunner.create()
                 .withProjectDir(projectDir.toFile())
                 .withPluginClasspath()
                 .withGradleVersion(gradleVersion)
                 .withArguments(arguments)
-            .withDebug(true);
-    }
-
-    private void writeCommonProjectFiles(String gradleVersion) throws IOException {
-        writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
-        if (gradleVersion.startsWith("4.")) {
-            // Gradle 4.0 daemons cannot run on Java 9+, so fork them on a JDK 8.
-            writeFile(
-                    "gradle.properties",
-                    "org.gradle.java.home=" + locateJdk8Home() + "\n" + "org.gradle.jvmargs=-Xmx512m\n");
-        }
+                .withDebug(true);
     }
 
     private void writeFile(String relativePath, String content) throws IOException {
         Path file = projectDir.resolve(relativePath);
         Files.createDirectories(file.getParent());
         Files.write(file, content.getBytes(UTF_8));
-    }
-
-    private static String locateJdk8Home() {
-        String override = System.getenv("AXELIX_TEST_JDK8_HOME");
-        if (override != null && !override.isEmpty()) {
-            return override;
-        }
-        throw new IllegalStateException("No JDK 8 found for the Gradle "
-                + MIN_GRADLE_VERSION
-                + " functional tests. Install Liberica JDK 8 via sdkman:\n"
-                + "  source ~/.sdkman/bin/sdkman-init.sh && echo n | sdk install java"
-                + " 8.0.492-librca\n"
-                + "and point AXELIX_TEST_JDK8_HOME at the JDK 8 installation.");
     }
 }

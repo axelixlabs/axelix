@@ -19,6 +19,9 @@ package com.axelixlabs.gradle.plugin;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
+
+import com.axelixlabs.axelix.common.utils.SemanticVersion;
 
 /**
  * Axelix Gradle plugin entry point.
@@ -29,8 +32,24 @@ import org.gradle.api.Project;
  * {@code JavaPluginExtension.getSourceSets()} was only added in 7.1).
  *
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
 public class AxelixGradlePlugin implements Plugin<Project> {
+
+    private static final String TEST_IMPLEMENTATION = "testImplementation";
+    private static final String TEST_RUNTIME_ONLY = "testRuntimeOnly";
+
+    static final String PROFILER_GROUP = "digital.pragmatech.testing";
+    static final String PROFILER_NAME = "spring-test-profiler";
+    static final String PROFILER_VERSION = "0.1.2";
+    static final String PROFILER_DEPENDENCY = PROFILER_GROUP + ":" + PROFILER_NAME + ":" + PROFILER_VERSION;
+
+    public static final String THYMELEAF_GROUP = "org.thymeleaf";
+    public static final String THYMELEAF_NAME = "thymeleaf";
+    public static final String THYMELEAF_VERSION = "3.1.5.RELEASE";
+    public static final String THYMELEAF_DEPENDENCY = THYMELEAF_GROUP + ":" + THYMELEAF_NAME + ":" + THYMELEAF_VERSION;
+    /** Minimum Thymeleaf version the profiler's HTML report renders on. */
+    private static final SemanticVersion MIN_THYMELEAF_VERSION = SemanticVersion.parse("3.1.3");
 
     @Override
     public void apply(final Project project) {
@@ -38,12 +57,61 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     }
 
     private void configure(Project project) {
-        InternalConfiguration configuration = new InternalConfiguration(project);
 
-        TestClasspathDependencyApplier testClasspathDependencyApplier = configuration.getTestClasspathDependencyApplier();
-        project.getConfigurations().getByName("testRuntimeClasspath").withDependencies(testClasspathDependencyApplier);
+        ModuleComponentIdentifier springBootTestProfiler = findSpringBootTestProfilerDependency(project);
 
-        CompileClasspathDependencyApplier compileClasspathDependencyApplier = configuration.getCompileClasspathDependencyApplier();
-        project.getConfigurations().getByName("compileClasspath").withDependencies(compileClasspathDependencyApplier);
+        if (springBootTestProfiler == null) {
+            // Spring Boot Test profiler needs thymeleaf to render html templates
+            ModuleComponentIdentifier thymeleaf = findThymeleaf(project);
+
+            if (thymeleaf == null) {
+                addBothThymeleafAndSpringBootTestProfiler(project);
+            } else if (SemanticVersion.parse(thymeleaf.getVersion()).isAtLeast(MIN_THYMELEAF_VERSION)) {
+                addJustSpringBootTestProfiler(project);
+            } else {
+                logUnableToProfileSpringBootTests(project);
+            }
+        } else {
+            project.getLogger()
+                    .info(
+                            "Everything's good, Spring Boot Test profiler of version {} is already included",
+                            springBootTestProfiler.getVersion());
+        }
+    }
+
+    private static void addJustSpringBootTestProfiler(Project project) {
+        project.getLogger()
+                .info("Adding just Spring Boot Test Profiler of version {} to your tests classpath", PROFILER_VERSION);
+        project.getDependencies().add(TEST_RUNTIME_ONLY, PROFILER_DEPENDENCY);
+    }
+
+    private static void addBothThymeleafAndSpringBootTestProfiler(Project project) {
+        project.getLogger()
+                .info(
+                        "Adding thymeleaf of version {} and Spring Boot Test Profiler of version {} to your tests classpath",
+                        THYMELEAF_VERSION,
+                        PROFILER_VERSION);
+        project.getDependencies().add(TEST_IMPLEMENTATION, THYMELEAF_DEPENDENCY);
+        project.getDependencies().add(TEST_RUNTIME_ONLY, PROFILER_DEPENDENCY);
+    }
+
+    private static void logUnableToProfileSpringBootTests(Project project) {
+        project.getLogger()
+                .warn(
+                        "Unable to profile Spring Boot Tests. Your application uses thymeleaf of version {} (either directly, or indirectly), "
+                                + "which is incompatible with Spring Boot Test Profiler. To avoid JAR hell, we're leaving you classpath "
+                                + "untouched. In order to take advantage of Spring Boot Test Profiler, please, increase thymeleaf version to at least {}",
+                        MIN_THYMELEAF_VERSION,
+                        MIN_THYMELEAF_VERSION);
+    }
+
+    private static ModuleComponentIdentifier findThymeleaf(Project project) {
+        return DependencyUtils.findInTheConfigurationClasspath(
+                project, TEST_IMPLEMENTATION, THYMELEAF_GROUP, THYMELEAF_NAME);
+    }
+
+    private static ModuleComponentIdentifier findSpringBootTestProfilerDependency(Project project) {
+        return DependencyUtils.findInTheConfigurationClasspath(
+                project, TEST_RUNTIME_ONLY, PROFILER_GROUP, PROFILER_NAME);
     }
 }

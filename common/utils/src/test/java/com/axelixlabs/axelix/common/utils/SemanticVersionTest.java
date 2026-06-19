@@ -193,4 +193,30 @@ class SemanticVersionTest {
                 Arguments.of("1.0.0-SNAPSHOT", "1.0.0", -1),
                 Arguments.of("1.0.0", "1.0.0-SNAPSHOT", 1));
     }
+
+    @ParameterizedTest
+    @MethodSource("isAtLeastCases")
+    void isAtLeast(String subject, String minimum, boolean expected) {
+        // given
+        SemanticVersion actualSubject = SemanticVersion.parse(subject);
+        SemanticVersion actualMinimum = SemanticVersion.parse(minimum);
+
+        // when
+        boolean result = actualSubject.isAtLeast(actualMinimum);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> isAtLeastCases() {
+        return Stream.of(
+                Arguments.of("2.5.0", "2.4.9", true),
+                Arguments.of("2.4.9", "2.5.0", false),
+                Arguments.of("3.0.0", "3.0.0", true),
+                Arguments.of("2.0.0", "1.9.9", true),
+                Arguments.of("1.2.3", "1.2.4", false),
+                Arguments.of("1.0.0-SNAPSHOT", "1.0.0.RELEASE", true),
+                Arguments.of("1.0.0-SNAPSHOT", "1.0.0", false),
+                Arguments.of("1.0.0", "1.0.0-SNAPSHOT", true));
+    }
 }

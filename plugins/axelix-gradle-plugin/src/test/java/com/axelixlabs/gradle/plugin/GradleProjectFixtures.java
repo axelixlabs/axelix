@@ -32,15 +32,6 @@ final class GradleProjectFixtures {
         return load(fixtureName);
     }
 
-    /**
-     * Loads a Java-source fixture. The sources are stored with a {@code .java.txt} suffix so that
-     * Spotless (which targets {@code src/**}/{@code *.java}) does not reformat them or inject a
-     * license header into the generated test project.
-     */
-    static String javaSource(String fixtureName) {
-        return load(fixtureName);
-    }
-
     private static String load(String fixtureName) {
         try (InputStream in = GradleProjectFixtures.class.getResourceAsStream(fixtureName)) {
             if (in == null) {

@@ -142,6 +142,10 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         return version.substring(pos + 1);
     }
 
+    public boolean isAtLeast(SemanticVersion semanticVersion) {
+        return this.compareTo(semanticVersion) >= 0;
+    }
+
     /**
      * Parses number from version string
      *
