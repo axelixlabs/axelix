@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpointTest.AxelixGcEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -180,7 +182,8 @@ class AxelixGcEndpointTest {
 
         @Bean
         public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
-            return new DefaultGcLogService(jcmdExecutor);
+            return new DefaultGcLogService(
+                    jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
         }
 
         @Bean

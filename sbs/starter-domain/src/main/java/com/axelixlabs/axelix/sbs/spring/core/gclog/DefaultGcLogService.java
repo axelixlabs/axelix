@@ -20,12 +20,12 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
  * Default implementation of {@link GcLogService}.
@@ -35,11 +35,10 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
  */
 public class DefaultGcLogService implements GcLogService {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultGcLogService.class);
-
     private static final String DEFAULT_FILE_NAME = "gc.log";
 
     private final JcmdExecutor jcmdExecutor;
+    private final Logger logger;
 
     @Nullable
     private volatile String pid;
@@ -47,8 +46,9 @@ public class DefaultGcLogService implements GcLogService {
     @Nullable
     private volatile List<String> availableLevels;
 
-    public DefaultGcLogService(JcmdExecutor jcmdExecutor) {
+    public DefaultGcLogService(JcmdExecutor jcmdExecutor, Logger logger) {
         this.jcmdExecutor = jcmdExecutor;
+        this.logger = logger;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class DefaultGcLogService implements GcLogService {
                 throw new GcLogException(result.getOutput());
             }
 
-            log.info("GC logging enabled: level={}, file={}", level, DEFAULT_FILE_NAME);
+            logger.info("GC logging enabled: level={}, file={}", level, DEFAULT_FILE_NAME);
 
         } catch (Exception e) {
             throw new GcLogException("Failed to enable GC logging", e);
@@ -123,7 +123,7 @@ public class DefaultGcLogService implements GcLogService {
                 throw new GcLogException(result.getOutput());
             }
 
-            log.info("GC logging disabled");
+            logger.info("GC logging disabled");
 
         } catch (Exception e) {
             throw new GcLogException("Failed to disable GC logging", e);
@@ -181,7 +181,7 @@ public class DefaultGcLogService implements GcLogService {
                             .map(String::trim)
                             .map(String::toLowerCase)
                             .filter(level -> !level.equals("off"))
-                            .toList();
+                            .collect(Collectors.toList());
                 }
             }
 

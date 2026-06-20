@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.DefaultGcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -119,7 +121,7 @@ class AxelixGcEndpointAutoConfigurationTest {
 
     static class CustomGcLogService extends DefaultGcLogService {
         public CustomGcLogService(JcmdExecutor jcmdExecutor) {
-            super(jcmdExecutor);
+            super(jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
         }
     }
 

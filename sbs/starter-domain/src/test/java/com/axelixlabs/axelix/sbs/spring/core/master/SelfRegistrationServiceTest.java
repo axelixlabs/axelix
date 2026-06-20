@@ -52,7 +52,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
+import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -267,17 +267,5 @@ class SelfRegistrationServiceTest {
                 + "\",\"instanceActuatorUrl\":\""
                 + metadata.getInstanceActuatorUrl()
                 + "\"}";
-    }
-
-    private static final class NoOpLogger implements Logger {
-
-        @Override
-        public void trace(String message, Object... args) {}
-
-        @Override
-        public void info(String message, Object... args) {}
-
-        @Override
-        public void debug(String message, Object... args) {}
     }
 }

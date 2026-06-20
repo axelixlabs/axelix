@@ -31,6 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class DefaultGcLogServiceTest {
 
-    private static final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor());
+    private static final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor(), new NoOpLogger());
 
     @AfterEach
     void tearDown() {
