@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -63,11 +62,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");
-        assertThat(instance.vmFeatures().features()).hasSize(1).first().satisfies(vmFeature -> {
-            assertThat(vmFeature.name()).isEqualTo("AppCDS");
-            assertThat(vmFeature.description()).isEqualTo("AppCDS Description");
-            assertThat(vmFeature.enabled()).isFalse();
-        });
+        assertThat(instance.vmFeatures().features()).isEmpty();
     }
 
     private BasicDiscoveryMetadata mapMetadata() {
@@ -76,9 +71,6 @@ public class DefaultInstanceFactoryTest {
 
         BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
 
-        BasicDiscoveryMetadata.VMFeature vmFeature =
-                new BasicDiscoveryMetadata.VMFeature("AppCDS", "AppCDS Description", false);
-
         return new BasicDiscoveryMetadata(
                 "1.0.0-SNAPSHOT",
                 "3.5.0-SNAPSHOT",
@@ -86,7 +78,6 @@ public class DefaultInstanceFactoryTest {
                 "BellSoft",
                 softwareVersions,
                 BasicDiscoveryMetadata.HealthStatus.UP,
-                memoryDetails,
-                List.of(vmFeature));
+                memoryDetails);
     }
 }

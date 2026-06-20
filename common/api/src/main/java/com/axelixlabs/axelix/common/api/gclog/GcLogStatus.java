@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
-public final class GcLogStatusResponse {
+public final class GcLogStatus {
 
     private final boolean enabled;
 
@@ -48,7 +48,7 @@ public final class GcLogStatusResponse {
      * @param availableLevels list of available GC log levels supported by the JVM
      */
     @JsonCreator
-    public GcLogStatusResponse(
+    public GcLogStatus(
             @JsonProperty("enabled") boolean enabled,
             @JsonProperty("level") @Nullable String level,
             @JsonProperty("availableLevels") List<String> availableLevels) {
@@ -78,7 +78,7 @@ public final class GcLogStatusResponse {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GcLogStatusResponse that = (GcLogStatusResponse) o;
+        GcLogStatus that = (GcLogStatus) o;
         return enabled == that.enabled
                 && Objects.equals(level, that.level)
                 && Objects.equals(availableLevels, that.availableLevels);

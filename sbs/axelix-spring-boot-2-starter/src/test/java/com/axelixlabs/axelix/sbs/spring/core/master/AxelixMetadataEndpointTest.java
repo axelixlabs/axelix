@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
-
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
@@ -61,12 +59,6 @@ class AxelixMetadataEndpointTest {
     static class CurrentConfig {
 
         @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
-
-        @Bean
         HealthDetectionFunction healthDetectionFunction() {
             return () -> BasicDiscoveryMetadata.HealthStatus.UP;
         }
@@ -92,7 +84,7 @@ class AxelixMetadataEndpointTest {
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
         JsonAssertions.assertThatJson(result.getBody())
                 // we do not want to know exactly the java version on which the test is going to run
-                .whenIgnoringPaths("softwareVersions", "vmFeatures")
+                .whenIgnoringPaths("softwareVersions")
                 .isEqualTo("{\n" + "  \"version\": \"1.1.3\",\n"
                         + "  \"serviceVersion\" : \"3.5.0-SNAPSHOT\",\n"
                         + "  \"commitShortSha\" : \"a8b0929\",\n"
@@ -106,8 +98,7 @@ class AxelixMetadataEndpointTest {
                         + "  \"healthStatus\" : \"UP\",\n"
                         + "  \"memoryDetails\" : {\n"
                         + "    \"heap\" : \"#{json-unit.ignore}\"\n"
-                        + "  },\n"
-                        + "  \"vmFeatures\": []\n"
+                        + "  }\n"
                         + "}");
     }
 

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +69,7 @@ class DefaultGcLogServiceTest {
     @MethodSource("availableLevelsProvider")
     void shouldEnableGcLoggingForEveryAvailableLevel(String level) {
         subject.enable(level);
-        GcLogStatusResponse status = subject.getStatus();
+        GcLogStatus status = subject.getStatus();
 
         assertThat(status.isEnabled()).isTrue();
         assertThat(status.getLevel()).isEqualTo(level);
@@ -88,7 +88,7 @@ class DefaultGcLogServiceTest {
         subject.enable(availableLevels.get(0));
         subject.disable();
 
-        GcLogStatusResponse status = subject.getStatus();
+        GcLogStatus status = subject.getStatus();
 
         assertThat(status.isEnabled()).isFalse();
         assertThat(status.getLevel()).isNull();

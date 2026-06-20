@@ -50,7 +50,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
         JsonAssertions.assertThatJson(result.getBody())
                 // we do not want to know exactly the java version on which the test is going to run
-                .whenIgnoringPaths("softwareVersions", "vmFeatures")
+                .whenIgnoringPaths("softwareVersions")
                 .isEqualTo(
                         // language=json
                         """
@@ -68,8 +68,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : "#{json-unit.ignore}"
-              },
-              "vmFeatures": []
+              }
             }
             """);
     }

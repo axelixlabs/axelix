@@ -15,22 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.master;
+package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
-import java.util.List;
-
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.VMFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insight;
 
 /**
- * Provides the information about specific VM features that are either used, or can potentially
- * be used for the benefit of the current application, for example AppCDS, AotCache, Compressed Object Headers etc.
+ * Provides insights discovered for the current service instance.
  *
+ * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public interface VMFeaturesProvider {
+public interface InsightsInfoProvider {
 
     /**
-     * @return the actual list of VM features.
+     * @return the actual insight information.
      */
-    List<VMFeature> discover();
+    Insight getInsight();
 }

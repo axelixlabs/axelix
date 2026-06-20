@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -87,10 +87,7 @@ public class GcLogFileApi {
     @ApiResponse(
             description = "GC logging status",
             responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = GcLogStatusResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = GcLogStatus.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.GcLogFileApi.STATUS_GC_LOGGING)
     public ResponseEntity<byte[]> getStatus(@PathVariable("instanceId") String instanceId) {

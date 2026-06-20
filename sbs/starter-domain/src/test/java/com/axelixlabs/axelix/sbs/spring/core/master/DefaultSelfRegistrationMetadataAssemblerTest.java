@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -88,12 +87,6 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
             return () -> BasicDiscoveryMetadata.HealthStatus.UP;
-        }
-
-        @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
         }
 
         @Bean

@@ -15,26 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.utils;
-
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.jspecify.annotations.Nullable;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
 /**
- * Utilities needed to work with {@link String} objects.
+ * Provides the current Spring Open Session in View state.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public class StringUtils {
+public interface OpenSessionInViewStateProvider {
 
-    public static String emptyIfNull(@Nullable String target) {
-        return target != null ? target : "";
-    }
-
-    public static Set<String> toSet(String... strings) {
-        return Arrays.stream(strings).collect(Collectors.toSet());
-    }
+    /**
+     * @return {@code true} if Spring Open Session in View is enabled.
+     */
+    boolean isOpenSessionInViewEnabled();
 }

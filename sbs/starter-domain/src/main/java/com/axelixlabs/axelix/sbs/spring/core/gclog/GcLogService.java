@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 
 import java.io.File;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 
 /**
  * Service for managing JVM GC logging at runtime.
@@ -35,7 +35,7 @@ public interface GcLogService {
      * @return current GC logging status
      * @throws GcLogException if the GC logging status cannot be reliably determined
      */
-    GcLogStatusResponse getStatus() throws GcLogException;
+    GcLogStatus getStatus() throws GcLogException;
 
     /**
      * Returns a {@link File} pointing to the JVM GC log.

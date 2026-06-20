@@ -143,14 +143,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
-              },
-              "vmFeatures": [
-                   {
-                     "name" : "AppCDS",
-                     "description" : "AppCDS Description",
-                     "enabled" : false
-                   }
-              ]
+              }
             }
         """;
 
@@ -188,8 +181,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);
         assertThat(registeredInstances)
-                .flatExtracting(inst -> inst.vmFeatures().features())
-                .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
+                .allSatisfy(
+                        instance -> assertThat(instance.vmFeatures().features()).isEmpty());
     }
 
     @Test
@@ -213,14 +206,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
-              },
-              "vmFeatures": [
-                   {
-                     "name" : "AppCDS",
-                     "description" : "AppCDS Description",
-                     "enabled" : false
-                   }
-              ]
+              }
             }
             """;
 
@@ -240,14 +226,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
-              },
-              "vmFeatures": [
-                   {
-                     "name" : "AppCDS",
-                     "description" : "AppCDS Description",
-                     "enabled" : false
-                   }
-              ]
+              }
             }
             """;
 
@@ -277,9 +256,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
             assertThat(instance.commitShaShort()).isEqualTo("910230");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
-            assertThat(instance.vmFeatures().features())
-                    .hasSize(1)
-                    .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
+            assertThat(instance.vmFeatures().features()).isEmpty();
         });
     }
 
@@ -304,14 +281,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
-              },
-              "vmFeatures": [
-                   {
-                     "name" : "AppCDS",
-                     "description" : "AppCDS Description",
-                     "enabled" : false
-                   }
-              ]
+              }
             }
             """;
 
@@ -374,14 +344,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
-             },
-             "vmFeatures": [
-               {
-                 "name" : "AppCDS",
-                 "description" : "AppCDS Description",
-                 "enabled" : false
-               }
-             ]
+             }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
              "instanceName" : "petclinic",
@@ -423,14 +386,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
-             },
-             "vmFeatures": [
-               {
-                 "name" : "AppCDS",
-                 "description" : "AppCDS Description",
-                 "enabled" : false
-               }
-             ]
+             }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
              "instanceName" : "petclinic",
@@ -463,14 +419,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
-              },
-              "vmFeatures": [
-                   {
-                     "name" : "AppCDS",
-                     "description" : "AppCDS Description",
-                     "enabled" : false
-                   }
-              ]
+              }
             }
             """;
 

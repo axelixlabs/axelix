@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * @since 30.12.2025
  * @author Nikita Kirillov
  */
+// TODO This service requests to be moved to the starter‑domain
 public class DefaultGcLogService implements GcLogService {
 
     private static final String DEFAULT_FILE_NAME = "gc.log";
@@ -51,8 +52,9 @@ public class DefaultGcLogService implements GcLogService {
         this.logger = logger;
     }
 
+    // TODO We need to enhance the GC Logging status monitoring https://github.com/axelixlabs/axelix/issues/573
     @Override
-    public GcLogStatusResponse getStatus() {
+    public GcLogStatus getStatus() {
         try {
             ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "list");
 
@@ -192,7 +194,7 @@ public class DefaultGcLogService implements GcLogService {
         }
     }
 
-    private GcLogStatusResponse parseStatus(String output) {
+    private GcLogStatus parseStatus(String output) {
         for (String line : output.split("\n")) {
             String trim = line.trim();
 
@@ -204,11 +206,11 @@ public class DefaultGcLogService implements GcLogService {
                 }
 
                 String level = trim.substring(idx + 3, end);
-                return new GcLogStatusResponse(true, level, getAvailableLevels());
+                return new GcLogStatus(true, level, getAvailableLevels());
             }
         }
 
-        return new GcLogStatusResponse(false, null, getAvailableLevels());
+        return new GcLogStatus(false, null, getAvailableLevels());
     }
 
     private void validateLevel(String level) {

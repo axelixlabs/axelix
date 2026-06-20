@@ -64,14 +64,7 @@ public class SelfRegisteredApiTest {
          "healthStatus" : "UP",
          "memoryDetails" : {
            "heap" : 12000
-         },
-         "vmFeatures": [
-           {
-             "name" : "AppCDS",
-             "description" : "AppCDS Description",
-             "enabled" : false
-           }
-         ]
+         }
        },
          "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
          "instanceName" : "petclinic",
