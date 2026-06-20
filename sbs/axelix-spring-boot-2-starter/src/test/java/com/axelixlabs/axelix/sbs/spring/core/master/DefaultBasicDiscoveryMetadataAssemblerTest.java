@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,12 +50,6 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
 
     @TestConfiguration
     static class CurrentConfig {
-
-        @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {

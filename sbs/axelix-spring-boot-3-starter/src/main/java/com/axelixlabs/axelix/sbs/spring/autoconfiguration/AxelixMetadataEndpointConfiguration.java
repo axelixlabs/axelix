@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
@@ -38,10 +37,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationPro
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.OptionsParsingVMFeaturesProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.VMFeaturesProvider;
 
 /**
  * Auto-configuration for the {@link AxelixMetadataEndpoint}.
@@ -65,13 +62,6 @@ public class AxelixMetadataEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public VMFeaturesProvider vmFeaturesProvider() {
-        return new OptionsParsingVMFeaturesProvider(
-                ManagementFactory.getRuntimeMXBean().getInputArguments());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public LibraryInformationProvider libraryInformationProvider() {
         return new DefaultLibraryInformationProvider();
     }
@@ -83,14 +73,12 @@ public class AxelixMetadataEndpointConfiguration {
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            VMFeaturesProvider vmFeaturesProvider,
             LibraryInformationProvider libraryInformationProvider) {
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
                 gitInformationProviders,
                 shortBuildInfoProviders,
-                vmFeaturesProvider,
                 libraryInformationProvider);
     }
 

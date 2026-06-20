@@ -43,7 +43,6 @@ public final class BasicDiscoveryMetadata {
     private final SoftwareVersions softwareVersions;
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
-    private final List<VMFeature> vmFeatures;
 
     /**
      * Creates a new ServiceMetadata.
@@ -60,7 +59,6 @@ public final class BasicDiscoveryMetadata {
      * @param healthStatus     the health status of the given instance that is reported by started infrastructure.
      *                         Never {@code null}.
      * @param memoryDetails    the memory details.
-     * @param vmFeatures       the VM features.
      */
     @JsonCreator
     public BasicDiscoveryMetadata(
@@ -70,8 +68,7 @@ public final class BasicDiscoveryMetadata {
             @JsonProperty("jdkVendor") String jdkVendor,
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
-            @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
-            @JsonProperty("vmFeatures") List<VMFeature> vmFeatures) {
+            @JsonProperty("memoryDetails") MemoryDetails memoryDetails) {
         this.version = version;
         this.serviceVersion = serviceVersion;
         this.commitShortSha = commitShortSha;
@@ -79,7 +76,6 @@ public final class BasicDiscoveryMetadata {
         this.softwareVersions = softwareVersions;
         this.healthStatus = healthStatus;
         this.memoryDetails = memoryDetails;
-        this.vmFeatures = vmFeatures;
     }
 
     public String getVersion() {
@@ -110,10 +106,6 @@ public final class BasicDiscoveryMetadata {
         return memoryDetails;
     }
 
-    public List<VMFeature> getVmFeatures() {
-        return vmFeatures;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -129,21 +121,13 @@ public final class BasicDiscoveryMetadata {
                 && Objects.equals(jdkVendor, that.jdkVendor)
                 && Objects.equals(softwareVersions, that.softwareVersions)
                 && healthStatus == that.healthStatus
-                && Objects.equals(memoryDetails, that.memoryDetails)
-                && Objects.equals(vmFeatures, that.vmFeatures);
+                && Objects.equals(memoryDetails, that.memoryDetails);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                version,
-                serviceVersion,
-                commitShortSha,
-                jdkVendor,
-                softwareVersions,
-                healthStatus,
-                memoryDetails,
-                vmFeatures);
+                version, serviceVersion, commitShortSha, jdkVendor, softwareVersions, healthStatus, memoryDetails);
     }
 
     @Override
@@ -167,74 +151,7 @@ public final class BasicDiscoveryMetadata {
                 + healthStatus
                 + ", memoryDetails="
                 + memoryDetails
-                + ", vmFeatures="
-                + vmFeatures
                 + '}';
-    }
-
-    /**
-     * The specific feature of the current runtime.
-     */
-    public static final class VMFeature {
-
-        private final String name;
-        private final String description;
-        private final boolean enabled;
-
-        @JsonCreator
-        public VMFeature(
-                @JsonProperty("name") String name,
-                @JsonProperty("description") String description,
-                @JsonProperty("enabled") boolean enabled) {
-            this.name = name;
-            this.description = description;
-            this.enabled = enabled;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            VMFeature vmFeature = (VMFeature) o;
-            return enabled == vmFeature.enabled
-                    && Objects.equals(name, vmFeature.name)
-                    && Objects.equals(description, vmFeature.description);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, description, enabled);
-        }
-
-        @Override
-        public String toString() {
-            return "VMFeature{"
-                    + "name='"
-                    + name
-                    + '\''
-                    + ", description='"
-                    + description
-                    + '\''
-                    + ", enabled="
-                    + enabled
-                    + '}';
-        }
     }
 
     /**

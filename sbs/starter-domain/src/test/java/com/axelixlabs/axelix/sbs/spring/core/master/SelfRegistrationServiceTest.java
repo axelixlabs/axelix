@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +72,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         })
 @Import({
     DefaultServiceMetadataAssembler.class,
-    OptionsParsingVMFeaturesProvider.class,
     SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class
 })
 class SelfRegistrationServiceTest {
@@ -139,12 +137,6 @@ class SelfRegistrationServiceTest {
 
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler, selfRegistrationConfigurationProperties);
-        }
-
-        @Bean
-        public VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
         }
 
         @Bean

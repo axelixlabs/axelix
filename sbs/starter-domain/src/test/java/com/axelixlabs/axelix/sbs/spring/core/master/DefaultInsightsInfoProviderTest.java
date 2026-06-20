@@ -17,15 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insight;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.ProcessResult;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.APP_CDS;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.AOT_CACHE;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.COMPACT_OBJECT_HEADERS;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOGGING_ENABLED;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOG_FILE_SPECIFIED;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.OSIV;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,124 +48,98 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsDisabledInsights_whenOptionsAreEmptyAndOsivDisabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(List.of(), osivDisabled(), jcmdOutput(""));
+        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
         Insight insight = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AppCDS", false);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AotCache", false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), "GC Logging", false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), "GC Log file Specified", false);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), "Compressed Object Headers", false);
-        assertFeatureEnabled(insight.getSpringFramework(), "OSIV", false);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, false);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), AOT_CACHE, false);
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, false);
+        assertFeatureEnabled(insight.getSpringFramework(), OSIV, false);
     }
 
     @Test
     void returnsProjectLeydenInsightsEnabled_whenCorrespondingOptionsPresent() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                List.of("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"),
                 osivDisabled(),
-                jcmdOutput(""));
+                gcLogDisabled(),
+                vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"));
 
         // when.
         Insight insight = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AppCDS", true);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AotCache", true);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, true);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), AOT_CACHE, true);
     }
 
     @Test
     void returnsAppCdsEnabled_whenSharedArchiveFilePresent() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                List.of("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"), osivDisabled(), jcmdOutput(""));
+                osivDisabled(), gcLogDisabled(), vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"));
 
         // when.
         Insight insight = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AppCDS", true);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, true);
     }
 
     @Test
-    void returnsAppCdsDisabled_whenXshareOffPresent() {
+    void returnsGcLoggingEnabled_whenGcLogServiceReportsEnabled() {
+        // given.
+        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogEnabled(), emptyVmOptions());
+
+        // when.
+        Insight insight = subject.getInsight();
+
+        // then.
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, true);
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+    }
+
+    @Test
+    void returnsGcLoggingDisabled_whenGcLogServiceReportsDisabled() {
+        // given.
+        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
+
+        // when.
+        Insight insight = subject.getInsight();
+
+        // then.
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+    }
+
+    @Test
+    void returnsCompactObjectHeadersEnabled_whenOptionPresent() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                List.of("-XX:SharedArchiveFile=/path/to/archive.jsa", "-Xshare:off"), osivDisabled(), jcmdOutput(""));
+                osivDisabled(), gcLogDisabled(), vmOptions("-XX:+UseCompactObjectHeaders"));
 
         // when.
         Insight insight = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AppCDS", false);
-    }
-
-    @Test
-    void returnsAppCdsDisabled_whenXshareOffThenSharedArchiveFile() {
-        // given.
-        var subject = new DefaultInsightsInfoProvider(
-                List.of("-Xshare:off", "-XX:SharedArchiveFile=/path/to/archive.jsa"), osivDisabled(), jcmdOutput(""));
-
-        // when.
-        Insight insight = subject.getInsight();
-
-        // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), "AppCDS", false);
-    }
-
-    @Test
-    void returnsGcLogFileSpecifiedEnabled_whenJcmdOutputContainsGcFileOutput() {
-        // given.
-        var subject =
-                new DefaultInsightsInfoProvider(List.of(), osivDisabled(), jcmdOutput("#1: file=/tmp/gc.log gc=debug"));
-
-        // when.
-        Insight insight = subject.getInsight();
-
-        // then.
-        assertFeatureEnabled(insight.getHotSpot().getGc(), "GC Log file Specified", true);
-    }
-
-    @Test
-    void returnsGcInsightsDisabled_whenJcmdFails() {
-        // given.
-        var subject = new DefaultInsightsInfoProvider(List.of(), osivDisabled(), failingJcmd());
-
-        // when.
-        Insight insight = subject.getInsight();
-
-        // then.
-        assertFeatureEnabled(insight.getHotSpot().getGc(), "GC Logging", false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), "GC Log file Specified", false);
-    }
-
-    @Test
-    void returnsCompressedObjectHeadersEnabled_whenOptionPresent() {
-        // given.
-        var subject = new DefaultInsightsInfoProvider(
-                List.of("-XX:+UseCompactObjectHeaders"), osivDisabled(), jcmdOutput(""));
-
-        // when.
-        Insight insight = subject.getInsight();
-
-        // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), "Compressed Object Headers", true);
+        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, true);
     }
 
     @Test
     void returnsOsivEnabled_whenOpenSessionInViewEnabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(List.of(), osivEnabled(), jcmdOutput(""));
+        var subject = new DefaultInsightsInfoProvider(osivEnabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
         Insight insight = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getSpringFramework(), "OSIV", true);
+        assertFeatureEnabled(insight.getSpringFramework(), OSIV, true);
     }
 
     private static void assertFeatureEnabled(List<InsightFeature> features, String name, boolean enabled) {
@@ -173,12 +156,20 @@ class DefaultInsightsInfoProviderTest {
                 .orElse(null);
     }
 
-    private static JcmdExecutor jcmdOutput(String output) {
-        return new TestJcmdExecutor(new ProcessResult(0, output), false);
+    private static VmOptionsAccessor emptyVmOptions() {
+        return new VmOptionsAccessor(List.of());
     }
 
-    private static JcmdExecutor failingJcmd() {
-        return new TestJcmdExecutor(new ProcessResult(1, ""), true);
+    private static VmOptionsAccessor vmOptions(String... options) {
+        return new VmOptionsAccessor(List.of(options));
+    }
+
+    private static GcLogService gcLogDisabled() {
+        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")));
+    }
+
+    private static GcLogService gcLogEnabled() {
+        return new TestGcLogService(new GcLogStatus(true, "debug", List.of("debug", "info")));
     }
 
     private static OpenSessionInViewStateProvider osivDisabled() {
@@ -189,23 +180,32 @@ class DefaultInsightsInfoProviderTest {
         return () -> true;
     }
 
-    private static final class TestJcmdExecutor extends JcmdExecutor {
+    private static final class TestGcLogService implements GcLogService {
 
-        private final ProcessResult result;
-        private final boolean fail;
+        private final GcLogStatus status;
 
-        private TestJcmdExecutor(ProcessResult result, boolean fail) {
-            this.result = result;
-            this.fail = fail;
+        private TestGcLogService(GcLogStatus status) {
+            this.status = status;
         }
 
         @Override
-        public ProcessResult execute(String... command) {
-            if (fail) {
-                throw new IllegalStateException("jcmd failed");
-            }
+        public GcLogStatus getStatus() {
+            return status;
+        }
 
-            return result;
+        @Override
+        public File getGcLogFile() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void enable(String level) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void disable() {
+            throw new UnsupportedOperationException();
         }
     }
 }

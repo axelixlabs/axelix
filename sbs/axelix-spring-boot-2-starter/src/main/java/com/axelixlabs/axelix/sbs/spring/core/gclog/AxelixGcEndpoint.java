@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
+import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 
 /**
  * Custom Actuator endpoint for managing and inspecting JVM GC logging.
@@ -44,7 +44,7 @@ public class AxelixGcEndpoint {
     }
 
     @GetMapping("/log/status")
-    public GcLogStatusResponse status() {
+    public GcLogStatus status() {
         return gcLogService.getStatus();
     }
 

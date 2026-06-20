@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.lang.management.ManagementFactory;
-
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,12 +56,6 @@ abstract class AbstractMasterSharedContextTest {
 
     @TestConfiguration
     static class SharedConfig {
-
-        @Bean
-        VMFeaturesProvider vmFeaturesProvider() {
-            return new OptionsParsingVMFeaturesProvider(
-                    ManagementFactory.getRuntimeMXBean().getInputArguments());
-        }
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {

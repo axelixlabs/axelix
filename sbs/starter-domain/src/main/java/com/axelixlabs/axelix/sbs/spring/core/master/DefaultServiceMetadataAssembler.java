@@ -40,7 +40,6 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final List<GitInformationProvider> gitInformationProvider;
     private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
-    private final VMFeaturesProvider vmFeaturesProvider;
     private final LibraryInformationProvider libraryInformationProvider;
 
     public DefaultServiceMetadataAssembler(
@@ -48,14 +47,12 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            VMFeaturesProvider vmFeaturesProvider,
             LibraryInformationProvider libraryInformationProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = gitInformationProviders;
         this.shortBuildInfoProvider = shortBuildInfoProviders;
-        this.vmFeaturesProvider = vmFeaturesProvider;
         this.libraryInformationProvider = libraryInformationProvider;
     }
 
@@ -72,8 +69,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
-                        memoryMXBean.getHeapMemoryUsage().getUsed()),
-                vmFeaturesProvider.discover());
+                        memoryMXBean.getHeapMemoryUsage().getUsed()));
     }
 
     private Optional<ShortBuildInfo> getShortBuildInfo() {
