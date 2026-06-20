@@ -29,8 +29,8 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.APP_CDS;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.AOT_CACHE;
+import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.APP_CDS;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.COMPACT_OBJECT_HEADERS;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOGGING_ENABLED;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOG_FILE_SPECIFIED;
