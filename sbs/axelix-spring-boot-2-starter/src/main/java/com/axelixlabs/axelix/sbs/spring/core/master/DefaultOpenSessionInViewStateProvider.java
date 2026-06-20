@@ -31,10 +31,10 @@ public class DefaultOpenSessionInViewStateProvider implements OpenSessionInViewS
     private static final ClassLoader CLASS_LOADER = DefaultOpenSessionInViewStateProvider.class.getClassLoader();
 
     private static final String OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME =
-        "org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter";
+            "org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter";
 
     private static final String OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME =
-        "org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor";
+            "org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor";
 
     private final ListableBeanFactory beanFactory;
 
@@ -51,7 +51,8 @@ public class DefaultOpenSessionInViewStateProvider implements OpenSessionInViewS
         if (!ClassUtils.isPresent(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER)) {
             return false;
         }
-        Class<?> beanClass = ClassUtils.resolveClassName(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER);
+        Class<?> beanClass =
+                ClassUtils.resolveClassName(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER);
         return beanFactory.getBeanNamesForType(beanClass, false, false).length > 0;
     }
 
