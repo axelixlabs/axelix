@@ -24,22 +24,17 @@ import org.springframework.util.ClassUtils;
  * Default {@link OpenSessionInViewStateProvider} based on Spring OSIV infrastructure beans.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public class DefaultOpenSessionInViewStateProvider implements OpenSessionInViewStateProvider {
 
     private static final ClassLoader CLASS_LOADER = DefaultOpenSessionInViewStateProvider.class.getClassLoader();
 
     private static final String OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME =
-            "org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter";
+        "org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter";
 
     private static final String OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME =
-            "org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor";
-
-    private static final boolean OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_PRESENT =
-            ClassUtils.isPresent(OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME, CLASS_LOADER);
-
-    private static final boolean OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_PRESENT =
-            ClassUtils.isPresent(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER);
+        "org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor";
 
     private final ListableBeanFactory beanFactory;
 
@@ -49,17 +44,22 @@ public class DefaultOpenSessionInViewStateProvider implements OpenSessionInViewS
 
     @Override
     public boolean isOpenSessionInViewEnabled() {
-        return hasBean(OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME, OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_PRESENT)
-                || hasBean(
-                        OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME,
-                        OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_PRESENT);
+        return hasOSIVFilter() || hasOSIVInterceptor();
     }
 
-    private boolean hasBean(String beanClassName, boolean beanClassPresent) {
-        if (!beanClassPresent) {
+    private boolean hasOSIVInterceptor() {
+        if (!ClassUtils.isPresent(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER)) {
             return false;
         }
-        Class<?> beanClass = ClassUtils.resolveClassName(beanClassName, CLASS_LOADER);
+        Class<?> beanClass = ClassUtils.resolveClassName(OPEN_ENTITY_MANAGER_IN_VIEW_INTERCEPTOR_CLASS_NAME, CLASS_LOADER);
+        return beanFactory.getBeanNamesForType(beanClass, false, false).length > 0;
+    }
+
+    private boolean hasOSIVFilter() {
+        if (!ClassUtils.isPresent(OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME, CLASS_LOADER)) {
+            return false;
+        }
+        Class<?> beanClass = ClassUtils.resolveClassName(OPEN_ENTITY_MANAGER_IN_VIEW_FILTER_CLASS_NAME, CLASS_LOADER);
         return beanFactory.getBeanNamesForType(beanClass, false, false).length > 0;
     }
 }
