@@ -88,7 +88,7 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
     public String toString() {
         return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod=" + maxTransactionsPerMethod
                 + ", inMemoryPaginationDetection=" + inMemoryPaginationDetection
-                + "\"" + '}';
+                + '}';
     }
 
     @Override
