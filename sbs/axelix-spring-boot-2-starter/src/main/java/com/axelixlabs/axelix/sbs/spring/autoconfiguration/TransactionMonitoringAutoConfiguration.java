@@ -21,6 +21,7 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +47,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @since 21.01.2026
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
@@ -107,6 +109,11 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Configuration
     @ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+    @ConditionalOnProperty(
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
     static class LogbackInMemoryPaginationAppenderConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)
