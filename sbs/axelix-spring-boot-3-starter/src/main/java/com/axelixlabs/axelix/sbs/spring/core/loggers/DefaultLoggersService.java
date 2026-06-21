@@ -95,7 +95,7 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
+    public synchronized void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
 
         LoggerConfiguration loggerConfiguration = findLoggerByName(loggerName);
@@ -132,7 +132,7 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
+    public synchronized void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
         LoggerGroup loggerGroup = findGroupByName(groupName);
 
@@ -145,7 +145,8 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void resetLogLevelByLoggerName(String loggerName) throws LoggerNotFoundException, LogLevelNotFoundException {
+    public synchronized void resetLogLevelByLoggerName(String loggerName)
+            throws LoggerNotFoundException, LogLevelNotFoundException {
         LoggerChange loggerChange = configuredLevelsCache.remove(loggerName);
 
         if (loggerChange == null) {

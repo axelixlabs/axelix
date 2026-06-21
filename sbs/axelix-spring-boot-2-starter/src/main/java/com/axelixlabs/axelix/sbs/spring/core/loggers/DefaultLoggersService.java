@@ -96,7 +96,7 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
+    public synchronized void changeLogLevelByLoggerName(String loggerName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
 
         LoggerConfiguration loggerConfiguration = findLoggerByName(loggerName);
@@ -133,7 +133,7 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
+    public synchronized void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException {
         LoggerGroup loggerGroup = findGroupByName(groupName);
 
@@ -146,7 +146,8 @@ public class DefaultLoggersService implements LoggersService {
     }
 
     @Override
-    public void resetLogLevelByLoggerName(String loggerName) throws LoggerNotFoundException, LogLevelNotFoundException {
+    public synchronized void resetLogLevelByLoggerName(String loggerName)
+            throws LoggerNotFoundException, LogLevelNotFoundException {
         LoggerChange loggerChange = configuredLevelsCache.remove(loggerName);
 
         if (loggerChange == null) {
@@ -166,10 +167,10 @@ public class DefaultLoggersService implements LoggersService {
         return new DefaultLoggerChange(
                 () -> {
                     loggingSystem.setLogLevel(
-                        loggerName,
-                        Optional.ofNullable(initiallyConfiguredLevel)
-                            .map(LogLevel::valueOf)
-                            .orElse(null));
+                            loggerName,
+                            Optional.ofNullable(initiallyConfiguredLevel)
+                                    .map(LogLevel::valueOf)
+                                    .orElse(null));
                     // nullify the reference to the anchor, so it becomes eligible for garbage collection
                     // and also the subsequent invocation will encounter null in the cache
                     configuredLevelsCache.remove(loggerName);
