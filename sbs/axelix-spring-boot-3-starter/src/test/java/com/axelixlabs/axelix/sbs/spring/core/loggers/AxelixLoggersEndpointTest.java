@@ -447,7 +447,7 @@ public class AxelixLoggersEndpointTest {
         // appliedAt must be at the time of the second request
         assertThat(appliedAt).isBetween(beforeSecondRequest, afterSecondRequest);
 
-        // expiresAt should be approximately 60 minutes (±10 sec for margin of error)
+        // expiresAt should be approximately 60 seconds (±10 sec for margin of error)
         assertThat(expiresAt)
                 .isBetween(
                         beforeSecondRequest.plus(60, ChronoUnit.SECONDS),
