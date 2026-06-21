@@ -38,16 +38,10 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
     private Integer maxTransactionsPerMethod;
 
     /**
-     * In memory pagination detection properties.
-     */
-    private InMemoryPaginationDetection inMemoryPaginationDetection;
-
-    /**
      * Create a new TransactionMonitoringConfigurationProperties
      */
     public TransactionMonitoringConfigurationProperties() {
         this.maxTransactionsPerMethod = 30;
-        this.inMemoryPaginationDetection = new InMemoryPaginationDetection(true);
     }
 
     public Integer getMaxTransactionsPerMethod() {
@@ -59,35 +53,24 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
         return this;
     }
 
-    public InMemoryPaginationDetection getInMemoryPaginationDetection() {
-        return inMemoryPaginationDetection;
-    }
-
-    public TransactionMonitoringConfigurationProperties setInMemoryPaginationDetection(
-            InMemoryPaginationDetection inMemoryPaginationDetection) {
-        this.inMemoryPaginationDetection = inMemoryPaginationDetection;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         TransactionMonitoringConfigurationProperties that = (TransactionMonitoringConfigurationProperties) o;
-        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod)
-                && Objects.equals(inMemoryPaginationDetection, that.inMemoryPaginationDetection);
+        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maxTransactionsPerMethod, inMemoryPaginationDetection);
+        return Objects.hash(maxTransactionsPerMethod);
     }
 
     @Override
     public String toString() {
         return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod=" + maxTransactionsPerMethod
-                + ", inMemoryPaginationDetection=" + inMemoryPaginationDetection
                 + '}';
     }
 
