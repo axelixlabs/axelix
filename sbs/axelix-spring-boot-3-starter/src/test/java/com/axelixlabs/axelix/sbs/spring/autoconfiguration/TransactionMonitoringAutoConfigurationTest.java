@@ -44,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 10.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 class TransactionMonitoringAutoConfigurationTest {
 
@@ -61,7 +62,24 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
+            assertThat(context)
+                    .hasSingleBean(
+                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                    .class);
         });
+    }
+
+    @Test // GH-1250
+    void shouldNotRegisterInMemoryPaginationAppenderConfiguration_whenDetectionDisabled() {
+        contextRunner
+                .withPropertyValues("axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false")
+                .run(context -> {
+                    assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
+                    assertThat(context)
+                            .doesNotHaveBean(
+                                    TransactionMonitoringAutoConfiguration
+                                            .LogbackInMemoryPaginationAppenderConfiguration.class);
+                });
     }
 
     @Test
@@ -76,6 +94,10 @@ class TransactionMonitoringAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
+                    assertThat(context)
+                            .doesNotHaveBean(
+                                    TransactionMonitoringAutoConfiguration
+                                            .LogbackInMemoryPaginationAppenderConfiguration.class);
                 });
     }
 
@@ -93,6 +115,10 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
+            assertThat(context)
+                    .doesNotHaveBean(
+                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                    .class);
         });
     }
 
