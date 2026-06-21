@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
-    @Import({DefaultServiceMetadataAssembler.class, CurrentConfig.class})
+    @Import({CurrentConfig.class})
     static class TestApplication {}
 
     @Autowired
@@ -108,6 +109,22 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         @Bean
         public LibraryInformationProvider libraryInformationProvider() {
             return new TestLibraryInformationProvider();
+        }
+
+        @Bean
+        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+                HealthDetectionFunction healthDetectionFunction,
+                AxelixVersionDiscoverer axelixVersionDiscoverer,
+                List<GitInformationProvider> gitInformationProviders,
+                List<ShortBuildInfoProvider> shortBuildInfoProviders,
+                LibraryInformationProvider libraryInformationProvider) {
+            return new DefaultServiceMetadataAssembler(
+                    healthDetectionFunction,
+                    axelixVersionDiscoverer,
+                    gitInformationProviders,
+                    shortBuildInfoProviders,
+                    libraryInformationProvider,
+                    null);
         }
     }
 

@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 import java.util.List;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insight;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
@@ -65,10 +65,10 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     }
 
     @Override
-    public Insight getInsight() {
+    public BasicDiscoveryMetadata.Insights getInsight() {
         GcLogStatus gcLogStatus = gcLogService.getStatus();
 
-        return new Insight(
+        return new BasicDiscoveryMetadata.Insights(
                 new HotSpot(
                         List.of(getAppCdsFeature(), getAotCacheFeature()),
                         List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature(gcLogStatus)),

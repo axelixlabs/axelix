@@ -28,7 +28,10 @@ import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
+import static com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider.TEST_INSIGHTS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -65,6 +68,11 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
         public LibraryInformationProvider libraryInformationProvider() {
             return new DefaultLibraryInformationProvider();
         }
+
+        @Bean
+        public InsightsInfoProvider insightsInfoProvider() {
+            return new TestInsightsInfoProvider();
+        }
     }
 
     @Test
@@ -80,5 +88,6 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
+        assertThat(serviceMetadata.getInsights()).isEqualTo(TEST_INSIGHTS);
     }
 }

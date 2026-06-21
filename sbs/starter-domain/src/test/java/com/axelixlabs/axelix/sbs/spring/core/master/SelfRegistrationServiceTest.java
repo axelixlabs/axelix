@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -70,10 +71,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
             "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator",
             "axelix.sbs.discovery.heartbeat-interval=PT1S"
         })
-@Import({
-    DefaultServiceMetadataAssembler.class,
-    SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class
-})
+@Import({SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class})
 class SelfRegistrationServiceTest {
 
     private static MockWebServer mockWebServer;
@@ -163,6 +161,22 @@ class SelfRegistrationServiceTest {
         @Bean
         public LibraryInformationProvider libraryInformationProvider() {
             return new TestLibraryInformationProvider();
+        }
+
+        @Bean
+        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+                HealthDetectionFunction healthDetectionFunction,
+                AxelixVersionDiscoverer axelixVersionDiscoverer,
+                List<GitInformationProvider> gitInformationProviders,
+                List<ShortBuildInfoProvider> shortBuildInfoProviders,
+                LibraryInformationProvider libraryInformationProvider) {
+            return new DefaultServiceMetadataAssembler(
+                    healthDetectionFunction,
+                    axelixVersionDiscoverer,
+                    gitInformationProviders,
+                    shortBuildInfoProviders,
+                    libraryInformationProvider,
+                    null);
         }
     }
 

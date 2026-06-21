@@ -43,7 +43,6 @@ public final class BasicDiscoveryMetadata {
     private final SoftwareVersions softwareVersions;
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
-
     /**
      * Creates a new ServiceMetadata.
      *
@@ -59,6 +58,7 @@ public final class BasicDiscoveryMetadata {
      * @param healthStatus     the health status of the given instance that is reported by started infrastructure.
      *                         Never {@code null}.
      * @param memoryDetails    the memory details.
+     * @param insights          the insight information discovered for the given service instance.
      */
     @JsonCreator
     public BasicDiscoveryMetadata(
@@ -68,7 +68,8 @@ public final class BasicDiscoveryMetadata {
             @JsonProperty("jdkVendor") String jdkVendor,
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
-            @JsonProperty("memoryDetails") MemoryDetails memoryDetails) {
+            @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
+            @JsonProperty("insights") @Nullable Insights insights) {
         this.version = version;
         this.serviceVersion = serviceVersion;
         this.commitShortSha = commitShortSha;
@@ -76,7 +77,10 @@ public final class BasicDiscoveryMetadata {
         this.softwareVersions = softwareVersions;
         this.healthStatus = healthStatus;
         this.memoryDetails = memoryDetails;
+        this.insights = insights;
     }
+
+    private final @Nullable Insights insights;
 
     public String getVersion() {
         return version;
@@ -106,6 +110,10 @@ public final class BasicDiscoveryMetadata {
         return memoryDetails;
     }
 
+    public @Nullable Insights getInsights() {
+        return insights;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -121,13 +129,21 @@ public final class BasicDiscoveryMetadata {
                 && Objects.equals(jdkVendor, that.jdkVendor)
                 && Objects.equals(softwareVersions, that.softwareVersions)
                 && healthStatus == that.healthStatus
-                && Objects.equals(memoryDetails, that.memoryDetails);
+                && Objects.equals(memoryDetails, that.memoryDetails)
+                && Objects.equals(insights, that.insights);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                version, serviceVersion, commitShortSha, jdkVendor, softwareVersions, healthStatus, memoryDetails);
+                version,
+                serviceVersion,
+                commitShortSha,
+                jdkVendor,
+                softwareVersions,
+                healthStatus,
+                memoryDetails,
+                insights);
     }
 
     @Override
@@ -307,7 +323,7 @@ public final class BasicDiscoveryMetadata {
     /**
      * Insight information discovered for the given service instance.
      */
-    public static final class Insight {
+    public static final class Insights {
 
         private final HotSpot hotSpot;
         private final List<InsightFeature> springFramework;
@@ -319,7 +335,7 @@ public final class BasicDiscoveryMetadata {
          * @param springFramework the Spring Framework insight features.
          */
         @JsonCreator
-        public Insight(
+        public Insights(
                 @JsonProperty("hotSpot") HotSpot hotSpot,
                 @JsonProperty("springFramework") List<InsightFeature> springFramework) {
             this.hotSpot = hotSpot;
@@ -342,8 +358,9 @@ public final class BasicDiscoveryMetadata {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Insight insight = (Insight) o;
-            return Objects.equals(hotSpot, insight.hotSpot) && Objects.equals(springFramework, insight.springFramework);
+            Insights insights = (Insights) o;
+            return Objects.equals(hotSpot, insights.hotSpot)
+                    && Objects.equals(springFramework, insights.springFramework);
         }
 
         @Override

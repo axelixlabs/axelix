@@ -31,6 +31,8 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -72,6 +74,11 @@ class AxelixMetadataEndpointTest {
         public LibraryInformationProvider libraryInformationProvider() {
             return new DefaultLibraryInformationProvider();
         }
+
+        @Bean
+        public InsightsInfoProvider insightsInfoProvider() {
+            return new TestInsightsInfoProvider();
+        }
     }
 
     @Test
@@ -98,6 +105,24 @@ class AxelixMetadataEndpointTest {
                         + "  \"healthStatus\" : \"UP\",\n"
                         + "  \"memoryDetails\" : {\n"
                         + "    \"heap\" : \"#{json-unit.ignore}\"\n"
+                        + "  },\n"
+                        + "  \"insights\" : {\n"
+                        + "    \"hotSpot\" : {\n"
+                        + "      \"projectLeyden\" : [\n"
+                        + "        { \"name\" : \"AppCDS\", \"enabled\" : true },\n"
+                        + "        { \"name\" : \"AotCache\", \"enabled\" : false }\n"
+                        + "      ],\n"
+                        + "      \"gc\" : [\n"
+                        + "        { \"name\" : \"GCLoggingEnabled\", \"enabled\" : true },\n"
+                        + "        { \"name\" : \"GCLogFileSpecified\", \"enabled\" : false }\n"
+                        + "      ],\n"
+                        + "      \"projectLilliputh\" : [\n"
+                        + "        { \"name\" : \"CompactObjectHeaders\", \"enabled\" : true }\n"
+                        + "      ]\n"
+                        + "    },\n"
+                        + "    \"springFramework\" : [\n"
+                        + "      { \"name\" : \"OSIV\", \"enabled\" : false }\n"
+                        + "    ]\n"
                         + "  }\n"
                         + "}");
     }

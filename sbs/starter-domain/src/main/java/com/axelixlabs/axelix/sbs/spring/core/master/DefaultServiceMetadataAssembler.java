@@ -22,10 +22,13 @@ import java.lang.management.MemoryMXBean;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.
@@ -41,19 +44,22 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final LibraryInformationProvider libraryInformationProvider;
+    private final @Nullable InsightsInfoProvider insightsInfoProvider;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            LibraryInformationProvider libraryInformationProvider) {
+            LibraryInformationProvider libraryInformationProvider,
+            @Nullable InsightsInfoProvider insightsInfoProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = gitInformationProviders;
         this.shortBuildInfoProvider = shortBuildInfoProviders;
         this.libraryInformationProvider = libraryInformationProvider;
+        this.insightsInfoProvider = insightsInfoProvider;
     }
 
     @Override
@@ -69,7 +75,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
-                        memoryMXBean.getHeapMemoryUsage().getUsed()));
+                        memoryMXBean.getHeapMemoryUsage().getUsed()),
+                insightsInfoProvider != null ? insightsInfoProvider.getInsight() : null);
     }
 
     private Optional<ShortBuildInfo> getShortBuildInfo() {

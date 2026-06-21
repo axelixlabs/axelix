@@ -23,8 +23,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insight;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
@@ -51,15 +52,15 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
-        Insight insight = subject.getInsight();
+        BasicDiscoveryMetadata.Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, false);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), AOT_CACHE, false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, false);
-        assertFeatureEnabled(insight.getSpringFramework(), OSIV, false);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), APP_CDS, false);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), AOT_CACHE, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, false);
+        assertFeatureEnabled(insights.getSpringFramework(), OSIV, false);
     }
 
     @Test
@@ -71,11 +72,11 @@ class DefaultInsightsInfoProviderTest {
                 vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"));
 
         // when.
-        Insight insight = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, true);
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), AOT_CACHE, true);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), APP_CDS, true);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), AOT_CACHE, true);
     }
 
     @Test
@@ -85,10 +86,10 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(), gcLogDisabled(), vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"));
 
         // when.
-        Insight insight = subject.getInsight();
+        BasicDiscoveryMetadata.Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLeyden(), APP_CDS, true);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), APP_CDS, true);
     }
 
     @Test
@@ -97,11 +98,11 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogEnabled(), emptyVmOptions());
 
         // when.
-        Insight insight = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, true);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOGGING_ENABLED, true);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
     }
 
     @Test
@@ -110,11 +111,11 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
-        Insight insight = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
-        assertFeatureEnabled(insight.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
     }
 
     @Test
@@ -124,10 +125,10 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(), gcLogDisabled(), vmOptions("-XX:+UseCompactObjectHeaders"));
 
         // when.
-        Insight insight = subject.getInsight();
+        BasicDiscoveryMetadata.Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, true);
+        assertFeatureEnabled(insights.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, true);
     }
 
     @Test
@@ -136,10 +137,10 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivEnabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
-        Insight insight = subject.getInsight();
+        BasicDiscoveryMetadata.Insights insights = subject.getInsight();
 
         // then.
-        assertFeatureEnabled(insight.getSpringFramework(), OSIV, true);
+        assertFeatureEnabled(insights.getSpringFramework(), OSIV, true);
     }
 
     private static void assertFeatureEnabled(List<InsightFeature> features, String name, boolean enabled) {
