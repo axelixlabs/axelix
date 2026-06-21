@@ -29,6 +29,8 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
 /**
  * Shared base for the {@code master} integration tests. By defining a single, unioned context here and having every
@@ -70,6 +72,11 @@ abstract class AbstractMasterSharedContextTest {
         @Bean
         public LibraryInformationProvider libraryInformationProvider() {
             return new DefaultLibraryInformationProvider();
+        }
+
+        @Bean
+        public InsightsInfoProvider insightsInfoProvider() {
+            return new TestInsightsInfoProvider();
         }
     }
 }

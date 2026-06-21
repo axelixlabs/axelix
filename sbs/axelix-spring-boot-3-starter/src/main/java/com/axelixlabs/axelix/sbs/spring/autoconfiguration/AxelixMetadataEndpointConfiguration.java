@@ -17,28 +17,38 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 
 /**
  * Auto-configuration for the {@link AxelixMetadataEndpoint}.
@@ -68,18 +78,43 @@ public class AxelixMetadataEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public OpenSessionInViewStateProvider openSessionInViewStateProvider(
+            ConfigurableApplicationContext applicationContext) {
+        return new DefaultOpenSessionInViewStateProvider(applicationContext.getBeanFactory());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public VmOptionsAccessor vmOptionsAccessor() {
+        return new VmOptionsAccessor(ManagementFactory.getRuntimeMXBean().getInputArguments());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(GcLogService.class)
+    public InsightsInfoProvider insightsInfoProvider(
+            OpenSessionInViewStateProvider openSessionInViewStateProvider,
+            GcLogService gcLogService,
+            VmOptionsAccessor vmOptionsAccessor) {
+        return new DefaultInsightsInfoProvider(openSessionInViewStateProvider, gcLogService, vmOptionsAccessor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            LibraryInformationProvider libraryInformationProvider) {
+            LibraryInformationProvider libraryInformationProvider,
+            ObjectProvider<InsightsInfoProvider> insightsInfoProvider) {
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
                 gitInformationProviders,
                 shortBuildInfoProviders,
-                libraryInformationProvider);
+                libraryInformationProvider,
+                insightsInfoProvider.getIfAvailable());
     }
 
     @Bean

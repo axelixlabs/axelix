@@ -24,6 +24,7 @@ import org.springframework.boot.SpringBootVersion;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 
+import static com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider.TEST_INSIGHTS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -50,5 +51,6 @@ class DefaultServiceMetadataAssemblerTest extends AbstractMasterSharedContextTes
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
+        assertThat(serviceMetadata.getInsights()).isEqualTo(TEST_INSIGHTS);
     }
 }

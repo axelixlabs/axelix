@@ -68,6 +68,24 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : "#{json-unit.ignore}"
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [
+                    { "name" : "AppCDS", "enabled" : true },
+                    { "name" : "AotCache", "enabled" : false }
+                  ],
+                  "gc" : [
+                    { "name" : "GCLoggingEnabled", "enabled" : true },
+                    { "name" : "GCLogFileSpecified", "enabled" : false }
+                  ],
+                  "projectLilliputh" : [
+                    { "name" : "CompactObjectHeaders", "enabled" : true }
+                  ]
+                },
+                "springFramework" : [
+                  { "name" : "OSIV", "enabled" : false }
+                ]
               }
             }
             """);
