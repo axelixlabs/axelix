@@ -47,7 +47,6 @@ jobs:
           max-lines: '500'
 
   backend-build:
-    needs: check-pr-size
     runs-on: ubuntu-latest
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
