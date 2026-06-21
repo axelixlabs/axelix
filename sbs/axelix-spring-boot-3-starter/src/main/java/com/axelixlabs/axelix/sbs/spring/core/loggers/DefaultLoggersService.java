@@ -122,8 +122,8 @@ public class DefaultLoggersService implements LoggersService {
             // the one that Axelix have configured
             String initiallyConfiguredLevel = loggerChange.getInitialConfiguredLevel();
 
-            // Cancel previously created anchor
-            loggerChange.cancelAutoRollback();
+            // Roll back previous change
+            loggerChange.rollbackManually();
 
             configuredLevelsCache.put(loggerName, createAnchor(loggerName, ttlSeconds, initiallyConfiguredLevel));
         }
@@ -169,6 +169,9 @@ public class DefaultLoggersService implements LoggersService {
                             Optional.ofNullable(initiallyConfiguredLevel)
                                     .map(LogLevel::valueOf)
                                     .orElse(null));
+                    // nullify the reference to the anchor, so it becomes eligible for garbage collection
+                    // and also the subsequent invocation will encounter null in the cache
+                    configuredLevelsCache.remove(loggerName);
                 },
                 ofNullable(ttlSeconds).map(Duration::ofSeconds).orElse(null),
                 ofNullable(initiallyConfiguredLevel).orElse(null));

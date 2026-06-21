@@ -51,11 +51,6 @@ public interface LoggerChange {
     Instant getAutoRollsBackAt();
 
     /**
-     * Cancels the auto-rollback capability.
-     */
-    void cancelAutoRollback();
-
-    /**
      * Manually rolls back this {@link LoggerChange}.
      */
     void rollbackManually();

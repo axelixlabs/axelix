@@ -101,15 +101,10 @@ public class DefaultLoggerChange implements LoggerChange {
     }
 
     @Override
-    public void cancelAutoRollback() {
+    public void rollbackManually() {
         if (automaticRollbackTask != null) {
             automaticRollbackTask.cancel(false);
         }
-    }
-
-    @Override
-    public void rollbackManually() {
-        this.cancelAutoRollback();
         this.rollbackAction.run();
     }
 }
