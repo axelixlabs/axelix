@@ -17,18 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.boot.actuate.logging.LoggersEndpoint;
-import org.springframework.boot.actuate.logging.LoggersEndpoint.LoggerLevels;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggerConfiguration;
-import org.springframework.boot.logging.LoggerGroups;
-import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,91 +25,81 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
+import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
+import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
+import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
+import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
 /**
  * Custom Spring Boot Actuator endpoint exposing the application's loggers.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 @RestControllerEndpoint(id = "axelix-loggers")
 public class AxelixLoggersEndpoint {
 
-    private final LoggersEndpoint delegate;
-    private final LoggingSystem loggingSystem;
-    private final LoggerGroups loggerGroups;
-    private final ConcurrentMap<String, LogLevel> cacheLoggers;
+    private final LoggersService loggersService;
 
-    public AxelixLoggersEndpoint(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
-        this.loggingSystem = loggingSystem;
-        this.loggerGroups = loggerGroups;
-        this.delegate = new LoggersEndpoint(loggingSystem, loggerGroups);
-
-        List<LoggerConfiguration> configurations = loggingSystem.getLoggerConfigurations();
-        this.cacheLoggers = new ConcurrentHashMap<>(configurations.size(), 1.1f);
-
-        configurations.forEach(config -> cacheLoggers.put(config.getName(), config.getEffectiveLevel()));
+    public AxelixLoggersEndpoint(LoggersService loggersService) {
+        this.loggersService = loggersService;
     }
 
     @GetMapping
-    public Map<String, Object> getAllLoggers() {
-        return delegate.loggers();
+    public ResponseEntity<LoggersFeed> getAllLoggers() {
+        return ResponseEntity.ok(loggersService.getAllLoggers());
     }
 
     @GetMapping("/logger/{name}")
-    public ResponseEntity<LoggerLevels> getSingleLogger(@PathVariable String name) {
-        if (!cacheLoggers.containsKey(name)) {
+    public ResponseEntity<SingleLoggerProfile> getSingleLogger(@PathVariable String name) {
+        try {
+            SingleLoggerProfile singleLoggerProfile = loggersService.getSingleLogger(name);
+            return ResponseEntity.ok(singleLoggerProfile);
+        } catch (LoggerNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.ok(delegate.loggerLevels(name));
     }
 
     @GetMapping("/group/{name}")
-    public ResponseEntity<LoggerLevels> getSingleGroup(@PathVariable String name) {
-        if (loggerGroups.get(name) == null) {
+    public ResponseEntity<LoggersGroupProfile> getLoggerGroup(@PathVariable String name) {
+        try {
+            LoggersGroupProfile loggerGroup = loggersService.getLoggerGroup(name);
+            return ResponseEntity.ok(loggerGroup);
+        } catch (LoggerNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.ok(delegate.loggerLevels(name));
     }
 
     @PostMapping("/logger/{name}/change-level")
     public ResponseEntity<Void> changeLogLevelByLoggerName(
-            @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
-
-        if (!cacheLoggers.containsKey(name)) {
+            @PathVariable String name, @RequestBody LogLevelChangeRequest changeRequest) {
+        try {
+            loggersService.changeLogLevelByLoggerName(name, changeRequest);
+            return ResponseEntity.noContent().build();
+        } catch (LoggerNotFoundException | LogLevelNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase());
-        delegate.configureLogLevel(name, logLevel);
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/group/{name}/change-level")
     public ResponseEntity<Void> changeLogLevelByGroupName(
-            @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
-        if (loggerGroups.get(name) == null) {
+            @PathVariable String name, @RequestBody LogLevelChangeRequest changeRequest) {
+        try {
+            loggersService.changeLogLevelByGroupName(name, changeRequest);
+            return ResponseEntity.noContent().build();
+        } catch (LoggerNotFoundException | LogLevelNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase());
-        delegate.configureLogLevel(name, logLevel);
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/logger/{name}/reset")
     public ResponseEntity<Void> resetLogLevelByLoggerName(@PathVariable String name) {
-        if (!cacheLoggers.containsKey(name)) {
+        try {
+            loggersService.resetLogLevelByLoggerName(name);
+            return ResponseEntity.noContent().build();
+        } catch (LoggerNotFoundException | LogLevelNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-
-        LogLevel level = cacheLoggers.get(name);
-
-        if (!loggingSystem.getLoggerConfiguration(name).getEffectiveLevel().equals(level)) {
-            loggingSystem.setLogLevel(name, level);
-        }
-
-        return ResponseEntity.noContent().build();
     }
 }

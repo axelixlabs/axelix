@@ -17,9 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -43,6 +45,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration;
@@ -55,6 +58,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixLoggersEndpoint}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
@@ -86,7 +91,7 @@ public class AxelixLoggersEndpointTest {
     private static final Logger abc_reset_logger = LoggerFactory.getLogger(ABC_RESET_LOGGER);
     private static final Logger abcd_reset_logger = LoggerFactory.getLogger(ABCD_RESET_LOGGER);
 
-    @AfterEach
+    @BeforeEach
     void resetLogLevels() {
         loggingSystem.setLogLevel(LOGGER, LogLevel.WARN);
         loggingSystem.setLogLevel(AB_RESET_LOGGER, LogLevel.WARN);
@@ -105,45 +110,23 @@ public class AxelixLoggersEndpointTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideValidLoggerAndGroupPaths")
-    void shouldReturnOk_WhenLoggerOrGroupFound(String path) {
-        // when.
-        ResponseEntity<String> response = testRestTemplate.asEditor().getForEntity(path, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    private static Stream<Arguments> provideValidLoggerAndGroupPaths() {
-        return Stream.of(
-                Arguments.of(String.format("/actuator/axelix-loggers/logger/%s", LOGGER)),
-                Arguments.of(String.format("/actuator/axelix-loggers/group/%s", GROUP)));
-    }
-
-    @ParameterizedTest
     @MethodSource("provideInvalidLoggerAndGroupPaths")
     void shouldReturnBadRequest_WhenLoggerOrGroupNotFound(String path) {
         // when.
-        ResponseEntity<String> response = testRestTemplate.asAdmin().getForEntity(path, String.class);
+        ResponseEntity<String> response = testRestTemplate.asEditor().getForEntity(path, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    private static Stream<Arguments> provideInvalidLoggerAndGroupPaths() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-loggers/logger/non.existent.logger"),
-                Arguments.of("/actuator/axelix-loggers/group/non.existent.group"));
-    }
-
     @Test
-    void shouldSetLoggerLevel() {
+    void shouldSetLoggerLevelWithoutTtl() {
         // language=json
         String request = "{\"configuredLevel\":\"debug\"}";
 
         // when.
         ResponseEntity<Void> response = testRestTemplate
-                .asViewer()
+                .asAdmin()
                 .postForEntity(
                         String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
                         defaultJsonEntity(request),
@@ -156,7 +139,7 @@ public class AxelixLoggersEndpointTest {
     }
 
     @Test
-    void shouldSetGroupLevel() {
+    void shouldSetGroupLevelHappyPath() {
         // language=json
         String request = "{\"configuredLevel\":\"debug\"}";
 
@@ -175,7 +158,7 @@ public class AxelixLoggersEndpointTest {
     }
 
     @ParameterizedTest
-    @MethodSource("argSetLogLevel")
+    @MethodSource("nonExistingLoggerChangeLevel")
     void shouldReturnBadRequest_SetLogLevel(String path) {
         // language=json
         String request = "{\"configuredLevel\":\"debug\"}";
@@ -187,12 +170,6 @@ public class AxelixLoggersEndpointTest {
         // then.
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    private static Stream<Arguments> argSetLogLevel() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-loggers/group/non.existent.logger/change-level"),
-                Arguments.of("/actuator/axelix-loggers/logger/non.existent.logger/change-level"));
     }
 
     @Test
@@ -254,6 +231,177 @@ public class AxelixLoggersEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
+    // Temporary override log level
+    @Test
+    void shouldContainOverrideInfo_WhenTemporaryLevelIsSet() {
+        // language=json
+        String request = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        // when.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelInitiatedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelRollsBackAt()).isNotNull();
+        assertThat(loggerProfile.getFallbackLevel()).isNotNull();
+    }
+
+    @Test
+    void shouldNotContainOverrideInfo_WhenPermanentLevelIsSet() {
+        // language=json
+        String request = "{\"configuredLevel\":\"debug\"}";
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        // when.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
+
+        // then.
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelInitiatedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelRollsBackAt()).isNull();
+        assertThat(loggerProfile.getFallbackLevel()).isNotNull();
+    }
+
+    @Test
+    void shouldCancelOverride_WhenPermanentChangeAppliedAfterTemporary() {
+        // language=json
+        String temporaryRequest = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
+        // language=json
+        String permanentRequest = "{\"configuredLevel\":\"trace\"}";
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(temporaryRequest),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        // when. — permanent over temporary
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(permanentRequest),
+                        Void.class);
+
+        // then. — override should disappear
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.TRACE);
+        assertThat(loggerProfile.getTemporaryLevelInitiatedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelRollsBackAt()).isNull();
+    }
+
+    @Test
+    void shouldClearOverride_WhenResetCalled() {
+        // language=json
+        String request = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(request),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        // when.
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(String.format("/actuator/axelix-loggers/logger/%s/reset", LOGGER), null, Void.class);
+
+        // then.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.WARN);
+        assertThat(loggerProfile.getTemporaryLevelInitiatedAt()).isNull();
+        assertThat(loggerProfile.getTemporaryLevelRollsBackAt()).isNull();
+    }
+
+    @Test
+    void shouldReplaceActiveOverride_WhenNewTemporaryRequestComes() {
+        // language=json
+        String firstRequest = "{\"configuredLevel\":\"debug\",\"ttlSeconds\":30}";
+        // language=json
+        String secondRequest = "{\"configuredLevel\":\"trace\",\"ttlSeconds\":60}";
+
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(firstRequest),
+                        Void.class);
+
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.DEBUG);
+
+        Instant beforeSecondRequest = Instant.now();
+
+        // when.
+        testRestTemplate
+                .asAdmin()
+                .postForEntity(
+                        String.format("/actuator/axelix-loggers/logger/%s/change-level", LOGGER),
+                        defaultJsonEntity(secondRequest),
+                        Void.class);
+
+        Instant afterSecondRequest = Instant.now();
+
+        // then.
+        ResponseEntity<SingleLoggerProfile> response = testRestTemplate
+                .asAdmin()
+                .getForEntity(String.format("/actuator/axelix-loggers/logger/%s", LOGGER), SingleLoggerProfile.class);
+
+        SingleLoggerProfile loggerProfile = response.getBody();
+        assertThat(loggerProfile).isNotNull();
+        assertThat(getLogLevel(LOGGER)).isEqualTo(LogLevel.TRACE);
+
+        assertThat(loggerProfile.getTemporaryLevelInitiatedAt()).isNotNull();
+        assertThat(loggerProfile.getTemporaryLevelRollsBackAt()).isNotNull();
+        Instant appliedAt = Instant.parse(loggerProfile.getTemporaryLevelInitiatedAt());
+        Instant expiresAt = Instant.parse(loggerProfile.getTemporaryLevelRollsBackAt());
+
+        // appliedAt must be at the time of the second request
+        assertThat(appliedAt).isBetween(beforeSecondRequest, afterSecondRequest);
+
+        // expiresAt should be approximately 60 seconds (±10 sec for margin of error)
+        assertThat(expiresAt)
+                .isBetween(
+                        beforeSecondRequest.plus(60, ChronoUnit.SECONDS),
+                        afterSecondRequest.plus(60, ChronoUnit.SECONDS).plusSeconds(10));
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-loggers")
     void negativeAuthTests() {}
 
@@ -263,6 +411,18 @@ public class AxelixLoggersEndpointTest {
 
     private LogLevel getGroupLevel(String groupName) {
         return loggerGroups.get(groupName).getConfiguredLevel();
+    }
+
+    private static Stream<Arguments> nonExistingLoggerChangeLevel() {
+        return Stream.of(
+                Arguments.of("/actuator/axelix-loggers/group/non.existent.logger/change-level"),
+                Arguments.of("/actuator/axelix-loggers/logger/non.existent.logger/change-level"));
+    }
+
+    private static Stream<Arguments> provideInvalidLoggerAndGroupPaths() {
+        return Stream.of(
+                Arguments.of("/actuator/axelix-loggers/logger/non.existent.logger"),
+                Arguments.of("/actuator/axelix-loggers/group/non.existent.group"));
     }
 
     private <T> HttpEntity<T> defaultJsonEntity(T request) {
@@ -275,9 +435,13 @@ public class AxelixLoggersEndpointTest {
     static class AxelixLoggersEndpointTestConfiguration {
 
         @Bean
-        public AxelixLoggersEndpoint axelixLoggersEndpoint(
-                LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
-            return new AxelixLoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
+        public AxelixLoggersEndpoint axelixLoggersEndpoint(LoggersService loggersService) {
+            return new AxelixLoggersEndpoint(loggersService);
+        }
+
+        @Bean
+        public LoggersService loggersService(LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
+            return new DefaultLoggersService(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
         }
     }
 }

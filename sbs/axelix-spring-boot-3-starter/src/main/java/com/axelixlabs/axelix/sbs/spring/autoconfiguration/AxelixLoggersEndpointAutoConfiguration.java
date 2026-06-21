@@ -39,15 +39,15 @@ import com.axelixlabs.axelix.sbs.spring.core.loggers.LoggersService;
 @ConditionalOnBean(LoggingSystem.class)
 public class AxelixLoggersEndpointAutoConfiguration {
 
-    /**
-     * {@link LoggingSystem} and {@link LoggerGroups} beans are registered dynamically in {@link LoggingApplicationListener}.
-     */
     @Bean
     @ConditionalOnMissingBean
     public AxelixLoggersEndpoint axelixLoggersEndpoint(LoggersService loggersService) {
         return new AxelixLoggersEndpoint(loggersService);
     }
 
+    /**
+     * {@link LoggingSystem} and {@link LoggerGroups} beans are registered dynamically in {@link LoggingApplicationListener}.
+     */
     @Bean
     @ConditionalOnMissingBean
     public LoggersService loggersService(LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
