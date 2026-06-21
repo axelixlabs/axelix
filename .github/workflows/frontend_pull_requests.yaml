@@ -28,7 +28,6 @@ jobs:
           max-lines: '600'
 
   frontend-build:
-    needs: check-pr-size
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
