@@ -48,6 +48,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
@@ -208,7 +209,7 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
-            assertThat(it.vmFeatures().features()).isEmpty();
+            assertThat(it.insights()).isEqualTo(Insights.empty());
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
         });

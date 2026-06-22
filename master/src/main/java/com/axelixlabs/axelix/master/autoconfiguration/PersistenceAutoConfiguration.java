@@ -53,7 +53,7 @@ import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -111,8 +111,8 @@ public class PersistenceAutoConfiguration {
             return List.of(
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
-                    new VmFeaturesReadingConverter(jsonMapper),
-                    new VmFeaturesWritingConverter(jsonMapper),
+                    new InsightsReadingConverter(jsonMapper),
+                    new InsightsWritingConverter(jsonMapper),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper));
         }
@@ -218,8 +218,8 @@ public class PersistenceAutoConfiguration {
         @Override
         protected @NonNull List<?> userConverters() {
             return List.of(
-                    new VmFeaturesReadingConverter(jsonMapper),
-                    new VmFeaturesWritingConverter(jsonMapper),
+                    new InsightsReadingConverter(jsonMapper),
+                    new InsightsWritingConverter(jsonMapper),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper));
         }
@@ -260,37 +260,36 @@ public class PersistenceAutoConfiguration {
         }
 
         @WritingConverter
-        public static class VmFeaturesWritingConverter implements Converter<Instance.VmFeatures, String> {
+        public static class InsightsWritingConverter implements Converter<Insights, String> {
 
             private final JsonMapper jsonMapper;
 
-            public VmFeaturesWritingConverter(JsonMapper jsonMapper) {
+            public InsightsWritingConverter(JsonMapper jsonMapper) {
                 this.jsonMapper = jsonMapper;
             }
 
             @Override
-            public String convert(Instance.VmFeatures source) {
-                Set<Instance.VMFeature> features = source == null ? Set.of() : source.features();
-                return jsonMapper.writeValueAsString(features);
+            public String convert(Insights source) {
+                Insights insights = source == null ? Insights.empty() : source;
+                return jsonMapper.writeValueAsString(insights);
             }
         }
 
         @ReadingConverter
-        public static class VmFeaturesReadingConverter implements Converter<String, Instance.VmFeatures> {
+        public static class InsightsReadingConverter implements Converter<String, Insights> {
 
             private final JsonMapper jsonMapper;
 
-            public VmFeaturesReadingConverter(JsonMapper jsonMapper) {
+            public InsightsReadingConverter(JsonMapper jsonMapper) {
                 this.jsonMapper = jsonMapper;
             }
 
             @Override
-            public Instance.VmFeatures convert(String source) {
+            public Insights convert(String source) {
                 if (source == null || source.isBlank()) {
-                    return Instance.VmFeatures.empty();
+                    return Insights.empty();
                 }
-                Set<Instance.VMFeature> features = jsonMapper.readValue(source, new TypeReference<>() {});
-                return Instance.VmFeatures.of(features);
+                return jsonMapper.readValue(source, Insights.class);
             }
         }
     }

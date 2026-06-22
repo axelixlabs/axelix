@@ -39,7 +39,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
@@ -94,18 +93,24 @@ public class DetailsApiTest {
              "version": "10.0",
              "arch": "amd64"
            },
-           "vmFeatures": [
-             {
-              "name" : "AppCDS",
-              "description" : "AppCDS Description",
-              "enabled" : false
+           "insights": {
+             "hotSpot": {
+               "projectLeyden": [
+                 {
+                   "name": "AppCDS",
+                   "enabled": false
+                 }
+               ],
+               "gc": [],
+               "projectLilliput": [
+                 {
+                   "name": "CompactObjectHeaders",
+                   "enabled": true
+                 }
+               ]
              },
-             {
-              "name" : "CompressedObjectHeaders",
-              "description" : "CompressedObjectHeaders Description",
-              "enabled" : true
-             }
-           ]
+             "springFramework": []
+           }
          }
         """;
 
@@ -143,18 +148,24 @@ public class DetailsApiTest {
          "version": "10.0",
          "arch": "amd64"
        },
-       "vmFeatures": [
+       "insights": {
+         "hotSpot": {
+           "projectLeyden": [
              {
-              "name" : "AppCDS",
-              "description" : "AppCDS Description",
-              "enabled" : false
-             },
-             {
-              "name" : "CompressedObjectHeaders",
-              "description" : "CompressedObjectHeaders Description",
-              "enabled" : true
+               "name": "AppCDS",
+               "enabled": false
              }
-       ]
+           ],
+           "gc": [],
+           "projectLilliput": [
+             {
+               "name": "CompactObjectHeaders",
+               "enabled": true
+             }
+           ]
+         },
+         "springFramework": []
+       }
      }
     """;
 
@@ -279,14 +290,12 @@ public class DetailsApiTest {
         registry.register(TestObjectFactory.createInstance(
                 activeInstanceId,
                 mockWebServer.url(activeInstanceId) + "/actuator",
-                new Instance.VMFeature("AppCDS", "AppCDS Description", false),
-                new Instance.VMFeature("CompressedObjectHeaders", "CompressedObjectHeaders Description", true)));
+                TestObjectFactory.sampleInsights()));
 
         registry.register(TestObjectFactory.createInstance(
                 instanceWithoutPluginId,
                 mockWebServer.url(instanceWithoutPluginId) + "/actuator",
-                new Instance.VMFeature("AppCDS", "AppCDS Description", false),
-                new Instance.VMFeature("CompressedObjectHeaders", "CompressedObjectHeaders Description", true)));
+                TestObjectFactory.sampleInsights()));
     }
 
     @AfterEach

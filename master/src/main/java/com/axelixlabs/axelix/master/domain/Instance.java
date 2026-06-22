@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.domain;
 
 import java.time.Instant;
-import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -43,7 +42,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param memoryUsage             Memory usage of the given instance
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
- * @param vmFeatures              Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
+ * @param insights                Insight information discovered for this service, like AOT Cache, AppCDS, OSIV etc.
  */
 @Table("instances")
 public record Instance(
@@ -61,31 +60,7 @@ public record Instance(
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
         String actuatorUrl,
-        @Column("vm_features") VmFeatures vmFeatures) {
-
-    /**
-     * Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
-     *
-     * @param name feature name
-     * @param description feature description
-     * @param enabled enabled or not
-     */
-    public record VMFeature(String name, String description, boolean enabled) {}
-
-    /**
-     * Wraps persisted VM features JSON. A dedicated type (not {@code Set}) is required so Spring Data JDBC maps a
-     * single column instead of a separate {@code vm_feature} collection table.
-     */
-    public record VmFeatures(Set<VMFeature> features) {
-
-        public static VmFeatures of(Set<VMFeature> features) {
-            return new VmFeatures(features);
-        }
-
-        public static VmFeatures empty() {
-            return new VmFeatures(Set.of());
-        }
-    }
+        @Column("insights") Insights insights) {
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
@@ -103,7 +78,7 @@ public record Instance(
                 instanceStatus,
                 this.memoryUsage,
                 this.actuatorUrl,
-                this.vmFeatures);
+                this.insights);
     }
 
     public enum InstanceStatus {

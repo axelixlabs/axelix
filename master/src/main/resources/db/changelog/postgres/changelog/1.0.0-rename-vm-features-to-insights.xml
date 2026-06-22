@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="postgres-1.0.0-rename-vm-features-to-insights" author="Axelix Team">
+
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <columnExists tableName="instances" columnName="vm_features"/>
+    </preConditions>
+
+    <renameColumn tableName="instances"
+                  oldColumnName="vm_features"
+                  newColumnName="insights"
+                  columnDataType="TEXT"/>
+  </changeSet>
+</databaseChangeLog>

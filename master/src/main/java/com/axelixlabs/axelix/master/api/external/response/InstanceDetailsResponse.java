@@ -17,12 +17,10 @@
  */
 package com.axelixlabs.axelix.master.api.external.response;
 
-import java.util.Collection;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
+import com.axelixlabs.axelix.master.domain.Insights;
 
 /**
  * The profile of a given details.
@@ -44,7 +42,7 @@ public record InstanceDetailsResponse(
         SpringProfile spring,
         @Nullable BuildProfile build,
         OSProfile os,
-        Collection<VMFeature> vmFeatures) {
+        Insights insights) {
 
     /**
      * The profile of a given build.

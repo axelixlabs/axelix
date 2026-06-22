@@ -29,8 +29,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.axelixlabs.axelix.master.domain.HotSpot;
+import com.axelixlabs.axelix.master.domain.InsightFeature;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
@@ -84,9 +86,12 @@ abstract class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                Instance.VmFeatures.of(Set.of(
-                        new VMFeature("feature-1", "description-1", true),
-                        new VMFeature("feature-2", "description-2", false))));
+                new Insights(
+                        new HotSpot(
+                                List.of(new InsightFeature("feature-1", true)),
+                                List.of(new InsightFeature("feature-2", false)),
+                                List.of()),
+                        List.of()));
 
         // when.
         instanceRegistry.register(instance);
@@ -122,9 +127,12 @@ abstract class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                Instance.VmFeatures.of(Set.of(
-                        new VMFeature("feature-1", "description-1", true),
-                        new VMFeature("feature-2", "description-2", false))));
+                new Insights(
+                        new HotSpot(
+                                List.of(new InsightFeature("feature-1", true)),
+                                List.of(new InsightFeature("feature-2", false)),
+                                List.of()),
+                        List.of()));
         instanceRegistry.register(instance);
 
         // when.
@@ -143,7 +151,7 @@ abstract class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(1200d),
                 instance.actuatorUrl(),
-                instance.vmFeatures());
+                instance.insights());
 
         instanceRegistry.register(updated);
 
@@ -271,6 +279,6 @@ abstract class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(heap),
                 "/actuator",
-                Instance.VmFeatures.empty());
+                Insights.empty());
     }
 }

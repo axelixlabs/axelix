@@ -18,10 +18,14 @@
 package com.axelixlabs.axelix.master.service;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.master.domain.HotSpot;
+import com.axelixlabs.axelix.master.domain.InsightFeature;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,10 +34,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link InstanceFactory}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public class DefaultInstanceFactoryTest {
 
-    private InstanceFactory instanceFactory = new DefaultInstanceFactory();
+    private final InstanceFactory instanceFactory = new DefaultInstanceFactory();
 
     @Test
     void createInstance() {
@@ -62,7 +67,13 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");
-        assertThat(instance.vmFeatures().features()).isEmpty();
+        assertThat(instance.insights())
+                .isEqualTo(new Insights(
+                        new HotSpot(
+                                List.of(new InsightFeature("AppCDS", true)),
+                                List.of(new InsightFeature("GCLoggingEnabled", false)),
+                                List.of()),
+                        List.of(new InsightFeature("OSIV", true))));
     }
 
     private BasicDiscoveryMetadata mapMetadata() {
@@ -71,6 +82,13 @@ public class DefaultInstanceFactoryTest {
 
         BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
 
+        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
+                new BasicDiscoveryMetadata.HotSpot(
+                        List.of(new BasicDiscoveryMetadata.InsightFeature("AppCDS", true)),
+                        List.of(new BasicDiscoveryMetadata.InsightFeature("GCLoggingEnabled", false)),
+                        List.of()),
+                List.of(new BasicDiscoveryMetadata.InsightFeature("OSIV", true)));
+
         return new BasicDiscoveryMetadata(
                 "1.0.0-SNAPSHOT",
                 "3.5.0-SNAPSHOT",
@@ -78,6 +96,7 @@ public class DefaultInstanceFactoryTest {
                 "BellSoft",
                 softwareVersions,
                 BasicDiscoveryMetadata.HealthStatus.UP,
-                memoryDetails);
+                memoryDetails,
+                insights);
     }
 }

@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.service.convert.InsightsConverter;
 
 /**
  * Default implementation {@link InstanceFactory}.
@@ -68,7 +69,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
                 instanceActuatorUrl,
-                Instance.VmFeatures.empty());
+                InsightsConverter.fromApi(metadata.getInsights()));
     }
 
     private InstanceStatus convertServiceStatus(HealthStatus healthStatus) {
