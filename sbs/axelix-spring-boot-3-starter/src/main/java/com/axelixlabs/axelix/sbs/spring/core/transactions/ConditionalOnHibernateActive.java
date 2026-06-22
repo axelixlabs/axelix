@@ -40,6 +40,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+@ConditionalOnClass(name = {"org.hibernate.Session"})
 @ConditionalOnBean(type = "jakarta.persistence.EntityManagerFactory")
 public @interface ConditionalOnHibernateActive {}
