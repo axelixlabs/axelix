@@ -19,7 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.List;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -45,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Ilya Naumov
+ * @author Vyacheslav Yanin
  */
 class TransactionMonitoringAutoConfigurationTest {
 
@@ -63,10 +67,22 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
             assertThat(context)
-                    .hasSingleBean(
+                    .doesNotHaveBean(
                             TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
                                     .class);
         });
+    }
+
+    @Test // GH-1254
+    void shouldCreatePaginationAppender_whenEntityManagerFactoryIsPresent() {
+        EntityManagerFactory mockFactory = Mockito.mock(EntityManagerFactory.class);
+
+        contextRunner
+                .withBean(EntityManagerFactory.class, () -> mockFactory)
+                .run(context -> assertThat(context)
+                        .hasSingleBean(
+                                TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                        .class));
     }
 
     @Test // GH-1250

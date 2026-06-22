@@ -24,7 +24,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -36,6 +35,7 @@ import org.springframework.context.event.EventListener;
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
@@ -55,6 +55,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Ilya Naumov
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
@@ -125,7 +126,7 @@ public class TransactionMonitoringAutoConfiguration {
     }
 
     @Configuration
-    @ConditionalOnClass(name = {"org.hibernate.Session", "ch.qos.logback.classic.LoggerContext"})
+    @ConditionalOnHibernateActive
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
             name = "enabled",
