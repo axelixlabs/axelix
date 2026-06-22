@@ -28,11 +28,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
 /**
  * Composite {@code @Conditional} annotation that matches only if Hibernate is
- * active in the application context and the required logging classes are present on the classpath.
+ * active in the application context.
  *
  * <p>This annotation should be used on configuration classes or components
- * that require an active {@code EntityManagerFactory} bean alongside
- * {@code LoggerContext} to perform Hibernate-specific logging and monitoring operations.
+ * that require an active {@code EntityManagerFactory} bean to perform
+ * Hibernate-specific operations.
  *
  * @since 22.06.2026
  * @author Vyacheslav Yanin
