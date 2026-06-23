@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.axelixlabs.axelix.sbs.spring.core.transactions.Log4j2InMemoryPaginationAppenderRegistrar;
 import io.micrometer.core.instrument.MeterRegistry;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -136,9 +138,37 @@ public class TransactionMonitoringAutoConfiguration {
             matchIfMissing = true)
     static class LogbackInMemoryPaginationAppenderConfiguration {
 
+        @Bean
+        public LogbackInMemoryPaginationAppenderRegistrar logbackInMemoryPaginationAppenderRegistrar() {
+            return new LogbackInMemoryPaginationAppenderRegistrar();
+        }
+
         @EventListener(ApplicationReadyEvent.class)
-        public void registerAppender() {
-            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        public void registerAppender(LogbackInMemoryPaginationAppenderRegistrar registrar) {
+            registrar.register();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnHibernateActive
+    @ConditionalOnClass(name = "org.apache.logging.log4j.core.LoggerContext")
+    @AutoConfigureAfter(LogbackInMemoryPaginationAppenderConfiguration.class)
+    @ConditionalOnProperty(
+        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true)
+    static class Log4j2InMemoryPaginationAppenderConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean(LogbackInMemoryPaginationAppenderRegistrar.class)
+        public Log4j2InMemoryPaginationAppenderRegistrar log4j2InMemoryPaginationAppenderRegistrar() {
+            return new Log4j2InMemoryPaginationAppenderRegistrar();
+        }
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender(ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider) {
+            registrarProvider.ifAvailable(Log4j2InMemoryPaginationAppenderRegistrar::register);
         }
     }
 }
