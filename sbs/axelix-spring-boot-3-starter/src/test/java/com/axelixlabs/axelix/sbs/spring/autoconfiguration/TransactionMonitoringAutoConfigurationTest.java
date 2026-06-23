@@ -100,8 +100,10 @@ class TransactionMonitoringAutoConfigurationTest {
 
             if (hasLogback) {
                 assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderRegistrar.class);
+                assertThat(context).doesNotHaveBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
             } else {
                 assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
+                assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderRegistrar.class);
             }
         });
     }
