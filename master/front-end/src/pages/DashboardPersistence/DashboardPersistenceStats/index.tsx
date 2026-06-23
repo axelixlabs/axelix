@@ -15,22 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import type { IDashboardPersistenceStatsData } from "models";
+
 import styles from "./styles.module.css";
 
 interface IProps {
-    title: string;
-    children: React.ReactNode;
-    subtitle: string;
+    data: IDashboardPersistenceStatsData[];
 }
 
-export const DashboardJavaCard = ({ title, subtitle, children }: IProps) => {
+export const DashboardPersistenceStats = ({ data }: IProps) => {
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.CardHeaderWrapper}>
-                <div className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</div>
-                <div className={styles.Title}>{title}</div>
+        <>
+            <div className={styles.MainWrapper}>
+                {data.map(({ label, value, color }) => (
+                    <div key={label} className={styles.Stat}>
+                        <span className={`TextUltraSmall ${styles.Label}`}>{label}</span>
+                        <span className={`TextSmall ${styles.Value}`} style={{ color: color }}>
+                            {value}
+                        </span>
+                    </div>
+                ))}
             </div>
-            {children}
-        </div>
+        </>
     );
 };

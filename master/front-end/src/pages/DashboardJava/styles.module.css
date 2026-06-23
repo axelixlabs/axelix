@@ -1,12 +1,3 @@
-.HeaderWrapper {
-    margin-bottom: 30px;
-}
-
-.Subtitle {
-    color: var(--axelix-bold-grey);
-    margin-top: 10px;
-}
-
 .ChartsWrapper {
     display: grid;
     gap: 20px;

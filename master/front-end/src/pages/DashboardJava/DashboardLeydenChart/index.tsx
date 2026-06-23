@@ -17,9 +17,10 @@
  */
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
+import { DashboardCard } from "components";
+
 import { DashboardChartTooltip } from "../DashboardChartTooltip";
 import { DashboardDonutCentre } from "../DashboardDonutCentre";
-import { DashboardJavaCard } from "../DashboardJavaCard";
 import { DashboardLegendItem } from "../DashboardLegendItem";
 
 import styles from "./styles.module.css";
@@ -39,33 +40,35 @@ const mockData = [
 
 export const DashboardLeydenChart = () => {
     return (
-        <DashboardJavaCard title="Project Leyden Adoption" subtitle="JVM optimisation">
-            <div className={styles.ContentWrapper}>
-                <div className={styles.ChartWrapper}>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={mockData}
-                                innerRadius={55}
-                                outerRadius={80}
-                                paddingAngle={3}
-                                dataKey="value"
-                                stroke="none"
-                            />
-                            <Tooltip content={<DashboardChartTooltip />} wrapperStyle={{ zIndex: 10 }} />
-                        </PieChart>
-                    </ResponsiveContainer>
+        <>
+            <DashboardCard title="Project Leyden Adoption" subtitle="JVM optimisation">
+                <div className={styles.ContentWrapper}>
+                    <div className={styles.ChartWrapper}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={mockData}
+                                    innerRadius={55}
+                                    outerRadius={80}
+                                    paddingAngle={3}
+                                    dataKey="value"
+                                    stroke="none"
+                                />
+                                <Tooltip content={<DashboardChartTooltip />} wrapperStyle={{ zIndex: 10 }} />
+                            </PieChart>
+                        </ResponsiveContainer>
 
-                    {/* TODO: Fix after using real data */}
-                    <DashboardDonutCentre topRowData="4" bottomRowData="methods" />
-                </div>
+                        {/* TODO: Fix after using real data */}
+                        <DashboardDonutCentre topRowData="4" bottomRowData="methods" />
+                    </div>
 
-                <div className={styles.LegendWrapper}>
-                    {mockData.map(({ name, fill, value }) => (
-                        <DashboardLegendItem key={name} circleColor={fill} label={name} value={`${value}%`} />
-                    ))}
+                    <div className={styles.LegendWrapper}>
+                        {mockData.map(({ name, fill, value }) => (
+                            <DashboardLegendItem key={name} circleColor={fill} label={name} value={`${value}%`} />
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </DashboardJavaCard>
+            </DashboardCard>
+        </>
     );
 };

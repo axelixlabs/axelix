@@ -15,8 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-const DashboardPersistance = () => {
-    return "DashboardPersistance";
+import { DashboardPagesFirstSection } from "components";
+
+import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
+import { NPlusOneTreemap } from "./NPlusOneTreemap";
+import styles from "./styles.module.css";
+
+const DashboardPersistence = () => {
+    return (
+        <>
+            <DashboardPagesFirstSection
+                title="Persistence Dashboard"
+                subtitle="Database access patterns · N+1 detection · In-memory pagination"
+            />
+
+            <div className={styles.ChartsWrapper}>
+                <NPlusOneTreemap />
+                <InMemoryPaginationTreemap />
+            </div>
+        </>
+    );
 };
 
-export default DashboardPersistance;
+export default DashboardPersistence;
