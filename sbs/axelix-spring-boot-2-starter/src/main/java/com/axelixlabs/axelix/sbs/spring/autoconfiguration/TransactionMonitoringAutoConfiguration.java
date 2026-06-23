@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -110,6 +111,7 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Configuration
     @ConditionalOnHibernateActive
+    @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
             name = "enabled",
