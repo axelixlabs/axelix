@@ -1,0 +1,29 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+}
+
+.LegendEnity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.Color {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    margin-right: 8px;
+}
+
+.Label {
+    color: var(--axelix-bold-grey);
+}
+
+.Value {
+    font-weight: 500;
+}

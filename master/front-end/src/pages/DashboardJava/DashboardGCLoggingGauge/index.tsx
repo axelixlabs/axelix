@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardJavaCard } from "../DashboardJavaCard";
+import { DashboardCard } from "components";
 
 import { ArcSegment } from "./ArcSegment";
 import { StatCards } from "./StatCards";
@@ -41,46 +41,48 @@ export const DashboardGCLoggingGauge = () => {
     const enabledPercent = total > 0 ? (gcLogEnabled / total) * 100 : 0;
     const split = (enabledPercent / 100) * 180;
 
-    const roundedEnabledPercent = Math.round(enabledPercent)
+    const roundedEnabledPercent = Math.round(enabledPercent);
 
     return (
-        <DashboardJavaCard title="Garbage Collector Logging" subtitle="Log output coverage">
-            <div className={styles.ContentWrapper}>
-                <svg viewBox="0 0 220 120" width="220" height="120">
-                    <ArcSegment
-                        cx={CX}
-                        cy={CY}
-                        radius={RADIUS}
-                        thickness={THICKNESS}
-                        startDeg={180}
-                        endDeg={360}
-                        color={SLATE}
-                    />
-                    <ArcSegment
-                        cx={CX}
-                        cy={CY}
-                        radius={RADIUS}
-                        thickness={THICKNESS}
-                        startDeg={180}
-                        endDeg={180 + split - GAP_DEG}
-                        color={GREEN}
-                    />
-                    <ArcSegment
-                        cx={CX}
-                        cy={CY}
-                        radius={RADIUS}
-                        thickness={THICKNESS}
-                        startDeg={180 + split + GAP_DEG}
-                        endDeg={360}
-                        color={ROSE}
-                    />
-                    <text x={CX} y={CY - 20} textAnchor="middle" dominantBaseline="central" className="TextMedium">
-                        {roundedEnabledPercent}%
-                    </text>
-                </svg>
+        <>
+            <DashboardCard title="Garbage Collector Logging" subtitle="Log output coverage">
+                <div className={styles.ContentWrapper}>
+                    <svg viewBox="0 0 220 120" width="220" height="120">
+                        <ArcSegment
+                            cx={CX}
+                            cy={CY}
+                            radius={RADIUS}
+                            thickness={THICKNESS}
+                            startDeg={180}
+                            endDeg={360}
+                            color={SLATE}
+                        />
+                        <ArcSegment
+                            cx={CX}
+                            cy={CY}
+                            radius={RADIUS}
+                            thickness={THICKNESS}
+                            startDeg={180}
+                            endDeg={180 + split - GAP_DEG}
+                            color={GREEN}
+                        />
+                        <ArcSegment
+                            cx={CX}
+                            cy={CY}
+                            radius={RADIUS}
+                            thickness={THICKNESS}
+                            startDeg={180 + split + GAP_DEG}
+                            endDeg={360}
+                            color={ROSE}
+                        />
+                        <text x={CX} y={CY - 20} textAnchor="middle" dominantBaseline="central" className="TextMedium">
+                            {roundedEnabledPercent}%
+                        </text>
+                    </svg>
 
-                <StatCards enabledPercent={roundedEnabledPercent} />
-            </div>
-        </DashboardJavaCard>
+                    <StatCards enabledPercent={roundedEnabledPercent} />
+                </div>
+            </DashboardCard>
+        </>
     );
 };

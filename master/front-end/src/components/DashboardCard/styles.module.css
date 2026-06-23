@@ -6,8 +6,8 @@
     box-shadow: var(--axelix-box-shadow-bold);
 }
 
-.CardHeaderWrapper {
-    margin-bottom: 12px;
+.HeaderWrapper {
+    margin-bottom: 20px;
 }
 
 .Subtitle {

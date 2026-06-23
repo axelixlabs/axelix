@@ -15,28 +15,39 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
-
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
 import styles from "./styles.module.css";
 
-const DashboardJava = () => {
+interface IProps {
+    active?: boolean;
+
+    // TODO: Fix type
+    payload?: any[];
+}
+
+export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
+    const entry = payload?.[0]?.payload;
+
+    if (!active || !entry) {
+        return null;
+    }
+
+    const { name, size, entity } = entry;
+
     return (
         <>
-            <DashboardPagesFirstSection
-                title="JAVA"
-                subtitle="Real-time JVM metrics · Project Leyden · Garbage Collection"
-            />
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <div className={styles.Title}>{name}</div>
 
-            <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
+                <div>
+                    Queries: <b>{size}</b>
+                </div>
+
+                {entity && (
+                    <div>
+                        Entity: <b>{entity}</b>
+                    </div>
+                )}
             </div>
         </>
     );
 };
-
-export default DashboardJava;

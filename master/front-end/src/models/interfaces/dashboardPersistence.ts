@@ -15,30 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
-
-// TODO: Fix types in future
-interface IProps {
-    active?: boolean;
-    payload?: any[];
+// TODO: Maybe we can improve these types
+export interface IDashboardTreemapEntity {
+    name: string;
+    size: number;
+    entity: string;
+    [key: string]: string | number;
 }
 
-// TODO: Improve this component in future
-export const DashboardChartTooltip = ({ active, payload }: IProps) => {
-    const entry = payload?.[0]?.payload;
+export interface IDashboardPersistenceStatsData {
+    label: string;
+    value: string;
+    color: string;
+}
 
-    if (!active || !entry) {
-        return null;
-    }
-
-    const { name, value, fill } = entry;
-
-    return (
-        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-            <span style={{ color: fill }}>&#9673;</span>
-            <span>
-                {name}: <b>{value}%</b>
-            </span>
-        </div>
-    );
-};
+export interface IDashboardTreemapEntityWithColor extends IDashboardTreemapEntity {
+    fill: string;
+}

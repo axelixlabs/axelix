@@ -1,0 +1,20 @@
+.MainWrapper {
+    display: flex;
+    column-gap: 20px;
+}
+
+.Stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.Label {
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.Value {
+    font-weight: 600;
+}
