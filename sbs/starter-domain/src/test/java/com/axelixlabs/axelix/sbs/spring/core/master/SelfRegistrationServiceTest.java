@@ -52,6 +52,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -164,19 +165,26 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
+        InsightsInfoProvider insightsInfoProvider() {
+            return () -> new BasicDiscoveryMetadata.Insights(
+                    new BasicDiscoveryMetadata.HotSpot(List.of(), List.of(), List.of()), List.of());
+        }
+
+        @Bean
         public DefaultServiceMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 List<GitInformationProvider> gitInformationProviders,
                 List<ShortBuildInfoProvider> shortBuildInfoProviders,
-                LibraryInformationProvider libraryInformationProvider) {
+                LibraryInformationProvider libraryInformationProvider,
+                InsightsInfoProvider insightsInfoProvider) {
             return new DefaultServiceMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProviders,
                     shortBuildInfoProviders,
                     libraryInformationProvider,
-                    null);
+                    insightsInfoProvider);
         }
     }
 

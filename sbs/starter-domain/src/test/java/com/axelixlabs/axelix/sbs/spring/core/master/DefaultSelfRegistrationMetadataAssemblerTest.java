@@ -36,11 +36,14 @@ import org.springframework.core.SpringVersion;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,19 +115,25 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         }
 
         @Bean
+        InsightsInfoProvider insightsInfoProvider() {
+            return () -> new Insights(new HotSpot(List.of(), List.of(), List.of()), List.of());
+        }
+
+        @Bean
         public DefaultServiceMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 List<GitInformationProvider> gitInformationProviders,
                 List<ShortBuildInfoProvider> shortBuildInfoProviders,
-                LibraryInformationProvider libraryInformationProvider) {
+                LibraryInformationProvider libraryInformationProvider,
+                InsightsInfoProvider insightsInfoProvider) {
             return new DefaultServiceMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProviders,
                     shortBuildInfoProviders,
                     libraryInformationProvider,
-                    null);
+                    insightsInfoProvider);
         }
     }
 

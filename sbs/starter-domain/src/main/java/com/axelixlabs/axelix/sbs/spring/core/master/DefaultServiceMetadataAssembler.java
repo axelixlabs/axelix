@@ -22,8 +22,6 @@ import java.lang.management.MemoryMXBean;
 import java.util.List;
 import java.util.Optional;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
@@ -44,7 +42,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final LibraryInformationProvider libraryInformationProvider;
-    private final @Nullable InsightsInfoProvider insightsInfoProvider;
+    private final InsightsInfoProvider insightsInfoProvider;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
@@ -52,7 +50,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
             LibraryInformationProvider libraryInformationProvider,
-            @Nullable InsightsInfoProvider insightsInfoProvider) {
+            InsightsInfoProvider insightsInfoProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
@@ -76,7 +74,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
                         memoryMXBean.getHeapMemoryUsage().getUsed()),
-                insightsInfoProvider != null ? insightsInfoProvider.getInsight() : null);
+                insightsInfoProvider.getInsight());
     }
 
     private Optional<ShortBuildInfo> getShortBuildInfo() {

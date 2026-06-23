@@ -30,6 +30,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvide
  *
  * @author Mikhail Polivakha
  */
+// TODO: This is the candidate for the future to-be-created common-test module
 public final class TestInsightsInfoProvider implements InsightsInfoProvider {
 
     public static final Insights TEST_INSIGHTS = new Insights(

@@ -43,6 +43,8 @@ public final class BasicDiscoveryMetadata {
     private final SoftwareVersions softwareVersions;
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
+    private final Insights insights;
+
     /**
      * Creates a new ServiceMetadata.
      *
@@ -69,7 +71,7 @@ public final class BasicDiscoveryMetadata {
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
             @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
-            @JsonProperty("insights") @Nullable Insights insights) {
+            @JsonProperty("insights") Insights insights) {
         this.version = version;
         this.serviceVersion = serviceVersion;
         this.commitShortSha = commitShortSha;
@@ -79,8 +81,6 @@ public final class BasicDiscoveryMetadata {
         this.memoryDetails = memoryDetails;
         this.insights = insights;
     }
-
-    private final @Nullable Insights insights;
 
     public String getVersion() {
         return version;
@@ -110,7 +110,7 @@ public final class BasicDiscoveryMetadata {
         return memoryDetails;
     }
 
-    public @Nullable Insights getInsights() {
+    public Insights getInsights() {
         return insights;
     }
 
