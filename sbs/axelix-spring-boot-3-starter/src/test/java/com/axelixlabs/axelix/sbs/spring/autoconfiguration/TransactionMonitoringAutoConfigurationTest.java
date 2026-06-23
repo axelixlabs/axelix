@@ -17,6 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.List;
+
+import jakarta.persistence.EntityManagerFactory;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
@@ -29,15 +41,6 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringB
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
-import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,42 +92,38 @@ class TransactionMonitoringAutoConfigurationTest {
     void shouldCreateAtLeastOneAppender_whenConditionsAreMet() {
         EntityManagerFactory mockFactory = Mockito.mock(EntityManagerFactory.class);
 
-        contextRunner
-            .withBean(EntityManagerFactory.class, () -> mockFactory)
-            .run(context -> {
-                boolean hasLogback = context.containsBean("logbackInMemoryPaginationAppenderRegistrar");
-                boolean hasLog4j2 = context.containsBean("log4j2InMemoryPaginationAppenderRegistrar");
+        contextRunner.withBean(EntityManagerFactory.class, () -> mockFactory).run(context -> {
+            boolean hasLogback = context.containsBean("logbackInMemoryPaginationAppenderRegistrar");
+            boolean hasLog4j2 = context.containsBean("log4j2InMemoryPaginationAppenderRegistrar");
 
-                assertThat(hasLogback || hasLog4j2).isTrue();
+            assertThat(hasLogback || hasLog4j2).isTrue();
 
-                if (hasLogback) {
-                    assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderRegistrar.class);
-                } else {
-                    assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
-                }
-            });
+            if (hasLogback) {
+                assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderRegistrar.class);
+            } else {
+                assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
+            }
+        });
     }
 
     @Test // GH-1251
     void shouldNotCreateLog4j2Appender_whenLogbackTakesPrecedence() {
         EntityManagerFactory mockFactory = Mockito.mock(EntityManagerFactory.class);
 
-        contextRunner
-            .withBean(EntityManagerFactory.class, () -> mockFactory)
-            .run(context -> {
-                assertThat(context).hasSingleBean(
-                    TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration.class
-                );
-                assertThat(context).doesNotHaveBean(
-                    TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration.class
-                );
-            });
+        contextRunner.withBean(EntityManagerFactory.class, () -> mockFactory).run(context -> {
+            assertThat(context)
+                    .hasSingleBean(
+                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                    .class);
+            assertThat(context)
+                    .doesNotHaveBean(
+                            TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration.class);
+        });
     }
 
     @Test // GH-1251
     void shouldNotCreateAnyAppender_whenEntityManagerFactoryIsMissing() {
-        contextRunner.run(context ->
-            assertThat(context).doesNotHaveBean(InMemoryPaginationAppenderRegistrar.class));
+        contextRunner.run(context -> assertThat(context).doesNotHaveBean(InMemoryPaginationAppenderRegistrar.class));
     }
 
     @Test // GH-1250

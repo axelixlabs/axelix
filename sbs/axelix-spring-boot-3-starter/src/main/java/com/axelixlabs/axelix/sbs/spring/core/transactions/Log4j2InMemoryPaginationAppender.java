@@ -39,7 +39,7 @@ public class Log4j2InMemoryPaginationAppender extends AbstractAppender {
     private static final String HHH90003004 = "HHH90003004";
 
     protected Log4j2InMemoryPaginationAppender(String name) {
-        super(name,  null, null, true, Property.EMPTY_ARRAY);
+        super(name, null, null, true, Property.EMPTY_ARRAY);
     }
 
     @Override

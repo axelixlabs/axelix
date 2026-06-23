@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.Log4j2InMemoryPaginationAppenderRegistrar;
 import io.micrometer.core.instrument.MeterRegistry;
 
 import org.springframework.beans.factory.ObjectProvider;
@@ -42,6 +41,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.ConditionalOnHibernate
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
@@ -154,10 +154,10 @@ public class TransactionMonitoringAutoConfiguration {
     @ConditionalOnClass(name = "org.apache.logging.log4j.core.LoggerContext")
     @AutoConfigureAfter(LogbackInMemoryPaginationAppenderConfiguration.class)
     @ConditionalOnProperty(
-        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
-        name = "enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
     static class Log4j2InMemoryPaginationAppenderConfiguration {
 
         @Bean
