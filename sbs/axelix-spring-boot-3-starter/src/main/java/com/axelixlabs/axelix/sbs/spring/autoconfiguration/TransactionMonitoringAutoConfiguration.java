@@ -17,6 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import io.micrometer.core.instrument.MeterRegistry;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
@@ -33,21 +50,6 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringE
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
-import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 
 /**
  * Auto-configuration for Transaction Monitoring infrastructure.
@@ -161,8 +163,7 @@ public class TransactionMonitoringAutoConfiguration {
         private final ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider;
 
         public Log4j2InMemoryPaginationAppenderConfiguration(
-            ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider
-        ) {
+                ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider) {
             this.registrarProvider = registrarProvider;
         }
 
