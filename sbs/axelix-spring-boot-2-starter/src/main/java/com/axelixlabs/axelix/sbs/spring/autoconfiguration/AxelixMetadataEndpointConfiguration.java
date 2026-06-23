@@ -25,7 +25,6 @@ import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoC
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -58,6 +57,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
  */
 @AutoConfiguration(
         after = {
+            GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
             CommitIdPluginGitInformationProvider.class,
             CommitIdPluginShortBuildInfoProvider.class,
@@ -91,7 +91,6 @@ public class AxelixMetadataEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(GcLogService.class)
     public InsightsInfoProvider insightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             GcLogService gcLogService,

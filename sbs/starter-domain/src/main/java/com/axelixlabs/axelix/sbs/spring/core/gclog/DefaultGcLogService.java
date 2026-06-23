@@ -33,7 +33,6 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * @since 30.12.2025
  * @author Nikita Kirillov
  */
-// TODO This service requests to be moved to the starter‑domain
 public class DefaultGcLogService implements GcLogService {
 
     private static final String DEFAULT_FILE_NAME = "gc.log";

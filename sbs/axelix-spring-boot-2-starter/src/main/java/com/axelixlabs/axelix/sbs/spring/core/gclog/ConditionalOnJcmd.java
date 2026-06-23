@@ -29,13 +29,11 @@ import org.springframework.context.annotation.Conditional;
  * {@link Conditional} annotation that enables a component only if
  * the {@code jcmd} tool is available for the current JVM process.
  *
- * <p>This annotation should be used on configuration classes or components
- * that require {@code jcmd} to perform runtime JVM operations.
- *
  * @since 29.12.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Conditional(OnJcmdCondition.class)

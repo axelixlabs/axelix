@@ -17,19 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.ConditionalOnJcmd;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.DefaultGcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 /**
  * Auto-configuration for GC Log Endpoint functionality.
@@ -40,23 +34,9 @@ import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
  * @since 26.12.2025
  * @author Nikita Kirillov
  */
-@AutoConfiguration
-@ConditionalOnJcmd
+@AutoConfiguration(after = GarbageCollectionAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixGcEndpoint.class)
 public class AxelixGcEndpointAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public JcmdExecutor jcmdExecutor() {
-        return new JcmdExecutor();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
-        return new DefaultGcLogService(
-                jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
-    }
 
     @Bean
     @ConditionalOnMissingBean

@@ -43,7 +43,8 @@ class AxelixGcEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-gc")
-            .withConfiguration(AutoConfigurations.of(AxelixGcEndpointAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(
+                    GarbageCollectionAutoConfiguration.class, AxelixGcEndpointAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -60,8 +61,8 @@ class AxelixGcEndpointAutoConfigurationTest {
                 .withPropertyValues("management.endpoint.axelix-gc.enabled=false")
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixGcEndpointAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(JcmdExecutor.class);
-                    assertThat(context).doesNotHaveBean(GcLogService.class);
+                    assertThat(context).hasSingleBean(JcmdExecutor.class);
+                    assertThat(context).hasSingleBean(GcLogService.class);
                     assertThat(context).doesNotHaveBean(AxelixGcEndpoint.class);
                 });
     }
@@ -69,12 +70,13 @@ class AxelixGcEndpointAutoConfigurationTest {
     @Test
     void shouldNotActivateAutoConfigurationWithoutRequiredProperty() {
         new ApplicationContextRunner()
-                .withConfiguration(AutoConfigurations.of(AxelixGcEndpointAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(
+                        GarbageCollectionAutoConfiguration.class, AxelixGcEndpointAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixGcEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixGcEndpoint.class);
-                    assertThat(context).doesNotHaveBean(JcmdExecutor.class);
-                    assertThat(context).doesNotHaveBean(GcLogService.class);
+                    assertThat(context).hasSingleBean(JcmdExecutor.class);
+                    assertThat(context).hasSingleBean(GcLogService.class);
                 });
     }
 
