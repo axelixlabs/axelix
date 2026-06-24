@@ -190,14 +190,11 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public SuperAdminPasswordEncoder superAdminPasswordEncoder(BCryptPasswordEncoder encoder) {
-            return new SuperAdminPasswordEncoder(encoder);
-        }
-
-        @Bean
         public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
-                SuperAdminConfigurationProperties staticCredentialsConfig, SuperAdminPasswordEncoder passwordEncoder) {
-            return new SuperAdminUserAuthenticator(staticCredentialsConfig, passwordEncoder);
+                SuperAdminConfigurationProperties staticCredentialsConfig,
+                BCryptPasswordEncoder bcryptPasswordEncoder) {
+            return new SuperAdminUserAuthenticator(
+                    staticCredentialsConfig, new SuperAdminPasswordEncoder(bcryptPasswordEncoder));
         }
     }
 
