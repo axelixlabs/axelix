@@ -150,6 +150,18 @@ class DefaultInsightsInfoProviderTest {
     }
 
     @Test
+    void returnsGcLogFileSpecified_whenGcLogServiceReportsFileSpecified() {
+        // given.
+        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogFileSpecified(), emptyVmOptions());
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, true);
+    }
+
+    @Test
     void returnsOsivEnabled_whenOpenSessionInViewEnabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
@@ -218,11 +230,15 @@ class DefaultInsightsInfoProviderTest {
     }
 
     private static GcLogService gcLogDisabled() {
-        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")));
+        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), false);
     }
 
     private static GcLogService gcLogEnabled() {
-        return new TestGcLogService(new GcLogStatus(true, "debug", List.of("debug", "info")));
+        return new TestGcLogService(new GcLogStatus(true, "debug", List.of("debug", "info")), false);
+    }
+
+    private static GcLogService gcLogFileSpecified() {
+        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), true);
     }
 
     private static OpenSessionInViewStateProvider osivDisabled() {
@@ -240,9 +256,11 @@ class DefaultInsightsInfoProviderTest {
     private static final class TestGcLogService implements GcLogService {
 
         private final GcLogStatus status;
+        private final boolean logFileSpecified;
 
-        private TestGcLogService(GcLogStatus status) {
+        private TestGcLogService(GcLogStatus status, boolean logFileSpecified) {
             this.status = status;
+            this.logFileSpecified = logFileSpecified;
         }
 
         @Override
@@ -253,6 +271,11 @@ class DefaultInsightsInfoProviderTest {
         @Override
         public File getGcLogFile() {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isGcLogFileSpecified() {
+            return logFileSpecified;
         }
 
         @Override
