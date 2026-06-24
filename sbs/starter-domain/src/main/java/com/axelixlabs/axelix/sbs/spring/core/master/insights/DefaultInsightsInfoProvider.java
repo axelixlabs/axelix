@@ -71,7 +71,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return new BasicDiscoveryMetadata.Insights(
                 new HotSpot(
                         List.of(getAppCdsFeature(), getAotCacheFeature()),
-                        List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature(gcLogStatus)),
+                        List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature()),
                         List.of(getCompressedObjectHeadersFeature())),
                 List.of(new InsightFeature(OSIV, openSessionInViewStateProvider.isOpenSessionInViewEnabled())));
     }
@@ -93,9 +93,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return new InsightFeature(GC_LOGGING_ENABLED, gcLogStatus.isEnabled());
     }
 
-    // TODO At present, this placeholder will remain in place until the GC Logging status tracking mechanism is improved
-    // https://github.com/axelixlabs/axelix/issues/573
-    private InsightFeature getGcLogFileSpecifiedFeature(GcLogStatus gcLogStatus) {
-        return new InsightFeature(GC_LOG_FILE_SPECIFIED, false);
+    private InsightFeature getGcLogFileSpecifiedFeature() {
+        return new InsightFeature(GC_LOG_FILE_SPECIFIED, gcLogService.isGcLogFileSpecified());
     }
 }
