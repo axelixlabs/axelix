@@ -478,6 +478,105 @@ you.
 
 Expose the Service through your cluster's usual mechanism — an `Ingress` or a `Gateway` — for a quick check.
 
+### Bringing your own chart
+
+Some teams keep their own Helm chart or raw manifests rather than the first-party chart. That is fine. There are just a couple
+of things that need to be emphasized.
+
+#### Automatic Discovery
+
+During auto-discovery, Axelix Master queries the K8S control plane REST API. In order to do that, the [K8S ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/)
+that is bundled into the pod must have the appropriate permissions. The [official chart](https://github.com/axelixlabs/helm-charts)
+wires them up for you.
+
+:::note
+
+This matters only when `axelix.master.discovery.auto.enabled=true` — without auto-discovery Master needs none of the
+permissions below.
+
+:::
+
+Here is what to keep in mind when writing custom Helm Chart:
+
+**1. Master must reach the Kubernetes API.** As mentioned, in auto-discovery mode Master calls the cluster's control-plane API on the
+schedule set by `broadcast.schedule`, listing Services and the Pods behind them in each configured namespace. By
+default, Axelix Master reads the connection details from the standard in-pod locations:
+
+- The URL of the API server from `KUBERNETES_SERVICE_HOST` / `KUBERNETES_SERVICE_PORT_HTTPS`, which Kubernetes injects into every pod;
+- The [ServiceAccount token](https://kubernetes.io/docs/concepts/security/service-accounts/#authenticating-credentials) is taken from `/var/run/secrets/kubernetes.io/serviceaccount/token`;
+- The CA certificate from `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
+
+Those are the defaults of the `kube-apiserver-url`, `sa-token-path`, and `ca-cert-path` properties listed under
+[auto-discovery](#discovery--auto-discovery). Keep the defaults, and your only job is to make the token and CA land at
+those paths. The next two points cover that.
+
+**2. The pod needs a ServiceAccount with its token mounted.** Create a ServiceAccount, set `serviceAccountName` on the
+Deployment, and leave `automountServiceAccountToken: true` so the token and CA appear at the paths above. Without a
+mounted token Master has no credentials to present, and every scan fails with an authorization error.
+
+**3. That ServiceAccount needs RBAC to read workloads.** A bare ServiceAccount can authenticate but is allowed nothing.
+Grant it `get`, `list`, and `watch` on `pods`, `services`, and `endpoints` in each namespace you want discovered, then
+bind the created Role to the ServiceAccount. The namespaces you grant must match `filters.namespaces`: Master scans exactly
+those, and a namespace it cannot read returns no instances.
+
+Put together, the minimum for a single discovered namespace looks like this:
+
+```yaml title="rbac.yaml"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: axelix-master
+  namespace: axelix
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: axelix-master-role
+  namespace: default          # a namespace listed in filters.namespaces
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: axelix-master-role-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: axelix-master
+    namespace: axelix         # the namespace the ServiceAccount lives in
+roleRef:
+  kind: Role
+  name: axelix-master-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Then point the Deployment at that ServiceAccount:
+
+```yaml title="deployment.yaml"
+spec:
+  template:
+    spec:
+      serviceAccountName: axelix-master
+      containers:
+        - name: axelix-master
+          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+```
+
+In K8S, a Role is a namespaced object, so repeat the Role and RoleBinding once per namespace in `filters.namespaces`, all referencing
+the same ServiceAccount. When the ServiceAccount lives in a different namespace from the workloads, the RoleBinding
+subject must still name the ServiceAccount's own namespace, as shown above.
+
+:::tip
+The official's chart [`templates/rbac.yaml`](https://github.com/axelixlabs/helm-charts/blob/main/charts/axelix/templates/rbac.yaml)
+and [`templates/serviceaccount.yaml`](https://github.com/axelixlabs/helm-charts/blob/main/charts/axelix/templates/serviceaccount.yaml)
+are the reference for exactly this. You may run `helm template` against the chart and copy the rendered ServiceAccount, Role,
+and RoleBinding into your own manifests if you want a starting point.
+:::
+
 ## Related
 
 - [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) — wire your monitored
