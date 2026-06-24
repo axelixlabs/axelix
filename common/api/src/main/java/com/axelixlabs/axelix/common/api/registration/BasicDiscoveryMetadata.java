@@ -33,7 +33,7 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressWarnings(
         "NullAway") // TODO: we need to think about nullability here. It is not obvious what the correct setup is in
-// this case
+// this case UPDATE: this is going to be solved when migrating to out plugins system and during openapi migration
 public final class BasicDiscoveryMetadata {
 
     private final String version;

@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -150,8 +149,8 @@ class SelfRegistrationServiceTest {
 
         @Bean
         GitInformationProvider gitInformationProvider() {
-            return () -> Optional.of(
-                    new GitInfo("8f4b9f7", "main", "2026-02-06T10:15:30Z", new GitInfo.CommitAuthor("test", "test")));
+            return () ->
+                    new GitInfo("8f4b9f7", "main", "2026-02-06T10:15:30Z", new GitInfo.CommitAuthor("test", "test"));
         }
 
         @Bean

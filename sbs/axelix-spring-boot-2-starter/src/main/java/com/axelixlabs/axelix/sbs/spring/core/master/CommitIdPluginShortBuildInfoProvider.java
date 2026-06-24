@@ -25,6 +25,10 @@ import org.springframework.core.annotation.Order;
 
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 
+/**
+ * @deprecated This implementation is going to be gone in favor of our own plugin-backed implementation.
+ */
+@Deprecated(forRemoval = true)
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvider {
 

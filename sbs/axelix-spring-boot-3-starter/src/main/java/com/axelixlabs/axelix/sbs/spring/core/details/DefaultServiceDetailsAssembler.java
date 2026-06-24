@@ -73,12 +73,9 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     private GitDetails getGitDetails() {
-        if (gitInformationProvider.getGitCommitInfo().isEmpty()) {
-            return new GitDetails("", "", new CommitAuthor("", ""), "");
-        }
-
-        GitInfo gitCommitInfo = gitInformationProvider.getGitCommitInfo().get();
+        GitInfo gitCommitInfo = gitInformationProvider.getGitCommitInfo();
         GitInfo.CommitAuthor commitAuthor = gitCommitInfo.commitAuthor();
+
         return new GitDetails(
                 emptyIfNull(gitCommitInfo.commitShaShort()),
                 emptyIfNull(gitCommitInfo.branch()),

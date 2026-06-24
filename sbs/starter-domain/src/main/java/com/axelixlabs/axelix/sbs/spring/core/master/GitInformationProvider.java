@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 
@@ -31,5 +31,6 @@ public interface GitInformationProvider {
     /**
      * @return the {@link GitInfo} discovered from the environment
      */
-    Optional<GitInfo> getGitCommitInfo();
+    @NonNull
+    GitInfo getGitCommitInfo();
 }

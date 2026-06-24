@@ -33,8 +33,6 @@ import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscov
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
@@ -57,8 +55,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
         after = {
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
-            CommitIdPluginGitInformationProvider.class,
-            CommitIdPluginShortBuildInfoProvider.class
+            GitInformationProviderAutoConfiguration.class,
+            ShortBuildInfoProviderAutoConfiguration.class,
         })
 public class AxelixMetadataEndpointConfiguration {
 

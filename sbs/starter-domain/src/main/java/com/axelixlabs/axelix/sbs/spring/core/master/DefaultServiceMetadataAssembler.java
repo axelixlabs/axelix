@@ -21,7 +21,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
@@ -64,7 +63,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         return new BasicDiscoveryMetadata(
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfoProvider.getShortBuildInfo().serviceVersion(),
-                gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
+                gitCommitInfo.commitShaShort(),
                 libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),

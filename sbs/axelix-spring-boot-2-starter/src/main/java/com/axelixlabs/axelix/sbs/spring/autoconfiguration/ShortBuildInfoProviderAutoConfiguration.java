@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
@@ -30,14 +27,12 @@ import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfo
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
 
 /**
- * Auto-Configuration for registering the appropriate {@link ShortBuildInfoProvider} instances.
+ * Auto-Configuration for registering the appropriate {@link ShortBuildInfoProvider}.
  *
  * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = ProjectInfoAutoConfiguration.class)
 public class ShortBuildInfoProviderAutoConfiguration {
-
-    private static final Logger log = LoggerFactory.getLogger(ShortBuildInfoProviderAutoConfiguration.class);
 
     @Bean
     @ConditionalOnBean(GitProperties.class)
