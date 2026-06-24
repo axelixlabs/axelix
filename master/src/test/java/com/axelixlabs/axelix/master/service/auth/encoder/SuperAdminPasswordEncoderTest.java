@@ -130,6 +130,18 @@ public class SuperAdminPasswordEncoderTest {
             // then.
             assertThat(result).isTrue();
         }
+
+        @Test
+        void shouldMatch_whenPasswordHasBCryptFormat() {
+            // given.
+            String bcryptPassword = "{bcrypt}" + bcryptPasswordEncoder.encode(PLAIN_PASSWORD);
+
+            // when.
+            boolean result = encoder.matches(PLAIN_PASSWORD, bcryptPassword);
+
+            // then.
+            assertThat(result).isTrue();
+        }
     }
 
     @Nested
