@@ -44,7 +44,7 @@ Provider»** при включённом OIDC.
 Пароль может быть указан в одном из следующих форматов:
 
 * **Plaintext**
-* **[Формат DelegatingPasswordEncoder](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/crypto/password/DelegatingPasswordEncoder.html)** — с префиксами {noop} или {bcrypt}.
+* **[DelegatingPasswordEncoder](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/crypto/password/DelegatingPasswordEncoder.html)** — с префиксами {noop} или {bcrypt}.
 
 Если префикс отсутствует, значение рассматривается как plaintext.
 В целях безопасности настоятельно рекомендуется использовать хешированный формат пароля (например, {bcrypt}) вместо
