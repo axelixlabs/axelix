@@ -55,5 +55,10 @@ public record SuperAdminConfigurationProperties(Credentials credentials) {
         return credentials.password();
     }
 
+    /**
+     * @param username super-admin username
+     * @param password plain text or encoded password using DelegatingPasswordEncoder format
+     * {@code {noop}}, {@code {bcrypt}}
+     */
     record Credentials(String username, String password) {}
 }
