@@ -19,12 +19,9 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.util.List;
-import java.util.Optional;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
-import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
@@ -38,8 +35,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
     private final HealthDetectionFunction healthDetectionFunction;
-    private final List<GitInformationProvider> gitInformationProvider;
-    private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
+    private final GitInformationProvider gitInformationProvider;
+    private final ShortBuildInfoProvider shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final LibraryInformationProvider libraryInformationProvider;
     private final InsightsInfoProvider insightsInfoProvider;
@@ -47,27 +44,26 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
-            List<GitInformationProvider> gitInformationProviders,
-            List<ShortBuildInfoProvider> shortBuildInfoProviders,
+            GitInformationProvider gitInformationProvider,
+            ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
-        this.gitInformationProvider = gitInformationProviders;
-        this.shortBuildInfoProvider = shortBuildInfoProviders;
+        this.gitInformationProvider = gitInformationProvider;
+        this.shortBuildInfoProvider = shortBuildInfoProvider;
         this.libraryInformationProvider = libraryInformationProvider;
         this.insightsInfoProvider = insightsInfoProvider;
     }
 
     @Override
     public BasicDiscoveryMetadata assemble() {
-        var shortBuildInfo = getShortBuildInfo();
-        var gitCommitInfo = getGitCommitInfo();
+        var gitCommitInfo = gitInformationProvider.getGitCommitInfo();
 
         return new BasicDiscoveryMetadata(
                 axelixVersionDiscoverer.getVersion(),
-                shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
+                shortBuildInfoProvider.getShortBuildInfo().serviceVersion(),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
                 libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),
@@ -75,30 +71,6 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 new BasicDiscoveryMetadata.MemoryDetails(
                         memoryMXBean.getHeapMemoryUsage().getUsed()),
                 insightsInfoProvider.getInsight());
-    }
-
-    private Optional<ShortBuildInfo> getShortBuildInfo() {
-        for (var provider : shortBuildInfoProvider) {
-            Optional<ShortBuildInfo> shortBuildInfo = provider.getShortBuildInfo();
-
-            if (shortBuildInfo.isPresent()) {
-                return shortBuildInfo;
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    private Optional<GitInfo> getGitCommitInfo() {
-        for (var provider : gitInformationProvider) {
-            Optional<GitInfo> gitCommitInfo = provider.getGitCommitInfo();
-
-            if (gitCommitInfo.isPresent()) {
-                return gitCommitInfo;
-            }
-        }
-
-        return Optional.empty();
     }
 
     private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {

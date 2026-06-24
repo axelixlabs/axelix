@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.NoOpShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 10.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 class ShortBuildInfoProviderAutoConfigurationTest {
 
@@ -49,21 +49,6 @@ class ShortBuildInfoProviderAutoConfigurationTest {
             assertThat(context)
                     .getBean(ShortBuildInfoProvider.class)
                     .isInstanceOf(CommitIdPluginShortBuildInfoProvider.class);
-            assertThat(context).doesNotHaveBean(NoOpShortBuildInfoProvider.class);
         });
-    }
-
-    @Test
-    void shouldCreateNoOpProvider_whenRequiredFileNotExist() {
-        new ApplicationContextRunner()
-                .withConfiguration(AutoConfigurations.of(
-                        ShortBuildInfoProviderAutoConfiguration.class, ProjectInfoAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context).hasSingleBean(ShortBuildInfoProvider.class);
-                    assertThat(context)
-                            .getBean(ShortBuildInfoProvider.class)
-                            .isInstanceOf(NoOpShortBuildInfoProvider.class);
-                    assertThat(context).doesNotHaveBean(CommitIdPluginShortBuildInfoProvider.class);
-                });
     }
 }

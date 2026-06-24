@@ -106,7 +106,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
 
         @Bean
         ShortBuildInfoProvider shortBuildInfoProvider() {
-            return () -> Optional.of(new ShortBuildInfo("2026-02-06T10:15:30Z", "1.1.3"));
+            return () -> new ShortBuildInfo("2026-02-06T10:15:30Z", "1.1.3");
         }
 
         @Bean
@@ -123,15 +123,15 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         public DefaultServiceMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
-                List<GitInformationProvider> gitInformationProviders,
-                List<ShortBuildInfoProvider> shortBuildInfoProviders,
+                GitInformationProvider gitInformationProvider,
+                ShortBuildInfoProvider shortBuildInfoProvider,
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
             return new DefaultServiceMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
-                    gitInformationProviders,
-                    shortBuildInfoProviders,
+                    gitInformationProvider,
+                    shortBuildInfoProvider,
                     libraryInformationProvider,
                     insightsInfoProvider);
         }

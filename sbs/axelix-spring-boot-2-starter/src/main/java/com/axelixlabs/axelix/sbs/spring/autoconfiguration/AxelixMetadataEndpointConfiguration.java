@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -102,16 +101,16 @@ public class AxelixMetadataEndpointConfiguration {
     public ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
-            List<GitInformationProvider> gitInformationProviders,
-            List<ShortBuildInfoProvider> shortBuildInfoProviders,
+            GitInformationProvider gitInformationProvider,
+            ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
-                gitInformationProviders,
-                shortBuildInfoProviders,
+                gitInformationProvider,
+                shortBuildInfoProvider,
                 libraryInformationProvider,
                 insightsInfoProvider);
     }

@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.info.GitProperties;
 import org.springframework.core.Ordered;
@@ -38,7 +38,8 @@ public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvi
     }
 
     @Override
-    public Optional<ShortBuildInfo> getShortBuildInfo() {
-        return Optional.of(new ShortBuildInfo(gitProperties.get(BUILD_TIME), gitProperties.get(BUILD_VERSION)));
+    @NonNull
+    public ShortBuildInfo getShortBuildInfo() {
+        return new ShortBuildInfo(gitProperties.get(BUILD_TIME), gitProperties.get(BUILD_VERSION));
     }
 }

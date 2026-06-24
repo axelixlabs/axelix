@@ -42,7 +42,7 @@ class CommitIdPluginShortBuildInfoProviderTest {
 
     @Test
     void shouldAssembleShortBuildInfoFromPropertiesFile() {
-        ShortBuildInfo shortBuildInfo = subject.getShortBuildInfo().orElse(null);
+        ShortBuildInfo shortBuildInfo = subject.getShortBuildInfo();
 
         assertThat(shortBuildInfo).isNotNull();
         assertThat(shortBuildInfo.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
