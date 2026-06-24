@@ -15,13 +15,18 @@ runs:
         script: |
           const MAX_LINES = parseInt('${{ inputs.max-lines }}')
 
-          const { data: pr } = await github.rest.pulls.get({
+          const EXCLUDED_FILES = ['package-lock.json', 'apm.lock.yaml']
+
+          const files = await github.paginate(github.rest.pulls.listFiles, {
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: context.issue.number,
+            per_page: 100,
           })
 
-          const totalLines = pr.additions + pr.deletions
+          const totalLines = files
+            .filter(file => !EXCLUDED_FILES.includes(file.filename.split('/').pop()))
+            .reduce((sum, file) => sum + file.additions + file.deletions, 0)
 
           if (totalLines > MAX_LINES) {
             await github.rest.issues.createComment({
