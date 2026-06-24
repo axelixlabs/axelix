@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.auth.provider;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +30,8 @@ import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncod
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,50 +53,59 @@ class SuperAdminUserAuthenticatorTest {
     @InjectMocks
     private SuperAdminUserAuthenticator authenticator;
 
-    @Nested
-    class AuthenticateTests {
-        @Test // GH-1004
-        void shouldAuthenticate_whenCredentialsMatch() {
-            // given.
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
-            when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
-            when(encoder.matches(anyString(), anyString())).thenReturn(true);
-            when(encoder.extractEncodedPassword(anyString())).thenReturn(PLAIN_PASSWORD);
+    @Test // GH-1004
+    void shouldInvokePasswordEncoderValidation() {
+        // given.
+        when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
 
-            // when.
-            User user = authenticator.authenticate(USERNAME, PLAIN_PASSWORD);
+        // when.
+        authenticator.validate();
 
-            // then.
-            assertThat(user).isNotNull();
-            assertThat(user.getUsername()).isEqualTo(USERNAME);
-            assertThat(user.getPassword()).isEqualTo(PLAIN_PASSWORD);
-            assertThat(user.getRoles()).containsExactly(DefaultRole.SUPER_ADMIN);
-        }
+        // then.
+        verify(encoder, times(1)).validatePasswordFormat(PLAIN_PASSWORD);
+    }
 
-        @Test // GH-1004
-        void shouldNotAuthenticate_whenUsernameDoesNotMatch() {
-            // given.
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
+    @Test // GH-1004
+    void shouldAuthenticate_whenCredentialsMatch() {
+        // given.
+        when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
+        when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
+        when(encoder.matches(anyString(), anyString())).thenReturn(true);
+        when(encoder.extractEncodedPassword(anyString())).thenReturn(PLAIN_PASSWORD);
 
-            // when.
-            User user = authenticator.authenticate("wrong-username", PLAIN_PASSWORD);
+        // when.
+        User user = authenticator.authenticate(USERNAME, PLAIN_PASSWORD);
 
-            // then.
-            assertThat(user).isNull();
-        }
+        // then.
+        assertThat(user).isNotNull();
+        assertThat(user.getUsername()).isEqualTo(USERNAME);
+        assertThat(user.getPassword()).isEqualTo(PLAIN_PASSWORD);
+        assertThat(user.getRoles()).containsExactly(DefaultRole.SUPER_ADMIN);
+    }
 
-        @Test // GH-1004
-        void shouldNotAuthenticate_whenPasswordDoesNotMatch() {
-            // given.
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
-            when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
-            when(encoder.matches(anyString(), anyString())).thenReturn(false);
+    @Test // GH-1004
+    void shouldNotAuthenticate_whenUsernameDoesNotMatch() {
+        // given.
+        when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
 
-            // when.
-            User user = authenticator.authenticate(USERNAME, "wrong-password");
+        // when.
+        User user = authenticator.authenticate("wrong-username", PLAIN_PASSWORD);
 
-            // then.
-            assertThat(user).isNull();
-        }
+        // then.
+        assertThat(user).isNull();
+    }
+
+    @Test // GH-1004
+    void shouldNotAuthenticate_whenPasswordDoesNotMatch() {
+        // given.
+        when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
+        when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
+        when(encoder.matches(anyString(), anyString())).thenReturn(false);
+
+        // when.
+        User user = authenticator.authenticate(USERNAME, "wrong-password");
+
+        // then.
+        assertThat(user).isNull();
     }
 }

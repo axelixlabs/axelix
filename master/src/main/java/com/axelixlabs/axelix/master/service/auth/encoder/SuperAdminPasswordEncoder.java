@@ -31,7 +31,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.Assert;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 
@@ -63,16 +62,23 @@ public class SuperAdminPasswordEncoder {
 
     public void validatePasswordFormat(String password) {
         String encoderId = extractId(password);
+
+        if (hasPrefix(password) && (encoderId == null || encoderId.isEmpty())) {
+            throw new IllegalArgumentException("The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                    + ".credentials.password has a malformed encoding prefix. "
+                    + "Expected format: {id}encodedValue");
+        }
+
         if (encoderId == null || Objects.equals(encoderId, "noop")) {
             log.warn(
                     "The {}.credentials.password is not hashed. Consider storing the password using a supported DelegatingPasswordEncoder format (e.g. {bcrypt}).",
                     SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX);
-        } else {
-            Assert.isTrue(
-                    supportedEncoderIds.contains(encoderId),
-                    "The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
-                            + ".credentials.password uses the encoder id " + encoderId
-                            + " which is unsupported.");
+        }
+
+        if (encoderId != null && !supportedEncoderIds.contains(encoderId)) {
+            throw new IllegalArgumentException("The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                    + ".credentials.password uses the encoder id " + encoderId
+                    + " which is unsupported.");
         }
     }
 
@@ -87,6 +93,10 @@ public class SuperAdminPasswordEncoder {
         }
 
         return prefixEncodedPassword.substring(end + 1);
+    }
+
+    private boolean hasPrefix(String password) {
+        return password.startsWith("{");
     }
 
     private @Nullable String extractId(String prefixEncodedPassword) {

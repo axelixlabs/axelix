@@ -94,6 +94,30 @@ public class SuperAdminPasswordEncoderTest {
                     // then.
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test // GH-1004
+        void shouldThrowIllegalArgumentException_whenPasswordHasMalformedPrefixMissingClosingBracket() {
+            // given.
+            String malformedPassword = "{bcrypt" + bcryptPasswordEncoder.encode(PLAIN_PASSWORD);
+            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(malformedPassword);
+
+            // when.
+            assertThatThrownBy(callable)
+                    // then.
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test // GH-1004
+        void shouldThrowIllegalArgumentException_whenPasswordHasEmptyEncoderId() {
+            // given.
+            String malformedPassword = "{}" + PLAIN_PASSWORD;
+            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(malformedPassword);
+
+            // when.
+            assertThatThrownBy(callable)
+                    // then.
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested
