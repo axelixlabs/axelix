@@ -36,17 +36,17 @@ import org.springframework.context.event.EventListener;
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnHibernateActive;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**

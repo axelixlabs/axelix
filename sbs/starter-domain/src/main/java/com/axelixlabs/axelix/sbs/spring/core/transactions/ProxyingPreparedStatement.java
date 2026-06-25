@@ -41,6 +41,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.InMemoryPaginationHolder;
+
 /**
  * A {@link PreparedStatement} wrapper that records execution statistics
  * for executed SQL queries.
@@ -59,6 +61,26 @@ public class ProxyingPreparedStatement implements PreparedStatement {
         this.sql = sql;
         this.delegate = delegate;
         this.queriesRecorder = queriesRecorder;
+    }
+
+    private <T> T wrapExecute(SqlAction<T> action) throws SQLException {
+        long startTimestampMs = System.currentTimeMillis();
+        long txStartTime = System.nanoTime();
+
+        try {
+            return action.run();
+        } finally {
+            long durationNs = System.nanoTime() - txStartTime;
+            boolean inMemoryPaginated = InMemoryPaginationHolder.isMarked();
+            InMemoryPaginationHolder.clear();
+            queriesRecorder.recordQuery(
+                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated));
+        }
+    }
+
+    @FunctionalInterface
+    private interface SqlAction<T> {
+        T run() throws SQLException;
     }
 
     @Override
@@ -630,25 +652,5 @@ public class ProxyingPreparedStatement implements PreparedStatement {
     @Override
     public String enquoteNCharLiteral(String val) throws SQLException {
         return delegate.enquoteNCharLiteral(val);
-    }
-
-    @FunctionalInterface
-    private interface SqlAction<T> {
-        T run() throws SQLException;
-    }
-
-    private <T> T wrapExecute(SqlAction<T> action) throws SQLException {
-        long startTimestampMs = System.currentTimeMillis();
-        long txStartTime = System.nanoTime();
-
-        try {
-            return action.run();
-        } finally {
-            long durationNs = System.nanoTime() - txStartTime;
-            boolean inMemoryPaginated = InMemoryPaginationHolder.isMarked();
-            InMemoryPaginationHolder.clear();
-            queriesRecorder.recordQuery(
-                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated));
-        }
     }
 }

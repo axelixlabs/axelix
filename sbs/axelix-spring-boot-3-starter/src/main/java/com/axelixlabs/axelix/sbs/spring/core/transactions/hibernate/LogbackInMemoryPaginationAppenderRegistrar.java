@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.transactions;
+package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -30,16 +30,15 @@ import org.slf4j.LoggerFactory;
 public class LogbackInMemoryPaginationAppenderRegistrar implements InMemoryPaginationAppenderRegistrar {
 
     private static final String APPENDER_NAME = "axelix-in-memory-pagination";
-    // Hibernate 5.x (Spring Boot 2)
-    private static final String HIBERNATE_LOGGER = "org.hibernate.hql.internal.ast.QueryTranslatorImpl";
+    // Hibernate 6+ (Spring Boot 3)
+    private static final String HIBERNATE_LOGGER = "org.hibernate.orm.query";
 
     @Override
     public void register() {
         ILoggerFactory factory = LoggerFactory.getILoggerFactory();
-        if (!(factory instanceof LoggerContext)) {
+        if (!(factory instanceof LoggerContext context)) {
             return;
         }
-        LoggerContext context = (LoggerContext) factory;
 
         Logger logger = context.getLogger(HIBERNATE_LOGGER);
         if (logger.getAppender(APPENDER_NAME) != null) {
