@@ -416,7 +416,7 @@ heartbeat-сигналы будут отклоняться с `401`.
 совместно с выборкой коллекций через fetch.
 
 По умолчанию мониторинг транзакций регистрирует Logback appender
-`com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppender`, который перехватывает
+`com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppender`, который перехватывает
 предупреждения Hibernate (HHH000104 в Hibernate 5.x и HHH90003004 в Hibernate 6.x–7.3.x).
 
 Установите значение свойства `axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` в `false`, если

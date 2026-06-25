@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.transactions;
+package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
+
+import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
 
 /**
  * Logback implementation of {@link InMemoryPaginationAppenderRegistrar}.

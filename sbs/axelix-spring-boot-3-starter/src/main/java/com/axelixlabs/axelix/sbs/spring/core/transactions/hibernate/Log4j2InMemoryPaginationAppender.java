@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.transactions;
+package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
+
+import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationHolder;
 
 /**
  * Log4j2 appender that detects Hibernate's in-memory pagination by intercepting
