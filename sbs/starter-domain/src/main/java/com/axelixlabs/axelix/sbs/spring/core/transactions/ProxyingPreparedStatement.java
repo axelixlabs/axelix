@@ -74,7 +74,7 @@ public class ProxyingPreparedStatement implements PreparedStatement {
             boolean inMemoryPaginated = InMemoryPaginationHolder.isMarked();
             InMemoryPaginationHolder.clear();
             queriesRecorder.recordQuery(
-                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated));
+                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated, null));
         }
     }
 
