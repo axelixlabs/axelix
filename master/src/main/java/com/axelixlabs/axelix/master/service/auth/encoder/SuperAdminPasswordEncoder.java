@@ -92,8 +92,8 @@ public class SuperAdminPasswordEncoder {
 
         if (isNotHashedFormat(encoderId)) {
             log.warn(
-                    "The {}.credentials.password is not hashed. Consider storing the password using a supported DelegatingPasswordEncoder format (e.g. {bcrypt}).",
-                    SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX);
+                    "The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                            + ".credentials.password is not hashed. Consider storing the password using a supported DelegatingPasswordEncoder format (e.g. {bcrypt}).");
         }
     }
 

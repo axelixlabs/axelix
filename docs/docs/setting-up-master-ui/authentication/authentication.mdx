@@ -39,8 +39,9 @@ defaults before exposing Master to anyone — `admin / admin` grants full contro
 
 The password can be provided in one of the following formats:
 
-* **Plaintext**
-* **[DelegatingPasswordEncoder](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/crypto/password/DelegatingPasswordEncoder.html)** — `{noop}` or `{bcrypt}` prefixes.
+* **Plaintext** — the raw password value.
+* **Encoded** — prefix the value with an identifier in curly braces to indicate how it should be verified: `{noop}`
+for plaintext, `{bcrypt}` for a BCrypt hash.
 
 If no prefix is provided, the value is treated as plaintext.
 For security reasons, it is strongly recommended to use a hashed password format (such as `{bcrypt}`) instead of

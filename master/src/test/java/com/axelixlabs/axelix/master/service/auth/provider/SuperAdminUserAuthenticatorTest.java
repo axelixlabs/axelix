@@ -17,90 +17,122 @@
  */
 package com.axelixlabs.axelix.master.service.auth.provider;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
-import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link SuperAdminUserAuthenticator}.
+ * Integration tests for {@link SuperAdminUserAuthenticator}.
  *
  * @author Ilya Naumov
  */
-@ExtendWith(MockitoExtension.class)
 class SuperAdminUserAuthenticatorTest {
     private static final String USERNAME = "admin";
     private static final String PLAIN_PASSWORD = "password";
+    private static final String BCRYPT_PASSWORD = "$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC";
 
-    @Mock
-    private SuperAdminPasswordEncoder encoder;
+    private ApplicationContextRunner contextRunner;
 
-    @Mock
-    private SuperAdminConfigurationProperties superAdminConfiguration;
-
-    @InjectMocks
-    private SuperAdminUserAuthenticator authenticator;
-
-    @Nested
-    class ValidationTests {
-        @Test // GH-1004
-        void shouldInvokePasswordEncoderValidation() {
-            // given.
-            when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
-
-            // when.
-            authenticator.validate();
-
-            // then.
-            verify(encoder, times(1)).validatePasswordFormat(PLAIN_PASSWORD);
-        }
+    @BeforeEach
+    void setup() {
+        this.contextRunner = new ApplicationContextRunner()
+                .withBean(BCryptPasswordEncoder.class, BCryptPasswordEncoder::new)
+                .withConfiguration(
+                        AutoConfigurations.of(SecurityAutoConfiguration.SuperAdminLoginAutoConfiguration.class));
     }
 
     @Nested
-    class AuthenticateTests {
+    class ValidationTests {
+
+        @BeforeEach
+        void setup() {
+            contextRunner = contextRunner.withPropertyValues(
+                    SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.username=" + USERNAME);
+        }
+
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    "{unsupported}" + PLAIN_PASSWORD,
+                    "{bcrypt" + BCRYPT_PASSWORD,
+                    "{}" + PLAIN_PASSWORD,
+                })
+        void shouldFailContextLaunch_whenPasswordFormatIsInvalid(String invalidPassword) {
+            // given.
+            contextRunner = contextRunner
+                    .withPropertyValues(
+                            SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.password=" + invalidPassword)
+                    // when.
+                    .run(context -> {
+                        // then.
+                        assertThat(context).hasFailed();
+                        assertThat(context.getStartupFailure()).hasRootCauseInstanceOf(IllegalArgumentException.class);
+                    });
+        }
+
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    PLAIN_PASSWORD,
+                    "{noop}" + PLAIN_PASSWORD,
+                    "{bcrypt}" + BCRYPT_PASSWORD,
+                })
+        void shouldCreateBean_whenPasswordIsCorrectlyFormatted(String password) {
+            // given.
+            contextRunner
+                    .withPropertyValues(SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.password=" + password)
+                    // when.
+                    .run(context -> {
+                        // then.
+                        assertThat(context).hasNotFailed();
+                        assertThat(context).hasSingleBean(SuperAdminUserAuthenticator.class);
+                    });
+        }
+    }
+
+    @SpringBootTest
+    @TestPropertySource(
+            properties = {
+                SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.username=admin",
+                SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX + ".credentials.password={bcrypt}" + BCRYPT_PASSWORD
+            })
+    @Nested
+    class AuthenticationTest {
+        private static final String USERNAME = "admin";
+        private static final String PLAIN_PASSWORD = "password";
+
+        @Autowired
+        private SuperAdminUserAuthenticator authenticator;
+
         @Test // GH-1004
         void shouldAuthenticate_whenCredentialsMatch() {
-            // given.
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String extractedPassword = passwordEncoder.encode(PLAIN_PASSWORD);
-            String configuredPassword = "{bcrypt}" + extractedPassword;
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
-            when(superAdminConfiguration.getPassword()).thenReturn(configuredPassword);
-            when(encoder.matches(PLAIN_PASSWORD, configuredPassword)).thenReturn(true);
-            when(encoder.extractEncodedPassword(configuredPassword)).thenReturn(extractedPassword);
-
             // when.
             User user = authenticator.authenticate(USERNAME, PLAIN_PASSWORD);
 
             // then.
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(USERNAME);
-            assertThat(user.getPassword()).isEqualTo(extractedPassword);
             assertThat(user.getRoles()).containsExactly(DefaultRole.SUPER_ADMIN);
-            verify(encoder).matches(PLAIN_PASSWORD, configuredPassword);
-            verify(encoder).extractEncodedPassword(configuredPassword);
         }
 
         @Test // GH-1004
         void shouldNotAuthenticate_whenUsernameDoesNotMatch() {
-            // given.
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
-
             // when.
             User user = authenticator.authenticate("wrong-username", PLAIN_PASSWORD);
 
@@ -110,11 +142,6 @@ class SuperAdminUserAuthenticatorTest {
 
         @Test // GH-1004
         void shouldNotAuthenticate_whenPasswordDoesNotMatch() {
-            // given.
-            when(superAdminConfiguration.getUsername()).thenReturn(USERNAME);
-            when(superAdminConfiguration.getPassword()).thenReturn(PLAIN_PASSWORD);
-            when(encoder.matches(anyString(), anyString())).thenReturn(false);
-
             // when.
             User user = authenticator.authenticate(USERNAME, "wrong-password");
 

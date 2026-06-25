@@ -30,6 +30,7 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  * Configuration of the {@link DefaultRole#SUPER_ADMIN}.
  *
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 @NullMarked
 @ConfigurationProperties(prefix = SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX)

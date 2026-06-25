@@ -18,12 +18,12 @@
 package com.axelixlabs.axelix.master.service.auth.encoder;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
@@ -37,23 +37,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @author Ilya Naumov
  */
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(OutputCaptureExtension.class)
 public class SuperAdminPasswordEncoderTest {
     private static final String PLAIN_PASSWORD = "password";
+    private static final String BCRYPT_PASSWORD = "$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC";
 
-    @Spy
-    private BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
-
-    @InjectMocks
     private SuperAdminPasswordEncoder encoder;
+
+    @BeforeEach
+    void setup() {
+        this.encoder = new SuperAdminPasswordEncoder(new BCryptPasswordEncoder());
+    }
 
     @Nested
     class ValidationTests {
         @Test // GH-1004
         void shouldNotWarn_whenPasswordHasSupportedFormat(CapturedOutput capturedOutput) {
             // given.
-            String bcryptPassword = "{bcrypt}" + bcryptPasswordEncoder.encode(PLAIN_PASSWORD);
+            String bcryptPassword = "{bcrypt}" + BCRYPT_PASSWORD;
 
             // when.
             encoder.validatePasswordFormat(bcryptPassword);
@@ -62,56 +63,29 @@ public class SuperAdminPasswordEncoderTest {
             assertThat(capturedOutput).doesNotContainIgnoringCase("not hashed");
         }
 
-        @Test // GH-1004
-        void shouldWarn_whenPasswordHasPlainTextFormat(CapturedOutput capturedOutput) {
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    PLAIN_PASSWORD,
+                    "{noop}" + PLAIN_PASSWORD,
+                })
+        void shouldWarn_whenPasswordIsNotHashed(String password, CapturedOutput capturedOutput) {
             // when.
-            encoder.validatePasswordFormat(PLAIN_PASSWORD);
+            encoder.validatePasswordFormat(password);
 
             // then.
             assertThat(capturedOutput).containsIgnoringCase("not hashed");
         }
 
-        @Test // GH-1004
-        void shouldWarn_whenPasswordHasNoOpFormat(CapturedOutput capturedOutput) {
-            // given.
-            String noopPassword = "{noop}" + PLAIN_PASSWORD;
-
-            // when.
-            encoder.validatePasswordFormat(noopPassword);
-
-            // then.
-            assertThat(capturedOutput).containsIgnoringCase("not hashed");
-        }
-
-        @Test // GH-1004
-        void shouldThrowIllegalArgumentException_whenPasswordHasUnsupportedFormat() {
-            // given.
-            String unsupportedPassword = "{unsupported}" + PLAIN_PASSWORD;
-            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(unsupportedPassword);
-
-            // when.
-            assertThatThrownBy(callable)
-                    // then.
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test // GH-1004
-        void shouldThrowIllegalArgumentException_whenPasswordHasMalformedPrefixMissingClosingBracket() {
-            // given.
-            String malformedPassword = "{bcrypt" + bcryptPasswordEncoder.encode(PLAIN_PASSWORD);
-            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(malformedPassword);
-
-            // when.
-            assertThatThrownBy(callable)
-                    // then.
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test // GH-1004
-        void shouldThrowIllegalArgumentException_whenPasswordHasEmptyEncoderId() {
-            // given.
-            String malformedPassword = "{}" + PLAIN_PASSWORD;
-            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(malformedPassword);
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    "{}" + PLAIN_PASSWORD,
+                    "{unsupported}" + PLAIN_PASSWORD,
+                    "{bcrypt" + BCRYPT_PASSWORD,
+                })
+        void shouldThrowIllegalArgumentException_whenPasswordFormatIsInvalid(String invalidPassword) {
+            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(invalidPassword);
 
             // when.
             assertThatThrownBy(callable)
@@ -122,25 +96,34 @@ public class SuperAdminPasswordEncoderTest {
 
     @Nested
     class MatchTests {
-        @Test // GH-1004
-        void shouldMatch_whenPasswordHasPlaintTextFormat() {
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    PLAIN_PASSWORD,
+                    "{noop}" + PLAIN_PASSWORD,
+                    "{bcrypt}" + BCRYPT_PASSWORD,
+                })
+        void shouldMatch_whenEncodedPasswordUsesSupportedFormat(String encodedPassword) {
             // when.
-            boolean result = encoder.matches(PLAIN_PASSWORD, PLAIN_PASSWORD);
+            boolean result = encoder.matches(PLAIN_PASSWORD, encodedPassword);
 
             // then.
             assertThat(result).isTrue();
         }
 
-        @Test
-        void shouldMatch_whenPasswordHasBCryptFormat() {
-            // given.
-            String bcryptPassword = "{bcrypt}" + bcryptPasswordEncoder.encode(PLAIN_PASSWORD);
-
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    "different_password",
+                    "{noop}different_password",
+                    "{bcrypt}$2a$10$differentBcryptHashValueHere1234567890abcdefghijk",
+                })
+        void shouldNotMatch_whenEncodedPasswordRepresentsDifferentPassword(String encodedPassword) {
             // when.
-            boolean result = encoder.matches(PLAIN_PASSWORD, bcryptPassword);
+            boolean result = encoder.matches(PLAIN_PASSWORD, encodedPassword);
 
             // then.
-            assertThat(result).isTrue();
+            assertThat(result).isFalse();
         }
     }
 
