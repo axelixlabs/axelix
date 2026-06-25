@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.info.GitProperties;
 import org.springframework.core.Ordered;
@@ -31,8 +31,11 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo.CommitAuthor;
  * It plugins natively supported by Spring Boot Actuator, so, we can just re-use the existing
  * Spring abstractions.
  *
+ * @deprecated This implementation is going to be gone in favor of our own plugin-backed implementation.
+ *
  * @author Mikhail Polivakha
  */
+@Deprecated(forRemoval = true)
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class CommitIdPluginGitInformationProvider implements GitInformationProvider {
 
@@ -48,11 +51,12 @@ public class CommitIdPluginGitInformationProvider implements GitInformationProvi
     }
 
     @Override
-    public Optional<GitInfo> getGitCommitInfo() {
-        return Optional.of(new GitInfo(
+    @NonNull
+    public GitInfo getGitCommitInfo() {
+        return new GitInfo(
                 gitProperties.get(AUTHOR_SHORT_SHA),
                 gitProperties.getBranch(),
                 gitProperties.get(COMMIT_TIME),
-                new CommitAuthor(gitProperties.get(AUTHOR_NAME_KEY), gitProperties.get(AUTHOR_EMAIL_KEY))));
+                new CommitAuthor(gitProperties.get(AUTHOR_NAME_KEY), gitProperties.get(AUTHOR_EMAIL_KEY)));
     }
 }

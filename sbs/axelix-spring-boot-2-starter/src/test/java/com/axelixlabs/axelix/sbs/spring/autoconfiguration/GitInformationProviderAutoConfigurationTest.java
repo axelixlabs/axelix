@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.NoOpGitInformationProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,33 +51,6 @@ class GitInformationProviderAutoConfigurationTest {
                     assertThat(context).hasSingleBean(GitInformationProvider.class);
                     assertThat(context.getBean(GitInformationProvider.class))
                             .isExactlyInstanceOf(CommitIdPluginGitInformationProvider.class);
-                    assertThat(context).doesNotHaveBean(NoOpGitInformationProvider.class);
                 });
-    }
-
-    @Test
-    void shouldCreateNoOpGitInformationProviderWhenGitPropertiesFileNotExist() {
-        contextRunner
-                .withPropertyValues(
-                        "spring.info.git.location=classpath:not-exist-git.properties",
-                        "management.info.git.enabled=true")
-                .run(context -> {
-                    assertThat(context).hasSingleBean(GitInformationProvider.class);
-                    assertThat(context.getBean(GitInformationProvider.class))
-                            .isExactlyInstanceOf(NoOpGitInformationProvider.class);
-                    assertThat(context).doesNotHaveBean(GitProperties.class);
-                    assertThat(context).doesNotHaveBean(CommitIdPluginGitInformationProvider.class);
-                });
-    }
-
-    @Test
-    void shouldCreateNoOpGitInformationProviderWhenGitInfoDisabled() {
-        contextRunner.withPropertyValues("management.info.git.enabled=false").run(context -> {
-            assertThat(context).hasSingleBean(GitInformationProvider.class);
-            assertThat(context.getBean(GitInformationProvider.class))
-                    .isExactlyInstanceOf(NoOpGitInformationProvider.class);
-            assertThat(context).doesNotHaveBean(GitProperties.class);
-            assertThat(context).doesNotHaveBean(CommitIdPluginGitInformationProvider.class);
-        });
     }
 }

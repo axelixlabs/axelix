@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 
@@ -31,5 +31,6 @@ public interface ShortBuildInfoProvider {
     /**
      * @return the discovered {@link ShortBuildInfo}.
      */
-    Optional<ShortBuildInfo> getShortBuildInfo();
+    @NonNull
+    ShortBuildInfo getShortBuildInfo();
 }

@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -34,8 +33,6 @@ import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscov
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
@@ -58,8 +55,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
         after = {
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
-            CommitIdPluginGitInformationProvider.class,
-            CommitIdPluginShortBuildInfoProvider.class,
+            GitInformationProviderAutoConfiguration.class,
+            ShortBuildInfoProviderAutoConfiguration.class,
         })
 public class AxelixMetadataEndpointConfiguration {
 
@@ -102,16 +99,16 @@ public class AxelixMetadataEndpointConfiguration {
     public ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
-            List<GitInformationProvider> gitInformationProviders,
-            List<ShortBuildInfoProvider> shortBuildInfoProviders,
+            GitInformationProvider gitInformationProvider,
+            ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
-                gitInformationProviders,
-                shortBuildInfoProviders,
+                gitInformationProvider,
+                shortBuildInfoProvider,
                 libraryInformationProvider,
                 insightsInfoProvider);
     }

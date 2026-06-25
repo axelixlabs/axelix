@@ -22,15 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.NoOpGitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.NoOpShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
 
 /**
@@ -47,16 +43,5 @@ public class ShortBuildInfoProviderAutoConfiguration {
     @ConditionalOnBean(GitProperties.class)
     public ShortBuildInfoProvider commitIdPluginShortBuildInfoProvider(GitProperties gitProperties) {
         return new CommitIdPluginShortBuildInfoProvider(gitProperties);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ShortBuildInfoProvider.class)
-    public ShortBuildInfoProvider noOpShortBuildInfoProvider() {
-        log.warn("""
-            The {} is active. It practically means that the build information (the version of the build,
-            the timestamp when app was build) will not be determined. If you see this message,
-            then we were not able to find any valid {} that is going to work in your setup.
-            """, NoOpGitInformationProvider.class.getSimpleName(), GitInformationProvider.class.getSimpleName());
-        return new NoOpShortBuildInfoProvider();
     }
 }

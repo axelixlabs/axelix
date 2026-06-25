@@ -44,7 +44,7 @@ class CommitIdPluginGitInformationProviderTest {
     void shouldAssembleGitInfoFromPropertiesFile() {
 
         // when.
-        GitInfo gitCommitInfo = subject.getGitCommitInfo().orElse(null);
+        GitInfo gitCommitInfo = subject.getGitCommitInfo();
 
         // then.
         assertThat(gitCommitInfo).isNotNull();

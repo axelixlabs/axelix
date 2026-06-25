@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.info.GitProperties;
 import org.springframework.core.Ordered;
@@ -25,6 +25,10 @@ import org.springframework.core.annotation.Order;
 
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 
+/**
+ * @deprecated This implementation is going to be gone in favor of our own plugin-backed implementation.
+ */
+@Deprecated(forRemoval = true)
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvider {
 
@@ -38,7 +42,8 @@ public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvi
     }
 
     @Override
-    public Optional<ShortBuildInfo> getShortBuildInfo() {
-        return Optional.of(new ShortBuildInfo(gitProperties.get(BUILD_TIME), gitProperties.get(BUILD_VERSION)));
+    @NonNull
+    public ShortBuildInfo getShortBuildInfo() {
+        return new ShortBuildInfo(gitProperties.get(BUILD_TIME), gitProperties.get(BUILD_VERSION));
     }
 }

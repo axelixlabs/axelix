@@ -491,6 +491,106 @@ helm install axelix axelix/axelix \
 
 Опубликуйте Service через обычный механизм вашего кластера — `Ingress` или `Gateway` — для быстрой проверки.
 
+### Сборка собственного чарта
+
+Некоторые команды предпочитают вести собственный Helm-чарт или «сырые» манифесты вместо first-party чарта. Это
+нормально. Нужно лишь учесть пару моментов.
+
+#### Автоматическое обнаружение
+
+При автообнаружении Axelix Master обращается к REST API control plane Kubernetes. Чтобы это работало,
+[ServiceAccount Kubernetes](https://kubernetes.io/docs/concepts/security/service-accounts/), встроенный в под, должен
+иметь соответствующие права. [Официальный чарт](https://github.com/axelixlabs/helm-charts) настраивает их за вас.
+
+:::note
+
+Это важно только при `axelix.master.discovery.auto.enabled=true` — без автообнаружения Master не нужны перечисленные
+ниже права.
+
+:::
+
+Вот что нужно иметь в виду при написании собственного Helm-чарта:
+
+**1. Master должен иметь доступ к Kubernetes API.** Как уже упоминалось, в режиме автообнаружения Master по расписанию,
+заданному `broadcast.schedule`, обращается к control-plane API кластера, перечисляя Service-ы и стоящие за ними Pod-ы в
+каждом настроенном пространстве имён. По умолчанию Axelix Master считывает параметры подключения из стандартных
+расположений внутри пода:
+
+- URL сервера API — из `KUBERNETES_SERVICE_HOST` / `KUBERNETES_SERVICE_PORT_HTTPS`, которые Kubernetes внедряет в каждый под;
+- [Токен ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/#authenticating-credentials) — из `/var/run/secrets/kubernetes.io/serviceaccount/token`;
+- CA-сертификат — из `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
+
+Это значения по умолчанию свойств `kube-apiserver-url`, `sa-token-path` и `ca-cert-path`, перечисленных в разделе
+[автообнаружение](#обнаружение--автообнаружение). Если оставить значения по умолчанию, ваша единственная задача —
+сделать так, чтобы токен и CA оказались по этим путям. Об этом — следующие два пункта.
+
+**2. Поду нужен ServiceAccount со смонтированным токеном.** Создайте ServiceAccount, задайте `serviceAccountName` в
+Deployment и оставьте `automountServiceAccountToken: true`, чтобы токен и CA появились по указанным выше путям. Без
+смонтированного токена, каждое сканирование Axelix Master-ом будет завершается ошибкой авторизации.
+
+**3. Этому ServiceAccount нужны права для чтения ряда данных.** «Голый» ServiceAccount но не имеет никаких прав.
+Выдайте ему `get`, `list` и `watch` на `pods`, `services` и `endpoints` в каждом пространстве имён, которое вы хотите
+обнаруживать, и привяжите созданную Role к ServiceAccount. Пространства имён, в рамках которых вы выдаёте
+права, должны совпадать с `filters.namespaces`: Axelix Master сканирует именно их. Пространство имён, которое Axelix Master не может
+прочитать, не вернёт ни одного инстанса.
+
+В совокупности минимум для одного обнаруживаемого пространства имён выглядит так:
+
+```yaml title="rbac.yaml"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: axelix-master
+  namespace: axelix
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: axelix-master-role
+  namespace: default          # пространство имён из filters.namespaces
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: axelix-master-role-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: axelix-master
+    namespace: axelix         # пространство имён, в котором находится ServiceAccount
+roleRef:
+  kind: Role
+  name: axelix-master-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Затем укажите этот ServiceAccount в Deployment:
+
+```yaml title="deployment.yaml"
+spec:
+  template:
+    spec:
+      serviceAccountName: axelix-master
+      containers:
+        - name: axelix-master
+          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+```
+
+В Kubernetes Role — это объект, привязанный к пространству имён, поэтому повторите Role и RoleBinding по одному разу на
+каждое пространство имён из `filters.namespaces`, и все они должны ссылаться на один и тот же ServiceAccount.
+
+:::tip
+[`templates/rbac.yaml`](https://github.com/axelixlabs/helm-charts/blob/main/charts/axelix/templates/rbac.yaml) и
+[`templates/serviceaccount.yaml`](https://github.com/axelixlabs/helm-charts/blob/main/charts/axelix/templates/serviceaccount.yaml)
+официального чарта — эталонная реализация именно этого. Вы можете выполнить `helm template` для официального чарта и скопировать
+сгенерированные ServiceAccount, Role и RoleBinding в свои манифесты, если нужна отправная точка.
+:::
+
 ## См. также
 
 - [Настройка Spring Boot

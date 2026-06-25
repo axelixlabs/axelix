@@ -17,6 +17,8 @@ reviews:
     docstrings:
       enabled: false
   path_instructions:
+    - path: "sbs/starter-domain/**"
+      instructions: Apply `.claude/skills/starter-domain-reviewer/SKILL.md`.
     - path: "**/src/test/**,**/*.test.ts,**/*.test.tsx"
       instructions: Apply `.claude/skills/test-reviewer/SKILL.md`.
 

@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.transactions;
+package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
+
+import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingPreparedStatement;
 
 /**
  * Holds a thread-local flag indicating that the current query is subject to in-memory pagination.

@@ -33,6 +33,9 @@ public final class DefaultUser implements User {
     private final String password;
     private final Set<Role> roles;
 
+    /**
+     * @param password the password of the given user. May be hash, may be plain-text.
+     */
     public DefaultUser(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;

@@ -93,17 +93,8 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                 statsCollector.recordTransaction(key, transactionRecord);
 
                 // METRICS. Publish metrics in MeterRegistry
-                try {
-                    if (metricsPublisher != null) {
-                        metricsPublisher.publishTransactionMetrics(
-                                declaringClass.getSimpleName(),
-                                method.getName(),
-                                transactionRecord.getDurationMs(),
-                                transactionStatus,
-                                queries.size());
-                    }
-                } catch (Exception ignored) {
-                }
+                publishInMeterRegistry(
+                        declaringClass, method, transactionRecord.getDurationMs(), transactionStatus, queries.size());
             }
         }
 
@@ -120,5 +111,21 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
             case SUPPORTS, MANDATORY, NOT_SUPPORTED, NEVER -> false;
         };
+    }
+
+    private void publishInMeterRegistry(
+            Class<?> declaringClass,
+            Method method,
+            long durationMs,
+            TransactionStatus transactionStatus,
+            int queriesSize) {
+        if (metricsPublisher == null) {
+            return;
+        }
+        try {
+            metricsPublisher.publishTransactionMetrics(
+                    declaringClass.getSimpleName(), method.getName(), durationMs, transactionStatus, queriesSize);
+        } catch (Exception ignored) {
+        }
     }
 }
