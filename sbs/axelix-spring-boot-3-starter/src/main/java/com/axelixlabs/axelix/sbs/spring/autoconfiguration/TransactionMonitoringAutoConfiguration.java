@@ -23,7 +23,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,6 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigu
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ConditionalOnHibernateActive;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
@@ -130,6 +130,7 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Configuration
     @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOGBACK)
     @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
@@ -138,21 +139,16 @@ public class TransactionMonitoringAutoConfiguration {
             matchIfMissing = true)
     static class LogbackInMemoryPaginationAppenderConfiguration {
 
-        @Bean
-        public LogbackInMemoryPaginationAppenderRegistrar logbackInMemoryPaginationAppenderRegistrar() {
-            return new LogbackInMemoryPaginationAppenderRegistrar();
-        }
-
         @EventListener(ApplicationReadyEvent.class)
         public void registerAppender() {
-            logbackInMemoryPaginationAppenderRegistrar().register();
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
         }
     }
 
     @Configuration
     @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOG4J2)
     @ConditionalOnClass(name = "org.apache.logging.log4j.core.LoggerContext")
-    @AutoConfigureAfter(LogbackInMemoryPaginationAppenderConfiguration.class)
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
             name = "enabled",
@@ -160,22 +156,9 @@ public class TransactionMonitoringAutoConfiguration {
             matchIfMissing = true)
     static class Log4j2InMemoryPaginationAppenderConfiguration {
 
-        private final ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider;
-
-        public Log4j2InMemoryPaginationAppenderConfiguration(
-                ObjectProvider<Log4j2InMemoryPaginationAppenderRegistrar> registrarProvider) {
-            this.registrarProvider = registrarProvider;
-        }
-
-        @Bean
-        @ConditionalOnMissingBean(LogbackInMemoryPaginationAppenderRegistrar.class)
-        public Log4j2InMemoryPaginationAppenderRegistrar log4j2InMemoryPaginationAppenderRegistrar() {
-            return new Log4j2InMemoryPaginationAppenderRegistrar();
-        }
-
         @EventListener(ApplicationReadyEvent.class)
         public void registerAppender() {
-            registrarProvider.ifAvailable(Log4j2InMemoryPaginationAppenderRegistrar::register);
+            new Log4j2InMemoryPaginationAppenderRegistrar().register();
         }
     }
 }

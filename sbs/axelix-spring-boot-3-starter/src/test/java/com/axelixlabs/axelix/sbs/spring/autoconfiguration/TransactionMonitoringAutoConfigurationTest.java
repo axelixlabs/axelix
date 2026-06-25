@@ -32,8 +32,6 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.Log4j2InMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlQueryRecord;
@@ -89,21 +87,37 @@ class TransactionMonitoringAutoConfigurationTest {
     }
 
     @Test // GH-1251
-    void shouldCreateAtLeastOneAppender_whenConditionsAreMet() {
+    void shouldActivateCorrectConfiguration_whenConditionsAreMet() {
         EntityManagerFactory mockFactory = Mockito.mock(EntityManagerFactory.class);
 
         contextRunner.withBean(EntityManagerFactory.class, () -> mockFactory).run(context -> {
-            boolean hasLogback = context.containsBean("logbackInMemoryPaginationAppenderRegistrar");
-            boolean hasLog4j2 = context.containsBean("log4j2InMemoryPaginationAppenderRegistrar");
+            boolean hasLogbackConfig = context.containsBean(
+                    TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration.class
+                            .getName());
+            boolean hasLog4j2Config = context.containsBean(
+                    TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration.class
+                            .getName());
 
-            assertThat(hasLogback || hasLog4j2).isTrue();
+            assertThat(hasLogbackConfig ^ hasLog4j2Config).isTrue();
 
-            if (hasLogback) {
-                assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderRegistrar.class);
-                assertThat(context).doesNotHaveBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
+            if (hasLogbackConfig) {
+                assertThat(context)
+                        .hasSingleBean(
+                                TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                        .class);
+                assertThat(context)
+                        .doesNotHaveBean(
+                                TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration
+                                        .class);
             } else {
-                assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderRegistrar.class);
-                assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderRegistrar.class);
+                assertThat(context)
+                        .hasSingleBean(
+                                TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration
+                                        .class);
+                assertThat(context)
+                        .doesNotHaveBean(
+                                TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
+                                        .class);
             }
         });
     }
