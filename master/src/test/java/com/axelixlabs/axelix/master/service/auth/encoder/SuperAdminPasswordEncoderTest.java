@@ -83,14 +83,29 @@ public class SuperAdminPasswordEncoderTest {
                     "{}" + PLAIN_PASSWORD,
                     "{unsupported}" + PLAIN_PASSWORD,
                     "{bcrypt" + BCRYPT_PASSWORD,
+                    "{bcrypt}",
+                    "{noop}"
                 })
         void shouldThrowIllegalArgumentException_whenPasswordFormatIsInvalid(String invalidPassword) {
             ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(invalidPassword);
 
             // when.
-            assertThatThrownBy(callable)
-                    // then.
-                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(callable).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest // GH-1004
+        @ValueSource(
+                strings = {
+                    "{bcrypt}garbage",
+                    "{bcrypt}$2a$10",
+                    "{bcrypt}$2a$invalid-format",
+                    "{bcrypt}$1a$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC",
+                })
+        void shouldThrowIllegalArgumentException_whenBcryptValueIsInvalid(String invalidBcrypt) {
+            ThrowableAssert.ThrowingCallable callable = () -> encoder.validatePasswordFormat(invalidBcrypt);
+
+            // when.
+            assertThatThrownBy(callable).isInstanceOf(IllegalArgumentException.class);
         }
     }
 

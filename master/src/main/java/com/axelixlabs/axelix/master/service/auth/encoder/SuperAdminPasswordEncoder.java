@@ -70,10 +70,11 @@ public class SuperAdminPasswordEncoder {
 
     /**
      * Validates the password format at startup. Throws for malformed or unsupported encoding prefixes,
-     * and logs a warning for not hashed passwords.
+     * empty payloads, and invalid hash values.
      *
      * @param password the password to validate
-     * @throws IllegalArgumentException if the password has a malformed encoding prefix or an unsupported encoder ID
+     * @throws IllegalArgumentException if the password has a malformed encoding prefix, an unsupported encoder ID,
+     *                                  an empty payload, or an invalid encoded value
      */
     public void validatePasswordFormat(String password) {
         String encoderId = extractId(password);
@@ -90,11 +91,8 @@ public class SuperAdminPasswordEncoder {
                     + " which is unsupported.");
         }
 
-        if (isNotHashedFormat(encoderId)) {
-            log.warn(
-                    "The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
-                            + ".credentials.password is not hashed. Consider storing the password using a supported DelegatingPasswordEncoder format (e.g. {bcrypt}).");
-        }
+        validatePayloadNotEmpty(password, encoderId);
+        validateEncodedValue(password, encoderId);
     }
 
     /**
@@ -117,18 +115,6 @@ public class SuperAdminPasswordEncoder {
         return prefixEncodedPassword.substring(end + 1);
     }
 
-    private boolean isMalformedPrefix(String password, @Nullable String encoderId) {
-        return password.startsWith("{") && (encoderId == null || encoderId.isEmpty());
-    }
-
-    private boolean isUnsupportedEncoderId(@Nullable String encoderId) {
-        return encoderId != null && !supportedEncoderIds.contains(encoderId);
-    }
-
-    private boolean isNotHashedFormat(@Nullable String encoderId) {
-        return encoderId == null || Objects.equals(encoderId, "noop");
-    }
-
     private @Nullable String extractId(String prefixEncodedPassword) {
         int start = prefixEncodedPassword.indexOf("{");
         if (start != 0) {
@@ -141,5 +127,43 @@ public class SuperAdminPasswordEncoder {
         }
 
         return prefixEncodedPassword.substring(start + 1, end);
+    }
+
+    private boolean isMalformedPrefix(String password, @Nullable String encoderId) {
+        return password.startsWith("{") && (encoderId == null || encoderId.isEmpty());
+    }
+
+    private boolean isUnsupportedEncoderId(@Nullable String encoderId) {
+        return encoderId != null && !supportedEncoderIds.contains(encoderId);
+    }
+
+    private void validatePayloadNotEmpty(String password, @Nullable String encoderId) {
+        String payload = extractEncodedPassword(password);
+        if (encoderId != null && payload.isEmpty()) {
+            throw new IllegalArgumentException("The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                    + ".credentials.password has an empty payload for the " + encoderId
+                    + " encoder. Expected format: {" + encoderId + "}encodedValue");
+        }
+    }
+
+    private void validateEncodedValue(String password, @Nullable String encoderId) {
+        if (encoderId == null || Objects.equals(encoderId, "noop")) {
+            log.warn(
+                    "The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                            + ".credentials.password is not hashed. Consider storing the password using a supported DelegatingPasswordEncoder format (e.g. {bcrypt}).");
+            return;
+        }
+
+        if (encoderId.equals("bcrypt")) {
+            String encodedPayload = extractEncodedPassword(password);
+            if (!isValidBcryptHash(encodedPayload)) {
+                throw new IllegalArgumentException("The " + SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX
+                        + ".credentials.password has an invalid bcrypt hash value.");
+            }
+        }
+    }
+
+    private boolean isValidBcryptHash(String payload) {
+        return payload.matches("^\\$2[aby]\\$\\d{2}\\$[./A-Za-z0-9]{53}$");
     }
 }
