@@ -228,8 +228,9 @@ public final class TransactionMonitoringFeed {
         private final Long startTimestampMs;
         private final Long endTimestampMs;
 
-        @Nullable
-        private final Boolean inMemoryPaginated;
+        private final @Nullable Boolean inMemoryPaginated;
+        private final @Nullable Boolean nPlusOne;
+        private final @Nullable Boolean batchPlusOne;
 
         /**
          * Creates a new Query.
@@ -245,11 +246,15 @@ public final class TransactionMonitoringFeed {
                 @JsonProperty("sql") String sql,
                 @JsonProperty("startTimestampMs") Long startTimestampMs,
                 @JsonProperty("endTimestampMs") Long endTimestampMs,
-                @JsonProperty("inMemoryPaginated") @Nullable Boolean inMemoryPaginated) {
+                @JsonProperty("inMemoryPaginated") @Nullable Boolean inMemoryPaginated,
+                @JsonProperty("nPlusOne") @Nullable Boolean nPlusOne,
+                @JsonProperty("batchPlusOne") @Nullable Boolean batchPlusOne) {
             this.sql = sql;
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
             this.inMemoryPaginated = inMemoryPaginated;
+            this.nPlusOne = nPlusOne;
+            this.batchPlusOne = batchPlusOne;
         }
 
         public String getSql() {
@@ -264,26 +269,36 @@ public final class TransactionMonitoringFeed {
             return endTimestampMs;
         }
 
-        @Nullable
-        public Boolean isInMemoryPaginated() {
+        public @Nullable Boolean isInMemoryPaginated() {
             return inMemoryPaginated;
+        }
+
+        @JsonProperty("nPlusOne")
+        public @Nullable Boolean getNPlusOne() {
+            return nPlusOne;
+        }
+
+        public @Nullable Boolean getBatchPlusOne() {
+            return batchPlusOne;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
+            if (!(o instanceof Query)) {
                 return false;
             }
-            Query that = (Query) o;
-            return Objects.equals(sql, that.sql)
-                    && Objects.equals(startTimestampMs, that.startTimestampMs)
-                    && Objects.equals(endTimestampMs, that.endTimestampMs)
-                    && Objects.equals(inMemoryPaginated, that.inMemoryPaginated);
+            Query query = (Query) o;
+            return Objects.equals(sql, query.sql)
+                    && Objects.equals(startTimestampMs, query.startTimestampMs)
+                    && Objects.equals(endTimestampMs, query.endTimestampMs)
+                    && Objects.equals(inMemoryPaginated, query.inMemoryPaginated)
+                    && Objects.equals(nPlusOne, query.nPlusOne)
+                    && Objects.equals(batchPlusOne, query.batchPlusOne);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(sql, startTimestampMs, endTimestampMs, inMemoryPaginated);
+            return Objects.hash(sql, startTimestampMs, endTimestampMs, inMemoryPaginated, nPlusOne, batchPlusOne);
         }
 
         @Override
@@ -292,7 +307,9 @@ public final class TransactionMonitoringFeed {
                     + sql + '\'' + ", startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
                     + endTimestampMs + ", inMemoryPaginated="
-                    + inMemoryPaginated + '}';
+                    + inMemoryPaginated + ", nPlusOne="
+                    + nPlusOne + ", batchPlusOne="
+                    + batchPlusOne + '}';
         }
     }
 

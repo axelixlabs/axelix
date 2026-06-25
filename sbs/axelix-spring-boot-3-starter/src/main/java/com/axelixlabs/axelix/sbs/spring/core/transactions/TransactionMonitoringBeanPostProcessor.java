@@ -47,6 +47,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneAnalyzer;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
 
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
@@ -64,15 +66,21 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
+    private final ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider;
+    private final ObjectProvider<NPlusOneAnalyzer> nPlusOneAnalyzerObjectProvider;
 
     public TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector,
             QueriesRecorder queriesCollector,
-            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
+            ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider,
+            ObjectProvider<NPlusOneAnalyzer> nPlusOneAnalyzerObjectProvider) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
         this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
+        this.nPlusOneHolderObjectProvider = nPlusOneHolderObjectProvider;
+        this.nPlusOneAnalyzerObjectProvider = nPlusOneAnalyzerObjectProvider;
     }
 
     @Override
@@ -145,7 +153,12 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setProxyTargetClass(true);
 
         TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, queriesCollector, metricsPublisherObjectProvider.getIfAvailable());
+                propagationCache,
+                statsCollector,
+                queriesCollector,
+                metricsPublisherObjectProvider.getIfAvailable(),
+                nPlusOneHolderObjectProvider.getIfAvailable(),
+                nPlusOneAnalyzerObjectProvider.getIfAvailable());
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);

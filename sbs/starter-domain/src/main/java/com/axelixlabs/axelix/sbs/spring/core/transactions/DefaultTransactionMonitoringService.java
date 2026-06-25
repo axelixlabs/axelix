@@ -116,9 +116,17 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
         return queriesRecords.stream()
                 .map(query -> {
                     Boolean inMemoryPaginated = query.isInMemoryPaginated() ? Boolean.TRUE : null;
+                    Boolean isNPlusOne = query.isNPlusOne() ? Boolean.TRUE : null;
+                    Boolean isBatchPlusOne = query.isBatchPlusOne() ? Boolean.TRUE : null;
                     long startTimestamp = query.getStartTimestampMs();
                     long endTimestamp = query.getDurationMs() + startTimestamp;
-                    return new Query(query.getSql(), startTimestamp, endTimestamp, inMemoryPaginated);
+                    return new Query(
+                            query.getSql(),
+                            startTimestamp,
+                            endTimestamp,
+                            inMemoryPaginated,
+                            isNPlusOne,
+                            isBatchPlusOne);
                 })
                 .collect(Collectors.toList());
     }

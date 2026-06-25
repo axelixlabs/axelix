@@ -44,6 +44,6 @@ public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
             return bean;
         }
 
-        return new ProxyingDataSource((DataSource) bean, queriesCollector);
+        return new ProxyingDataSource((DataSource) bean, queriesCollector, null);
     }
 }

@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneAnalyzer;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder.NPlusOneContext;
 
 /**
  * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
@@ -45,16 +48,22 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     private final TransactionStatsCollector statsCollector;
     private final QueriesRecorder queriesCollector;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
+    private final @Nullable NPlusOneHolder nPlusOneHolder;
+    private final @Nullable NPlusOneAnalyzer nPlusOneAnalyzer;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
             QueriesRecorder queriesCollector,
-            @Nullable AxelixMetricsPublisher metricsPublisher) {
+            @Nullable AxelixMetricsPublisher metricsPublisher,
+            @Nullable NPlusOneHolder nPlusOneHolder,
+            @Nullable NPlusOneAnalyzer nPlusOneAnalyzer) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
         this.queriesCollector = queriesCollector;
         this.metricsPublisher = metricsPublisher;
+        this.nPlusOneHolder = nPlusOneHolder;
+        this.nPlusOneAnalyzer = nPlusOneAnalyzer;
     }
 
     @Override
@@ -70,6 +79,8 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
             long startTimestampMs = System.currentTimeMillis();
 
             queriesCollector.startNewContext();
+            // N+1
+            startNPlusOneContext();
 
             // METRICS. Create transaction status
             TransactionStatus transactionStatus = TransactionStatus.SUCCESS;
@@ -87,6 +98,9 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                 long endTimestampMs = System.currentTimeMillis();
 
                 List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
+
+                // N+1
+                endNPlusOneContextAndAnalyzeQueries(queries);
 
                 TransactionRecord transactionRecord = new TransactionRecord(endTimestampMs, startTimestampMs, queries);
 
@@ -126,6 +140,23 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
             metricsPublisher.publishTransactionMetrics(
                     declaringClass.getSimpleName(), method.getName(), durationMs, transactionStatus, queriesSize);
         } catch (Exception ignored) {
+        }
+    }
+
+    private void startNPlusOneContext() {
+        if (nPlusOneHolder != null) {
+            nPlusOneHolder.startContext();
+        }
+    }
+
+    private void endNPlusOneContextAndAnalyzeQueries(List<SqlQueryRecord> queries) {
+        if (nPlusOneHolder == null || nPlusOneAnalyzer == null) {
+            return;
+        }
+        NPlusOneContext context = nPlusOneHolder.popContext();
+
+        if (context != null) {
+            nPlusOneAnalyzer.analyzeAndMarkNPlusOneQueries(context, queries);
         }
     }
 }

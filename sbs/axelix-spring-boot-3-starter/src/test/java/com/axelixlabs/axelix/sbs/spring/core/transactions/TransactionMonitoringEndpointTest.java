@@ -69,12 +69,21 @@ class TransactionMonitoringEndpointTest extends AbstractTransactionMonitoringSha
     private OwnerRepository ownerRepository;
 
     @Autowired
+    private PetRepository petRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private MeterRegistry meterRegistry;
 
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearStats();
         meterRegistry.clear();
+        petRepository.deleteAll();
+        ownerRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test
@@ -226,7 +235,7 @@ class TransactionMonitoringEndpointTest extends AbstractTransactionMonitoringSha
                         "startTimestampMs" : "#{json-unit.ignore}",
                         "endTimestampMs" : "#{json-unit.ignore}"
                       }, {
-                        "sql" : "select p1_0.owner_id,p1_0.id,p1_0.name from pet p1_0 where p1_0.owner_id=?",
+                        "sql" : "select p1_0.owner_id,p1_0.id,p1_0.category_id,p1_0.name from pet p1_0 where p1_0.owner_id=?",
                         "startTimestampMs" : "#{json-unit.ignore}",
                         "endTimestampMs" : "#{json-unit.ignore}"
                       } ]
@@ -285,7 +294,7 @@ class TransactionMonitoringEndpointTest extends AbstractTransactionMonitoringSha
                   "startTimestampMs" : "#{json-unit.ignore}",
                   "endTimestampMs" : "#{json-unit.ignore}",
                   "queries" : [ {
-                    "sql" : "select o1_0.id,o1_0.last_name from owner o1_0 where o1_0.id=?",
+                    "sql" : "select o1_0.id,o1_0.last_name,t1_0.owner_id,t1_0.id,t1_0.name from owner o1_0 left join tag t1_0 on o1_0.id=t1_0.owner_id where o1_0.id=?",
                     "startTimestampMs" : "#{json-unit.ignore}",
                     "endTimestampMs" : "#{json-unit.ignore}"
                   }, {
@@ -513,6 +522,139 @@ class TransactionMonitoringEndpointTest extends AbstractTransactionMonitoringSha
                 JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[*].inMemoryPaginated");
 
         assertThat(inMemoryPaginatedFlags).contains(true);
+    }
+
+    @Test
+    void shouldMarkCollectionNPlusOne() {
+        // given
+        Owner owner1 = new Owner();
+        owner1.addPet(new Pet("pet1", owner1));
+        Owner owner2 = new Owner();
+        owner2.addPet(new Pet("pet2", owner2));
+
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+
+        // when (will cause collection N+1)
+        propagationTestHelper.loadOwnersAndAccessPets();
+
+        // then
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                // language=json
+                .isEqualTo("""
+            {
+              "entrypoints" : [ {
+                "className" : "#{json-unit.ignore}",
+                "methodName" : "loadOwnersAndAccessPets",
+                "executions" : [ {
+                  "startTimestampMs" : "#{json-unit.ignore}",
+                  "endTimestampMs" : "#{json-unit.ignore}",
+                  "queries" : [ {
+                    "sql" : "#{json-unit.ignore}",
+                    "startTimestampMs" : "#{json-unit.ignore}",
+                    "endTimestampMs" : "#{json-unit.ignore}",
+                    "nPlusOne" : true
+                  }, {
+                    "sql" : "#{json-unit.ignore}",
+                    "startTimestampMs" : "#{json-unit.ignore}",
+                    "endTimestampMs" : "#{json-unit.ignore}",
+                    "nPlusOne" : true
+                  }, {
+                    "sql" : "#{json-unit.ignore}",
+                    "startTimestampMs" : "#{json-unit.ignore}",
+                    "endTimestampMs" : "#{json-unit.ignore}"
+                  } ]
+                } ],
+                "executionStats" : "#{json-unit.ignore}"
+              } ]
+            }
+            """);
+    }
+
+    @Test
+    void shouldMarkCollectionBatchPlusOne() {
+        // given
+        Owner owner1 = new Owner();
+        owner1.addTag(new Tag("tag1", owner1));
+        Owner owner2 = new Owner();
+        owner2.addTag(new Tag("tag2", owner2));
+        Owner owner3 = new Owner();
+        owner3.addTag(new Tag("tag3", owner3));
+
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+        ownerRepository.save(owner3);
+
+        // when (will cause collection Batch+1)
+        propagationTestHelper.loadOwnersAndAccessTags();
+
+        // then
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("loadOwnersAndAccessTags");
+
+        List<Boolean> batchPlusOneFlags =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[*].batchPlusOne");
+
+        assertThat(batchPlusOneFlags).isNotEmpty().allMatch(flag -> flag);
+    }
+
+    @Test
+    void shouldMarkEntityNPlusOne() {
+        // given
+        Owner owner1 = new Owner().setLastName("owner1");
+        Owner owner2 = new Owner().setLastName("owner2");
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+
+        petRepository.save(new Pet("pet1", owner1));
+        petRepository.save(new Pet("pet2", owner2));
+
+        // when (will cause entity N+1 — pet.getOwner() triggers separate SELECT per pet)
+        propagationTestHelper.loadPetsAndAccessOwners();
+
+        // then
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("loadPetsAndAccessOwners");
+
+        List<Map<String, Object>> queries = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries");
+
+        assertThat(queries.get(0).get("nPlusOne")).isEqualTo(true);
+
+        assertThat(queries.get(1).get("nPlusOne")).isEqualTo(true);
+
+        assertThat(queries.get(2).get("nPlusOne")).isNotEqualTo(true);
+    }
+
+    @Test
+    void shouldMarkEntityBatchPlusOne() {
+        // given
+        Category category1 = new Category("cat1");
+        Category category2 = new Category("cat2");
+        Category category3 = new Category("cat3");
+        categoryRepository.save(category1);
+        categoryRepository.save(category2);
+        categoryRepository.save(category3);
+
+        petRepository.save(new Pet("pet1", null, category1));
+        petRepository.save(new Pet("pet2", null, category2));
+        petRepository.save(new Pet("pet3", null, category3));
+
+        // when (will cause entity Batch+1 — pet.getCategory() triggers batch SELECT)
+        propagationTestHelper.loadPetsAndAccessCategories();
+
+        // then
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("loadPetsAndAccessCategories");
+
+        List<Boolean> batchPlusOneFlags =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[*].batchPlusOne");
+
+        assertThat(batchPlusOneFlags).isNotEmpty().allMatch(flag -> flag);
     }
 
     private void checkMeterRegistry(

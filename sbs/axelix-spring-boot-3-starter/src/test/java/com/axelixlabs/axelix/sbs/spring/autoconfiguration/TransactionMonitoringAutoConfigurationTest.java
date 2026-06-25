@@ -24,11 +24,13 @@ import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.HibernateRelatedConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
@@ -38,6 +40,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringB
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,10 +69,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
-            assertThat(context)
-                    .doesNotHaveBean(
-                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
-                                    .class);
+            assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
 
@@ -79,10 +79,8 @@ class TransactionMonitoringAutoConfigurationTest {
 
         contextRunner
                 .withBean(EntityManagerFactory.class, () -> mockFactory)
-                .run(context -> assertThat(context)
-                        .hasSingleBean(
-                                TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
-                                        .class));
+                .run(context ->
+                        assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderConfiguration.class));
     }
 
     @Test // GH-1250
@@ -91,10 +89,7 @@ class TransactionMonitoringAutoConfigurationTest {
                 .withPropertyValues("axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false")
                 .run(context -> {
                     assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
-                    assertThat(context)
-                            .doesNotHaveBean(
-                                    TransactionMonitoringAutoConfiguration
-                                            .LogbackInMemoryPaginationAppenderConfiguration.class);
+                    assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
                 });
     }
 
@@ -110,10 +105,7 @@ class TransactionMonitoringAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
-                    assertThat(context)
-                            .doesNotHaveBean(
-                                    TransactionMonitoringAutoConfiguration
-                                            .LogbackInMemoryPaginationAppenderConfiguration.class);
+                    assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
                 });
     }
 
@@ -131,10 +123,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
-            assertThat(context)
-                    .doesNotHaveBean(
-                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
-                                    .class);
+            assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
 
@@ -191,8 +180,8 @@ class TransactionMonitoringAutoConfigurationTest {
 
         @Bean
         public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new CustomProxyingDataSourceBeanPostProcessor(queriesCollector);
+                QueriesRecorder queriesCollector, ObjectProvider<NPlusOneHolder> nPlusOneHolder) {
+            return new CustomProxyingDataSourceBeanPostProcessor(queriesCollector, nPlusOneHolder);
         }
     }
 
@@ -235,13 +224,14 @@ class TransactionMonitoringAutoConfigurationTest {
 
         public CustomTransactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            super(transactionStatsCollector, queriesCollector, null);
+            super(transactionStatsCollector, queriesCollector, null, null, null);
         }
     }
 
     static class CustomProxyingDataSourceBeanPostProcessor extends ProxyingDataSourceBeanPostProcessor {
-        public CustomProxyingDataSourceBeanPostProcessor(QueriesRecorder queriesCollector) {
-            super(queriesCollector);
+        public CustomProxyingDataSourceBeanPostProcessor(
+                QueriesRecorder queriesCollector, ObjectProvider<NPlusOneHolder> nPlusOneHolder) {
+            super(queriesCollector, nPlusOneHolder);
         }
     }
 }
