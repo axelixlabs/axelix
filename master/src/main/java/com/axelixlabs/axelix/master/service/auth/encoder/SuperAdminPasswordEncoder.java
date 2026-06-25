@@ -164,6 +164,6 @@ public class SuperAdminPasswordEncoder {
     }
 
     private boolean isValidBcryptHash(String payload) {
-        return payload.matches("^\\$2[aby]\\$\\d{2}\\$[./A-Za-z0-9]{53}$");
+        return payload.matches("^\\$2[aby]\\$(0[4-9]|[12]\\d|3[01])\\$[./A-Za-z0-9]{53}$");
     }
 }
