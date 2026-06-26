@@ -30,6 +30,7 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  * Configuration of the {@link DefaultRole#SUPER_ADMIN}.
  *
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 @NullMarked
 @ConfigurationProperties(prefix = SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX)
@@ -55,5 +56,10 @@ public record SuperAdminConfigurationProperties(Credentials credentials) {
         return credentials.password();
     }
 
+    /**
+     * @param username super-admin username
+     * @param password plain text or encoded password using DelegatingPasswordEncoder format
+     * {@code {noop}}, {@code {bcrypt}}
+     */
     record Credentials(String username, String password) {}
 }

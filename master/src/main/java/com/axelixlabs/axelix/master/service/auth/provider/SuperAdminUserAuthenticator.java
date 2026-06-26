@@ -20,34 +20,46 @@ package com.axelixlabs.axelix.master.service.auth.provider;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.annotation.PostConstruct;
+
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
+import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 
 /**
  * {@link UserAuthenticator} that authenticates a {@link DefaultRole#SUPER_ADMIN}.
  *
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
     private final SuperAdminConfigurationProperties superAdminConfiguration;
+    private final SuperAdminPasswordEncoder passwordEncoder;
 
-    public SuperAdminUserAuthenticator(SuperAdminConfigurationProperties superAdminConfiguration) {
+    public SuperAdminUserAuthenticator(
+            SuperAdminConfigurationProperties superAdminConfiguration, SuperAdminPasswordEncoder passwordEncoder) {
         this.superAdminConfiguration = superAdminConfiguration;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @PostConstruct
+    public void validate() {
+        passwordEncoder.validatePasswordFormat(superAdminConfiguration.getPassword());
     }
 
     @Override
     public @Nullable User authenticate(String username, String password) {
 
         if (Objects.equals(superAdminConfiguration.getUsername(), username)
-                && Objects.equals(superAdminConfiguration.getPassword(), password)) {
+                && passwordEncoder.matches(password, superAdminConfiguration.getPassword())) {
             return new DefaultUser(
                     superAdminConfiguration.getUsername(),
-                    superAdminConfiguration.getPassword(),
+                    passwordEncoder.extractEncodedPassword(superAdminConfiguration.getPassword()),
                     Set.of(DefaultRole.SUPER_ADMIN));
         }
 

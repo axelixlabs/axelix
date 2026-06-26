@@ -57,6 +57,7 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
+import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathOidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
@@ -74,6 +75,7 @@ import com.axelixlabs.axelix.master.service.state.UserService;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
 @AutoConfiguration
 public class SecurityAutoConfiguration {
@@ -99,7 +101,7 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder bcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -189,8 +191,10 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
-                SuperAdminConfigurationProperties staticCredentialsConfig) {
-            return new SuperAdminUserAuthenticator(staticCredentialsConfig);
+                SuperAdminConfigurationProperties staticCredentialsConfig,
+                BCryptPasswordEncoder bcryptPasswordEncoder) {
+            return new SuperAdminUserAuthenticator(
+                    staticCredentialsConfig, new SuperAdminPasswordEncoder(bcryptPasswordEncoder));
         }
     }
 
