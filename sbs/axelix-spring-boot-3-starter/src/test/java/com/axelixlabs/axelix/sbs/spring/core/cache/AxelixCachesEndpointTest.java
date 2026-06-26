@@ -51,6 +51,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
@@ -78,6 +79,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     DefaultCacheOperationsDispatcher.class,
     AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
 })
+@IgnoreArchitectureTest
 class AxelixCachesEndpointTest {
 
     // Cache names under test

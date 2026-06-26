@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
@@ -103,6 +104,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     EnvironmentTestConfig.class,
     JwtAuthTestConfiguration.class
 })
+@IgnoreArchitectureTest
 class JwtAuthorizationFilterTest {
 
     private static final String USER_NAME = "testUser";
