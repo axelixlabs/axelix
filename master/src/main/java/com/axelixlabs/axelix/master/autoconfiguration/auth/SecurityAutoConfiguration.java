@@ -100,6 +100,9 @@ public class SecurityAutoConfiguration {
         return new DefaultAuthorizer();
     }
 
+    /**
+     * The main password encoder to be used in both database & super-admin credentials.
+     */
     @Bean
     public BCryptPasswordEncoder bcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
