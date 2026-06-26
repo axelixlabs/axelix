@@ -88,8 +88,8 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
                     shortBuildInfoProvider,
                     libraryInformationProvider,
                     insightsInfoProvider,
-                    "com.axelixlabs",
-                    "axelix-sbs");
+                    () -> "com.axelixlabs",
+                    () -> "axelix-sbs");
         }
     }
 
