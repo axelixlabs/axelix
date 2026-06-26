@@ -19,11 +19,13 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
  */
 @AutoConfiguration(
         after = {
+            ProjectInfoAutoConfiguration.class,
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
@@ -104,7 +107,7 @@ public class AxelixMetadataEndpointConfiguration {
             ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider,
-            BuildProperties buildProperties) {
+            ObjectProvider<BuildProperties> buildPropertiesProvider) {
 
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
@@ -115,8 +118,14 @@ public class AxelixMetadataEndpointConfiguration {
                 insightsInfoProvider,
 
                 // TODO: https://github.com/axelixlabs/axelix/issues/1305
-                () -> buildProperties != null ? buildProperties.getGroup() : "",
-                () -> buildProperties != null ? buildProperties.getArtifact() : "");
+                () -> {
+                    BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
+                    return buildProperties != null ? buildProperties.getGroup() : "";
+                },
+                () -> {
+                    BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
+                    return buildProperties != null ? buildProperties.getArtifact() : "";
+                });
     }
 
     @Bean
