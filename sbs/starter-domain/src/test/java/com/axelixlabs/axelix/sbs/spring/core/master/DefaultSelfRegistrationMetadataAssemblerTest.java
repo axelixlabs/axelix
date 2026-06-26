@@ -143,11 +143,13 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     void shouldAssembleTheSelfRegistrationMetadataAboutGivenService() {
         // when.
         SelfRegistrationMetadata metadata = subject.assemble();
+        SelfRegistrationMetadata secondMetadata = subject.assemble();
         BasicDiscoveryMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
         assertThat(metadata.getInstanceName()).startsWith("testApp-").hasSize("testApp-".length() + 8);
+        assertThat(metadata.getInstanceName()).isNotEqualTo(secondMetadata.getInstanceName());
         assertThat(metadata.getInstanceActuatorUrl()).isEqualTo("http://localhost:8089/actuator");
         assertThat(metadata.getDeploymentAt()).isNotBlank();
         assertThat(Instant.parse(metadata.getDeploymentAt()).isBefore(Instant.now()))
