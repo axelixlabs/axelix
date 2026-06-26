@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
 
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
@@ -105,8 +105,8 @@ public class AxelixMetadataEndpointConfiguration {
             ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider,
-            ObjectProvider<BuildProperties> buildProperties) {
-        BuildProperties resolvedBuildProperties = buildProperties.getIfAvailable();
+            @Autowired(required = false) BuildProperties buildProperties) {
+
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
@@ -116,8 +116,8 @@ public class AxelixMetadataEndpointConfiguration {
                 insightsInfoProvider,
 
                 // TODO: https://github.com/axelixlabs/axelix/issues/1305
-                resolvedBuildProperties != null ? emptyIfNull(resolvedBuildProperties.getGroup()) : "",
-                resolvedBuildProperties != null ? emptyIfNull(resolvedBuildProperties.getArtifact()) : "");
+                buildProperties != null ? emptyIfNull(buildProperties.getGroup()) : "",
+                buildProperties != null ? emptyIfNull(buildProperties.getArtifact()) : "");
     }
 
     private static String emptyIfNull(String value) {
