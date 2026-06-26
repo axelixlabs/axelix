@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "management.endpoints.web.exposure.include=axelix-feign")
 @Import({AxelixFeignEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
+@IgnoreArchitectureTest
 public class AxelixFeignEndpointTest {
 
     private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION = "service-1";

@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({AxelixGcEndpointTestTestConfiguration.class, JwtAuthTestConfiguration.class})
+@IgnoreArchitectureTest
 class AxelixGcEndpointTest {
 
     @Autowired

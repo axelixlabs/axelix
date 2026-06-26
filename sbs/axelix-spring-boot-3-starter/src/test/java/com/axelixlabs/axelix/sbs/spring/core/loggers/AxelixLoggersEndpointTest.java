@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -70,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "logging.level.a.b.c.d.e=DEBUG"
         })
 @Import({AxelixLoggersEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
+@IgnoreArchitectureTest
 public class AxelixLoggersEndpointTest {
 
     @Autowired

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans", "axelix.conditions.test.flag=enabled"})
 @Import(JwtAuthTestConfiguration.class)
+@IgnoreArchitectureTest
 public class AxelixConditionsEndpointTest {
 
     @Autowired

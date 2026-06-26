@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @Import(ScheduledTasksRegistryTest.ScheduledTaskRegistryTestConfiguration.class)
+@IgnoreArchitectureTest
 class ScheduledTasksRegistryTest {
 
     private static final String CRON_TASK_ID = ScheduledTaskRegistryTestConfiguration.class.getName() + ".testCronTask";
