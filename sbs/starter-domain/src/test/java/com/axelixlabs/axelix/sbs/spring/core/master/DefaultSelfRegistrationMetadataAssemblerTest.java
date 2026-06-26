@@ -132,7 +132,9 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
                     gitInformationProvider,
                     shortBuildInfoProvider,
                     libraryInformationProvider,
-                    insightsInfoProvider);
+                    insightsInfoProvider,
+                    "com.axelixlabs",
+                    "axelix-sbs");
         }
     }
 

@@ -46,7 +46,6 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
     ProjectInfoAutoConfiguration.class,
-    DefaultServiceMetadataAssembler.class,
     AxelixMetadataEndpoint.class,
     JwtAuthTestConfiguration.class,
     AbstractMasterSharedContextTest.SharedConfig.class
@@ -77,6 +76,26 @@ abstract class AbstractMasterSharedContextTest {
         @Bean
         public InsightsInfoProvider insightsInfoProvider() {
             return new TestInsightsInfoProvider();
+        }
+
+        // TODO: fallback to @Import once https://github.com/axelixlabs/axelix/issues/1305 is done
+        @Bean
+        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+                HealthDetectionFunction healthDetectionFunction,
+                AxelixVersionDiscoverer axelixVersionDiscoverer,
+                GitInformationProvider gitInformationProvider,
+                ShortBuildInfoProvider shortBuildInfoProvider,
+                LibraryInformationProvider libraryInformationProvider,
+                InsightsInfoProvider insightsInfoProvider) {
+            return new DefaultServiceMetadataAssembler(
+                    healthDetectionFunction,
+                    axelixVersionDiscoverer,
+                    gitInformationProvider,
+                    shortBuildInfoProvider,
+                    libraryInformationProvider,
+                    insightsInfoProvider,
+                    "com.axelixlabs",
+                    "axelix-sbs");
         }
     }
 }

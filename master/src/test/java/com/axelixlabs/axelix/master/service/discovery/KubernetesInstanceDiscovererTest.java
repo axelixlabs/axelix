@@ -590,7 +590,9 @@ class KubernetesInstanceDiscovererTest {
 
         Set<Instance> instances = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(instanceWithApplicationId);
+        assertThat(instances)
+                .extracting(instance -> instance.id().instanceId())
+                .containsOnly(instanceWithApplicationId);
     }
 
     @Test

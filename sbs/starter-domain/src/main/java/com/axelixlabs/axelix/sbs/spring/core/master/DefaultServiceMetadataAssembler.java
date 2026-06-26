@@ -39,6 +39,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final LibraryInformationProvider libraryInformationProvider;
     private final InsightsInfoProvider insightsInfoProvider;
+    private final String groupId;
+    private final String artifactId;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
@@ -46,7 +48,11 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
             GitInformationProvider gitInformationProvider,
             ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
-            InsightsInfoProvider insightsInfoProvider) {
+            InsightsInfoProvider insightsInfoProvider,
+
+            // TODO: https://github.com/axelixlabs/axelix/issues/1305
+            String groupId,
+            String artifactId) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
@@ -54,6 +60,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         this.shortBuildInfoProvider = shortBuildInfoProvider;
         this.libraryInformationProvider = libraryInformationProvider;
         this.insightsInfoProvider = insightsInfoProvider;
+        this.groupId = groupId;
+        this.artifactId = artifactId;
     }
 
     @Override
@@ -63,6 +71,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         return new BasicDiscoveryMetadata(
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfoProvider.getShortBuildInfo().serviceVersion(),
+                groupId,
+                artifactId,
                 gitCommitInfo.commitShaShort(),
                 libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),

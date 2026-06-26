@@ -184,7 +184,9 @@ class SelfRegistrationServiceTest {
                     gitInformationProvider,
                     shortBuildInfoProvider,
                     libraryInformationProvider,
-                    insightsInfoProvider);
+                    insightsInfoProvider,
+                    "com.axelixlabs",
+                    "axelix-sbs");
         }
     }
 
