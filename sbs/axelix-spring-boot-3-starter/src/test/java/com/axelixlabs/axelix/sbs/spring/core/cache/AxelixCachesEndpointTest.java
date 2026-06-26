@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import io.micrometer.core.instrument.MeterRegistry;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.BeforeEach;
