@@ -115,12 +115,8 @@ public class AxelixMetadataEndpointConfiguration {
                 insightsInfoProvider,
 
                 // TODO: https://github.com/axelixlabs/axelix/issues/1305
-                buildProperties != null ? emptyIfNull(buildProperties.getGroup()) : "",
-                buildProperties != null ? emptyIfNull(buildProperties.getArtifact()) : "");
-    }
-
-    private static String emptyIfNull(String value) {
-        return value != null ? value : "";
+                () -> buildProperties != null ? buildProperties.getGroup() : "",
+                () -> buildProperties != null ? buildProperties.getArtifact() : "");
     }
 
     @Bean
