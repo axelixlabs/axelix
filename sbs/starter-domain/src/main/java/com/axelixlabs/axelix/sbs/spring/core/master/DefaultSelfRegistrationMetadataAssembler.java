@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
@@ -28,8 +29,14 @@ import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfiguratio
  *
  * @since 05.02.2026
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
 public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistrationMetadataAssembler {
+
+    private static final char[] NAME_POSTFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    private static final int NAME_POSTFIX_LENGTH = 8;
+
+    private final Random random = new Random();
 
     private final SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
 
@@ -50,11 +57,22 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     @Override
     public SelfRegistrationMetadata assemble() {
+        String uniqueInstanceName =
+                selfRegistrationConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
+
         return new SelfRegistrationMetadata(
                 serviceMetadataAssembler.assemble(),
                 instanceId,
-                selfRegistrationConfigurationProperties.getInstanceName(),
+                uniqueInstanceName,
                 selfRegistrationConfigurationProperties.getInstanceActuatorUrl(),
                 deploymentAt);
+    }
+
+    private String generateNamePostfix() {
+        StringBuilder sb = new StringBuilder(NAME_POSTFIX_LENGTH);
+        for (int i = 0; i < NAME_POSTFIX_LENGTH; i++) {
+            sb.append(NAME_POSTFIX_CHARS[random.nextInt(NAME_POSTFIX_CHARS.length)]);
+        }
+        return sb.toString();
     }
 }

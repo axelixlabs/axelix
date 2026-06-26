@@ -52,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 @SpringBootTest(classes = DefaultSelfRegistrationMetadataAssemblerTest.TestApplication.class)
 @TestPropertySource(
@@ -146,7 +147,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
-        assertThat(metadata.getInstanceName()).isEqualTo("testApp");
+        assertThat(metadata.getInstanceName()).startsWith("testApp-").hasSize("testApp-".length() + 8);
         assertThat(metadata.getInstanceActuatorUrl()).isEqualTo("http://localhost:8089/actuator");
         assertThat(metadata.getDeploymentAt()).isNotBlank();
         assertThat(Instant.parse(metadata.getDeploymentAt()).isBefore(Instant.now()))
