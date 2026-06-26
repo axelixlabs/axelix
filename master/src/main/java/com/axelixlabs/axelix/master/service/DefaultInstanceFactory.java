@@ -27,9 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HealthStatus;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -53,9 +55,11 @@ public class DefaultInstanceFactory implements InstanceFactory {
             String deploymentAt,
             @Nullable Instant latestHeartBeat,
             String instanceActuatorUrl,
-            BasicDiscoveryMetadata metadata) {
+            BasicDiscoveryMetadata metadata)
+            throws IllegalArgumentException {
         return new Instance(
                 InstanceId.of(instanceId),
+                resolveApplicationId(instanceId, metadata),
                 instanceName,
                 metadata.getServiceVersion(),
                 metadata.getSoftwareVersions().getJava(),
@@ -70,6 +74,15 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
                 instanceActuatorUrl,
                 InsightsConverter.fromApi(metadata.getInsights()));
+    }
+
+    private ApplicationId resolveApplicationId(String instanceId, BasicDiscoveryMetadata metadata) {
+        if (!StringUtils.hasText(metadata.getGroupId()) || !StringUtils.hasText(metadata.getArtifactId())) {
+            throw new IllegalArgumentException(
+                    "Instance %s cannot be registered without a valid application id (both groupId and artifactId are mandatory)"
+                            .formatted(instanceId));
+        }
+        return ApplicationId.of(metadata.getGroupId(), metadata.getArtifactId());
     }
 
     private InstanceStatus convertServiceStatus(HealthStatus healthStatus) {

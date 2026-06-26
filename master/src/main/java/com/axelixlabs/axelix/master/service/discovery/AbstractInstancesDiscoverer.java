@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -90,6 +91,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
                         .map(this::getManagedServiceMetadata)
                         .filter(Objects::nonNull)
                         .filter(this::isCompatibleVersion)
+                        .filter(this::hasApplicationId)
                         .map(this::toDomainInstanceSafe)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet()));
@@ -122,6 +124,18 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
             logger.warn(
                     "Service: {} has a version of Axelix starter that current Axelix Master is not capable to work with",
                     profile.serviceInstance().getServiceId());
+            return false;
+        }
+    }
+
+    private boolean hasApplicationId(InstanceIntermediateProfile profile) {
+        BasicDiscoveryMetadata metadata = profile.metadata();
+        if (StringUtils.hasText(metadata.getGroupId()) && StringUtils.hasText(metadata.getArtifactId())) {
+            return true;
+        } else {
+            logger.warn(
+                    "Service instance: {} does not expose a valid application id (both groupId and artifactId are mandatory). Skipping registration",
+                    profile.serviceInstance().getInstanceId());
             return false;
         }
     }

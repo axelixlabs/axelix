@@ -29,6 +29,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
  *                                managed by this Axelix Master.
+ * @param applicationId           The id of the application this instance belongs to (groupId + artifactId). Shared by
+ *                                all the instances of the same application. Mandatory.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
  * @param javaVersion             Version of the Java Platform used inside the service
@@ -47,6 +49,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("instances")
 public record Instance(
         @Id InstanceId id,
+        @Embedded.Empty ApplicationId applicationId,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -65,6 +68,7 @@ public record Instance(
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
                 this.id,
+                this.applicationId,
                 this.name,
                 this.serviceVersion,
                 this.javaVersion,

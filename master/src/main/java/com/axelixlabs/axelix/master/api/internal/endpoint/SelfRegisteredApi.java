@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 import java.time.Instant;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,8 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
         matchIfMissing = true)
 public class SelfRegisteredApi {
 
+    private static final Logger log = LoggerFactory.getLogger(SelfRegisteredApi.class);
+
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
 
@@ -60,15 +64,21 @@ public class SelfRegisteredApi {
     @PostMapping(path = ApiPaths.SelfRegistryApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
 
-        Instance instance = instanceFactory.createInstance(
-                request.getInstanceId(),
-                request.getInstanceName(),
-                request.getDeploymentAt(),
-                Instant.now(),
-                request.getInstanceActuatorUrl(),
-                request.getBasicDiscoveryMetadata());
-        instanceRegistry.register(instance);
+        try {
+            Instance instance = instanceFactory.createInstance(
+                    request.getInstanceId(),
+                    request.getInstanceName(),
+                    request.getDeploymentAt(),
+                    Instant.now(),
+                    request.getInstanceActuatorUrl(),
+                    request.getBasicDiscoveryMetadata());
 
-        return ResponseEntity.noContent().build();
+            instanceRegistry.register(instance);
+
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException iae) {
+            log.warn("Unable to process self-registration request from '{}'", request.getInstanceName(), iae);
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

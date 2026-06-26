@@ -23,12 +23,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HotSpot;
 import com.axelixlabs.axelix.master.domain.InsightFeature;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for {@link InstanceFactory}.
@@ -49,11 +51,12 @@ public class DefaultInstanceFactoryTest {
                 "2025-02-03T13:29:29Z",
                 Instant.parse("2025-04-03T13:29:29Z"),
                 "http://localhost:8080/actuator",
-                mapMetadata());
+                mapMetadata("org.springframework.samples", "petclinic"));
 
         // then.
         assertThat(instance).isNotNull();
         assertThat(instance.id().instanceId()).isEqualTo("3c994958-924f-4a12-87d0-a8782e97af10");
+        assertThat(instance.applicationId()).isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
         assertThat(instance.name()).isEqualTo("petclinic");
         assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(instance.javaVersion()).isEqualTo("25");
@@ -76,7 +79,20 @@ public class DefaultInstanceFactoryTest {
                         List.of(new InsightFeature("OSIV", true))));
     }
 
-    private BasicDiscoveryMetadata mapMetadata() {
+    @Test
+    void createInstance_shouldRejectRegistrationWhenApplicationIdIsBlank() {
+        // when / then.
+        assertThatThrownBy(() -> instanceFactory.createInstance(
+                        "3c994958-924f-4a12-87d0-a8782e97af10",
+                        "petclinic",
+                        "2025-02-03T13:29:29Z",
+                        Instant.parse("2025-04-03T13:29:29Z"),
+                        "http://localhost:8080/actuator",
+                        mapMetadata("", "petclinic")))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private BasicDiscoveryMetadata mapMetadata(String groupId, String artifactId) {
         BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
                 new BasicDiscoveryMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
 
@@ -92,6 +108,8 @@ public class DefaultInstanceFactoryTest {
         return new BasicDiscoveryMetadata(
                 "1.0.0-SNAPSHOT",
                 "3.5.0-SNAPSHOT",
+                groupId,
+                artifactId,
                 "a8b0929",
                 "BellSoft",
                 softwareVersions,

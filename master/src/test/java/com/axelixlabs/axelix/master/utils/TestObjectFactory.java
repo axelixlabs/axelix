@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HotSpot;
 import com.axelixlabs.axelix.master.domain.InsightFeature;
 import com.axelixlabs.axelix.master.domain.Insights;
@@ -39,6 +40,9 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
 public final class TestObjectFactory {
 
     private static final String DEFAULT_URL = "http://example.com";
+
+    private static final ApplicationId DEFAULT_APPLICATION_ID =
+            ApplicationId.of("com.axelixlabs", "test-object-factory-app");
 
     private static final Instance.InstanceStatus DEFAULT_STATUS = Instance.InstanceStatus.UP;
 
@@ -99,6 +103,7 @@ public final class TestObjectFactory {
             double memoryUsage) {
         return new Instance(
                 InstanceId.of(id),
+                DEFAULT_APPLICATION_ID,
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 java,
@@ -150,6 +155,7 @@ public final class TestObjectFactory {
     public static Instance createInstanceWithHeartbeat(String id, @Nullable Instant instant) {
         return new Instance(
                 InstanceId.of(id),
+                DEFAULT_APPLICATION_ID,
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 "25",
@@ -179,6 +185,7 @@ public final class TestObjectFactory {
             Insights insights) {
         return new Instance(
                 InstanceId.of(id),
+                DEFAULT_APPLICATION_ID,
                 name,
                 "1.2.3-classifer-test",
                 java,

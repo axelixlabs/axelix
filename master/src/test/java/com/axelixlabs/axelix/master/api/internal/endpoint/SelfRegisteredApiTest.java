@@ -53,6 +53,8 @@ public class SelfRegisteredApiTest {
        "basicDiscoveryMetadata" : {
          "version": "1.0.0-SNAPSHOT",
          "serviceVersion" : "3.5.0-SNAPSHOT",
+         "groupId" : "org.springframework.samples",
+         "artifactId" : "petclinic",
          "commitShortSha" : "a8b0929",
          "jdkVendor" : "BellSoft",
          "softwareVersions" : {

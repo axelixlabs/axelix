@@ -50,5 +50,6 @@ public interface InstanceFactory {
             String deploymentAt,
             @Nullable Instant latestHeartBeat,
             String instanceActuatorUrl,
-            BasicDiscoveryMetadata metadata);
+            BasicDiscoveryMetadata metadata)
+            throws IllegalArgumentException;
 }

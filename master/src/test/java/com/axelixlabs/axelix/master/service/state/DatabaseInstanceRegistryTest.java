@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HotSpot;
 import com.axelixlabs.axelix.master.domain.InsightFeature;
 import com.axelixlabs.axelix.master.domain.Insights;
@@ -73,6 +74,7 @@ abstract class DatabaseInstanceRegistryTest {
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-1"),
+                ApplicationId.of("com.axelixlabs", "test-app"),
                 "name",
                 "1.0.0",
                 "java-17",
@@ -114,6 +116,7 @@ abstract class DatabaseInstanceRegistryTest {
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-2"),
+                ApplicationId.of("com.axelixlabs", "test-app"),
                 "name",
                 "1.0.0",
                 "java-17",
@@ -138,6 +141,7 @@ abstract class DatabaseInstanceRegistryTest {
         // when.
         Instance updated = new Instance(
                 instance.id(),
+                instance.applicationId(),
                 "updated-name",
                 "1.0.1",
                 "java-21",
@@ -266,6 +270,7 @@ abstract class DatabaseInstanceRegistryTest {
     private Instance createInstanceWithHeap(String instanceId, double heap) {
         return new Instance(
                 InstanceId.of(instanceId),
+                ApplicationId.of("com.axelixlabs", "test-app"),
                 "updated-name",
                 "1.0.1",
                 "java-21",
