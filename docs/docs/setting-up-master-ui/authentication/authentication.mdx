@@ -47,6 +47,11 @@ If no prefix is provided, the value is treated as plaintext.
 For security reasons, it is strongly recommended to use a hashed password format (such as `{bcrypt}`) instead of
 plaintext.
 
+For the encoded password examples are:
+
+* `{bcrypt}$2a$10$KjkxE0Tt8L4B2kDYlSWcme0o/AjKE7LqyDaTqPr0sESbF85e3bDTC` - bcrypt encoded password
+* `{noop}password` - plaintext encoded (same as just `password`).
+
 ### Local users
 
 Local users live in Master's own database (`UserEntity`). Passwords are hashed with BCrypt. When
