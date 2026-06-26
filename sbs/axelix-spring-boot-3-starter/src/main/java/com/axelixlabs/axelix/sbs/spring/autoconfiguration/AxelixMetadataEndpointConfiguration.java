@@ -21,6 +21,7 @@ import java.lang.management.ManagementFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.info.InfoContributorAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -56,6 +57,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
  */
 @AutoConfiguration(
         after = {
+            InfoContributorAutoConfiguration.class,
             ProjectInfoAutoConfiguration.class,
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
@@ -107,7 +109,7 @@ public class AxelixMetadataEndpointConfiguration {
             ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider,
-            ObjectProvider<BuildProperties> buildPropertiesProvider) {
+            ObjectProvider<BuildProperties> providerBuildProperties) {
 
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
@@ -118,14 +120,8 @@ public class AxelixMetadataEndpointConfiguration {
                 insightsInfoProvider,
 
                 // TODO: https://github.com/axelixlabs/axelix/issues/1305
-                () -> {
-                    BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
-                    return buildProperties != null ? buildProperties.getGroup() : "";
-                },
-                () -> {
-                    BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
-                    return buildProperties != null ? buildProperties.getArtifact() : "";
-                });
+                () -> groupIdFrom(providerBuildProperties),
+                () -> artifactIdFrom(providerBuildProperties));
     }
 
     @Bean
@@ -147,5 +143,15 @@ public class AxelixMetadataEndpointConfiguration {
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
         return BasicDiscoveryMetadata.HealthStatus.UNKNOWN;
+    }
+
+    private static String groupIdFrom(ObjectProvider<BuildProperties> providerBuildProperties) {
+        BuildProperties buildProperties = providerBuildProperties.getIfAvailable();
+        return buildProperties != null ? buildProperties.getGroup() : "";
+    }
+
+    private static String artifactIdFrom(ObjectProvider<BuildProperties> providerBuildProperties) {
+        BuildProperties buildProperties = providerBuildProperties.getIfAvailable();
+        return buildProperties != null ? buildProperties.getArtifact() : "";
     }
 }
