@@ -4,6 +4,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 export const presetOptions: Preset.Options = {
   docs: {
     sidebarPath: './sidebars.ts',
+    // Docs sit at the root of the /docs/ baseUrl so URLs stay /docs/...
+    // (and /docs/<locale>/... for non-default locales).
+    routeBasePath: '/',
     // Please change this to your repo.
     // Remove this to remove the "edit this page" links.
   },

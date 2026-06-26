@@ -23,7 +23,11 @@ const config: Config = {
   url: 'https://axelix.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  // The whole docs site is served under /docs/. Combined with the docs
+  // routeBasePath of '/', Docusaurus inserts the locale segment *after*
+  // /docs/, so non-default locales live at /docs/<locale>/... (e.g.
+  // /docs/ru/...) instead of the default /<locale>/docs/... layout.
+  baseUrl: '/docs/',
 
   onBrokenLinks: 'throw',
 
