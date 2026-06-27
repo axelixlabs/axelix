@@ -3,9 +3,9 @@ import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.1.0-RC1"
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
+    id("java-test-fixtures")
 }
 
 val springBootVersion = "4.1.0-RC1"
@@ -27,15 +27,15 @@ val vertxVersion = "4.5.28"
 
 dependencies {
     // Self
-    implementation(project(":common:domain"))
-    implementation(project(":common:api"))
-    implementation(project(":common:auth"))
-    implementation(project(":common:utils"))
+    api(project(":common:domain"))
+    api(project(":common:api"))
+    api(project(":common:auth"))
+    api(project(":common:utils"))
 
     // Impl
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
-    implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    api(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
+    api(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Security Patches
     implementation(platform("io.netty:netty-bom:${nettyVersion}"))
@@ -49,27 +49,27 @@ dependencies {
     }
 
     // Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-restclient")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    api("org.springframework.boot:spring-boot-starter-data-jdbc")
+    api("org.springframework.boot:spring-boot-starter-restclient")
+    api("org.springframework.boot:spring-boot-starter-webmvc")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+    api("org.springframework.boot:spring-boot-starter-liquibase")
 
-    implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
-    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
-    implementation("org.springframework.security:spring-security-crypto")
+    api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
+    api("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
+    api("org.springframework.security:spring-security-crypto")
 
-    implementation("org.slf4j:slf4j-api")
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
-    implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
+    api("org.slf4j:slf4j-api")
+    api("com.github.ben-manes.caffeine:caffeine")
+    api("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
+    api("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:
     //  This library is archived, and it only supports Jackson 2.x
     //  For now we're gonna get away with it, but Spring Boot 4 already
     //  establishes a baseline for Jackson 3, but it still ca work with Jackson 2.
     //  So, we need to decide how are we going to work with this.
-    implementation("io.burt:jmespath-jackson:${jmesPathVersion}")
+    api("io.burt:jmespath-jackson:${jmesPathVersion}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")
@@ -77,23 +77,30 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
 
+    // Test Self
+    testImplementation(testFixtures(project))
+    testFixturesImplementation(project(":common:domain"))
+    testFixturesImplementation(project(":common:api"))
+    testFixturesImplementation(project(":common:auth"))
+    testFixturesImplementation(project(":common:utils"))
+
     // Test
-    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
-    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
+    testFixturesApi(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testFixturesApi(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-jdbc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-restclient-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-testcontainers")
 
-    testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("org.testcontainers:testcontainers-mysql")
-    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
-    testImplementation("org.instancio:instancio-core:${instancioVersion}")
+    testFixturesApi("org.testcontainers:testcontainers-postgresql")
+    testFixturesApi("org.testcontainers:testcontainers-mysql")
+    testFixturesApi("org.testcontainers:testcontainers-junit-jupiter")
+    testFixturesApi("com.squareup.okhttp3:mockwebserver")
+    testFixturesApi("com.squareup.okhttp3:okhttp")
+    testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.1")
+    testFixturesApi("org.instancio:instancio-core:${instancioVersion}")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
@@ -110,15 +117,6 @@ java {
     }
 }
 
-// We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need
-tasks.jar {
-    enabled = false
-}
-
-tasks.bootJar {
-    archiveFileName = "master.jar"
-}
-
 tasks.processResources {
 
     val projectVersion = version.toString()
@@ -132,6 +130,11 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-parameters")
+    options.release = 25
 }
 
 axelix {
