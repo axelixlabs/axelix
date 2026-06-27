@@ -19,13 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.util.function.Supplier;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
-
-import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.
@@ -42,8 +39,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final LibraryInformationProvider libraryInformationProvider;
     private final InsightsInfoProvider insightsInfoProvider;
-    private final Supplier<String> groupIdSupplier;
-    private final Supplier<String> artifactIdSupplier;
+    private final String groupId;
+    private final String artifactId;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
@@ -54,8 +51,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
             InsightsInfoProvider insightsInfoProvider,
 
             // TODO: https://github.com/axelixlabs/axelix/issues/1305
-            Supplier<String> groupIdSupplier,
-            Supplier<String> artifactIdSupplier) {
+            String groupId,
+            String artifactId) {
 
         this.healthDetectionFunction = healthDetectionFunction;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
@@ -63,8 +60,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         this.shortBuildInfoProvider = shortBuildInfoProvider;
         this.libraryInformationProvider = libraryInformationProvider;
         this.insightsInfoProvider = insightsInfoProvider;
-        this.groupIdSupplier = groupIdSupplier;
-        this.artifactIdSupplier = artifactIdSupplier;
+        this.groupId = groupId;
+        this.artifactId = artifactId;
     }
 
     @Override
@@ -74,8 +71,8 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         return new BasicDiscoveryMetadata(
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfoProvider.getShortBuildInfo().serviceVersion(),
-                emptyIfNull(groupIdSupplier.get()),
-                emptyIfNull(artifactIdSupplier.get()),
+                groupId,
+                artifactId,
                 gitCommitInfo.commitShaShort(),
                 libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),

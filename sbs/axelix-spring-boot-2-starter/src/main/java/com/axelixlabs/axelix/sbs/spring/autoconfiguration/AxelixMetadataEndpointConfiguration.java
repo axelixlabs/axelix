@@ -49,6 +49,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfo
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 
+import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
+
 /**
  * Auto-configuration for the {@link AxelixMetadataEndpoint}.
  *
@@ -109,8 +111,9 @@ public class AxelixMetadataEndpointConfiguration {
             ShortBuildInfoProvider shortBuildInfoProvider,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider,
-            ObjectProvider<BuildProperties> providerBuildProperties) {
+            ObjectProvider<BuildProperties> buildProperties) {
 
+        BuildProperties resolvedBuildProperties = buildProperties.getIfAvailable();
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
@@ -120,8 +123,8 @@ public class AxelixMetadataEndpointConfiguration {
                 insightsInfoProvider,
 
                 // TODO: https://github.com/axelixlabs/axelix/issues/1305
-                () -> groupIdFrom(providerBuildProperties),
-                () -> artifactIdFrom(providerBuildProperties));
+                resolvedBuildProperties != null ? emptyIfNull(resolvedBuildProperties.getGroup()) : "",
+                resolvedBuildProperties != null ? emptyIfNull(resolvedBuildProperties.getArtifact()) : "");
     }
 
     @Bean
@@ -143,15 +146,5 @@ public class AxelixMetadataEndpointConfiguration {
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
         return BasicDiscoveryMetadata.HealthStatus.UNKNOWN;
-    }
-
-    private static String groupIdFrom(ObjectProvider<BuildProperties> providerBuildProperties) {
-        BuildProperties buildProperties = providerBuildProperties.getIfAvailable();
-        return buildProperties != null ? buildProperties.getGroup() : "";
-    }
-
-    private static String artifactIdFrom(ObjectProvider<BuildProperties> providerBuildProperties) {
-        BuildProperties buildProperties = providerBuildProperties.getIfAvailable();
-        return buildProperties != null ? buildProperties.getArtifact() : "";
     }
 }
