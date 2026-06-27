@@ -1,4 +1,3 @@
-import Dependencies.jsonUnitAssertJVersion
 import Dependencies.jspecifyVersion
 import Dependencies.jsonwebtokenVersion
 
@@ -18,7 +17,6 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonwebtokenVersion}")
 
     // Test
-    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$jsonUnitAssertJVersion")
     testRuntimeOnly("io.jsonwebtoken:jjwt-impl:${jsonwebtokenVersion}")
     testRuntimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonwebtokenVersion}")
 }

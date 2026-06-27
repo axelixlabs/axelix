@@ -18,6 +18,7 @@ val sqliteVersion = "3.53.1.0"
 val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.5.1"
+val jsonUnitAssertJVersion = "2.38.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.11"
@@ -94,6 +95,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
     testImplementation("org.instancio:instancio-core:${instancioVersion}")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")

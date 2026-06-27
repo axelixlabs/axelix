@@ -6,6 +6,8 @@ plugins {
 val springBootVersion = "4.0.6"
 val springCloudVersion = "2025.1.0"
 
+val jsonUnitAssertJVersion = "2.38.0"
+
 dependencies {
     // Self
     api(project(":sbs:starter-domain"))
@@ -41,6 +43,8 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 }
 
 tasks.withType<JavaCompile>().configureEach {

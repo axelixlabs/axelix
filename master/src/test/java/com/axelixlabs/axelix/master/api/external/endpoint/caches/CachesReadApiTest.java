@@ -209,8 +209,7 @@ public class CachesReadApiTest {
             }
         });
 
-        registry.reload(
-                TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         registry.reload(TestObjectFactory.withUrl(
                 activeInstanceIdEmptyCaches, mockWebServer.url(activeInstanceIdEmptyCaches) + "/actuator"));
     }
