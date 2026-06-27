@@ -84,7 +84,7 @@ public class SelfRegisteredApi {
                     request.getBasicDiscoveryMetadata());
 
             transactionTemplate.executeWithoutResult(_ -> {
-                instanceRegistry.register(instance);
+                instanceRegistry.reload(instance);
                 historicalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
             });
 

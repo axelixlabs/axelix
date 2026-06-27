@@ -209,9 +209,9 @@ public class CachesReadApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 activeInstanceIdEmptyCaches, mockWebServer.url(activeInstanceIdEmptyCaches) + "/actuator"));
     }
 
@@ -287,7 +287,7 @@ public class CachesReadApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorCachesResponse() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response =
@@ -313,7 +313,7 @@ public class CachesReadApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorCacheProfileResponse() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         String cacheName = "cities";
 
         // when.

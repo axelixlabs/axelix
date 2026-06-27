@@ -158,7 +158,7 @@ public class DashboardApiTest {
         deRegisterAll();
 
         // Register instances with different versions and statuses
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance1Id,
                 "http://example.com/1",
                 "test-name",
@@ -169,7 +169,7 @@ public class DashboardApiTest {
                 "BellSoft",
                 null));
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance2Id,
                 "http://example.com/2",
                 "test-name",
@@ -180,7 +180,7 @@ public class DashboardApiTest {
                 "BellSoft",
                 "1.9.0"));
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance3Id,
                 "http://example.com/3",
                 "test-name",
@@ -227,7 +227,7 @@ public class DashboardApiTest {
     void shouldReturnDashboardWithUnknownStatusInstances() {
         // given.
         String unknownInstanceId = UUID.randomUUID().toString();
-        registry.register(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
+        registry.reload(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
 
         try {
             // when.

@@ -92,7 +92,7 @@ public class CachesClearApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 

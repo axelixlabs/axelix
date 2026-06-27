@@ -280,7 +280,7 @@ class ThreadDumpApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -305,7 +305,7 @@ class ThreadDumpApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -350,7 +350,7 @@ class ThreadDumpApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError_OnEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         // when.
         ResponseEntity<String> response = restTemplate
                 .asViewer()

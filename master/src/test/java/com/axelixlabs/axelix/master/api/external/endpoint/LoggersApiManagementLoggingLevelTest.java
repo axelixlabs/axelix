@@ -101,7 +101,7 @@ public class LoggersApiManagementLoggingLevelTest {
             }
         });
 
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
@@ -172,7 +172,7 @@ public class LoggersApiManagementLoggingLevelTest {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate
@@ -194,7 +194,7 @@ public class LoggersApiManagementLoggingLevelTest {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "logger.name";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG", null);
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate
@@ -215,7 +215,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnInternalServerError_OnResetLoggingLevelByLoggerName() {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "reset.logger.name";
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate

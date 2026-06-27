@@ -61,7 +61,7 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
      * for custom dialects. I have filed a ticket for that, so, I hope this is gonna get done.
      */
     @Override
-    public void register(Instance instance) {
+    public void reload(Instance instance) {
         if (instanceRepository.existsById(instance.id())) {
             jdbcAggregateTemplate.update(instance);
         } else {

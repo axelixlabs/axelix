@@ -62,7 +62,7 @@ public class InstanceDetailsConverterTest {
 
     @BeforeEach
     void prepare() {
-        instanceRegistry.register(createInstance(activeInstanceId));
+        instanceRegistry.reload(createInstance(activeInstanceId));
         converter = new InstanceDetailsConverter(instanceRegistry);
     }
 

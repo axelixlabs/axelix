@@ -65,7 +65,7 @@ abstract class DatabaseInstanceRegistryTest {
     }
 
     @Test
-    void register_shouldPersistInstance() {
+    void reload_shouldPersistInstance() {
 
         // given.
         Instant instant = Instant.now();
@@ -87,7 +87,7 @@ abstract class DatabaseInstanceRegistryTest {
                 "Http://localhost:8080/actuator");
 
         // when.
-        instanceRegistry.register(instance);
+        instanceRegistry.reload(instance);
 
         // then.
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
@@ -102,7 +102,7 @@ abstract class DatabaseInstanceRegistryTest {
     }
 
     @Test
-    void register_shouldUpdateExistingInstance() {
+    void reload_shouldUpdateExistingInstance() {
         // given.
         Instant instant = Instant.now();
         Instance instance = new Instance(
@@ -121,7 +121,7 @@ abstract class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator");
-        instanceRegistry.register(instance);
+        instanceRegistry.reload(instance);
 
         // when.
         Instance updated = new Instance(
@@ -141,7 +141,7 @@ abstract class DatabaseInstanceRegistryTest {
                 new MemoryUsage(1200d),
                 instance.actuatorUrl());
 
-        instanceRegistry.register(updated);
+        instanceRegistry.reload(updated);
 
         // then.
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
@@ -172,7 +172,7 @@ abstract class DatabaseInstanceRegistryTest {
     void deRegister_shouldRemoveInstance() {
         // given.
         Instance instance = createInstance("deregister-id-1");
-        instanceRegistry.register(instance);
+        instanceRegistry.reload(instance);
         assertThat(instanceRegistry.get(InstanceId.of("deregister-id-1"))).isNotEmpty();
 
         // when.
@@ -185,8 +185,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void deRegisterAll_shouldRemoveAllInstances() {
         // given.
-        instanceRegistry.register(createInstance("deregister-all-1"));
-        instanceRegistry.register(createInstance("deregister-all-2"));
+        instanceRegistry.reload(createInstance("deregister-all-1"));
+        instanceRegistry.reload(createInstance("deregister-all-2"));
 
         assertThat(instanceRegistry.getAll()).hasSize(2);
 
@@ -200,8 +200,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void getAll_shouldReturnAllInstances() {
         // given.
-        instanceRegistry.register(createInstance("test-id-1"));
-        instanceRegistry.register(createInstance("test-id-2"));
+        instanceRegistry.reload(createInstance("test-id-1"));
+        instanceRegistry.reload(createInstance("test-id-2"));
 
         // when. / then.
         assertThat(instanceRegistry.getAll())
@@ -212,8 +212,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void getAverageHeapSize_shouldReturnAverage() {
         // given.
-        instanceRegistry.register(createInstanceWithHeap("heap-id-1", 100.0));
-        instanceRegistry.register(createInstanceWithHeap("heap-id-2", 200.0));
+        instanceRegistry.reload(createInstanceWithHeap("heap-id-1", 100.0));
+        instanceRegistry.reload(createInstanceWithHeap("heap-id-2", 200.0));
 
         // when. / then.
         assertThat(instanceRegistry.getAverageHeapSize()).isEqualTo(150.0);
@@ -222,8 +222,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void getTotalHeapSize_shouldReturnSum() {
         // given.
-        instanceRegistry.register(createInstanceWithHeap("total-id-1", 100.0));
-        instanceRegistry.register(createInstanceWithHeap("total-id-2", 200.0));
+        instanceRegistry.reload(createInstanceWithHeap("total-id-1", 100.0));
+        instanceRegistry.reload(createInstanceWithHeap("total-id-2", 200.0));
 
         // when. / then.
         assertThat(instanceRegistry.getTotalHeapSize()).isEqualTo(300.0);
@@ -235,8 +235,8 @@ abstract class DatabaseInstanceRegistryTest {
         Instance petclinicInstance = withName("query-id-1", "petclinic-service");
         Instance featureServiceInstance = withName("query-id-2", "feature-service");
 
-        instanceRegistry.register(petclinicInstance);
-        instanceRegistry.register(featureServiceInstance);
+        instanceRegistry.reload(petclinicInstance);
+        instanceRegistry.reload(featureServiceInstance);
 
         // when.
         Set<Instance> result = instanceRegistry.findByQuery("petclinic");

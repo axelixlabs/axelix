@@ -230,7 +230,7 @@ class FeignClientApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -256,7 +256,7 @@ class FeignClientApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError when fetching EnvironmentFeed")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<String> response =

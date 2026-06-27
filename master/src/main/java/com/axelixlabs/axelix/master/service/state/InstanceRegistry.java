@@ -42,12 +42,13 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 public interface InstanceRegistry {
 
     /**
-     * Registers the given instance inside the registry. In case the {@link Instance} with this ID
-     * is already present, it will be updated with the new data (upsert semantics).
+     * Reloads the given instance inside the registry. In case the {@link Instance} with this ID
+     * is already present, it will be updated with the new data (upsert semantics), if case it is
+     * not present - it is going to be created.
      *
      * @param instance the instance to be registered or updated
      */
-    void register(Instance instance);
+    void reload(Instance instance);
 
     /**
      * Reloads the registry, by removing all previously auto-discovered Instances,

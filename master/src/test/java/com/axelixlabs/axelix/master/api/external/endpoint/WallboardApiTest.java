@@ -70,7 +70,7 @@ public class WallboardApiTest {
                 registry.deRegister(instance.id());
             });
 
-            registry.register(TestObjectFactory.createInstance(
+            registry.reload(TestObjectFactory.createInstance(
                     instance1Id,
                     "http://example.com/1",
                     "app-one",
@@ -81,7 +81,7 @@ public class WallboardApiTest {
                     "BellSoft",
                     "2.0.0"));
 
-            registry.register(TestObjectFactory.createInstance(
+            registry.reload(TestObjectFactory.createInstance(
                     instance2Id,
                     "http://example.com/2",
                     "app-two",

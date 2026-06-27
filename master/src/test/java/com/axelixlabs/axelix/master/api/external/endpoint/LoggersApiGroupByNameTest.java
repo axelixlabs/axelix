@@ -116,7 +116,7 @@ public class LoggersApiGroupByNameTest {
             }
         });
 
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
@@ -184,7 +184,7 @@ public class LoggersApiGroupByNameTest {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "test";
 
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate

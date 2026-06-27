@@ -72,9 +72,9 @@ class DefaultDashboardServiceTest {
     }
 
     private void populateInstanceRegistry() {
-        instanceRegistry.register(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
-        instanceRegistry.register(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
-        instanceRegistry.register(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));
+        instanceRegistry.reload(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
+        instanceRegistry.reload(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
+        instanceRegistry.reload(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));
     }
 
     @Test

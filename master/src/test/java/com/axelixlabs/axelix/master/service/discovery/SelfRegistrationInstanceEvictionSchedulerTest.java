@@ -121,6 +121,6 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
 
     private void registerInstance(String instanceId, Instant latestHeartBeat) {
         Instance instance = createInstance(instanceId, latestHeartBeat);
-        instanceRegistry.register(instance);
+        instanceRegistry.reload(instance);
     }
 }

@@ -205,7 +205,7 @@ public class LoggersApiAllLoggersTest {
             }
         });
 
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
@@ -231,7 +231,7 @@ public class LoggersApiAllLoggersTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError_OnAllLoggers() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response =

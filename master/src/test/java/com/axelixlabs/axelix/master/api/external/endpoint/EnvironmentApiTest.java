@@ -258,7 +258,7 @@ class EnvironmentApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -284,7 +284,7 @@ class EnvironmentApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError when fetching EnvironmentFeed")
     void shouldReturnInternalServerErrorOnEnvFeed() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<String> response =

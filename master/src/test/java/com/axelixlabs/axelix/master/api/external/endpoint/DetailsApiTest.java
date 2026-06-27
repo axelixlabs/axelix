@@ -250,9 +250,9 @@ public class DetailsApiTest {
             }
         });
 
-        registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        registry.register(
+        registry.reload(
                 createInstance(instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
     }
 
@@ -294,7 +294,7 @@ public class DetailsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
 

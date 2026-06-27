@@ -303,7 +303,7 @@ public class ConfigPropsApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -331,7 +331,7 @@ public class ConfigPropsApiTest {
         // when.
         String instanceId = UUID.randomUUID().toString();
 
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         ResponseEntity<String> response = restTemplate
                 .asViewer()

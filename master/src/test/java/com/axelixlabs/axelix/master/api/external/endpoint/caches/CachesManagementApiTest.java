@@ -107,7 +107,7 @@ class CachesManagementApiTest {
             }
         });
 
-        registry.register(
+        registry.reload(
                 TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -159,7 +159,7 @@ class CachesManagementApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError_OnEnableOrDisableCacheName(String cacheStatus) {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate
