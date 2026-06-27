@@ -34,6 +34,11 @@ import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
 
+/**
+ * Converter that is capable to conver the {@link BasicDiscoveryMetadata} into {@link HistoricalApplicationSnapshot}.
+ *
+ * @author Mikhail Polivakha
+ */
 @Component
 public class HistoricalApplicationSnapshotConverter {
 

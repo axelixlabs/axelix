@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +44,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -49,6 +52,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
@@ -93,6 +98,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Autowired
     private InstanceRepository instanceRepository;
 
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
     @BeforeEach
     void setUp() throws IOException {
         if (mockWebServer != null) {
@@ -102,6 +110,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         instanceRepository.deleteAll();
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 
@@ -475,6 +484,99 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .first()
                 .extracting(instance -> instance.id().instanceId())
                 .isEqualTo("3c994958-924f-4a12-87d0-a8782e97af10");
+    }
+
+    @Test
+    void shouldUpdateHistoricalApplicationSnapshotWhenInstanceIsDiscovered() {
+        String service = "service-with-insights";
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [
+                    {
+                      "name" : "AotCache",
+                      "enabled" : false
+                    },
+                    {
+                      "name" : "AppCDS",
+                      "enabled" : true
+                    }
+                  ],
+                  "gc" : [
+                    {
+                      "name" : "GCLoggingEnabled",
+                      "enabled" : false
+                    }
+                  ],
+                  "projectLilliputh" : [
+                    {
+                      "name" : "CompactObjectHeaders",
+                      "enabled" : false
+                    }
+                  ]
+                },
+                "springFramework" : [
+                  {
+                    "name" : "OSIV",
+                    "enabled" : true
+                  }
+                ]
+              }
+            }
+        """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance k8sInstance = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), service)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
+        Mockito.when(discoveryClient.getInstances(service)).thenReturn(List.of(k8sInstance));
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        SnapshotId snapshotId =
+                new SnapshotId("org.springframework.samples", "petclinic", LocalDate.now(ZoneOffset.UTC));
+        HistoricalApplicationSnapshot snapshot =
+                jdbcAggregateTemplate.findById(snapshotId, HistoricalApplicationSnapshot.class);
+
+        assertThat(snapshot).isNotNull();
+        assertThat(snapshot.insights().hotSpot().projectLeyden().appCdsEnabled())
+                .isTrue();
+        assertThat(snapshot.insights().hotSpot().projectLeyden().aotCacheEnabled())
+                .isFalse();
+        assertThat(snapshot.insights().hotSpot().gc().gcLoggingEnabled()).isFalse();
+        assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
+                .isFalse();
+        assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
     }
 
     @Test

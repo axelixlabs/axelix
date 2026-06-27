@@ -23,6 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -110,6 +112,9 @@ public class PersistenceAutoConfiguration {
             return List.of(
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
+                    new LocalDateToStringConverter(),
+                    new StringToLocalDateConverter(),
+                    new IntegerToBooleanConverter(),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper));
         }
@@ -144,6 +149,41 @@ public class PersistenceAutoConfiguration {
                     log.warn("Unable to parse the input '{}' as the numeric data type", source);
                     return null;
                 }
+            }
+        }
+
+        @WritingConverter
+        public static class LocalDateToStringConverter implements Converter<LocalDate, String> {
+
+            @Override
+            public @NonNull String convert(@NonNull LocalDate source) {
+                return String.valueOf(
+                        source.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+            }
+        }
+
+        @ReadingConverter
+        public static class StringToLocalDateConverter implements Converter<String, LocalDate> {
+
+            @Override
+            // NullAway is correct here, but Spring Framework Converter's contract is a bit wrong here
+            @SuppressWarnings("NullAway")
+            public @Nullable LocalDate convert(String source) {
+                try {
+                    long parsed = Long.parseLong(source);
+                    return Instant.ofEpochMilli(parsed).atZone(ZoneOffset.UTC).toLocalDate();
+                } catch (NumberFormatException e) {
+                    return LocalDate.parse(source);
+                }
+            }
+        }
+
+        @ReadingConverter
+        public static class IntegerToBooleanConverter implements Converter<Integer, Boolean> {
+
+            @Override
+            public @NonNull Boolean convert(@NonNull Integer source) {
+                return source != 0;
             }
         }
     }

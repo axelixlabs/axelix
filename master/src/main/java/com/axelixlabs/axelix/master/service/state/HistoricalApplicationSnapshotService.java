@@ -29,6 +29,11 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
 
+/**
+ * Service for operating over the {@link HistoricalApplicationSnapshot}.
+ *
+ * @author Mikhail Polivakha
+ */
 @Service
 public class HistoricalApplicationSnapshotService {
 
