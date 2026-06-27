@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -168,8 +167,7 @@ public class DashboardApiTest {
                 "3.5.2",
                 "6.0.2",
                 "BellSoft",
-                null,
-                Insights.empty()));
+                null));
 
         registry.register(TestObjectFactory.createInstance(
                 instance2Id,
@@ -180,8 +178,7 @@ public class DashboardApiTest {
                 "3.5.1",
                 "6.0.1",
                 "BellSoft",
-                "1.9.0",
-                Insights.empty()));
+                "1.9.0"));
 
         registry.register(TestObjectFactory.createInstance(
                 instance3Id,
@@ -192,8 +189,7 @@ public class DashboardApiTest {
                 "2.7.0",
                 "5.3.0",
                 "BellSoft",
-                null,
-                Insights.empty()));
+                null));
     }
 
     @AfterEach

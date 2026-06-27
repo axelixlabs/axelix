@@ -41,7 +41,6 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
@@ -92,24 +91,6 @@ public class DetailsApiTest {
              "name": "Windows 10",
              "version": "10.0",
              "arch": "amd64"
-           },
-           "insights": {
-             "hotSpot": {
-               "projectLeyden": [
-                 {
-                   "name": "AppCDS",
-                   "enabled": false
-                 }
-               ],
-               "gc": [],
-               "projectLilliput": [
-                 {
-                   "name": "CompactObjectHeaders",
-                   "enabled": true
-                 }
-               ]
-             },
-             "springFramework": []
            }
          }
         """;
@@ -147,24 +128,6 @@ public class DetailsApiTest {
          "name": "Windows 10",
          "version": "10.0",
          "arch": "amd64"
-       },
-       "insights": {
-         "hotSpot": {
-           "projectLeyden": [
-             {
-               "name": "AppCDS",
-               "enabled": false
-             }
-           ],
-           "gc": [],
-           "projectLilliput": [
-             {
-               "name": "CompactObjectHeaders",
-               "enabled": true
-             }
-           ]
-         },
-         "springFramework": []
        }
      }
     """;
@@ -287,15 +250,10 @@ public class DetailsApiTest {
             }
         });
 
-        registry.register(TestObjectFactory.createInstance(
-                activeInstanceId,
-                mockWebServer.url(activeInstanceId) + "/actuator",
-                TestObjectFactory.sampleInsights()));
+        registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        registry.register(TestObjectFactory.createInstance(
-                instanceWithoutPluginId,
-                mockWebServer.url(instanceWithoutPluginId) + "/actuator",
-                TestObjectFactory.sampleInsights()));
+        registry.register(
+                createInstance(instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
     }
 
     @AfterEach

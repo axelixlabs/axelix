@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
@@ -39,6 +40,7 @@ import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -56,9 +58,16 @@ public class DiscoveryAutoConfiguration {
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry,
             JwtEncoderService jwtEncoderService,
-            SecurityContextExecutor securityContextExecutor) {
+            SecurityContextExecutor securityContextExecutor,
+            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            TransactionTemplate transactionTemplate) {
         return new ShortPollingInstanceDiscoveryScheduler(
-                instancesDiscoverer, instanceRegistry, jwtEncoderService, securityContextExecutor);
+                instancesDiscoverer,
+                instanceRegistry,
+                jwtEncoderService,
+                securityContextExecutor,
+                historicalApplicationSnapshotService,
+                transactionTemplate);
     }
 
     @AutoConfiguration

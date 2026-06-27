@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -55,10 +57,18 @@ public class SelfRegisteredApi {
 
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
+    private final HistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+    private final TransactionTemplate transactionTemplate;
 
-    public SelfRegisteredApi(InstanceRegistry instanceRegistry, InstanceFactory instanceFactory) {
+    public SelfRegisteredApi(
+            InstanceRegistry instanceRegistry,
+            InstanceFactory instanceFactory,
+            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            TransactionTemplate transactionTemplate) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
+        this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @PostMapping(path = ApiPaths.SelfRegistryApi.SERVICE_REGISTER)
@@ -73,7 +83,10 @@ public class SelfRegisteredApi {
                     request.getInstanceActuatorUrl(),
                     request.getBasicDiscoveryMetadata());
 
-            instanceRegistry.register(instance);
+            transactionTemplate.executeWithoutResult(_ -> {
+                instanceRegistry.register(instance);
+                historicalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
+            });
 
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException iae) {

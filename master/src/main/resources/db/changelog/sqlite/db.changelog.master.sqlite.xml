@@ -8,6 +8,7 @@
 
   <include relativeToChangelogFile="true" file="changelog/1.0.0-create-instances-table.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.0.0-create-users-table.xml"/>
-  <include relativeToChangelogFile="true" file="changelog/1.0.0-rename-vm-features-to-insights.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.0.0-drop-vm-features.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.0.0-add-application-id-to-instances.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.0.0-create-historical-application-snapshots-table.xml"/>
 </databaseChangeLog>

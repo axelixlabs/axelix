@@ -36,7 +36,6 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
-import com.axelixlabs.axelix.master.service.convert.InsightsConverter;
 
 /**
  * Default implementation {@link InstanceFactory}.
@@ -57,6 +56,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
             String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata)
             throws IllegalArgumentException {
+
         return new Instance(
                 InstanceId.of(instanceId),
                 resolveApplicationId(instanceId, metadata),
@@ -72,8 +72,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 latestHeartBeat,
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
-                instanceActuatorUrl,
-                InsightsConverter.fromApi(metadata.getInsights()));
+                instanceActuatorUrl);
     }
 
     private ApplicationId resolveApplicationId(String instanceId, BasicDiscoveryMetadata metadata) {
@@ -82,6 +81,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                     "Instance %s cannot be registered without a valid application id (both groupId and artifactId are mandatory)"
                             .formatted(instanceId));
         }
+
         return ApplicationId.of(metadata.getGroupId(), metadata.getArtifactId());
     }
 

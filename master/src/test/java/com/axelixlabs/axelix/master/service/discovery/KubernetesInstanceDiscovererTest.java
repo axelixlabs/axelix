@@ -48,7 +48,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
@@ -199,10 +198,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
         Mockito.when(discoveryClient.getInstances(activeInstanceId)).thenReturn(List.of(serviceInstance));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).hasSize(1);
-        Instance instance = instances.iterator().next();
+        assertThat(profiles).hasSize(1);
+        Instance instance = profiles.iterator().next().instance();
         assertThat(instance).satisfies(it -> {
             assertThat(it.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
             assertThat(it.commitShaShort()).isEqualTo("a8b0929");
@@ -211,7 +210,6 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
-            assertThat(it.insights()).isEqualTo(Insights.empty());
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
         });
@@ -258,9 +256,11 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
         Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(serviceInstance));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(instanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(instanceId);
     }
 
     @Test
@@ -343,10 +343,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(firstServiceId)).thenReturn(List.of(firstServiceBadVersion));
         Mockito.when(discoveryClient.getInstances(secondServiceId)).thenReturn(List.of(secondServiceGoodVersion));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances)
-                .extracting(instance -> instance.id().instanceId())
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
                 .containsOnly(secondServiceInstanceGoodVersionId);
     }
 
@@ -354,9 +354,9 @@ class KubernetesInstanceDiscovererTest {
     void shouldIgnoreWhenDiscoveryClientReturnsEmpty() {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of());
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).isEmpty();
+        assertThat(profiles).isEmpty();
     }
 
     @Test
@@ -380,9 +380,11 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).isEmpty();
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .isEmpty();
     }
 
     @Test
@@ -461,9 +463,11 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(healthyK8sPod, timeoutK8sPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(healthyInstanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(healthyInstanceId);
     }
 
     @Test
@@ -507,9 +511,9 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).isEmpty();
+        assertThat(profiles).isEmpty();
     }
 
     @Test
@@ -588,10 +592,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(testServiceId))
                 .thenReturn(List.of(instanceMissingApplicationId, instanceHavingApplicationId));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances)
-                .extracting(instance -> instance.id().instanceId())
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
                 .containsOnly(instanceWithApplicationId);
     }
 
@@ -647,8 +651,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(testServiceId))
                 .thenReturn(List.of(healthyK8SPod, connectionRefusedPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(healthyK8SInstanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(healthyK8SInstanceId);
     }
 }

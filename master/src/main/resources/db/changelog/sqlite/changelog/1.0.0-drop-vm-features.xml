@@ -6,15 +6,14 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="postgres-1.0.0-rename-vm-features-to-insights" author="Axelix Team">
+  <changeSet id="sqlite-1.0.0-drop-vm-features" author="Axelix Team">
 
     <preConditions onFail="MARK_RAN" onError="HALT">
       <columnExists tableName="instances" columnName="vm_features"/>
     </preConditions>
 
-    <renameColumn tableName="instances"
-                  oldColumnName="vm_features"
-                  newColumnName="insights"
-                  columnDataType="TEXT"/>
+    <sql>
+      ALTER TABLE instances DROP COLUMN vm_features;
+    </sql>
   </changeSet>
 </databaseChangeLog>

@@ -18,14 +18,10 @@
 package com.axelixlabs.axelix.master.utils;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
-import com.axelixlabs.axelix.master.domain.HotSpot;
-import com.axelixlabs.axelix.master.domain.InsightFeature;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
@@ -57,8 +53,7 @@ public final class TestObjectFactory {
     }
 
     public static Instance withName(String id, String name) {
-        return createInstance(
-                id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null, Insights.empty());
+        return createInstance(id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null);
     }
 
     public static Instance withUrl(String id, String url) {
@@ -89,8 +84,7 @@ public final class TestObjectFactory {
                 springBoot,
                 springFramework,
                 jdkVendor,
-                kotlin,
-                Insights.empty());
+                kotlin);
     }
 
     public static Instance createInstance(
@@ -116,40 +110,12 @@ public final class TestObjectFactory {
                 Instant.now(),
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(memoryUsage),
-                "url",
-                Insights.empty());
+                "url");
     }
 
     public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
         return createInstance(
-                id,
-                url,
-                "test-object-factory-instance",
-                status,
-                "25",
-                "3.5.2",
-                "6.0.2",
-                "BellSoft",
-                null,
-                Insights.empty());
-    }
-
-    public static Instance createInstance(String id, String url, Instance.InstanceStatus status, Insights insights) {
-        return createInstance(
-                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null, insights);
-    }
-
-    public static Instance createInstance(String id, String url, Insights insights) {
-        return createInstance(id, url, DEFAULT_STATUS, insights);
-    }
-
-    public static Insights sampleInsights() {
-        return new Insights(
-                new HotSpot(
-                        List.of(new InsightFeature("AppCDS", false)),
-                        List.of(),
-                        List.of(new InsightFeature("CompactObjectHeaders", true))),
-                List.of());
+                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null);
     }
 
     public static Instance createInstanceWithHeartbeat(String id, @Nullable Instant instant) {
@@ -168,8 +134,7 @@ public final class TestObjectFactory {
                 instant,
                 DEFAULT_STATUS,
                 new MemoryUsage(1000L),
-                DEFAULT_URL,
-                Insights.empty());
+                DEFAULT_URL);
     }
 
     public static Instance createInstance(
@@ -181,8 +146,7 @@ public final class TestObjectFactory {
             String springBoot,
             String springFramework,
             String jdkVendor,
-            @Nullable String kotlin,
-            Insights insights) {
+            @Nullable String kotlin) {
         return new Instance(
                 InstanceId.of(id),
                 DEFAULT_APPLICATION_ID,
@@ -198,7 +162,6 @@ public final class TestObjectFactory {
                 Instant.now().minusSeconds(60),
                 status,
                 new MemoryUsage(1000L),
-                url,
-                insights);
+                url);
     }
 }

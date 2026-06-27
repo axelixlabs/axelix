@@ -53,7 +53,6 @@ import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -111,8 +110,6 @@ public class PersistenceAutoConfiguration {
             return List.of(
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
-                    new InsightsReadingConverter(jsonMapper),
-                    new InsightsWritingConverter(jsonMapper),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper));
         }
@@ -217,11 +214,7 @@ public class PersistenceAutoConfiguration {
 
         @Override
         protected @NonNull List<?> userConverters() {
-            return List.of(
-                    new InsightsReadingConverter(jsonMapper),
-                    new InsightsWritingConverter(jsonMapper),
-                    new RolesWritingConverter(jsonMapper),
-                    new RolesReadingConverter(jsonMapper));
+            return List.of(new RolesWritingConverter(jsonMapper), new RolesReadingConverter(jsonMapper));
         }
 
         @WritingConverter
@@ -256,40 +249,6 @@ public class PersistenceAutoConfiguration {
                 }
                 Set<String> roles = jsonMapper.readValue(source, new TypeReference<>() {});
                 return new UserEntity.Roles(roles);
-            }
-        }
-
-        @WritingConverter
-        public static class InsightsWritingConverter implements Converter<Insights, String> {
-
-            private final JsonMapper jsonMapper;
-
-            public InsightsWritingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public String convert(Insights source) {
-                Insights insights = source == null ? Insights.empty() : source;
-                return jsonMapper.writeValueAsString(insights);
-            }
-        }
-
-        @ReadingConverter
-        public static class InsightsReadingConverter implements Converter<String, Insights> {
-
-            private final JsonMapper jsonMapper;
-
-            public InsightsReadingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public Insights convert(String source) {
-                if (source == null || source.isBlank()) {
-                    return Insights.empty();
-                }
-                return jsonMapper.readValue(source, Insights.class);
             }
         }
     }

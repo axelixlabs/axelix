@@ -57,7 +57,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     }
 
     @Override
-    protected Instance toDomainInstance(InstanceIntermediateProfile profile) throws IllegalArgumentException {
+    protected Instance toDomainInstance(IntermediateInstanceProfile profile) throws IllegalArgumentException {
         ServiceInstance serviceInstance = profile.serviceInstance();
 
         if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {

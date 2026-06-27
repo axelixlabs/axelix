@@ -31,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -80,8 +79,7 @@ public class WallboardApiTest {
                     "3.4.0",
                     "6.2.0",
                     "BellSoft",
-                    "2.0.0",
-                    Insights.empty()));
+                    "2.0.0"));
 
             registry.register(TestObjectFactory.createInstance(
                     instance2Id,
@@ -92,8 +90,7 @@ public class WallboardApiTest {
                     "2.7.0",
                     "5.3.0",
                     "Corretto",
-                    null,
-                    Insights.empty()));
+                    null));
         }
 
         @AfterEach

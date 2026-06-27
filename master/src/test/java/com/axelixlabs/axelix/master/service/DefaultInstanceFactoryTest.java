@@ -24,9 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
-import com.axelixlabs.axelix.master.domain.HotSpot;
-import com.axelixlabs.axelix.master.domain.InsightFeature;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,13 +67,6 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");
-        assertThat(instance.insights())
-                .isEqualTo(new Insights(
-                        new HotSpot(
-                                List.of(new InsightFeature("AppCDS", true)),
-                                List.of(new InsightFeature("GCLoggingEnabled", false)),
-                                List.of()),
-                        List.of(new InsightFeature("OSIV", true))));
     }
 
     @Test

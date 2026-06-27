@@ -57,7 +57,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="vm_features" type="TEXT">
-        <constraints nullable="false"/>
+        <constraints nullable="false" />
       </column>
     </createTable>
   </changeSet>

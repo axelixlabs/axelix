@@ -22,7 +22,6 @@ import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -44,7 +43,6 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param memoryUsage             Memory usage of the given instance
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
- * @param insights                Insight information discovered for this service, like AOT Cache, AppCDS, OSIV etc.
  */
 @Table("instances")
 public record Instance(
@@ -62,8 +60,7 @@ public record Instance(
         @Nullable Instant latestHeartBeat,
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
-        String actuatorUrl,
-        @Column("insights") Insights insights) {
+        String actuatorUrl) {
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
@@ -81,8 +78,7 @@ public record Instance(
                 this.latestHeartBeat,
                 instanceStatus,
                 this.memoryUsage,
-                this.actuatorUrl,
-                this.insights);
+                this.actuatorUrl);
     }
 
     public enum InstanceStatus {

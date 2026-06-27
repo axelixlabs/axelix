@@ -30,9 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
-import com.axelixlabs.axelix.master.domain.HotSpot;
-import com.axelixlabs.axelix.master.domain.InsightFeature;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
@@ -87,13 +84,7 @@ abstract class DatabaseInstanceRegistryTest {
                 instant,
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
-                "Http://localhost:8080/actuator",
-                new Insights(
-                        new HotSpot(
-                                List.of(new InsightFeature("feature-1", true)),
-                                List.of(new InsightFeature("feature-2", false)),
-                                List.of()),
-                        List.of()));
+                "Http://localhost:8080/actuator");
 
         // when.
         instanceRegistry.register(instance);
@@ -129,13 +120,7 @@ abstract class DatabaseInstanceRegistryTest {
                 instant,
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
-                "Http://localhost:8080/actuator",
-                new Insights(
-                        new HotSpot(
-                                List.of(new InsightFeature("feature-1", true)),
-                                List.of(new InsightFeature("feature-2", false)),
-                                List.of()),
-                        List.of()));
+                "Http://localhost:8080/actuator");
         instanceRegistry.register(instance);
 
         // when.
@@ -154,8 +139,7 @@ abstract class DatabaseInstanceRegistryTest {
                 Instant.now(),
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(1200d),
-                instance.actuatorUrl(),
-                instance.insights());
+                instance.actuatorUrl());
 
         instanceRegistry.register(updated);
 
@@ -283,7 +267,6 @@ abstract class DatabaseInstanceRegistryTest {
                 null,
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(heap),
-                "/actuator",
-                Insights.empty());
+                "/actuator");
     }
 }

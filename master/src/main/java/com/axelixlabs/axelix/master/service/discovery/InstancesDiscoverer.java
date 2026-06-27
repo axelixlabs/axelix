@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
-
 import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
@@ -41,15 +39,13 @@ public interface InstancesDiscoverer {
     /**
      * Perform actual discovery.
      */
-    @NonNull
-    Set<@NonNull Instance> discover();
+    Set<DiscoveredInstanceProfile> discover();
 
     /**
      * Return the discovered {@link Set} of {@link Instance instance references}.
      * Safe variation of {@link #discover()}.
      */
-    @NonNull
-    default Set<@NonNull Instance> discoverSafely() {
+    default Set<DiscoveredInstanceProfile> discoverSafely() {
         try {
             return discover();
         } catch (Throwable t) {

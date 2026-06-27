@@ -49,7 +49,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
@@ -183,8 +182,6 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         assertThat(registeredInstances).hasSize(2);
 
         assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);
-        assertThat(registeredInstances)
-                .allSatisfy(instance -> assertThat(instance.insights()).isEqualTo(Insights.empty()));
     }
 
     @Test
@@ -262,7 +259,6 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
             assertThat(instance.commitShaShort()).isEqualTo("910230");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
-            assertThat(instance.insights()).isEqualTo(Insights.empty());
         });
     }
 

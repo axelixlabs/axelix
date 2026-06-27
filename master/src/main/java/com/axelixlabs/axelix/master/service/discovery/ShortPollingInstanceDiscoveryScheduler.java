@@ -19,17 +19,21 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -50,16 +54,22 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final InstanceRegistry instanceRegistry;
     private final JwtEncoderService jwtEncoderService;
     private final SecurityContextExecutor securityContextExecutor;
+    private final HistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+    private final TransactionTemplate transactionTemplate;
 
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry,
             JwtEncoderService jwtEncoderService,
-            SecurityContextExecutor securityContextExecutor) {
+            SecurityContextExecutor securityContextExecutor,
+            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            TransactionTemplate transactionTemplate) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
         this.jwtEncoderService = jwtEncoderService;
         this.securityContextExecutor = securityContextExecutor;
+        this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
@@ -67,7 +77,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));
 
-        Set<Instance> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
+        Set<DiscoveredInstanceProfile> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
                 instancesDiscoverer::discoverSafely, new DefaultSecurityContext(TECH_USER, token));
 
         if (discoveredInstances.isEmpty()) {
@@ -77,6 +87,17 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        instanceRegistry.reload(discoveredInstances);
+        Set<BasicDiscoveryMetadata> collectiveMetadata = discoveredInstances.stream()
+                .map(DiscoveredInstanceProfile::metadata)
+                .collect(Collectors.toSet());
+
+        Set<Instance> instances = discoveredInstances.stream()
+                .map(DiscoveredInstanceProfile::instance)
+                .collect(Collectors.toSet());
+
+        transactionTemplate.executeWithoutResult(_ -> {
+            instanceRegistry.reload(instances);
+            historicalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
+        });
     }
 }
