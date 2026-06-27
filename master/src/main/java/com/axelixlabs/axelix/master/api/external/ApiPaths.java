@@ -151,6 +151,11 @@ public final class ApiPaths {
         public static final String LOGGER_NAME = "/loggers/{instanceId}/logger/{loggerName}";
 
         /**
+         * Endpoint to change a specific logger by name across instances.
+         */
+        public static final String LOGGER_BULK_CHANGE = "/loggers/logger";
+
+        /**
          * Endpoint to retrieve a specific logger group by name from an instance.
          */
         public static final String GROUP_NAME = "/loggers/{instanceId}/group/{groupName}";
