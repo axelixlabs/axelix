@@ -27,6 +27,10 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
+
 /**
  * A {@link DataSource} wrapper that returns proxy {@link Connection} instances
  * capable of collecting SQL query execution statistics.
@@ -38,10 +42,13 @@ public class ProxyingDataSource implements DataSource {
 
     private final DataSource delegate;
     private final QueriesRecorder queriesRecorder;
+    private final @Nullable NPlusOneHolder nPlusOneHolder;
 
-    public ProxyingDataSource(DataSource delegate, QueriesRecorder queriesRecorder) {
+    public ProxyingDataSource(
+            DataSource delegate, QueriesRecorder queriesRecorder, @Nullable NPlusOneHolder nPlusOneHolder) {
         this.delegate = delegate;
         this.queriesRecorder = queriesRecorder;
+        this.nPlusOneHolder = nPlusOneHolder;
     }
 
     @Override
@@ -51,12 +58,12 @@ public class ProxyingDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new ProxyingConnection(delegate.getConnection(), queriesRecorder);
+        return new ProxyingConnection(delegate.getConnection(), queriesRecorder, nPlusOneHolder);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new ProxyingConnection(delegate.getConnection(username, password), queriesRecorder);
+        return new ProxyingConnection(delegate.getConnection(username, password), queriesRecorder, nPlusOneHolder);
     }
 
     @Override

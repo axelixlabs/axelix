@@ -32,9 +32,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -56,6 +61,13 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneAnalyzer;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneCollectionLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneEntityLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneIntegrator;
+
+import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
 
 /**
  * Base Spring Boot Test context class for the transaction-monitoring integration tests.
@@ -108,9 +120,15 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector,
                 QueriesRecorder queriesCollector,
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider,
+                ObjectProvider<NPlusOneHolder> nPlusOneHolder,
+                ObjectProvider<NPlusOneAnalyzer> nPlusOneAnalyzer) {
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, queriesCollector, axelixMetricsPublisherObjectProvider);
+                    transactionStatsCollector,
+                    queriesCollector,
+                    axelixMetricsPublisherObjectProvider,
+                    nPlusOneHolder,
+                    nPlusOneAnalyzer);
         }
 
         @Bean
@@ -120,14 +138,14 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
 
         @Bean
         public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
+                QueriesRecorder queriesCollector, ObjectProvider<NPlusOneHolder> nPlusOneHolder) {
+            return new ProxyingDataSourceBeanPostProcessor(queriesCollector, nPlusOneHolder);
         }
 
         @Bean
         public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
+                OwnerRepository ownerRepository, PetRepository petRepository, @Lazy PropagationTestHelper self) {
+            return new PropagationTestHelper(ownerRepository, petRepository, self);
         }
 
         @Bean
@@ -137,13 +155,32 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         }
 
         @Bean
-        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+        public AxelixMetricsPublisher axelixMetricsPublisher(
+                MeterRegistry meterRegistry, NPlusOneHolder nPlusOneHolder) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
 
         @EventListener(ApplicationReadyEvent.class)
         public void registerAppender() {
             new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
+
+        @Bean
+        public NPlusOneHolder nPlusOneHolder() {
+            return new NPlusOneHolder();
+        }
+
+        @Bean
+        public NPlusOneAnalyzer nPlusOneAnalyzer() {
+            return new NPlusOneAnalyzer();
+        }
+
+        @Bean
+        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(NPlusOneHolder nPlusOneHolder) {
+            return properties ->
+                    properties.put(INTEGRATOR_PROVIDER, (IntegratorProvider) () -> List.of(new NPlusOneIntegrator(
+                            new NPlusOneEntityLoadListener(nPlusOneHolder),
+                            new NPlusOneCollectionLoadListener(nPlusOneHolder))));
         }
     }
 
@@ -159,6 +196,10 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
         private List<Pet> pets = new ArrayList<>();
+
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @BatchSize(size = 2)
+        private List<Tag> tags = new ArrayList<>();
 
         public List<Pet> getPets() {
             return pets;
@@ -181,6 +222,14 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
             this.pets.add(pet);
             return this;
         }
+
+        public List<Tag> getTags() {
+            return tags;
+        }
+
+        public void addTag(Tag tag) {
+            this.tags.add(tag);
+        }
     }
 
     @Entity
@@ -197,11 +246,74 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         @JoinColumn(name = "owner_id")
         private Owner owner;
 
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "category_id")
+        private Category category;
+
         public Pet() {}
 
         public Pet(String name, Owner owner) {
             this.name = name;
             this.owner = owner;
+        }
+
+        public Pet(String name, Owner owner, Category category) {
+            this.name = name;
+            this.owner = owner;
+            this.category = category;
+        }
+
+        public Owner getOwner() {
+            return owner;
+        }
+
+        public Category getCategory() {
+            return category;
+        }
+    }
+
+    @Entity
+    @Table(name = "tag")
+    static class Tag {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String name;
+
+        @ManyToOne
+        @JoinColumn(name = "owner_id")
+        @OnDelete(action = OnDeleteAction.CASCADE)
+        private Owner owner;
+
+        public Tag() {}
+
+        public Tag(String name, Owner owner) {
+            this.name = name;
+            this.owner = owner;
+        }
+    }
+
+    @Entity
+    @Table(name = "category")
+    @BatchSize(size = 2)
+    static class Category {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String name;
+
+        public Category() {}
+
+        public Category(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 
@@ -210,10 +322,10 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         @Transactional
         Owner findByLastName(String lastName);
 
-        @Transactional(propagation = Propagation.SUPPORTS)
-        default List<Owner> findAll() {
-            return List.of(new Owner());
-        }
+        //        @Transactional(propagation = Propagation.SUPPORTS)
+        //        default List<Owner> findAll() {
+        //            return List.of(new Owner());
+        //        }
 
         @Transactional
         @Query(
@@ -222,13 +334,20 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         Page<Owner> findAllWithPets(Pageable pageable);
     }
 
+    interface PetRepository extends JpaRepository<Pet, Long> {}
+
+    interface CategoryRepository extends JpaRepository<Category, Long> {}
+
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
         private final PropagationTestHelper self;
+        private final PetRepository petRepository;
 
-        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+        public PropagationTestHelper(
+                OwnerRepository ownerRepository, PetRepository petRepository, @Lazy PropagationTestHelper self) {
             this.ownerRepository = ownerRepository;
+            this.petRepository = petRepository;
             this.self = self;
         }
 
@@ -301,6 +420,30 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         @Transactional(propagation = Propagation.MANDATORY)
         public void testMandatory(String lastName) {
             ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOwnersAndAccessPets() {
+            List<Owner> owners = ownerRepository.findAll();
+            owners.forEach(o -> o.getPets().size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOwnersAndAccessTags() {
+            List<Owner> owners = ownerRepository.findAll();
+            owners.forEach(o -> o.getTags().size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadPetsAndAccessOwners() {
+            List<Pet> pets = petRepository.findAll();
+            pets.forEach(p -> p.getOwner().getId());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadPetsAndAccessCategories() {
+            List<Pet> pets = petRepository.findAll();
+            pets.forEach(p -> p.getCategory().getName());
         }
     }
 

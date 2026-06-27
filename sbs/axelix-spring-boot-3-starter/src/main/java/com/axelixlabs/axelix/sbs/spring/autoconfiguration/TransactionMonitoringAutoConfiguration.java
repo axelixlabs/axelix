@@ -17,7 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.List;
+
+import jakarta.servlet.DispatcherType;
+
 import io.micrometer.core.instrument.MeterRegistry;
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -27,11 +32,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
@@ -47,7 +55,15 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringS
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneAnalyzer;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneCollectionLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneEntityLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolderCleanupFilter;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneIntegrator;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
+
+import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
 
 /**
  * Auto-configuration for Transaction Monitoring infrastructure.
@@ -101,9 +117,15 @@ public class TransactionMonitoringAutoConfiguration {
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             QueriesRecorder queriesCollector,
-            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
+            ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider,
+            ObjectProvider<NPlusOneAnalyzer> nPlusOneAnalyzerObjectProvider) {
         return new TransactionMonitoringBeanPostProcessor(
-                transactionStatsCollector, queriesCollector, metricsPublisherObjectProvider);
+                transactionStatsCollector,
+                queriesCollector,
+                metricsPublisherObjectProvider,
+                nPlusOneHolderObjectProvider,
+                nPlusOneAnalyzerObjectProvider);
     }
 
     @Bean
@@ -115,8 +137,8 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-            QueriesRecorder queriesCollector) {
-        return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
+            QueriesRecorder queriesCollector, ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider) {
+        return new ProxyingDataSourceBeanPostProcessor(queriesCollector, nPlusOneHolderObjectProvider);
     }
 
     @Bean
@@ -128,17 +150,57 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Configuration
     @ConditionalOnHibernateActive
-    @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
-    @ConditionalOnProperty(
-            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
-            name = "enabled",
-            havingValue = "true",
-            matchIfMissing = true)
-    static class LogbackInMemoryPaginationAppenderConfiguration {
+    static class HibernateRelatedConfiguration {
 
-        @EventListener(ApplicationReadyEvent.class)
-        public void registerAppender() {
-            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        @Configuration
+        @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
+        @ConditionalOnProperty(
+                prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+                name = "enabled",
+                havingValue = "true",
+                matchIfMissing = true)
+        static class LogbackInMemoryPaginationAppenderConfiguration {
+
+            @EventListener(ApplicationReadyEvent.class)
+            public void registerAppender() {
+                new LogbackInMemoryPaginationAppenderRegistrar().register();
+            }
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public NPlusOneAnalyzer nPlusOneAnalyzer() {
+            return new NPlusOneAnalyzer();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public NPlusOneHolder nPlusOneHolder() {
+            return new NPlusOneHolder();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(NPlusOneHolder nPlusOneHolder) {
+            return properties ->
+                    properties.put(INTEGRATOR_PROVIDER, (IntegratorProvider) () -> List.of(new NPlusOneIntegrator(
+                            new NPlusOneEntityLoadListener(nPlusOneHolder),
+                            new NPlusOneCollectionLoadListener(nPlusOneHolder))));
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public FilterRegistrationBean<NPlusOneHolderCleanupFilter> nPlusOneHolderCleanupFilterRegistration(
+                NPlusOneHolder nPlusOneHolder) {
+            FilterRegistrationBean<NPlusOneHolderCleanupFilter> registrationBean = new FilterRegistrationBean<>();
+
+            registrationBean.setFilter(new NPlusOneHolderCleanupFilter(nPlusOneHolder));
+            registrationBean.addUrlPatterns("/*");
+            registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
+
+            registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR);
+
+            return registrationBean;
         }
     }
 }

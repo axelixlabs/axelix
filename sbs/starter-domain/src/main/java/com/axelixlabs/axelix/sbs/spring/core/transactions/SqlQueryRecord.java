@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Record of a single SQL query execution.
  *
@@ -29,6 +31,9 @@ public class SqlQueryRecord {
     private final long durationMs;
     private final long startTimestampMs;
     private final boolean inMemoryPaginated;
+    private final @Nullable Integer sqlIndex;
+    private boolean nPlusOne = false;
+    private boolean batchPlusOne = false;
 
     /**
      * @param sql               the executed SQL statement
@@ -36,11 +41,13 @@ public class SqlQueryRecord {
      * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started.
      * @param inMemoryPaginated whether Hibernate applied pagination in memory for this query.
      */
-    public SqlQueryRecord(String sql, long durationMs, long startTimestampMs, boolean inMemoryPaginated) {
+    public SqlQueryRecord(
+            String sql, long durationMs, long startTimestampMs, boolean inMemoryPaginated, @Nullable Integer sqlIndex) {
         this.sql = sql;
         this.durationMs = durationMs;
         this.startTimestampMs = startTimestampMs;
         this.inMemoryPaginated = inMemoryPaginated;
+        this.sqlIndex = sqlIndex;
     }
 
     public String getSql() {
@@ -61,5 +68,25 @@ public class SqlQueryRecord {
 
     public boolean isInMemoryPaginated() {
         return inMemoryPaginated;
+    }
+
+    public @Nullable Integer getSqlIndex() {
+        return sqlIndex;
+    }
+
+    public boolean isNPlusOne() {
+        return nPlusOne;
+    }
+
+    public boolean isBatchPlusOne() {
+        return batchPlusOne;
+    }
+
+    public void markAsNPlusOne() {
+        this.nPlusOne = true;
+    }
+
+    public void markAsBatchPlusOne() {
+        this.batchPlusOne = true;
     }
 }

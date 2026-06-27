@@ -41,7 +41,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.InMemoryPaginationHolder;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
 
 /**
  * A {@link PreparedStatement} wrapper that records execution statistics
@@ -56,14 +59,24 @@ public class ProxyingPreparedStatement implements PreparedStatement {
     private final String sql;
     private final PreparedStatement delegate;
     private final QueriesRecorder queriesRecorder;
+    private final @Nullable NPlusOneHolder nPlusOneHolder;
 
-    public ProxyingPreparedStatement(String sql, PreparedStatement delegate, QueriesRecorder queriesRecorder) {
+    public ProxyingPreparedStatement(
+            String sql,
+            PreparedStatement delegate,
+            QueriesRecorder queriesRecorder,
+            @Nullable NPlusOneHolder nPlusOneHolder) {
         this.sql = sql;
         this.delegate = delegate;
         this.queriesRecorder = queriesRecorder;
+        this.nPlusOneHolder = nPlusOneHolder;
     }
 
     private <T> T wrapExecute(SqlAction<T> action) throws SQLException {
+        Integer sqlIndex = null;
+        if (nPlusOneHolder != null) {
+            sqlIndex = nPlusOneHolder.incrementAndGetSqlCount();
+        }
         long startTimestampMs = System.currentTimeMillis();
         long txStartTime = System.nanoTime();
 
@@ -74,7 +87,7 @@ public class ProxyingPreparedStatement implements PreparedStatement {
             boolean inMemoryPaginated = InMemoryPaginationHolder.isMarked();
             InMemoryPaginationHolder.clear();
             queriesRecorder.recordQuery(
-                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated));
+                    new SqlQueryRecord(sql, durationNs / 1_000_000, startTimestampMs, inMemoryPaginated, sqlIndex));
         }
     }
 

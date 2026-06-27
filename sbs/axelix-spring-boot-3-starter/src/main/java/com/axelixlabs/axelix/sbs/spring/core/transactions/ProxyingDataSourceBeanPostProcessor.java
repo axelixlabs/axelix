@@ -22,7 +22,10 @@ import javax.sql.DataSource;
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.NPlusOneHolder;
 
 /**
  * {@link BeanPostProcessor} that wraps {@link DataSource} beans with a monitoring
@@ -35,8 +38,12 @@ public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
 
     private final QueriesRecorder queriesCollector;
 
-    public ProxyingDataSourceBeanPostProcessor(QueriesRecorder queriesCollector) {
+    private final ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider;
+
+    public ProxyingDataSourceBeanPostProcessor(
+            QueriesRecorder queriesCollector, ObjectProvider<NPlusOneHolder> nPlusOneHolderObjectProvider) {
         this.queriesCollector = queriesCollector;
+        this.nPlusOneHolderObjectProvider = nPlusOneHolderObjectProvider;
     }
 
     @Override
@@ -45,6 +52,6 @@ public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
             return bean;
         }
 
-        return new ProxyingDataSource(dataSource, queriesCollector);
+        return new ProxyingDataSource(dataSource, queriesCollector, nPlusOneHolderObjectProvider.getIfAvailable());
     }
 }
