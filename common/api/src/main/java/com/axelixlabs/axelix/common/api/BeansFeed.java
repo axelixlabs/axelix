@@ -26,7 +26,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,6 +38,7 @@ import org.jspecify.annotations.Nullable;
  * @author Nikita Kirillov
  */
 public final class BeansFeed {
+    public static final String ORIGIN_FIELD = "origin";
 
     private final List<Bean> beans;
 
@@ -130,8 +132,7 @@ public final class BeansFeed {
                 @JsonProperty("isLazyInit") boolean isLazyInit,
                 @JsonProperty("isConfigPropsBean") boolean isConfigPropsBean,
                 @JsonProperty("qualifiers") List<String> qualifiers,
-                @JsonProperty("beanSource") @JsonDeserialize(using = BeanSourceDeserializer.class)
-                        BeanSource beanSource) {
+                @JsonProperty("beanSource") BeanSource beanSource) {
             this.beanName = beanName;
             this.className = className;
             this.scope = scope;
@@ -344,9 +345,22 @@ public final class BeansFeed {
      * Interface representing bean source information.
      * In Java 11, we use a regular interface instead of sealed interface.
      */
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            property = BeansFeed.ORIGIN_FIELD,
+            visible = true,
+            defaultImpl = UnknownBean.class)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = ComponentVariant.class, name = "COMPONENT_ANNOTATION"),
+        @JsonSubTypes.Type(value = BeanMethod.class, name = "BEAN_METHOD"),
+        @JsonSubTypes.Type(value = FactoryBean.class, name = "FACTORY_BEAN"),
+        @JsonSubTypes.Type(value = SyntheticBean.class, name = "SYNTHETIC_BEAN"),
+        @JsonSubTypes.Type(value = UnknownBean.class, name = "UNKNOWN"),
+    })
     public interface BeanSource {
 
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         BeanOrigin origin();
     }
 
@@ -354,7 +368,7 @@ public final class BeansFeed {
      * The {@link BeanSource} for the {@link BeanOrigin#UNKNOWN}. Does not hold
      * any fields since the actual origin if unknown.
      */
-    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    @JsonIgnoreProperties(value = ORIGIN_FIELD, allowGetters = true)
     public static final class UnknownBean implements BeanSource {
 
         /**
@@ -364,7 +378,7 @@ public final class BeansFeed {
         public UnknownBean() {}
 
         @Override
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.UNKNOWN;
         }
@@ -392,7 +406,7 @@ public final class BeansFeed {
      * The {@link BeanSource} for the {@link BeanOrigin#FACTORY_BEAN}. Holds the
      * reference to the {@link #factoryBeanName factory bean} that produced this bean.
      */
-    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    @JsonIgnoreProperties(value = ORIGIN_FIELD, allowGetters = true)
     public static final class FactoryBean implements BeanSource {
 
         private final String factoryBeanName;
@@ -412,7 +426,7 @@ public final class BeansFeed {
         }
 
         @Override
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.FACTORY_BEAN;
         }
@@ -444,7 +458,7 @@ public final class BeansFeed {
      * This is the "synthetic" bean. It means that, most likely, this Bean was created programmatically inside the
      * Spring Framework, but it might be also created programmatically by some library that uses Spring as well.
      */
-    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    @JsonIgnoreProperties(value = ORIGIN_FIELD, allowGetters = true)
     public static final class SyntheticBean implements BeanSource {
 
         /**
@@ -454,7 +468,7 @@ public final class BeansFeed {
         public SyntheticBean() {}
 
         @Override
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.SYNTHETIC_BEAN;
         }
@@ -484,7 +498,7 @@ public final class BeansFeed {
      * actual bean, and the name of the class, where this {@link #methodName method}
      * resides.
      */
-    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    @JsonIgnoreProperties(value = ORIGIN_FIELD, allowGetters = true)
     public static final class BeanMethod implements BeanSource {
 
         @Nullable
@@ -527,7 +541,7 @@ public final class BeansFeed {
         }
 
         @Override
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.BEAN_METHOD;
         }
@@ -572,7 +586,7 @@ public final class BeansFeed {
      * any additional fields since it is quite obvious by the #className bean class name
      * from where the class actually originated.
      */
-    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    @JsonIgnoreProperties(value = ORIGIN_FIELD, allowGetters = true)
     public static final class ComponentVariant implements BeanSource {
 
         /**
@@ -582,7 +596,7 @@ public final class BeansFeed {
         public ComponentVariant() {}
 
         @Override
-        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        @JsonGetter(ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.COMPONENT_ANNOTATION;
         }

@@ -19,14 +19,17 @@ dependencies {
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-web")
+    compileOnly("org.springframework.boot:spring-boot-starter-cache")
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
+    compileOnly("io.micrometer:micrometer-core")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
     // Test
+    testImplementation(project(":sbs:starter-domain"))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
@@ -41,6 +44,7 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
 }
 
 tasks.withType<JavaCompile>().configureEach {
