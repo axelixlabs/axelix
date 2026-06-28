@@ -44,6 +44,8 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     private final String instanceId;
 
+    private final String instanceName;
+
     private final String deploymentAt;
 
     public DefaultSelfRegistrationMetadataAssembler(
@@ -52,18 +54,17 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
         this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
+        this.instanceName = selfRegistrationConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
     }
 
     @Override
     public SelfRegistrationMetadata assemble() {
-        String uniqueInstanceName =
-                selfRegistrationConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
 
         return new SelfRegistrationMetadata(
                 serviceMetadataAssembler.assemble(),
                 instanceId,
-                uniqueInstanceName,
+                instanceName,
                 selfRegistrationConfigurationProperties.getInstanceActuatorUrl(),
                 deploymentAt);
     }
