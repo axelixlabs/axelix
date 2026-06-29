@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
@@ -32,10 +33,13 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  *
  * @since 30.12.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultGcLogService implements GcLogService {
 
     private static final String DEFAULT_FILE_NAME = "gc.log";
+    private static final String DEFAULT_LOG_LEVEL = "info";
+    private static final String OFF_LOG_LEVEL = "off";
 
     private final JcmdExecutor jcmdExecutor;
     private final Logger logger;
@@ -51,13 +55,12 @@ public class DefaultGcLogService implements GcLogService {
         this.logger = logger;
     }
 
-    // TODO We need to enhance the GC Logging status monitoring https://github.com/axelixlabs/axelix/issues/573
     @Override
     public GcLogStatus getStatus() {
         try {
             ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "list");
 
-            return parseStatus(result.getOutput());
+            return parseStatus(result.getOutput(), getAvailableLevels());
 
         } catch (Exception e) {
             throw new GcLogException("Failed to get GC log status via jcmd", e);
@@ -73,6 +76,38 @@ public class DefaultGcLogService implements GcLogService {
         }
 
         return file;
+    }
+
+    @Override
+    public boolean isGcLogFileSpecified() throws GcLogException {
+        try {
+            ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "list");
+
+            for (String line : result.getOutput().split("\n")) {
+                String trim = line.trim();
+                if (!trim.startsWith("#")) {
+                    continue;
+                }
+
+                // Expected format: "#0: <output> <what> <decorators> ...", where <what> contains log selectors.
+                String[] configurationParts = trim.split("\\s+");
+                if (configurationParts.length < 3 || !configurationParts[1].startsWith("file=")) {
+                    continue;
+                }
+
+                String what = configurationParts[2];
+                for (String selectorText : what.split(",")) {
+                    if (isGcSelector(selectorText.trim())) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            throw new GcLogException("Failed to get GC log file output status via jcmd", e);
+        }
     }
 
     /**
@@ -99,7 +134,7 @@ public class DefaultGcLogService implements GcLogService {
                     "jcmd",
                     getPid(),
                     "VM.log",
-                    "what=gc=" + level.toLowerCase(),
+                    "what=gc=" + level.toLowerCase(Locale.ROOT),
                     "output=file=" + DEFAULT_FILE_NAME,
                     "output_options=filecount=1,filesize=10M",
                     "decorators=time,level,tags");
@@ -180,7 +215,7 @@ public class DefaultGcLogService implements GcLogService {
                                     .trim()
                                     .split(","))
                             .map(String::trim)
-                            .map(String::toLowerCase)
+                            .map(level -> level.toLowerCase(Locale.ROOT))
                             .filter(level -> !level.equals("off"))
                             .collect(Collectors.toList());
                 }
@@ -193,33 +228,86 @@ public class DefaultGcLogService implements GcLogService {
         }
     }
 
-    private GcLogStatus parseStatus(String output) {
-        for (String line : output.split("\n")) {
-            String trim = line.trim();
-
-            if (trim.startsWith("#") && trim.contains("gc=")) {
-                int idx = trim.indexOf("gc=");
-                int end = trim.indexOf(" ", idx);
-                if (end == -1) {
-                    end = trim.length();
-                }
-
-                String level = trim.substring(idx + 3, end);
-                return new GcLogStatus(true, level, getAvailableLevels());
-            }
-        }
-
-        return new GcLogStatus(false, null, getAvailableLevels());
-    }
-
     private void validateLevel(String level) {
         if (level == null || level.isBlank()) {
             throw new GcLogException("GC log level must not be empty");
         }
 
-        String normalized = level.toLowerCase();
+        String normalized = level.toLowerCase(Locale.ROOT);
         if (!getAvailableLevels().contains(normalized)) {
             throw new GcLogException("Invalid GC log level '" + level + "', available: " + getAvailableLevels());
+        }
+    }
+
+    private GcLogStatus parseStatus(String output, List<String> availableLevels) {
+        boolean gcSelectorFound = false;
+        String highestLevel = null;
+
+        for (String line : output.split("\n")) {
+            String trim = line.trim();
+            if (!trim.startsWith("#")) {
+                continue;
+            }
+
+            // Expected format: "#0: <output> <what> <decorators> ...", where <what> contains log selectors.
+            String[] configurationParts = trim.split("\\s+");
+            if (configurationParts.length < 3) {
+                continue;
+            }
+
+            String what = configurationParts[2];
+            for (String selectorText : what.split(",")) {
+                String selector = selectorText.trim();
+
+                if (!isGcSelector(selector)) {
+                    continue;
+                }
+
+                gcSelectorFound = true;
+                String[] parts = selector.split("=", 2);
+                String level = parts.length == 2 ? parts[1] : DEFAULT_LOG_LEVEL;
+                if (!OFF_LOG_LEVEL.equals(level) && verbosity(level) > verbosity(highestLevel)) {
+                    highestLevel = level;
+                }
+            }
+        }
+
+        return new GcLogStatus(gcSelectorFound, highestLevel, availableLevels);
+    }
+
+    private boolean isGcSelector(String selector) {
+        String[] parts = selector.split("=", 2);
+        String tagSet = parts[0];
+
+        if ("all".equals(tagSet)) {
+            String level = parts.length == 2 ? parts[1] : DEFAULT_LOG_LEVEL;
+            // JVM default logging uses all=warning, which technically includes GC warning/error messages.
+            // For the product status, treat broad all selectors as GC logging only at info/debug/trace.
+            return verbosity(level) >= verbosity(DEFAULT_LOG_LEVEL);
+        }
+
+        return "gc".equals(tagSet) || "gc*".equals(tagSet) || tagSet.startsWith("gc+");
+    }
+
+    // JEP 158 defines levels in increasing order of verbosity: error < warning < info < debug < trace.
+    private int verbosity(@Nullable String level) {
+        if (level == null) {
+            return -1;
+        }
+
+        switch (level) {
+            case "error":
+                return 0;
+            case "warning":
+                return 1;
+            case "info":
+                return 2;
+            case "debug":
+                return 3;
+            case "trace":
+                return 4;
+            default:
+                return -1;
         }
     }
 }
