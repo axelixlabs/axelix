@@ -21,8 +21,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationHolder;
-
 /**
  * Logback appender that detects Hibernate's in-memory pagination by intercepting
  * the {@code HHH90003004} warning emitted by Hibernate 6.x–7.3.x when {@code firstResult/maxResults}

@@ -25,8 +25,6 @@ import org.apache.logging.slf4j.Log4jLoggerFactory;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
-
 /**
  * Log4j2 implementation of {@link InMemoryPaginationAppenderRegistrar}.
  *

@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlQueryRecord;
@@ -39,6 +38,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringB
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.InMemoryPaginationAppenderRegistrar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

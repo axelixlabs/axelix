@@ -22,8 +22,6 @@ import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
-
 /**
  * Logback implementation of {@link InMemoryPaginationAppenderRegistrar}.
  *

@@ -22,8 +22,6 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationHolder;
-
 /**
  * Log4j2 appender that detects Hibernate's in-memory pagination by intercepting
  * the {@code HHH90003004} warning emitted by Hibernate 6.x–7.3.x when {@code firstResult/maxResults}
