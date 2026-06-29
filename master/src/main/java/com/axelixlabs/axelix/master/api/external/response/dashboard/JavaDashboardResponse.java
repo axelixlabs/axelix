@@ -33,7 +33,7 @@ public record JavaDashboardResponse(HotSpot hotSpot, List<AggregatedFeature> spr
      * @param gc the list of aggregated GC features.
      * @param projectLilliput the list of aggregated features inside project Lilliput
      */
-    record HotSpot(
+    public record HotSpot(
             List<AggregatedFeature> projectLeyden,
             List<AggregatedFeature> gc,
             List<AggregatedFeature> projectLilliput) {}
@@ -42,5 +42,5 @@ public record JavaDashboardResponse(HotSpot hotSpot, List<AggregatedFeature> spr
      * @param featureId the id of the feature in use.
      * @param adoptionPercentage percentage of the total services that use the feature with the given featureId.
      */
-    record AggregatedFeature(String featureId, double adoptionPercentage) {}
+    public record AggregatedFeature(String featureId, double adoptionPercentage) {}
 }

@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse.AggregatedFeature;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse.HotSpot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
 
 /**
@@ -39,11 +46,45 @@ public class HistoricalApplicationSnapshotService {
 
     private final HistoricalApplicationSnapshotConverter converter;
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
+    private final HistoricalApplicationSnapshotRepository repository;
 
     public HistoricalApplicationSnapshotService(
-            HistoricalApplicationSnapshotConverter converter, JdbcAggregateTemplate jdbcAggregateTemplate) {
+            HistoricalApplicationSnapshotConverter converter,
+            JdbcAggregateTemplate jdbcAggregateTemplate,
+            HistoricalApplicationSnapshotRepository repository) {
         this.converter = converter;
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
+        this.repository = repository;
+    }
+
+    /**
+     * Builds the aggregated, ecosystem-wide Java/JVM features adoption view used to render the Java dashboard.
+     *
+     * @return the {@link JavaDashboardResponse} with the adoption percentage of every tracked feature.
+     */
+    @Transactional(readOnly = true)
+    public JavaDashboardResponse getJavaDashboard() {
+        JavaInsightsAggregate aggregate = repository.aggregateLatestJavaInsights();
+        long total = aggregate.totalServices();
+
+        HotSpot hotSpot = new HotSpot(
+                List.of(
+                        new AggregatedFeature(
+                                FeatureId.APP_CDS.getId(), adoptionPercentage(aggregate.appCdsEnabledCount(), total)),
+                        new AggregatedFeature(
+                                FeatureId.AOT_CACHE.getId(),
+                                adoptionPercentage(aggregate.aotCacheEnabledCount(), total))),
+                List.of(new AggregatedFeature(
+                        FeatureId.GC_LOGGING_ENABLED.getId(),
+                        adoptionPercentage(aggregate.gcLoggingEnabledCount(), total))),
+                List.of(new AggregatedFeature(
+                        FeatureId.COMPACT_OBJECT_HEADERS.getId(),
+                        adoptionPercentage(aggregate.compactObjectHeadersEnabledCount(), total))));
+
+        List<AggregatedFeature> springFramework = List.of(
+                new AggregatedFeature(FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total)));
+
+        return new JavaDashboardResponse(hotSpot, springFramework);
     }
 
     // TODO:
@@ -75,5 +116,12 @@ public class HistoricalApplicationSnapshotService {
                 HistoricalApplicationSnapshot.class);
 
         jdbcAggregateTemplate.insertAll(snapshots);
+    }
+
+    private static double adoptionPercentage(long enabledCount, long total) {
+        if (total == 0) {
+            return 0.0;
+        }
+        return (enabledCount * 100.0) / total;
     }
 }

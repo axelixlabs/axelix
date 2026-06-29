@@ -126,6 +126,11 @@ public final class ApiPaths {
          * Base path for dashboard APIs.
          */
         public static final String MAIN = "/dashboard";
+
+        /**
+         * Endpoint to retrieve the aggregated Java/JVM features adoption across the ecosystem.
+         */
+        public static final String JAVA = "/dashboard/java";
     }
 
     public static final class LoggersApi {

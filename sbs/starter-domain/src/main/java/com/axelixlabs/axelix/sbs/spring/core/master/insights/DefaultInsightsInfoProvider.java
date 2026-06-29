@@ -23,6 +23,7 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 
@@ -37,13 +38,6 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmO
  * @author Mikhail Polivakha
  */
 public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
-
-    public static final String APP_CDS = "AppCDS";
-    public static final String AOT_CACHE = "AotCache";
-    public static final String COMPACT_OBJECT_HEADERS = "CompactObjectHeaders";
-    public static final String OSIV = "OSIV";
-    public static final String GC_LOGGING_ENABLED = "GCLoggingEnabled";
-    public static final String GC_LOG_FILE_SPECIFIED = "GCLogFileSpecified";
 
     private final OpenSessionInViewStateProvider openSessionInViewStateProvider;
 
@@ -73,29 +67,33 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         List.of(getAppCdsFeature(), getAotCacheFeature()),
                         List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature(gcLogStatus)),
                         List.of(getCompressedObjectHeadersFeature())),
-                List.of(new InsightFeature(OSIV, openSessionInViewStateProvider.isOpenSessionInViewEnabled())));
+                List.of(new InsightFeature(
+                        FeatureId.OSIV.getId(), openSessionInViewStateProvider.isOpenSessionInViewEnabled())));
     }
 
     private InsightFeature getAppCdsFeature() {
-        return new InsightFeature(APP_CDS, vmOptionsAccessor.isAdvancedFeatureSpecified(SHARED_ARCHIVE_FILE));
+        return new InsightFeature(
+                FeatureId.APP_CDS.getId(), vmOptionsAccessor.isAdvancedFeatureSpecified(SHARED_ARCHIVE_FILE));
     }
 
     private InsightFeature getAotCacheFeature() {
-        return new InsightFeature(AOT_CACHE, vmOptionsAccessor.isAdvancedFeatureSpecified(AOT_CACHE_OPTION));
+        return new InsightFeature(
+                FeatureId.AOT_CACHE.getId(), vmOptionsAccessor.isAdvancedFeatureSpecified(AOT_CACHE_OPTION));
     }
 
     private InsightFeature getCompressedObjectHeadersFeature() {
         return new InsightFeature(
-                COMPACT_OBJECT_HEADERS, vmOptionsAccessor.isAdvancedFeatureEnabled(USE_COMPACT_OBJECT_HEADERS));
+                FeatureId.COMPACT_OBJECT_HEADERS.getId(),
+                vmOptionsAccessor.isAdvancedFeatureEnabled(USE_COMPACT_OBJECT_HEADERS));
     }
 
     private InsightFeature getGcLoggingFeature(GcLogStatus gcLogStatus) {
-        return new InsightFeature(GC_LOGGING_ENABLED, gcLogStatus.isEnabled());
+        return new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLogStatus.isEnabled());
     }
 
     // TODO At present, this placeholder will remain in place until the GC Logging status tracking mechanism is improved
     // https://github.com/axelixlabs/axelix/issues/573
     private InsightFeature getGcLogFileSpecifiedFeature(GcLogStatus gcLogStatus) {
-        return new InsightFeature(GC_LOG_FILE_SPECIFIED, false);
+        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), false);
     }
 }

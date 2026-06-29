@@ -479,23 +479,23 @@ public final class BasicDiscoveryMetadata {
      */
     public static final class InsightFeature {
 
-        private final String name;
+        private final String featureId;
         private final boolean enabled;
 
         /**
          * Creates a new InsightFeature.
          *
-         * @param name    the insight feature name.
-         * @param enabled the enabled state of the insight feature.
+         * @param featureId the insight feature id.
+         * @param enabled   the enabled state of the insight feature.
          */
         @JsonCreator
-        public InsightFeature(@JsonProperty("name") String name, @JsonProperty("enabled") boolean enabled) {
-            this.name = name;
+        public InsightFeature(@JsonProperty("featureId") String featureId, @JsonProperty("enabled") boolean enabled) {
+            this.featureId = featureId;
             this.enabled = enabled;
         }
 
-        public String getName() {
-            return name;
+        public String getFeatureId() {
+            return featureId;
         }
 
         public boolean isEnabled() {
@@ -511,17 +511,17 @@ public final class BasicDiscoveryMetadata {
                 return false;
             }
             InsightFeature that = (InsightFeature) o;
-            return enabled == that.enabled && Objects.equals(name, that.name);
+            return enabled == that.enabled && Objects.equals(featureId, that.featureId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, enabled);
+            return Objects.hash(featureId, enabled);
         }
 
         @Override
         public String toString() {
-            return "InsightFeature{" + "name='" + name + '\'' + ", enabled=" + enabled + '}';
+            return "InsightFeature{" + "featureId='" + featureId + '\'' + ", enabled=" + enabled + '}';
         }
     }
 }

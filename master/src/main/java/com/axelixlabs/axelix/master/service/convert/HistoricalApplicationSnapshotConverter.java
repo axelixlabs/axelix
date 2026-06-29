@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
@@ -41,12 +42,6 @@ import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
  */
 @Component
 public class HistoricalApplicationSnapshotConverter {
-
-    private static final String APP_CDS = "AppCDS";
-    private static final String AOT_CACHE = "AotCache";
-    private static final String COMPACT_OBJECT_HEADERS = "CompactObjectHeaders";
-    private static final String OSIV = "OSIV";
-    private static final String GC_LOGGING_ENABLED = "GCLoggingEnabled";
 
     public HistoricalApplicationSnapshot currentSnapshot(BasicDiscoveryMetadata metadata) {
 
@@ -77,28 +72,29 @@ public class HistoricalApplicationSnapshotConverter {
     }
 
     private ProjectLeyden fromProjectLeyden(List<InsightFeature> features) {
-        return new ProjectLeyden(isFeatureEnabled(features, APP_CDS), isFeatureEnabled(features, AOT_CACHE));
+        return new ProjectLeyden(
+                isFeatureEnabled(features, FeatureId.APP_CDS), isFeatureEnabled(features, FeatureId.AOT_CACHE));
     }
 
     private GarbageCollector fromGarbageCollector(List<InsightFeature> features) {
-        return new GarbageCollector(isFeatureEnabled(features, GC_LOGGING_ENABLED), resolveGcInUse(features));
+        return new GarbageCollector(isFeatureEnabled(features, FeatureId.GC_LOGGING_ENABLED), resolveGcInUse(features));
     }
 
     private ProjectLilliput fromProjectLilliput(List<InsightFeature> features) {
-        return new ProjectLilliput(isFeatureEnabled(features, COMPACT_OBJECT_HEADERS));
+        return new ProjectLilliput(isFeatureEnabled(features, FeatureId.COMPACT_OBJECT_HEADERS));
     }
 
     private SpringFramework fromSpringFramework(List<InsightFeature> features) {
-        return new SpringFramework(isFeatureEnabled(features, OSIV));
+        return new SpringFramework(isFeatureEnabled(features, FeatureId.OSIV));
     }
 
-    private boolean isFeatureEnabled(List<InsightFeature> features, String name) {
+    private boolean isFeatureEnabled(List<InsightFeature> features, FeatureId featureId) {
         if (features == null) {
             return false;
         }
 
         return features.stream()
-                .filter(feature -> name.equals(feature.getName()))
+                .filter(feature -> featureId.getId().equals(feature.getFeatureId()))
                 .findFirst()
                 .map(InsightFeature::isEnabled)
                 .orElse(false);

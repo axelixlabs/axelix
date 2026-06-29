@@ -514,30 +514,30 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "hotSpot" : {
                   "projectLeyden" : [
                     {
-                      "name" : "AotCache",
+                      "featureId" : "AotCache",
                       "enabled" : false
                     },
                     {
-                      "name" : "AppCDS",
+                      "featureId" : "AppCDS",
                       "enabled" : true
                     }
                   ],
                   "gc" : [
                     {
-                      "name" : "GCLoggingEnabled",
+                      "featureId" : "GCLoggingEnabled",
                       "enabled" : false
                     }
                   ],
                   "projectLilliputh" : [
                     {
-                      "name" : "CompactObjectHeaders",
+                      "featureId" : "CompactObjectHeaders",
                       "enabled" : false
                     }
                   ]
                 },
                 "springFramework" : [
                   {
-                    "name" : "OSIV",
+                    "featureId" : "OSIV",
                     "enabled" : true
                   }
                 ]
