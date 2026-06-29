@@ -1,0 +1,46 @@
+name: "Deploy Playground"
+inputs:
+  working-directory:
+    description: Playground directory
+    required: true
+  cr-repository-path:
+      description: "Full repository path inside registry (e.g., crp.../playground/my-playground-sb-2)"
+      required: true
+  image-tag:
+    description: Image tag (name:version)
+    required: true
+  helm-release:
+    description: Helm release name
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Build Docker Image
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: docker build --tag $CR_URL/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} --file docker/Dockerfile .
+
+    - name: Docker login to Yandex Cloud CR
+      shell: bash
+      run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL
+
+    - name: Docker push to Yandex Cloud CR
+      shell: bash
+      run: docker push $CR_URL/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }}
+
+    - name: Docker logout
+      shell: bash
+      run: docker logout $CR_URL
+
+    - name: Deploy to K8S
+      working-directory: ${{ inputs.working-directory }}/chart
+      shell: bash
+      run: |
+        mkdir -p ~/.kube
+        echo "$SANDBOX_KUBE_CONFIG" > ~/.kube/config
+        chmod 600 ~/.kube/config
+        helm upgrade --install ${{ inputs.helm-release }} . \
+          --set image.ref=$CR_URL/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} \
+          --set axelix.sbs.auth.jwt.algorithm=HMAC512 \
+          --set axelix.sbs.auth.jwt.signingKey=$SANDBOX_JWT_SIGNING_KEY
