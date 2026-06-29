@@ -131,7 +131,6 @@ public class TransactionMonitoringAutoConfiguration {
     @Configuration
     @ConditionalOnHibernateActive
     @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOGBACK)
-    @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
             name = "enabled",
@@ -148,7 +147,6 @@ public class TransactionMonitoringAutoConfiguration {
     @Configuration
     @ConditionalOnHibernateActive
     @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOG4J2)
-    @ConditionalOnClass(name = "org.apache.logging.log4j.core.LoggerContext")
     @ConditionalOnProperty(
             prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
             name = "enabled",
