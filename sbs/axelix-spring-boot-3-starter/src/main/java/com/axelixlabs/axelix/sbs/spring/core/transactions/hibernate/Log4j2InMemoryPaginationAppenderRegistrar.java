@@ -17,19 +17,22 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.slf4j.Log4jLoggerFactory;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.sbs.spring.core.transactions.InMemoryPaginationAppenderRegistrar;
 
 /**
- * Logback implementation of {@link InMemoryPaginationAppenderRegistrar}.
+ * Log4j2 implementation of {@link InMemoryPaginationAppenderRegistrar}.
  *
- * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
-public class LogbackInMemoryPaginationAppenderRegistrar implements InMemoryPaginationAppenderRegistrar {
+public class Log4j2InMemoryPaginationAppenderRegistrar implements InMemoryPaginationAppenderRegistrar {
 
     private static final String APPENDER_NAME = "axelix-in-memory-pagination";
     // Hibernate 6+ (Spring Boot 3)
@@ -38,20 +41,25 @@ public class LogbackInMemoryPaginationAppenderRegistrar implements InMemoryPagin
     @Override
     public void register() {
         ILoggerFactory factory = LoggerFactory.getILoggerFactory();
-        if (!(factory instanceof LoggerContext context)) {
+        if (!(factory instanceof Log4jLoggerFactory)) {
             return;
         }
 
+        if (!(LogManager.getContext(false) instanceof LoggerContext context)) {
+            return;
+        }
+
+        Configuration configuration = context.getConfiguration();
         Logger logger = context.getLogger(HIBERNATE_LOGGER);
-        if (logger.getAppender(APPENDER_NAME) != null) {
+        if (logger.getAppenders().get(APPENDER_NAME) != null) {
             return;
         }
 
-        LogbackInMemoryPaginationAppender appender = new LogbackInMemoryPaginationAppender();
-        appender.setName(APPENDER_NAME);
-        appender.setContext(context);
+        Log4j2InMemoryPaginationAppender appender = new Log4j2InMemoryPaginationAppender(APPENDER_NAME);
         appender.start();
-
+        configuration.addAppender(appender);
         logger.addAppender(appender);
+
+        context.updateLoggers();
     }
 }
