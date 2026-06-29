@@ -6,7 +6,7 @@ plugins {
 val springBootVersion = "2.7.18"
 val springCloudVersion = "2021.0.9"
 
-val jsonUnitAssertJVersion = "2.38.0"
+val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     // Self
