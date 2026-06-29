@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 import java.util.Map;
 
 import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
 
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -34,11 +34,14 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * when a specific logging implementation is missing from the classpath.
  *
  * @author Vyacheslav Yanin
+ * @author Mikhail Polivakha
  */
 public class OnLoggingSystemCondition implements Condition {
 
-    private static final String LOGBACK_FACTORY_FULL_CLASS_NAME = "ch.qos.logback.classic.LoggerContext";
-    private static final String LOG_4_J_FACTORY_FULL_CLASS_NAME = "org.apache.logging.slf4j.Log4jLoggerFactory";
+    private static final String LOGBACK_LOGGING_SYSTEM_CLASS_NAME =
+            "org.springframework.boot.logging.logback.LogbackLoggingSystem";
+    private static final String LOG4J2_LOGGING_SYSTEM_FULL_CLASS_NAME =
+            "org.springframework.boot.logging.log4j2.Log4J2LoggingSystem";
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -52,13 +55,20 @@ public class OnLoggingSystemCondition implements Condition {
             return false;
         }
 
-        ILoggerFactory activeFactory = LoggerFactory.getILoggerFactory();
+        LoggingSystem loggingSystem = LoggingSystem.get(getClass().getClassLoader());
+
+        return switch (requiredSystem) {
+            case LOGBACK -> isInstance(LOGBACK_LOGGING_SYSTEM_CLASS_NAME, loggingSystem);
+            case LOG4J2 -> isInstance(LOG4J2_LOGGING_SYSTEM_FULL_CLASS_NAME, loggingSystem);
+        };
+    }
+
+    private static boolean isInstance(String logbackLoggingSystemClassName, LoggingSystem loggingSystem) {
         try {
-            return switch (requiredSystem) {
-                case LOGBACK -> Class.forName(LOGBACK_FACTORY_FULL_CLASS_NAME).isInstance(activeFactory);
-                case LOG4J2 -> Class.forName(LOG_4_J_FACTORY_FULL_CLASS_NAME).isInstance(activeFactory);
-            };
-        } catch (ClassNotFoundException e) {
+            return Class.forName(logbackLoggingSystemClassName).isInstance(loggingSystem);
+        } catch (ClassNotFoundException | LinkageError e) {
+            // if we were not able to load the LoggingSystem class, then LoggingSystem used by Spring Boot is definitely
+            // not the one that we're checking.
             return false;
         }
     }
