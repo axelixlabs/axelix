@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnLoggingSystem;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.Log4j2InMemoryPaginationAppenderRegistrar;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -111,17 +113,35 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Configuration
     @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOGBACK)
     @ConditionalOnClass(name = "ch.qos.logback.classic.LoggerContext")
     @ConditionalOnProperty(
-            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
-            name = "enabled",
-            havingValue = "true",
-            matchIfMissing = true)
+        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true)
     static class LogbackInMemoryPaginationAppenderConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)
         public void registerAppender() {
             new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOG4J2)
+    @ConditionalOnClass(name = "org.apache.logging.log4j.core.LoggerContext")
+    @ConditionalOnProperty(
+        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true)
+    static class Log4j2InMemoryPaginationAppenderConfiguration {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new Log4j2InMemoryPaginationAppenderRegistrar().register();
         }
     }
 }
