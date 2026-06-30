@@ -33,8 +33,8 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
     /**
      * Aggregates the adoption of the tracked Java/JVM features across the entire ecosystem. For every
      * service (identified by its {@code group_id} + {@code artifact_id}) only the most recent snapshot
-     * is taken into account, so that a service is counted exactly once. The query is intentionally kept
-     * vendor-agnostic so that it runs identically on SQLite, PostgreSQL and MySQL.
+     * is taken into account, so that a service is counted exactly once. The query is intentionally
+     * kept vendor-agnostic so that it runs identically on all RDBMS vendors.
      *
      * @return the single-row aggregate with the total number of services and per-feature usage counters.
      */
@@ -44,8 +44,7 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
                 COALESCE(SUM(CASE WHEN s.app_cds_enabled = TRUE THEN 1 ELSE 0 END), 0) AS app_cds_enabled_count,
                 COALESCE(SUM(CASE WHEN s.aot_cache_enabled = TRUE THEN 1 ELSE 0 END), 0) AS aot_cache_enabled_count,
                 COALESCE(SUM(CASE WHEN s.gc_logging_enabled = TRUE THEN 1 ELSE 0 END), 0) AS gc_logging_enabled_count,
-                COALESCE(SUM(CASE WHEN s.compact_object_headers_enabled = TRUE THEN 1 ELSE 0 END), 0) AS compact_object_headers_enabled_count,
-                COALESCE(SUM(CASE WHEN s.osiv_enabled = TRUE THEN 1 ELSE 0 END), 0) AS osiv_enabled_count
+                COALESCE(SUM(CASE WHEN s.compact_object_headers_enabled = TRUE THEN 1 ELSE 0 END), 0) AS compact_object_headers_enabled_count
             FROM historical_application_snapshots s
             WHERE s.date = (
                 SELECT MAX(latest.date)
@@ -57,6 +56,28 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
     JavaInsightsAggregate aggregateLatestJavaInsights();
 
     /**
+     * Aggregates the adoption of the tracked Spring Framework features across the entire ecosystem. For
+     * every service (identified by its {@code group_id} + {@code artifact_id}) only the most recent
+     * snapshot is taken into account, so that a service is counted exactly once. The query is intentionally
+     * kept vendor-agnostic so that it runs identically on all RDBMS vendors.
+     *
+     * @return the single-row aggregate with the total number of services and per-feature usage counters.
+     */
+    @Query("""
+            SELECT
+                COUNT(*) AS total_services,
+                COALESCE(SUM(CASE WHEN s.osiv_enabled = TRUE THEN 1 ELSE 0 END), 0) AS osiv_enabled_count
+            FROM historical_application_snapshots s
+            WHERE s.date = (
+                SELECT MAX(latest.date)
+                FROM historical_application_snapshots latest
+                WHERE latest.group_id = s.group_id
+                  AND latest.artifact_id = s.artifact_id
+            )
+            """)
+    SpringFrameworkInsightsAggregate aggregateLatestSpringFrameworkInsights();
+
+    /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Java/JVM features.
      *
      * @param totalServices the total number of distinct services that reported at least one snapshot.
@@ -64,13 +85,19 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
      * @param aotCacheEnabledCount how many services have the AOT cache enabled.
      * @param gcLoggingEnabledCount how many services have GC logging enabled.
      * @param compactObjectHeadersEnabledCount how many services have compact object headers enabled.
-     * @param osivEnabledCount how many services have OSIV enabled.
      */
     record JavaInsightsAggregate(
             long totalServices,
             long appCdsEnabledCount,
             long aotCacheEnabledCount,
             long gcLoggingEnabledCount,
-            long compactObjectHeadersEnabledCount,
-            long osivEnabledCount) {}
+            long compactObjectHeadersEnabledCount) {}
+
+    /**
+     * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.
+     *
+     * @param totalServices the total number of distinct services that reported at least one snapshot.
+     * @param osivEnabledCount how many services have OSIV enabled.
+     */
+    record SpringFrameworkInsightsAggregate(long totalServices, long osivEnabledCount) {}
 }

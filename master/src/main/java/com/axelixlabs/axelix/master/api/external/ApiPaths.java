@@ -131,6 +131,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the aggregated Java/JVM features adoption across the ecosystem.
          */
         public static final String JAVA = "/dashboard/java";
+
+        /**
+         * Endpoint to retrieve the aggregated Spring Framework features adoption across the ecosystem.
+         */
+        public static final String SPRING_FRAMEWORK = "/dashboard/spring-framework";
     }
 
     public static final class LoggersApi {

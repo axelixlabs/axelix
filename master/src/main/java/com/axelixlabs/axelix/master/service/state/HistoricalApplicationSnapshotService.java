@@ -28,12 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
-import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse.AggregatedFeature;
-import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse.HotSpot;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.SpringFrameworkInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
 
 /**
@@ -60,31 +61,43 @@ public class HistoricalApplicationSnapshotService {
     /**
      * Builds the aggregated, ecosystem-wide Java/JVM features adoption view used to render the Java dashboard.
      *
-     * @return the {@link JavaDashboardResponse} with the adoption percentage of every tracked feature.
+     * @return the {@link JavaDashboardResponse} with the adoption percentage of every tracked Java/JVM feature.
      */
     @Transactional(readOnly = true)
     public JavaDashboardResponse getJavaDashboard() {
         JavaInsightsAggregate aggregate = repository.aggregateLatestJavaInsights();
         long total = aggregate.totalServices();
 
-        HotSpot hotSpot = new HotSpot(
-                List.of(
-                        new AggregatedFeature(
-                                FeatureId.APP_CDS.getId(), adoptionPercentage(aggregate.appCdsEnabledCount(), total)),
-                        new AggregatedFeature(
-                                FeatureId.AOT_CACHE.getId(),
-                                adoptionPercentage(aggregate.aotCacheEnabledCount(), total))),
-                List.of(new AggregatedFeature(
-                        FeatureId.GC_LOGGING_ENABLED.getId(),
-                        adoptionPercentage(aggregate.gcLoggingEnabledCount(), total))),
-                List.of(new AggregatedFeature(
-                        FeatureId.COMPACT_OBJECT_HEADERS.getId(),
-                        adoptionPercentage(aggregate.compactObjectHeadersEnabledCount(), total))));
+        List<AggregatedFeature> projectLeyden = List.of(
+                new AggregatedFeature(
+                        FeatureId.APP_CDS.getId(), adoptionPercentage(aggregate.appCdsEnabledCount(), total)),
+                new AggregatedFeature(
+                        FeatureId.AOT_CACHE.getId(), adoptionPercentage(aggregate.aotCacheEnabledCount(), total)));
 
-        List<AggregatedFeature> springFramework = List.of(
-                new AggregatedFeature(FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total)));
+        List<AggregatedFeature> gc = List.of(new AggregatedFeature(
+                FeatureId.GC_LOGGING_ENABLED.getId(), adoptionPercentage(aggregate.gcLoggingEnabledCount(), total)));
 
-        return new JavaDashboardResponse(hotSpot, springFramework);
+        List<AggregatedFeature> projectLilliput = List.of(new AggregatedFeature(
+                FeatureId.COMPACT_OBJECT_HEADERS.getId(),
+                adoptionPercentage(aggregate.compactObjectHeadersEnabledCount(), total)));
+
+        return new JavaDashboardResponse(projectLeyden, gc, projectLilliput);
+    }
+
+    /**
+     * Builds the aggregated, ecosystem-wide Spring Framework features adoption view used to render the
+     * Spring Framework dashboard.
+     *
+     * @return the {@link SpringFrameworkDashboardResponse} with the adoption percentage of every tracked
+     *         Spring Framework feature.
+     */
+    @Transactional(readOnly = true)
+    public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
+        SpringFrameworkInsightsAggregate aggregate = repository.aggregateLatestSpringFrameworkInsights();
+        long total = aggregate.totalServices();
+
+        return new SpringFrameworkDashboardResponse(List.of(new AggregatedFeature(
+                FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total))));
     }
 
     // TODO:

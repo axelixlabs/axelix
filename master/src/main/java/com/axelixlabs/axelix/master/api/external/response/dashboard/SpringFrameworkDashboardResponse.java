@@ -20,13 +20,10 @@ package com.axelixlabs.axelix.master.api.external.response.dashboard;
 import java.util.List;
 
 /**
- * The aggregated info about the overall Java/JVM features usage in the ecosystem.
+ * The aggregated Spring Framework-specific features usage statistics.
  *
- * @param projectLeyden the list of aggregated Project Leyden features.
- * @param gc the list of aggregated GC features.
- * @param projectLilliput the list of aggregated features inside Project Lilliput.
+ * @param features the list of aggregated Spring Framework features.
  *
  * @author Mikhail Polivakha
  */
-public record JavaDashboardResponse(
-        List<AggregatedFeature> projectLeyden, List<AggregatedFeature> gc, List<AggregatedFeature> projectLilliput) {}
+public record SpringFrameworkDashboardResponse(List<AggregatedFeature> features) {}

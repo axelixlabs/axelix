@@ -7,8 +7,8 @@ repositories {
 }
 
 // The plugin must run inside Gradle 4.0 daemons, which require JDK 8.
-tasks.compileJava {
-    options.release = 8
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 11
 }
 
 gradlePlugin {

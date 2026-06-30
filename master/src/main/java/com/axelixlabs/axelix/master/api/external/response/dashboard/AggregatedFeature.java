@@ -17,16 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.dashboard;
 
-import java.util.List;
-
 /**
- * The aggregated info about the overall Java/JVM features usage in the ecosystem.
+ * The aggregated adoption of a single feature across the ecosystem.
  *
- * @param projectLeyden the list of aggregated Project Leyden features.
- * @param gc the list of aggregated GC features.
- * @param projectLilliput the list of aggregated features inside Project Lilliput.
+ * @param featureId the id of the feature in use.
+ * @param adoptionPercentage percentage of the total services that use the feature with the given featureId.
  *
  * @author Mikhail Polivakha
  */
-public record JavaDashboardResponse(
-        List<AggregatedFeature> projectLeyden, List<AggregatedFeature> gc, List<AggregatedFeature> projectLilliput) {}
+public record AggregatedFeature(String featureId, double adoptionPercentage) {}
