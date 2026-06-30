@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -57,17 +57,17 @@ public class SelfRegisteredApi {
 
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
-    private final HistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
 
     public SelfRegisteredApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
-            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
-        this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
+        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -85,7 +85,7 @@ public class SelfRegisteredApi {
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
-                historicalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
+                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
             });
 
             return ResponseEntity.noContent().build();

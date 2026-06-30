@@ -43,13 +43,13 @@ import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapsho
  * @author Mikhail Polivakha
  */
 @Service
-public class HistoricalApplicationSnapshotService {
+public class DatabaseHistoricalApplicationSnapshotService {
 
     private final HistoricalApplicationSnapshotConverter converter;
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
     private final HistoricalApplicationSnapshotRepository repository;
 
-    public HistoricalApplicationSnapshotService(
+    public DatabaseHistoricalApplicationSnapshotService(
             HistoricalApplicationSnapshotConverter converter,
             JdbcAggregateTemplate jdbcAggregateTemplate,
             HistoricalApplicationSnapshotRepository repository) {

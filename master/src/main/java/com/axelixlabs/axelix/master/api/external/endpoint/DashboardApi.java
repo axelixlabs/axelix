@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboar
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
-import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 /**
  * API for rendering the dashboard.
@@ -43,13 +43,13 @@ import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotS
 public class DashboardApi {
 
     private final DashboardService dashboardService;
-    private final HistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
 
     public DashboardApi(
             DashboardService dashboardService,
-            HistoricalApplicationSnapshotService historicalApplicationSnapshotService) {
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService) {
         this.dashboardService = dashboardService;
-        this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
+        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
     }
 
     @DefaultApiResponse(summary = "Retrieve information about the entire ecosystem to render the dashboard")
@@ -75,7 +75,7 @@ public class DashboardApi {
                             schema = @Schema(implementation = JavaDashboardResponse.class)))
     @GetMapping(path = ApiPaths.DashboardApi.JAVA)
     public JavaDashboardResponse getJavaDashboard() {
-        return historicalApplicationSnapshotService.getJavaDashboard();
+        return databaseHistoricalApplicationSnapshotService.getJavaDashboard();
     }
 
     @DefaultApiResponse(
@@ -89,6 +89,6 @@ public class DashboardApi {
                             schema = @Schema(implementation = SpringFrameworkDashboardResponse.class)))
     @GetMapping(path = ApiPaths.DashboardApi.SPRING_FRAMEWORK)
     public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
-        return historicalApplicationSnapshotService.getSpringFrameworkDashboard();
+        return databaseHistoricalApplicationSnapshotService.getSpringFrameworkDashboard();
     }
 }

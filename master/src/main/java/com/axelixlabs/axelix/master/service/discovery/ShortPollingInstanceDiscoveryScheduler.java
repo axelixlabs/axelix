@@ -33,7 +33,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -54,7 +54,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final InstanceRegistry instanceRegistry;
     private final JwtEncoderService jwtEncoderService;
     private final SecurityContextExecutor securityContextExecutor;
-    private final HistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
 
     public ShortPollingInstanceDiscoveryScheduler(
@@ -62,13 +62,13 @@ public class ShortPollingInstanceDiscoveryScheduler {
             InstanceRegistry instanceRegistry,
             JwtEncoderService jwtEncoderService,
             SecurityContextExecutor securityContextExecutor,
-            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
         this.jwtEncoderService = jwtEncoderService;
         this.securityContextExecutor = securityContextExecutor;
-        this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
+        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -97,7 +97,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         transactionTemplate.executeWithoutResult(_ -> {
             instanceRegistry.reload(instances);
-            historicalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
+            databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
         });
     }
 }

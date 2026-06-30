@@ -40,7 +40,7 @@ import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
-import com.axelixlabs.axelix.master.service.state.HistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -59,14 +59,14 @@ public class DiscoveryAutoConfiguration {
             InstanceRegistry instanceRegistry,
             JwtEncoderService jwtEncoderService,
             SecurityContextExecutor securityContextExecutor,
-            HistoricalApplicationSnapshotService historicalApplicationSnapshotService,
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate) {
         return new ShortPollingInstanceDiscoveryScheduler(
                 instancesDiscoverer,
                 instanceRegistry,
                 jwtEncoderService,
                 securityContextExecutor,
-                historicalApplicationSnapshotService,
+                databaseHistoricalApplicationSnapshotService,
                 transactionTemplate);
     }
 
