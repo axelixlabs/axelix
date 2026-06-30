@@ -25,9 +25,10 @@ import { resetLogger, setLoggerLevel } from "services";
 
 import { Levels } from "../Levels";
 
+import { LoggerScheduler } from "./LoggerScheduler";
 import styles from "./styles.module.css";
 
-import { Reset } from "assets";
+import { ResetIcon } from "assets";
 
 interface IProps {
     /**
@@ -49,12 +50,12 @@ interface IProps {
 export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
     // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
     const { t } = useTranslation();
-    const { effectiveLevel, configuredLevel } = logger;
+    const { effectiveLevel, configuredLevel, name } = logger;
     const { instanceId } = useParams();
 
     const { message } = App.useApp();
 
-    const handleChange = (level: string): void => {
+    const handleChange = (level: string, timerSeconds?: number): void => {
         if (configuredLevel === level) {
             return;
         }
@@ -63,6 +64,7 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
             instanceId: instanceId!,
             loggerName: logger.name,
             loggingLevel: level,
+            ttlSeconds: timerSeconds,
         }).then(() => {
             message.success(t("Loggers.loggerLevelUpdated"));
             fetchLoggersData();
@@ -80,20 +82,21 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
     };
 
     return (
-        <>
-            <div className={styles.MainWrapper}>
-                <TooltipWithCopy text={logger.name} />
+        <div className={styles.MainWrapper}>
+            <TooltipWithCopy text={name} />
 
-                <div className={styles.LevelsWrapper}>
-                    <Levels
-                        checkedLevel={effectiveLevel}
-                        configuredLevel={configuredLevel}
-                        levels={levels}
-                        handleChange={handleChange}
-                    />
-                    <Reset className={styles.Reset} onClick={() => handleLoggerReset(logger.name)} />
-                </div>
+            <div className={styles.LevelsWrapper}>
+                <LoggerScheduler checkedLevel={effectiveLevel} handleChange={handleChange} levels={levels} />
+
+                <Levels
+                    checkedLevel={effectiveLevel}
+                    configuredLevel={configuredLevel}
+                    levels={levels}
+                    handleChange={handleChange}
+                />
+
+                <ResetIcon className={styles.ResetIcon} onClick={() => handleLoggerReset(name)} />
             </div>
-        </>
+        </div>
     );
 };

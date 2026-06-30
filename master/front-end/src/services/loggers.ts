@@ -27,10 +27,11 @@ export const getLoggersData = (instanceId: string) => {
 };
 
 export const setLoggerLevel = (data: ISetLoggerLevelRequestData) => {
-    const { instanceId, loggerName, loggingLevel } = data;
+    const { instanceId, loggerName, loggingLevel, ttlSeconds } = data;
 
     return apiFetch.post(`loggers/${instanceId}/logger/${loggerName}`, {
         configuredLevel: loggingLevel,
+        ttlSeconds: ttlSeconds
     });
 };
 

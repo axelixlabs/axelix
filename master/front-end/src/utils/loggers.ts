@@ -45,3 +45,6 @@ export const loggersTabs = (t: TFunction): TabsProps["items"] => {
         },
     ];
 };
+
+export const SECONDS_IN_HOUR = 3600;
+export const SECONDS_IN_MINUTE = 60;

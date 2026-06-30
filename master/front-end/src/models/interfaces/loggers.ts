@@ -53,7 +53,7 @@ export interface ILoggersResponseBody {
     /**
      * All logger groups data
      */
-    groups: ILoggerGroup[];
+    groups: Record<string, Omit<ILoggerGroup, "name">>;
 
     /**
      * All possible logging levels that are supported by the logging system inside the instance
@@ -63,7 +63,7 @@ export interface ILoggersResponseBody {
     /**
      * All loggers
      */
-    loggers: ILogger[];
+    loggers: Record<string, Omit<ILogger, "name">>;
 }
 
 export interface ISetLoggerLevelRequestData {
@@ -81,6 +81,7 @@ export interface ISetLoggerLevelRequestData {
      * Selected level
      */
     loggingLevel: string;
+    ttlSeconds?: number;
 }
 
 export interface IResetLoggerLevelRequestData {
@@ -110,4 +111,18 @@ export interface IChangeLoggerGroupLevelRequestData {
      * The configured level of a logger group
      */
     configuredLevel: string;
+}
+
+export interface ITimepickerData {
+    hour: string;
+    minutes: string;
+    type?: string;
+    time: string;
+    degreesHours: number | null;
+    degreesMinutes: number | null;
+}
+
+export interface ITimepickerClockConfig {
+    type: "12h" | "24h";
+    locale: string;
 }

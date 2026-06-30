@@ -19,3 +19,8 @@ export enum ELoggersTabs {
     LOGGERS = "loggers",
     LOGGER_GROUPS = "loggerGroups",
 }
+
+export enum ETimepickerHourCycle {
+    AM = "AM",
+    PM = "PM",
+}

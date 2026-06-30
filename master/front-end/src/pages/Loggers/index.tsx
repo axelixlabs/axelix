@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";
+import { fetchData, filterLoggerGroups, filterLoggers, mapLoggersResponse } from "helpers";
 import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest } from "models";
 import { getLoggersData } from "services";
 import { loggersTabs } from "utils";
@@ -56,9 +56,8 @@ const Loggers = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const levels = loggersData.response!.levels;
-    const loggerGroups = loggersData.response!.groups;
-    const loggers = loggersData.response!.loggers;
+    const loggersResponse = loggersData.response!;
+    const { levels, loggers, groups: loggerGroups } = mapLoggersResponse(loggersResponse);
 
     const isLoggersTab = activeTab === ELoggersTabs.LOGGERS;
     const isLoggerGroupsTab = activeTab === ELoggersTabs.LOGGER_GROUPS;

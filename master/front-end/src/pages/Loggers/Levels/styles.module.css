@@ -49,9 +49,14 @@
     color: var(--axelix-primary-white);
 }
 
-.TargetIcon {
+.TargetIcon,
+.ClockIcon {
     position: absolute;
     top: -7px;
     right: -7px;
     z-index: 500;
+}
+
+.ClockIcon {
+    color: var(--axelix-primary-red);
 }

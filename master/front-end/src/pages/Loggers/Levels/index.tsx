@@ -22,7 +22,7 @@ import { loggersColors } from "utils";
 
 import styles from "./styles.module.css";
 
-import { TargetIcon } from "assets";
+import { ClockIcon, TargetIcon } from "assets";
 
 interface IProps {
     /**
@@ -33,7 +33,7 @@ interface IProps {
     /**
      * The logging level inside the {@link levels} array, that is considered to be currently active.
      */
-    checkedLevel?: string;
+    checkedLevel: string;
 
     /**
      * The configured level of a logger group, if any
@@ -75,11 +75,14 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
                                 />
                                 {level}
                             </label>
-                            {configuredLevel === level && (
-                                <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
-                                    <TargetIcon className={styles.TargetIcon} />
-                                </Tooltip>
-                            )}
+                            {configuredLevel === level &&
+                                (false ? (
+                                    <ClockIcon className={styles.ClockIcon} />
+                                ) : (
+                                    <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
+                                        <TargetIcon className={styles.TargetIcon} />
+                                    </Tooltip>
+                                ))}
                         </div>
                     );
                 })}
