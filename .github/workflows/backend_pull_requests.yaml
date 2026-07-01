@@ -11,7 +11,7 @@ on:
       - 'common/**'
 
       # Playground projects
-      - 'playgrounds/petclinic-maven-sb-2/**'
+      - 'playgrounds/**'
 
       # Core Gradle build configuration
       - 'buildSrc/**'
@@ -56,10 +56,6 @@ jobs:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
       NEXUS_URL: ${{ secrets.NEXUS_URL }}
-
-      # Required variables for playground builds
-      AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
-      AXELIX_SBS_AUTH_JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -85,6 +81,10 @@ jobs:
               - 'sbs/axelix-spring-boot-2-starter/**'
               - 'playgrounds/petclinic-maven-sb-2/**'
             
+            sb3_specific:
+              - 'sbs/axelix-spring-boot-3-starter/**'
+              - 'playgrounds/feature-service-maven-sb-3/**'
+            
             global_trigger:
               - 'common/**'
               - 'sbs/starter-domain/**'
@@ -97,12 +97,20 @@ jobs:
               - 'Makefile'
           
       - name: Run Conditional Playground Build via Make
+        env:
+          # Required variables for playground builds
+          AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
+          AXELIX_SBS_AUTH_JWT_SIGNING_KEY: ${{ env.SANDBOX_JWT_SIGNING_KEY }}
         run: |
           SHOULD_BUILD_SB2="false"
           if [ "${{ steps.filter.outputs.sb2_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
             SHOULD_BUILD_SB2="true"
           fi
+          
+          SHOULD_BUILD_SB3="false"
+          if [ "${{ steps.filter.outputs.sb3_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
+            SHOULD_BUILD_SB3="true"
+          fi
 
           make build-playground BUILD_SB2="$SHOULD_BUILD_SB2"
-
-      
+          make build-playground BUILD_SB3="$SHOULD_BUILD_SB3"

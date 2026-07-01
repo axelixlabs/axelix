@@ -24,7 +24,7 @@ on:
       - 'sbs/**'
 
       # Playground projects
-      - 'playgrounds/petclinic-maven-sb-2/**'
+      - 'playgrounds/**'
 
       # Core Gradle build configuration
       - 'buildSrc/**'
@@ -164,6 +164,14 @@ jobs:
           image-tag: petclinic-maven-sb-2:2.7.18-SNAPSHOT
           helm-release: petclinic-maven-sb-2
 
+      - name: Deploy Playground Feature Service Maven SB 3
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/feature-service-maven-sb-3
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/feature-service-sb-3
+          image-tag: feature-service-maven-sb-3:0.0.2-SNAPSHOT
+          helm-release: feature-service-maven-sb-3
+
   dispatch:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
     needs: [build-deploy-source]
@@ -171,7 +179,6 @@ jobs:
       matrix:
         playground_repo: [
           'axelixlabs/notification-service',
-          'axelixlabs/feature-service',
           'axelixlabs/spring-petclinic',
         ]
     runs-on: ubuntu-latest
