@@ -10,7 +10,7 @@ clean:
 	./gradlew clean
 
 clean-playgrounds:
-	cd playgrounds/petclinic-maven-sb-2 && ./mvnw clean
+	cd playgrounds/spring-petclinic-maven-sb-2 && ./mvnw clean
 	cd playgrounds/feature-service-maven-sb-3 && ./mvnw clean
 
 clean-all: clean clean-playgrounds
@@ -22,7 +22,7 @@ spotless-all:
 	@echo "=== Formatting Backend Project ==="
 	./gradlew spotlessApply
 	@echo "=== Formatting Petclinic Maven SB-2 Project ==="
-	cd playgrounds/petclinic-maven-sb-2 && ./mvnw spring-javaformat:apply
+	cd playgrounds/spring-petclinic-maven-sb-2 && ./mvnw spring-javaformat:apply
 	@echo "=== Formatting Feature Service Maven SB-3 Project ==="
 	cd playgrounds/feature-service-maven-sb-3 && ./mvnw spotless:apply
 
@@ -67,7 +67,7 @@ publish-starter-sb3:
 
 build-petclinic-maven-sb2:
 	@echo "=== Running Maven build for Petclinic Spring boot 2 ==="
-	cd playgrounds/petclinic-maven-sb-2 && ./mvnw clean package -B
+	cd playgrounds/spring-petclinic-maven-sb-2 && ./mvnw clean package -B
 
 build-feature-service-maven-sb3:
 	@echo "=== Running Maven build for Feature Service Spring boot 3 ==="

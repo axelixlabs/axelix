@@ -159,7 +159,7 @@ jobs:
       - name: Deploy Playground Petclinic Maven SB 2
         uses: ./.github/actions/deploy-playground
         with:
-          working-directory: playgrounds/petclinic-maven-sb-2
+          working-directory: playgrounds/spring-petclinic-maven-sb-2
           cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/spring-petclinic-sb-2
           image-tag: petclinic-maven-sb-2:2.7.18-SNAPSHOT
           helm-release: petclinic-maven-sb-2

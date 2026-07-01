@@ -79,7 +79,7 @@ jobs:
           filters: |
             sb2_specific:
               - 'sbs/axelix-spring-boot-2-starter/**'
-              - 'playgrounds/petclinic-maven-sb-2/**'
+              - 'playgrounds/spring-petclinic-maven-sb-2/**'
             
             sb3_specific:
               - 'sbs/axelix-spring-boot-3-starter/**'
