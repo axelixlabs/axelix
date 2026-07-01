@@ -3,12 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("shared")
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.0"
 }
 
 val springBootTestPlatformVersion = "2.7.18"
 
-val jsonUnitAssertJVersion = "2.38.0"
+val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     // Self
@@ -22,7 +22,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework:spring-web")
     testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.2")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
