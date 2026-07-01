@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -91,19 +92,19 @@ class AxelixBeansEndpointAutoConfigurationTest {
     }
 
     @Test
-    void shouldHandleMultipleCustomBeans() {
+    void shouldFailWhenCustomBeansProvided() {
+        // given.
         contextRunner
                 .withUserConfiguration(
                         CustomConditionalBeanRefBuilderConfig.class,
                         CustomBeanMetaInfoExtractorConfig.class,
                         CustomAxelixBeansEndpointConfig.class)
+
+                // when.
                 .run(context -> {
-                    assertThat(context.getBean(ConditionalBeanRefBuilder.class))
-                            .isExactlyInstanceOf(CustomConditionalBeanRefBuilder.class);
-                    assertThat(context.getBean(BeanMetaInfoExtractor.class))
-                            .isExactlyInstanceOf(CustomBeanMetaInfoExtractor.class);
-                    assertThat(context.getBean(AxelixBeansEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixBeansEndpoint.class);
+                    // then.
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).isInstanceOf(BeanDefinitionOverrideException.class);
                 });
     }
 
