@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -73,13 +74,16 @@ class AxelixConditionsEndpointAutoConfigurationTest {
     }
 
     @Test
-    void shouldNotCreateDefaultEndpointWhenCustomBeanProvided() {
+    void shouldFailWhenCustomBeanProvided() {
+        // given.
         contextRunner
                 .withUserConfiguration(CustomAxelixConditionsEndpointConfig.class)
+
+                // when.
                 .run(context -> {
-                    assertThat(context).hasSingleBean(AxelixConditionsEndpoint.class);
-                    assertThat(context.getBean(AxelixConditionsEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixConditionsEndpoint.class);
+                    // then.
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).isInstanceOf(BeanDefinitionOverrideException.class);
                 });
     }
 
