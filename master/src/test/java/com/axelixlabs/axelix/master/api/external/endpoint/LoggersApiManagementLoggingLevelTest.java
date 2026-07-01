@@ -122,9 +122,9 @@ public class LoggersApiManagementLoggingLevelTest {
 
         registry.reload(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 siblingInstanceId, mockWebServer.url(siblingInstanceId).toString()));
-        registry.register(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.withUrl(
                 failingInstanceId, mockWebServer.url(failingInstanceId).toString()));
     }
 
@@ -133,6 +133,25 @@ public class LoggersApiManagementLoggingLevelTest {
         registry.deRegister(InstanceId.of(activeInstanceId));
         registry.deRegister(InstanceId.of(siblingInstanceId));
         registry.deRegister(InstanceId.of(failingInstanceId));
+    }
+
+    @Test
+    void shouldSetLoggingLevelByGroupName() {
+        String groupName = "groupName";
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
+
+        // when.
+        ResponseEntity<String> body = restTemplate
+                .asViewer()
+                .postForEntity(
+                        "/api/external/loggers/{instanceId}/group/{groupName}",
+                        requestBody,
+                        String.class,
+                        activeInstanceId,
+                        groupName);
+
+        // then.
+        assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -215,12 +234,11 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_OnLoggerName() {
-        String instanceId = UUID.randomUUID().toString();
-        String loggerName = "logger.name";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG", null);
-        registry.reload(createInstance(instanceId));
+    @DisplayName("Should return 400 on EndpointInvocationError")
+    void shouldReturnBadRequest_OnLoggerBulkChangeEndpointInvocationError() {
+        // given.
+        LogLevelLoggerBulkChangeRequest requestBody =
+                new LogLevelLoggerBulkChangeRequest(List.of(failingInstanceId), "logger.name", null, "DEBUG");
 
         // when.
         ResponseEntity<String> response =
@@ -344,7 +362,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
     @ProtectedEndpointTests(method = HttpMethod.POST, path = "/api/external/loggers/logger", jsonBody = """
                     {
-                      "instanceIds": ["00000000-0000-0000-0000-000000000001"],
+                      "instanceIds": ["00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000001"],
                       "loggerName": "logger.name",
                       "configuredLevel": "DEBUG"
                     }
