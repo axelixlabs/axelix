@@ -43,7 +43,7 @@ jobs:
       issues: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Check PR size
         uses: ./.github/actions/check-pr-size
@@ -58,7 +58,7 @@ jobs:
       NEXUS_URL: ${{ secrets.NEXUS_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Java 25 will be installed at this step.
       - name: Build Backend

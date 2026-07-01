@@ -68,7 +68,7 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
@@ -113,7 +113,7 @@ jobs:
         run: docker logout
 
       - name: Checkout helm-charts repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: axelixlabs/helm-charts
           ref: ${{ env.HELM_CHART_BRANCH }}
@@ -121,7 +121,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
-        uses: azure/setup-helm@v5.0.0
+        uses: azure/setup-helm@v5.0.1
         with:
           version: v3.14.0
 
@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
