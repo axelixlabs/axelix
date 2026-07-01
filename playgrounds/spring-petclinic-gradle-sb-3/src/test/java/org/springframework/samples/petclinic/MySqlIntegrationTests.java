@@ -45,30 +45,30 @@ import org.testcontainers.utility.DockerImageName;
 @DisabledInAotMode
 class MySqlIntegrationTests {
 
-	@ServiceConnection
-	@Container
-	static MySQLContainer<?> container = new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+    @ServiceConnection
+    @Container
+    static MySQLContainer<?> container = new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
 
-	@LocalServerPort
-	int port;
+    @LocalServerPort
+    int port;
 
-	@Autowired
-	private VetRepository vets;
+    @Autowired
+    private VetRepository vets;
 
-	@Autowired
-	private RestTemplateBuilder builder;
+    @Autowired
+    private RestTemplateBuilder builder;
 
-	@Test
-	void testFindAll() {
-		vets.findAll();
-		vets.findAll(); // served from cache
-	}
+    @Test
+    void testFindAll() {
+        vets.findAll();
+        vets.findAll(); // served from cache
+    }
 
-	@Test
-	void testOwnerDetails() {
-		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
-		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-	}
-
+    @Test
+    void testOwnerDetails() {
+        RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+        ResponseEntity<String> result =
+                template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 }

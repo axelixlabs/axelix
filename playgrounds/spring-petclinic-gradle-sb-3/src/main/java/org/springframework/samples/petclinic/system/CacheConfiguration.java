@@ -26,6 +26,4 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableCaching
-class CacheConfiguration {
-
-}
+class CacheConfiguration {}

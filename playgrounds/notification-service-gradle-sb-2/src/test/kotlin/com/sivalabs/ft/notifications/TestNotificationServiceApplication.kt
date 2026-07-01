@@ -11,8 +11,7 @@ fun main(args: Array<String>) {
     SpringApplicationBuilder(NotificationServiceApplication::class.java)
         .properties(
             mapOf(
-                "spring.kafka.bootstrap-servers" to kafka.bootstrapServers
-            )
-        )
-        .run(*args)
+                "spring.kafka.bootstrap-servers" to kafka.bootstrapServers,
+            ),
+        ).run(*args)
 }

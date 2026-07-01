@@ -32,16 +32,15 @@ import org.testcontainers.utility.DockerImageName;
 @Configuration
 public class MysqlTestApplication {
 
-	@ServiceConnection
-	@Profile("mysql")
-	@Bean
-	static MySQLContainer<?> container() {
-		return new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
-	}
+    @ServiceConnection
+    @Profile("mysql")
+    @Bean
+    static MySQLContainer<?> container() {
+        return new MySQLContainer<>(DockerImageName.parse("mysql:9.2"));
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(PetClinicApplication.class, "--spring.profiles.active=mysql",
-				"--spring.docker.compose.enabled=false");
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(
+                PetClinicApplication.class, "--spring.profiles.active=mysql", "--spring.docker.compose.enabled=false");
+    }
 }

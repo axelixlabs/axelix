@@ -34,30 +34,30 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PetClinicIntegrationTests {
 
-	@LocalServerPort
-	int port;
+    @LocalServerPort
+    int port;
 
-	@Autowired
-	private VetRepository vets;
+    @Autowired
+    private VetRepository vets;
 
-	@Autowired
-	private RestTemplateBuilder builder;
+    @Autowired
+    private RestTemplateBuilder builder;
 
-	@Test
-	void testFindAll() {
-		vets.findAll();
-		vets.findAll(); // served from cache
-	}
+    @Test
+    void testFindAll() {
+        vets.findAll();
+        vets.findAll(); // served from cache
+    }
 
-	@Test
-	void testOwnerDetails() {
-		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
-		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-	}
+    @Test
+    void testOwnerDetails() {
+        RestTemplate template = builder.rootUri("http://localhost:" + port).build();
+        ResponseEntity<String> result =
+                template.exchange(RequestEntity.get("/owners/1").build(), String.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(PetClinicApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(PetClinicApplication.class, args);
+    }
 }

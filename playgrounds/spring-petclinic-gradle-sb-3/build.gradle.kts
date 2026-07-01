@@ -1,3 +1,7 @@
+import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
+import kotlin.io.path.readText
+
 plugins {
   java
   checkstyle
@@ -5,11 +9,9 @@ plugins {
   id("io.spring.dependency-management") version "1.1.7"
   id("org.graalvm.buildtools.native") version "0.10.6"
   id("org.cyclonedx.bom") version "2.3.1"
-  id("io.spring.javaformat") version "0.0.46"
+  id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
 }
-
-gradle.startParameter.excludedTaskNames += listOf("checkFormatAot", "checkFormatAotTest")
 
 group = "org.springframework.samples"
 version = "3.5.0"
@@ -24,7 +26,6 @@ repositories {
   mavenCentral()
 }
 
-val checkstyleVersion by ext("10.25.0")
 val springJavaformatCheckstyleVersion by ext("0.0.46")
 val webjarsLocatorLiteVersion by ext("1.1.0")
 val webjarsFontawesomeVersion by ext("4.7.0")
@@ -62,9 +63,6 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-docker-compose")
   testImplementation("org.testcontainers:junit-jupiter")
   testImplementation("org.testcontainers:mysql")
-
-  "checkstyle"("io.spring.javaformat:spring-javaformat-checkstyle:$springJavaformatCheckstyleVersion")
-  "checkstyle"("com.puppycrawl.tools:checkstyle:$checkstyleVersion")
 }
 
 tasks.named<Test>("test") {
@@ -81,24 +79,22 @@ tasks.named<Checkstyle>("checkstyleNohttp") {
   configFile = file("src/checkstyle/nohttp-checkstyle.xml")
 }
 
-tasks.named("formatMain").configure {
-  dependsOn("checkstyleMain")
-  dependsOn("checkstyleNohttp")
-}
-
-tasks.named("formatTest").configure {
-  dependsOn("checkstyleTest")
-  dependsOn("checkstyleNohttp")
-}
-
-tasks.named("checkstyleAot") { enabled = false }
-tasks.named("checkstyleAotTest") { enabled = false }
-tasks.named("checkFormatAot") { enabled = false }
-tasks.named("checkFormatAotTest") { enabled = false }
-tasks.named("formatAot") { enabled = false }
-tasks.named("formatAotTest") { enabled = false }
-
 tasks.wrapper {
   gradleVersion = "8.14.3"
   distributionType = Wrapper.DistributionType.ALL
+}
+
+spotless {
+  java {
+    palantirJavaFormat("2.90.0")
+    target("src/**/*.java")
+    forbidWildcardImports()
+    trimTrailingWhitespace()
+    removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
+  }
+
+  kotlin {
+    target("src/**/*.kt")
+    trimTrailingWhitespace()
+  }
 }
