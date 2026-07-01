@@ -1,0 +1,17 @@
+plugins {
+    id 'com.axelixlabs.axelix'
+}
+apply plugin: 'java'
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation platform('org.springframework.boot:spring-boot-dependencies:4.0.7')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Gradle 9 requires the launcher on the test runtime classpath; the Boot
+    // BOM supplies its version via the imported junit-bom.
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test { useJUnitPlatform() }
