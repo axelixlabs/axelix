@@ -15,28 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
-
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
 import styles from "./styles.module.css";
 
-const DashboardJava = () => {
+interface IProps {
+    title: string;
+    subtitle: string;
+    children: React.ReactNode;
+}
+
+export const DashboardCard = ({ title, subtitle, children }: IProps) => {
     return (
         <>
-            <DashboardPagesFirstSection
-                title="JAVA"
-                subtitle="Real-time JVM metrics · Project Leyden · Garbage Collection"
-            />
-
-            <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
+            <div className={styles.MainWrapper}>
+                <div className={styles.HeaderWrapper}>
+                    <p className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</p>
+                    <h2 className={`TextSmall ${styles.Title}`}>{title}</h2>
+                </div>
+                {children}
             </div>
         </>
     );
 };
-
-export default DashboardJava;

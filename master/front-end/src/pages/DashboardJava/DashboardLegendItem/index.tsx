@@ -15,28 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
-
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
 import styles from "./styles.module.css";
 
-const DashboardJava = () => {
-    return (
-        <>
-            <DashboardPagesFirstSection
-                title="JAVA"
-                subtitle="Real-time JVM metrics · Project Leyden · Garbage Collection"
-            />
+interface IProps {
+    circleColor: string;
+    label: string;
+    value: string;
+}
 
-            <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
-            </div>
-        </>
+export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
+    return (
+        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+            <span
+                style={{
+                    backgroundColor: circleColor,
+                }}
+                className={styles.Circle}
+            />
+            <span className={styles.Label}>{label}</span>
+            <span className={styles.Value}>{value}</span>
+        </div>
     );
 };
-
-export default DashboardJava;

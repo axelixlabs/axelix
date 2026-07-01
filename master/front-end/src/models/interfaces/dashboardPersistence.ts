@@ -15,26 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
+// TODO: Maybe we can improve these types
+export interface IDashboardTreemapEntity {
+    name: string;
+    size: number;
+    entity: string;
+    [key: string]: string | number;
+}
 
-import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
-import { NPlusOneTreemap } from "./NPlusOneTreemap";
-import styles from "./styles.module.css";
+export interface IDashboardPersistenceStatsData {
+    label: string;
+    value: string;
+    color: string;
+}
 
-const DashboardPersistence = () => {
-    return (
-        <>
-            <DashboardPagesFirstSection
-                title="Persistence Dashboard"
-                subtitle="Database access patterns · N+1 detection · In-memory pagination"
-            />
-
-            <div className={styles.ChartsWrapper}>
-                <NPlusOneTreemap />
-                <InMemoryPaginationTreemap />
-            </div>
-        </>
-    );
-};
-
-export default DashboardPersistence;
+export interface IDashboardTreemapEntityWithColor extends IDashboardTreemapEntity {
+    fill: string;
+}
