@@ -15,6 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
 import {
     ETimepickerHourCycle,
     type ILogger,
@@ -23,7 +26,8 @@ import {
     type ITimepickerClockConfig,
     type ITimepickerData,
 } from "models";
-import { SECONDS_IN_HOUR, SECONDS_IN_MINUTE } from "utils";
+
+dayjs.extend(isSameOrBefore);
 
 export const mapLoggersResponse = (response: ILoggersResponseBody) => {
     const { levels, loggers, groups } = response;
@@ -117,11 +121,21 @@ export const timepickerDataConvertToSeconds = (data: ITimepickerData | undefined
     let parsedHour = Number(hour);
     const parsedMinutes = Number(minutes);
 
-    if (type === ETimepickerHourCycle.AM && parsedHour === 12) {
+    const isAM = type === ETimepickerHourCycle.AM;
+    const isPM = type === ETimepickerHourCycle.PM;
+
+    if (isAM && parsedHour === 12) {
         parsedHour = 0;
-    } else if (type === ETimepickerHourCycle.PM && parsedHour !== 12) {
+    } else if (isPM && parsedHour !== 12) {
         parsedHour += 12;
     }
 
-    return parsedHour * SECONDS_IN_HOUR + parsedMinutes * SECONDS_IN_MINUTE;
+    const now = dayjs();
+    let target = now.hour(parsedHour).minute(parsedMinutes).second(0).millisecond(0);
+
+    if (target.isSameOrBefore(now)) {
+        target = target.add(1, "day");
+    }
+
+    return target.diff(now, "second");
 };

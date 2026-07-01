@@ -24,21 +24,21 @@
     --tp-border: var(--axelix-medium-grey);
     --tp-border-radius: var(--axelix-border-radius-large);
     --tp-outline: var(--axelix-primary-green);
-    
+
     &:global(.tp-ui-wrapper) {
-        box-shadow: none !important;
-        margin-bottom: 20px;
+        margin-bottom: -165px !important;
     }
 
-    &:global(.tp-ui-select-time) {
-        display: none;
+    & :global(.tp-ui-header.expanded) {
+        padding-bottom: 20px;
     }
 
-    &:global(.tp-ui-footer) {
-        display: none;
+    & :global(:is(.tp-ui-hour, .tp-ui-minutes, .tp-ui-input-ripple-wrapper)) {
+        height: 60px;
+        font-size: 40px;
     }
 
-    &:global(.tp-ui-wrapper-type-time) {
+    & :global(:is(.tp-ui-select-time, .tp-ui-footer)) {
         display: none;
     }
 }

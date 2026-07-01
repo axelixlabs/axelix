@@ -86,7 +86,7 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
             <TooltipWithCopy text={name} />
 
             <div className={styles.LevelsWrapper}>
-                <LoggerScheduler checkedLevel={effectiveLevel} handleChange={handleChange} levels={levels} />
+                <LoggerScheduler logger={logger} handleChange={handleChange} levels={levels} />
 
                 <Levels
                     checkedLevel={effectiveLevel}

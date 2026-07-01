@@ -30,6 +30,9 @@ export interface ILogger {
      * Single logger current level
      */
     effectiveLevel: string;
+
+    temporaryLevelInitiatedAt: string | null;
+    temporaryLevelRollsBackAt: string | null;
 }
 
 export interface ILoggerGroup {

@@ -16,7 +16,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Popover, Select } from "antd";
-import { useState } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+
+import type { ILogger } from "models";
 
 import { LoggerTimePicker } from "./LoggerTimePicker";
 import styles from "./styles.module.css";
@@ -24,14 +27,56 @@ import styles from "./styles.module.css";
 import { TimerIcon } from "assets";
 
 export interface IProps {
-    checkedLevel: string;
     handleChange: (level: string, timerSeconds: number) => void;
     levels: string[];
+    logger: ILogger;
 }
 
-export const LoggerScheduler = ({ checkedLevel, handleChange, levels }: IProps) => {
+export const LoggerScheduler = ({ handleChange, levels, logger }: IProps) => {
+    const { effectiveLevel, temporaryLevelInitiatedAt, temporaryLevelRollsBackAt } = logger;
+
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-    const [selectedLevel, setSelectedLevel] = useState<string>(checkedLevel);
+    const [selectedLevel, setSelectedLevel] = useState<string>(effectiveLevel);
+    const [remainingTime, setRemainingTime] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!temporaryLevelInitiatedAt || !temporaryLevelRollsBackAt) {
+            setRemainingTime(null);
+            return;
+        }
+
+        const endTime = dayjs(temporaryLevelRollsBackAt);
+
+        if (!endTime.isValid()) {
+            setRemainingTime(null);
+            return;
+        }
+
+        const updateTimer = () => {
+            const diffMs = endTime.diff(dayjs());
+
+            if (diffMs <= 0) {
+                setRemainingTime(null);
+                return;
+            }
+
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+            const formattedHours = String(hours).padStart(2, "0");
+            const formattedMinutes = String(minutes).padStart(2, "0");
+
+            const time = `${formattedHours}:${formattedMinutes}`;
+            setRemainingTime(time);
+        };
+
+        updateTimer();
+
+        const interval = setInterval(updateTimer, 60000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <Popover
@@ -62,8 +107,20 @@ export const LoggerScheduler = ({ checkedLevel, handleChange, levels }: IProps) 
             trigger="click"
             open={popoverOpen}
             onOpenChange={setPopoverOpen}
+            styles={{
+                content: {
+                    overflow: "hidden",
+                },
+                title: {
+                    marginBottom: "20px",
+                },
+            }}
         >
-            <TimerIcon className={styles.TimerIcon} />
+            {remainingTime ? (
+                <span className={styles.TimerText}>{remainingTime}</span>
+            ) : (
+                <TimerIcon className={styles.TimerIcon} />
+            )}
         </Popover>
     );
 };
