@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { IAxelixVersionData } from "@/models";
+
+import { AxelixVersion } from "../AxelixVersion";
 import styles from "../shared.module.css";
 
 interface IProps {
     refEl: any;
+    axelixVersionData: IAxelixVersionData;
 }
 
-export const ComposeSnippet = ({ refEl }: IProps) => {
+export const ComposeSnippet = ({ refEl, axelixVersionData }: IProps) => {
     return (
         <pre
             className={styles.Snippet}
@@ -40,7 +44,10 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 <span className={styles.Line}>
                     {"    "}
                     <span className={styles.At}>image</span>:{" "}
-                    <span className={styles.St}>ghcr.io/axelixlabs/axelix:v1.0.0-m1</span>
+                    <span className={styles.St}>
+                        ghcr.io/axelixlabs/axelix:
+                        <AxelixVersion axelixVersionData={axelixVersionData} />
+                    </span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
