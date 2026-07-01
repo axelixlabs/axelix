@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.UserDuplicateValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 
@@ -52,6 +53,7 @@ public interface UserService {
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UserDuplicateValueException if a user with the same username or email already exists.
      */
     void createLocal(String username, @Nullable String email, String password, String role);
 
@@ -64,6 +66,7 @@ public interface UserService {
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UserDuplicateValueException if a user with the same username or email already exists.
      */
     void createFromOidc(String username, @Nullable String email, String role);
 
@@ -123,10 +126,11 @@ public interface UserService {
      * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
      * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UserDuplicateValueException if another user with the same username or email already exists.
      */
     default void updateUserPatch(
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
-            throws UserRoleNotFoundException, UserInvalidValueException {
+            throws UserRoleNotFoundException, UserInvalidValueException, UserDuplicateValueException {
 
         updateUserPatch(id, username, email, password, roles, null);
     }
@@ -143,5 +147,5 @@ public interface UserService {
             @Nullable String password,
             Set<String> roles,
             @Nullable Instant lastLoginAt)
-            throws UserRoleNotFoundException, UserInvalidValueException;
+            throws UserRoleNotFoundException, UserInvalidValueException, UserDuplicateValueException;
 }

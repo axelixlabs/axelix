@@ -21,10 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -71,10 +69,7 @@ public class UserManagementApi {
             userService.createLocal(request.username(), request.email(), request.password(), request.role());
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
-        } catch (UserInvalidValueException
-                | UserRoleNotFoundException
-                | UncategorizedSQLException
-                | DataIntegrityViolationException e) {
+        } catch (UserInvalidValueException | UserRoleNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -98,10 +93,7 @@ public class UserManagementApi {
 
             return ResponseEntity.noContent().build();
 
-        } catch (UserInvalidValueException
-                | UserRoleNotFoundException
-                | UncategorizedSQLException
-                | DataIntegrityViolationException e) {
+        } catch (UserInvalidValueException | UserRoleNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

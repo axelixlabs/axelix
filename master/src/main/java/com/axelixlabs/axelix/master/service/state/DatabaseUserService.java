@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.UserDuplicateValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -64,7 +67,7 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void createLocal(String username, @Nullable String email, String password, String role)
-            throws UserRoleNotFoundException, UserInvalidValueException {
+            throws UserRoleNotFoundException, UserInvalidValueException, UserDuplicateValueException {
 
         UserEntity userEntity = new UserEntity(
                 UUID.randomUUID().toString(),
@@ -75,11 +78,12 @@ public class DatabaseUserService implements UserService {
                 UserOrigin.LOCAL,
                 null);
 
-        jdbcAggregateTemplate.insert(userEntity);
+        insertNewUser(userEntity);
     }
 
     @Override
-    public void createFromOidc(String username, @Nullable String email, String role) {
+    public void createFromOidc(String username, @Nullable String email, String role)
+            throws UserRoleNotFoundException, UserInvalidValueException, UserDuplicateValueException {
 
         UserEntity userEntity = new UserEntity(
                 UUID.randomUUID().toString(),
@@ -90,7 +94,18 @@ public class DatabaseUserService implements UserService {
                 UserOrigin.OIDC,
                 Instant.now()); // the assumption is that the user is created during the initial login
 
-        jdbcAggregateTemplate.insert(userEntity);
+        insertNewUser(userEntity);
+    }
+
+    private void insertNewUser(UserEntity userEntity) throws UserDuplicateValueException {
+        try {
+            jdbcAggregateTemplate.insert(userEntity);
+        } catch (DuplicateKeyException | UncategorizedSQLException e) {
+            // TODO: develop a proper approach for handling SQLite errors so that only actual
+            //  unique constraint violations are mapped to UserDuplicateValueException, instead
+            //  of blindly treating every untranslated UncategorizedSQLException as a duplicate
+            throw new UserDuplicateValueException(e);
+        }
     }
 
     @Override
@@ -126,7 +141,7 @@ public class DatabaseUserService implements UserService {
             @Nullable String password,
             Set<String> roles,
             @Nullable Instant lastLoginAt)
-            throws UserRoleNotFoundException, UserInvalidValueException {
+            throws UserRoleNotFoundException, UserInvalidValueException, UserDuplicateValueException {
 
         if (roles.isEmpty()) {
             throw new UserInvalidValueException(null);
@@ -135,13 +150,20 @@ public class DatabaseUserService implements UserService {
         Set<String> validRoles =
                 roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 
-        userRepository.updateUserPatch(
-                id,
-                requireNonBlankTrimmed(username),
-                email == null ? null : requireNonBlankTrimmed(email),
-                password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(validRoles),
-                lastLoginAt);
+        try {
+            userRepository.updateUserPatch(
+                    id,
+                    requireNonBlankTrimmed(username),
+                    email == null ? null : requireNonBlankTrimmed(email),
+                    password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                    new UserEntity.Roles(validRoles),
+                    lastLoginAt);
+        } catch (DuplicateKeyException | UncategorizedSQLException e) {
+            // TODO: develop a proper approach for handling SQLite errors so that only actual
+            //  unique constraint violations are mapped to UserDuplicateValueException, instead
+            //  of blindly treating every untranslated UncategorizedSQLException as a duplicate
+            throw new UserDuplicateValueException(e);
+        }
     }
 
     private String requireNonBlankTrimmed(String value) throws UserInvalidValueException {
