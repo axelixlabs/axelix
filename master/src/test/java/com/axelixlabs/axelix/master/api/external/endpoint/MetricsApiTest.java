@@ -208,8 +208,7 @@ public class MetricsApiTest {
             }
         });
 
-        registry.register(
-                TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -236,7 +235,7 @@ public class MetricsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
 

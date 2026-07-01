@@ -11,6 +11,8 @@ plugins {
 val springBootVersion = "3.0.13"
 val springCloudVersion = "2022.0.4"
 
+val jsonUnitAssertJVersion = "2.38.0"
+
 dependencies {
     // Self
     compileOnly(project(":sbs:starter-domain"))
@@ -28,6 +30,7 @@ dependencies {
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
     compileOnly("io.micrometer:micrometer-core")
+    compileOnly("org.springframework.boot:spring-boot-starter-log4j2")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
@@ -47,6 +50,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
     testImplementation("com.tngtech.archunit:archunit:1.4.2")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 }
 
 tasks.withType<JavaCompile>().configureEach {

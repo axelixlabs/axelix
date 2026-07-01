@@ -23,6 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +55,6 @@ import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -111,8 +112,9 @@ public class PersistenceAutoConfiguration {
             return List.of(
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
-                    new InsightsReadingConverter(jsonMapper),
-                    new InsightsWritingConverter(jsonMapper),
+                    new LocalDateToStringConverter(),
+                    new StringToLocalDateConverter(),
+                    new IntegerToBooleanConverter(),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper));
         }
@@ -147,6 +149,41 @@ public class PersistenceAutoConfiguration {
                     log.warn("Unable to parse the input '{}' as the numeric data type", source);
                     return null;
                 }
+            }
+        }
+
+        @WritingConverter
+        public static class LocalDateToStringConverter implements Converter<LocalDate, String> {
+
+            @Override
+            public @NonNull String convert(@NonNull LocalDate source) {
+                return String.valueOf(
+                        source.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+            }
+        }
+
+        @ReadingConverter
+        public static class StringToLocalDateConverter implements Converter<String, LocalDate> {
+
+            @Override
+            // NullAway is correct here, but Spring Framework Converter's contract is a bit wrong here
+            @SuppressWarnings("NullAway")
+            public @Nullable LocalDate convert(String source) {
+                try {
+                    long parsed = Long.parseLong(source);
+                    return Instant.ofEpochMilli(parsed).atZone(ZoneOffset.UTC).toLocalDate();
+                } catch (NumberFormatException e) {
+                    return LocalDate.parse(source);
+                }
+            }
+        }
+
+        @ReadingConverter
+        public static class IntegerToBooleanConverter implements Converter<Integer, Boolean> {
+
+            @Override
+            public @NonNull Boolean convert(@NonNull Integer source) {
+                return source != 0;
             }
         }
     }
@@ -217,11 +254,7 @@ public class PersistenceAutoConfiguration {
 
         @Override
         protected @NonNull List<?> userConverters() {
-            return List.of(
-                    new InsightsReadingConverter(jsonMapper),
-                    new InsightsWritingConverter(jsonMapper),
-                    new RolesWritingConverter(jsonMapper),
-                    new RolesReadingConverter(jsonMapper));
+            return List.of(new RolesWritingConverter(jsonMapper), new RolesReadingConverter(jsonMapper));
         }
 
         @WritingConverter
@@ -256,40 +289,6 @@ public class PersistenceAutoConfiguration {
                 }
                 Set<String> roles = jsonMapper.readValue(source, new TypeReference<>() {});
                 return new UserEntity.Roles(roles);
-            }
-        }
-
-        @WritingConverter
-        public static class InsightsWritingConverter implements Converter<Insights, String> {
-
-            private final JsonMapper jsonMapper;
-
-            public InsightsWritingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public String convert(Insights source) {
-                Insights insights = source == null ? Insights.empty() : source;
-                return jsonMapper.writeValueAsString(insights);
-            }
-        }
-
-        @ReadingConverter
-        public static class InsightsReadingConverter implements Converter<String, Insights> {
-
-            private final JsonMapper jsonMapper;
-
-            public InsightsReadingConverter(JsonMapper jsonMapper) {
-                this.jsonMapper = jsonMapper;
-            }
-
-            @Override
-            public Insights convert(String source) {
-                if (source == null || source.isBlank()) {
-                    return Insights.empty();
-                }
-                return jsonMapper.readValue(source, Insights.class);
             }
         }
     }

@@ -3,14 +3,14 @@ import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.1.0-RC1"
+    id("org.springframework.boot") version "4.1.0"
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
 }
 
-val springBootVersion = "4.1.0-RC1"
+val springBootVersion = "4.1.0"
 val springCloudVersion = "2025.1.1"
-val springAiVersion = "2.0.0-M8"
+val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
 val springDocSwaggerVersion = "3.0.3"
@@ -18,6 +18,7 @@ val sqliteVersion = "3.53.1.0"
 val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.5.1"
+val jsonUnitAssertJVersion = "2.38.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.11"
@@ -94,6 +95,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
     testImplementation("org.instancio:instancio-core:${instancioVersion}")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")

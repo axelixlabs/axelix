@@ -48,7 +48,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
@@ -156,6 +155,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -197,10 +198,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
         Mockito.when(discoveryClient.getInstances(activeInstanceId)).thenReturn(List.of(serviceInstance));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).hasSize(1);
-        Instance instance = instances.iterator().next();
+        assertThat(profiles).hasSize(1);
+        Instance instance = profiles.iterator().next().instance();
         assertThat(instance).satisfies(it -> {
             assertThat(it.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
             assertThat(it.commitShaShort()).isEqualTo("a8b0929");
@@ -209,7 +210,6 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
-            assertThat(it.insights()).isEqualTo(Insights.empty());
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
         });
@@ -225,6 +225,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "1.5.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -254,9 +256,11 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
         Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(serviceInstance));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(instanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(instanceId);
     }
 
     @Test
@@ -272,6 +276,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "2.0.0-BAD-VERSION",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -291,6 +297,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -335,10 +343,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(firstServiceId)).thenReturn(List.of(firstServiceBadVersion));
         Mockito.when(discoveryClient.getInstances(secondServiceId)).thenReturn(List.of(secondServiceGoodVersion));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances)
-                .extracting(instance -> instance.id().instanceId())
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
                 .containsOnly(secondServiceInstanceGoodVersionId);
     }
 
@@ -346,9 +354,9 @@ class KubernetesInstanceDiscovererTest {
     void shouldIgnoreWhenDiscoveryClientReturnsEmpty() {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of());
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).isEmpty();
+        assertThat(profiles).isEmpty();
     }
 
     @Test
@@ -372,9 +380,11 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).isEmpty();
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .isEmpty();
     }
 
     @Test
@@ -389,6 +399,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -451,9 +463,140 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(healthyK8sPod, timeoutK8sPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(healthyInstanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(healthyInstanceId);
+    }
+
+    @Test
+    void shouldIgnoreInstanceWhenApplicationIdIsMissing() {
+        String testServiceId = "test-service";
+        String testInstanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : null,
+              "artifactId" : null,
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              }
+            }
+            """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance k8sPod = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), testInstanceId)
+                .set(Select.field("serviceId"), testServiceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
+        Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles).isEmpty();
+    }
+
+    @Test
+    void shouldRegisterOnlyInstanceWithApplicationId() {
+        String testServiceId = "test-service";
+        String instanceWithoutApplicationId = UUID.randomUUID().toString();
+        String instanceWithApplicationId = UUID.randomUUID().toString();
+
+        // language=json
+        String responseWithoutApplicationId = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              }
+            }
+            """;
+        // language=json
+        String responseWithApplicationId = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              }
+            }
+            """;
+
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(responseWithoutApplicationId)
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(responseWithApplicationId)
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance instanceMissingApplicationId = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceWithoutApplicationId)
+                .set(Select.field("serviceId"), testServiceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        ServiceInstance instanceHavingApplicationId = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceWithApplicationId)
+                .set(Select.field("serviceId"), testServiceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
+        Mockito.when(discoveryClient.getInstances(testServiceId))
+                .thenReturn(List.of(instanceMissingApplicationId, instanceHavingApplicationId));
+
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(instanceWithApplicationId);
     }
 
     @Test
@@ -467,6 +610,8 @@ class KubernetesInstanceDiscovererTest {
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "org.springframework.samples",
+              "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -506,8 +651,10 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(testServiceId))
                 .thenReturn(List.of(healthyK8SPod, connectionRefusedPod));
 
-        Set<Instance> instances = subject.discover();
+        Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(healthyK8SInstanceId);
+        assertThat(profiles)
+                .extracting(profile -> profile.instance().id().instanceId())
+                .containsOnly(healthyK8SInstanceId);
     }
 }

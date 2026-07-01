@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -72,24 +73,24 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     @Override
-    public Set<Instance> discover() {
+    public Set<DiscoveredInstanceProfile> discover() {
         List<String> serviceIds = discoveryClient.getServices();
 
         if (CollectionUtils.isEmpty(serviceIds)) {
             return Set.of();
         }
 
-        Set<Instance> result = new HashSet<>();
+        Set<DiscoveredInstanceProfile> result = new HashSet<>();
 
         for (String serviceId : serviceIds) {
             List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
 
             if (!CollectionUtils.isEmpty(instances)) {
                 result.addAll(instances.stream()
-                        .filter(Objects::nonNull)
                         .map(this::getManagedServiceMetadata)
                         .filter(Objects::nonNull)
                         .filter(this::isCompatibleVersion)
+                        .filter(this::hasApplicationId)
                         .map(this::toDomainInstanceSafe)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet()));
@@ -99,13 +100,15 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         return result;
     }
 
-    private @Nullable InstanceIntermediateProfile getManagedServiceMetadata(ServiceInstance serviceInstance) {
+    protected record IntermediateInstanceProfile(ServiceInstance serviceInstance, BasicDiscoveryMetadata metadata) {}
+
+    private @Nullable IntermediateInstanceProfile getManagedServiceMetadata(ServiceInstance serviceInstance) {
         String actuatorUrl = serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
             BasicDiscoveryMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
 
-            return new InstanceIntermediateProfile(serviceInstance, metadata);
+            return new IntermediateInstanceProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {
             logger.debug(
                     "Unable to reach the managed service with id : {}. Skipping instance registration",
@@ -115,7 +118,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         }
     }
 
-    private boolean isCompatibleVersion(InstanceIntermediateProfile profile) {
+    private boolean isCompatibleVersion(IntermediateInstanceProfile profile) {
         if (compatibilityDetectionStrategy.isCompatible(profile.metadata().getVersion())) {
             return true;
         } else {
@@ -126,17 +129,21 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         }
     }
 
-    /**
-     * It is a simple data carrying class that sole purpose is to carry the state that we have
-     * assembled about the instance we're about register.
-     *
-     * @author Mikhail Polivakha
-     */
-    protected record InstanceIntermediateProfile(ServiceInstance serviceInstance, BasicDiscoveryMetadata metadata) {}
+    private boolean hasApplicationId(IntermediateInstanceProfile profile) {
+        BasicDiscoveryMetadata metadata = profile.metadata();
+        if (StringUtils.hasText(metadata.getGroupId()) && StringUtils.hasText(metadata.getArtifactId())) {
+            return true;
+        } else {
+            logger.warn(
+                    "Service instance: {} does not expose a valid application id (both groupId and artifactId are mandatory). Skipping registration",
+                    profile.serviceInstance().getInstanceId());
+            return false;
+        }
+    }
 
-    private @Nullable Instance toDomainInstanceSafe(InstanceIntermediateProfile intermediateProfile) {
+    private @Nullable DiscoveredInstanceProfile toDomainInstanceSafe(IntermediateInstanceProfile intermediateProfile) {
         try {
-            return toDomainInstance(intermediateProfile);
+            return new DiscoveredInstanceProfile(toDomainInstance(intermediateProfile), intermediateProfile.metadata());
         } catch (IllegalArgumentException e) {
             logger.warn(
                     "Unable to convert the discovered service : {} to its internal representation to make it manageable. Skipping registration",
@@ -147,7 +154,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     /**
-     * Map the {@link InstanceIntermediateProfile} to the {@link Instance}. Each implementation may and will have its own
+     * Map the {@link IntermediateInstanceProfile} to the {@link Instance}. Each implementation may and will have its own
      * {@link ServiceInstance}, and therefore we delegate this mapping to subclasses.
      *
      * @param serviceInstance the dto object that carries information known to this point about the instance being registered
@@ -155,6 +162,6 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
      * @throws IllegalArgumentException thrown in case of any conversion error, or in case there some unexpected
      *         condition happened during mapping process
      */
-    protected abstract Instance toDomainInstance(InstanceIntermediateProfile serviceInstance)
+    protected abstract Instance toDomainInstance(IntermediateInstanceProfile serviceInstance)
             throws IllegalArgumentException;
 }

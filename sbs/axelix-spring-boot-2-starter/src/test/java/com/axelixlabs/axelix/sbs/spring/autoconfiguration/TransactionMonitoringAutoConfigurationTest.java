@@ -21,14 +21,19 @@ import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
@@ -66,10 +71,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
-            assertThat(context)
-                    .doesNotHaveBean(
-                            TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
-                                    .class);
+            assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
 
@@ -79,10 +81,31 @@ class TransactionMonitoringAutoConfigurationTest {
 
         contextRunner
                 .withBean(EntityManagerFactory.class, () -> mockFactory)
-                .run(context -> assertThat(context)
-                        .hasSingleBean(
-                                TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
-                                        .class));
+                .run(context ->
+                        assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderConfiguration.class));
+    }
+
+    @Test // GH-1251
+    @Disabled(
+            "TODO: We need to figure out how to run tests with log4j2, maybe we can create a new gradle test task or smth")
+    void shouldActivateLog4j2Configuration_whenLog4j2IsTheDetectedLoggingSystemBySpringBoot() {
+        contextRunner
+                .withBean(EntityManagerFactory.class, () -> Mockito.mock(EntityManagerFactory.class))
+                .withBean(
+                        LoggingSystem.class,
+                        () -> new Log4J2LoggingSystem(getClass().getClassLoader()))
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
+                    assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderConfiguration.class);
+                });
+    }
+
+    @Test // GH-1251
+    void shouldNotCreateAnyAppender_whenEntityManagerFactoryIsMissing() {
+        contextRunner.run(context -> {
+            assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
+            assertThat(context).doesNotHaveBean(Log4j2InMemoryPaginationAppenderConfiguration.class);
+        });
     }
 
     @Test // GH-1250

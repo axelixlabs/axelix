@@ -35,6 +35,18 @@ import org.springframework.data.relational.core.sql.LockOptions;
 public class SQLiteDialect extends AnsiDialect implements JdbcDialect {
 
     @Override
+    @NonNull
+    public String getName() {
+        // TODO:
+        // That is a dirty hack to make Spring Data JDBC think that we're
+        // like postgres, and thus ON CONFLICT DO NOTHING is okay, since
+        // SQLite tries to mimic Postgres, and thus supports such syntax.
+        //
+        // See: https://github.com/spring-projects/spring-data-relational/issues/2304
+        return "postgres";
+    }
+
+    @Override
     public @NonNull IdentifierProcessing getIdentifierProcessing() {
         return IdentifierProcessing.create(IdentifierProcessing.Quoting.NONE, IdentifierProcessing.LetterCasing.AS_IS);
     }

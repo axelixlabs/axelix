@@ -52,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 @SpringBootTest(classes = DefaultSelfRegistrationMetadataAssemblerTest.TestApplication.class)
 @TestPropertySource(
@@ -69,6 +70,12 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
 
     @Autowired
     private SelfRegistrationMetadataAssembler subject;
+
+    @Autowired
+    private ServiceMetadataAssembler service;
+
+    @Autowired
+    private SelfRegistrationConfigurationProperties properties;
 
     @TestConfiguration
     static class CurrentConfig {
@@ -132,7 +139,9 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
                     gitInformationProvider,
                     shortBuildInfoProvider,
                     libraryInformationProvider,
-                    insightsInfoProvider);
+                    insightsInfoProvider,
+                    "com.axelixlabs",
+                    "axelix-sbs");
         }
     }
 
@@ -144,7 +153,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
-        assertThat(metadata.getInstanceName()).isEqualTo("testApp");
+        assertThat(metadata.getInstanceName()).startsWith("testApp-").hasSize("testApp-".length() + 8);
         assertThat(metadata.getInstanceActuatorUrl()).isEqualTo("http://localhost:8089/actuator");
         assertThat(metadata.getDeploymentAt()).isNotBlank();
         assertThat(Instant.parse(metadata.getDeploymentAt()).isBefore(Instant.now()))
@@ -155,5 +164,33 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
         assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());
+    }
+
+    @Test // GH-1292
+    void shouldReturnStableInstanceNameOnRepeatedCalls() {
+        // when.
+        SelfRegistrationMetadata firstMetadata = subject.assemble();
+        SelfRegistrationMetadata secondMetadata = subject.assemble();
+
+        // then.
+        assertThat(firstMetadata.getInstanceName()).isEqualTo(secondMetadata.getInstanceName());
+    }
+
+    @Test // GH-1292
+    void shouldReturnDifferentInstanceNameForDifferentInstances() {
+        // given.
+        DefaultSelfRegistrationMetadataAssembler assembler1 =
+                new DefaultSelfRegistrationMetadataAssembler(service, properties);
+        DefaultSelfRegistrationMetadataAssembler assembler2 =
+                new DefaultSelfRegistrationMetadataAssembler(service, properties);
+
+        // when.
+        SelfRegistrationMetadata metadata1 = assembler1.assemble();
+        SelfRegistrationMetadata metadata2 = assembler2.assemble();
+
+        // then.
+        assertThat(metadata1.getInstanceName()).startsWith("testApp-");
+        assertThat(metadata2.getInstanceName()).startsWith("testApp-");
+        assertThat(metadata1.getInstanceName()).isNotEqualTo(metadata2.getInstanceName());
     }
 }

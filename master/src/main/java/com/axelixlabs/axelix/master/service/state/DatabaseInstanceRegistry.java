@@ -56,12 +56,8 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void register(Instance instance) {
-        if (instanceRepository.existsById(instance.id())) {
-            jdbcAggregateTemplate.update(instance);
-        } else {
-            jdbcAggregateTemplate.insert(instance);
-        }
+    public void reload(Instance instance) {
+        jdbcAggregateTemplate.upsert(instance);
     }
 
     @Override

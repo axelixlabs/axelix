@@ -38,6 +38,8 @@ public final class BasicDiscoveryMetadata {
 
     private final String version;
     private final String serviceVersion;
+    private final String groupId;
+    private final String artifactId;
     private final String commitShortSha;
     private final String jdkVendor;
     private final SoftwareVersions softwareVersions;
@@ -53,6 +55,12 @@ public final class BasicDiscoveryMetadata {
      * @param serviceVersion   the version of the <strong>managed service itself</strong>, i.e. the version
      *                         of the end-service artifact (the V inside GAV coordinate). The assumption is that
      *                         is never {@code null}, and it frankly should not be.
+     * @param groupId          the group id of the managed service artifact (the G inside GAV coordinate). Together with
+     *                         the {@code artifactId} it forms the application id shared by all instances of the
+     *                         same application. Mandatory - an instance cannot be registered without it.
+     * @param artifactId       the artifact id of the managed service artifact (the A inside GAV coordinate). Together
+     *                         with the {@code groupId} it forms the application id shared by all instances of the
+     *                         same application. Mandatory - an instance cannot be registered without it.
      * @param commitShortSha   the short commit hash (i.e. 'a622a54' or smth like that). Assuming it
      *                         to never be {@code null}.
      * @param jdkVendor        the JDK vendor name.
@@ -66,6 +74,8 @@ public final class BasicDiscoveryMetadata {
     public BasicDiscoveryMetadata(
             @JsonProperty("version") String version,
             @JsonProperty("serviceVersion") String serviceVersion,
+            @JsonProperty("groupId") String groupId,
+            @JsonProperty("artifactId") String artifactId,
             @JsonProperty("commitShortSha") String commitShortSha,
             @JsonProperty("jdkVendor") String jdkVendor,
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
@@ -74,6 +84,8 @@ public final class BasicDiscoveryMetadata {
             @JsonProperty("insights") Insights insights) {
         this.version = version;
         this.serviceVersion = serviceVersion;
+        this.groupId = groupId;
+        this.artifactId = artifactId;
         this.commitShortSha = commitShortSha;
         this.jdkVendor = jdkVendor;
         this.softwareVersions = softwareVersions;
@@ -88,6 +100,14 @@ public final class BasicDiscoveryMetadata {
 
     public String getServiceVersion() {
         return serviceVersion;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
     }
 
     public String getCommitShortSha() {
@@ -125,6 +145,8 @@ public final class BasicDiscoveryMetadata {
         BasicDiscoveryMetadata that = (BasicDiscoveryMetadata) o;
         return Objects.equals(version, that.version)
                 && Objects.equals(serviceVersion, that.serviceVersion)
+                && Objects.equals(groupId, that.groupId)
+                && Objects.equals(artifactId, that.artifactId)
                 && Objects.equals(commitShortSha, that.commitShortSha)
                 && Objects.equals(jdkVendor, that.jdkVendor)
                 && Objects.equals(softwareVersions, that.softwareVersions)
@@ -138,6 +160,8 @@ public final class BasicDiscoveryMetadata {
         return Objects.hash(
                 version,
                 serviceVersion,
+                groupId,
+                artifactId,
                 commitShortSha,
                 jdkVendor,
                 softwareVersions,
@@ -154,6 +178,12 @@ public final class BasicDiscoveryMetadata {
                 + '\''
                 + ", serviceVersion='"
                 + serviceVersion
+                + '\''
+                + ", groupId='"
+                + groupId
+                + '\''
+                + ", artifactId='"
+                + artifactId
                 + '\''
                 + ", commitShortSha='"
                 + commitShortSha
@@ -449,23 +479,23 @@ public final class BasicDiscoveryMetadata {
      */
     public static final class InsightFeature {
 
-        private final String name;
+        private final String featureId;
         private final boolean enabled;
 
         /**
          * Creates a new InsightFeature.
          *
-         * @param name    the insight feature name.
-         * @param enabled the enabled state of the insight feature.
+         * @param featureId the insight feature id.
+         * @param enabled   the enabled state of the insight feature.
          */
         @JsonCreator
-        public InsightFeature(@JsonProperty("name") String name, @JsonProperty("enabled") boolean enabled) {
-            this.name = name;
+        public InsightFeature(@JsonProperty("featureId") String featureId, @JsonProperty("enabled") boolean enabled) {
+            this.featureId = featureId;
             this.enabled = enabled;
         }
 
-        public String getName() {
-            return name;
+        public String getFeatureId() {
+            return featureId;
         }
 
         public boolean isEnabled() {
@@ -481,17 +511,17 @@ public final class BasicDiscoveryMetadata {
                 return false;
             }
             InsightFeature that = (InsightFeature) o;
-            return enabled == that.enabled && Objects.equals(name, that.name);
+            return enabled == that.enabled && Objects.equals(featureId, that.featureId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, enabled);
+            return Objects.hash(featureId, enabled);
         }
 
         @Override
         public String toString() {
-            return "InsightFeature{" + "name='" + name + '\'' + ", enabled=" + enabled + '}';
+            return "InsightFeature{" + "featureId='" + featureId + '\'' + ", enabled=" + enabled + '}';
         }
     }
 }

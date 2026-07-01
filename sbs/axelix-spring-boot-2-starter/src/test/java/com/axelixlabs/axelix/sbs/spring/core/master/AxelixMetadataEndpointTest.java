@@ -47,7 +47,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({
     AxelixMetadataEndpoint.class,
     AxelixMetadataEndpointTest.CurrentConfig.class,
-    DefaultServiceMetadataAssembler.class,
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
     JwtAuthTestConfiguration.class
@@ -79,6 +78,26 @@ class AxelixMetadataEndpointTest {
         public InsightsInfoProvider insightsInfoProvider() {
             return new TestInsightsInfoProvider();
         }
+
+        // TODO: fallback to @Import once https://github.com/axelixlabs/axelix/issues/1305 is done
+        @Bean
+        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+                HealthDetectionFunction healthDetectionFunction,
+                AxelixVersionDiscoverer axelixVersionDiscoverer,
+                GitInformationProvider gitInformationProvider,
+                ShortBuildInfoProvider shortBuildInfoProvider,
+                LibraryInformationProvider libraryInformationProvider,
+                InsightsInfoProvider insightsInfoProvider) {
+            return new DefaultServiceMetadataAssembler(
+                    healthDetectionFunction,
+                    axelixVersionDiscoverer,
+                    gitInformationProvider,
+                    shortBuildInfoProvider,
+                    libraryInformationProvider,
+                    insightsInfoProvider,
+                    "com.axelixlabs",
+                    "axelix-sbs");
+        }
     }
 
     @Test
@@ -94,6 +113,8 @@ class AxelixMetadataEndpointTest {
                 .whenIgnoringPaths("softwareVersions")
                 .isEqualTo("{\n" + "  \"version\": \"1.1.3\",\n"
                         + "  \"serviceVersion\" : \"3.5.0-SNAPSHOT\",\n"
+                        + "  \"groupId\" : \"com.axelixlabs\",\n"
+                        + "  \"artifactId\" : \"axelix-sbs\",\n"
                         + "  \"commitShortSha\" : \"a8b0929\",\n"
                         + "  \"jdkVendor\" : \"#{json-unit.ignore}\",\n"
                         + "  \"softwareVersions\" : {\n"
@@ -109,19 +130,19 @@ class AxelixMetadataEndpointTest {
                         + "  \"insights\" : {\n"
                         + "    \"hotSpot\" : {\n"
                         + "      \"projectLeyden\" : [\n"
-                        + "        { \"name\" : \"AppCDS\", \"enabled\" : true },\n"
-                        + "        { \"name\" : \"AotCache\", \"enabled\" : false }\n"
+                        + "        { \"featureId\" : \"AppCDS\", \"enabled\" : true },\n"
+                        + "        { \"featureId\" : \"AotCache\", \"enabled\" : false }\n"
                         + "      ],\n"
                         + "      \"gc\" : [\n"
-                        + "        { \"name\" : \"GCLoggingEnabled\", \"enabled\" : true },\n"
-                        + "        { \"name\" : \"GCLogFileSpecified\", \"enabled\" : false }\n"
+                        + "        { \"featureId\" : \"GCLoggingEnabled\", \"enabled\" : true },\n"
+                        + "        { \"featureId\" : \"GCLogFileSpecified\", \"enabled\" : false }\n"
                         + "      ],\n"
                         + "      \"projectLilliputh\" : [\n"
-                        + "        { \"name\" : \"CompactObjectHeaders\", \"enabled\" : true }\n"
+                        + "        { \"featureId\" : \"CompactObjectHeaders\", \"enabled\" : true }\n"
                         + "      ]\n"
                         + "    },\n"
                         + "    \"springFramework\" : [\n"
-                        + "      { \"name\" : \"OSIV\", \"enabled\" : false }\n"
+                        + "      { \"featureId\" : \"OSIV\", \"enabled\" : false }\n"
                         + "    ]\n"
                         + "  }\n"
                         + "}");

@@ -17,19 +17,55 @@
  */
 package com.axelixlabs.axelix.master.domain;
 
-import java.util.List;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
 
 /**
  * Insight information discovered for the given service instance.
  *
- * @param hotSpot         the HotSpot-specific insight groups
- * @param springFramework the Spring Framework insight features
+ * @param hotSpot         the HotSpot-specific insights
+ * @param springFramework the Spring Framework-specific insights
  *
  * @author Mikhail Polivakha
  */
-public record Insights(HotSpot hotSpot, List<InsightFeature> springFramework) {
+public record Insights(
+        @Embedded.Empty HotSpot hotSpot, @Embedded.Empty SpringFramework springFramework) {
 
-    public static Insights empty() {
-        return new Insights(HotSpot.empty(), List.of());
+    /**
+     * @param projectLeyden Project Leyden-specific insights
+     * @param gc Garbage collector Leyden-specific insights
+     * @param projectLilliput Project Lilliput-specific insights
+     */
+    public record HotSpot(
+            @Embedded.Empty ProjectLeyden projectLeyden,
+            @Embedded.Empty GarbageCollector gc,
+            @Embedded.Empty ProjectLilliput projectLilliput) {
+
+        /**
+         * @param appCdsEnabled is App CDS being used.
+         * @param aotCacheEnabled is Aot Cache being used.
+         */
+        public record ProjectLeyden(
+                @Column("app_cds_enabled") boolean appCdsEnabled,
+                @Column("aot_cache_enabled") boolean aotCacheEnabled) {}
+
+        /**
+         * @param gcLoggingEnabled is gc logging enabled
+         * @param gcInUse what garbage collector is in use
+         */
+        public record GarbageCollector(
+                @Column("gc_logging_enabled") boolean gcLoggingEnabled,
+                @Column("gc_in_use") String gcInUse) {}
+
+        /**
+         * @param compactObjectHeadersEnabled are Compact Object Headers enabled.
+         */
+        public record ProjectLilliput(
+                @Column("compact_object_headers_enabled") boolean compactObjectHeadersEnabled) {}
     }
+
+    /**
+     * @param osivEnabled is OSIV enabled?
+     */
+    public record SpringFramework(boolean osivEnabled) {}
 }

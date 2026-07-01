@@ -17,8 +17,14 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +41,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,37 +60,90 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SelfRegisteredApiTest {
 
+    private static final String TEST_INSTANCE_ID = "3c994958-924f-4a12-87d0-a8782e97af10";
+
     // language=json
     private static final String JSON_REQUEST = """
         {
-       "basicDiscoveryMetadata" : {
-         "version": "1.0.0-SNAPSHOT",
-         "serviceVersion" : "3.5.0-SNAPSHOT",
-         "commitShortSha" : "a8b0929",
-         "jdkVendor" : "BellSoft",
-         "softwareVersions" : {
-           "springBoot" : "3.5.0",
-           "java" : "25",
-           "springFramework" : "6.1.2",
-           "kotlin" : null
-         },
-         "healthStatus" : "UP",
-         "memoryDetails" : {
-           "heap" : 12000
-         }
-       },
-         "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
-         "instanceName" : "petclinic",
-         "instanceActuatorUrl" : "http://localhost:8080/actuator",
-         "deploymentAt" : "2025-02-03T13:29:29Z"
+           "basicDiscoveryMetadata" : {
+             "version": "1.0.0-SNAPSHOT",
+             "serviceVersion" : "3.5.0-SNAPSHOT",
+             "groupId" : "org.springframework.samples",
+             "artifactId" : "petclinic",
+             "commitShortSha" : "a8b0929",
+             "jdkVendor" : "BellSoft",
+             "softwareVersions" : {
+               "springBoot" : "3.5.0",
+               "java" : "25",
+               "springFramework" : "6.1.2",
+               "kotlin" : null
+             },
+             "healthStatus" : "UP",
+             "memoryDetails" : {
+               "heap" : 12000
+             },
+             "insights" : {
+               "hotSpot" : {
+                 "projectLeyden" : [
+                   {
+                     "featureId" : "AotCache",
+                     "enabled" : false
+                   },
+                   {
+                     "featureId" : "AppCDS",
+                     "enabled" : true
+                   }
+                 ],
+                 "gc" : [
+                   {
+                     "featureId" : "GCLoggingEnabled",
+                     "enabled" : false
+                   },
+                   {
+                     "featureId" : "GCLogFileSpecified",
+                     "enabled" : false
+                   }
+                 ],
+                 "projectLilliputh" : [
+                   {
+                     "featureId" : "CompactObjectHeaders",
+                     "enabled" : false
+                   }
+                 ]
+               },
+               "springFramework" : [
+                 {
+                   "featureId" : "OSIV",
+                   "enabled" : true
+                 }
+               ]
+             }
+           },
+           "instanceId" : "%s",
+           "instanceName" : "petclinic",
+           "instanceActuatorUrl" : "http://localhost:8080/actuator",
+           "deploymentAt" : "2025-02-03T13:29:29Z"
      }
-    """;
+    """.formatted(TEST_INSTANCE_ID);
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
+    @Autowired
+    private InstanceRegistry instanceRegistry;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @BeforeEach
+    @AfterEach
+    void cleanDatabase() {
+        jdbcAggregateTemplate.deleteAll(Instance.class);
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+    }
+
     @Test
-    void shouldRegistryServiceInstance() {
+    void shouldRegisterServiceInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
                 .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
@@ -85,6 +151,40 @@ public class SelfRegisteredApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
+
+        // and then.
+        Optional<Instance> registeredInstance = instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID));
+        assertThat(registeredInstance).get().satisfies(instance -> {
+            assertThat(instance.id().instanceId()).isEqualTo(TEST_INSTANCE_ID);
+            assertThat(instance.applicationId())
+                    .isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
+            assertThat(instance.name()).isEqualTo("petclinic");
+            assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+            assertThat(instance.javaVersion()).isEqualTo("25");
+            assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
+            assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
+            assertThat(instance.kotlinVersion()).isNull();
+            assertThat(instance.jdkVendor()).isEqualTo("BellSoft");
+            assertThat(instance.commitShaShort()).isEqualTo("a8b0929");
+            assertThat(instance.deployedAt()).isEqualTo(Instant.parse("2025-02-03T13:29:29Z"));
+            assertThat(instance.latestHeartBeat()).isNotNull();
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
+            assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
+            assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");
+        });
+
+        var snapshotId = new SnapshotId("org.springframework.samples", "petclinic", LocalDate.now(ZoneOffset.UTC));
+        var snapshot = jdbcAggregateTemplate.findById(snapshotId, HistoricalApplicationSnapshot.class);
+
+        assertThat(snapshot).isNotNull();
+        assertThat(snapshot.insights().hotSpot().projectLeyden().appCdsEnabled())
+                .isTrue();
+        assertThat(snapshot.insights().hotSpot().projectLeyden().aotCacheEnabled())
+                .isFalse();
+        assertThat(snapshot.insights().hotSpot().gc().gcLoggingEnabled()).isFalse();
+        assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
+                .isFalse();
+        assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
     }
 
     @ParameterizedTest(name = "{0}")
@@ -96,6 +196,10 @@ public class SelfRegisteredApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+
+        // and then.
+        Optional<Instance> registeredInstance = instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID));
+        assertThat(registeredInstance).isEmpty();
     }
 
     private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {

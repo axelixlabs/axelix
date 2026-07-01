@@ -20,9 +20,12 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 import java.time.Instant;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +35,7 @@ import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -49,26 +53,45 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
         matchIfMissing = true)
 public class SelfRegisteredApi {
 
+    private static final Logger log = LoggerFactory.getLogger(SelfRegisteredApi.class);
+
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
+    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
+    private final TransactionTemplate transactionTemplate;
 
-    public SelfRegisteredApi(InstanceRegistry instanceRegistry, InstanceFactory instanceFactory) {
+    public SelfRegisteredApi(
+            InstanceRegistry instanceRegistry,
+            InstanceFactory instanceFactory,
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
+            TransactionTemplate transactionTemplate) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
+        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @PostMapping(path = ApiPaths.SelfRegistryApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
 
-        Instance instance = instanceFactory.createInstance(
-                request.getInstanceId(),
-                request.getInstanceName(),
-                request.getDeploymentAt(),
-                Instant.now(),
-                request.getInstanceActuatorUrl(),
-                request.getBasicDiscoveryMetadata());
-        instanceRegistry.register(instance);
+        try {
+            Instance instance = instanceFactory.createInstance(
+                    request.getInstanceId(),
+                    request.getInstanceName(),
+                    request.getDeploymentAt(),
+                    Instant.now(),
+                    request.getInstanceActuatorUrl(),
+                    request.getBasicDiscoveryMetadata());
 
-        return ResponseEntity.noContent().build();
+            transactionTemplate.executeWithoutResult(_ -> {
+                instanceRegistry.reload(instance);
+                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
+            });
+
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException iae) {
+            log.warn("Unable to process self-registration request from '{}'", request.getInstanceName(), iae);
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

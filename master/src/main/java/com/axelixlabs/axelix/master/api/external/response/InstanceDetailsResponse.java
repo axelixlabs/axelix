@@ -20,8 +20,6 @@ package com.axelixlabs.axelix.master.api.external.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.Insights;
-
 /**
  * The profile of a given details.
  *
@@ -41,8 +39,7 @@ public record InstanceDetailsResponse(
         RuntimeProfile runtime,
         SpringProfile spring,
         @Nullable BuildProfile build,
-        OSProfile os,
-        Insights insights) {
+        OSProfile os) {
 
     /**
      * The profile of a given build.

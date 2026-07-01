@@ -8,7 +8,7 @@ axelix:
           heartbeat-timeout: 45s
           schedule: "0 * * * * *"
       auto:
-        enabled: false
+        enabled: true
         broadcast:
           schedule: "0 * * * * *"
         platform: kubernetes
@@ -16,8 +16,8 @@ axelix:
           # Should be provided by the local-launch configuration
           kube-apiserver-url:
           # Should be set-up in local .env file or by any other means
-          sa-token-path: ${SA_TOKEN_PATH:}
-          ca-cert-path: ${CA_CERT_PATH:}
+          sa-token-path: ${SA_TOKEN_PATH:/home/mpolivaha/OpenSource/axelix/master/local/sa-token}
+          ca-cert-path: ${CA_CERT_PATH:/home/mpolivaha/OpenSource/axelix/master/local/ca-cert}
           filters:
             namespaces: default
     auth:

@@ -6,6 +6,8 @@ plugins {
 val springBootVersion = "2.7.18"
 val springCloudVersion = "2021.0.9"
 
+val jsonUnitAssertJVersion = "2.38.0"
+
 dependencies {
     // Self
     compileOnly(project(":sbs:starter-domain"))
@@ -22,6 +24,7 @@ dependencies {
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
+    compileOnly("org.springframework.boot:spring-boot-starter-log4j2")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
@@ -40,6 +43,7 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // Test Runtime
 

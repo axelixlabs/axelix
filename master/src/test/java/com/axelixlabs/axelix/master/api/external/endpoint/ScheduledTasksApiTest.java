@@ -322,8 +322,7 @@ public class ScheduledTasksApiTest {
             }
         });
 
-        registry.register(
-                TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -493,7 +492,7 @@ public class ScheduledTasksApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorOnGetAllScheduledTasks() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -527,7 +526,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -570,7 +569,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -611,7 +610,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -652,7 +651,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.register(createInstance(instanceId));
+        registry.reload(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(

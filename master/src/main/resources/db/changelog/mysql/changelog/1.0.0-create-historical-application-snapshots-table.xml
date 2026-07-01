@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="mysql-1.0.0-create-historical-application-snapshots-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="historical_application_snapshots"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="historical_application_snapshots">
+      <column name="group_id" type="VARCHAR(255)">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_historical_application_snapshots"/>
+      </column>
+      <column name="artifact_id" type="VARCHAR(255)">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_historical_application_snapshots"/>
+      </column>
+      <column name="date" type="DATE">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_historical_application_snapshots"/>
+      </column>
+      <column name="app_cds_enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="aot_cache_enabled" type="BOOLEAN">
+        <constraints nullable="true"/>
+      </column>
+      <column name="gc_logging_enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="gc_in_use" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="compact_object_headers_enabled" type="BOOLEAN">
+        <constraints nullable="true"/>
+      </column>
+      <column name="osiv_enabled" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

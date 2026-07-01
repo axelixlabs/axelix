@@ -22,13 +22,14 @@ import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
  *                                managed by this Axelix Master.
+ * @param applicationId           The id of the application this instance belongs to (groupId + artifactId). Shared by
+ *                                all the instances of the same application. Mandatory.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
  * @param javaVersion             Version of the Java Platform used inside the service
@@ -42,11 +43,11 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param memoryUsage             Memory usage of the given instance
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
- * @param insights                Insight information discovered for this service, like AOT Cache, AppCDS, OSIV etc.
  */
 @Table("instances")
 public record Instance(
         @Id InstanceId id,
+        @Embedded.Empty ApplicationId applicationId,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -59,12 +60,12 @@ public record Instance(
         @Nullable Instant latestHeartBeat,
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
-        String actuatorUrl,
-        @Column("insights") Insights insights) {
+        String actuatorUrl) {
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
                 this.id,
+                this.applicationId,
                 this.name,
                 this.serviceVersion,
                 this.javaVersion,
@@ -77,8 +78,7 @@ public record Instance(
                 this.latestHeartBeat,
                 instanceStatus,
                 this.memoryUsage,
-                this.actuatorUrl,
-                this.insights);
+                this.actuatorUrl);
     }
 
     public enum InstanceStatus {

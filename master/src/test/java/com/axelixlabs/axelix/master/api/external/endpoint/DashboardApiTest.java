@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -159,7 +158,7 @@ public class DashboardApiTest {
         deRegisterAll();
 
         // Register instances with different versions and statuses
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance1Id,
                 "http://example.com/1",
                 "test-name",
@@ -168,10 +167,9 @@ public class DashboardApiTest {
                 "3.5.2",
                 "6.0.2",
                 "BellSoft",
-                null,
-                Insights.empty()));
+                null));
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance2Id,
                 "http://example.com/2",
                 "test-name",
@@ -180,10 +178,9 @@ public class DashboardApiTest {
                 "3.5.1",
                 "6.0.1",
                 "BellSoft",
-                "1.9.0",
-                Insights.empty()));
+                "1.9.0"));
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.reload(TestObjectFactory.createInstance(
                 instance3Id,
                 "http://example.com/3",
                 "test-name",
@@ -192,8 +189,7 @@ public class DashboardApiTest {
                 "2.7.0",
                 "5.3.0",
                 "BellSoft",
-                null,
-                Insights.empty()));
+                null));
     }
 
     @AfterEach
@@ -231,7 +227,7 @@ public class DashboardApiTest {
     void shouldReturnDashboardWithUnknownStatusInstances() {
         // given.
         String unknownInstanceId = UUID.randomUUID().toString();
-        registry.register(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
+        registry.reload(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
 
         try {
             // when.

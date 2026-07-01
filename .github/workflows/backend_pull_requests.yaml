@@ -4,11 +4,14 @@ on:
   pull_request:
     branches: [ master ]
     paths:
-      # Build logic, and application modules
+      # Backend modules
       - 'master/**'
       - '!master/front-end/**'
       - 'sbs/**'
       - 'common/**'
+
+      # Playground projects
+      - 'playgrounds/**'
 
       # Core Gradle build configuration
       - 'buildSrc/**'
@@ -18,6 +21,7 @@ on:
       - 'gradle.properties'
       - 'gradlew'
       - 'gradlew.bat'
+      - 'Makefile'
 
       # Code quality, formatting, and license configurations
       - 'pmd.ruleset.xml'
@@ -56,7 +60,57 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Java 25 will be installed at this step.
       - name: Build Backend
         uses: ./.github/actions/build-master
         with:
           gradle-cache-encryption-key: ''
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
+      # Starting build playground projects
+      - name: Detect Changed Modules
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            sb2_specific:
+              - 'sbs/axelix-spring-boot-2-starter/**'
+              - 'playgrounds/spring-petclinic-maven-sb-2/**'
+            
+            sb3_specific:
+              - 'sbs/axelix-spring-boot-3-starter/**'
+              - 'playgrounds/feature-service-maven-sb-3/**'
+            
+            global_trigger:
+              - 'common/**'
+              - 'sbs/starter-domain/**'
+              - 'buildSrc/**'
+              - 'gradle/**'
+              - 'build.gradle.kts'
+              - 'settings.gradle.kts'
+              - 'gradle.properties'
+              - '.github/workflows/**'
+              - 'Makefile'
+          
+      - name: Run Conditional Playground Build via Make
+        env:
+          # Required variables for playground builds
+          AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
+          AXELIX_SBS_AUTH_JWT_SIGNING_KEY: ${{ env.SANDBOX_JWT_SIGNING_KEY }}
+        run: |
+          SHOULD_BUILD_SB2="false"
+          if [ "${{ steps.filter.outputs.sb2_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
+            SHOULD_BUILD_SB2="true"
+          fi
+          
+          SHOULD_BUILD_SB3="false"
+          if [ "${{ steps.filter.outputs.sb3_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
+            SHOULD_BUILD_SB3="true"
+          fi
+
+          make build-playground BUILD_SB2="$SHOULD_BUILD_SB2"
+          make build-playground BUILD_SB3="$SHOULD_BUILD_SB3"

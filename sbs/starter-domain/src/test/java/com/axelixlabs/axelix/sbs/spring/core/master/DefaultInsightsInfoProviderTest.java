@@ -26,16 +26,17 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.AOT_CACHE;
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.APP_CDS;
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.COMPACT_OBJECT_HEADERS;
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOGGING_ENABLED;
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.GC_LOG_FILE_SPECIFIED;
-import static com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider.OSIV;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.APP_CDS;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.COMPACT_OBJECT_HEADERS;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.GC_LOGGING_ENABLED;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.GC_LOG_FILE_SPECIFIED;
+import static com.axelixlabs.axelix.common.domain.insights.FeatureId.OSIV;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -143,16 +144,16 @@ class DefaultInsightsInfoProviderTest {
         assertFeatureEnabled(insights.getSpringFramework(), OSIV, true);
     }
 
-    private static void assertFeatureEnabled(List<InsightFeature> features, String name, boolean enabled) {
-        InsightFeature feature = findByName(features, name);
+    private static void assertFeatureEnabled(List<InsightFeature> features, FeatureId featureId, boolean enabled) {
+        InsightFeature feature = findByFeatureId(features, featureId);
 
         assertThat(feature).isNotNull();
         assertThat(feature.isEnabled()).isEqualTo(enabled);
     }
 
-    private static InsightFeature findByName(List<InsightFeature> features, String name) {
+    private static InsightFeature findByFeatureId(List<InsightFeature> features, FeatureId featureId) {
         return features.stream()
-                .filter(f -> name.equals(f.getName()))
+                .filter(f -> featureId.getId().equals(f.getFeatureId()))
                 .findFirst()
                 .orElse(null);
     }

@@ -27,8 +27,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 /**
  * API for rendering the dashboard.
@@ -40,9 +43,13 @@ import com.axelixlabs.axelix.master.service.DashboardService;
 public class DashboardApi {
 
     private final DashboardService dashboardService;
+    private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
 
-    public DashboardApi(DashboardService dashboardService) {
+    public DashboardApi(
+            DashboardService dashboardService,
+            DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService) {
         this.dashboardService = dashboardService;
+        this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
     }
 
     @DefaultApiResponse(summary = "Retrieve information about the entire ecosystem to render the dashboard")
@@ -56,5 +63,32 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.MAIN)
     public DashboardResponse getDashboard() {
         return dashboardService.getDashboardInfo();
+    }
+
+    @DefaultApiResponse(summary = "Retrieve the aggregated Java/JVM features adoption across the entire ecosystem")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = JavaDashboardResponse.class)))
+    @GetMapping(path = ApiPaths.DashboardApi.JAVA)
+    public JavaDashboardResponse getJavaDashboard() {
+        return databaseHistoricalApplicationSnapshotService.getJavaDashboard();
+    }
+
+    @DefaultApiResponse(
+            summary = "Retrieve the aggregated Spring Framework features adoption across the entire ecosystem")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SpringFrameworkDashboardResponse.class)))
+    @GetMapping(path = ApiPaths.DashboardApi.SPRING_FRAMEWORK)
+    public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
+        return databaseHistoricalApplicationSnapshotService.getSpringFrameworkDashboard();
     }
 }

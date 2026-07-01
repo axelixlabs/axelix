@@ -57,6 +57,8 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
             {
               "version": "1.1.3",
               "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "com.axelixlabs",
+              "artifactId" : "axelix-sbs",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "#{json-unit.ignore}",
               "softwareVersions" : {
@@ -72,19 +74,19 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
               "insights" : {
                 "hotSpot" : {
                   "projectLeyden" : [
-                    { "name" : "AppCDS", "enabled" : true },
-                    { "name" : "AotCache", "enabled" : false }
+                    { "featureId" : "AppCDS", "enabled" : true },
+                    { "featureId" : "AotCache", "enabled" : false }
                   ],
                   "gc" : [
-                    { "name" : "GCLoggingEnabled", "enabled" : true },
-                    { "name" : "GCLogFileSpecified", "enabled" : false }
+                    { "featureId" : "GCLoggingEnabled", "enabled" : true },
+                    { "featureId" : "GCLogFileSpecified", "enabled" : false }
                   ],
                   "projectLilliputh" : [
-                    { "name" : "CompactObjectHeaders", "enabled" : true }
+                    { "featureId" : "CompactObjectHeaders", "enabled" : true }
                   ]
                 },
                 "springFramework" : [
-                  { "name" : "OSIV", "enabled" : false }
+                  { "featureId" : "OSIV", "enabled" : false }
                 ]
               }
             }

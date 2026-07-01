@@ -17,11 +17,14 @@ on:
       # Docker
       - 'Dockerfile'
 
-      # Build logic, and application modules
+      # Application modules
       - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
       - 'common/**'
       - 'master/**'
       - 'sbs/**'
+
+      # Playground projects
+      - 'playgrounds/**'
 
       # Core Gradle build configuration
       - 'buildSrc/**'
@@ -31,6 +34,7 @@ on:
       - 'gradle.properties'
       - 'gradlew'
       - 'gradlew.bat'
+      - 'Makefile'
 
       # Code quality, formatting, and license configurations
       - 'pmd.ruleset.xml'
@@ -71,6 +75,7 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
+      # Java 25 will be installed at this step.
       - name: Build Backend
         uses: ./.github/actions/build-master
         with:
@@ -143,6 +148,29 @@ jobs:
             --set axelix.master.discovery.selfRegistration.enabled=true \
             --install axelix-master . \
             -f values.yaml
+          
+      - name: Build Playgrounds via Make
+        env:
+          AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
+          AXELIX_SBS_AUTH_JWT_SIGNING_KEY: $SANDBOX_JWT_SIGNING_KEY
+        run: |
+          make build-playground BUILD_ALL_PLAYGROUNDS="true"
+
+      - name: Deploy Playground Petclinic Maven SB 2
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/spring-petclinic-maven-sb-2
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/spring-petclinic-sb-2
+          image-tag: petclinic-maven-sb-2:2.7.18-SNAPSHOT
+          helm-release: petclinic-maven-sb-2
+
+      - name: Deploy Playground Feature Service Maven SB 3
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/feature-service-maven-sb-3
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/feature-service-sb-3
+          image-tag: feature-service-maven-sb-3:0.0.2-SNAPSHOT
+          helm-release: feature-service-maven-sb-3
 
   dispatch:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
@@ -151,9 +179,7 @@ jobs:
       matrix:
         playground_repo: [
           'axelixlabs/notification-service',
-          'axelixlabs/feature-service',
           'axelixlabs/spring-petclinic',
-          'axelixlabs/spring-petclinic-sb-2'
         ]
     runs-on: ubuntu-latest
     steps:
