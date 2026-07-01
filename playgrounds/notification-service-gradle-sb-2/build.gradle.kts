@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.spring") version "2.2.20"
     id("org.springframework.boot") version "2.7.18"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.gorylenko.gradle-git-properties") version "2.5.3"
+    id("com.gorylenko.gradle-git-properties") version "4.0.1"
     id("com.diffplug.spotless") version "8.0.0"
     id("org.cyclonedx.bom") version "2.3.1"
 }
@@ -36,6 +36,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url = uri("https://repo.spring.io/milestone") }
 }
@@ -48,7 +49,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M2") {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-SNAPSHOT") {
         isChanging = true
     }
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -67,6 +68,10 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:${property("testcontainers.version")}")
     testImplementation("org.testcontainers:kafka:${property("testcontainers.version")}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.bootJar {
+    archiveFileName = "notification-service-0.0.2-SNAPSHOT.jar"
 }
 
 springBoot {

@@ -52,10 +52,6 @@ jobs:
 
   backend-build:
     runs-on: ubuntu-latest
-    env:
-      NEXUS_USER: ${{ secrets.NEXUS_USER }}
-      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-      NEXUS_URL: ${{ secrets.NEXUS_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -66,10 +62,27 @@ jobs:
         with:
           gradle-cache-encryption-key: ''
 
-      - name: Loading Secrets
-        uses: ./.github/actions/bitwarden
+      # Set up Extra JDKs for Playgrounds
+      - name: Set up JDK 17 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-17
         with:
-          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+          java-version: '17'
+          distribution: 'liberica'
+
+      - name: Set up JDK 21 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-21
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+
+      - name: Set up JDK 24 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-24
+        with:
+          java-version: '24'
+          distribution: 'liberica'
 
       # Starting build playground projects
       - name: Detect Changed Modules
@@ -77,15 +90,17 @@ jobs:
         id: filter
         with:
           filters: |
-            sb2_specific:
+            sb2_specific_trigger:
               - 'sbs/axelix-spring-boot-2-starter/**'
               - 'playgrounds/spring-petclinic-maven-sb-2/**'
+              - 'playgrounds/notification-service-gradle-sb-2/**'
             
-            sb3_specific:
+            sb3_specific_trigger:
               - 'sbs/axelix-spring-boot-3-starter/**'
+              - 'playgrounds/spring-petclinic-gradle-sb-3/**'
               - 'playgrounds/feature-service-maven-sb-3/**'
             
-            global_trigger:
+            sbs_global_trigger:
               - 'common/**'
               - 'sbs/starter-domain/**'
               - 'buildSrc/**'
@@ -98,19 +113,22 @@ jobs:
           
       - name: Run Conditional Playground Build via Make
         env:
-          # Required variables for playground builds
-          AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
-          AXELIX_SBS_AUTH_JWT_SIGNING_KEY: ${{ env.SANDBOX_JWT_SIGNING_KEY }}
+          SB2_CHANGE_TRIGGER: ${{ steps.filter.outputs.sb2_specific_trigger }}
+          SB3_CHANGE_TRIGGER: ${{ steps.filter.outputs.sb3_specific_trigger }}
+          GLOBAL_CHANGE_TRIGGER: ${{ steps.filter.outputs.sbs_global_trigger }}
+
+          JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
+          JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
+          JAVA_24_HOME: ${{ steps.setup-java-24.outputs.path }}
         run: |
           SHOULD_BUILD_SB2="false"
-          if [ "${{ steps.filter.outputs.sb2_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
+          if [ "$SB2_CHANGE_TRIGGER" = "true" ] || [ "$GLOBAL_CHANGE_TRIGGER" = "true" ]; then
             SHOULD_BUILD_SB2="true"
           fi
           
           SHOULD_BUILD_SB3="false"
-          if [ "${{ steps.filter.outputs.sb3_specific }}" = "true" ] || [ "${{ steps.filter.outputs.global_trigger }}" = "true" ]; then
+          if [ "$SB3_CHANGE_TRIGGER" = "true" ] || [ "$GLOBAL_CHANGE_TRIGGER" = "true" ]; then
             SHOULD_BUILD_SB3="true"
           fi
 
-          make build-playground BUILD_SB2="$SHOULD_BUILD_SB2"
-          make build-playground BUILD_SB3="$SHOULD_BUILD_SB3"
+          make build-playground BUILD_SB2="$SHOULD_BUILD_SB2" BUILD_SB3="$SHOULD_BUILD_SB3"

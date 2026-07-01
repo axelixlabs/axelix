@@ -53,13 +53,6 @@ jobs:
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
-      # We need Nexus so that the playground repos have the place to pull the dependency from
-      # These are needed in order to publish the final build artifacts into Nexus package registry
-      NEXUS_USER: ${{ secrets.NEXUS_USER }}
-      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-      NEXUS_URL: ${{ secrets.NEXUS_URL }}
-      NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
-
       # OIDC Related settings
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED: true
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI: ${{ secrets.OIDC_GOOGLE_ISSUER_URL }}
@@ -148,52 +141,73 @@ jobs:
             --set axelix.master.discovery.selfRegistration.enabled=true \
             --install axelix-master . \
             -f values.yaml
+
+      # Set up Extra JDKs for Playgrounds
+      - name: Set up JDK 17 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-17
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+
+      - name: Set up JDK 21 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-21
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+
+      - name: Set up JDK 24 for Playgrounds
+        uses: actions/setup-java@v4
+        id: setup-java-24
+        with:
+          java-version: '24'
+          distribution: 'liberica'
           
-      - name: Build Playgrounds via Make
+      - name: Build Playgrounds
         env:
-          AXELIX_SBS_AUTH_JWT_ALGORITHM: HMAC512
-          AXELIX_SBS_AUTH_JWT_SIGNING_KEY: $SANDBOX_JWT_SIGNING_KEY
+          JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
+          JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
+          JAVA_24_HOME: ${{ steps.setup-java-24.outputs.path }}
         run: |
           make build-playground BUILD_ALL_PLAYGROUNDS="true"
 
-      - name: Deploy Playground Petclinic Maven SB 2
+      - name: Deploy Playground Spring Petclinic Maven SB 2
+        env:
+          APP_NAME: spring-petclinic-maven-sb-2
         uses: ./.github/actions/deploy-playground
         with:
-          working-directory: playgrounds/spring-petclinic-maven-sb-2
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/spring-petclinic-sb-2
-          image-tag: petclinic-maven-sb-2:2.7.18-SNAPSHOT
-          helm-release: petclinic-maven-sb-2
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:2.7.18-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}
+
+      - name: Deploy Playground Notification Service Gradle SB 2
+        env:
+          APP_NAME: notification-service-gradle-sb-2
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Feature Service Maven SB 3
+        env:
+          APP_NAME: feature-service-maven-sb-3
         uses: ./.github/actions/deploy-playground
         with:
-          working-directory: playgrounds/feature-service-maven-sb-3
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/feature-service-sb-3
-          image-tag: feature-service-maven-sb-3:0.0.2-SNAPSHOT
-          helm-release: feature-service-maven-sb-3
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}
 
-  dispatch:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
-    needs: [build-deploy-source]
-    strategy:
-      matrix:
-        playground_repo: [
-          'axelixlabs/notification-service',
-          'axelixlabs/spring-petclinic',
-        ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Loading Secrets
-        uses: ./.github/actions/bitwarden
+      - name: Deploy Playground Spring Petclinic Gradle SB 3
+        env:
+          APP_NAME: spring-petclinic-gradle-sb-3
+        uses: ./.github/actions/deploy-playground
         with:
-          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v4
-        with:
-          token: ${{ env.GITHUB_MASTER_ACCESS_TOKEN }}
-          repository: ${{ matrix.playground_repo }}
-          event-type: monorepo-backend-updated
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:3.5.0-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}

@@ -2,7 +2,7 @@ FROM eclipse-temurin:17
 
 WORKDIR /app
 
-COPY target/spring-petclinic-3.5.0-SNAPSHOT.jar /app/petclinic.jar
+COPY build/libs/spring-petclinic-3.5.0-SNAPSHOT.jar /app/petclinic.jar
 
 EXPOSE 8080
 
