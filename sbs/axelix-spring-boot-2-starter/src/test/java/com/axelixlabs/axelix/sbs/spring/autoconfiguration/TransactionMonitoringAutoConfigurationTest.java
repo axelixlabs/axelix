@@ -32,6 +32,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
@@ -43,8 +45,6 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringS
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
 
 /**
  * Integration tests for {@link TransactionMonitoringAutoConfiguration}
@@ -81,25 +81,23 @@ class TransactionMonitoringAutoConfigurationTest {
 
         contextRunner
                 .withBean(EntityManagerFactory.class, () -> mockFactory)
-                .run(context -> assertThat(context)
-                        .hasSingleBean(
-                                LogbackInMemoryPaginationAppenderConfiguration
-                                        .class));
+                .run(context ->
+                        assertThat(context).hasSingleBean(LogbackInMemoryPaginationAppenderConfiguration.class));
     }
 
     @Test // GH-1251
     @Disabled(
-        "TODO: We need to figure out how to run tests with log4j2, maybe we can create a new gradle test task or smth")
+            "TODO: We need to figure out how to run tests with log4j2, maybe we can create a new gradle test task or smth")
     void shouldActivateLog4j2Configuration_whenLog4j2IsTheDetectedLoggingSystemBySpringBoot() {
         contextRunner
-            .withBean(EntityManagerFactory.class, () -> Mockito.mock(EntityManagerFactory.class))
-            .withBean(
-                LoggingSystem.class,
-                () -> new Log4J2LoggingSystem(getClass().getClassLoader()))
-            .run(context -> {
-                assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
-                assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderConfiguration.class);
-            });
+                .withBean(EntityManagerFactory.class, () -> Mockito.mock(EntityManagerFactory.class))
+                .withBean(
+                        LoggingSystem.class,
+                        () -> new Log4J2LoggingSystem(getClass().getClassLoader()))
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
+                    assertThat(context).hasSingleBean(Log4j2InMemoryPaginationAppenderConfiguration.class);
+                });
     }
 
     @Test // GH-1251

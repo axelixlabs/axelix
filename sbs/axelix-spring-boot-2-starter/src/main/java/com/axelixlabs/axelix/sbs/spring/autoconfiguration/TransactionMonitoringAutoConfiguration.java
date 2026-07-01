@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnLoggingSystem;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.Log4j2InMemoryPaginationAppenderRegistrar;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -40,6 +38,8 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringE
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnHibernateActive;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnLoggingSystem;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
@@ -114,10 +114,10 @@ public class TransactionMonitoringAutoConfiguration {
     @ConditionalOnHibernateActive
     @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOGBACK)
     @ConditionalOnProperty(
-        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
-        name = "enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
     static class LogbackInMemoryPaginationAppenderConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)
@@ -130,10 +130,10 @@ public class TransactionMonitoringAutoConfiguration {
     @ConditionalOnHibernateActive
     @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOG4J2)
     @ConditionalOnProperty(
-        prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
-        name = "enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
     static class Log4j2InMemoryPaginationAppenderConfiguration {
 
         @EventListener(ApplicationReadyEvent.class)

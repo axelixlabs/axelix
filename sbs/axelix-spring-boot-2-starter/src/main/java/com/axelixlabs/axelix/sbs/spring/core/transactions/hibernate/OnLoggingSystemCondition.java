@@ -17,13 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate;
 
+import java.util.Map;
+
 import org.slf4j.ILoggerFactory;
+
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import java.util.Map;
 
 /**
  * {@link Condition} implementation that checks if the active SLF4J {@link ILoggerFactory}
@@ -37,9 +38,9 @@ import java.util.Map;
 public class OnLoggingSystemCondition implements Condition {
 
     private static final String LOGBACK_LOGGING_SYSTEM_CLASS_NAME =
-        "org.springframework.boot.logging.logback.LogbackLoggingSystem";
+            "org.springframework.boot.logging.logback.LogbackLoggingSystem";
     private static final String LOG4J2_LOGGING_SYSTEM_FULL_CLASS_NAME =
-        "org.springframework.boot.logging.log4j2.Log4J2LoggingSystem";
+            "org.springframework.boot.logging.log4j2.Log4J2LoggingSystem";
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
