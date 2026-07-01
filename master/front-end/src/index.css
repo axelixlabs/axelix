@@ -52,10 +52,10 @@ ol {
 a {
     text-decoration: none;
     color: inherit;
-}
 
-a:hover {
-    color: var(--axelix-primary-green);
+    &:hover {
+        color: var(--axelix-primary-green);
+    }
 }
 
 .MainContainer {
