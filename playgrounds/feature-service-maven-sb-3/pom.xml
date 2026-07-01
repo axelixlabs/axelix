@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.axelixlabs</groupId>
             <artifactId>axelix-spring-boot-3-starter</artifactId>
-            <version>1.0.0-M2</version>
+            <version>1.0.0-M3-SNAPSHOT</version>
         </dependency>
 
         <dependency>

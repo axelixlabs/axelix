@@ -11,10 +11,11 @@ plugins {
   id("org.cyclonedx.bom") version "2.3.1"
   id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
+  id("com.gorylenko.gradle-git-properties") version "4.0.1"
 }
 
 group = "org.springframework.samples"
-version = "3.5.0"
+version = "3.5.0-SNAPSHOT"
 
 java {
   toolchain {
@@ -23,6 +24,7 @@ java {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 
@@ -31,12 +33,16 @@ val webjarsLocatorLiteVersion by ext("1.1.0")
 val webjarsFontawesomeVersion by ext("4.7.0")
 val webjarsBootstrapVersion by ext("5.3.6")
 
+gitProperties {
+    failOnNoGitDirectory = false
+}
+
 configurations.all {
   resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
 }
 
 dependencies {
-  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M2") {
+  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M3-SNAPSHOT") {
     isChanging = true
   }
   implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -82,6 +88,10 @@ tasks.named<Checkstyle>("checkstyleNohttp") {
 tasks.wrapper {
   gradleVersion = "8.14.3"
   distributionType = Wrapper.DistributionType.ALL
+}
+
+tasks.bootJar {
+    archiveFileName = "spring-petclinic-3.5.0-SNAPSHOT.jar"
 }
 
 spotless {

@@ -57,18 +57,3 @@ runs:
         path: 'build/reports/spring-test-profiler'
         retention-days: 3
         if-no-files-found: ignore
-
-    - name: Download and trust Nexus SSL certificate for Gradle
-      if: ${{ inputs.deploy-to-nexus == 'true' }}
-      run: |
-        TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
-        openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
-        sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass changeit -noprompt
-            
-        echo "org.gradle.jvmargs=-Djavax.net.ssl.trustStore=$TRUSTSTORE -Djavax.net.ssl.trustStorePassword=changeit" >> $HOME/.gradle/gradle.properties
-      shell: bash
-
-    - name: Publish Libraries to Nexus
-      if: ${{ inputs.deploy-to-nexus == 'true' }}
-      run: ./gradlew publishMainPublicationToNexusAxelixRepository
-      shell: bash
