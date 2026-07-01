@@ -18,6 +18,7 @@
 import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 
+import { EnterpriseFeature } from "components";
 import { EMCPToolStatus, type IMCPTool } from "models";
 
 import { MCPCardDescription } from "../MCPCardDescription";
@@ -53,28 +54,30 @@ export const MCPCard = ({ mcpTool }: IProps) => {
 
     return (
         <>
-            <div className={styles.Card}>
-                <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
-                    <Tooltip title={isEllipsis ? title : undefined}>
-                        <div ref={textRef} className={styles.Title}>
-                            {title}
-                        </div>
-                    </Tooltip>
-                    <Badge
-                        color={isEnabled ? "#00ab55" : "#ff000a"}
-                        styles={{
-                            indicator: {
-                                width: "8px",
-                                height: "8px",
-                            },
-                        }}
-                    />
+            <EnterpriseFeature docsHref="https://axelix.io/docs/product/introduction" className={styles.CardWrapper}>
+                <div className={styles.Card}>
+                    <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
+                        <Tooltip title={isEllipsis ? title : undefined}>
+                            <div ref={textRef} className={styles.Title}>
+                                {title}
+                            </div>
+                        </Tooltip>
+                        <Badge
+                            color={isEnabled ? "#00ab55" : "#ff000a"}
+                            styles={{
+                                indicator: {
+                                    width: "8px",
+                                    height: "8px",
+                                },
+                            }}
+                        />
+                    </div>
+
+                    <MCPCardDescription description={description} />
+
+                    <MCPCardFooter annotations={annotations} />
                 </div>
-
-                <MCPCardDescription description={description} />
-
-                <MCPCardFooter annotations={annotations} />
-            </div>
+            </EnterpriseFeature>
         </>
     );
 };
