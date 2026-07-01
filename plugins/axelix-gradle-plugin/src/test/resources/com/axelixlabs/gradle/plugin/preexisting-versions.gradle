@@ -1,0 +1,26 @@
+plugins {
+    id 'com.axelixlabs.axelix'
+}
+apply plugin: 'java'
+
+repositories { mavenCentral() }
+
+dependencies {
+    // testRuntimeOnly mirrors how the plugin declares the profiler.
+    testRuntimeOnly 'digital.pragmatech.testing:spring-test-profiler:0.1.1'
+    // implementation exercises the extended-configuration lookup path; the version
+    // is at or above the plugin's minimum, so it must be left untouched.
+    implementation 'org.thymeleaf:thymeleaf:3.1.5.RELEASE'
+}
+
+// Prints the *declared* modules (not resolved files) of the test runtime
+// classpath, so the plugin's own pinned versions only appear if it added
+// them. allDependencies omits transitives, so the thymeleaf the profiler
+// pulls in does not muddy the assertion.
+task printDeclaredDeps {
+    doLast {
+        configurations.testRuntimeClasspath.allDependencies.each { d ->
+            println 'DEP>> ' + d.group + ':' + d.name + ':' + d.version
+        }
+    }
+}

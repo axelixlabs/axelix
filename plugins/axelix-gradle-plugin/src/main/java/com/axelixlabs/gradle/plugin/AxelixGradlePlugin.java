@@ -28,8 +28,7 @@ import org.gradle.api.Project;
  * wiring, no sourceSets/conventions access ({@code JavaPluginConvention} was removed in Gradle 9,
  * {@code JavaPluginExtension.getSourceSets()} was only added in 7.1).
  *
- * <p>The plugin defers all work until the {@code java} plugin is applied, because the
- * {@code testRuntimeOnly} configuration only exists once it is.
+ * @author Artemiy Degtyarev
  */
 public class AxelixGradlePlugin implements Plugin<Project> {
 
@@ -39,6 +38,12 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     }
 
     private void configure(Project project) {
-        // Configuration is added incrementally in subsequent changes.
+        InternalConfiguration configuration = new InternalConfiguration(project);
+
+        TestClasspathDependencyApplier testClasspathDependencyApplier = configuration.getTestClasspathDependencyApplier();
+        project.getConfigurations().getByName("testRuntimeClasspath").withDependencies(testClasspathDependencyApplier);
+
+        CompileClasspathDependencyApplier compileClasspathDependencyApplier = configuration.getCompileClasspathDependencyApplier();
+        project.getConfigurations().getByName("compileClasspath").withDependencies(compileClasspathDependencyApplier);
     }
 }
