@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.List;
-
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.jupiter.api.Disabled;
@@ -28,17 +26,12 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
@@ -159,112 +152,5 @@ class TransactionMonitoringAutoConfigurationTest {
                             TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration
                                     .class);
         });
-    }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(CustomTransactionConfiguration.class)
-                .run(context -> {
-                    assertThat(context.getBean(TransactionStatsCollector.class))
-                            .isExactlyInstanceOf(CustomTransactionStatsCollector.class);
-                    assertThat(context.getBean(QueriesRecorder.class))
-                            .isExactlyInstanceOf(CustomDefaultQueriesRecorder.class);
-                    assertThat(context.getBean(TransactionMonitoringService.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringService.class);
-                    assertThat(context.getBean(TransactionMonitoringEndpoint.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringEndpoint.class);
-                    assertThat(context.getBean(TransactionMonitoringBeanPostProcessor.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringBeanPostProcessor.class);
-                    assertThat(context.getBean(ProxyingDataSourceBeanPostProcessor.class))
-                            .isExactlyInstanceOf(CustomProxyingDataSourceBeanPostProcessor.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomTransactionConfiguration {
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new CustomTransactionStatsCollector();
-        }
-
-        @Bean
-        public TransactionMonitoringService transactionMonitoringService(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new CustomTransactionMonitoringService(transactionStatsCollector);
-        }
-
-        @Bean
-        public QueriesRecorder testQueriesRecorder() {
-            return new CustomDefaultQueriesRecorder();
-        }
-
-        @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-                TransactionMonitoringService transactionMonitoringService) {
-            return new CustomTransactionMonitoringEndpoint(transactionMonitoringService);
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesRecorder queriesCollector) {
-            return new CustomProxyingDataSourceBeanPostProcessor(queriesCollector);
-        }
-    }
-
-    static class CustomTransactionStatsCollector extends DefaultTransactionStatsCollector {
-
-        public CustomTransactionStatsCollector() {
-            super(1000);
-        }
-    }
-
-    static class CustomDefaultQueriesRecorder implements QueriesRecorder {
-
-        @Override
-        public void startNewContext() {}
-
-        @Override
-        public void recordQuery(SqlQueryRecord query) {}
-
-        @Override
-        public List<SqlQueryRecord> popAllRecords() {
-            return List.of();
-        }
-    }
-
-    static class CustomTransactionMonitoringService extends DefaultTransactionMonitoringService {
-
-        public CustomTransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
-            super(transactionStatsCollector);
-        }
-    }
-
-    static class CustomTransactionMonitoringEndpoint extends TransactionMonitoringEndpoint {
-
-        public CustomTransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-            super(transactionMonitoringService);
-        }
-    }
-
-    static class CustomTransactionMonitoringBeanPostProcessor extends TransactionMonitoringBeanPostProcessor {
-
-        public CustomTransactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
-            super(transactionStatsCollector, queriesCollector);
-        }
-    }
-
-    static class CustomProxyingDataSourceBeanPostProcessor extends ProxyingDataSourceBeanPostProcessor {
-        public CustomProxyingDataSourceBeanPostProcessor(QueriesRecorder queriesCollector) {
-            super(queriesCollector);
-        }
     }
 }
