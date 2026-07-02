@@ -42,7 +42,6 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
-import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.
@@ -51,15 +50,9 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Mikhail Polivakha
  * @since 22.07.2025
  */
-@AutoConfiguration
+@AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ValidationListener validationListener() {
-        return new ValidationListener();
-    }
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.sbs.auth")
@@ -68,14 +61,12 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
         return new DefaultJwtDecoderService(
                 authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
         return new DefaultJwtEncoderService(
                 authProperties.getJwt().getAlgorithm(),
@@ -84,7 +75,6 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AuthorityResolver authorityResolver() {
         return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
@@ -93,13 +83,11 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public Authorizer authorizer() {
         return new DefaultAuthorizer();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public WebIdentityAccessManager webIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);

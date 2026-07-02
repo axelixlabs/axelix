@@ -17,32 +17,19 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.Optional;
-
-import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,97 +99,5 @@ class JwtAuthAutoConfigurationTest {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
                 });
-    }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomJwtDecoderServiceConfig.class,
-                        CustomAuthorityResolverConfig.class,
-                        CustomAuthorizerConfig.class,
-                        CustomSecurityContextExecutorConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(JwtDecoderService.class))
-                            .isExactlyInstanceOf(CustomJwtDecoderService.class);
-                    assertThat(context.getBean(AuthorityResolver.class))
-                            .isExactlyInstanceOf(CustomAuthorityResolver.class);
-                    assertThat(context.getBean(Authorizer.class)).isExactlyInstanceOf(CustomAuthorizer.class);
-                    assertThat(context.getBean(SecurityContextExecutor.class))
-                            .isExactlyInstanceOf(CustomSecurityContextExecutor.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomJwtDecoderServiceConfig {
-        @Bean
-        public JwtDecoderService jwtDecoderService() {
-            return new CustomJwtDecoderService();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAuthorityResolverConfig {
-        @Bean
-        public AuthorityResolver authorityResolver() {
-            return new CustomAuthorityResolver();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAuthorizerConfig {
-        @Bean
-        public Authorizer authorizer() {
-            return new CustomAuthorizer();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomSecurityContextExecutorConfig {
-        @Bean
-        public SecurityContextExecutor securityContextExecutor() {
-            return new CustomSecurityContextExecutor();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomJwtAuthorizationFilterConfig {
-        @Bean
-        public JwtAuthorizationFilter jwtAuthorizationFilter(
-                WebIdentityAccessManager webIdentityAccessManager,
-                SecurityContextExecutor securityContextExecutor,
-                WebEndpointProperties webEndpointProperties) {
-            return new CustomJwtAuthorizationFilter(
-                    webIdentityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
-        }
-    }
-
-    static class CustomJwtDecoderService extends DefaultJwtDecoderService {
-        public CustomJwtDecoderService() {
-            super(JwtAlgorithm.HMAC512, "secret");
-        }
-    }
-
-    @NullMarked
-    static class CustomAuthorityResolver implements AuthorityResolver {
-
-        @Override
-        public Optional<Authority> resolve(String relativeRequestPath, HttpMethod httpMethod) {
-            return Optional.empty();
-        }
-    }
-
-    static class CustomAuthorizer extends DefaultAuthorizer {}
-
-    static class CustomSecurityContextExecutor extends ThreadLocalSecurityContextExecutor {}
-
-    static class CustomJwtAuthorizationFilter extends JwtAuthorizationFilter {
-
-        public CustomJwtAuthorizationFilter(
-                WebIdentityAccessManager webIdentityAccessManager,
-                SecurityContextExecutor securityContextExecutor,
-                String baseActuatorPath) {
-            super(webIdentityAccessManager, securityContextExecutor, baseActuatorPath);
-        }
     }
 }
