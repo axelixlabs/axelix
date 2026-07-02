@@ -25,7 +25,6 @@ import org.springframework.boot.actuate.autoconfigure.info.InfoContributorAutoCo
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -37,7 +36,6 @@ import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscov
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
@@ -64,37 +62,28 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNul
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
+            LibraryInformationProviderAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
         })
 public class AxelixMetadataEndpointConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixVersionDiscoverer axelixVersionDiscoverer() {
         return new CachingAxelixVersionDiscoverer(new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties"));
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public LibraryInformationProvider libraryInformationProvider() {
-        return new DefaultLibraryInformationProvider();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public OpenSessionInViewStateProvider openSessionInViewStateProvider(
             ConfigurableApplicationContext applicationContext) {
         return new DefaultOpenSessionInViewStateProvider(applicationContext.getBeanFactory());
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public VmOptionsAccessor vmOptionsAccessor() {
         return new VmOptionsAccessor(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public InsightsInfoProvider insightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             GcLogService gcLogService,
@@ -103,7 +92,6 @@ public class AxelixMetadataEndpointConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
@@ -128,7 +116,6 @@ public class AxelixMetadataEndpointConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixMetadataEndpoint axelixMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
         return new AxelixMetadataEndpoint(serviceMetadataAssembler);
     }
