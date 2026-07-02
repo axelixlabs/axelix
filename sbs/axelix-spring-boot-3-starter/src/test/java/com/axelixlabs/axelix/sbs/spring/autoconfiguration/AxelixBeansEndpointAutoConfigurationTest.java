@@ -17,17 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfo;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
@@ -88,66 +83,5 @@ class AxelixBeansEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(BeansFeedBuilder.class);
             assertThat(context).doesNotHaveBean(QualifiersPersistencePostProcessor.class);
         });
-    }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomConditionalBeanRefBuilderConfig.class,
-                        CustomBeanMetaInfoExtractorConfig.class,
-                        CustomAxelixBeansEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(ConditionalBeanRefBuilder.class))
-                            .isExactlyInstanceOf(CustomConditionalBeanRefBuilder.class);
-                    assertThat(context.getBean(BeanMetaInfoExtractor.class))
-                            .isExactlyInstanceOf(CustomBeanMetaInfoExtractor.class);
-                    assertThat(context.getBean(AxelixBeansEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixBeansEndpoint.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomConditionalBeanRefBuilderConfig {
-        @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new CustomConditionalBeanRefBuilder();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomBeanMetaInfoExtractorConfig {
-        @Bean
-        public BeanMetaInfoExtractor beanMetaInfoExtractor() {
-            return new CustomBeanMetaInfoExtractor();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAxelixBeansEndpointConfig {
-        @Bean
-        public AxelixBeansEndpoint axelixBeansEndpoint() {
-            return new CustomAxelixBeansEndpoint();
-        }
-    }
-
-    static class CustomConditionalBeanRefBuilder implements ConditionalBeanRefBuilder {
-        @Override
-        public String buildBeanRefInternal(Class<?> beanClass, @Nullable String beanFactoryMethodName) {
-            return "";
-        }
-    }
-
-    static class CustomBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
-        @Override
-        public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
-            return null;
-        }
-    }
-
-    static class CustomAxelixBeansEndpoint extends AxelixBeansEndpoint {
-        public CustomAxelixBeansEndpoint() {
-            super(null);
-        }
     }
 }

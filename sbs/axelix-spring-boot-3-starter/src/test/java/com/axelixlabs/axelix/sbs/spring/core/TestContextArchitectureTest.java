@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.autoconfigure.data.cassandra.AutoConfigureDataCassandra;
@@ -64,9 +67,6 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-
 /**
  * Tests that check for context pollution in Spring Boot tests
  *
@@ -85,51 +85,50 @@ public class TestContextArchitectureTest {
      * not used in places where they would compromise context reuse or isolation.
      */
     public static final List<Class<? extends Annotation>> RESTRICTED_TYPE_ANNOTATIONS = List.of(
-        ContextConfiguration.class,
-        ActiveProfiles.class,
-        ContextHierarchy.class,
-        TestPropertySource.class,
-        WebAppConfiguration.class,
-        SpringBootTest.class,
-        Import.class,
-        AutoConfigureMockMvc.class,
-        WebMvcTest.class,
-        AutoConfigureWebTestClient.class,
-        DirtiesContext.class,
-        AutoConfigureObservability.class,
-        JsonTest.class,
-        AutoConfigureJsonTesters.class,
-        WebFluxTest.class,
-        GraphQlTest.class,
-        AutoConfigureGraphQlTester.class,
-        DataCassandraTest.class,
-        AutoConfigureDataCassandra.class,
-        DataCouchbaseTest.class,
-        AutoConfigureDataCouchbase.class,
-        DataElasticsearchTest.class,
-        AutoConfigureDataElasticsearch.class,
-        DataJpaTest.class,
-        AutoConfigureDataJpa.class,
-        DataJdbcTest.class,
-        AutoConfigureDataJdbc.class,
-        JdbcTest.class,
-        AutoConfigureJdbc.class,
-        DataR2dbcTest.class,
-        AutoConfigureDataR2dbc.class,
-        JooqTest.class,
-        AutoConfigureJooq.class,
-        DataMongoTest.class,
-        AutoConfigureDataMongo.class,
-        DataNeo4jTest.class,
-        AutoConfigureDataNeo4j.class,
-        DataRedisTest.class,
-        AutoConfigureDataRedis.class,
-        DataLdapTest.class,
-        AutoConfigureDataLdap.class,
-        RestClientTest.class,
-        AutoConfigureMockRestServiceServer.class,
-        AutoConfigureRestDocs.class,
-        WebServiceClientTest.class,
-        ImportAutoConfiguration.class
-    );
+            ContextConfiguration.class,
+            ActiveProfiles.class,
+            ContextHierarchy.class,
+            TestPropertySource.class,
+            WebAppConfiguration.class,
+            SpringBootTest.class,
+            Import.class,
+            AutoConfigureMockMvc.class,
+            WebMvcTest.class,
+            AutoConfigureWebTestClient.class,
+            DirtiesContext.class,
+            AutoConfigureObservability.class,
+            JsonTest.class,
+            AutoConfigureJsonTesters.class,
+            WebFluxTest.class,
+            GraphQlTest.class,
+            AutoConfigureGraphQlTester.class,
+            DataCassandraTest.class,
+            AutoConfigureDataCassandra.class,
+            DataCouchbaseTest.class,
+            AutoConfigureDataCouchbase.class,
+            DataElasticsearchTest.class,
+            AutoConfigureDataElasticsearch.class,
+            DataJpaTest.class,
+            AutoConfigureDataJpa.class,
+            DataJdbcTest.class,
+            AutoConfigureDataJdbc.class,
+            JdbcTest.class,
+            AutoConfigureJdbc.class,
+            DataR2dbcTest.class,
+            AutoConfigureDataR2dbc.class,
+            JooqTest.class,
+            AutoConfigureJooq.class,
+            DataMongoTest.class,
+            AutoConfigureDataMongo.class,
+            DataNeo4jTest.class,
+            AutoConfigureDataNeo4j.class,
+            DataRedisTest.class,
+            AutoConfigureDataRedis.class,
+            DataLdapTest.class,
+            AutoConfigureDataLdap.class,
+            RestClientTest.class,
+            AutoConfigureMockRestServiceServer.class,
+            AutoConfigureRestDocs.class,
+            WebServiceClientTest.class,
+            ImportAutoConfiguration.class);
 }

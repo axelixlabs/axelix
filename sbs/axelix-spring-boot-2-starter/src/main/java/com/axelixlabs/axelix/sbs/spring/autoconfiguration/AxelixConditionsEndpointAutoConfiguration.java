@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -42,13 +41,11 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTarget
 public class AxelixConditionsEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public ConditionalTargetUnwrapper conditionalTargetUnwrapper() {
         return new DefaultConditionalTargetUnwrapper();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ConditionalFeedBuilder conditionalFeedBuilder(
             ConfigurableApplicationContext configurableApplicationContext,
             ConditionalTargetUnwrapper conditionalTargetUnwrapper) {
@@ -56,7 +53,6 @@ public class AxelixConditionsEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
         return new AxelixConditionsEndpoint(conditionalFeedBuilder);
     }
