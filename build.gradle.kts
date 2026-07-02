@@ -231,20 +231,6 @@ configure(starterModules) {
     publishing {
         repositories {
 
-            val nexusUrl = project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL")
-
-            // It may be null in case of launches in the PRs
-            if (!nexusUrl.isNullOrBlank()) {
-                maven {
-                    name = "NexusAxelix"
-                    url = uri(nexusUrl)
-                    credentials {
-                        username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
-                        password = project.findProperty("nexus.password") as String? ?: System.getenv("NEXUS_PASSWORD")
-                    }
-                }
-            }
-
             maven {
                 name = mavenCentral
                 url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")

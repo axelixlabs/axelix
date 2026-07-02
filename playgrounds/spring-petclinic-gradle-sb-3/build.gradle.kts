@@ -22,6 +22,13 @@ java {
     languageVersion.set(JavaLanguageVersion.of(17))
   }
 }
+val javaVersionString =
+    JavaVersion
+        .toVersion(
+            java.toolchain.languageVersion
+                .get()
+                .asInt(),
+        ).toString()
 
 repositories {
   mavenLocal()
@@ -69,6 +76,20 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-docker-compose")
   testImplementation("org.testcontainers:junit-jupiter")
   testImplementation("org.testcontainers:mysql")
+}
+
+springBoot {
+    buildInfo {
+        properties {
+            additional =
+                mapOf(
+                    "encoding.source" to "UTF-8",
+                    "encoding.reporting" to "UTF-8",
+                    "java.source" to javaVersionString,
+                    "java.target" to javaVersionString,
+                )
+        }
+    }
 }
 
 tasks.named<Test>("test") {
