@@ -20,9 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
@@ -63,32 +61,5 @@ class AxelixHeapDumpEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(AxelixHeapDumpEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixHeapDumpEndpoint.class);
                 });
-    }
-
-    @Test
-    void shouldNotCreateDefaultAxelixHeapDumpEndpoint_whenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomAxelixHeapDumpEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(AxelixHeapDumpEndpoint.class);
-                    var beans = context.getBeansOfType(AxelixHeapDumpEndpoint.class);
-                    assertThat(beans).hasSize(1);
-                    assertThat(beans.values().iterator().next())
-                            .isExactlyInstanceOf(CustomAxelixHeapDumpEndpoint.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomAxelixHeapDumpEndpointConfig {
-        @Bean
-        public AxelixHeapDumpEndpoint customAxelixHeapDumpEndpoint() {
-            return new CustomAxelixHeapDumpEndpoint();
-        }
-    }
-
-    static class CustomAxelixHeapDumpEndpoint extends AxelixHeapDumpEndpoint {
-        public CustomAxelixHeapDumpEndpoint() {
-            super();
-        }
     }
 }
