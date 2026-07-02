@@ -26,7 +26,6 @@ import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegi
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
@@ -50,7 +49,6 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.ServiceMetricsGroupsAssembl
 public class AxelixMetricsAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixMetricsEndpoint axelixMetricsEndpoint(
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,
@@ -61,25 +59,21 @@ public class AxelixMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public BytesMemoryBaseUnitValueTransformer bytesMemoryBaseUnitValueTransformer() {
         return new BytesMemoryBaseUnitValueTransformer();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public KilobytesMemoryBaseUnitValueTransformer kilobytesMemoryBaseUnitValueTransformer() {
         return new KilobytesMemoryBaseUnitValueTransformer();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public BaseUnitParser baseUnitParser() {
         return new BaseUnitParser();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ServiceMetricsGroupsAssembler serviceMetricsGroupsAssembler(MeterRegistry registry) {
         return new DefaultServiceMetricsGroupsAssembler(registry);
     }
