@@ -17,20 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.List;
-
 import feign.Feign;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClientFactoryBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpoint;
@@ -103,66 +97,5 @@ class AxelixFeignEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(AxelixFeignEndpoint.class);
             assertThat(context).doesNotHaveBean(FeignClientIntegrationDiscoverer.class);
         });
-    }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomFeignClientIntegrationDiscovererConfig.class, CustomAxelixFeignEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(FeignClientIntegrationDiscoverer.class))
-                            .isExactlyInstanceOf(
-                                    AxelixFeignEndpointAutoConfigurationTest.CustomFeignClientIntegrationDiscoverer
-                                            .class);
-                    assertThat(context.getBean(AxelixFeignEndpoint.class))
-                            .isExactlyInstanceOf(
-                                    AxelixFeignEndpointAutoConfigurationTest.CustomAxelixFeignEndpoint.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomFeignClientIntegrationDiscovererConfig {
-        @Bean
-        public FeignClientIntegrationDiscoverer customFeignClientIntegrationDiscoverer(ApplicationContext context) {
-            return new CustomFeignClientIntegrationDiscoverer(context, new NoOpTestDiscoveryClient());
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAxelixFeignEndpointConfig {
-        @Bean
-        public AxelixFeignEndpoint customAxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
-            return new CustomAxelixFeignEndpoint(discoverer);
-        }
-    }
-
-    static final class CustomAxelixFeignEndpoint extends AxelixFeignEndpoint {
-        CustomAxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
-            super(discoverer);
-        }
-    }
-
-    static final class CustomFeignClientIntegrationDiscoverer extends FeignClientIntegrationDiscoverer {
-        CustomFeignClientIntegrationDiscoverer(ApplicationContext context, DiscoveryClient discoveryClient) {
-            super(context, discoveryClient);
-        }
-    }
-
-    static final class NoOpTestDiscoveryClient implements DiscoveryClient {
-        @Override
-        public String description() {
-            return "test";
-        }
-
-        @Override
-        public List<ServiceInstance> getInstances(String serviceId) {
-            return List.of();
-        }
-
-        @Override
-        public List<String> getServices() {
-            return List.of();
-        }
     }
 }

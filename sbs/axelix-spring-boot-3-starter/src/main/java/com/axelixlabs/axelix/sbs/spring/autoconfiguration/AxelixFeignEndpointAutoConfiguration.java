@@ -24,7 +24,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.FeignClientFactoryBean;
@@ -50,7 +49,6 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryCli
 public class AxelixFeignEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public FeignClientIntegrationDiscoverer feignClientIntegrationDiscoverer(
             ApplicationContext applicationContext, ObjectProvider<DiscoveryClient> discoveryClientProvider) {
         DiscoveryClient discoveryClient = discoveryClientProvider.getIfAvailable(NoOpDiscoveryClient::new);
@@ -58,7 +56,6 @@ public class AxelixFeignEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixFeignEndpoint axelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
         return new AxelixFeignEndpoint(discoverer);
     }
