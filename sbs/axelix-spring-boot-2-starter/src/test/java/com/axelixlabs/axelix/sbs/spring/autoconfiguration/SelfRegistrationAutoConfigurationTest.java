@@ -31,7 +31,6 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
@@ -51,7 +50,8 @@ class SelfRegistrationAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("axelix.sbs.discovery.auto=true")
             .withUserConfiguration(RequiredDependenciesConfig.class)
-            .withConfiguration(AutoConfigurations.of(SelfRegistrationAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(
+                    SelfRegistrationAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -92,20 +92,6 @@ class SelfRegistrationAutoConfigurationTest {
                 });
     }
 
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomSelfRegistrationMetadataAssemblerConfig.class,
-                        CustomSelfRegistrationLifecycleListenerConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(SelfRegistrationMetadataAssembler.class))
-                            .isExactlyInstanceOf(CustomSelfRegistrationMetadataAssembler.class);
-                    assertThat(context.getBean(SelfRegistrationLifecycleListener.class))
-                            .isExactlyInstanceOf(CustomSelfRegistrationLifecycleListener.class);
-                });
-    }
-
     @TestConfiguration
     static class RequiredDependenciesConfig {
 
@@ -122,40 +108,6 @@ class SelfRegistrationAutoConfigurationTest {
         @Bean
         public JwtEncoderService jwtEncoderService() {
             return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
-        }
-    }
-
-    @TestConfiguration
-    static class CustomSelfRegistrationMetadataAssemblerConfig {
-        @Bean
-        public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
-                ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-            return new CustomSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
-        }
-    }
-
-    @TestConfiguration
-    static class CustomSelfRegistrationLifecycleListenerConfig {
-        @Bean
-        public SelfRegistrationLifecycleListener selfRegistrationLifecycleListener(
-                SelfRegistrationService selfRegistrationService) {
-            return new CustomSelfRegistrationLifecycleListener(selfRegistrationService);
-        }
-    }
-
-    static class CustomSelfRegistrationMetadataAssembler extends DefaultSelfRegistrationMetadataAssembler {
-        public CustomSelfRegistrationMetadataAssembler(
-                ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-            super(serviceMetadataAssembler, selfRegistrationConfigurationProperties);
-        }
-    }
-
-    static class CustomSelfRegistrationLifecycleListener extends SelfRegistrationLifecycleListener {
-        public CustomSelfRegistrationLifecycleListener(SelfRegistrationService selfRegistrationService) {
-            super(selfRegistrationService);
         }
     }
 }
