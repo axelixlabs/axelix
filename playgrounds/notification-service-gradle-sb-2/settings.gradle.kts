@@ -1,1 +1,1 @@
-rootProject.name = "notification-service"
+rootProject.name = "notification-service-gradle-sb-2"
