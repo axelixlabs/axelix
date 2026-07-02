@@ -61,7 +61,7 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
@@ -106,7 +106,7 @@ jobs:
         run: docker logout
 
       - name: Checkout helm-charts repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: axelixlabs/helm-charts
           ref: ${{ env.HELM_CHART_BRANCH }}
@@ -114,7 +114,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
-        uses: azure/setup-helm@v5.0.0
+        uses: azure/setup-helm@v5.0.1
         with:
           version: v3.14.0
 
@@ -144,21 +144,21 @@ jobs:
 
       # Set up Extra JDKs for Playgrounds
       - name: Set up JDK 17 for Playgrounds
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         id: setup-java-17
         with:
           java-version: '17'
           distribution: 'liberica'
 
       - name: Set up JDK 21 for Playgrounds
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         id: setup-java-21
         with:
           java-version: '21'
           distribution: 'liberica'
 
       - name: Set up JDK 24 for Playgrounds
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         id: setup-java-24
         with:
           java-version: '24'
