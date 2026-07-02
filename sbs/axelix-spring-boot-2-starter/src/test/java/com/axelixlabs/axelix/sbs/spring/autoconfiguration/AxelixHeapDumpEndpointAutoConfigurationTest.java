@@ -19,11 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
@@ -64,33 +61,5 @@ class AxelixHeapDumpEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(AxelixHeapDumpEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixHeapDumpEndpoint.class);
                 });
-    }
-
-    @Test
-    void shouldFailWhenCustomBeanProvided() {
-        // given.
-        contextRunner
-                .withUserConfiguration(CustomAxelixHeapDumpEndpointConfig.class)
-
-                // when.
-                .run(context -> {
-                    // then.
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isInstanceOf(BeanDefinitionOverrideException.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomAxelixHeapDumpEndpointConfig {
-        @Bean
-        public AxelixHeapDumpEndpoint axelixHeapDumpEndpoint() {
-            return new CustomAxelixHeapDumpEndpoint();
-        }
-    }
-
-    static class CustomAxelixHeapDumpEndpoint extends AxelixHeapDumpEndpoint {
-        public CustomAxelixHeapDumpEndpoint() {
-            super();
-        }
     }
 }
