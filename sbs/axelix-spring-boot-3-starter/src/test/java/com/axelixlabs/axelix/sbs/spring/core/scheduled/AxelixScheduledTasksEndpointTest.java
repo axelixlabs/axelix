@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 import java.time.Instant;
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -52,6 +51,7 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteReques
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;

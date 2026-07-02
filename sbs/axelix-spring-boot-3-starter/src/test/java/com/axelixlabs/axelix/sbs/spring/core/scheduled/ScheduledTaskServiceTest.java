@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -43,6 +42,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
+
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

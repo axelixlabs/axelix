@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +42,8 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;
+
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

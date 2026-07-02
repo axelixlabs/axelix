@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import io.micrometer.core.instrument.MeterRegistry;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +51,7 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
