@@ -69,6 +69,11 @@ abstract class AbstractMasterSharedContextTest {
         }
 
         @Bean
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new DefaultLibraryInformationProvider();
+        }
+
+        @Bean
         public InsightsInfoProvider insightsInfoProvider() {
             return new TestInsightsInfoProvider();
         }

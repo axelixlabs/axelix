@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
@@ -77,6 +78,11 @@ abstract class AbstractDetailsSharedContextTest {
         @Bean
         public GitInformationProvider gitInformationProvider(GitProperties gitProperties) {
             return new CommitIdPluginGitInformationProvider(gitProperties);
+        }
+
+        @Bean
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new DefaultLibraryInformationProvider();
         }
 
         @Bean
