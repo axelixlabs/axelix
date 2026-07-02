@@ -205,7 +205,7 @@ public class LoggersApiAllLoggersTest {
             }
         });
 
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 

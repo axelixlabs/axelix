@@ -102,14 +102,14 @@ public class LoggersApiManagementLoggingLevelTest {
                 assert path != null;
                 invokedPaths.add(path);
 
-                if (path.equals("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level")) {
-                    return new MockResponse().setResponseCode(failingLoggerUpdateStatusCode.get());
-                }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/group/groupName/change-level")) {
                     return new MockResponse();
                 }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/reset.logger.name/reset")) {
                     return new MockResponse();
+                }
+                if (path.equals("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level")) {
+                    return new MockResponse().setResponseCode(failingLoggerUpdateStatusCode.get());
                 }
                 if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level")
                         || path.equals("/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level")) {
@@ -120,11 +120,11 @@ public class LoggersApiManagementLoggingLevelTest {
             }
         });
 
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 siblingInstanceId, mockWebServer.url(siblingInstanceId).toString()));
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 failingInstanceId, mockWebServer.url(failingInstanceId).toString()));
     }
 
@@ -213,7 +213,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_OnGroupName() {
+    void shouldReturnInternalServerError_WhenInvokedOnUnknownInstance() {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
@@ -234,26 +234,8 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    @DisplayName("Should return 400 on EndpointInvocationError")
-    void shouldReturnBadRequest_OnLoggerBulkChangeEndpointInvocationError() {
-        // given.
-        LogLevelLoggerBulkChangeRequest requestBody =
-                new LogLevelLoggerBulkChangeRequest(List.of(failingInstanceId), "logger.name", null, "DEBUG");
-
-        // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNull();
-        assertThat(invokedPaths)
-                .containsExactly("/" + failingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
-    }
-
-    @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_OnResetLoggingLevelByLoggerName() {
+    void shouldReturnInternalServerError_WhenResettingOnUnknonInstance() {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "reset.logger.name";
         registry.reload(createInstance(instanceId));
@@ -309,7 +291,7 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenInstanceIdsAreEmpty() {
+    void givenInstanceIdsAreEmpty_shouldReturnBadRequest_WhenUpdatingLoggingLevelBulk() {
         // given.
         LogLevelLoggerBulkChangeRequest requestBody =
                 new LogLevelLoggerBulkChangeRequest(List.of(), "logger.name", null, "DEBUG");
@@ -324,7 +306,7 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldDeduplicateInstanceIds() {
+    void shouldDeduplicateInstanceIds_WhenUpdatingLoggingLevelBulk() {
         // given.
         LogLevelLoggerBulkChangeRequest requestBody = new LogLevelLoggerBulkChangeRequest(
                 List.of(activeInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
@@ -340,7 +322,7 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenConfiguredLevelIsBlank() {
+    void givenConfiguredLevelIsEmpty_shouldReturnBadRequest__WhenUpdatingLoggingLevelBulk() {
         // given.
         LogLevelLoggerBulkChangeRequest requestBody =
                 new LogLevelLoggerBulkChangeRequest(List.of(activeInstanceId), "logger.name", null, " ");

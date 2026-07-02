@@ -74,9 +74,8 @@ public interface EndpointInvoker {
      * @param endpoint the endpoint that should be invoked.
      * @param payload the HTTP payload (headers, body etc.) to be sent.
      *
-     * @throws PartiallyUpdatedException in case the invocation failed only for some of the requested instances.
-     * @throws BadRequestException in case the invocation failed for all requested instances.
+     * @throws PartiallyUpdatedException in case the invocation failed for some of the requested instances (potentially for everything).
      */
-    void invokeForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
-            throws PartiallyUpdatedException, BadRequestException;
+    void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+            throws PartiallyUpdatedException;
 }

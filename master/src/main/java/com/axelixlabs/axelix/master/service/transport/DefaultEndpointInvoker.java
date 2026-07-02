@@ -74,8 +74,8 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     }
 
     @Override
-    public void invokeForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
-            throws PartiallyUpdatedException, BadRequestException {
+    public void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+            throws PartiallyUpdatedException {
 
         List<String> uniqueInstanceIds =
                 instanceIds.stream().filter(StringUtils::hasText).distinct().toList();
@@ -92,12 +92,8 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
             }
         }
 
-        int instanceIdsSize = uniqueInstanceIds.size();
-
-        if (failures > 0 && failures < instanceIdsSize) {
+        if (failures > 0) {
             throw new PartiallyUpdatedException("Some instances failed to update");
-        } else if (failures == instanceIdsSize) {
-            throw new BadRequestException("All instances failed to update");
         }
     }
 

@@ -414,7 +414,8 @@ class StateExportApiTest {
 
     @Test
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
-        registry.reload(TestObjectFactory.withUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(TestObjectFactory.createTestInstance(
+                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

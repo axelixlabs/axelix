@@ -54,7 +54,6 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
-import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 import com.axelixlabs.axelix.master.service.transport.PartiallyUpdatedException;
 
@@ -150,14 +149,12 @@ public class LoggersApi {
                         new LogLevelChangeRequest(request.configuredLevel(), request.ttlSeconds())));
 
         try {
-            endpointInvoker.invokeForInstances(request.instanceIds(), ActuatorEndpoints.SET_ONE_LOGGER, payload);
+            endpointInvoker.invokeNoValueForInstances(request.instanceIds(), ActuatorEndpoints.SET_ONE_LOGGER, payload);
             return ResponseEntity.noContent().build();
         } catch (PartiallyUpdatedException e) {
             return ResponseEntity.badRequest()
                     .body(new SimpleApiError(
                             ApiErrorCodes.PARTIALLY_UPDATED.getErrorCode(), HttpStatus.BAD_REQUEST.value()));
-        } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().build();
         }
     }
 

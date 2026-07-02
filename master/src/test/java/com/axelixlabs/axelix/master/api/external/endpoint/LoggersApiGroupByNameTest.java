@@ -116,7 +116,7 @@ public class LoggersApiGroupByNameTest {
             }
         });
 
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 

@@ -45,7 +45,7 @@ public final class TestObjectFactory {
     private TestObjectFactory() {}
 
     public static Instance createInstance(String id) {
-        return withUrl(id, DEFAULT_URL);
+        return createTestInstance(id, DEFAULT_URL);
     }
 
     public static Instance createInstance(String id, @Nullable Instant instant) {
@@ -56,12 +56,12 @@ public final class TestObjectFactory {
         return createInstance(id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null);
     }
 
-    public static Instance withUrl(String id, String url) {
+    public static Instance createTestInstance(String id, String url) {
         return createInstance(id, url, DEFAULT_STATUS);
     }
 
     public static Instance createInstance(String id, String url) {
-        return withUrl(id, url);
+        return createTestInstance(id, url);
     }
 
     public static Instance withStatus(String id, Instance.InstanceStatus status) {

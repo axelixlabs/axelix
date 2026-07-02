@@ -147,7 +147,7 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 
@@ -241,14 +241,14 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invokeForInstances_shouldInvokeEndpointForAllInstances() {
+    void invokeNoValueForInstances_shouldInvokeEndpointNoValueForAllInstances() {
         // given.
         RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
         DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
         assertThatNoException()
-                .isThrownBy(() -> subject.invokeForInstances(
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
                         List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE));
 
         // then.
@@ -256,14 +256,14 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invokeForInstances_shouldIgnoreBlankAndDuplicatedInstanceIds() {
+    void invokeNoValueForInstances_shouldIgnoreBlankAndDuplicatedInstanceIds() {
         // given.
         RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
         DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
         assertThatNoException()
-                .isThrownBy(() -> subject.invokeForInstances(
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
                         List.of("first-instance", "", " ", "first-instance", "second-instance", "second-instance"),
                         METHOD_INVOKE_NO_VALUE,
                         NoHttpPayload.INSTANCE));
@@ -273,14 +273,14 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invokeForInstances_shouldThrowPartiallyUpdatedException_WhenSomeInstancesFail() {
+    void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenSomeInstancesFail() {
         // given.
         RecordingEndpointProber prober =
                 new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("failed-instance"));
         DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeForInstances(
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
                 List.of("successful-instance", "failed-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
@@ -289,30 +289,30 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invokeForInstances_shouldThrowBadRequestException_WhenAllInstancesFail() {
+    void invokeNoValueForInstances_shouldThrowBadRequestException_WhenAllInstancesFail() {
         // given.
         RecordingEndpointProber prober =
                 new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("first-instance", "second-instance"));
         DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeForInstances(
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
                 List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
 
         // then.
-        assertThatThrownBy(callable).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(callable).isInstanceOf(PartiallyUpdatedException.class);
         assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
     }
 
     @Test
-    void invokeForInstances_shouldThrowEndpointInvocationException_OnUnknownActuatorEndpoint() {
+    void invokeNoValueForInstances_shouldThrowEndpointInvocationException_OnUnknownActuatorEndpoint() {
         // given.
         RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
         DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
 
         // when.
-        ThrowableAssert.ThrowingCallable callable =
-                () -> subject.invokeForInstances(List.of("first-instance"), METHOD_INVOKE, NoHttpPayload.INSTANCE);
+        ThrowableAssert.ThrowingCallable callable = () ->
+                subject.invokeNoValueForInstances(List.of("first-instance"), METHOD_INVOKE, NoHttpPayload.INSTANCE);
 
         // then.
         assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);
