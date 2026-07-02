@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -33,7 +32,6 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 public class EndpointsConfigurationPropertiesAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
     public EndpointsConfigurationProperties endpointsConfigurationProperties() {
         return new EndpointsConfigurationProperties();

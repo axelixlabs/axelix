@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.threaddump.DefaultThreadDumpContentionMonitoringManagement;
@@ -36,13 +35,11 @@ import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndp
 public class ThreadDumpManagementEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement() {
         return new DefaultThreadDumpContentionMonitoringManagement();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ThreadDumpManagementEndpoint threadDumpManagementEndpoint(
             ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement) {
         return new ThreadDumpManagementEndpoint(threadDumpContentionMonitoringManagement);
