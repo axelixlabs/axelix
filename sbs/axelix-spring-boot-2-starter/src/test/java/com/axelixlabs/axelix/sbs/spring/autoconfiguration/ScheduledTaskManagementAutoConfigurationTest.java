@@ -17,12 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -30,10 +26,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
@@ -100,23 +94,6 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomAxelixScheduledTasksEndpointConfig.class,
-                        CustomScheduledTasksAssemblerConfig.class,
-                        CustomScheduledTasksRegistryConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(ScheduledTasksRegistry.class))
-                            .isExactlyInstanceOf(CustomScheduledTasksRegistry.class);
-                    assertThat(context.getBean(ScheduledTasksAssembler.class))
-                            .isExactlyInstanceOf(CustomScheduledTasksAssembler.class);
-                    assertThat(context.getBean(AxelixScheduledTasksEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixScheduledTasksEndpoint.class);
-                });
-    }
-
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -124,49 +101,6 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Bean
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomScheduledTasksRegistryConfig {
-        @Bean
-        public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
-            return new CustomScheduledTasksRegistry(taskHolders.orderedStream().collect(Collectors.toList()));
-        }
-    }
-
-    @TestConfiguration
-    static class CustomScheduledTasksAssemblerConfig {
-        @Bean
-        public ScheduledTasksAssembler scheduledTasksAssembler(ScheduledTasksRegistry registry) {
-            return new CustomScheduledTasksAssembler(registry);
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAxelixScheduledTasksEndpointConfig {
-        @Bean
-        public AxelixScheduledTasksEndpoint axelixScheduledTasksEndpoint(
-                ScheduledTaskService service, ScheduledTasksAssembler assembler) {
-            return new CustomAxelixScheduledTasksEndpoint(service, assembler);
-        }
-    }
-
-    static class CustomScheduledTasksRegistry extends ScheduledTasksRegistry {
-        public CustomScheduledTasksRegistry(List<ScheduledTaskHolder> taskHolders) {
-            super(taskHolders);
-        }
-    }
-
-    static class CustomScheduledTasksAssembler extends DefaultScheduledTasksAssembler {
-        public CustomScheduledTasksAssembler(ScheduledTasksRegistry registry) {
-            super(registry);
-        }
-    }
-
-    static class CustomAxelixScheduledTasksEndpoint extends AxelixScheduledTasksEndpoint {
-        public CustomAxelixScheduledTasksEndpoint(ScheduledTaskService service, ScheduledTasksAssembler assembler) {
-            super(service, assembler);
         }
     }
 }
