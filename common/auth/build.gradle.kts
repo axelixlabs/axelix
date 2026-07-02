@@ -2,7 +2,7 @@ plugins {
     id("common")
 }
 
-val jsonUnitAssertJVersion = "2.38.0"
+val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     api(project(":common:domain"))
