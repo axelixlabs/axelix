@@ -30,8 +30,4 @@ issue_enrichment:
     labeling_instructions:
       - label: duplicate
         instructions: >
-          Apply only when CodeRabbit's enrichment comment lists the issue under
-          "Possible Duplicates" (not merely "Related Issues"). The candidate must
-          describe the same underlying problem, not just the same area of the codebase.
-          Require a clear match on symptoms, expected behavior, and affected component.
-          Do not label if the only overlap is a shared keyword or module name.
+          Use this label when you think that semantically there is an already existing issue, that aims to bring up the same problem, bug, or feature suggestion.
