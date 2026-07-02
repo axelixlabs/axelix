@@ -1,0 +1,58 @@
+.PopoverHeaderWrapper {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+}
+
+.TimerIcon {
+    color: var(--axelix-bold-grey);
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+        color: var(--axelix-primary-green);
+    }
+}
+
+.LevelSelect {
+    min-width: 120px;
+}
+
+.BadgeDot {
+    display: inline-block;
+    height: 4px;
+    width: 4px;
+    border-radius: 50%;
+    background-color: var(--axelix-primary-green);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px #bbf7d0;
+    transition: box-shadow 0.3s;
+}
+
+.BadgeContent {
+    font-weight: 500;
+    color: var(--axelix-primary-green);
+    user-select: none;
+}
+
+.Badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px 3px 5px;
+    border-radius: 20px;
+    border: 1.5px solid #bbf7d0;
+    background-color: #f0fdf4;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s, border-color 0.3s;
+
+    &:hover {
+        background-color: #dcfce7;
+        border-color: #86efac;
+
+        & .BadgeDot {
+            box-shadow: 0 0 0 3px #bbf7d0;
+        }
+    }
+}

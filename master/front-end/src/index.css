@@ -110,6 +110,18 @@ a {
     animation: highlight-fade 8s;
 }
 
+.VisuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 @keyframes highlight-fade {
     0% {
         background-color: var(--axelix-primary-green);

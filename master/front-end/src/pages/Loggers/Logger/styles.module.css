@@ -12,13 +12,23 @@
     column-gap: 8px;
 }
 
-.Reset {
+.ResetIcon {
     border-radius: 4px;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.3s, opacity 0.3s;
     color: var(--axelix-primary-red);
+
+    &:hover {
+        cursor: pointer;
+        background-color: var(--axelix-primary-light-red);
+    }
 }
 
-.Reset:hover {
-    cursor: pointer;
-    background-color: var(--axelix-primary-light-red);
+.DisabledResetIcon {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+        background-color: transparent;
+        cursor: not-allowed;
+    }
 }

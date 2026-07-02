@@ -49,7 +49,7 @@
     color: var(--axelix-primary-white);
 }
 
-.TargetIcon {
+.Icon {
     position: absolute;
     top: -7px;
     right: -7px;

@@ -74,7 +74,9 @@
         "loggerGroups": "Logger groups",
         "configuredExplicitly": "Configured explicitly",
         "loggerLevelUpdated": "Level has been changed",
-        "reset" : "The logger was successfully reset"
+        "reset" : "The logger was successfully reset",
+        "setTemporaryLevel": "Temporary level",
+        "changedTemporary": "Changed Temporarily"
     },
     "Header": {
         "dashboard": "Dashboard",

@@ -18,11 +18,12 @@
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
+import type { TChangeLoggerLevel } from "models";
 import { loggersColors } from "utils";
 
 import styles from "./styles.module.css";
 
-import { TargetIcon } from "assets";
+import { ClockIcon, TargetIcon } from "assets";
 
 interface IProps {
     /**
@@ -41,12 +42,17 @@ interface IProps {
     configuredLevel?: string;
 
     /**
-     * The function that should update the level
+     * Callback to change the logger level.
      */
-    handleChange: (level: string) => void;
+    handleChange: TChangeLoggerLevel;
+
+    /**
+     * Formatted remaining time string (e.g. "2h 5m"), or null if no temporary level.
+     */
+    remainingTime?: string | null;
 }
 
-export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: IProps) => {
+export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange, remainingTime }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -75,11 +81,17 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
                                 />
                                 {level}
                             </label>
-                            {configuredLevel === level && (
-                                <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
-                                    <TargetIcon className={styles.TargetIcon} />
-                                </Tooltip>
-                            )}
+
+                            {configuredLevel === level &&
+                                (remainingTime ? (
+                                    <Tooltip title={t("Loggers.changedTemporary")} className={styles.Tooltip}>
+                                        <ClockIcon className={styles.Icon} />
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
+                                        <TargetIcon className={styles.Icon} />
+                                    </Tooltip>
+                                ))}
                         </div>
                     );
                 })}
