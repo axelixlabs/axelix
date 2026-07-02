@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -44,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(JwtAuthTestConfiguration.class)
+@IgnoreArchitectureTest
 public class ThreadDumpManagementEndpointTest {
 
     @Autowired
