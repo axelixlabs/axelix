@@ -37,7 +37,8 @@ public enum ApiErrorCodes {
     // Bad request related error codes
     BAD_REQUEST("BAD_REQUEST"),
     INSTANCE_NOT_FOUND("INSTANCE_NOT_FOUND"),
-    INVALID_CRON_EXPRESSION("INVALID_CRON_EXPRESSION");
+    INVALID_CRON_EXPRESSION("INVALID_CRON_EXPRESSION"),
+    PARTIALLY_UPDATED("PARTIALLY_UPDATED");
 
     /**
      * actual code that is sent from the master backend.

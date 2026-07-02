@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.master.service.transport;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
@@ -144,7 +147,7 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.reload(TestObjectFactory.withUrl(
+        registry.reload(TestObjectFactory.createTestInstance(
                 activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 
@@ -237,6 +240,85 @@ public class DefaultEndpointInvokerTest {
                 .isInstanceOf(BadRequestException.class);
     }
 
+    @Test
+    void invokeNoValueForInstances_shouldInvokeEndpointNoValueForAllInstances() {
+        // given.
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        assertThatNoException()
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
+                        List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE));
+
+        // then.
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
+    }
+
+    @Test
+    void invokeNoValueForInstances_shouldIgnoreBlankAndDuplicatedInstanceIds() {
+        // given.
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        assertThatNoException()
+                .isThrownBy(() -> subject.invokeNoValueForInstances(
+                        List.of("first-instance", "", " ", "first-instance", "second-instance", "second-instance"),
+                        METHOD_INVOKE_NO_VALUE,
+                        NoHttpPayload.INSTANCE));
+
+        // then.
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
+    }
+
+    @Test
+    void invokeNoValueForInstances_shouldThrowPartiallyUpdatedException_WhenSomeInstancesFail() {
+        // given.
+        RecordingEndpointProber prober =
+                new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("failed-instance"));
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
+                List.of("successful-instance", "failed-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
+
+        // then.
+        assertThatThrownBy(callable).isInstanceOf(PartiallyUpdatedException.class);
+        assertThat(prober.invokedInstanceIds()).containsExactly("successful-instance", "failed-instance");
+    }
+
+    @Test
+    void invokeNoValueForInstances_shouldThrowBadRequestException_WhenAllInstancesFail() {
+        // given.
+        RecordingEndpointProber prober =
+                new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of("first-instance", "second-instance"));
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        ThrowableAssert.ThrowingCallable callable = () -> subject.invokeNoValueForInstances(
+                List.of("first-instance", "second-instance"), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE);
+
+        // then.
+        assertThatThrownBy(callable).isInstanceOf(PartiallyUpdatedException.class);
+        assertThat(prober.invokedInstanceIds()).containsExactly("first-instance", "second-instance");
+    }
+
+    @Test
+    void invokeNoValueForInstances_shouldThrowEndpointInvocationException_OnUnknownActuatorEndpoint() {
+        // given.
+        RecordingEndpointProber prober = new RecordingEndpointProber(METHOD_INVOKE_NO_VALUE, List.of());
+        DefaultEndpointInvoker subject = new DefaultEndpointInvoker(List.of(prober));
+
+        // when.
+        ThrowableAssert.ThrowingCallable callable = () ->
+                subject.invokeNoValueForInstances(List.of("first-instance"), METHOD_INVOKE, NoHttpPayload.INSTANCE);
+
+        // then.
+        assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);
+        assertThat(prober.invokedInstanceIds()).isEmpty();
+    }
+
     @TestConfiguration
     static class DefaultEndpointInvokerTestConfiguration {
 
@@ -289,6 +371,45 @@ public class DefaultEndpointInvokerTest {
             public @NonNull Class<JsonNode> supported() {
                 return JsonNode.class;
             }
+        }
+    }
+
+    private static class RecordingEndpointProber implements EndpointProber<Object> {
+
+        private final ActuatorEndpoint endpoint;
+        private final List<String> failingInstanceIds;
+        private final List<String> invokedInstanceIds = new ArrayList<>();
+
+        RecordingEndpointProber(ActuatorEndpoint endpoint, List<String> failingInstanceIds) {
+            this.endpoint = endpoint;
+            this.failingInstanceIds = failingInstanceIds;
+        }
+
+        @Override
+        public @NonNull Object invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
+                throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
+            invokedInstanceIds.add(instanceId.instanceId());
+
+            if (failingInstanceIds.contains(instanceId.instanceId())) {
+                throw new InstanceNotFoundException(instanceId);
+            }
+
+            return new Object();
+        }
+
+        @Override
+        public @NonNull Object invoke(@NonNull String baseUrl, HttpPayload httpPayload)
+                throws EndpointInvocationException, BadRequestException {
+            return new Object();
+        }
+
+        @Override
+        public @NonNull ActuatorEndpoint supports() {
+            return endpoint;
+        }
+
+        List<String> invokedInstanceIds() {
+            return invokedInstanceIds;
         }
     }
 }

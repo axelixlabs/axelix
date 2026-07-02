@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.util.List;
+
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -28,6 +30,7 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
  * payload.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface EndpointInvoker {
 
@@ -63,4 +66,16 @@ public interface EndpointInvoker {
      */
     void invokeNoValue(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException;
+
+    /**
+     * Invoke endpoint on multiple instances with the given payload. Blank and duplicated instance IDs are ignored.
+     *
+     * @param instanceIds the IDs of the {@link Instance}s on which the endpoint is supposed to be invoked.
+     * @param endpoint the endpoint that should be invoked.
+     * @param payload the HTTP payload (headers, body etc.) to be sent.
+     *
+     * @throws PartiallyUpdatedException in case the invocation failed for some of the requested instances (potentially for everything).
+     */
+    void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+            throws PartiallyUpdatedException;
 }

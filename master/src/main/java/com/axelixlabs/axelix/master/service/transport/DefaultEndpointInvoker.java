@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -37,6 +38,7 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
  * Default {@link EndpointInvoker} that delegates the actual query execution to selected {@link EndpointProber}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @Component
 public class DefaultEndpointInvoker implements EndpointInvoker {
@@ -69,6 +71,30 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     public void invokeNoValue(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
         getEndpointProber(endpoint).invoke(instanceId, httpPayload);
+    }
+
+    @Override
+    public void invokeNoValueForInstances(List<String> instanceIds, ActuatorEndpoint endpoint, HttpPayload payload)
+            throws PartiallyUpdatedException {
+
+        List<String> uniqueInstanceIds =
+                instanceIds.stream().filter(StringUtils::hasText).distinct().toList();
+
+        EndpointProber<?> prober = getEndpointProber(endpoint);
+
+        int failures = 0;
+
+        for (String instanceId : uniqueInstanceIds) {
+            try {
+                prober.invoke(InstanceId.of(instanceId), payload);
+            } catch (EndpointInvocationException | BadRequestException | InstanceNotFoundException e) {
+                failures++;
+            }
+        }
+
+        if (failures > 0) {
+            throw new PartiallyUpdatedException("Some instances failed to update");
+        }
     }
 
     @NonNull
