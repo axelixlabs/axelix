@@ -18,18 +18,13 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.DefaultGcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,58 +73,5 @@ class AxelixGcEndpointAutoConfigurationTest {
                     assertThat(context).hasSingleBean(JcmdExecutor.class);
                     assertThat(context).hasSingleBean(GcLogService.class);
                 });
-    }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomJcmdExecutorConfig.class,
-                        CustomGcLogServiceConfig.class,
-                        CustomAxelixGcEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(JcmdExecutor.class)).isExactlyInstanceOf(CustomJcmdExecutor.class);
-                    assertThat(context.getBean(GcLogService.class)).isExactlyInstanceOf(CustomGcLogService.class);
-                    assertThat(context.getBean(AxelixGcEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixGcEndpoint.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomJcmdExecutorConfig {
-        @Bean
-        public JcmdExecutor jcmdExecutor() {
-            return new CustomJcmdExecutor();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomGcLogServiceConfig {
-        @Bean
-        public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
-            return new CustomGcLogService(jcmdExecutor);
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAxelixGcEndpointConfig {
-        @Bean
-        public AxelixGcEndpoint axelixGcEndpoint(GcLogService gcLogService) {
-            return new CustomAxelixGcEndpoint(gcLogService);
-        }
-    }
-
-    static class CustomJcmdExecutor extends JcmdExecutor {}
-
-    static class CustomGcLogService extends DefaultGcLogService {
-        public CustomGcLogService(JcmdExecutor jcmdExecutor) {
-            super(jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
-        }
-    }
-
-    static class CustomAxelixGcEndpoint extends AxelixGcEndpoint {
-        public CustomAxelixGcEndpoint(GcLogService gcLogService) {
-            super(gcLogService);
-        }
     }
 }

@@ -23,7 +23,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -51,13 +50,11 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
         return new ScheduledTasksRegistry(taskHolders.orderedStream().toList());
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
@@ -81,14 +78,12 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixScheduledTasksEndpoint axelixScheduledTasksEndpoint(
             ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
         return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ScheduledTasksAssembler scheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
