@@ -51,6 +51,7 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteReques
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
@@ -71,6 +72,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduled-tasks"})
 @Import({AxelixScheduledTasksEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
+@IgnoreArchitectureTest
 class AxelixScheduledTasksEndpointTest {
 
     // Cron
