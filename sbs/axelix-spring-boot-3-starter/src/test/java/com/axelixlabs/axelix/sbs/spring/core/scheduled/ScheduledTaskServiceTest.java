@@ -43,8 +43,9 @@ import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 
+import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -56,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
-@IgnoreArchitectureTest
+@IgnoreTestContextArchitecture(reason = POTENTIAL_CONTEXT_MUTATION)
 class ScheduledTaskServiceTest {
 
     // Cron

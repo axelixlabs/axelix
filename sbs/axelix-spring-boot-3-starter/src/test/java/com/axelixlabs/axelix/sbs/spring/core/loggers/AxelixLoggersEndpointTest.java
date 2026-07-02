@@ -47,12 +47,13 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
+import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -71,7 +72,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "logging.level.a.b.c.d.e=DEBUG"
         })
 @Import({AxelixLoggersEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-@IgnoreArchitectureTest
+@IgnoreTestContextArchitecture(reason = POTENTIAL_CONTEXT_MUTATION)
 public class AxelixLoggersEndpointTest {
 
     @Autowired

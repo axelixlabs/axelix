@@ -44,12 +44,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
+import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.NO_SIBLINGS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -61,7 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "management.endpoints.web.exposure.include=axelix-feign")
 @Import({AxelixFeignEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
-@IgnoreArchitectureTest
+@IgnoreTestContextArchitecture(reason = NO_SIBLINGS)
 public class AxelixFeignEndpointTest {
 
     private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION = "service-1";
