@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoCo
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.
@@ -72,7 +73,8 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             ThreadDumpManagementEndpointAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class,
             EndpointsConfigurationPropertiesAutoConfiguration.class,
-            AxelixLoggersEndpointAutoConfiguration.class
+            AxelixLoggersEndpointAutoConfiguration.class,
+            ValidationListenerAutoConfiguration.class
         })
 @EnableCaching
 @EnableFeignClients

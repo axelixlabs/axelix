@@ -48,7 +48,6 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalO
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * Auto-configuration for Transaction Monitoring infrastructure.
@@ -59,15 +58,9 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Ilya Naumov
  * @author Vyacheslav Yanin
  */
-@AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
+@AutoConfiguration(after = {CompositeMeterRegistryAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ValidationListener validationListener() {
-        return new ValidationListener();
-    }
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
@@ -76,7 +69,6 @@ public class TransactionMonitoringAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public TransactionStatsCollector transactionStatsCollector(
             TransactionMonitoringConfigurationProperties properties) {
 
@@ -84,21 +76,18 @@ public class TransactionMonitoringAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public TransactionMonitoringService transactionMonitoringService(
             TransactionStatsCollector transactionStatsCollector) {
         return new DefaultTransactionMonitoringService(transactionStatsCollector);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
             TransactionMonitoringService transactionMonitoringService) {
         return new TransactionMonitoringEndpoint(transactionMonitoringService);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             QueriesRecorder queriesCollector,
@@ -108,13 +97,11 @@ public class TransactionMonitoringAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public QueriesRecorder queriesStatsCollector() {
         return new DefaultQueriesRecorder();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             QueriesRecorder queriesCollector) {
         return new ProxyingDataSourceBeanPostProcessor(queriesCollector);

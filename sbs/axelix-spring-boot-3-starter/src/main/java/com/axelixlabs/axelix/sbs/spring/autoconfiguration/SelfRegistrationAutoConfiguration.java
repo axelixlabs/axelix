@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +33,6 @@ import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleLis
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -42,25 +40,17 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @since 04.02.2026
  * @author Nikita Kirillov
  */
-@AutoConfiguration
+@AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public ValidationListener validationListener() {
-        return new ValidationListener();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     @ConfigurationProperties(prefix = "axelix.sbs.discovery")
     public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
         return new SelfRegistrationConfigurationProperties();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
             SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
@@ -69,7 +59,6 @@ public class SelfRegistrationAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
             ObjectMapper objectMapper,
@@ -84,7 +73,6 @@ public class SelfRegistrationAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public SelfRegistrationLifecycleListener selfRegistrationLifecycleListener(
             SelfRegistrationService selfRegistrationService) {
         return new SelfRegistrationLifecycleListener(selfRegistrationService);
