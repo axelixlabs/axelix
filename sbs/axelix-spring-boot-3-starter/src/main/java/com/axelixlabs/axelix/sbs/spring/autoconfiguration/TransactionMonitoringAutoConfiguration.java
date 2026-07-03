@@ -17,14 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import io.micrometer.core.instrument.MeterRegistry;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -34,7 +29,6 @@ import org.springframework.context.event.EventListener;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
@@ -58,7 +52,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMem
  * @author Ilya Naumov
  * @author Vyacheslav Yanin
  */
-@AutoConfiguration(after = {CompositeMeterRegistryAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
+@AutoConfiguration(after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
 
@@ -105,13 +99,6 @@ public class TransactionMonitoringAutoConfiguration {
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             QueriesRecorder queriesCollector) {
         return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnBean(MeterRegistry.class)
-    public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-        return new DefaultAxelixMetricsPublisher(meterRegistry);
     }
 
     @Configuration
