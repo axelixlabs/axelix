@@ -1,0 +1,134 @@
+name: Nightly Master E2E DRAFT!
+
+on:
+  workflow_dispatch:
+
+env:
+  KIND_CLUSTER_NAME: axelix-master-e2e
+  MASTER_IMAGE: axelix-master-e2e:local
+  PLAYGROUND_IMAGE: notification-service-e2e:local
+  JWT_SIGNING_KEY: e2e-only-dummy-signing-key-do-not-reuse-12345678901234567890
+
+jobs:
+  master-e2e-single-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Checkout helm-charts
+        uses: actions/checkout@v6
+        with:
+          repository: axelixlabs/helm-charts
+          path: helm-charts
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'liberica'
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execution access to the wrapper
+        run: chmod +x gradlew
+
+      # TODO ./gradlew :master:bootJar --no-configuration-cache
+      - name: Build Master jar
+        run: ./gradlew :master:bootJar -x test
+
+      - name: Build Master Docker image
+        run: docker build --tag ${{ env.MASTER_IMAGE }} --file Dockerfile .
+
+      # TODO ./gradlew :sbs:axelix-spring-boot-2-starter:publishToMavenLocal --no-configuration-cache
+      - name: Publish Spring Boot 2 Starter to Maven local
+        run: ./gradlew :sbs:axelix-spring-boot-2-starter:publishToMavenLocal -x test
+
+      - name: Set up JDK 21 for Playground
+        uses: actions/setup-java@v5
+        id: setup-java-21
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+
+      - name: Build Playground jar Notification Service
+        working-directory: playgrounds/notification-service-gradle-sb-2
+        env:
+          JAVA_HOME: ${{ steps.setup-java-21.outputs.path }}
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+
+      - name: Build Playground Docker image
+        working-directory: playgrounds/notification-service-gradle-sb-2
+        run: docker build --tag ${{ env.PLAYGROUND_IMAGE }} --file docker/Dockerfile .
+
+      - name: Create KinD cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: ${{ env.KIND_CLUSTER_NAME }}
+
+      - name: Load images into KinD
+        run: |
+          kind load docker-image ${{ env.MASTER_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
+          kind load docker-image ${{ env.PLAYGROUND_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v5.0.0
+        with:
+          version: v3.14.0
+
+      - name: Deploy Axelix Master
+        run: |
+          helm upgrade --install axelix-master helm-charts/charts/axelix \
+            --set image.name=${{ env.MASTER_IMAGE }} \
+            --set image.ref=local \
+            --set image.pullPolicy=Never \
+            --set ingress.enabled=false \
+            --set axelix.master.auth.jwt.algorithm=HMAC256 \
+            --set axelix.master.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
+            --set axelix.master.auth.cookie.secure=false \
+            --set axelix.master.auth.options.local.enabled=true \
+            --set axelix.master.discovery.auto.enabled=true \
+            --wait --timeout 3m
+
+      - name: Deploy Playground (notification-service)
+        working-directory: playgrounds/notification-service-gradle-sb-2/chart
+        run: |
+          helm upgrade --install notification-service . \
+            --set image.ref=${{ env.PLAYGROUND_IMAGE }} \
+            --set image.pullPolicy=Never \
+            --set axelix.sbs.auth.jwt.algorithm=HMAC256 \
+            --set axelix.sbs.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
+            --wait --timeout 3m
+
+      - name: Port-forward Axelix Master
+        run: |
+          kubectl port-forward svc/axelix-master 8080:8080 > /tmp/port-forward.log 2>&1 &
+
+      - name: Run Master E2E tests
+        run: >
+          ./gradlew :master-e2e-tests:e2eTest
+          -Paxelix.e2e.masterBaseUrl=http://localhost:8080
+
+      - name: Dump cluster state on failure
+        if: failure()
+        run: |
+          echo "---- pods ----"
+          kubectl get pods -o wide
+          echo "---- axelix-master logs ----"
+          kubectl logs deploy/axelix-master --tail=300 || true
+          echo "---- notification-service logs ----"
+          kubectl logs deploy/notification-service --tail=300 || true
+          echo "---- port-forward log ----"
+          cat /tmp/port-forward.log || true
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-e2e-test-report
+          path: master-e2e-tests/build/reports/tests/e2eTest
+          retention-days: 3
+          if-no-files-found: ignore
