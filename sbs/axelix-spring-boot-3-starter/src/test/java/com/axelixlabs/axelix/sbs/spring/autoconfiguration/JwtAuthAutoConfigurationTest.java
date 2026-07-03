@@ -47,7 +47,8 @@ class JwtAuthAutoConfigurationTest {
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",
                     "axelix.sbs.auth.jwt.signing-key=secret")
-            .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(
+                    JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -68,7 +69,8 @@ class JwtAuthAutoConfigurationTest {
         new ApplicationContextRunner()
                 // "axelix.sbs.auth.jwt.algorithm" is missing
                 .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.signing-key=secret")
-                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(
+                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
@@ -80,7 +82,8 @@ class JwtAuthAutoConfigurationTest {
         new ApplicationContextRunner()
                 // "axelix.sbs.auth.jwt.signing-key" is missing
                 .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.algorithm=HMAC512")
-                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(
+                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
@@ -95,7 +98,8 @@ class JwtAuthAutoConfigurationTest {
                         "axelix.sbs.auth.jwt",
                         "axelix.sbs.auth.jwt.algorithm=RSA512",
                         "axelix.sbs.auth.jwt.signing-key=secret")
-                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(
+                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
