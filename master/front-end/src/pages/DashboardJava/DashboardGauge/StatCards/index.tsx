@@ -26,13 +26,13 @@ export const StatCards = ({ enabledPercent }: IProps) => {
 
     const statCardsData = [
         {
-            label: "Logging Enabled",
+            label: "Enabled",
             value: enabledPercent,
             cardStyles: styles.EnabledLoggingCard,
             valueStyles: styles.EnabledValue,
         },
         {
-            label: "Logging Disabled",
+            label: "Disabled",
             value: disabledPercent,
             cardStyles: styles.DisabledLoggingCard,
             valueStyles: styles.DisabledValue,

@@ -18,6 +18,7 @@
 export * from "./interfaces/dashboardPersistence";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";
+export * from "./interfaces/dashboardJava";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";

@@ -15,21 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./dashboardJava";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./settings";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+export interface IJavaFeatureAdoption {
+    featureId: string;
+    adoptionPercentage: number;
+}
+
+export interface IDashboardJavaResponseBody {
+    projectLeyden: IJavaFeatureAdoption[];
+    gc: IJavaFeatureAdoption[];
+    projectLilliput: IJavaFeatureAdoption[];
+}
+
+export interface IMaxAdoptionInfo {
+    maxPercent: number;
+    featureNameWithMaxPercent: string;
+}

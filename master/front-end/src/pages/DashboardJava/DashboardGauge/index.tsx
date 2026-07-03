@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { DashboardCard } from "components";
+import type { IJavaFeatureAdoption } from "models";
 
 import { ArcSegment } from "./ArcSegment";
 import { StatCards } from "./StatCards";
@@ -25,64 +26,69 @@ const CX = 110;
 const CY = 110;
 const RADIUS = 80;
 const THICKNESS = 20;
-
 const GAP_DEG = 2;
-const SLATE = "#e5e7eb";
-
-const gcLogEnabled = 200;
-const gcLogDisabled = 100;
 
 // TODO: Fix colors in future
+const SLATE = "#e5e7eb";
 const GREEN = "#34D399";
 const ROSE = "#FB7185";
 
-export const DashboardGCLoggingGauge = () => {
-    const total = gcLogEnabled + gcLogDisabled;
-    const enabledPercent = total > 0 ? (gcLogEnabled / total) * 100 : 0;
-    const split = (enabledPercent / 100) * 180;
+interface IProps {
+    data: IJavaFeatureAdoption[];
+    title: string;
+    subtitle: string;
+}
 
-    const roundedEnabledPercent = Math.round(enabledPercent);
+export const DashboardGauge = ({ data, title, subtitle }: IProps) => {
+    const { adoptionPercentage } = data[0];
+    const splitAngle = (adoptionPercentage / 100) * 180;
+    const roundedPercent = Math.round(adoptionPercentage);
+
+    const greenEnd = Math.max(180 + splitAngle - GAP_DEG, 180);
+    const redStart = Math.min(180 + splitAngle + GAP_DEG, 360);
 
     return (
-        <>
-            <DashboardCard title="Garbage Collector Logging" subtitle="Log output coverage">
-                <div className={styles.ContentWrapper}>
-                    <svg viewBox="0 0 220 120" width="220" height="120">
+        <DashboardCard title={title} subtitle={subtitle}>
+            <div className={styles.ContentWrapper}>
+                <svg viewBox="0 0 220 120" width="220" height="120">
+                    <ArcSegment
+                        cx={CX}
+                        cy={CY}
+                        radius={RADIUS}
+                        thickness={THICKNESS}
+                        startDeg={180}
+                        endDeg={360}
+                        color={SLATE}
+                    />
+                    {splitAngle > 0 && (
                         <ArcSegment
                             cx={CX}
                             cy={CY}
                             radius={RADIUS}
                             thickness={THICKNESS}
                             startDeg={180}
-                            endDeg={360}
-                            color={SLATE}
-                        />
-                        <ArcSegment
-                            cx={CX}
-                            cy={CY}
-                            radius={RADIUS}
-                            thickness={THICKNESS}
-                            startDeg={180}
-                            endDeg={180 + split - GAP_DEG}
+                            endDeg={greenEnd}
                             color={GREEN}
                         />
+                    )}
+                    {splitAngle < 180 && (
                         <ArcSegment
                             cx={CX}
                             cy={CY}
                             radius={RADIUS}
                             thickness={THICKNESS}
-                            startDeg={180 + split + GAP_DEG}
+                            startDeg={redStart}
                             endDeg={360}
                             color={ROSE}
                         />
-                        <text x={CX} y={CY - 20} textAnchor="middle" dominantBaseline="central" className="TextMedium">
-                            {roundedEnabledPercent}%
-                        </text>
-                    </svg>
+                    )}
+                    <text x={CX} y={CY - 20} textAnchor="middle" dominantBaseline="central" className="TextMedium">
+                        {roundedPercent}%
+                    </text>
+                </svg>
 
-                    <StatCards enabledPercent={roundedEnabledPercent} />
-                </div>
-            </DashboardCard>
-        </>
+                <StatCards enabledPercent={roundedPercent} />
+            </div>
+        </DashboardCard>
     );
 };

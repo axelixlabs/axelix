@@ -32,7 +32,7 @@ export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
                 }}
                 className={styles.Circle}
             />
-            <span className={styles.Label}>{label}</span>
+            <span className={styles.Label}>{label}:</span>
             <span className={styles.Value}>{value}</span>
         </div>
     );

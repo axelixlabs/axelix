@@ -15,14 +15,42 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
+import { useEffect, useState } from "react";
 
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { fetchData } from "helpers";
+import { type IDashboardJavaResponseBody, type IJavaFeatureAdoption, StatefulRequest } from "models";
+import { getDashboardJavaData } from "services";
+
+import { DashboardDonutChart } from "./DashboardDonutChart";
+import { DashboardGauge } from "./DashboardGauge";
 import styles from "./styles.module.css";
 
+export const mockGcDistributionData: IJavaFeatureAdoption[] = [
+    { featureId: "G1GC", adoptionPercentage: 54 },
+    { featureId: "ZGC", adoptionPercentage: 20 },
+    { featureId: "Shenandoah", adoptionPercentage: 15 },
+    { featureId: "Parallel", adoptionPercentage: 8 },
+    { featureId: "Serial", adoptionPercentage: 3 },
+];
+
 const DashboardJava = () => {
+    const [dashboardJavaState, setDashboardJavaState] = useState(StatefulRequest.loading<IDashboardJavaResponseBody>());
+
+    useEffect(() => {
+        fetchData(setDashboardJavaState, () => getDashboardJavaData());
+    }, []);
+
+    if (dashboardJavaState.loading) {
+        return <Loader />;
+    }
+
+    if (dashboardJavaState.error) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    const { projectLeyden, gc, projectLilliput } = dashboardJavaState.response!;
+
     return (
         <>
             <DashboardPagesFirstSection
@@ -31,9 +59,19 @@ const DashboardJava = () => {
             />
 
             <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
+                <DashboardDonutChart data={projectLeyden} title="Project Leyden Adoption" subtitle="JVM optimisation" />
+                <DashboardDonutChart
+                    data={mockGcDistributionData}
+                    title="Garbage Collector Distribution"
+                    subtitle="Runtime profile"
+                    showRest={false}
+                />
+                <DashboardGauge data={gc} title="Garbage Collector Logging" subtitle="Log output coverage" />
+                <DashboardGauge
+                    data={projectLilliput}
+                    title="Project Liliput Adoption"
+                    subtitle="Compact object headers"
+                />
             </div>
         </>
     );

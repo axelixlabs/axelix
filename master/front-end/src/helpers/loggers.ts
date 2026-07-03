@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ILogger, ILoggerGroup } from "models";
+import type { IJavaFeatureAdoption, ILogger, ILoggerGroup, IMaxAdoptionInfo } from "models";
 
 export const filterLoggers = (loggers: ILogger[], search: string): ILogger[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -44,4 +44,17 @@ export const filterLoggerGroups = (loggerGroups: ILoggerGroup[], search: string)
         }
         return result;
     }, []);
+};
+
+export const getMaxAdoptionInfo = (data: IJavaFeatureAdoption[]): IMaxAdoptionInfo => {
+    const adoptionPercentages = data.map(({ adoptionPercentage }) => adoptionPercentage);
+    const maxPercent = adoptionPercentages.length ? Math.max(...adoptionPercentages) : 0;
+    const featuresWithMaxPercentages = data.filter(({ adoptionPercentage }) => adoptionPercentage === maxPercent);
+    const featureNameWithMaxPercent =
+        featuresWithMaxPercentages.length === 1 ? featuresWithMaxPercentages[0].featureId : "";
+
+    return {
+        maxPercent: maxPercent,
+        featureNameWithMaxPercent: featureNameWithMaxPercent,
+    };
 };
