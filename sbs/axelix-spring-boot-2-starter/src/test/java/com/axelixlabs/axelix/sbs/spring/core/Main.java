@@ -33,11 +33,13 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpoint
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
@@ -63,6 +65,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             AxelixHeapDumpEndpointAutoConfiguration.class,
             AxelixMetadataEndpointConfiguration.class,
             AxelixMetricsAutoConfiguration.class,
+            EndpointPropertiesSupportAutoConfiguration.class,
             AxelixGcEndpointAutoConfiguration.class,
             GarbageCollectionAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
@@ -73,6 +76,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             TransactionMonitoringAutoConfiguration.class,
             EndpointsConfigurationPropertiesAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
+            SecurityContextExecutorAutoConfiguration.class,
             ValidationListenerAutoConfiguration.class
         })
 @EnableCaching
