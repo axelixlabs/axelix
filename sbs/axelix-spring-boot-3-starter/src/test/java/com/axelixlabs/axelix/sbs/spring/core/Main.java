@@ -79,7 +79,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             EndpointPropertiesSupportAutoConfiguration.class,
             EndpointsConfigurationPropertiesAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
-            LibraryInformationProviderAutoConfiguration.class
+            LibraryInformationProviderAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
             SecurityContextExecutorAutoConfiguration.class,
             ValidationListenerAutoConfiguration.class
