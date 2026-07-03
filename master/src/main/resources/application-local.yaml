@@ -8,7 +8,7 @@ axelix:
           heartbeat-timeout: 45s
           schedule: "0 * * * * *"
       auto:
-        enabled: true
+        enabled: false
         broadcast:
           schedule: "0 * * * * *"
         platform: kubernetes
