@@ -20,9 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
@@ -79,61 +77,4 @@ class AxelixCachesEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(CacheManagerBeanPostProcessor.class);
         });
     }
-
-    @Test
-    void shouldHandleMultipleCustomBeans() {
-        contextRunner
-                .withUserConfiguration(
-                        CustomCacheManagerBeanPostProcessorConfig.class,
-                        CustomAxelixCachesEndpointConfig.class,
-                        CustomCacheSizeProviderConfig.class)
-                .run(context -> {
-                    assertThat(context.getBean(CacheManagerBeanPostProcessor.class))
-                            .isExactlyInstanceOf(CustomCacheManagerBeanPostProcessor.class);
-                    assertThat(context.getBean(AxelixCachesEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixCachesEndpoint.class);
-                    assertThat(context.getBean(CacheSizeProvider.class))
-                            .isExactlyInstanceOf(CustomCacheSizeProvider.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomCacheSizeProviderConfig {
-        @Bean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new CustomCacheSizeProvider();
-        }
-    }
-
-    @TestConfiguration
-    static class CustomAxelixCachesEndpointConfig {
-        @Bean
-        public AxelixCachesEndpoint axelixCachesEndpoint(CacheOperationsDispatcher cacheOperationsDispatcher) {
-            return new CustomAxelixCachesEndpoint(cacheOperationsDispatcher);
-        }
-    }
-
-    @TestConfiguration
-    static class CustomCacheManagerBeanPostProcessorConfig {
-        @Bean
-        public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CustomCacheManagerBeanPostProcessor();
-        }
-    }
-
-    static class CustomCacheSizeProvider implements CacheSizeProvider {
-
-        @Override
-        public Long getEstimatedCacheSize(Object nativeCache) {
-            return 0L;
-        }
-    }
-
-    static class CustomAxelixCachesEndpoint extends AxelixCachesEndpoint {
-        public CustomAxelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
-            super(dispatcher);
-        }
-    }
-
-    static class CustomCacheManagerBeanPostProcessor extends CacheManagerBeanPostProcessor {}
 }

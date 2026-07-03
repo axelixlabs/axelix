@@ -19,15 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Map;
 
-import io.micrometer.core.instrument.MeterRegistry;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
@@ -38,7 +33,6 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 /**
  * Auto-configuration class for the caches custom actuator endpoint.
@@ -47,18 +41,16 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = {CacheAutoConfiguration.class, CompositeMeterRegistryAutoConfiguration.class})
+@AutoConfiguration(after = {CacheAutoConfiguration.class, AxelixMetricsPublisherAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = AxelixCachesEndpoint.class)
 public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheSizeProvider cacheSizeProvider() {
         return new DefaultCacheSizeProvider();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheOperationsDispatcher cacheOperationsDispatcher(
             // we have to inject here by CacheManager rather than by EnhancedCacheManager, since the bean definition
             // in spring for the EnhancedCacheManager still has CacheManager type.
@@ -67,22 +59,13 @@ public class AxelixCachesEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixCachesEndpoint axelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
         return new AxelixCachesEndpoint(dispatcher);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
         return new CacheManagerBeanPostProcessor(metricsPublisherObjectProvider);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnBean(MeterRegistry.class)
-    public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-        return new DefaultAxelixMetricsPublisher(meterRegistry);
     }
 }

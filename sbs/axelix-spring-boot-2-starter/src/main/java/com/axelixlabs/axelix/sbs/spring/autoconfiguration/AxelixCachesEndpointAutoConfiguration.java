@@ -22,7 +22,6 @@ import java.util.Map;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
@@ -59,13 +58,11 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheSizeProvider cacheSizeProvider() {
         return new DefaultCacheSizeProvider();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheOperationsDispatcher cacheOperationsDispatcher(
             // we have to inject here by CacheManager rather than by EnhancedCacheManager, since the bean definition
             // in spring for the EnhancedCacheManager still has CacheManager type.
@@ -74,13 +71,11 @@ public class AxelixCachesEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixCachesEndpoint axelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
         return new AxelixCachesEndpoint(dispatcher);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
         return new CacheManagerBeanPostProcessor();
     }
