@@ -41,12 +41,11 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -214,8 +213,8 @@ class ConditionsApiTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
-                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -240,7 +239,7 @@ class ConditionsApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate

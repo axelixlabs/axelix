@@ -33,7 +33,7 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public final class TestObjectFactory {
+public final class TestInstanceFactory {
 
     private static final String DEFAULT_URL = "http://example.com";
 
@@ -42,40 +42,36 @@ public final class TestObjectFactory {
 
     private static final Instance.InstanceStatus DEFAULT_STATUS = Instance.InstanceStatus.UP;
 
-    private TestObjectFactory() {}
+    private TestInstanceFactory() {}
 
-    public static Instance createInstance(String id) {
-        return createTestInstance(id, DEFAULT_URL);
+    public static Instance create(String id) {
+        return create(id, DEFAULT_URL);
     }
 
-    public static Instance createInstance(String id, @Nullable Instant instant) {
+    public static Instance create(String id, @Nullable Instant instant) {
         return createInstanceWithHeartbeat(id, instant);
     }
 
     public static Instance withName(String id, String name) {
-        return createInstance(id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null);
+        return create(id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null);
     }
 
-    public static Instance createTestInstance(String id, String url) {
-        return createInstance(id, url, DEFAULT_STATUS);
-    }
-
-    public static Instance createInstance(String id, String url) {
-        return createTestInstance(id, url);
+    public static Instance create(String id, String url) {
+        return create(id, url, DEFAULT_STATUS);
     }
 
     public static Instance withStatus(String id, Instance.InstanceStatus status) {
-        return createInstance(id, DEFAULT_URL, status);
+        return create(id, DEFAULT_URL, status);
     }
 
-    public static Instance createInstance(
+    public static Instance create(
             String id,
             String java,
             String springBoot,
             String springFramework,
             String jdkVendor,
             @Nullable String kotlin) {
-        return createInstance(
+        return create(
                 id,
                 DEFAULT_URL,
                 "test-object-factory-instance",
@@ -87,7 +83,7 @@ public final class TestObjectFactory {
                 kotlin);
     }
 
-    public static Instance createInstance(
+    public static Instance create(
             String id,
             String java,
             String springBoot,
@@ -113,9 +109,8 @@ public final class TestObjectFactory {
                 "url");
     }
 
-    public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
-        return createInstance(
-                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null);
+    public static Instance create(String id, String url, Instance.InstanceStatus status) {
+        return create(id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null);
     }
 
     public static Instance createInstanceWithHeartbeat(String id, @Nullable Instant instant) {
@@ -137,7 +132,7 @@ public final class TestObjectFactory {
                 DEFAULT_URL);
     }
 
-    public static Instance createInstance(
+    public static Instance create(
             String id,
             String url,
             String name,

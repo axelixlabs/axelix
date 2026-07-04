@@ -42,10 +42,9 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -131,8 +130,8 @@ class GcLogFileApiTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
-                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -208,7 +207,7 @@ class GcLogFileApiTest {
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
 
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         ResponseEntity<String> response = restTemplate
                 .asViewer()

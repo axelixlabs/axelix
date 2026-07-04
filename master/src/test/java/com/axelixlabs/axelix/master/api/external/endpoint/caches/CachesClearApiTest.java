@@ -38,7 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,8 +92,8 @@ public class CachesClearApiTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
-                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach

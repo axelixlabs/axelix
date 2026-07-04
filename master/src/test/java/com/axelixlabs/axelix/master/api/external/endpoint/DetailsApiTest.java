@@ -48,11 +48,11 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -263,10 +263,11 @@ public class DetailsApiTest {
             }
         });
 
-        registry.reload(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-
         registry.reload(
-                createInstance(instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+
+        registry.reload(TestInstanceFactory.create(
+                instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
 
         historicalApplicationSnapshotService.reloadCurrentState(
                 metadata("org.springframework.samples", "spring-petclinic", GarbageCollector.G1));
@@ -312,7 +313,7 @@ public class DetailsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
 

@@ -55,11 +55,10 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
 import static com.axelixlabs.axelix.common.domain.ActuatorEndpoint.of;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -147,7 +146,7 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
+        registry.reload(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 
@@ -168,7 +167,7 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invoke_shouldReturnEndpointInvocationException_OnUnavailableInstance() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         assertThatThrownBy(
                         () -> endpointInvoker.invoke(InstanceId.of(instanceId), METHOD_INVOKE, NoHttpPayload.INSTANCE))
@@ -217,7 +216,7 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValue_shouldReturnEndpointInvocationException() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         assertThatThrownBy(() -> endpointInvoker.invoke(
                         InstanceId.of(instanceId), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE))

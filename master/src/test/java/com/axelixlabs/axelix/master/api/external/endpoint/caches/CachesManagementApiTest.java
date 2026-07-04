@@ -45,11 +45,10 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -107,8 +106,8 @@ class CachesManagementApiTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
-                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -159,7 +158,7 @@ class CachesManagementApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError_OnEnableOrDisableCacheName(String cacheStatus) {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate

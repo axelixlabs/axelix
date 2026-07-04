@@ -53,12 +53,11 @@ import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpres
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -322,8 +321,8 @@ public class ScheduledTasksApiTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
-                activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.reload(
+                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach
@@ -493,7 +492,7 @@ public class ScheduledTasksApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorOnGetAllScheduledTasks() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -527,7 +526,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -570,7 +569,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
 
         // when.
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -611,7 +610,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
 
         // when.
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -652,7 +651,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(

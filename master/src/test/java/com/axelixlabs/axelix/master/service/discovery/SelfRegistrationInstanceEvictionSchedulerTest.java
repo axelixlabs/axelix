@@ -32,8 +32,8 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -120,7 +120,7 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
     }
 
     private void registerInstance(String instanceId, Instant latestHeartBeat) {
-        Instance instance = createInstance(instanceId, latestHeartBeat);
+        Instance instance = TestInstanceFactory.create(instanceId, latestHeartBeat);
         instanceRegistry.reload(instance);
     }
 }

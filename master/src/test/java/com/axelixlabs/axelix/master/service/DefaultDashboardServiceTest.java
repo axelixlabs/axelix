@@ -36,8 +36,8 @@ import com.axelixlabs.axelix.master.api.external.response.software.DistributionR
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -72,9 +72,10 @@ class DefaultDashboardServiceTest {
     }
 
     private void populateInstanceRegistry() {
-        instanceRegistry.reload(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
-        instanceRegistry.reload(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
-        instanceRegistry.reload(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));
+        instanceRegistry.reload(
+                TestInstanceFactory.create("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
+        instanceRegistry.reload(TestInstanceFactory.create("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
+        instanceRegistry.reload(TestInstanceFactory.create("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));
     }
 
     @Test

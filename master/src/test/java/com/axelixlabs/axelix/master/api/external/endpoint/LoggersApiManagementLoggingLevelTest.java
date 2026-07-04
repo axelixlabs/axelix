@@ -47,11 +47,10 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -120,11 +119,11 @@ public class LoggersApiManagementLoggingLevelTest {
             }
         });
 
-        registry.reload(TestObjectFactory.createTestInstance(
+        registry.reload(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-        registry.reload(TestObjectFactory.createTestInstance(
+        registry.reload(TestInstanceFactory.create(
                 siblingInstanceId, mockWebServer.url(siblingInstanceId).toString()));
-        registry.reload(TestObjectFactory.createTestInstance(
+        registry.reload(TestInstanceFactory.create(
                 failingInstanceId, mockWebServer.url(failingInstanceId).toString()));
     }
 
@@ -217,7 +216,7 @@ public class LoggersApiManagementLoggingLevelTest {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate
@@ -238,7 +237,7 @@ public class LoggersApiManagementLoggingLevelTest {
     void shouldReturnInternalServerError_WhenResettingOnUnknonInstance() {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "reset.logger.name";
-        registry.reload(createInstance(instanceId));
+        registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate

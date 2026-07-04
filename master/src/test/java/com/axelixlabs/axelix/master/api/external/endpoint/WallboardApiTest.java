@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestObjectFactory;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
@@ -70,7 +70,7 @@ public class WallboardApiTest {
                 registry.deRegister(instance.id());
             });
 
-            registry.reload(TestObjectFactory.createInstance(
+            registry.reload(TestInstanceFactory.create(
                     instance1Id,
                     "http://example.com/1",
                     "app-one",
@@ -81,7 +81,7 @@ public class WallboardApiTest {
                     "BellSoft",
                     "2.0.0"));
 
-            registry.reload(TestObjectFactory.createInstance(
+            registry.reload(TestInstanceFactory.create(
                     instance2Id,
                     "http://example.com/2",
                     "app-two",

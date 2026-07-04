@@ -46,8 +46,8 @@ import com.axelixlabs.axelix.master.service.convert.response.details.DetailsConv
 import com.axelixlabs.axelix.master.service.convert.response.details.InstanceDetailsConverter;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -70,7 +70,7 @@ public class InstanceDetailsConverterTest {
 
     @BeforeEach
     void prepare() {
-        instanceRegistry.reload(createInstance(activeInstanceId));
+        instanceRegistry.reload(TestInstanceFactory.create(activeInstanceId));
         applicationSnapshotService.reloadCurrentState(getCurrentSnapshotMetadata());
         converter = new InstanceDetailsConverter(instanceRegistry, applicationSnapshotService);
     }

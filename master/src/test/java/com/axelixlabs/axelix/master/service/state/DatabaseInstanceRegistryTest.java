@@ -34,9 +34,9 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.withName;
+import static com.axelixlabs.axelix.master.utils.TestInstanceFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -158,8 +158,10 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void registerAll_shouldPersistAllInstances() {
         // given.
-        List<Instance> instances =
-                List.of(createInstance("batch-id-1"), createInstance("batch-id-2"), createInstance("batch-id-3"));
+        List<Instance> instances = List.of(
+                TestInstanceFactory.create("batch-id-1"),
+                TestInstanceFactory.create("batch-id-2"),
+                TestInstanceFactory.create("batch-id-3"));
 
         // when
         instanceRegistry.reload(instances);
@@ -171,7 +173,7 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void deRegister_shouldRemoveInstance() {
         // given.
-        Instance instance = createInstance("deregister-id-1");
+        Instance instance = TestInstanceFactory.create("deregister-id-1");
         instanceRegistry.reload(instance);
         assertThat(instanceRegistry.get(InstanceId.of("deregister-id-1"))).isNotEmpty();
 
@@ -185,8 +187,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void deRegisterAll_shouldRemoveAllInstances() {
         // given.
-        instanceRegistry.reload(createInstance("deregister-all-1"));
-        instanceRegistry.reload(createInstance("deregister-all-2"));
+        instanceRegistry.reload(TestInstanceFactory.create("deregister-all-1"));
+        instanceRegistry.reload(TestInstanceFactory.create("deregister-all-2"));
 
         assertThat(instanceRegistry.getAll()).hasSize(2);
 
@@ -200,8 +202,8 @@ abstract class DatabaseInstanceRegistryTest {
     @Test
     void getAll_shouldReturnAllInstances() {
         // given.
-        instanceRegistry.reload(createInstance("test-id-1"));
-        instanceRegistry.reload(createInstance("test-id-2"));
+        instanceRegistry.reload(TestInstanceFactory.create("test-id-1"));
+        instanceRegistry.reload(TestInstanceFactory.create("test-id-2"));
 
         // when. / then.
         assertThat(instanceRegistry.getAll())
