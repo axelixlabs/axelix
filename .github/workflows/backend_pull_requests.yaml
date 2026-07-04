@@ -58,6 +58,7 @@ jobs:
 
       # Java 25 will be installed at this step.
       - name: Build Backend
+        id: build-backend
         uses: ./.github/actions/build-master
         with:
           gradle-cache-encryption-key: ''
@@ -75,13 +76,6 @@ jobs:
         id: setup-java-21
         with:
           java-version: '21'
-          distribution: 'liberica'
-
-      - name: Set up JDK 25 for Playgrounds
-        uses: actions/setup-java@v4
-        id: setup-java-25
-        with:
-          java-version: '25'
           distribution: 'liberica'
 
       # Starting build playground projects
@@ -119,7 +113,7 @@ jobs:
 
           JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
           JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
-          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
+          JAVA_25_HOME: ${{ steps.build-backend.outputs.java-25-home }}
         run: |
           SHOULD_BUILD_SB2="false"
           if [ "$SB2_CHANGE_TRIGGER" = "true" ] || [ "$GLOBAL_CHANGE_TRIGGER" = "true" ]; then
