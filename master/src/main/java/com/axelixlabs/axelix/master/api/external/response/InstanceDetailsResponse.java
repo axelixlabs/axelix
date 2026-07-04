@@ -59,9 +59,11 @@ public record InstanceDetailsResponse(
      * @param javaVersion       The version of the java.
      * @param kotlinVersion     The version of the kotlin, if any.
      * @param jdkVendor         The name of the vendor.
+     * @param garbageCollector  The name of the garbage collector.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record RuntimeProfile(String javaVersion, @Nullable String kotlinVersion, String jdkVendor) {}
+    public record RuntimeProfile(
+            String javaVersion, @Nullable String kotlinVersion, String jdkVendor, String garbageCollector) {}
 
     /**
      * The profile of a given spring.

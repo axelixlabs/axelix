@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
 import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 
@@ -109,5 +110,4 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(System.getProperty("os.version")),
                 emptyIfNull(System.getProperty("os.arch")));
     }
-
 }

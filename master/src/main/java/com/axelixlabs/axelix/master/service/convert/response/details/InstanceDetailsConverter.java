@@ -33,10 +33,13 @@ import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsRespons
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.OSProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.RuntimeProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.SpringProfile;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -53,9 +56,13 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 public class InstanceDetailsConverter implements Converter<DetailsConversionRequest, InstanceDetailsResponse> {
 
     private final InstanceRegistry instanceRegistry;
+    private final DatabaseHistoricalApplicationSnapshotService applicationSnapshotService;
 
-    public InstanceDetailsConverter(InstanceRegistry instanceRegistry) {
+    public InstanceDetailsConverter(
+            InstanceRegistry instanceRegistry,
+            DatabaseHistoricalApplicationSnapshotService applicationSnapshotService) {
         this.instanceRegistry = instanceRegistry;
+        this.applicationSnapshotService = applicationSnapshotService;
     }
 
     @Override
@@ -63,11 +70,14 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
         InstanceDetails source = request.instanceDetails();
         InstanceId instanceId = request.instanceId();
 
+        // Strictly speaking, there must be a wrapping tran
         Instance instance = instanceRegistry.get(instanceId).orElseThrow(InstanceNotFoundException::new);
+        HistoricalApplicationSnapshot currentRecord = applicationSnapshotService.getCurrentRecord(new ApplicationId(
+                source.getBuild().getGroup(), source.getBuild().getArtifact()));
 
         String serviceName = instance.name();
         GitProfile gitProfile = gitDetailsConverter(source.getGit());
-        RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.getRuntime());
+        RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.getRuntime(), currentRecord);
         SpringProfile springProfile = springDetailsConverter(source.getSpring());
         BuildProfile buildProfile = buildDetailsConverter(source.getBuild());
         OSProfile osProfile = osDetailsConverter(source.getOs());
@@ -85,11 +95,13 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
                 gitDetails.getCommitTimestamp());
     }
 
-    private RuntimeProfile runtimeDetailsConverter(RuntimeDetails runtimeDetails) {
+    private RuntimeProfile runtimeDetailsConverter(
+            RuntimeDetails runtimeDetails, HistoricalApplicationSnapshot currentRecord) {
         return new RuntimeProfile(
                 runtimeDetails.getJavaVersion(),
                 runtimeDetails.getKotlinVersion(),
-                runtimeDetails.getJdkVendor());
+                runtimeDetails.getJdkVendor(),
+                currentRecord.insights().hotSpot().gc().gcInUse().name());
     }
 
     private SpringProfile springDetailsConverter(SpringDetails springDetails) {

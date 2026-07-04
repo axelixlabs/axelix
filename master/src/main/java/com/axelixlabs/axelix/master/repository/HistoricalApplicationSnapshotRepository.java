@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.repository;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -76,6 +77,23 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
             )
             """)
     SpringFrameworkInsightsAggregate aggregateLatestSpringFrameworkInsights();
+
+    // Select * is generally a bad idea. Here, it does not cost that much, but still.
+    @Query(value = """
+        SELECT *
+        FROM historical_application_snapshots s
+        WHERE
+            group_id = :groupId
+            AND artifact_id = :artifactId
+            AND s.date = (
+                SELECT MAX(latest.date)
+                FROM historical_application_snapshots latest
+                WHERE latest.group_id = :groupId
+                    AND latest.artifact_id = :artifactId
+            )
+        """)
+    HistoricalApplicationSnapshot findLatestApplicationSnapshot(
+            @Param("groupId") String groupId, @Param("artifactId") String artifactId);
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Java/JVM features.

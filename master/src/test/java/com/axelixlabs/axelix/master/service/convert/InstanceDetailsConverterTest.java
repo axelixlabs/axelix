@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.convert;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.BuildProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.GitProfile;
@@ -40,6 +44,7 @@ import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsRespons
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.details.DetailsConversionRequest;
 import com.axelixlabs.axelix.master.service.convert.response.details.InstanceDetailsConverter;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -56,6 +61,9 @@ public class InstanceDetailsConverterTest {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
+    @Autowired
+    private DatabaseHistoricalApplicationSnapshotService applicationSnapshotService;
+
     private final String activeInstanceId = UUID.randomUUID().toString();
 
     private InstanceDetailsConverter converter;
@@ -63,7 +71,8 @@ public class InstanceDetailsConverterTest {
     @BeforeEach
     void prepare() {
         instanceRegistry.reload(createInstance(activeInstanceId));
-        converter = new InstanceDetailsConverter(instanceRegistry);
+        applicationSnapshotService.reloadCurrentState(getCurrentSnapshotMetadata());
+        converter = new InstanceDetailsConverter(instanceRegistry, applicationSnapshotService);
     }
 
     @Test
@@ -91,6 +100,7 @@ public class InstanceDetailsConverterTest {
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
         assertThat(runtime.kotlinVersion()).isEqualTo(null);
+        assertThat(runtime.garbageCollector()).isEqualTo(GarbageCollector.G1.name());
 
         BuildProfile build = response.build();
         assertThat(build).isNotNull();
@@ -122,5 +132,30 @@ public class InstanceDetailsConverterTest {
         OsDetails osDetails = new InstanceDetails.OsDetails("Windows 10", "10.0", "amd64");
 
         return new InstanceDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
+    }
+
+    private static BasicDiscoveryMetadata getCurrentSnapshotMetadata() {
+        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
+                new BasicDiscoveryMetadata.SoftwareVersions("17.0.16", "3.5.0", "7.0", null);
+        BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
+        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
+                new BasicDiscoveryMetadata.HotSpot(
+                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.APP_CDS.getId(), false)),
+                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), false)),
+                        List.of()),
+                List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.OSIV.getId(), false)));
+
+        return new BasicDiscoveryMetadata(
+                "1.0.0-SNAPSHOT",
+                "3.5.0-SNAPSHOT",
+                "org.springframework.samples",
+                "spring-petclinic",
+                "a8b0929",
+                "BellSoft",
+                GarbageCollector.G1,
+                softwareVersions,
+                BasicDiscoveryMetadata.HealthStatus.UP,
+                memoryDetails,
+                insights);
     }
 }

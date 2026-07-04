@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 
@@ -125,6 +126,44 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
             assertThat(otherAppSnapshot).isNotNull();
             assertThat(otherAppSnapshot.insights().springFramework().osivEnabled())
                     .isFalse();
+        }
+    }
+
+    @Nested
+    class GetCurrentRecord {
+
+        @Test
+        void shouldReturnLatestSnapshotForApplication() {
+            // given.
+            HistoricalApplicationSnapshot previous = snapshot(
+                    "com.example", "service-a", LocalDate.now(ZoneOffset.UTC).minusDays(1), GarbageCollector.G1);
+            HistoricalApplicationSnapshot current =
+                    snapshot("com.example", "service-a", LocalDate.now(ZoneOffset.UTC), GarbageCollector.ZGC);
+            HistoricalApplicationSnapshot otherApplication =
+                    snapshot("com.example", "service-b", LocalDate.now(ZoneOffset.UTC), GarbageCollector.PARALLEL);
+            jdbcAggregateTemplate.insertAll(List.of(previous, current, otherApplication));
+
+            // when.
+            HistoricalApplicationSnapshot result =
+                    subject.getCurrentRecord(ApplicationId.of("com.example", "service-a"));
+
+            // then.
+            assertThat(result).isEqualTo(current);
+            assertThat(result.insights().hotSpot().gc().gcInUse()).isEqualTo(GarbageCollector.ZGC);
+        }
+
+        @Test
+        void shouldReturnNullWhenApplicationHasNoSnapshots() {
+            // given.
+            jdbcAggregateTemplate.insert(
+                    snapshot("com.example", "service-a", LocalDate.now(ZoneOffset.UTC), GarbageCollector.G1));
+
+            // when.
+            HistoricalApplicationSnapshot result =
+                    subject.getCurrentRecord(ApplicationId.of("com.example", "missing-service"));
+
+            // then.
+            assertThat(result).isNull();
         }
     }
 
@@ -241,6 +280,20 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
                 HealthStatus.UP,
                 new MemoryDetails(12_000),
                 insights);
+    }
+
+    private static HistoricalApplicationSnapshot snapshot(
+            String groupId, String artifactId, LocalDate date, GarbageCollector garbageCollector) {
+
+        return new HistoricalApplicationSnapshot(
+                new SnapshotId(groupId, artifactId, date),
+                new com.axelixlabs.axelix.master.domain.Insights(
+                        new com.axelixlabs.axelix.master.domain.Insights.HotSpot(
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden(false, false),
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
+                                        false, garbageCollector),
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false)));
     }
 
     private static BasicDiscoveryMetadata otherAppMetadata() {

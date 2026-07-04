@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
+import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
@@ -42,6 +43,7 @@ import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapsho
  *
  * @author Mikhail Polivakha
  */
+// TODO: Extract an interface
 @Service
 public class DatabaseHistoricalApplicationSnapshotService {
 
@@ -98,6 +100,11 @@ public class DatabaseHistoricalApplicationSnapshotService {
 
         return new SpringFrameworkDashboardResponse(List.of(new AggregatedFeature(
                 FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total))));
+    }
+
+    @Transactional(readOnly = true)
+    public HistoricalApplicationSnapshot getCurrentRecord(ApplicationId applicationId) {
+        return repository.findLatestApplicationSnapshot(applicationId.groupId(), applicationId.artifactId());
     }
 
     // TODO:

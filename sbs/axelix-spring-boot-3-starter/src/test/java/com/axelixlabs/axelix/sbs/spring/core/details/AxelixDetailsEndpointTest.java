@@ -83,10 +83,7 @@ class AxelixDetailsEndpointTest extends AbstractDetailsSharedContextTest {
                         entry("springFrameworkVersion", SpringVersion.getVersion()),
                         entry("springCloudVersion", "2022.0.4"));
 
-        assertThatJson(responseBody)
-                .inPath("runtime")
-                .isObject()
-                .containsKeys("javaVersion", "jdkVendor");
+        assertThatJson(responseBody).inPath("runtime").isObject().containsKeys("javaVersion", "jdkVendor");
 
         assertThatJson(responseBody).node("build").isNotNull();
         assertThatJson(responseBody)
