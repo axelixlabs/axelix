@@ -24,8 +24,8 @@ const DashboardJava = () => {
     return (
         <>
             <div className={styles.HeaderWrapper}>
-                <div className="TextLarge"> JAVA</div>
-                <p className={styles.Subtitle}>Real-time JVM metrics · Project Leyden · Garbage Collection</p>
+                <div className="TextLarge">Java</div>
+                <p className={styles.Subtitle}>Real-time JVM insights · Project Leyden · Garbage Collection</p>
             </div>
 
             <div className={styles.ChartsWrapper}>

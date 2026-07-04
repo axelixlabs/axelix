@@ -41,7 +41,7 @@ export const DashboardGCLoggingGauge = () => {
     const enabledPercent = total > 0 ? (gcLogEnabled / total) * 100 : 0;
     const split = (enabledPercent / 100) * 180;
 
-    const roundedEnabledPercent = Math.round(enabledPercent)
+    const roundedEnabledPercent = Math.round(enabledPercent);
 
     return (
         <DashboardJavaCard title="Garbage Collector Logging" subtitle="Log output coverage">
