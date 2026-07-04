@@ -1,6 +1,5 @@
-package org.springframework.samples.petclinic.testdata.airport;
+package com.sivalabs.ft.notifications.testdata
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaRepository
 
-public interface FlightRepository extends JpaRepository<Flight, Long> {
-}
+interface FlightRepository : JpaRepository<Flight, Long>

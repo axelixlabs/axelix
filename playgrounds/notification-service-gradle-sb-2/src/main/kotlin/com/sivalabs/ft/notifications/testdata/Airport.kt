@@ -1,27 +1,21 @@
-package org.springframework.samples.petclinic.testdata.airport;
+package com.sivalabs.ft.notifications.testdata
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "airports")
-public class Airport {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String name;
+class Airport {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null
 
-	@OneToMany(mappedBy = "airport")
-	private Set<Flight> flights = new HashSet<>();
+    var name: String? = null
 
-	public Long getId() { return id; }
-	public String getName() { return name; }
-	public Set<Flight> getFlights() { return flights; }
+    @OneToMany(mappedBy = "airport")
+    var flights: MutableSet<Flight> = mutableSetOf()
 }

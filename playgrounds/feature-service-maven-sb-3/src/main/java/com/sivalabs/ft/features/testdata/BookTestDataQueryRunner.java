@@ -1,11 +1,12 @@
-package org.springframework.samples.petclinic.testdata.bookstore;
+package com.sivalabs.ft.features.testdata;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile({"default", "local"})
 public class BookTestDataQueryRunner {
 
     private final BookTestDataService bookTestDataService;
@@ -14,8 +15,9 @@ public class BookTestDataQueryRunner {
         this.bookTestDataService = bookTestDataService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void runTests() {
+    @Scheduled(cron = "*/2 * * * * *")
+    public void runTests() throws InterruptedException {
+        Thread.sleep(10000);
         bookTestDataService.runNplusOne_1();
         bookTestDataService.runNplusOne_2();
         bookTestDataService.runNplusOne_3();

@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.testdata.bookstore;
+package com.sivalabs.ft.features.testdata;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

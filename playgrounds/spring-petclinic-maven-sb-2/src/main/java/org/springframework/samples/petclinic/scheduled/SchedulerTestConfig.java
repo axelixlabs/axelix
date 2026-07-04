@@ -82,7 +82,7 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
 	/**
 	 * CRON
 	 */
-	@Scheduled(cron = "*/2 * * * * *")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void alive() {
 		log.info("alive task");
 	}
@@ -98,7 +98,7 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
 	/**
 	 * fixedDelay
 	 */
-	@Scheduled(fixedDelay = 2000)
+	@Scheduled(fixedDelay = 20000)
 	public void fixedDelayTask() throws InterruptedException {
 		log.info("Running FIXED_DELAY task");
 		Thread.sleep(50);
@@ -107,7 +107,7 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
 	/**
 	 * fixedRate
 	 */
-	@Scheduled(fixedRate = 2000, initialDelay = 100)
+	@Scheduled(fixedRate = 200000, initialDelay = 100)
 	public void fixedRateTask() {
 		log.info("Running FIXED_RATE task");
 	}
@@ -130,9 +130,9 @@ public class SchedulerTestConfig implements SchedulingConfigurer {
 		public Date nextExecutionTime(TriggerContext triggerContext) {
 			Date lastCompletion = triggerContext.lastCompletionTime();
 			if (lastCompletion == null) {
-				return Date.from(Instant.now().plusSeconds(1));
+				return Date.from(Instant.now().plusSeconds(10));
 			}
-			return Date.from(lastCompletion.toInstant().plusSeconds(2));
+			return Date.from(lastCompletion.toInstant().plusSeconds(20));
 		}
 
 	}

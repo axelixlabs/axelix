@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.testdata.bookstore;
+package com.sivalabs.ft.features.testdata;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.testdata.restaurant;
+package org.springframework.samples.petclinic.testdata;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

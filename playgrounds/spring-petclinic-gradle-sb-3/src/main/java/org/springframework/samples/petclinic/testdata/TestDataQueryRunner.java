@@ -1,13 +1,12 @@
 package org.springframework.samples.petclinic.testdata;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("default")
+@Profile({"default", "local"})
 public class TestDataQueryRunner {
 
     private final TestDataService testDataService;
@@ -16,7 +15,7 @@ public class TestDataQueryRunner {
         this.testDataService = testDataService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(initialDelay = 10000, fixedRate = 60000)
     public void runTests() {
         testDataService.runNplusOne_1();
         testDataService.runNplusOne_2();

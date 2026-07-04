@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.testdata.bookstore;
+package com.sivalabs.ft.features.testdata;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
