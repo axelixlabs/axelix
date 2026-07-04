@@ -40,6 +40,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
+import org.springframework.data.jdbc.core.dialect.JdbcPostgresDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
@@ -188,6 +189,12 @@ public class PersistenceAutoConfiguration {
             LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
             liquibaseProperties.setChangeLog("db/changelog/postgres/db.changelog.master.postgresql.xml");
             return liquibaseProperties;
+        }
+
+        @Override
+        @NonNull
+        public JdbcDialect jdbcDialect(@NonNull NamedParameterJdbcOperations operations) {
+            return JdbcPostgresDialect.INSTANCE;
         }
     }
 
