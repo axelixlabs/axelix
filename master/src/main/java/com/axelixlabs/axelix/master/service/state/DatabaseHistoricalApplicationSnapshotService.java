@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,12 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.GarbageCollectorDistributionAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.SpringFrameworkInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
@@ -78,12 +81,14 @@ public class DatabaseHistoricalApplicationSnapshotService {
 
         List<AggregatedFeature> gc = List.of(new AggregatedFeature(
                 FeatureId.GC_LOGGING_ENABLED.getId(), adoptionPercentage(aggregate.gcLoggingEnabledCount(), total)));
+        Map<GarbageCollector, Double> garbageCollectorDistribution =
+                garbageCollectorDistribution(repository.aggregateLatestGarbageCollectorDistribution(), total);
 
         List<AggregatedFeature> projectLilliput = List.of(new AggregatedFeature(
                 FeatureId.COMPACT_OBJECT_HEADERS.getId(),
                 adoptionPercentage(aggregate.compactObjectHeadersEnabledCount(), total)));
 
-        return new JavaDashboardResponse(projectLeyden, gc, projectLilliput);
+        return new JavaDashboardResponse(projectLeyden, gc, garbageCollectorDistribution, projectLilliput);
     }
 
     /**
@@ -143,5 +148,17 @@ public class DatabaseHistoricalApplicationSnapshotService {
             return 0.0;
         }
         return (enabledCount * 100.0) / total;
+    }
+
+    private static Map<GarbageCollector, Double> garbageCollectorDistribution(
+            List<GarbageCollectorDistributionAggregate> aggregates, long total) {
+        if (total == 0) {
+            return Map.of();
+        }
+
+        return aggregates.stream()
+                .collect(Collectors.toMap(
+                        aggregate -> GarbageCollector.valueOf(aggregate.gcInUse()),
+                        aggregate -> adoptionPercentage(aggregate.serviceCount(), total)));
     }
 }

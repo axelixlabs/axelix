@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -34,12 +35,18 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -73,7 +80,8 @@ public class DetailsApiTest {
            "runtime": {
              "javaVersion": "17.0.16",
              "kotlinVersion": "1.9.0",
-             "jdkVendor": "Corretto-17.0.16.8.1"
+             "jdkVendor": "Corretto-17.0.16.8.1",
+             "garbageCollector": "G1"
            },
            "spring": {
              "springBootVersion": "3.5.0",
@@ -109,7 +117,8 @@ public class DetailsApiTest {
        "runtime": {
          "javaVersion": "17.0.16",
          "kotlinVersion": "1.9.0",
-         "jdkVendor": "Corretto-17.0.16.8.1"
+         "jdkVendor": "Corretto-17.0.16.8.1",
+         "garbageCollector": "ZGC"
        },
        "spring": {
          "springBootVersion": "3.5.0",
@@ -141,6 +150,12 @@ public class DetailsApiTest {
     @Autowired
     private InstanceRegistry registry;
 
+    @Autowired
+    private DatabaseHistoricalApplicationSnapshotService historicalApplicationSnapshotService;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
     @BeforeAll
     static void startServer() throws IOException {
         mockWebServer = new MockWebServer();
@@ -154,6 +169,8 @@ public class DetailsApiTest {
 
     @BeforeEach
     void prepare() {
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+
         // language=json
         String jsonResponse = """
         {
@@ -250,12 +267,17 @@ public class DetailsApiTest {
 
         registry.reload(
                 createInstance(instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
+
+        historicalApplicationSnapshotService.reloadCurrentState(
+                metadata("org.springframework.samples", "spring-petclinic", GarbageCollector.G1));
+        historicalApplicationSnapshotService.reloadCurrentState(metadata("", "", GarbageCollector.ZGC));
     }
 
     @AfterEach
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
         registry.deRegister(InstanceId.of(instanceWithoutPluginId));
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
     }
 
     @Test
@@ -314,4 +336,31 @@ public class DetailsApiTest {
             method = HttpMethod.GET,
             path = "/api/external/details/00000000-0000-0000-0000-000000000001")
     void negativeAuthTests() {}
+
+    private static BasicDiscoveryMetadata metadata(
+            String groupId, String artifactId, GarbageCollector garbageCollector) {
+        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
+                new BasicDiscoveryMetadata.SoftwareVersions("17.0.16", "3.5.0", "7.0", "1.9.0");
+        BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
+        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
+                new BasicDiscoveryMetadata.HotSpot(
+                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.APP_CDS.getId(), false)),
+                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), false)),
+                        List.of(new BasicDiscoveryMetadata.InsightFeature(
+                                FeatureId.COMPACT_OBJECT_HEADERS.getId(), false))),
+                List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.OSIV.getId(), false)));
+
+        return new BasicDiscoveryMetadata(
+                "1.0.0-SNAPSHOT",
+                "3.5.0-SNAPSHOT",
+                groupId,
+                artifactId,
+                "a8b0929",
+                "BellSoft",
+                garbageCollector,
+                softwareVersions,
+                BasicDiscoveryMetadata.HealthStatus.UP,
+                memoryDetails,
+                insights);
+    }
 }

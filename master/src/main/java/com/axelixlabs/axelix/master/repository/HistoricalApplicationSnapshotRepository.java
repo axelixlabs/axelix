@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.util.List;
+
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -56,6 +58,21 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
             """)
     JavaInsightsAggregate aggregateLatestJavaInsights();
 
+    @Query("""
+            SELECT
+                s.gc_in_use AS gc_in_use,
+                COUNT(*) AS service_count
+            FROM historical_application_snapshots s
+            WHERE s.date = (
+                SELECT MAX(latest.date)
+                FROM historical_application_snapshots latest
+                WHERE latest.group_id = s.group_id
+                  AND latest.artifact_id = s.artifact_id
+            )
+            GROUP BY s.gc_in_use
+            """)
+    List<GarbageCollectorDistributionAggregate> aggregateLatestGarbageCollectorDistribution();
+
     /**
      * Aggregates the adoption of the tracked Spring Framework features across the entire ecosystem. For
      * every service (identified by its {@code group_id} + {@code artifact_id}) only the most recent
@@ -83,8 +100,8 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
         SELECT *
         FROM historical_application_snapshots s
         WHERE
-            group_id = :groupId
-            AND artifact_id = :artifactId
+            s.group_id = :groupId
+            AND s.artifact_id = :artifactId
             AND s.date = (
                 SELECT MAX(latest.date)
                 FROM historical_application_snapshots latest
@@ -110,6 +127,14 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
             long aotCacheEnabledCount,
             long gcLoggingEnabledCount,
             long compactObjectHeadersEnabledCount) {}
+
+    /**
+     * Aggregated usage counter for a particular garbage collector.
+     *
+     * @param gcInUse the garbage collector name stored in the latest snapshot.
+     * @param serviceCount how many services use this garbage collector.
+     */
+    record GarbageCollectorDistributionAggregate(String gcInUse, long serviceCount) {}
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.
