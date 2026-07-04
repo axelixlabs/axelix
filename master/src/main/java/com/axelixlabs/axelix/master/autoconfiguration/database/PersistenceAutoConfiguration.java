@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.autoconfiguration.database;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
@@ -146,7 +146,7 @@ public class PersistenceAutoConfiguration {
             @Override
             public @NonNull String convert(@NonNull LocalDate source) {
                 return String.valueOf(
-                        source.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli());
+                        source.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
             }
         }
 
@@ -159,7 +159,9 @@ public class PersistenceAutoConfiguration {
             public @Nullable LocalDate convert(String source) {
                 try {
                     long parsed = Long.parseLong(source);
-                    return Instant.ofEpochMilli(parsed).atZone(ZoneOffset.UTC).toLocalDate();
+                    return Instant.ofEpochMilli(parsed)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
                 } catch (NumberFormatException e) {
                     return LocalDate.parse(source);
                 }
