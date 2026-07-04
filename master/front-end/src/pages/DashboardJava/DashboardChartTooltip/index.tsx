@@ -15,26 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
 import styles from "./styles.module.css";
 
-const DashboardJava = () => {
-    return (
-        <>
-            <div className={styles.HeaderWrapper}>
-                <div className="TextLarge">Java</div>
-                <p className={styles.Subtitle}>Real-time JVM insights · Project Leyden · Garbage Collection</p>
-            </div>
+// TODO: Fix types in future
+interface IProps {
+    active?: boolean;
+    payload?: any[];
+}
 
-            <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
-            </div>
-        </>
+// TODO: Improve this component in future
+export const DashboardChartTooltip = ({ active, payload }: IProps) => {
+    const entry = payload?.[0]?.payload;
+
+    if (!active || !entry) {
+        return null;
+    }
+
+    const { name, value, fill } = entry;
+
+    return (
+        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+            <span style={{ color: fill }}>&#9673;</span>
+            <span>
+                {name}: <strong>{value}%</strong>
+            </span>
+        </div>
     );
 };
-
-export default DashboardJava;

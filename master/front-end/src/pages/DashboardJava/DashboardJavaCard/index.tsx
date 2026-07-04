@@ -15,26 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
 import styles from "./styles.module.css";
 
-const DashboardJava = () => {
-    return (
-        <>
-            <div className={styles.HeaderWrapper}>
-                <div className="TextLarge">Java</div>
-                <p className={styles.Subtitle}>Real-time JVM insights · Project Leyden · Garbage Collection</p>
-            </div>
+interface IProps {
+    title: string;
+    children: React.ReactNode;
+    subtitle: string;
+}
 
-            <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
+export const DashboardJavaCard = ({ title, subtitle, children }: IProps) => {
+    return (
+        <div className={styles.MainWrapper}>
+            <div className={styles.CardHeaderWrapper}>
+                <div className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</div>
+                <div className={styles.Title}>{title}</div>
             </div>
-        </>
+            {children}
+        </div>
     );
 };
-
-export default DashboardJava;
