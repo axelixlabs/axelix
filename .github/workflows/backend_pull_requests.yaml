@@ -77,11 +77,11 @@ jobs:
           java-version: '21'
           distribution: 'liberica'
 
-      - name: Set up JDK 24 for Playgrounds
+      - name: Set up JDK 25 for Playgrounds
         uses: actions/setup-java@v4
-        id: setup-java-24
+        id: setup-java-25
         with:
-          java-version: '24'
+          java-version: '25'
           distribution: 'liberica'
 
       # Starting build playground projects
@@ -119,7 +119,7 @@ jobs:
 
           JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
           JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
-          JAVA_24_HOME: ${{ steps.setup-java-24.outputs.path }}
+          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
         run: |
           SHOULD_BUILD_SB2="false"
           if [ "$SB2_CHANGE_TRIGGER" = "true" ] || [ "$GLOBAL_CHANGE_TRIGGER" = "true" ]; then
