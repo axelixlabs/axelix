@@ -15,24 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.details;
+package com.axelixlabs.axelix.common.domain.insights;
 
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NullMarked;
-
-// TODO: Add Azul GC
-// TODO: Are we sure that the aliases provided here are even correct? Double check
-
 /**
- * Gar
+ * Garbage collector used by a managed JVM service instance.
  *
  * @author Mikhail Polivakha
  */
-@NullMarked
-public enum GarageCollector {
+public enum GarbageCollector {
 
     /**
      * G1 GC
@@ -45,7 +39,7 @@ public enum GarageCollector {
     SHENADOAH("shenandoah"),
 
     /**
-     * Generational shenandoah GC
+     * Generational Shenandoah GC
      */
     GEN_SHENADOAH("generational shenandoah"),
 
@@ -79,16 +73,16 @@ public enum GarageCollector {
      */
     UNKNOWN();
 
-    GarageCollector(String... aliases) {
+    private final Set<String> aliases;
+
+    GarbageCollector(String... aliases) {
         this.aliases = Arrays.stream(aliases).collect(Collectors.toSet());
     }
 
-    private final Set<String> aliases;
-
-    public static GarageCollector fromName(String name) {
+    public static GarbageCollector fromName(String name) {
         String lowerCase = name.toLowerCase();
 
-        for (GarageCollector value : values()) {
+        for (GarbageCollector value : values()) {
             for (String alias : value.aliases) {
                 if (lowerCase.contains(alias)) {
                     return value;
@@ -96,6 +90,6 @@ public enum GarageCollector {
             }
         }
 
-        return GarageCollector.UNKNOWN;
+        return GarbageCollector.UNKNOWN;
     }
 }

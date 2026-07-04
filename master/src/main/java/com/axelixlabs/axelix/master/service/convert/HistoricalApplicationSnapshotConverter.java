@@ -26,11 +26,11 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot;
-import com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
@@ -47,27 +47,30 @@ public class HistoricalApplicationSnapshotConverter {
 
         return new HistoricalApplicationSnapshot(
                 new SnapshotId(metadata.getGroupId(), metadata.getArtifactId(), LocalDate.now(ZoneOffset.UTC)),
-                fromDto(metadata.getInsights()));
+                fromDto(metadata));
     }
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
     // nullability annotations.
-    private Insights fromDto(BasicDiscoveryMetadata.Insights insights) {
+    private Insights fromDto(BasicDiscoveryMetadata metadata) {
+        BasicDiscoveryMetadata.Insights insights = metadata.getInsights();
         if (insights == null) {
             return defaultInsights();
         }
 
-        return new Insights(fromHotSpot(insights.getHotSpot()), fromSpringFramework(insights.getSpringFramework()));
+        return new Insights(
+                fromHotSpot(insights.getHotSpot(), metadata.getGcInUse()),
+                fromSpringFramework(insights.getSpringFramework()));
     }
 
-    private HotSpot fromHotSpot(BasicDiscoveryMetadata.HotSpot hotSpot) {
+    private HotSpot fromHotSpot(BasicDiscoveryMetadata.HotSpot hotSpot, GarbageCollector gcInUse) {
         if (hotSpot == null) {
             return defaultHotSpot();
         }
 
         return new HotSpot(
                 fromProjectLeyden(hotSpot.getProjectLeyden()),
-                fromGarbageCollector(hotSpot.getGc()),
+                fromGarbageCollector(hotSpot.getGc(), gcInUse),
                 fromProjectLilliput(hotSpot.getProjectLilliputh()));
     }
 
@@ -76,8 +79,9 @@ public class HistoricalApplicationSnapshotConverter {
                 isFeatureEnabled(features, FeatureId.APP_CDS), isFeatureEnabled(features, FeatureId.AOT_CACHE));
     }
 
-    private GarbageCollector fromGarbageCollector(List<InsightFeature> features) {
-        return new GarbageCollector(isFeatureEnabled(features, FeatureId.GC_LOGGING_ENABLED), resolveGcInUse(features));
+    private HotSpot.GarbageCollector fromGarbageCollector(List<InsightFeature> features, GarbageCollector gcInUse) {
+        return new HotSpot.GarbageCollector(
+                isFeatureEnabled(features, FeatureId.GC_LOGGING_ENABLED), resolveGcInUse(gcInUse));
     }
 
     private ProjectLilliput fromProjectLilliput(List<InsightFeature> features) {
@@ -100,8 +104,8 @@ public class HistoricalApplicationSnapshotConverter {
                 .orElse(false);
     }
 
-    private String resolveGcInUse(List<InsightFeature> features) {
-        return "TODO"; // TODO: we do not ship it in there
+    private GarbageCollector resolveGcInUse(GarbageCollector gcInUse) {
+        return gcInUse == null ? GarbageCollector.UNKNOWN : gcInUse;
     }
 
     private Insights defaultInsights() {
@@ -110,6 +114,8 @@ public class HistoricalApplicationSnapshotConverter {
 
     private HotSpot defaultHotSpot() {
         return new HotSpot(
-                new ProjectLeyden(false, false), new GarbageCollector(false, ""), new ProjectLilliput(false));
+                new ProjectLeyden(false, false),
+                new HotSpot.GarbageCollector(false, GarbageCollector.UNKNOWN),
+                new ProjectLilliput(false));
     }
 }

@@ -41,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -72,6 +73,7 @@ public class SelfRegisteredApiTest {
              "artifactId" : "petclinic",
              "commitShortSha" : "a8b0929",
              "jdkVendor" : "BellSoft",
+             "gcInUse" : "G1",
              "softwareVersions" : {
                "springBoot" : "3.5.0",
                "java" : "25",
@@ -182,6 +184,7 @@ public class SelfRegisteredApiTest {
         assertThat(snapshot.insights().hotSpot().projectLeyden().aotCacheEnabled())
                 .isFalse();
         assertThat(snapshot.insights().hotSpot().gc().gcLoggingEnabled()).isFalse();
+        assertThat(snapshot.insights().hotSpot().gc().gcInUse()).isEqualTo(GarbageCollector.G1);
         assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
                 .isFalse();
         assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();

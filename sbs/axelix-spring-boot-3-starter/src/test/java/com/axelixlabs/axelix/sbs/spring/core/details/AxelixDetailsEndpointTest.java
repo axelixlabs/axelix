@@ -86,7 +86,7 @@ class AxelixDetailsEndpointTest extends AbstractDetailsSharedContextTest {
         assertThatJson(responseBody)
                 .inPath("runtime")
                 .isObject()
-                .containsKeys("javaVersion", "jdkVendor", "garbageCollector");
+                .containsKeys("javaVersion", "jdkVendor");
 
         assertThatJson(responseBody).node("build").isNotNull();
         assertThatJson(responseBody)

@@ -89,8 +89,7 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
         return new RuntimeProfile(
                 runtimeDetails.getJavaVersion(),
                 runtimeDetails.getKotlinVersion(),
-                runtimeDetails.getJdkVendor(),
-                runtimeDetails.getGarbageCollector());
+                runtimeDetails.getJdkVendor());
     }
 
     private SpringProfile springDetailsConverter(SpringDetails springDetails) {

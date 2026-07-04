@@ -18,9 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 
@@ -35,7 +32,6 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
-import static com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler.getGarbageCollectorInfo;
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
 /**
@@ -45,8 +41,6 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNul
  * @author Nikita Kirillov
  */
 public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultServiceDetailsAssembler.class);
 
     private final GitInformationProvider gitInformationProvider;
     private final @Nullable BuildProperties buildProperties;
@@ -94,7 +88,6 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         return new RuntimeDetails(
                 libraryInformationProvider.getJavaVersion(),
                 libraryInformationProvider.getJdkVendorName(),
-                getGarbageCollectorInfo(),
                 libraryInformationProvider.getKotlinVersion());
     }
 
@@ -117,13 +110,4 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(System.getProperty("os.arch")));
     }
 
-    private String getGarbageCollectorInfo() {
-
-        String garbageCollectorInfo = GarbageCollectorInfoAssembler.getGarbageCollectorInfo();
-        if (garbageCollectorInfo.equals(GarageCollector.UNKNOWN.name())) {
-            log.warn("Unable to determine the GC used inside the given application. Falling back to UNKNOWN");
-        }
-
-        return garbageCollectorInfo;
-    }
 }

@@ -90,7 +90,6 @@ public class InstanceDetailsConverterTest {
         RuntimeProfile runtime = response.runtime();
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
-        assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
         assertThat(runtime.kotlinVersion()).isEqualTo(null);
 
         BuildProfile build = response.build();
@@ -115,8 +114,7 @@ public class InstanceDetailsConverterTest {
 
         SpringDetails springDetails = new InstanceDetails.SpringDetails("3.5.0", "7.0", "2023.0.1");
 
-        RuntimeDetails runtimeDetails =
-                new InstanceDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", "G1 GC", null);
+        RuntimeDetails runtimeDetails = new InstanceDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", null);
 
         BuildDetails buildDetails = new InstanceDetails.BuildDetails(
                 "spring-petclinic", "3.5.0-SNAPSHOT", "org.springframework.samples", "2025-10-29T15:10:54.770Z");

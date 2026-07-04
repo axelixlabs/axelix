@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insi
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.MemoryDetails;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
@@ -235,6 +236,7 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
                 "petclinic",
                 "a8b0929",
                 "BellSoft",
+                GarbageCollector.G1,
                 softwareVersions,
                 HealthStatus.UP,
                 new MemoryDetails(12_000),
@@ -258,6 +260,7 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
                 "other-app",
                 "910230",
                 "Eclipse Temurin",
+                GarbageCollector.ZGC,
                 softwareVersions,
                 HealthStatus.DOWN,
                 new MemoryDetails(8_000),
@@ -291,6 +294,7 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
                 artifactId,
                 "a8b0929",
                 "BellSoft",
+                GarbageCollector.G1,
                 softwareVersions,
                 HealthStatus.UP,
                 new MemoryDetails(12_000),

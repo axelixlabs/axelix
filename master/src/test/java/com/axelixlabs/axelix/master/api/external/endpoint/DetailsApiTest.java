@@ -73,8 +73,7 @@ public class DetailsApiTest {
            "runtime": {
              "javaVersion": "17.0.16",
              "kotlinVersion": "1.9.0",
-             "jdkVendor": "Corretto-17.0.16.8.1",
-             "garbageCollector": "G1 GC"
+             "jdkVendor": "Corretto-17.0.16.8.1"
            },
            "spring": {
              "springBootVersion": "3.5.0",
@@ -110,8 +109,7 @@ public class DetailsApiTest {
        "runtime": {
          "javaVersion": "17.0.16",
          "kotlinVersion": "1.9.0",
-         "jdkVendor": "Corretto-17.0.16.8.1",
-         "garbageCollector": "G1 GC"
+         "jdkVendor": "Corretto-17.0.16.8.1"
        },
        "spring": {
          "springBootVersion": "3.5.0",
@@ -176,7 +174,6 @@ public class DetailsApiTest {
              "runtime": {
                  "javaVersion": "17.0.16",
                  "jdkVendor": "Corretto-17.0.16.8.1",
-                 "garbageCollector": "G1 GC",
                  "kotlinVersion": "1.9.0"
              },
              "build": {
@@ -213,7 +210,6 @@ public class DetailsApiTest {
               "runtime": {
                 "javaVersion": "17.0.16",
                 "jdkVendor": "Corretto-17.0.16.8.1",
-                "garbageCollector": "G1 GC",
                 "kotlinVersion": "1.9.0"
               },
               "build": {

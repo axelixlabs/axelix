@@ -55,7 +55,7 @@ public record Insights(
          */
         public record GarbageCollector(
                 @Column("gc_logging_enabled") boolean gcLoggingEnabled,
-                @Column("gc_in_use") String gcInUse) {}
+                @Column("gc_in_use") com.axelixlabs.axelix.common.domain.insights.GarbageCollector gcInUse) {}
 
         /**
          * @param compactObjectHeadersEnabled are Compact Object Headers enabled.

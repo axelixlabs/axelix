@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Primary;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -96,6 +97,7 @@ class BasicDiscoveryMetadataEndpointProberTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "17.0.14u",
@@ -133,6 +135,7 @@ class BasicDiscoveryMetadataEndpointProberTest {
         assertThat(metadata.getVersion()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(metadata.getServiceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(metadata.getCommitShortSha()).isEqualTo("a8b0929");
+        assertThat(metadata.getGcInUse()).isEqualTo(GarbageCollector.G1);
         assertThat(metadata.getSoftwareVersions().getJava()).isEqualTo("17.0.14u");
         assertThat(metadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
         assertThat(metadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);

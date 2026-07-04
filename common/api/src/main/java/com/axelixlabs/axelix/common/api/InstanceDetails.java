@@ -337,7 +337,6 @@ public final class InstanceDetails {
 
         private final String javaVersion;
         private final String jdkVendor;
-        private final String garbageCollector;
 
         @Nullable
         private final String kotlinVersion;
@@ -347,18 +346,15 @@ public final class InstanceDetails {
          *
          * @param javaVersion      The version of the java.
          * @param jdkVendor        The name of the vendor.
-         * @param garbageCollector The name of the garbage collector.
          * @param kotlinVersion    The version of the kotlin, if any.
          */
         @JsonCreator
         public RuntimeDetails(
                 @JsonProperty("javaVersion") String javaVersion,
                 @JsonProperty("jdkVendor") String jdkVendor,
-                @JsonProperty("garbageCollector") String garbageCollector,
                 @JsonProperty("kotlinVersion") @Nullable String kotlinVersion) {
             this.javaVersion = javaVersion;
             this.jdkVendor = jdkVendor;
-            this.garbageCollector = garbageCollector;
             this.kotlinVersion = kotlinVersion;
         }
 
@@ -368,10 +364,6 @@ public final class InstanceDetails {
 
         public String getJdkVendor() {
             return jdkVendor;
-        }
-
-        public String getGarbageCollector() {
-            return garbageCollector;
         }
 
         @Nullable
@@ -390,13 +382,12 @@ public final class InstanceDetails {
             RuntimeDetails that = (RuntimeDetails) o;
             return Objects.equals(javaVersion, that.javaVersion)
                     && Objects.equals(jdkVendor, that.jdkVendor)
-                    && Objects.equals(garbageCollector, that.garbageCollector)
                     && Objects.equals(kotlinVersion, that.kotlinVersion);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(javaVersion, jdkVendor, garbageCollector, kotlinVersion);
+            return Objects.hash(javaVersion, jdkVendor, kotlinVersion);
         }
 
         @Override
@@ -407,9 +398,6 @@ public final class InstanceDetails {
                     + '\''
                     + ", jdkVendor='"
                     + jdkVendor
-                    + '\''
-                    + ", garbageCollector='"
-                    + garbageCollector
                     + '\''
                     + ", kotlinVersion='"
                     + kotlinVersion

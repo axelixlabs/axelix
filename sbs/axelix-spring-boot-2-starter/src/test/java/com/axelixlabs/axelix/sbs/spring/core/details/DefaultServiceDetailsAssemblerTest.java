@@ -83,7 +83,6 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(runtime).isNotNull();
         assertThat(runtime.getJavaVersion()).isEqualTo(System.getProperty("java.version"));
         assertThat(runtime.getJdkVendor()).isNotBlank().isEqualTo(System.getProperty("java.vendor"));
-        assertThat(runtime.getGarbageCollector()).isNotBlank();
         assertThat(runtime.getKotlinVersion()).isEqualTo(KotlinVersion.CURRENT.toString());
 
         BuildDetails build = result.getBuild();

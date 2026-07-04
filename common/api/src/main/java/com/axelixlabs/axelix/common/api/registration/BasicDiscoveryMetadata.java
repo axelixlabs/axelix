@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+
 /**
  * Represents the basic metadata of a service instance as exposed by the custom starter actuator endpoint.
  *
@@ -42,6 +44,7 @@ public final class BasicDiscoveryMetadata {
     private final String artifactId;
     private final String commitShortSha;
     private final String jdkVendor;
+    private final GarbageCollector gcInUse;
     private final SoftwareVersions softwareVersions;
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
@@ -64,6 +67,7 @@ public final class BasicDiscoveryMetadata {
      * @param commitShortSha   the short commit hash (i.e. 'a622a54' or smth like that). Assuming it
      *                         to never be {@code null}.
      * @param jdkVendor        the JDK vendor name.
+     * @param gcInUse          the garbage collector currently used by the service.
      * @param softwareVersions the software versions.
      * @param healthStatus     the health status of the given instance that is reported by started infrastructure.
      *                         Never {@code null}.
@@ -78,6 +82,7 @@ public final class BasicDiscoveryMetadata {
             @JsonProperty("artifactId") String artifactId,
             @JsonProperty("commitShortSha") String commitShortSha,
             @JsonProperty("jdkVendor") String jdkVendor,
+            @JsonProperty("gcInUse") GarbageCollector gcInUse,
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
             @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
@@ -88,6 +93,7 @@ public final class BasicDiscoveryMetadata {
         this.artifactId = artifactId;
         this.commitShortSha = commitShortSha;
         this.jdkVendor = jdkVendor;
+        this.gcInUse = gcInUse;
         this.softwareVersions = softwareVersions;
         this.healthStatus = healthStatus;
         this.memoryDetails = memoryDetails;
@@ -116,6 +122,10 @@ public final class BasicDiscoveryMetadata {
 
     public String getJdkVendor() {
         return jdkVendor;
+    }
+
+    public GarbageCollector getGcInUse() {
+        return gcInUse;
     }
 
     public SoftwareVersions getSoftwareVersions() {
@@ -149,6 +159,7 @@ public final class BasicDiscoveryMetadata {
                 && Objects.equals(artifactId, that.artifactId)
                 && Objects.equals(commitShortSha, that.commitShortSha)
                 && Objects.equals(jdkVendor, that.jdkVendor)
+                && Objects.equals(gcInUse, that.gcInUse)
                 && Objects.equals(softwareVersions, that.softwareVersions)
                 && healthStatus == that.healthStatus
                 && Objects.equals(memoryDetails, that.memoryDetails)
@@ -164,6 +175,7 @@ public final class BasicDiscoveryMetadata {
                 artifactId,
                 commitShortSha,
                 jdkVendor,
+                gcInUse,
                 softwareVersions,
                 healthStatus,
                 memoryDetails,
@@ -190,6 +202,9 @@ public final class BasicDiscoveryMetadata {
                 + '\''
                 + ", jdkVendor='"
                 + jdkVendor
+                + '\''
+                + ", gcInUse='"
+                + gcInUse
                 + '\''
                 + ", versions="
                 + softwareVersions

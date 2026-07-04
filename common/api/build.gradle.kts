@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    api(project(":common:domain"))
+
     // Test
     // Required for `testImplementation` dependencies to pick a version from.
     testImplementation("org.junit.jupiter:junit-jupiter-engine")

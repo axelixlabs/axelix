@@ -63,7 +63,6 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
              "runtime": {
                  "javaVersion": "17.0.16",
                  "jdkVendor": "Corretto-17.0.16.8.1",
-                 "garbageCollector": "G1 GC",
                  "kotlinVersion": "1.9.0"
              },
              "build": {
@@ -98,7 +97,6 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
         RuntimeDetails runtime = instanceDetails.getRuntime();
         assertThat(runtime.getJavaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.getJdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
-        assertThat(runtime.getGarbageCollector()).isEqualTo("G1 GC");
         assertThat(runtime.getKotlinVersion()).isEqualTo("1.9.0");
 
         BuildDetails build = instanceDetails.getBuild();

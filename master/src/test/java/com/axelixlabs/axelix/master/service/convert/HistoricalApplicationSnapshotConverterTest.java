@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 
@@ -55,7 +56,7 @@ class HistoricalApplicationSnapshotConverterTest {
         assertThat(snapshot.insights().hotSpot().projectLeyden().aotCacheEnabled())
                 .isFalse();
         assertThat(snapshot.insights().hotSpot().gc().gcLoggingEnabled()).isFalse();
-        assertThat(snapshot.insights().hotSpot().gc().gcInUse()).isEqualTo("TODO");
+        assertThat(snapshot.insights().hotSpot().gc().gcInUse()).isEqualTo(GarbageCollector.G1);
         assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
                 .isFalse();
         assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
@@ -85,6 +86,7 @@ class HistoricalApplicationSnapshotConverterTest {
                 "petclinic",
                 "a8b0929",
                 "BellSoft",
+                GarbageCollector.G1,
                 softwareVersions,
                 BasicDiscoveryMetadata.HealthStatus.UP,
                 memoryDetails,

@@ -30,7 +30,6 @@ export interface IDetailsGit {
 export interface IDetailsRuntime {
     javaVersion: string;
     jdkVendor: string;
-    garbageCollector: string;
     kotlinVersion?: string;
 }
 

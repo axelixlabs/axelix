@@ -117,6 +117,7 @@ class AxelixMetadataEndpointTest {
                         + "  \"artifactId\" : \"axelix-sbs\",\n"
                         + "  \"commitShortSha\" : \"a8b0929\",\n"
                         + "  \"jdkVendor\" : \"#{json-unit.ignore}\",\n"
+                        + "  \"gcInUse\" : \"#{json-unit.ignore}\",\n"
                         + "  \"softwareVersions\" : {\n"
                         + "    \"springBoot\" : \"3.5.0\",\n"
                         + "    \"java\" : \"25\",\n"

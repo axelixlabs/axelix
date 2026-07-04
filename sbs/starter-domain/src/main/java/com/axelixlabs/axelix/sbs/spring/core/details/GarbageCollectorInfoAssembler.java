@@ -22,6 +22,8 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+
 /**
  * Utility class for retrieving garbage collector information.
  *
@@ -32,7 +34,7 @@ public class GarbageCollectorInfoAssembler {
 
     private GarbageCollectorInfoAssembler() {}
 
-    public static String getGarbageCollectorInfo() {
+    public static GarbageCollector getGarbageCollectorInfo() {
 
         List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
                 .map(GarbageCollectorMXBean::getName)
@@ -41,15 +43,9 @@ public class GarbageCollectorInfoAssembler {
         if (!gcNames.isEmpty()) {
             String joined = String.join(", ", gcNames).toLowerCase();
 
-            GarageCollector garageCollector = GarageCollector.fromName(joined);
-
-            if (garageCollector == GarageCollector.UNKNOWN) {
-                return String.join(", ", gcNames);
-            }
-
-            return garageCollector.name();
+            return GarbageCollector.fromName(joined);
         }
 
-        return GarageCollector.UNKNOWN.name();
+        return GarbageCollector.UNKNOWN;
     }
 }

@@ -33,7 +33,6 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
-import static com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler.getGarbageCollectorInfo;
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
 /**
@@ -89,7 +88,6 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         return new RuntimeDetails(
                 libraryInformationProvider.getJavaVersion(),
                 libraryInformationProvider.getJdkVendorName(),
-                getGarbageCollectorInfo(),
                 libraryInformationProvider.getKotlinVersion());
     }
 

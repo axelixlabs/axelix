@@ -61,6 +61,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
               "artifactId" : "axelix-sbs",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "#{json-unit.ignore}",
+              "gcInUse" : "#{json-unit.ignore}",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",

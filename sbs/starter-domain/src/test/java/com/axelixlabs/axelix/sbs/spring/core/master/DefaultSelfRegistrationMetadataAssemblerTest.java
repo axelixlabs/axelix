@@ -162,6 +162,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         assertThat(basicMetadata.getServiceVersion()).isEqualTo("1.1.3");
         assertThat(basicMetadata.getCommitShortSha()).isEqualTo("8f4b9f7");
         assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
+        assertThat(basicMetadata.getGcInUse()).isNotNull();
         assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());
     }

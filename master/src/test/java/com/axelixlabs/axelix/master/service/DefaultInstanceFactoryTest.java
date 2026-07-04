@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 
@@ -102,6 +103,7 @@ public class DefaultInstanceFactoryTest {
                 artifactId,
                 "a8b0929",
                 "BellSoft",
+                GarbageCollector.G1,
                 softwareVersions,
                 BasicDiscoveryMetadata.HealthStatus.UP,
                 memoryDetails,

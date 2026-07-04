@@ -22,6 +22,7 @@ import java.lang.management.MemoryMXBean;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
@@ -75,6 +76,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 artifactId,
                 gitCommitInfo.commitShaShort(),
                 libraryInformationProvider.getJdkVendorName(),
+                GarbageCollectorInfoAssembler.getGarbageCollectorInfo(),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
