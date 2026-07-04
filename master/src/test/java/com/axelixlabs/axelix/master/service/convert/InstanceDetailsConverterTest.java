@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.convert;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +31,6 @@ import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.BuildProfile;
@@ -47,6 +44,7 @@ import com.axelixlabs.axelix.master.service.convert.response.details.InstanceDet
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,7 +69,8 @@ public class InstanceDetailsConverterTest {
     @BeforeEach
     void prepare() {
         instanceRegistry.reload(TestInstanceFactory.create(activeInstanceId));
-        applicationSnapshotService.reloadCurrentState(getCurrentSnapshotMetadata());
+        applicationSnapshotService.reloadCurrentState(
+                TestMetadataFactory.create("org.springframework.samples", "spring-petclinic", GarbageCollector.G1));
         converter = new InstanceDetailsConverter(instanceRegistry, applicationSnapshotService);
     }
 
@@ -132,30 +131,5 @@ public class InstanceDetailsConverterTest {
         OsDetails osDetails = new InstanceDetails.OsDetails("Windows 10", "10.0", "amd64");
 
         return new InstanceDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
-    }
-
-    private static BasicDiscoveryMetadata getCurrentSnapshotMetadata() {
-        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
-                new BasicDiscoveryMetadata.SoftwareVersions("17.0.16", "3.5.0", "7.0", null);
-        BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
-        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
-                new BasicDiscoveryMetadata.HotSpot(
-                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.APP_CDS.getId(), false)),
-                        List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), false)),
-                        List.of()),
-                List.of(new BasicDiscoveryMetadata.InsightFeature(FeatureId.OSIV.getId(), false)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0-SNAPSHOT",
-                "org.springframework.samples",
-                "spring-petclinic",
-                "a8b0929",
-                "BellSoft",
-                GarbageCollector.G1,
-                softwareVersions,
-                BasicDiscoveryMetadata.HealthStatus.UP,
-                memoryDetails,
-                insights);
     }
 }

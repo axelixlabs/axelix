@@ -32,12 +32,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HealthStatus;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.MemoryDetails;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
@@ -46,6 +40,7 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFramew
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -288,27 +283,8 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
     }
 
     private static BasicDiscoveryMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
-        SoftwareVersions softwareVersions = new SoftwareVersions("25", "3.5.0", "6.1.2", null);
-
-        Insights insights = new Insights(
-                new HotSpot(
-                        List.of(new InsightFeature("AppCDS", appCdsEnabled)),
-                        List.of(new InsightFeature("GCLoggingEnabled", false)),
-                        List.of()),
-                List.of(new InsightFeature("OSIV", osivEnabled)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0-SNAPSHOT",
-                "org.springframework.samples",
-                "petclinic",
-                "a8b0929",
-                "BellSoft",
-                GarbageCollector.G1,
-                softwareVersions,
-                HealthStatus.UP,
-                new MemoryDetails(12_000),
-                insights);
+        return TestMetadataFactory.withFeatures(
+                "org.springframework.samples", "petclinic", appCdsEnabled, false, false, false, osivEnabled);
     }
 
     private static HistoricalApplicationSnapshot snapshot(
@@ -326,27 +302,8 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
     }
 
     private static BasicDiscoveryMetadata otherAppMetadata() {
-        SoftwareVersions softwareVersions = new SoftwareVersions("21", "1.0.0", "6.2.0", null);
-
-        Insights insights = new Insights(
-                new HotSpot(
-                        List.of(new InsightFeature("AppCDS", false)),
-                        List.of(new InsightFeature("GCLoggingEnabled", true)),
-                        List.of(new InsightFeature("CompactObjectHeaders", true))),
-                List.of(new InsightFeature("OSIV", false)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "1.0.0",
-                "com.example",
-                "other-app",
-                "910230",
-                "Eclipse Temurin",
-                GarbageCollector.ZGC,
-                softwareVersions,
-                HealthStatus.DOWN,
-                new MemoryDetails(8_000),
-                insights);
+        return TestMetadataFactory.withFeatures(
+                "com.example", "other-app", false, false, true, true, false, GarbageCollector.ZGC);
     }
 
     private static BasicDiscoveryMetadata metadata(
@@ -377,29 +334,14 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled,
             GarbageCollector garbageCollector) {
-        SoftwareVersions softwareVersions = new SoftwareVersions("25", "3.5.0", "6.2.0", null);
-
-        Insights insights = new Insights(
-                new HotSpot(
-                        List.of(
-                                new InsightFeature(FeatureId.APP_CDS.getId(), appCdsEnabled),
-                                new InsightFeature(FeatureId.AOT_CACHE.getId(), aotCacheEnabled)),
-                        List.of(new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLoggingEnabled)),
-                        List.of(new InsightFeature(
-                                FeatureId.COMPACT_OBJECT_HEADERS.getId(), compactObjectHeadersEnabled))),
-                List.of(new InsightFeature(FeatureId.OSIV.getId(), osivEnabled)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0",
+        return TestMetadataFactory.withFeatures(
                 groupId,
                 artifactId,
-                "a8b0929",
-                "BellSoft",
-                garbageCollector,
-                softwareVersions,
-                HealthStatus.UP,
-                new MemoryDetails(12_000),
-                insights);
+                appCdsEnabled,
+                aotCacheEnabled,
+                gcLoggingEnabled,
+                compactObjectHeadersEnabled,
+                osivEnabled,
+                garbageCollector);
     }
 }

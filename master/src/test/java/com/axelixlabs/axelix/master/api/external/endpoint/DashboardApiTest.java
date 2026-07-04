@@ -33,20 +33,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HealthStatus;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.MemoryDetails;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
@@ -291,26 +285,7 @@ public class DashboardApiTest {
 
     private static BasicDiscoveryMetadata metadata(
             String groupId, String artifactId, GarbageCollector garbageCollector) {
-        SoftwareVersions softwareVersions = new SoftwareVersions("25", "3.5.0", "6.2.0", null);
-
-        Insights insights = new Insights(
-                new HotSpot(
-                        List.of(new InsightFeature(FeatureId.APP_CDS.getId(), false)),
-                        List.of(new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), false)),
-                        List.of(new InsightFeature(FeatureId.COMPACT_OBJECT_HEADERS.getId(), false))),
-                List.of(new InsightFeature(FeatureId.OSIV.getId(), false)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0",
-                groupId,
-                artifactId,
-                "a8b0929",
-                "BellSoft",
-                garbageCollector,
-                softwareVersions,
-                HealthStatus.UP,
-                new MemoryDetails(12_000),
-                insights);
+        return TestMetadataFactory.withFeatures(
+                groupId, artifactId, false, false, false, false, false, garbageCollector);
     }
 }

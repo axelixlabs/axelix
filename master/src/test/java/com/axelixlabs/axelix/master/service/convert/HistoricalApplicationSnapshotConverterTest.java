@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.service.convert;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +26,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ class HistoricalApplicationSnapshotConverterTest {
     @Test
     void shouldMapAllFieldsCorrectly() {
         // given.
-        BasicDiscoveryMetadata metadata = sampleMetadata();
+        BasicDiscoveryMetadata metadata = TestMetadataFactory.create("org.springframework.samples", "petclinic");
 
         // when.
         HistoricalApplicationSnapshot snapshot = subject.currentSnapshot(metadata);
@@ -60,36 +60,5 @@ class HistoricalApplicationSnapshotConverterTest {
         assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
                 .isFalse();
         assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
-    }
-
-    private static BasicDiscoveryMetadata sampleMetadata() {
-        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
-                new BasicDiscoveryMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
-
-        BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
-
-        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
-                new BasicDiscoveryMetadata.HotSpot(
-                        List.of(
-                                new BasicDiscoveryMetadata.InsightFeature("AotCache", false),
-                                new BasicDiscoveryMetadata.InsightFeature("AppCDS", true)),
-                        List.of(
-                                new BasicDiscoveryMetadata.InsightFeature("GCLoggingEnabled", false),
-                                new BasicDiscoveryMetadata.InsightFeature("GCLogFileSpecified", false)),
-                        List.of(new BasicDiscoveryMetadata.InsightFeature("CompactObjectHeaders", false))),
-                List.of(new BasicDiscoveryMetadata.InsightFeature("OSIV", true)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0-SNAPSHOT",
-                "org.springframework.samples",
-                "petclinic",
-                "a8b0929",
-                "BellSoft",
-                GarbageCollector.G1,
-                softwareVersions,
-                BasicDiscoveryMetadata.HealthStatus.UP,
-                memoryDetails,
-                insights);
     }
 }

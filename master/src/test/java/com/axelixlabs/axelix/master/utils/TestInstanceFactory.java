@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
 /**
- * Utility factory for creating test objects used in unit and integration tests.
+ * Test fixture factory for {@link Instance}.
  *
  * @since 29.08.2025
  * @author Nikita Kirillov

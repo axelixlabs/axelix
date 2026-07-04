@@ -18,14 +18,12 @@
 package com.axelixlabs.axelix.master.service;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,7 +47,7 @@ public class DefaultInstanceFactoryTest {
                 "2025-02-03T13:29:29Z",
                 Instant.parse("2025-04-03T13:29:29Z"),
                 "http://localhost:8080/actuator",
-                mapMetadata("org.springframework.samples", "petclinic"));
+                TestMetadataFactory.create("org.springframework.samples", "petclinic"));
 
         // then.
         assertThat(instance).isNotNull();
@@ -79,34 +77,7 @@ public class DefaultInstanceFactoryTest {
                         "2025-02-03T13:29:29Z",
                         Instant.parse("2025-04-03T13:29:29Z"),
                         "http://localhost:8080/actuator",
-                        mapMetadata("", "petclinic")))
+                        TestMetadataFactory.create("", "petclinic")))
                 .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    private BasicDiscoveryMetadata mapMetadata(String groupId, String artifactId) {
-        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
-                new BasicDiscoveryMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
-
-        BasicDiscoveryMetadata.MemoryDetails memoryDetails = new BasicDiscoveryMetadata.MemoryDetails(12_000);
-
-        BasicDiscoveryMetadata.Insights insights = new BasicDiscoveryMetadata.Insights(
-                new BasicDiscoveryMetadata.HotSpot(
-                        List.of(new BasicDiscoveryMetadata.InsightFeature("AppCDS", true)),
-                        List.of(new BasicDiscoveryMetadata.InsightFeature("GCLoggingEnabled", false)),
-                        List.of()),
-                List.of(new BasicDiscoveryMetadata.InsightFeature("OSIV", true)));
-
-        return new BasicDiscoveryMetadata(
-                "1.0.0-SNAPSHOT",
-                "3.5.0-SNAPSHOT",
-                groupId,
-                artifactId,
-                "a8b0929",
-                "BellSoft",
-                GarbageCollector.G1,
-                softwareVersions,
-                BasicDiscoveryMetadata.HealthStatus.UP,
-                memoryDetails,
-                insights);
     }
 }
