@@ -27,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -35,6 +34,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
+import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static com.axelixlabs.axelix.master.utils.TestInstanceFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,8 +49,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 //  Checks for an Instant fields are not performed in these tests, they are omitted there.
 //  And I think this can lead to problems in the future. AssertJ provides the way to test the
 //  Instant and other datetime fields with closeTo method that we should probably utilize
-@SpringBootTest
-abstract class DatabaseInstanceRegistryTest {
+@DatabaseMatrixTest
+class DatabaseInstanceRegistryTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;

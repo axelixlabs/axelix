@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
@@ -41,6 +40,7 @@ import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
+import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -50,8 +50,8 @@ import static org.assertj.core.api.Assertions.tuple;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest
-abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
+@DatabaseMatrixTest
+class DatabaseHistoricalApplicationSnapshotServiceTest {
 
     @Autowired
     private DatabaseHistoricalApplicationSnapshotService subject;
@@ -172,8 +172,10 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateJavaFeaturesAdoptionAcrossServices() {
             // given two distinct services with different Java/JVM features enabled.
-            BasicDiscoveryMetadata first = metadata("com.example", "service-a", true, true, true, false, true);
-            BasicDiscoveryMetadata second = metadata("com.example", "service-b", true, false, false, false, false);
+            BasicDiscoveryMetadata first =
+                    TestMetadataFactory.withFeatures("com.example", "service-a", true, true, true, false, true);
+            BasicDiscoveryMetadata second =
+                    TestMetadataFactory.withFeatures("com.example", "service-b", true, false, false, false, false);
             subject.reloadCurrentStateBulk(List.of(first, second));
 
             // when.
@@ -196,12 +198,12 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateGarbageCollectorDistributionAcrossServices() {
             // given.
-            BasicDiscoveryMetadata first =
-                    metadata("com.example", "service-a", false, false, false, false, false, GarbageCollector.G1);
-            BasicDiscoveryMetadata second =
-                    metadata("com.example", "service-b", false, false, false, false, false, GarbageCollector.G1);
-            BasicDiscoveryMetadata third =
-                    metadata("com.example", "service-c", false, false, false, false, false, GarbageCollector.ZGC);
+            BasicDiscoveryMetadata first = TestMetadataFactory.withFeatures(
+                    "com.example", "service-a", false, false, false, false, false, GarbageCollector.G1);
+            BasicDiscoveryMetadata second = TestMetadataFactory.withFeatures(
+                    "com.example", "service-b", false, false, false, false, false, GarbageCollector.G1);
+            BasicDiscoveryMetadata third = TestMetadataFactory.withFeatures(
+                    "com.example", "service-c", false, false, false, false, false, GarbageCollector.ZGC);
             subject.reloadCurrentStateBulk(List.of(first, second, third));
 
             // when.
@@ -216,8 +218,11 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldCountOnlyTheLatestSnapshotPerService() {
             // given a service whose latest snapshot has AppCDS disabled.
-            BasicDiscoveryMetadata current = metadata("com.example", "service-a", false, false, false, false, false);
-            subject.reloadCurrentState(metadata("com.example", "service-a", true, true, true, true, true));
+            BasicDiscoveryMetadata staleMetadata =
+                    TestMetadataFactory.withFeatures("com.example", "service-a", true, true, true, true, true);
+            BasicDiscoveryMetadata current =
+                    TestMetadataFactory.withFeatures("com.example", "service-a", false, false, false, false, false);
+            subject.reloadCurrentState(staleMetadata);
             subject.reloadCurrentState(current);
 
             // when.
@@ -256,9 +261,12 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateSpringFrameworkFeaturesAdoptionAcrossServices() {
             // given three services, two of which have OSIV enabled.
-            BasicDiscoveryMetadata first = metadata("com.example", "service-a", false, false, false, false, true);
-            BasicDiscoveryMetadata second = metadata("com.example", "service-b", false, false, false, false, true);
-            BasicDiscoveryMetadata third = metadata("com.example", "service-c", false, false, false, false, false);
+            BasicDiscoveryMetadata first =
+                    TestMetadataFactory.withFeatures("com.example", "service-a", false, false, false, false, true);
+            BasicDiscoveryMetadata second =
+                    TestMetadataFactory.withFeatures("com.example", "service-b", false, false, false, false, true);
+            BasicDiscoveryMetadata third =
+                    TestMetadataFactory.withFeatures("com.example", "service-c", false, false, false, false, false);
             subject.reloadCurrentStateBulk(List.of(first, second, third));
 
             // when.
@@ -304,44 +312,5 @@ abstract class DatabaseHistoricalApplicationSnapshotServiceTest {
     private static BasicDiscoveryMetadata otherAppMetadata() {
         return TestMetadataFactory.withFeatures(
                 "com.example", "other-app", false, false, true, true, false, GarbageCollector.ZGC);
-    }
-
-    private static BasicDiscoveryMetadata metadata(
-            String groupId,
-            String artifactId,
-            boolean appCdsEnabled,
-            boolean aotCacheEnabled,
-            boolean gcLoggingEnabled,
-            boolean compactObjectHeadersEnabled,
-            boolean osivEnabled) {
-        return metadata(
-                groupId,
-                artifactId,
-                appCdsEnabled,
-                aotCacheEnabled,
-                gcLoggingEnabled,
-                compactObjectHeadersEnabled,
-                osivEnabled,
-                GarbageCollector.G1);
-    }
-
-    private static BasicDiscoveryMetadata metadata(
-            String groupId,
-            String artifactId,
-            boolean appCdsEnabled,
-            boolean aotCacheEnabled,
-            boolean gcLoggingEnabled,
-            boolean compactObjectHeadersEnabled,
-            boolean osivEnabled,
-            GarbageCollector garbageCollector) {
-        return TestMetadataFactory.withFeatures(
-                groupId,
-                artifactId,
-                appCdsEnabled,
-                aotCacheEnabled,
-                gcLoggingEnabled,
-                compactObjectHeadersEnabled,
-                osivEnabled,
-                garbageCollector);
     }
 }
