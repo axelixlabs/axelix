@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Checkout helm-charts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: axelixlabs/helm-charts
           path: helm-charts
@@ -29,7 +29,7 @@ jobs:
           java-version: '25'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Grant execution access to the wrapper
         run: chmod +x gradlew
@@ -75,7 +75,7 @@ jobs:
           kind load docker-image ${{ env.PLAYGROUND_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
 
       - name: Setup Helm
-        uses: azure/setup-helm@v5.0.0
+        uses: azure/setup-helm@v5.0.1
         with:
           version: v3.14.0
 
@@ -126,7 +126,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: master-e2e-test-report
           path: master-e2e-tests/build/reports/tests/e2eTest
