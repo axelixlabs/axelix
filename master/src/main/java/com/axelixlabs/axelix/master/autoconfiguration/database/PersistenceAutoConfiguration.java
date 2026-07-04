@@ -15,13 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration;
+package com.axelixlabs.axelix.master.autoconfiguration.database;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -38,17 +33,10 @@ import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
@@ -56,6 +44,7 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -75,8 +64,7 @@ public class PersistenceAutoConfiguration {
      * Autoconfiguration for SQLite-based {@link InstanceRegistry}.
      */
     @AutoConfiguration
-    @ConditionalOnClass(name = "org.sqlite.JDBC")
-    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:sqlite:")
+    @ConditionalOnCommunityRdbms(CommunityRDBMS.SQLITE)
     public static class SQLiteAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Autowired
@@ -189,8 +177,7 @@ public class PersistenceAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnClass(name = "org.postgresql.Driver")
-    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:postgresql:")
+    @ConditionalOnCommunityRdbms(CommunityRDBMS.POSTGRES)
     public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Bean
@@ -203,8 +190,7 @@ public class PersistenceAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
-    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:mysql:")
+    @ConditionalOnCommunityRdbms(CommunityRDBMS.MYSQL)
     public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Bean
@@ -213,37 +199,6 @@ public class PersistenceAutoConfiguration {
             LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
             liquibaseProperties.setChangeLog("db/changelog/mysql/db.changelog.master.mysql.xml");
             return liquibaseProperties;
-        }
-    }
-
-    @Target({ElementType.TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Documented
-    @Conditional(OnJdbcUrlCondition.class)
-    public @interface ConditionalOnJdbcUrlPrefix {
-
-        /**
-         * @return JDBC url prefix
-         */
-        String jdbcUrlPrefix();
-    }
-
-    public static class OnJdbcUrlCondition extends SpringBootCondition {
-
-        @Override
-        public @NonNull ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
-            MergedAnnotation<ConditionalOnJdbcUrlPrefix> annotation =
-                    metadata.getAnnotations().get(ConditionalOnJdbcUrlPrefix.class);
-
-            String expectedJdbcUrlPrefix = annotation.getString("jdbcUrlPrefix");
-
-            if (jdbcUrl != null && jdbcUrl.startsWith(expectedJdbcUrlPrefix)) {
-                return ConditionOutcome.match();
-            } else {
-                return ConditionOutcome.noMatch("jdbcUrlPrefix was expected to be '%s', but JDBC url actually is '%s'"
-                        .formatted(expectedJdbcUrlPrefix, jdbcUrl));
-            }
         }
     }
 
