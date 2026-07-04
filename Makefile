@@ -69,11 +69,11 @@ LOCAL_JAVA_21 := $(firstword $(wildcard \
     $(HOME)/.jdks/temurin-21* \
     $(HOME)/.sdkman/candidates/java/21*))
 
-LOCAL_JAVA_24 := $(firstword $(wildcard \
-    $(JAVA_24_HOME) \
-    $(HOME)/.jdks/liberica-24* \
-    $(HOME)/.jdks/temurin-24* \
-    $(HOME)/.sdkman/candidates/java/24*))
+LOCAL_JAVA_25 := $(firstword $(wildcard \
+    $(JAVA_25_HOME) \
+    $(HOME)/.jdks/liberica-25* \
+    $(HOME)/.jdks/temurin-25* \
+    $(HOME)/.sdkman/candidates/java/25*))
 
 # PUBLISH STARTERS
 publish-starter-sb-2:
@@ -95,7 +95,7 @@ build-notification-service-gradle-sb-2:
 
 build-feature-service-maven-sb-3:
 	@echo "=== Running Maven build for Feature Service Spring Boot 3 ==="
-	cd playgrounds/feature-service-maven-sb-3 && JAVA_HOME=$(LOCAL_JAVA_24) ./mvnw package -B
+	cd playgrounds/feature-service-maven-sb-3 && JAVA_HOME=$(LOCAL_JAVA_25) ./mvnw package -B
 
 build-spring-petclinic-gradle-sb-3:
 	@echo "=== Running Gradle build for Petclinic Spring Boot 3 ==="

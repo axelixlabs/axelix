@@ -16,7 +16,7 @@
     <name>feature-service</name>
     <description>feature-service</description>
     <properties>
-        <java.version>24</java.version>
+        <java.version>25</java.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <springdoc.version>2.8.9</springdoc.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
