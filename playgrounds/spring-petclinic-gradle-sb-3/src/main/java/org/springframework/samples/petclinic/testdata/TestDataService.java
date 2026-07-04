@@ -1,12 +1,14 @@
 package org.springframework.samples.petclinic.testdata;
 
 import java.util.List;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Profile("default")
 public class TestDataService {
 
     private final CompanyRepository companyRepository;
