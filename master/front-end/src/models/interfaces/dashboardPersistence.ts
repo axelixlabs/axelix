@@ -17,10 +17,15 @@
  */
 // TODO: Maybe we can improve these types
 export interface IDashboardTreemapEntity {
-    name: string;
+    /**
+     * Displayable name of the application.
+     */
+    appName: string;
+
+    /**
+     * The size/count of the problem (e.g. count of N + 1).
+     */
     size: number;
-    entity: string;
-    [key: string]: string | number;
 }
 
 export interface IDashboardPersistenceStatsData {
@@ -29,6 +34,14 @@ export interface IDashboardPersistenceStatsData {
     color: string;
 }
 
-export interface IDashboardTreemapEntityWithColor extends IDashboardTreemapEntity {
-    fill: string;
+export interface IDashboardPersistenceResponse {
+    /**
+     * The state of the N + 1 Problem in the ecosystem.
+     */
+    nPlusOne: IDashboardTreemapEntity[];
+
+    /**
+     * The state of the In memory pagination in the ecosystem.
+     */
+    inMemoryPagination: IDashboardTreemapEntity[];
 }

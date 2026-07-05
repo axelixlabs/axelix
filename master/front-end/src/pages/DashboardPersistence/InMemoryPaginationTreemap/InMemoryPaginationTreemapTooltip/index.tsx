@@ -31,7 +31,7 @@ export const InMemoryPaginationTreemapTooltip = ({ active, payload }: IProps) =>
         return null;
     }
 
-    const { name, size, entity } = entry;
+    const { name, size } = entry;
 
     return (
         <>
@@ -39,11 +39,7 @@ export const InMemoryPaginationTreemapTooltip = ({ active, payload }: IProps) =>
                 <div className={styles.Title}>{name}</div>
 
                 <div>
-                    Records loaded: <b>{size}</b>
-                </div>
-
-                <div>
-                    Entity: <b>{entity}</b>
+                    Count: <b>{size}</b>
                 </div>
             </div>
         </>

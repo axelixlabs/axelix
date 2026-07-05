@@ -17,20 +17,8 @@
  */
 import type { PieLabelRenderProps } from "recharts";
 
-
-
 import type { EInstanceStatus, IChartData, IDistribution, IHealthStatus, IJavaFeatureAdoption } from "models";
 import { HEALTH_STATUSES_COLORS, RADIAN, pickColor } from "utils";
-
-
-
-
-
-
-
-
-
-
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
     const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];

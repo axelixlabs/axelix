@@ -40,6 +40,13 @@ interface IProps {
 }
 
 export const DashboardGauge = ({ data, title, subtitle }: IProps) => {
+    if (data.length == 0) {
+        return (
+            <DashboardCard title={title} subtitle={subtitle}>
+                No data
+            </DashboardCard>
+        );
+    }
     const { adoptionPercentage } = data[0];
     const splitAngle = (adoptionPercentage / 100) * 180;
     const roundedPercent = Math.round(adoptionPercentage);

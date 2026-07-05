@@ -19,7 +19,7 @@ import type { JSX } from "react";
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
 import { DashboardCard } from "components";
-import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity, IDashboardTreemapEntityWithColor } from "models";
+import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity } from "models";
 
 import { DashboardPersistenceLegend } from "../DashboardPersistenceLegend";
 import { DashboardPersistenceStats } from "../DashboardPersistenceStats";
@@ -32,39 +32,37 @@ import styles from "./styles.module.css";
 // TODO: Fix colors
 const nPlusOneColors = ["#ef4444", "#f97316", "#f59e0b", "#eab308", "#fb7185", "#fca5a5", "#fdba74", "#fcd34d"];
 
-const mockData: IDashboardTreemapEntity[] = [
-    { name: "UserRepository", size: 312, entity: "User" },
-    { name: "OrderService", size: 248, entity: "Order" },
-    { name: "ProductCatalog", size: 195, entity: "Product" },
-    { name: "InvoiceLoader", size: 167, entity: "Invoice" },
-    { name: "CommentFeed", size: 134, entity: "Comment" },
-    { name: "TagResolver", size: 98, entity: "Tag" },
-    { name: "AddressMapper", size: 87, entity: "Address" },
-    { name: "PaymentGateway", size: 76, entity: "Payment" },
-    { name: "NotificationSvc", size: 54, entity: "Notification" },
-    { name: "AuditLog", size: 43, entity: "AuditEntry" },
-];
-
-const dataWithColors: IDashboardTreemapEntityWithColor[] = mockData.map((data, index) => ({
-    ...data,
-    fill: nPlusOneColors[index % nPlusOneColors.length],
-}));
-
 // TODO: Fix type
 const renderTreemapCell = (props: any): JSX.Element => {
-    return <TreemapCell {...props} fill={props.fill} valueLabel={`${props.size} queries`} />;
+    return <TreemapCell {...props} fill={props.fill} valueLabel={`${props.size} cases`} />;
 };
 
-export const NPlusOneTreemap = () => {
+interface IProps {
+    nPlusOneEntries: IDashboardTreemapEntity[];
+}
+
+export const NPlusOneTreemap = ({ nPlusOneEntries }: IProps) => {
+    const totalOccurrences = nPlusOneEntries.reduce((total, item) => total + item.size, 0);
+    const maxOccurrences = nPlusOneEntries.reduce(
+        (max, item) => (item.size > max.size ? item : max),
+        nPlusOneEntries[0],
+    );
+
+    const coloredEntries = nPlusOneEntries.map((data, index) => ({
+        ...data,
+        name: data.appName,
+        fill: nPlusOneColors[index % nPlusOneColors.length],
+    }));
+
     const statsData: IDashboardPersistenceStatsData[] = [
         {
             label: "Total Occurrences",
-            value: "Placeholder",
+            value: `${totalOccurrences}`,
             color: "#f97316",
         },
         {
             label: "Worst offender",
-            value: "Placeholder",
+            value: `${maxOccurrences.appName}`,
             color: "#f59e0b",
         },
     ];
@@ -78,7 +76,7 @@ export const NPlusOneTreemap = () => {
                     <div className={styles.TreemapWrapper}>
                         <ResponsiveContainer width="100%" height="100%">
                             <Treemap
-                                data={dataWithColors}
+                                data={coloredEntries}
                                 dataKey="size"
                                 aspectRatio={4 / 3}
                                 content={renderTreemapCell}
@@ -88,7 +86,7 @@ export const NPlusOneTreemap = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <DashboardPersistenceLegend data={mockData} colors={nPlusOneColors} />
+                    <DashboardPersistenceLegend data={nPlusOneEntries} colors={nPlusOneColors} />
                 </div>
             </DashboardCard>
         </>

@@ -28,11 +28,11 @@ export const DashboardPersistenceLegend = ({ data, colors }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                {data.map(({ name, size }, index) => {
+                {data.map(({ appName, size }, index) => {
                     const legendColor = colors[index % colors.length];
 
                     return (
-                        <div key={name} className={styles.LegendEnity}>
+                        <div key={appName} className={styles.LegendEntity}>
                             <span>
                                 <span
                                     className={styles.Color}
@@ -40,7 +40,7 @@ export const DashboardPersistenceLegend = ({ data, colors }: IProps) => {
                                         backgroundColor: legendColor,
                                     }}
                                 />
-                                <span className={`TextUltraSmall ${styles.Label}`}>{name}</span>
+                                <span className={`TextUltraSmall ${styles.Label}`}>{appName}</span>
                             </span>
                             <span className={`TextUltraSmall ${styles.Value}`}>{size}</span>
                         </div>

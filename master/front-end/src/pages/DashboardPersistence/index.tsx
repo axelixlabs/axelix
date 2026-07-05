@@ -16,12 +16,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { DashboardPagesFirstSection } from "components";
+import { getDashboardPersistence } from "services";
 
 import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
 import { NPlusOneTreemap } from "./NPlusOneTreemap";
 import styles from "./styles.module.css";
 
 const DashboardPersistence = () => {
+    // TODO: revisit this
+    const dashboardPersistence = getDashboardPersistence();
+
     return (
         <>
             <DashboardPagesFirstSection
@@ -30,8 +34,8 @@ const DashboardPersistence = () => {
             />
 
             <div className={styles.ChartsWrapper}>
-                <NPlusOneTreemap />
-                <InMemoryPaginationTreemap />
+                <NPlusOneTreemap nPlusOneEntries={dashboardPersistence.nPlusOne} />
+                <InMemoryPaginationTreemap inMemoryPaginationEntries={dashboardPersistence.inMemoryPagination} />
             </div>
         </>
     );

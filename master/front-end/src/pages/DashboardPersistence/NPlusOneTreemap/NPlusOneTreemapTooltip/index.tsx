@@ -31,7 +31,7 @@ export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
         return null;
     }
 
-    const { name, size, entity } = entry;
+    const { name, size } = entry;
 
     return (
         <>
@@ -39,14 +39,8 @@ export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
                 <div className={styles.Title}>{name}</div>
 
                 <div>
-                    Queries: <b>{size}</b>
+                    Count: <b>{size}</b>
                 </div>
-
-                {entity && (
-                    <div>
-                        Entity: <b>{entity}</b>
-                    </div>
-                )}
             </div>
         </>
     );

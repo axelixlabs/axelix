@@ -222,10 +222,10 @@
         "statistics": "Statistics",
         "totalServicesCount": "Total count of services",
         "java": {
-          "projectLeyden" : {
-            "AppCDS" : "App CDS",
-            "AotCache" : "Aot Cache"
-          }
+            "projectLeyden" : {
+                "AppCDS" : "App CDS",
+                "AotCache" : "Aot Cache"
+            }
         }
     },
     "About": {

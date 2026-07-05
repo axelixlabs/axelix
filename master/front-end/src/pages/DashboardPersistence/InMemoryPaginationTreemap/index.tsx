@@ -18,7 +18,7 @@
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
 import { DashboardCard } from "components";
-import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity, IDashboardTreemapEntityWithColor } from "models";
+import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity } from "models";
 
 import { DashboardPersistenceLegend } from "../DashboardPersistenceLegend";
 import { DashboardPersistenceStats } from "../DashboardPersistenceStats";
@@ -28,48 +28,43 @@ import sharedStyles from "../shared.module.css";
 import { InMemoryPaginationTreemapTooltip } from "./InMemoryPaginationTreemapTooltip";
 import styles from "./styles.module.css";
 
-const mockData: IDashboardTreemapEntity[] = [
-    { name: "ProductListAPI", size: 45000, entity: "Product" },
-    { name: "OrderHistoryCtrl", size: 32800, entity: "Order" },
-    { name: "UserSearchSvc", size: 28600, entity: "User" },
-    { name: "ReportExporter", size: 21400, entity: "Report" },
-    { name: "AuditViewer", size: 18700, entity: "AuditLog" },
-    { name: "LogBrowser", size: 15200, entity: "LogEntry" },
-    { name: "InventoryMgr", size: 11900, entity: "Item" },
-    { name: "AnalyticsFeed", size: 8400, entity: "Event" },
-];
-
 const paginationColors = ["#6366f1", "#8b5cf6", "#a78bfa", "#7c3aed", "#818cf8", "#c4b5fd", "#4f46e5", "#ddd6fe"];
 
-const dataWithColors: IDashboardTreemapEntityWithColor[] = mockData.map((data, index) => ({
-    ...data,
-    fill: paginationColors[index % paginationColors.length],
-}));
-
 const renderPaginationCell = (props: any) => {
-    const label = props.size >= 1000 ? `${(props.size / 1000).toFixed(1)}k records` : `${props.size} records`;
+    const label = `${props.size} cases`;
 
     return <TreemapCell {...props} fill={props.fill} valueLabel={label} />;
 };
 
-export const InMemoryPaginationTreemap = () => {
+interface IProps {
+    inMemoryPaginationEntries: IDashboardTreemapEntity[];
+}
+
+export const InMemoryPaginationTreemap = ({ inMemoryPaginationEntries }: IProps) => {
+    const totalOccurrences = inMemoryPaginationEntries.reduce((acc, item) => acc + item.size, 0);
+    const maxCounter = inMemoryPaginationEntries.reduce(
+        (acc, item) => (item.size > acc.size ? item : acc),
+        inMemoryPaginationEntries[0],
+    );
+
     const statsData: IDashboardPersistenceStatsData[] = [
         {
-            label: "Endpoints",
-            value: "Placeholder",
+            label: "Total Occurrences",
+            value: `${totalOccurrences}`,
             color: "#6366f1",
         },
         {
-            label: "Records loaded",
-            value: "Placeholder",
-            color: "#8b5cf6",
-        },
-        {
-            label: "Largest loader",
-            value: "Placeholder",
+            label: "Worst Offender",
+            value: `${maxCounter.appName}`,
             color: "#7c3aed",
         },
     ];
+
+    const coloredApplications = inMemoryPaginationEntries.map((data, index) => ({
+        ...data,
+        name: data.appName,
+        fill: paginationColors[index % paginationColors.length],
+    }));
 
     return (
         <>
@@ -80,7 +75,7 @@ export const InMemoryPaginationTreemap = () => {
                     <div className={styles.ChartWrapper}>
                         <ResponsiveContainer width="100%" height="100%">
                             <Treemap
-                                data={dataWithColors}
+                                data={coloredApplications}
                                 dataKey="size"
                                 aspectRatio={4 / 3}
                                 content={renderPaginationCell}
@@ -90,7 +85,7 @@ export const InMemoryPaginationTreemap = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <DashboardPersistenceLegend data={mockData} colors={paginationColors} />
+                    <DashboardPersistenceLegend data={inMemoryPaginationEntries} colors={paginationColors} />
                 </div>
             </DashboardCard>
         </>
