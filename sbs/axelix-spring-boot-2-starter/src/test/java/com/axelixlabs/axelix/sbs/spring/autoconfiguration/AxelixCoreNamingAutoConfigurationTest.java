@@ -27,6 +27,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -40,37 +41,39 @@ class AxelixCoreNamingAutoConfigurationTest {
     private static final String PREFIX = "axelix";
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(AxelixCoreNamingAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(AxelixCoreNamingAutoConfiguration.class));
 
     @Test
     void shouldRenameBeanToAxelixConvention() {
         contextRunner
-            .withConfiguration(AutoConfigurations.of(EndpointsConfigurationPropertiesAutoConfiguration.class))
-            .run(context -> {
-                assertThat(context).hasSingleBean(AxelixBeanRenamingProcessor.class);
+                .withConfiguration(AutoConfigurations.of(EndpointsConfigurationPropertiesAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(AxelixBeanRenamingProcessor.class);
 
-                String[] beanNames = context.getBeanNamesForType(EndpointsConfigurationProperties.class);
-                assertThat(beanNames).isNotEmpty();
-                String actualBeanName = beanNames[0];
-                assertThat(actualBeanName).startsWith(PREFIX);
-            });
+                    String[] beanNames = context.getBeanNamesForType(EndpointsConfigurationProperties.class);
+                    assertThat(beanNames).isNotEmpty();
+                    String actualBeanName = beanNames[0];
+                    assertThat(actualBeanName).startsWith(PREFIX);
+                    assertEquals("axelixEndpointsConfigurationProperties",  actualBeanName);
+                });
     }
 
     @Test
     void shouldNotRenameBeanToAxelixConvention_WhenBeanAlreadyCompliesWithConvention() {
         contextRunner
-            .withConfiguration(AutoConfigurations.of(AxelixHeapDumpEndpointAutoConfiguration.class))
-            .withPropertyValues(
-                "management.endpoint.axelixheapdump.enabled=true",
-                "management.endpoints.web.exposure.include=axelixheapdump")
-            .run(context -> {
-                assertThat(context).hasSingleBean(AxelixBeanRenamingProcessor.class);
-                assertThat(context).hasSingleBean(AxelixHeapDumpEndpoint.class);
+                .withConfiguration(AutoConfigurations.of(AxelixHeapDumpEndpointAutoConfiguration.class))
+                .withPropertyValues(
+                        "management.endpoint.axelixheapdump.enabled=true",
+                        "management.endpoints.web.exposure.include=axelixheapdump")
+                .run(context -> {
+                    assertThat(context).hasSingleBean(AxelixBeanRenamingProcessor.class);
+                    assertThat(context).hasSingleBean(AxelixHeapDumpEndpoint.class);
 
-                String[] beanNames = context.getBeanNamesForType(AxelixHeapDumpEndpoint.class);
-                assertThat(beanNames).isNotEmpty();
-                String actualBeanName = beanNames[0];
-                assertFalse(actualBeanName.startsWith(PREFIX + PREFIX));
-            });
+                    String[] beanNames = context.getBeanNamesForType(AxelixHeapDumpEndpoint.class);
+                    assertThat(beanNames).isNotEmpty();
+                    String actualBeanName = beanNames[0];
+                    assertFalse(actualBeanName.startsWith(PREFIX + PREFIX));
+                    assertEquals("axelixHeapDumpEndpoint", actualBeanName);
+                });
     }
 }

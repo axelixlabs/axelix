@@ -27,6 +27,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -53,6 +54,7 @@ class AxelixCoreNamingAutoConfigurationTest {
                     assertThat(beanNames).isNotEmpty();
                     String actualBeanName = beanNames[0];
                     assertThat(actualBeanName).startsWith(PREFIX);
+                    assertEquals("axelixEndpointsConfigurationProperties",  actualBeanName);
                 });
     }
 
@@ -71,6 +73,7 @@ class AxelixCoreNamingAutoConfigurationTest {
                     assertThat(beanNames).isNotEmpty();
                     String actualBeanName = beanNames[0];
                     assertFalse(actualBeanName.startsWith(PREFIX + PREFIX));
+                    assertEquals("axelixHeapDumpEndpoint", actualBeanName);
                 });
     }
 }
