@@ -20,3 +20,4 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfig
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration

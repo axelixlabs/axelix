@@ -10,12 +10,18 @@ val springBootTestPlatformVersion = "2.7.18"
 
 val jsonUnitAssertJVersion = "2.38.0"
 
+val springVersion = "5.3.31"
+
 dependencies {
     // Self
     api(project(":common:auth"))
     api(project(":common:api"))
     api(project(":common:domain"))
     api(project(":common:utils"))
+
+    compileOnly("org.springframework:spring-context:$springVersion")
+    compileOnly("org.springframework:spring-beans:$springVersion")
+    compileOnly("org.springframework:spring-core:$springVersion")
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
