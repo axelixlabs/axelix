@@ -18,8 +18,7 @@
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { DashboardCard } from "components";
-import { getMaxAdoptionInfo } from "helpers";
-import type { IJavaFeatureAdoption } from "models";
+import type { IChartData } from "models";
 
 import { DashboardChartTooltip } from "../DashboardChartTooltip";
 import { DashboardDonutCentre } from "../DashboardDonutCentre";
@@ -28,44 +27,75 @@ import { DashboardLegendItem } from "../DashboardLegendItem";
 import styles from "./styles.module.css";
 
 interface IProps {
-    data: IJavaFeatureAdoption[];
+    /**
+     * The actual data to be displayed in donut chart.
+     */
+    data: IChartData[];
+
+    /**
+     * Chart heading titling info.
+     */
+    heading: ITitle;
+
+    /**
+     * Centre titling info.
+     */
+    centre: ITitle;
+
+    /**
+     * Rest category configuration.
+     */
+    rest: IRestCategory;
+}
+
+export interface ITitle {
     title: string;
     subtitle: string;
-    showRest?: boolean;
+}
+
+export interface IRestCategory {
+    /**
+     * Show the 'rest' category?
+     */
+    show: boolean;
+
+    /**
+     * The title of the 'rest' category in the legend. Must be supplied if 'show = true'
+     */
+    title?: string;
 }
 
 // TODO: Fix colors in future
-const DEFAULT_COLORS = ["#4B9EFF", "#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185"];
+const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 
-export const DashboardDonutChart = ({ data, title, subtitle, showRest = true }: IProps) => {
+export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => {
     if (!data.length) {
         return (
-            <DashboardCard title={title} subtitle={subtitle}>
+            <DashboardCard title={heading.title} subtitle={heading.subtitle}>
                 No data
             </DashboardCard>
         );
     }
 
-    const totalAdoption = data.reduce((sum, { adoptionPercentage }) => sum + adoptionPercentage, 0);
-    const restPercent = Math.round(100 - totalAdoption);
-    const { maxPercent, featureNameWithMaxPercent } = getMaxAdoptionInfo(data);
-
-    const chartData = data.map(({ featureId, adoptionPercentage }, index) => ({
-        name: featureId,
-        value: adoptionPercentage,
+    const chartData = data.map(({ categoryName, value }, index) => ({
+        name: categoryName,
+        value,
         fill: DEFAULT_COLORS[index % DEFAULT_COLORS.length],
     }));
 
-    if (showRest && restPercent > 0) {
+    const totalValue = data.reduce((sum, { value }) => sum + value, 0);
+    const restPercent = Math.round(100 - totalValue);
+
+    if (rest.show && restPercent > 0) {
         chartData.push({
-            name: "Rest",
+            name: rest.title!,
             value: restPercent,
             fill: "#D1D5DB",
         });
     }
 
     return (
-        <DashboardCard title={title} subtitle={subtitle}>
+        <DashboardCard title={heading.title} subtitle={heading.subtitle}>
             <div className={styles.ContentWrapper}>
                 <div className={styles.ChartWrapper}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -82,10 +112,7 @@ export const DashboardDonutChart = ({ data, title, subtitle, showRest = true }: 
                         </PieChart>
                     </ResponsiveContainer>
 
-                    <DashboardDonutCentre
-                        topRowData={`${Math.round(maxPercent)}%`}
-                        bottomRowData={featureNameWithMaxPercent}
-                    />
+                    <DashboardDonutCentre topRowData={centre.title} bottomRowData={centre.subtitle} />
                 </div>
 
                 <div className={styles.LegendWrapper}>

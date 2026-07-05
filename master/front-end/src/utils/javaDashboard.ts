@@ -15,10 +15,5 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { TFunction } from "i18next";
-
-export const getScheduledTasksTypes = (t: TFunction) => ({
-    cron: t("ScheduledTasks.cron"),
-    fixedDelay: t("ScheduledTasks.fixedDelay"),
-    fixedRate: t("ScheduledTasks.fixedRate"),
-});
+export const APP_CDS_FEATURE_ID = "AppCDS";
+export const AOT_CACHE_FEATURE_ID = "AotCache";

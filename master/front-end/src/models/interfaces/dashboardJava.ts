@@ -20,10 +20,20 @@ export interface IJavaFeatureAdoption {
     adoptionPercentage: number;
 }
 
+export interface IChartData {
+    categoryName: string;
+    value: number;
+}
+
 export interface IDashboardJavaResponseBody {
     projectLeyden: IJavaFeatureAdoption[];
     gc: IJavaFeatureAdoption[];
+    garbageCollectorDistribution: IGCDistributionData;
     projectLilliput: IJavaFeatureAdoption[];
+}
+
+export interface IGCDistributionData {
+    [gcName: string]: number;
 }
 
 export interface IMaxAdoptionInfo {

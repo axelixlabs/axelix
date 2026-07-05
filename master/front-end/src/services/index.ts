@@ -17,7 +17,6 @@
  */
 export * from "./scheduledTasks";
 export * from "./transactional";
-export * from "./dashboardJava";
 export * from "./environment";
 export * from "./configProps";
 export * from "./threadDump";

@@ -18,21 +18,20 @@
 import { useEffect, useState } from "react";
 
 import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IDashboardJavaResponseBody, type IJavaFeatureAdoption, StatefulRequest } from "models";
+import { fetchData, toChartData } from "helpers";
+import { type IChartData, type IDashboardJavaResponseBody, type IGCDistributionData, StatefulRequest } from "models";
 import { getDashboardJavaData } from "services";
 
-import { DashboardDonutChart } from "./DashboardDonutChart";
+import { DashboardGCDistribution } from "./DashboardGCDistribution";
 import { DashboardGauge } from "./DashboardGauge";
+import { DashboardProjectLeyden } from "./DashboardProjectLeyden";
 import styles from "./styles.module.css";
 
-export const mockGcDistributionData: IJavaFeatureAdoption[] = [
-    { featureId: "G1GC", adoptionPercentage: 54 },
-    { featureId: "ZGC", adoptionPercentage: 20 },
-    { featureId: "Shenandoah", adoptionPercentage: 15 },
-    { featureId: "Parallel", adoptionPercentage: 8 },
-    { featureId: "Serial", adoptionPercentage: 3 },
-];
+const toGcDistributionData = (garbageCollectorDistribution: IGCDistributionData): IChartData[] => {
+    return Object.entries(garbageCollectorDistribution)
+        .map(([categoryName, value]) => ({ categoryName, value }))
+        .sort((left, right) => right.value - left.value);
+};
 
 const DashboardJava = () => {
     const [dashboardJavaState, setDashboardJavaState] = useState(StatefulRequest.loading<IDashboardJavaResponseBody>());
@@ -49,7 +48,10 @@ const DashboardJava = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const { projectLeyden, gc, projectLilliput } = dashboardJavaState.response!;
+    const { projectLeyden, gc, garbageCollectorDistribution, projectLilliput } = dashboardJavaState.response!;
+
+    const projectLeydenData = toChartData(projectLeyden);
+    const gcDistributionData = toGcDistributionData(garbageCollectorDistribution);
 
     return (
         <>
@@ -59,13 +61,8 @@ const DashboardJava = () => {
             />
 
             <div className={styles.ChartsWrapper}>
-                <DashboardDonutChart data={projectLeyden} title="Project Leyden Adoption" subtitle="JVM optimisation" />
-                <DashboardDonutChart
-                    data={mockGcDistributionData}
-                    title="Garbage Collector Distribution"
-                    subtitle="Runtime profile"
-                    showRest={false}
-                />
+                <DashboardProjectLeyden projectLeydenData={projectLeydenData} />
+                <DashboardGCDistribution gcDistributionData={gcDistributionData} />
                 <DashboardGauge data={gc} title="Garbage Collector Logging" subtitle="Log output coverage" />
                 <DashboardGauge
                     data={projectLilliput}

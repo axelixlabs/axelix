@@ -20,3 +20,11 @@ import { apiFetch } from "api";
 export const getDashboardData = () => {
     return apiFetch.get("dashboard");
 };
+
+export const getDashboardJavaData = () => {
+    return apiFetch.get("/dashboard/java");
+};
+
+export const getDashboardSpringFramework = () => {
+    return apiFetch.get("/dashboard/spring-framework");
+};

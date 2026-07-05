@@ -58,12 +58,7 @@ const renderTreemapCell = (props: any): JSX.Element => {
 export const NPlusOneTreemap = () => {
     const statsData: IDashboardPersistenceStatsData[] = [
         {
-            label: "Hotspots",
-            value: "Placeholder",
-            color: "#ef4444",
-        },
-        {
-            label: "Total queries",
+            label: "Total Occurrences",
             value: "Placeholder",
             color: "#f97316",
         },

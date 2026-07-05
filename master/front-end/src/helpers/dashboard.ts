@@ -17,8 +17,20 @@
  */
 import type { PieLabelRenderProps } from "recharts";
 
-import type { EInstanceStatus, IDistribution, IHealthStatus } from "models";
+
+
+import type { EInstanceStatus, IChartData, IDistribution, IHealthStatus, IJavaFeatureAdoption } from "models";
 import { HEALTH_STATUSES_COLORS, RADIAN, pickColor } from "utils";
+
+
+
+
+
+
+
+
+
+
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
     const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];
@@ -71,4 +83,11 @@ export const calculateInnerValueCoordinates = (props: PieLabelRenderProps, total
     const displayedValue = `${value} (${percentage}%)`;
 
     return [x, y, displayedValue];
+};
+
+export const toChartData = (javaFeatureAdoption: IJavaFeatureAdoption[]): IChartData[] => {
+    return javaFeatureAdoption.map(({ featureId, adoptionPercentage }) => ({
+        categoryName: featureId,
+        value: adoptionPercentage,
+    }));
 };
