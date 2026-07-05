@@ -15,8 +15,51 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useEffect, useState } from "react";
+
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { fetchData } from "helpers";
+import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "models";
+import { getDashboardSpringFramework } from "services";
+
+import { DashboardGauge } from "../DashboardJava/DashboardGauge";
+
+import styles from "./styles.module.css";
+
+const OSIV_FEATURE_ID = "OSIV";
+
 const DashboardSpringFramework = () => {
-    return "DashboardSpringFramework";
+    const [springFramework, setSpringFramework] = useState(
+        StatefulRequest.loading<IDashboardSpringFrameworkResponseBody>(),
+    );
+
+    useEffect(() => {
+        fetchData(setSpringFramework, () => getDashboardSpringFramework());
+    }, []);
+
+    if (springFramework.loading) {
+        return <Loader />;
+    }
+
+    if (springFramework.error) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    const { features } = springFramework.response!;
+    const osiv = features.filter(({ featureId }) => featureId === OSIV_FEATURE_ID);
+
+    return (
+        <>
+            <DashboardPagesFirstSection
+                title="Spring Framework"
+                subtitle="Ecosystem-wide Spring Framework insights · Open Session in View"
+            />
+
+            <div className={styles.ChartsWrapper}>
+                <DashboardGauge data={osiv} title="Open Session in View (OSIV)" subtitle="Enabled services coverage" />
+            </div>
+        </>
+    );
 };
 
 export default DashboardSpringFramework;

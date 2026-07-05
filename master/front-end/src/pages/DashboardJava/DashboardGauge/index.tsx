@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { DashboardCard } from "components";
-import type { IJavaFeatureAdoption } from "models";
+import type { IFeatureAdoption } from "models";
 
 import { ArcSegment } from "./ArcSegment";
 import { StatCards } from "./StatCards";
@@ -34,7 +34,7 @@ const GREEN = "#34D399";
 const ROSE = "#FB7185";
 
 interface IProps {
-    data: IJavaFeatureAdoption[];
+    data: IFeatureAdoption[];
     title: string;
     subtitle: string;
 }

@@ -15,10 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export interface IJavaFeatureAdoption {
+export interface IFeatureAdoption {
     featureId: string;
     adoptionPercentage: number;
 }
+
+export type IJavaFeatureAdoption = IFeatureAdoption;
 
 export interface IChartData {
     categoryName: string;
@@ -30,6 +32,10 @@ export interface IDashboardJavaResponseBody {
     gc: IJavaFeatureAdoption[];
     garbageCollectorDistribution: IGCDistributionData;
     projectLilliput: IJavaFeatureAdoption[];
+}
+
+export interface IDashboardSpringFrameworkResponseBody {
+    features: IFeatureAdoption[];
 }
 
 export interface IGCDistributionData {
