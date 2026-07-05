@@ -15,22 +15,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
+import type { IChartData } from "models";
+
+import { DashboardDonutChart } from "../DashboardDonutChart";
 
 interface IProps {
-    title: string;
-    children: React.ReactNode;
-    subtitle: string;
+    gcDistributionData: IChartData[];
 }
 
-export const DashboardJavaCard = ({ title, subtitle, children }: IProps) => {
+export const DashboardGCDistribution = ({ gcDistributionData }: IProps) => {
+    const mostUsedGc = gcDistributionData.reduce(
+        (max, item) => (item.value > max.value ? item : max),
+        gcDistributionData[0],
+    );
+
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.CardHeaderWrapper}>
-                <div className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</div>
-                <div className={styles.Title}>{title}</div>
-            </div>
-            {children}
-        </div>
+        <DashboardDonutChart
+            data={gcDistributionData}
+            heading={{
+                title: "Garbage Collector Distribution",
+                subtitle: "Runtime profile",
+            }}
+            centre={{
+                title: mostUsedGc.categoryName,
+                subtitle: "Most used",
+            }}
+            rest={{
+                show: false,
+            }}
+        />
     );
 };

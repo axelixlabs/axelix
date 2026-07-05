@@ -1,0 +1,11 @@
+.MainWrapper {
+    padding: 8px 12px;
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-medium-grey);
+}
+
+.Title {
+    margin-bottom: 4px;
+    font-weight: 600;
+}

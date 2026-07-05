@@ -17,35 +17,91 @@
  */
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
+import { DashboardCard } from "components";
+import type { IChartData } from "models";
+
 import { DashboardChartTooltip } from "../DashboardChartTooltip";
 import { DashboardDonutCentre } from "../DashboardDonutCentre";
-import { DashboardJavaCard } from "../DashboardJavaCard";
 import { DashboardLegendItem } from "../DashboardLegendItem";
 
 import styles from "./styles.module.css";
 
+interface IProps {
+    /**
+     * The actual data to be displayed in donut chart.
+     */
+    data: IChartData[];
+
+    /**
+     * Chart heading titling info.
+     */
+    heading: ITitle;
+
+    /**
+     * Centre titling info.
+     */
+    centre: ITitle;
+
+    /**
+     * Rest category configuration.
+     */
+    rest: IRestCategory;
+}
+
+export interface ITitle {
+    title: string;
+    subtitle: string;
+}
+
+export interface IRestCategory {
+    /**
+     * Show the 'rest' category?
+     */
+    show: boolean;
+
+    /**
+     * The title of the 'rest' category in the legend. Must be supplied if 'show = true'
+     */
+    title?: string;
+}
+
 // TODO: Fix colors in future
-const TEAL = "#2DD4BF";
-const BLUE = "#4B9EFF";
-const INDIGO = "#818CF8";
-const PURPLE = "#A78BFA";
+const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 
-const mockData = [
-    { name: "AOT Compilation", value: 38, fill: BLUE },
-    { name: "CDS Enabled", value: 27, fill: TEAL },
-    { name: "No Leyden", value: 24, fill: PURPLE },
-    { name: "Partial Adoption", value: 11, fill: INDIGO },
-];
+export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => {
+    if (!data.length) {
+        return (
+            <DashboardCard title={heading.title} subtitle={heading.subtitle}>
+                No data
+            </DashboardCard>
+        );
+    }
 
-export const DashboardLeydenChart = () => {
+    const chartData = data.map(({ categoryName, value }, index) => ({
+        name: categoryName,
+        value,
+        fill: DEFAULT_COLORS[index % DEFAULT_COLORS.length],
+    }));
+
+    const totalValue = data.reduce((sum, { value }) => sum + value, 0);
+    const restPercent = Math.round(100 - totalValue);
+
+    if (rest.show && restPercent > 0) {
+        chartData.push({
+            name: rest.title!,
+            value: restPercent,
+            fill: "#D1D5DB",
+        });
+    }
+
     return (
-        <DashboardJavaCard title="Project Leyden Adoption" subtitle="JVM optimisation">
+        <DashboardCard title={heading.title} subtitle={heading.subtitle}>
             <div className={styles.ContentWrapper}>
                 <div className={styles.ChartWrapper}>
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
-                                data={mockData}
+                                data={chartData}
                                 innerRadius={55}
                                 outerRadius={80}
                                 paddingAngle={3}
@@ -56,16 +112,15 @@ export const DashboardLeydenChart = () => {
                         </PieChart>
                     </ResponsiveContainer>
 
-                    {/* TODO: Fix after using real data */}
-                    <DashboardDonutCentre topRowData="4" bottomRowData="methods" />
+                    <DashboardDonutCentre topRowData={centre.title} bottomRowData={centre.subtitle} />
                 </div>
 
                 <div className={styles.LegendWrapper}>
-                    {mockData.map(({ name, fill, value }) => (
+                    {chartData.map(({ name, fill, value }) => (
                         <DashboardLegendItem key={name} circleColor={fill} label={name} value={`${value}%`} />
                     ))}
                 </div>
             </div>
-        </DashboardJavaCard>
+        </DashboardCard>
     );
 };

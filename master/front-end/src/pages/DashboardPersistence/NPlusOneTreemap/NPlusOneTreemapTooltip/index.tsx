@@ -15,30 +15,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardPagesFirstSection } from "components";
-import { getDashboardPersistence } from "services";
-
-import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
-import { NPlusOneTreemap } from "./NPlusOneTreemap";
 import styles from "./styles.module.css";
 
-const DashboardPersistence = () => {
-    // TODO: revisit this
-    const dashboardPersistence = getDashboardPersistence();
+interface IProps {
+    active?: boolean;
+
+    // TODO: Fix type
+    payload?: any[];
+}
+
+export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
+    const entry = payload?.[0]?.payload;
+
+    if (!active || !entry) {
+        return null;
+    }
+
+    const { name, size } = entry;
 
     return (
         <>
-            <DashboardPagesFirstSection
-                title="Persistence Dashboard"
-                subtitle="Database access patterns · N+1 detection · In-memory pagination"
-            />
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <div className={styles.Title}>{name}</div>
 
-            <div className={styles.ChartsWrapper}>
-                <NPlusOneTreemap nPlusOneEntries={dashboardPersistence.nPlusOne} />
-                <InMemoryPaginationTreemap inMemoryPaginationEntries={dashboardPersistence.inMemoryPagination} />
+                <div>
+                    Count: <b>{size}</b>
+                </div>
             </div>
         </>
     );
 };
-
-export default DashboardPersistence;

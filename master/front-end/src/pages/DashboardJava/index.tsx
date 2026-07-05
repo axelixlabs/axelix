@@ -15,23 +15,60 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { DashboardGCDistributionChart } from "./DashboardGCDistributionChart";
-import { DashboardGCLoggingGauge } from "./DashboardGCLoggingGauge";
-import { DashboardLeydenChart } from "./DashboardLeydenChart";
+import { useEffect, useState } from "react";
+
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { fetchData, toChartData } from "helpers";
+import { type IChartData, type IDashboardJavaResponseBody, type IGCDistributionData, StatefulRequest } from "models";
+import { getDashboardJavaData } from "services";
+
+import { DashboardGCDistribution } from "./DashboardGCDistribution";
+import { DashboardGauge } from "./DashboardGauge";
+import { DashboardProjectLeyden } from "./DashboardProjectLeyden";
 import styles from "./styles.module.css";
 
+const toGcDistributionData = (garbageCollectorDistribution: IGCDistributionData): IChartData[] => {
+    return Object.entries(garbageCollectorDistribution)
+        .map(([categoryName, value]) => ({ categoryName, value }))
+        .sort((left, right) => right.value - left.value);
+};
+
 const DashboardJava = () => {
+    const [dashboardJavaState, setDashboardJavaState] = useState(StatefulRequest.loading<IDashboardJavaResponseBody>());
+
+    useEffect(() => {
+        fetchData(setDashboardJavaState, () => getDashboardJavaData());
+    }, []);
+
+    if (dashboardJavaState.loading) {
+        return <Loader />;
+    }
+
+    if (dashboardJavaState.error) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    const { projectLeyden, gc, garbageCollectorDistribution, projectLilliput } = dashboardJavaState.response!;
+
+    const projectLeydenData = toChartData(projectLeyden);
+    const gcDistributionData = toGcDistributionData(garbageCollectorDistribution);
+
     return (
         <>
-            <div className={styles.HeaderWrapper}>
-                <div className="TextLarge">Java</div>
-                <p className={styles.Subtitle}>Real-time JVM insights · Project Leyden · Garbage Collection</p>
-            </div>
+            <DashboardPagesFirstSection
+                title="Java"
+                subtitle="Real-time JVM insights · Project Leyden · Garbage Collection"
+            />
 
             <div className={styles.ChartsWrapper}>
-                <DashboardLeydenChart />
-                <DashboardGCDistributionChart />
-                <DashboardGCLoggingGauge />
+                <DashboardProjectLeyden projectLeydenData={projectLeydenData} />
+                <DashboardGCDistribution gcDistributionData={gcDistributionData} />
+                <DashboardGauge data={gc} title="Garbage Collector Logging" subtitle="Log output coverage" />
+                <DashboardGauge
+                    data={projectLilliput}
+                    title="Project Liliput Adoption"
+                    subtitle="Compact object headers"
+                />
             </div>
         </>
     );

@@ -15,25 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
-
-interface IProps {
-    circleColor: string;
-    label: string;
-    value: string;
+export interface IJavaFeatureAdoption {
+    featureId: string;
+    adoptionPercentage: number;
 }
 
-export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
-    return (
-        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-            <span
-                style={{
-                    backgroundColor: circleColor,
-                }}
-                className={styles.Circle}
-            />
-            <span className={styles.Label}>{label}:</span>
-            <span className={styles.Value}>{value}</span>
-        </div>
-    );
-};
+export interface IChartData {
+    categoryName: string;
+    value: number;
+}
+
+export interface IDashboardJavaResponseBody {
+    projectLeyden: IJavaFeatureAdoption[];
+    gc: IJavaFeatureAdoption[];
+    garbageCollectorDistribution: IGCDistributionData;
+    projectLilliput: IJavaFeatureAdoption[];
+}
+
+export interface IGCDistributionData {
+    [gcName: string]: number;
+}
+
+export interface IMaxAdoptionInfo {
+    maxPercent: number;
+    featureNameWithMaxPercent: string;
+}

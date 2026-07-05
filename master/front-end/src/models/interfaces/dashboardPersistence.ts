@@ -15,25 +15,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
+// TODO: Maybe we can improve these types
+export interface IDashboardTreemapEntity {
+    /**
+     * Displayable name of the application.
+     */
+    appName: string;
 
-interface IProps {
-    circleColor: string;
-    label: string;
-    value: string;
+    /**
+     * The size/count of the problem (e.g. count of N + 1).
+     */
+    size: number;
 }
 
-export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
-    return (
-        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-            <span
-                style={{
-                    backgroundColor: circleColor,
-                }}
-                className={styles.Circle}
-            />
-            <span className={styles.Label}>{label}:</span>
-            <span className={styles.Value}>{value}</span>
-        </div>
-    );
-};
+export interface IDashboardPersistenceStatsData {
+    label: string;
+    value: string;
+    color: string;
+}
+
+export interface IDashboardPersistenceResponse {
+    /**
+     * The state of the N + 1 Problem in the ecosystem.
+     */
+    nPlusOne: IDashboardTreemapEntity[];
+
+    /**
+     * The state of the In memory pagination in the ecosystem.
+     */
+    inMemoryPagination: IDashboardTreemapEntity[];
+}

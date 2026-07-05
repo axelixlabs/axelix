@@ -15,25 +15,5 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
-
-interface IProps {
-    circleColor: string;
-    label: string;
-    value: string;
-}
-
-export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
-    return (
-        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-            <span
-                style={{
-                    backgroundColor: circleColor,
-                }}
-                className={styles.Circle}
-            />
-            <span className={styles.Label}>{label}:</span>
-            <span className={styles.Value}>{value}</span>
-        </div>
-    );
-};
+export const APP_CDS_FEATURE_ID = "AppCDS";
+export const AOT_CACHE_FEATURE_ID = "AotCache";

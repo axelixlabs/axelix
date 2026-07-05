@@ -25,7 +25,7 @@ interface IProps {
     color: string;
 }
 
-const toRadians = (degrees: number) => {
+const toRadians = (degrees: number): number => {
     return (degrees * Math.PI) / 180;
 };
 

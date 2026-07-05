@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+export * from "./interfaces/dashboardPersistence";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";
+export * from "./interfaces/dashboardJava";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";

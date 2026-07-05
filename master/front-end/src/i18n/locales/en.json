@@ -220,7 +220,13 @@
         "healthStatus": "Health Status",
         "totalCount": "Total Count",
         "statistics": "Statistics",
-        "totalServicesCount": "Total count of services"
+        "totalServicesCount": "Total count of services",
+        "java": {
+            "projectLeyden" : {
+                "AppCDS" : "App CDS",
+                "AotCache" : "Aot Cache"
+            }
+        }
     },
     "About": {
         "title": "About Axelix",

@@ -15,10 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { TFunction } from "i18next";
+import type { IDashboardPersistenceStatsData } from "models";
 
-export const getScheduledTasksTypes = (t: TFunction) => ({
-    cron: t("ScheduledTasks.cron"),
-    fixedDelay: t("ScheduledTasks.fixedDelay"),
-    fixedRate: t("ScheduledTasks.fixedRate"),
-});
+import styles from "./styles.module.css";
+
+interface IProps {
+    data: IDashboardPersistenceStatsData[];
+}
+
+export const DashboardPersistenceStats = ({ data }: IProps) => {
+    return (
+        <>
+            <div className={styles.MainWrapper}>
+                {data.map(({ label, value, color }) => (
+                    <div key={label} className={styles.Stat}>
+                        <span className={`TextUltraSmall ${styles.Label}`}>{label}</span>
+                        <span className={`TextSmall ${styles.Value}`} style={{ color: color }}>
+                            {value}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        </>
+    );
+};

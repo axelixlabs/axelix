@@ -37,7 +37,7 @@ export const DashboardChartTooltip = ({ active, payload }: IProps) => {
         <div className={`TextUltraSmall ${styles.MainWrapper}`}>
             <span style={{ color: fill }}>&#9673;</span>
             <span>
-                {name}: <strong>{value}%</strong>
+                {name}: <b>{value}%</b>
             </span>
         </div>
     );
