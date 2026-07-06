@@ -55,10 +55,6 @@ public class AxelixBeanRenamingProcessor implements BeanDefinitionRegistryPostPr
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         String[] beanNames = registry.getBeanDefinitionNames().clone();
         for (String beanName : beanNames) {
-            if (beanName.toLowerCase().contains("entitymanager")) {
-                beanNames = beanNames.clone();
-            }
-
             BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
             if (beanDefinition instanceof AbstractBeanDefinition abstractBeanDefinition) {
                 if (isBeanCreatedViaBeanAnnotation(abstractBeanDefinition)) {
