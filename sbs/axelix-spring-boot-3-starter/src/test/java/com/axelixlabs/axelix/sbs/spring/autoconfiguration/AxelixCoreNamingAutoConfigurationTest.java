@@ -54,7 +54,7 @@ class AxelixCoreNamingAutoConfigurationTest {
                     assertThat(beanNames).isNotEmpty();
                     String actualBeanName = beanNames[0];
                     assertThat(actualBeanName).startsWith(PREFIX);
-                    assertEquals("axelixEndpointsConfigurationProperties",  actualBeanName);
+                    assertEquals("axelixEndpointsConfigurationProperties", actualBeanName);
                 });
     }
 

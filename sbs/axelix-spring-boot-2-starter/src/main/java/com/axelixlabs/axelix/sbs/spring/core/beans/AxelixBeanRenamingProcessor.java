@@ -55,9 +55,9 @@ public class AxelixBeanRenamingProcessor implements BeanDefinitionRegistryPostPr
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         String[] beanNames = registry.getBeanDefinitionNames().clone();
         for (String beanName : beanNames) {
-            BeanDefinition bd = registry.getBeanDefinition(beanName);
-            if (bd instanceof AbstractBeanDefinition) {
-                AbstractBeanDefinition abstractBeanDefinition = (AbstractBeanDefinition) bd;
+            BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
+            if (beanDefinition instanceof AbstractBeanDefinition) {
+                AbstractBeanDefinition abstractBeanDefinition = (AbstractBeanDefinition) beanDefinition;
 
                 if (isBeanCreatedViaBeanAnnotation(abstractBeanDefinition)) {
                     String factoryBeanName = abstractBeanDefinition.getFactoryBeanName();
