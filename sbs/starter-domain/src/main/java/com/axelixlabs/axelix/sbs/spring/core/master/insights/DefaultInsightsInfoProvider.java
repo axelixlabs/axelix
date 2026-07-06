@@ -162,9 +162,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLogStatus.isEnabled());
     }
 
-    // TODO At present, this placeholder will remain in place until the GC Logging status tracking mechanism is improved
-    // https://github.com/axelixlabs/axelix/issues/573
     private InsightFeature getGcLogFileSpecifiedFeature() {
-        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), false);
+        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), gcLogService.isGcLogFileSpecified());
     }
 }

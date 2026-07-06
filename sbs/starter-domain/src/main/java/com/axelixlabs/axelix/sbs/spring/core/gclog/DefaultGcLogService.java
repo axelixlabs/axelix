@@ -64,7 +64,7 @@ public class DefaultGcLogService implements GcLogService {
             ProcessResult result =
                     jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
 
-            return parseStatus(result.getOutput(), getAvailableLevels());
+            return parseStatus(result.getOutput());
 
         } catch (Exception e) {
             throw new GcLogException("Failed to get GC log status via jcmd", e);
@@ -265,7 +265,7 @@ public class DefaultGcLogService implements GcLogService {
      *
      * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
      */
-    private GcLogStatus parseStatus(String output, List<String> availableLevels) {
+    private GcLogStatus parseStatus(String output) {
         boolean gcSelectorFound = false;
         String highestLevel = null;
 
@@ -295,7 +295,7 @@ public class DefaultGcLogService implements GcLogService {
             }
         }
 
-        return new GcLogStatus(gcSelectorFound, highestLevel, availableLevels);
+        return new GcLogStatus(gcSelectorFound, highestLevel, getAvailableLevels());
     }
 
     /**
