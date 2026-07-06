@@ -23,19 +23,19 @@ import { useAppSelector } from "hooks";
 import { MainLayout } from "layout";
 import { DashboardSiderMenu } from "layout/siders";
 
-const DashboardSpringFramework = Loadable(lazy(() => import("pages/DashboardSpringFramework")));
-const DashboardPersistence = Loadable(lazy(() => import("pages/DashboardPersistence")));
+const DashboardSpringFramework = Loadable(lazy(() => import("pages/Dashboard/DashboardSpringFramework")));
+const DashboardPersistence = Loadable(lazy(() => import("pages/Dashboard/DashboardPersistence")));
+const DashboardOverview = Loadable(lazy(() => import("pages/Dashboard/DashboardOverview")));
+const DashboardJava = Loadable(lazy(() => import("pages/Dashboard/DashboardJava")));
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("pages/Transactional")));
-const DashboardJava = Loadable(lazy(() => import("pages/DashboardJava")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
 const UserProfile = Loadable(lazy(() => import("pages/UserProfile")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
-const Dashboard = Loadable(lazy(() => import("pages/Dashboard")));
 const Loggers = Loadable(lazy(() => import("pages/Loggers")));
 const Details = Loadable(lazy(() => import("pages/Details")));
 const Metrics = Loadable(lazy(() => import("pages/Metrics")));
@@ -59,7 +59,7 @@ export const MainRoutes = () => {
 
                 <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
                     <Route index element={<Navigate to="overview" replace />} />
-                    <Route path="overview" element={<Dashboard />} />
+                    <Route path="overview" element={<DashboardOverview />} />
                     <Route path="java" element={<DashboardJava />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
                     <Route path="spring-framework" element={<DashboardSpringFramework />} />

@@ -17,13 +17,12 @@
  */
 import { useEffect, useState } from "react";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
 import { fetchData, toChartData } from "helpers";
 import { type IChartData, type IDashboardJavaResponseBody, type IGCDistributionData, StatefulRequest } from "models";
 import { getDashboardJavaData } from "services";
 
 import { DashboardGCDistribution } from "./DashboardGCDistribution";
-import { DashboardGauge } from "./DashboardGauge";
 import { DashboardProjectLeyden } from "./DashboardProjectLeyden";
 import styles from "./styles.module.css";
 
