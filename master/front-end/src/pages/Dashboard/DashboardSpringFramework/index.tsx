@@ -17,12 +17,10 @@
  */
 import { useEffect, useState } from "react";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
 import { fetchData } from "helpers";
 import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "models";
 import { getDashboardSpringFramework } from "services";
-
-import { DashboardGauge } from "../DashboardJava/DashboardGauge";
 
 import styles from "./styles.module.css";
 

@@ -27,7 +27,7 @@ import { HealthStatuses } from "./HealthStatuses";
 import { MemoryCards } from "./MemoryCards";
 import styles from "./styles.module.css";
 
-const Dashboard = () => {
+const DashboardOverview = () => {
     const [dashboardData, setDashboardData] = useState(StatefulRequest.loading<IDashboardResponseBody>());
 
     useEffect(() => {
@@ -59,4 +59,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default DashboardOverview;
