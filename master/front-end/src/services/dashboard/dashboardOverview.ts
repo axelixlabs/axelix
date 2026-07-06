@@ -15,5 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export const APP_CDS_FEATURE_ID = "AppCDS";
-export const AOT_CACHE_FEATURE_ID = "AotCache";
+import { apiFetch } from "api";
+
+export const getDashboardOverviewData = () => {
+    return apiFetch.get("dashboard");
+};

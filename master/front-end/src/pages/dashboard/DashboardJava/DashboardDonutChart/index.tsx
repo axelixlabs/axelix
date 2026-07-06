@@ -69,14 +69,6 @@ export interface IRestCategory {
 const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 
 export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => {
-    if (!data.length) {
-        return (
-            <DashboardCard title={heading.title} subtitle={heading.subtitle}>
-                No data
-            </DashboardCard>
-        );
-    }
-
     const chartData = data.map(({ categoryName, value }, index) => ({
         name: categoryName,
         value,
@@ -95,7 +87,7 @@ export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => 
     }
 
     return (
-        <DashboardCard title={heading.title} subtitle={heading.subtitle}>
+        <DashboardCard title={heading.title} subtitle={heading.subtitle} isEmpty={!chartData.length}>
             <div className={styles.ContentWrapper}>
                 <div className={styles.ChartWrapper}>
                     <ResponsiveContainer width="100%" height="100%">

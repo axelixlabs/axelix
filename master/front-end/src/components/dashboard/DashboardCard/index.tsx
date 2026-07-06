@@ -15,15 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { EmptyHandler } from "components";
+
 import styles from "./styles.module.css";
 
 interface IProps {
     title: string;
     subtitle: string;
     children: React.ReactNode;
+    isEmpty?: boolean;
 }
 
-export const DashboardCard = ({ title, subtitle, children }: IProps) => {
+export const DashboardCard = ({ title, subtitle, children, isEmpty = false }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
@@ -31,7 +34,7 @@ export const DashboardCard = ({ title, subtitle, children }: IProps) => {
                     <p className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</p>
                     <h2 className={`TextSmall ${styles.Title}`}>{title}</h2>
                 </div>
-                {children}
+                {isEmpty ? <EmptyHandler isEmpty={isEmpty} /> : children}
             </div>
         </>
     );

@@ -15,19 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { apiFetch } from "api";
+import type { IDashboardPersistenceResponse } from "models";
 
-import type { IDashboardPersistenceResponse } from "../models";
-
-export const getDashboardData = () => {
-    return apiFetch.get("dashboard");
-};
-
-export const getDashboardJavaData = () => {
-    return apiFetch.get("/dashboard/java");
-};
-
-export const getDashboardPersistence = () => {
+export const getDashboardPersistence = (): IDashboardPersistenceResponse => {
     return {
         nPlusOne: [
             { appName: "payments-service", size: 10 },
@@ -53,9 +43,5 @@ export const getDashboardPersistence = () => {
             { appName: "delivery-service", size: 5 },
             { appName: "audit-service", size: 2 },
         ],
-    } as IDashboardPersistenceResponse;
-};
-
-export const getDashboardSpringFramework = () => {
-    return apiFetch.get("/dashboard/spring-framework");
+    };
 };

@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+export * from "./dashboard/dashboardOverview";
+export * from "./dashboard/dashboardJava";
 export * from "./instanceSiderMenu";
 export * from "./scheduledTasks";
 export * from "./transactional";
@@ -23,7 +25,6 @@ export * from "./environment";
 export * from "./conditions";
 export * from "./threadDump";
 export * from "./wallboard";
-export * from "./dashboard";
 export * from "./metrics";
 export * from "./globals";
 export * from "./details";

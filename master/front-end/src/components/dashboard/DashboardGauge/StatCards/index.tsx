@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useTranslation } from "react-i18next";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -22,17 +24,19 @@ interface IProps {
 }
 
 export const StatCards = ({ enabledPercent }: IProps) => {
+    const { t } = useTranslation();
+
     const disabledPercent = 100 - enabledPercent;
 
     const statCardsData = [
         {
-            label: "Enabled",
+            label: t("Dashboard.enabled"),
             value: enabledPercent,
             cardStyles: styles.EnabledLoggingCard,
             valueStyles: styles.EnabledValue,
         },
         {
-            label: "Disabled",
+            label: t("Dashboard.disabled"),
             value: disabledPercent,
             cardStyles: styles.DisabledLoggingCard,
             valueStyles: styles.DisabledValue,

@@ -16,23 +16,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData, toChartData } from "helpers";
-import { type IChartData, type IDashboardJavaResponseBody, type IGCDistributionData, StatefulRequest } from "models";
+import { fetchData, toChartData, toGcDistributionData } from "helpers";
+import { type IDashboardJavaResponseBody, StatefulRequest } from "models";
 import { getDashboardJavaData } from "services";
 
 import { DashboardGCDistribution } from "./DashboardGCDistribution";
 import { DashboardProjectLeyden } from "./DashboardProjectLeyden";
 import styles from "./styles.module.css";
 
-const toGcDistributionData = (garbageCollectorDistribution: IGCDistributionData): IChartData[] => {
-    return Object.entries(garbageCollectorDistribution)
-        .map(([categoryName, value]) => ({ categoryName, value }))
-        .sort((left, right) => right.value - left.value);
-};
-
 const DashboardJava = () => {
+    const { t } = useTranslation();
     const [dashboardJavaState, setDashboardJavaState] = useState(StatefulRequest.loading<IDashboardJavaResponseBody>());
 
     useEffect(() => {
@@ -48,25 +44,25 @@ const DashboardJava = () => {
     }
 
     const { projectLeyden, gc, garbageCollectorDistribution, projectLilliput } = dashboardJavaState.response!;
-
     const projectLeydenData = toChartData(projectLeyden);
     const gcDistributionData = toGcDistributionData(garbageCollectorDistribution);
 
     return (
         <>
-            <DashboardPagesFirstSection
-                title="Java"
-                subtitle="Real-time JVM insights · Project Leyden · Garbage Collection"
-            />
+            <DashboardPagesFirstSection title="Java" subtitle={t("Dashboard.Java.subtitle")} />
 
             <div className={styles.ChartsWrapper}>
                 <DashboardProjectLeyden projectLeydenData={projectLeydenData} />
                 <DashboardGCDistribution gcDistributionData={gcDistributionData} />
-                <DashboardGauge data={gc} title="Garbage Collector Logging" subtitle="Log output coverage" />
+                <DashboardGauge
+                    data={gc}
+                    title={t("Dashboard.Java.gcLoggingChartTitle")}
+                    subtitle={t("Dashboard.Java.gcLoggingChartSubtitle")}
+                />
                 <DashboardGauge
                     data={projectLilliput}
-                    title="Project Liliput Adoption"
-                    subtitle="Compact object headers"
+                    title={t("Dashboard.Java.lilliputChartTitle")}
+                    subtitle={t("Dashboard.Java.lilliputChartSubtitle")}
                 />
             </div>
         </>

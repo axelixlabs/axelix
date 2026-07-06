@@ -15,33 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
+import type { IChartData, IGCDistributionData, IJavaFeatureAdoption } from "models";
 
-interface IProps {
-    active?: boolean;
+export const toChartData = (javaFeatureAdoption: IJavaFeatureAdoption[]): IChartData[] => {
+    return javaFeatureAdoption.map(({ featureId, adoptionPercentage }) => ({
+        categoryName: featureId,
+        value: adoptionPercentage,
+    }));
+};
 
-    // TODO: Fix type
-    payload?: any[];
-}
-
-export const InMemoryPaginationTreemapTooltip = ({ active, payload }: IProps) => {
-    const entry = payload?.[0]?.payload;
-
-    if (!active || !entry) {
-        return null;
-    }
-
-    const { name, size } = entry;
-
-    return (
-        <>
-            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                <div className={styles.Title}>{name}</div>
-
-                <div>
-                    Count: <b>{size}</b>
-                </div>
-            </div>
-        </>
-    );
+export const toGcDistributionData = (garbageCollectorDistribution: IGCDistributionData): IChartData[] => {
+    return Object.entries(garbageCollectorDistribution)
+        .map(([categoryName, value]) => ({ categoryName, value }))
+        .sort((left, right) => right.value - left.value);
 };

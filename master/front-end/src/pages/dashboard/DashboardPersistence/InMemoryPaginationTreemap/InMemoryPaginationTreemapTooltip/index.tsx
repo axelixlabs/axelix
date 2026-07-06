@@ -15,34 +15,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IChartData } from "models";
+import { useTranslation } from "react-i18next";
 
-import { DashboardDonutChart } from "../DashboardDonutChart";
+import styles from "./styles.module.css";
 
 interface IProps {
-    gcDistributionData: IChartData[];
+    active?: boolean;
+
+    // TODO: Fix type
+    payload?: any[];
 }
 
-export const DashboardGCDistribution = ({ gcDistributionData }: IProps) => {
-    const mostUsedGc = gcDistributionData.reduce(
-        (max, item) => (item.value > max.value ? item : max),
-        gcDistributionData[0],
-    );
+export const InMemoryPaginationTreemapTooltip = ({ active, payload }: IProps) => {
+    const { t } = useTranslation();
+
+    const entry = payload?.[0]?.payload;
+
+    if (!active || !entry) {
+        return null;
+    }
+
+    const { name, size } = entry;
 
     return (
-        <DashboardDonutChart
-            data={gcDistributionData}
-            heading={{
-                title: "Garbage Collector Distribution",
-                subtitle: "Runtime profile",
-            }}
-            centre={{
-                title: mostUsedGc.categoryName,
-                subtitle: "Most used",
-            }}
-            rest={{
-                show: false,
-            }}
-        />
+        <>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <div className={styles.Title}>{name}</div>
+
+                <div>
+                    {t("Dashboard.Persistence.tooltipCount")}: <b>{size}</b>
+                </div>
+            </div>
+        </>
     );
 };

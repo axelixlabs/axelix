@@ -40,13 +40,6 @@ interface IProps {
 }
 
 export const DashboardGauge = ({ data, title, subtitle }: IProps) => {
-    if (data.length == 0) {
-        return (
-            <DashboardCard title={title} subtitle={subtitle}>
-                No data
-            </DashboardCard>
-        );
-    }
     const { adoptionPercentage } = data[0];
     const splitAngle = (adoptionPercentage / 100) * 180;
     const roundedPercent = Math.round(adoptionPercentage);
@@ -55,7 +48,7 @@ export const DashboardGauge = ({ data, title, subtitle }: IProps) => {
     const redStart = Math.min(180 + splitAngle + GAP_DEG, 360);
 
     return (
-        <DashboardCard title={title} subtitle={subtitle}>
+        <DashboardCard title={title} subtitle={subtitle} isEmpty={!data.length}>
             <div className={styles.ContentWrapper}>
                 <svg viewBox="0 0 220 120" width="220" height="120">
                     <ArcSegment

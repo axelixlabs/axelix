@@ -221,11 +221,36 @@
         "totalCount": "Total Count",
         "statistics": "Statistics",
         "totalServicesCount": "Total count of services",
-        "java": {
-            "projectLeyden" : {
-                "AppCDS" : "App CDS",
-                "AotCache" : "Aot Cache"
-            }
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "Java": {
+            "subtitle": "Real-time JVM insights · Project Leyden · Garbage Collection",
+            "gcLoggingChartTitle": "Garbage Collector Logging",
+            "gcLoggingChartSubtitle": "Log output coverage",
+            "lilliputChartTitle": "Project Liliput Adoption",
+            "lilliputChartSubtitle": "Compact object headers",
+            "leydenChartTitle": "Project Leyden Adoption",
+            "leydenChartSubtitle": "JVM optimisation",
+            "leydenChartCentreSubtitle": "Adoption",
+            "leydenChartRestTitle": "No adoption",
+            "gcDistributionChartTitle": "Garbage Collector Distribution",
+            "gcDistributionChartSubtitle": "Runtime profile",
+            "gcDistributionChartCentreSubtitle": "Most used"
+        },
+        "Persistence": {
+            "title": "Persistence Dashboard",
+            "subtitle": "Database access patterns · N+1 detection · In-memory pagination",
+            "statFirstLabel": "Total Occurrences",
+            "statSecondLabel": "Worst offender",
+            "nPlusOneChartSubtitle": "Persistence · query anti-patterns",
+            "tooltipCount": "Count",
+            "inMemoryPaginationChartTitle": "In-Memory Pagination",
+            "inMemoryPaginationChartSubtitle": "Persistence · memory pressure"
+        },
+        "SpringFramework": {
+            "subtitle": "Ecosystem-wide Spring Framework insights · Open Session in View",
+            "osivChartTitle": "Open Session in View (OSIV)",
+            "osivChartSubtitle": "Enabled services coverage"
         }
     },
     "About": {

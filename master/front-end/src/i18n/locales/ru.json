@@ -220,7 +220,38 @@
         "healthStatus": "Состояние системы",
         "totalCount": "Общее кол-во",
         "statistics": "Статистика",
-        "totalServicesCount": "Общее количество сервисов"
+        "totalServicesCount": "Общее количество сервисов",
+        "enabled": "Включено",
+        "disabled": "Отключено",
+        "Java": {
+            "subtitle": "Мониторинг JVM в реальном времени · Проект Leyden · Сборка мусора",
+            "gcLoggingChartTitle": "Логирование сборщика мусора",
+            "gcLoggingChartSubtitle": "Покрытие вывода логов",
+            "lilliputChartTitle": "Внедрение Project Lilliput",
+            "lilliputChartSubtitle": "Компактные заголовки объектов",
+            "leydenChartTitle": "Внедрение Project Leyden",
+            "leydenChartSubtitle": "Оптимизация JVM",
+            "leydenChartCentreSubtitle": "Внедрено",
+            "leydenChartRestTitle": "Не внедрено",
+            "gcDistributionChartTitle": "Распределение сборщиков мусора",
+            "gcDistributionChartSubtitle": "Профиль среды выполнения",
+            "gcDistributionChartCentreSubtitle": "Наиболее используемый"
+        },
+        "Persistence": {
+            "title": "Панель персистентности",
+            "subtitle": "Паттерны доступа к БД · Обнаружение N+1 · Пагинация в памяти",
+            "statFirstLabel": "Всего срабатываний",
+            "statSecondLabel": "Худший случай",
+            "nPlusOneChartSubtitle": "Персистентность · антипаттерны запросов",
+            "tooltipCount": "Количество",
+            "inMemoryPaginationChartTitle": "Пагинация в памяти",
+            "inMemoryPaginationChartSubtitle": "Персистентность · нагрузка на память"
+        },
+        "SpringFramework": {
+            "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
+            "osivChartTitle": "Open Session in View (OSIV)",
+            "osivChartSubtitle": "Охват сервисов с включённым OSIV"
+        }
     },
     "About": {
         "title": "Про Axelix",

@@ -16,9 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { AOT_CACHE_FEATURE_ID, APP_CDS_FEATURE_ID } from "utils/javaDashboard.ts";
 
 import type { IChartData } from "models";
+import { AOT_CACHE_FEATURE_ID, APP_CDS_FEATURE_ID } from "utils";
 
 import { DashboardDonutChart } from "../DashboardDonutChart";
 
@@ -33,27 +33,20 @@ export const DashboardProjectLeyden = ({ projectLeydenData }: IProps) => {
         .filter((value) => [APP_CDS_FEATURE_ID, AOT_CACHE_FEATURE_ID].includes(value.categoryName))
         .reduce((acc, item) => acc + item.value, 0);
 
-    projectLeydenData = projectLeydenData.map((value) => {
-        return {
-            value: value.value,
-            categoryName: t(`Dashboard.java.projectLeyden.${value.categoryName}`),
-        };
-    });
-
     return (
         <DashboardDonutChart
             data={projectLeydenData}
             heading={{
-                title: "Project Leyden Adoption",
-                subtitle: "JVM optimisation",
+                title: t("Dashboard.Java.leydenChartTitle"),
+                subtitle: t("Dashboard.Java.leydenChartSubtitle"),
             }}
             centre={{
                 title: `${totalProjectLeydenAdoption}%`,
-                subtitle: "Adoption",
+                subtitle: t("Dashboard.Java.leydenChartCentreSubtitle"),
             }}
             rest={{
                 show: true,
-                title: "No adoption",
+                title: t("Dashboard.Java.leydenChartRestTitle"),
             }}
         />
     );

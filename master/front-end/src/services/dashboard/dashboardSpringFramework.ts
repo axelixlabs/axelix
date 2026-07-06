@@ -15,33 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
+import { apiFetch } from "api";
 
-interface IProps {
-    active?: boolean;
-
-    // TODO: Fix type
-    payload?: any[];
-}
-
-export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
-    const entry = payload?.[0]?.payload;
-
-    if (!active || !entry) {
-        return null;
-    }
-
-    const { name, size } = entry;
-
-    return (
-        <>
-            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                <div className={styles.Title}>{name}</div>
-
-                <div>
-                    Count: <b>{size}</b>
-                </div>
-            </div>
-        </>
-    );
+export const getDashboardSpringFramework = () => {
+    return apiFetch.get("/dashboard/spring-framework");
 };

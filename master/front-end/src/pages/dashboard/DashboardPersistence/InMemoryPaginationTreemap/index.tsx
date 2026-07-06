@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useTranslation } from "react-i18next";
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
 import { DashboardCard } from "components";
@@ -41,6 +42,8 @@ interface IProps {
 }
 
 export const InMemoryPaginationTreemap = ({ inMemoryPaginationEntries }: IProps) => {
+    const { t } = useTranslation();
+
     const totalOccurrences = inMemoryPaginationEntries.reduce((acc, item) => acc + item.size, 0);
     const maxCounter = inMemoryPaginationEntries.reduce(
         (acc, item) => (item.size > acc.size ? item : acc),
@@ -49,12 +52,12 @@ export const InMemoryPaginationTreemap = ({ inMemoryPaginationEntries }: IProps)
 
     const statsData: IDashboardPersistenceStatsData[] = [
         {
-            label: "Total Occurrences",
+            label: t("Dashboard.Persistence.statFirstLabel"),
             value: `${totalOccurrences}`,
             color: "#6366f1",
         },
         {
-            label: "Worst Offender",
+            label: t("Dashboard.Persistence.statSecondLabel"),
             value: `${maxCounter.appName}`,
             color: "#7c3aed",
         },
@@ -68,7 +71,11 @@ export const InMemoryPaginationTreemap = ({ inMemoryPaginationEntries }: IProps)
 
     return (
         <>
-            <DashboardCard title="In-Memory Pagination" subtitle="Persistence · memory pressure">
+            <DashboardCard
+                title={t("Dashboard.Persistence.inMemoryPaginationChartTitle")}
+                subtitle={t("Dashboard.Persistence.inMemoryPaginationChartSubtitle")}
+                isEmpty={!inMemoryPaginationEntries.length}
+            >
                 <div className={sharedStyles.PersistenceCardContentWrapper}>
                     <DashboardPersistenceStats data={statsData} />
 

@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useTranslation } from "react-i18next";
+
 import { DashboardPagesFirstSection } from "components";
 import { getDashboardPersistence } from "services";
 
@@ -23,14 +25,16 @@ import { NPlusOneTreemap } from "./NPlusOneTreemap";
 import styles from "./styles.module.css";
 
 const DashboardPersistence = () => {
+    const { t } = useTranslation();
+
     // TODO: revisit this
     const dashboardPersistence = getDashboardPersistence();
 
     return (
         <>
             <DashboardPagesFirstSection
-                title="Persistence Dashboard"
-                subtitle="Database access patterns · N+1 detection · In-memory pagination"
+                title={t("Dashboard.Persistence.title")}
+                subtitle={t("Dashboard.Persistence.subtitle")}
             />
 
             <div className={styles.ChartsWrapper}>

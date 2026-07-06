@@ -16,17 +16,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
 import { fetchData } from "helpers";
 import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "models";
 import { getDashboardSpringFramework } from "services";
+import { OSIV_FEATURE_ID } from "utils";
 
 import styles from "./styles.module.css";
 
-const OSIV_FEATURE_ID = "OSIV";
-
 const DashboardSpringFramework = () => {
+    const { t } = useTranslation();
+
     const [springFramework, setSpringFramework] = useState(
         StatefulRequest.loading<IDashboardSpringFrameworkResponseBody>(),
     );
@@ -48,13 +50,14 @@ const DashboardSpringFramework = () => {
 
     return (
         <>
-            <DashboardPagesFirstSection
-                title="Spring Framework"
-                subtitle="Ecosystem-wide Spring Framework insights · Open Session in View"
-            />
+            <DashboardPagesFirstSection title="Spring Framework" subtitle={t("Dashboard.SpringFramework.subtitle")} />
 
             <div className={styles.ChartsWrapper}>
-                <DashboardGauge data={osiv} title="Open Session in View (OSIV)" subtitle="Enabled services coverage" />
+                <DashboardGauge
+                    data={osiv}
+                    title={t("Dashboard.SpringFramework.osivChartTitle")}
+                    subtitle={t("Dashboard.SpringFramework.osivChartSubtitle")}
+                />
             </div>
         </>
     );

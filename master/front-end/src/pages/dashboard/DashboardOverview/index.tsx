@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { EmptyHandler, Loader } from "components";
 import { fetchData, getTotalStatusesCount } from "helpers";
 import { type IDashboardResponseBody, StatefulRequest } from "models";
-import { getDashboardData } from "services";
+import { getDashboardOverviewData } from "services";
 
 import { Distributions } from "./Distributions";
 import { HealthStatuses } from "./HealthStatuses";
@@ -31,7 +31,7 @@ const DashboardOverview = () => {
     const [dashboardData, setDashboardData] = useState(StatefulRequest.loading<IDashboardResponseBody>());
 
     useEffect(() => {
-        fetchData(setDashboardData, () => getDashboardData());
+        fetchData(setDashboardData, () => getDashboardOverviewData());
     }, []);
 
     if (dashboardData.loading) {

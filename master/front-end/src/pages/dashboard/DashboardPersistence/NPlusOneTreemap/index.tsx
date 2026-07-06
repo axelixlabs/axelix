@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { JSX } from "react";
+import { useTranslation } from "react-i18next";
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
 import { DashboardCard } from "components";
@@ -42,6 +43,8 @@ interface IProps {
 }
 
 export const NPlusOneTreemap = ({ nPlusOneEntries }: IProps) => {
+    const { t } = useTranslation();
+
     const totalOccurrences = nPlusOneEntries.reduce((total, item) => total + item.size, 0);
     const maxOccurrences = nPlusOneEntries.reduce(
         (max, item) => (item.size > max.size ? item : max),
@@ -56,12 +59,12 @@ export const NPlusOneTreemap = ({ nPlusOneEntries }: IProps) => {
 
     const statsData: IDashboardPersistenceStatsData[] = [
         {
-            label: "Total Occurrences",
+            label: t("Dashboard.Persistence.statFirstLabel"),
             value: `${totalOccurrences}`,
             color: "#f97316",
         },
         {
-            label: "Worst offender",
+            label: t("Dashboard.Persistence.statSecondLabel"),
             value: `${maxOccurrences.appName}`,
             color: "#f59e0b",
         },
@@ -69,7 +72,11 @@ export const NPlusOneTreemap = ({ nPlusOneEntries }: IProps) => {
 
     return (
         <>
-            <DashboardCard title="N + 1" subtitle="Persistence · query anti-patterns">
+            <DashboardCard
+                title="N + 1"
+                subtitle={t("Dashboard.Persistence.nPlusOneChartSubtitle")}
+                isEmpty={!nPlusOneEntries.length}
+            >
                 <div className={sharedStyles.PersistenceCardContentWrapper}>
                     <DashboardPersistenceStats data={statsData} />
 
