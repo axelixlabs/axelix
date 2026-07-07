@@ -15,6 +15,17 @@ concurrency:
 
 jobs:
   check-linked-issues:
+    # External contributors can open PRs without targeting a specific issue.
+    #
+    # OWNER - Author is the owner of the repository.
+    # MEMBER - Author is a member of the organization that owns the repository.
+    # COLLABORATOR - Author has been invited to collaborate on the repository.
+    #
+    # see https://docs.github.com/en/graphql/reference/issues#enums
+    if: >-
+      github.event.pull_request.author_association == 'OWNER' ||
+      github.event.pull_request.author_association == 'MEMBER' ||
+      github.event.pull_request.author_association == 'COLLABORATOR'
     runs-on: ubuntu-latest
     steps:
       - name: Check for linked issues
