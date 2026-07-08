@@ -20,22 +20,18 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
@@ -49,40 +45,17 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration(after = EndpointsConfigurationPropertiesAutoConfiguration.class)
+@AutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public PropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultPropertyNameNormalizer();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public PropertyMetadataExtractor propertyMetadataExtractor(
             ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
         return new DefaultPropertyMetadataExtractor(configurableEnvironment, propertyNameNormalizer);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public SmartSanitizingFunction smartSanitizingFunction(
-            EndpointsConfigurationProperties endpointsConfigurationProperties,
-            PropertyNameNormalizer propertyNameNormalizer) {
-        return new SmartSanitizingFunction(
-                endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SecurityContextExecutor securityContextExecutor() {
-        return new ThreadLocalSecurityContextExecutor();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
@@ -98,21 +71,12 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
             PropertyNameNormalizer propertyNameNormalizer, SecurityContextExecutor securityContextExecutor) {
         return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public RequiredAuthorityCheckService requiredAuthorityCheckService(
-            SecurityContextExecutor securityContextExecutor) {
-        return new RequiredAuthorityCheckService(securityContextExecutor);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public EnvironmentService environmentService(
             Environment environment,
             SmartSanitizingFunction smartSanitizingFunction,
@@ -123,7 +87,6 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
         return new AxelixEnvironmentEndpoint(environmentService);
     }

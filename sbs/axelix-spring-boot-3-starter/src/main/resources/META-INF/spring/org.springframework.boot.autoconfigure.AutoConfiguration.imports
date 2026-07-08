@@ -9,6 +9,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoCon
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration
@@ -20,4 +21,5 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointA
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration

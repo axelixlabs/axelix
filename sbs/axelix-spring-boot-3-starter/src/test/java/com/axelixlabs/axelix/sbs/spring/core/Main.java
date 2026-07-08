@@ -35,11 +35,13 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointA
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
@@ -75,7 +77,9 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             ThreadDumpManagementEndpointAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class,
             EndpointsConfigurationPropertiesAutoConfiguration.class,
+            EndpointPropertiesSupportAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
+            SecurityContextExecutorAutoConfiguration.class,
             ValidationListenerAutoConfiguration.class
         })
 @EnableCaching
