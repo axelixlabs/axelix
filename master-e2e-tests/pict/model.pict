@@ -1,0 +1,4 @@
+DB:            SQLite, Postgres, MySQL
+DiscoveryMode: Discovery_Auto, Discovery_SelfRegistration, Discovery_Both
+Auth:          Auth_Local, Auth_OAuth2, Auth_Both
+MCP:           MCP_Enabled, MCP_Disabled

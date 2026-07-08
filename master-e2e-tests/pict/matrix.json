@@ -1,0 +1,72 @@
+[
+  {
+    "name": "mysql-discovery-both-auth-oauth2-mcp-enabled",
+    "db": "MySQL",
+    "discoverymode": "Discovery_Both",
+    "auth": "Auth_OAuth2",
+    "mcp": "MCP_Enabled"
+  },
+  {
+    "name": "mysql-discovery-auto-auth-local-mcp-disabled",
+    "db": "MySQL",
+    "discoverymode": "Discovery_Auto",
+    "auth": "Auth_Local",
+    "mcp": "MCP_Disabled"
+  },
+  {
+    "name": "sqlite-discovery-selfregistration-auth-oauth2-mcp-disabled",
+    "db": "SQLite",
+    "discoverymode": "Discovery_SelfRegistration",
+    "auth": "Auth_OAuth2",
+    "mcp": "MCP_Disabled"
+  },
+  {
+    "name": "postgres-discovery-auto-auth-oauth2-mcp-enabled",
+    "db": "Postgres",
+    "discoverymode": "Discovery_Auto",
+    "auth": "Auth_OAuth2",
+    "mcp": "MCP_Enabled"
+  },
+  {
+    "name": "sqlite-discovery-auto-auth-both-mcp-enabled",
+    "db": "SQLite",
+    "discoverymode": "Discovery_Auto",
+    "auth": "Auth_Both",
+    "mcp": "MCP_Enabled"
+  },
+  {
+    "name": "mysql-discovery-selfregistration-auth-local-mcp-enabled",
+    "db": "MySQL",
+    "discoverymode": "Discovery_SelfRegistration",
+    "auth": "Auth_Local",
+    "mcp": "MCP_Enabled"
+  },
+  {
+    "name": "mysql-discovery-both-auth-both-mcp-disabled",
+    "db": "MySQL",
+    "discoverymode": "Discovery_Both",
+    "auth": "Auth_Both",
+    "mcp": "MCP_Disabled"
+  },
+  {
+    "name": "postgres-discovery-selfregistration-auth-both-mcp-disabled",
+    "db": "Postgres",
+    "discoverymode": "Discovery_SelfRegistration",
+    "auth": "Auth_Both",
+    "mcp": "MCP_Disabled"
+  },
+  {
+    "name": "sqlite-discovery-both-auth-local-mcp-disabled",
+    "db": "SQLite",
+    "discoverymode": "Discovery_Both",
+    "auth": "Auth_Local",
+    "mcp": "MCP_Disabled"
+  },
+  {
+    "name": "postgres-discovery-both-auth-local-mcp-enabled",
+    "db": "Postgres",
+    "discoverymode": "Discovery_Both",
+    "auth": "Auth_Local",
+    "mcp": "MCP_Enabled"
+  }
+]

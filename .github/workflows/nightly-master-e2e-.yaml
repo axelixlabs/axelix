@@ -1,17 +1,47 @@
-name: Nightly Master E2E DRAFT!
+name: Nightly Master E2E
 
 on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'master-e2e-tests/**'
   workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
 
 env:
   KIND_CLUSTER_NAME: axelix-master-e2e
-  MASTER_IMAGE: axelix-master-e2e:local
-  PLAYGROUND_IMAGE: notification-service-e2e:local
+  MASTER_IMAGE_NAME: axelix-master
+  MASTER_IMAGE_TAG: local
+  NOTIFICATION_SERVICE_IMAGE: notification-service-gradle-sb-2:local
   JWT_SIGNING_KEY: e2e-only-dummy-signing-key-do-not-reuse-12345678901234567890
 
+permissions:
+  contents: read
+
 jobs:
-  master-e2e-single-config:
+  setup-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.read.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Read matrix.json
+        id: read
+        run: |
+          echo "matrix<<EOF" >> $GITHUB_OUTPUT
+          cat master-e2e-tests/pict/matrix.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  master-e2e:
+    needs: setup-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -34,16 +64,14 @@ jobs:
       - name: Grant execution access to the wrapper
         run: chmod +x gradlew
 
-      # TODO ./gradlew :master:bootJar --no-configuration-cache
       - name: Build Master jar
-        run: ./gradlew :master:bootJar -x test
+        run: ./gradlew :master:bootJar --no-configuration-cache --no-build-cache
 
       - name: Build Master Docker image
-        run: docker build --tag ${{ env.MASTER_IMAGE }} --file Dockerfile .
+        run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file Dockerfile .
 
-      # TODO ./gradlew :sbs:axelix-spring-boot-2-starter:publishToMavenLocal --no-configuration-cache
       - name: Publish Spring Boot 2 Starter to Maven local
-        run: ./gradlew :sbs:axelix-spring-boot-2-starter:publishToMavenLocal -x test
+        run: ./gradlew :sbs:axelix-spring-boot-2-starter:publishToMavenLocal --no-configuration-cache --no-build-cache
 
       - name: Set up JDK 21 for Playground
         uses: actions/setup-java@v5
@@ -52,83 +80,229 @@ jobs:
           distribution: 'liberica'
           java-version: '21'
 
-      - name: Build Playground jar Notification Service
+      - name: Build Playground Notification Service
         working-directory: playgrounds/notification-service-gradle-sb-2
         env:
           JAVA_HOME: ${{ steps.setup-java-21.outputs.path }}
         run: |
           chmod +x gradlew
-          ./gradlew build -x test
+          ./gradlew build --no-configuration-cache --no-build-cache
 
-      - name: Build Playground Docker image
+      - name: Build Notification Service Docker image
         working-directory: playgrounds/notification-service-gradle-sb-2
-        run: docker build --tag ${{ env.PLAYGROUND_IMAGE }} --file docker/Dockerfile .
+        run: docker build --tag ${{ env.NOTIFICATION_SERVICE_IMAGE }} --file docker/Dockerfile .
 
       - name: Create KinD cluster
         uses: helm/kind-action@v1
         with:
           cluster_name: ${{ env.KIND_CLUSTER_NAME }}
 
+      - name: Install ingress-nginx
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+          kubectl wait \
+            --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=120s
+
       - name: Load images into KinD
         run: |
-          kind load docker-image ${{ env.MASTER_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
-          kind load docker-image ${{ env.PLAYGROUND_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
+          kind load docker-image ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --name ${{ env.KIND_CLUSTER_NAME }}
+          kind load docker-image ${{ env.NOTIFICATION_SERVICE_IMAGE }} --name ${{ env.KIND_CLUSTER_NAME }}
 
       - name: Setup Helm
         uses: azure/setup-helm@v5.0.1
         with:
           version: v3.14.0
 
+      - name: Compute configuration
+        run: |
+          # ---------- Database ----------
+          case "${{ matrix.db }}" in
+            SQLite)
+              echo "DB_TYPE=sqlite" >> $GITHUB_ENV
+              echo "DB_URL=jdbc:sqlite::axelix.db" >> $GITHUB_ENV
+              echo "DB_USERNAME=" >> $GITHUB_ENV
+              echo "DB_PASSWORD=" >> $GITHUB_ENV
+              ;;
+
+            Postgres)
+              echo "DB_TYPE=postgres" >> $GITHUB_ENV
+              echo "DB_URL=jdbc:postgresql://postgres:5432/axelix" >> $GITHUB_ENV
+              echo "DB_USERNAME=user" >> $GITHUB_ENV
+              echo "DB_PASSWORD=password" >> $GITHUB_ENV
+              ;;
+
+            MySQL)
+              echo "DB_TYPE=mysql" >> $GITHUB_ENV
+              echo "DB_URL=jdbc:mysql://mysql:3306/axelix" >> $GITHUB_ENV
+              echo "DB_USERNAME=user" >> $GITHUB_ENV
+              echo "DB_PASSWORD=password" >> $GITHUB_ENV
+              ;;
+          esac
+          
+          # ---------- Discovery ----------
+          case "${{ matrix.discoverymode }}" in
+            Discovery_Auto)
+              echo "DISCOVERY_AUTO=true" >> $GITHUB_ENV
+              echo "DISCOVERY_SELF_REG=false" >> $GITHUB_ENV
+              ;;
+            Discovery_SelfRegistration)
+              echo "DISCOVERY_AUTO=false" >> $GITHUB_ENV
+              echo "DISCOVERY_SELF_REG=true" >> $GITHUB_ENV
+              ;;
+            Discovery_Both)
+              echo "DISCOVERY_AUTO=true" >> $GITHUB_ENV
+              echo "DISCOVERY_SELF_REG=true" >> $GITHUB_ENV
+              ;;
+          esac
+          
+          # ---------- Authentication ----------
+          case "${{ matrix.auth }}" in
+            Auth_Local)
+              echo "AUTH_LOCAL=true" >> $GITHUB_ENV
+              echo "AUTH_OAUTH2=false" >> $GITHUB_ENV
+              ;;
+            Auth_OAuth2)
+              echo "AUTH_LOCAL=false" >> $GITHUB_ENV
+              echo "AUTH_OAUTH2=true" >> $GITHUB_ENV
+              ;;
+            Auth_Both)
+              echo "AUTH_LOCAL=true" >> $GITHUB_ENV
+              echo "AUTH_OAUTH2=true" >> $GITHUB_ENV
+              ;;
+          esac
+          
+          # ---------- MCP ----------
+          if [[ "${{ matrix.mcp }}" == "MCP_Enabled" ]]; then
+            echo "MCP_ENABLED=true" >> $GITHUB_ENV
+          else
+            echo "MCP_ENABLED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy database (Postgres/MySQL) if needed
+        if: matrix.db != 'SQLite'
+        run: |
+          kubectl apply -f master-e2e-tests/k8s/${DB_TYPE}.yaml
+          kubectl rollout status deployment/${DB_TYPE} --timeout=60s
+
+      # Resolve ingress and port-forward hostnames from the GitHub Actions runner.
+      - name: Configure local DNS
+        run: |
+          echo "127.0.0.1 master" | sudo tee -a /etc/hosts
+
+      - name: Prepare Master Helm set
+        id: master_set
+        run: |
+          MASTER_SET="--set image.name=$MASTER_IMAGE_NAME \
+                       --set image.ref=$MASTER_IMAGE_TAG \
+                       --set image.pullPolicy=Never \
+                       --set ingress.enabled=true \
+                       --set ingress.host=master \
+                       --set axelix.master.auth.jwt.algorithm=HMAC256 \
+                       --set axelix.master.auth.jwt.signingKey=$JWT_SIGNING_KEY \
+                       --set axelix.master.auth.cookie.secure=false \
+                       --set axelix.master.database.url=$DB_URL \
+                       --set axelix.master.database.username=$DB_USERNAME \
+                       --set axelix.master.database.password=$DB_PASSWORD \
+                       --set axelix.master.discovery.auto.enabled=$DISCOVERY_AUTO \
+                       --set axelix.master.discovery.selfRegistration.enabled=$DISCOVERY_SELF_REG \
+                       --set axelix.master.auth.options.local.enabled=$AUTH_LOCAL \
+                       --set axelix.master.auth.options.oauth2.enabled=$AUTH_OAUTH2 \
+                       --set axelix.master.mcpServer.enabled=$MCP_ENABLED"
+
+          echo "MASTER_SET=$MASTER_SET" >> $GITHUB_ENV
+
       - name: Deploy Axelix Master
         run: |
           helm upgrade --install axelix-master helm-charts/charts/axelix \
-            --set image.name=${{ env.MASTER_IMAGE }} \
-            --set image.ref=local \
-            --set image.pullPolicy=Never \
-            --set ingress.enabled=false \
-            --set axelix.master.auth.jwt.algorithm=HMAC256 \
-            --set axelix.master.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
-            --set axelix.master.auth.cookie.secure=false \
-            --set axelix.master.auth.options.local.enabled=true \
-            --set axelix.master.discovery.auto.enabled=true \
+            ${{ env.MASTER_SET }} \
             --wait --timeout 3m
 
-      - name: Deploy Playground (notification-service)
+      - name: Deploy Notification Service (Auto discovery mode)
+        if: env.DISCOVERY_AUTO == 'true'
         working-directory: playgrounds/notification-service-gradle-sb-2/chart
         run: |
-          helm upgrade --install notification-service . \
-            --set image.ref=${{ env.PLAYGROUND_IMAGE }} \
+          helm upgrade --install notification-service-automatic-discovery . \
+            --set image.ref=$NOTIFICATION_SERVICE_IMAGE \
             --set image.pullPolicy=Never \
             --set axelix.sbs.auth.jwt.algorithm=HMAC256 \
-            --set axelix.sbs.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
+            --set axelix.sbs.auth.jwt.signingKey=$JWT_SIGNING_KEY \
             --wait --timeout 3m
 
-      - name: Port-forward Axelix Master
+      - name: Deploy Notification Service (Self-Registration mode)
+        if: env.DISCOVERY_SELF_REG == 'true'
+        working-directory: playgrounds/notification-service-gradle-sb-2/chart
         run: |
-          kubectl port-forward svc/axelix-master 8080:8080 > /tmp/port-forward.log 2>&1 &
+          EXTRA_ENV=$(jq -c . <<EOF
+          [
+            {"name":"SERVER_PORT","value":"8080"},
+            {"name":"AXELIX_SBS_DISCOVERY_INSTANCE_ACTUATOR_URL","value":"http://notification-service-self-registration.selfreg.svc.cluster.local:8080/actuator"},
+            {"name":"AXELIX_SBS_DISCOVERY_MASTER_URL","value":"http://axelix-master.default.svc.cluster.local:8080/api/internal/service/register"},
+            {"name":"AXELIX_SBS_DISCOVERY_INSTANCE_NAME","value":"notification-service-self-registration"},
+            {"name":"AXELIX_SBS_DISCOVERY_AUTO","value":"true"}
+          ]
+          EOF
+          )
+
+          helm upgrade --install notification-service-self-registration . \
+            --set image.ref=$NOTIFICATION_SERVICE_IMAGE \
+            --set image.pullPolicy=Never \
+            --set axelix.sbs.auth.jwt.algorithm=HMAC256 \
+            --set axelix.sbs.auth.jwt.signingKey=$JWT_SIGNING_KEY \
+            --set-json extraEnv="$EXTRA_ENV" \
+            --namespace selfreg \
+            --create-namespace \
+            --wait --timeout 3m
 
       - name: Run Master E2E tests
-        run: >
-          ./gradlew :master-e2e-tests:e2eTest
-          -Paxelix.e2e.masterBaseUrl=http://localhost:8080
+        run: |
+          ./gradlew :master-e2e-tests:e2eTest \
+            -Paxelix.e2e.run=true \
+            -Paxelix.e2e.masterBaseUrl=http://master:8080 \
+            -Paxelix.e2e.mcpEnabled=$MCP_ENABLED \
+            -Paxelix.e2e.discoveryModeAutoEnabled=$DISCOVERY_AUTO \
+            -Paxelix.e2e.discoveryModeSelfRegEnabled=$DISCOVERY_SELF_REG \
+            -Paxelix.e2e.authModeLocalEnabled=$AUTH_LOCAL \
+            -Paxelix.e2e.authModeOAuth2Enabled=$AUTH_OAUTH2
 
-      - name: Dump cluster state on failure
-        if: failure()
+      - name: Dump cluster state
+        if: always()
         run: |
           echo "---- pods ----"
-          kubectl get pods -o wide
+          kubectl get pods -o wide --all-namespaces
+          
           echo "---- axelix-master logs ----"
           kubectl logs deploy/axelix-master --tail=300 || true
-          echo "---- notification-service logs ----"
-          kubectl logs deploy/notification-service --tail=300 || true
-          echo "---- port-forward log ----"
-          cat /tmp/port-forward.log || true
+          
+          if kubectl get deploy/notification-service-automatic-discovery &>/dev/null; then
+            echo "---- notification-service-automatic-discovery logs ----"
+            kubectl logs deploy/notification-service-automatic-discovery --tail=300 || true
+          fi
+          
+          if [[ "${{ matrix.db }}" != "SQLite" ]]; then
+            echo "---- ${DB_TYPE} database logs ----"
+            kubectl logs deploy/${DB_TYPE} --tail=200 || true
+          fi
+          
+          if kubectl get deploy/notification-service-self-registration -n selfreg &>/dev/null; then
+            echo "---- notification-service-self-registration logs ----"
+            kubectl logs deploy/notification-service-self-registration -n selfreg --tail=300 || true
+          fi
+          
+          echo "---- ingresses ----"
+          kubectl get ingress -A
+          
+          echo "---- ingress controller logs ----"
+          kubectl logs -n ingress-nginx deploy/ingress-nginx-controller --tail=300 || true
 
       - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v7
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          name: master-e2e-test-report
+          name: master-e2e-test-report-${{ matrix.name }}
           path: master-e2e-tests/build/reports/tests/e2eTest
           retention-days: 3
           if-no-files-found: ignore
