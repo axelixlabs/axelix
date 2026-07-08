@@ -15,16 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./interfaces/dashboardPersistence";
+export * from "./interfaces/dashboard/dashboardPersistence";
+export * from "./interfaces/dashboard/dashboardOverview";
+export * from "./interfaces/dashboard/dashboardJava";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";
-export * from "./interfaces/dashboardJava";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";
 export * from "./interfaces/threadDump";
 export * from "./interfaces/wallboard";
-export * from "./interfaces/dashboard";
 export * from "./interfaces/metrics";
 export * from "./interfaces/details";
 export * from "./interfaces/globals";

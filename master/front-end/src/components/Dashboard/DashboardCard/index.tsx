@@ -15,23 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringFramework";
-export * from "./dashboard/dashboardPersistence";
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./settings";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import { EmptyHandler } from "components";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    title: string;
+    subtitle: string;
+    children: React.ReactNode;
+    isEmpty?: boolean;
+}
+
+export const DashboardCard = ({ title, subtitle, children, isEmpty = false }: IProps) => {
+    return (
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.HeaderWrapper}>
+                    <p className={`TextUltraSmall ${styles.Subtitle}`}>{subtitle}</p>
+                    <h2 className={`TextSmall ${styles.Title}`}>{title}</h2>
+                </div>
+                {isEmpty ? <EmptyHandler isEmpty={isEmpty} /> : children}
+            </div>
+        </>
+    );
+};

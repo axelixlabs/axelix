@@ -15,11 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import {
-    type LOCAL_AUTH_OPTION_TYPE_NAME,
-    type OIDC_AUTH_OPTION_TYPE_NAME,
-    type SUPER_ADMIN_AUTH_OPTION_TYPE_NAME,
-} from "utils/auth";
+import type { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "utils";
 
 export type LocalLoginOption = {
     type: typeof LOCAL_AUTH_OPTION_TYPE_NAME;

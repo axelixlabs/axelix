@@ -15,23 +15,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringFramework";
-export * from "./dashboard/dashboardPersistence";
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./settings";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import { useTranslation } from "react-i18next";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    active?: boolean;
+
+    // TODO: Fix type
+    payload?: any[];
+}
+
+export const NPlusOneTreemapTooltip = ({ active, payload }: IProps) => {
+    const { t } = useTranslation();
+
+    const entry = payload?.[0]?.payload;
+
+    if (!active || !entry) {
+        return null;
+    }
+
+    const { name, size } = entry;
+
+    return (
+        <>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <div className={styles.Title}>{name}</div>
+
+                <div>
+                    {t("Dashboard.Persistence.tooltipCount")}: <b>{size}</b>
+                </div>
+            </div>
+        </>
+    );
+};
