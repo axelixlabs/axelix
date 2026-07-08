@@ -95,7 +95,7 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.auth")
+        @ConfigurationProperties(prefix = AuthProperties.CONFIG_PROPS_PREFIX)
         public AuthProperties authProperties() {
             return new AuthProperties();
         }

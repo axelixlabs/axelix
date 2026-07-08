@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 public class JwtAuthTestConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "axelix.sbs.auth")
+    @ConfigurationProperties(prefix = AuthProperties.CONFIG_PROPS_PREFIX)
     public AuthProperties authProperties() {
         return new AuthProperties();
     }

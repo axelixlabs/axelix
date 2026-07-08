@@ -55,7 +55,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
+    @ConfigurationProperties(prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX)
     public TransactionMonitoringConfigurationProperties transactionMonitoringConfigurationProperties() {
         return new TransactionMonitoringConfigurationProperties();
     }

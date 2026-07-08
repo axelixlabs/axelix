@@ -32,6 +32,8 @@ import com.axelixlabs.axelix.common.utils.Assert;
  */
 public class TransactionMonitoringConfigurationProperties implements Validatable {
 
+    public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.transaction.monitoring";
+
     /**
      * Maximum number of transaction records to keep per method.
      */

@@ -72,7 +72,7 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
+    @ConfigurationProperties(prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX)
     public TransactionMonitoringConfigurationProperties transactionMonitoringConfigurationProperties() {
         return new TransactionMonitoringConfigurationProperties();
     }

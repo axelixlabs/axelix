@@ -30,6 +30,8 @@ import com.axelixlabs.axelix.common.utils.Assert;
 @SuppressWarnings("NullAway.Init")
 public class AuthProperties implements Validatable {
 
+    public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.auth";
+
     /**
      * JWT related configuration
      */
