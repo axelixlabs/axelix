@@ -45,8 +45,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(
                     AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
                     EndpointPropertiesSupportAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class,
-                    EndpointsConfigurationPropertiesAutoConfiguration.class))
+                    SecurityContextExecutorAutoConfiguration.class))
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-configprops");
 
     @Test

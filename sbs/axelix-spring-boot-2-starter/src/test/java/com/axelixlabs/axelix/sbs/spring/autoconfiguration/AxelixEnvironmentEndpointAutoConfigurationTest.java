@@ -47,8 +47,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(
                     AxelixEnvironmentEndpointAutoConfiguration.class,
                     EndpointPropertiesSupportAutoConfiguration.class,
-                    SecurityContextExecutorAutoConfiguration.class,
-                    EndpointsConfigurationPropertiesAutoConfiguration.class));
+                    SecurityContextExecutorAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -71,8 +70,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                 .withConfiguration(AutoConfigurations.of(
                         AxelixEnvironmentEndpointAutoConfiguration.class,
                         EndpointPropertiesSupportAutoConfiguration.class,
-                        SecurityContextExecutorAutoConfiguration.class,
-                        EndpointsConfigurationPropertiesAutoConfiguration.class))
+                        SecurityContextExecutorAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(PropertyMetadataExtractor.class);
