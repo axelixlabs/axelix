@@ -255,7 +255,12 @@ jobs:
             --set-json extraEnv="$EXTRA_ENV" \
             --namespace selfreg \
             --create-namespace \
-            --wait --timeout 3m
+
+          kubectl port-forward svc/axelix-master 8080:8080 > /tmp/port-forward.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/actuator/health && break
+            sleep 1
+          done
 
       - name: Run Master E2E tests
         run: |
