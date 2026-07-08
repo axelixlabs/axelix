@@ -36,11 +36,11 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
+class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
 
-    public CacheManagerBeanPostProcessor(ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+    CacheManagerBeanPostProcessor(ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
         this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
     }
 

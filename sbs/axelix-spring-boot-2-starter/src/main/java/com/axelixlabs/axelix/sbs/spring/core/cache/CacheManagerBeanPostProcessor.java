@@ -34,7 +34,7 @@ import org.springframework.cache.CacheManager;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  */
-public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
+class CacheManagerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {

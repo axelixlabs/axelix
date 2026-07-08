@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Sergey Cherkasov
  */
-public interface CacheSizeProvider {
+interface CacheSizeProvider {
 
     /**
      * @param nativeCache the underlying native cache provider.

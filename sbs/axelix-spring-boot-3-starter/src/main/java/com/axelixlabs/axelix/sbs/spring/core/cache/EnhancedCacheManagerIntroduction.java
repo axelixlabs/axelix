@@ -40,7 +40,7 @@ final class EnhancedCacheManagerIntroduction implements IntroductionInterceptor 
     private final EnhancedCacheManager delegate;
     private final Map<Method, Method> delegateMethods = new ConcurrentHashMap<>();
 
-    public EnhancedCacheManagerIntroduction(EnhancedCacheManager delegate) {
+    EnhancedCacheManagerIntroduction(EnhancedCacheManager delegate) {
         this.delegate = delegate;
     }
 

@@ -41,14 +41,14 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
  */
-public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
+class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     private final String cacheManagerBeanName;
     private final CacheManager delegate;
     private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
-    public DefaultEnhancedCacheManager(
+    DefaultEnhancedCacheManager(
             String cacheManagerBeanName, CacheManager delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.delegate = delegate;
         this.cacheManagerBeanName = cacheManagerBeanName;

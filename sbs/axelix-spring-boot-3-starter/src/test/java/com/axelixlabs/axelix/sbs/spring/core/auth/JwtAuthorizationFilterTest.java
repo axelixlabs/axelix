@@ -29,10 +29,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -65,12 +63,8 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
-import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
-import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
+import com.axelixlabs.axelix.sbs.spring.core.cache.TestCachesEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
@@ -99,11 +93,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(
         properties = {
             "axelix.prop.test.name=axelix-beans",
+            "management.endpoints.web.exposure.include=axelix-caches,axelix-env,axelix-beans,health",
         })
 @Import({
     JwtAuthorizationFilterTestConfiguration.class,
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
+    TestCachesEndpointConfiguration.class,
     EnvironmentTestConfig.class,
     JwtAuthTestConfiguration.class
 })
@@ -449,18 +443,6 @@ class JwtAuthorizationFilterTest {
         public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
             return new SmartSanitizingFunction(
                     List.of("axelix.env.test.toBeSanitized", "AXELIX_FOR_SANITIZATION"), propertyNameNormalizer);
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
         }
 
         @Bean

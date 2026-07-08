@@ -28,7 +28,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Sergey Cherkasov
  */
-public class DefaultCacheSizeProvider implements CacheSizeProvider {
+class DefaultCacheSizeProvider implements CacheSizeProvider {
     private static final ClassLoader CLASS_LOADER = DefaultCacheSizeProvider.class.getClassLoader();
 
     private static final boolean CAFFEINE_CACHE_PRESENT =

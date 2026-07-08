@@ -23,9 +23,9 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
  * @since 25.11.2025
  * @author Nikita Kirillov
  */
-public class CacheManagerNotFoundException extends RuntimeException {
+class CacheManagerNotFoundException extends RuntimeException {
 
-    public CacheManagerNotFoundException(String message) {
+    CacheManagerNotFoundException(String message) {
         super(message);
     }
 }

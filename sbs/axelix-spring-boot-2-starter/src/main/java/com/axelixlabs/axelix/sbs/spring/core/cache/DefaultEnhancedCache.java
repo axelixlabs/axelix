@@ -37,13 +37,13 @@ import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultEnhancedCache implements EnhancedCache {
+class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
     private final AtomicBoolean enabled;
     private final SlidingWindow<CacheLookup> cacheLookupHistory;
 
-    public DefaultEnhancedCache(@NonNull Cache delegate) {
+    DefaultEnhancedCache(@NonNull Cache delegate) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
         // TODO: We need to find a way to allow for configuring those values

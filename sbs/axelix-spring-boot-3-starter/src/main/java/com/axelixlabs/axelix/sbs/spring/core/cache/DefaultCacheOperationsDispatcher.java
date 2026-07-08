@@ -43,12 +43,12 @@ import com.axelixlabs.axelix.common.api.caches.SingleCache;
 //  We need to migrate to more recent versions of jspecify. Current version incorrectly
 //  reports the nullability issue with type-use annotations on generics
 @SuppressWarnings("NullAway")
-public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatcher {
+class DefaultCacheOperationsDispatcher implements CacheOperationsDispatcher {
 
     private final Map<String, EnhancedCacheManager> cacheManagers;
     private final CacheSizeProvider cacheSizeProvider;
 
-    public DefaultCacheOperationsDispatcher(Map<String, CacheManager> managers, CacheSizeProvider cacheSizeProvider) {
+    DefaultCacheOperationsDispatcher(Map<String, CacheManager> managers, CacheSizeProvider cacheSizeProvider) {
         this.cacheManagers = onlyEnhancedCacheManagers(managers);
         this.cacheSizeProvider = cacheSizeProvider;
     }
@@ -153,14 +153,14 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         execute(cacheManagerName, adapter -> adapter.disable(cacheName));
     }
 
-    public <T> T extractFromCacheManager(
+    <T> T extractFromCacheManager(
             String cacheManagerName, Function<EnhancedCacheManager, @Nullable T> providerFunction) {
         EnhancedCacheManager enhancedCacheManager = findCacheManager(cacheManagerName);
 
         return providerFunction.apply(enhancedCacheManager);
     }
 
-    public <T> void execute(String cacheManagerName, Consumer<EnhancedCacheManager> action) {
+    <T> void execute(String cacheManagerName, Consumer<EnhancedCacheManager> action) {
         EnhancedCacheManager enhancedCacheManager = findCacheManager(cacheManagerName);
 
         action.accept(enhancedCacheManager);

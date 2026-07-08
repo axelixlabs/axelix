@@ -39,13 +39,13 @@ import org.springframework.cache.CacheManager;
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
  */
-public class DefaultEnhancedCacheManager implements EnhancedCacheManager {
+class DefaultEnhancedCacheManager implements EnhancedCacheManager {
 
     private final String cacheManagerBeanName;
     private final CacheManager delegate;
     private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
 
-    public DefaultEnhancedCacheManager(String cacheManagerBeanName, CacheManager delegate) {
+    DefaultEnhancedCacheManager(String cacheManagerBeanName, CacheManager delegate) {
         this.delegate = delegate;
         this.cacheManagerBeanName = cacheManagerBeanName;
     }

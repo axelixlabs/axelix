@@ -29,7 +29,7 @@ import com.axelixlabs.axelix.common.api.caches.SingleCache;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public interface CacheOperationsDispatcher {
+interface CacheOperationsDispatcher {
 
     /**
      * Get the profile of the specific cache.

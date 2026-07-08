@@ -35,11 +35,11 @@ import com.axelixlabs.axelix.common.api.caches.SingleCache;
  * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-caches")
-public class AxelixCachesEndpoint {
+class AxelixCachesEndpoint {
 
     private final CacheOperationsDispatcher dispatcher;
 
-    public AxelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
+    AxelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 

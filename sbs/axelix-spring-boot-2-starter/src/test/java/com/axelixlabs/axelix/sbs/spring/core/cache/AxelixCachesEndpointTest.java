@@ -30,7 +30,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
@@ -69,10 +68,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 24.06.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@Import({
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
-    AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
+@Import({TestCachesEndpointConfiguration.class, AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
 })
 class AxelixCachesEndpointTest {
 
@@ -519,17 +515,6 @@ class AxelixCachesEndpointTest {
 
     @TestConfiguration
     public static class CacheDispatcherEndpointTestConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CacheManagerBeanPostProcessor();
-        }
 
         @Bean(name = MAIN_CACHE_MANAGER)
         @Primary

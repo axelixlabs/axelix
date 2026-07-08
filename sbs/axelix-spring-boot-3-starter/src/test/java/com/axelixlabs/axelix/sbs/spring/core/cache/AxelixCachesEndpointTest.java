@@ -29,10 +29,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
@@ -77,10 +75,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 24.06.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@Import({
-    AxelixCachesEndpoint.class,
-    DefaultCacheOperationsDispatcher.class,
-    AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
+@Import({TestCachesEndpointConfiguration.class, AxelixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class
 })
 @IgnoreTestContextArchitecture(reason = POTENTIAL_CONTEXT_MUTATION)
 class AxelixCachesEndpointTest {
@@ -530,20 +525,8 @@ class AxelixCachesEndpointTest {
     public static class CacheDispatcherEndpointTestConfiguration {
 
         @Bean
-        @ConditionalOnMissingBean
-        public CacheSizeProvider cacheSizeProvider() {
-            return new DefaultCacheSizeProvider();
-        }
-
-        @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
-        }
-
-        @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
         }
 
         @Bean(name = MAIN_CACHE_MANAGER)

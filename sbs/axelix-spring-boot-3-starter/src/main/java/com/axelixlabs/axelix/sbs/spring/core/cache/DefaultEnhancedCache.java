@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultEnhancedCache implements EnhancedCache {
+class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
     private final AtomicBoolean enabled;
@@ -47,7 +47,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
 
-    public DefaultEnhancedCache(@NonNull Cache delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
+    DefaultEnhancedCache(@NonNull Cache delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
         // TODO: We need to find a way to allow for configuring those values

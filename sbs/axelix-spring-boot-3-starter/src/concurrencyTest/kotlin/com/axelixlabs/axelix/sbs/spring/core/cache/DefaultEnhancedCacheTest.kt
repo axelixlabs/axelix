@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Param(name = "key", gen = StringGen::class, conf = "1:3")
 class DefaultEnhancedCacheTest {
 
-    val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache", ConcurrentHashMap(3), true), null)
+    private val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache", ConcurrentHashMap(3), true), null)
 
     @Operation fun getValueWrapper(@Param(name = "key") key: Any) = delegate.get(key)?.get()
 
