@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate;
+package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -24,6 +24,8 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.slf4j.Log4jLoggerFactory;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
+
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.InMemoryPaginationAppenderRegistrar;
 
 /**
  * Log4j2 implementation of {@link InMemoryPaginationAppenderRegistrar}.

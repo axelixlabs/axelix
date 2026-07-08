@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate;
+package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.InMemoryPaginationHolder;
 
 /**
  * Logback appender that detects Hibernate's in-memory pagination by intercepting

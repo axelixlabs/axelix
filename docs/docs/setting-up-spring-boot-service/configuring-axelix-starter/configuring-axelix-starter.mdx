@@ -410,11 +410,20 @@ Detects Hibernate`s in-memory pagination caused by using
 [setFirstResult/setMaxResults](https://docs.hibernate.org/orm/current/javadocs/org/hibernate/query/Query.html?#setMaxResults(int))
 together with a collection fetch.
 
-By default, transaction monitoring registers a Logback appender
-`com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LogbackInMemoryPaginationAppender` that intercepts Hibernate
-warnings (HHH000104 in Hibernate 5.x and HHH90003004 in Hibernate 6.x–7.3.x).
+By default, transaction monitoring registers an appender that intercepts Hibernate warnings (HHH000104 in Hibernate 5.x
+and HHH90003004 in Hibernate 6.x–7.3.x). The starter picks the appender that matches your application's active logging
+system, so detection works whether you run on Logback or Log4j2:
 
-Set `axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` to `false` if you want to prevent the
+- **Logback** — the starter registers
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppender`. This is the
+  case for a default Spring Boot setup, where Logback is the logging system.
+- **Log4j2** — when your application uses Log4j2 instead (typically after adding `spring-boot-starter-log4j2` and
+  excluding the default Logback starter), the starter registers
+  `com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppender`.
+
+You don't choose between them — the starter detects the active logging system and registers the right appender for you.
+
+Set `axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` to `false` if you want to prevent either
 appender from being registered.
 
 <Tabs groupId="spring-config">
