@@ -23,10 +23,10 @@ import { useAppSelector } from "hooks";
 import { MainLayout } from "layout";
 import { DashboardSiderMenu } from "layout/siders";
 
-const DashboardSpringFramework = Loadable(lazy(() => import("pages/dashboard/DashboardSpringFramework")));
-const DashboardPersistence = Loadable(lazy(() => import("pages/dashboard/DashboardPersistence")));
-const DashboardOverview = Loadable(lazy(() => import("pages/dashboard/DashboardOverview")));
-const DashboardJava = Loadable(lazy(() => import("pages/dashboard/DashboardJava")));
+const DashboardSpringFramework = Loadable(lazy(() => import("pages/Dashboard/DashboardSpringFramework")));
+const DashboardPersistence = Loadable(lazy(() => import("pages/Dashboard/DashboardPersistence")));
+const DashboardOverview = Loadable(lazy(() => import("pages/Dashboard/DashboardOverview")));
+const DashboardJava = Loadable(lazy(() => import("pages/Dashboard/DashboardJava")));
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("pages/Transactional")));
