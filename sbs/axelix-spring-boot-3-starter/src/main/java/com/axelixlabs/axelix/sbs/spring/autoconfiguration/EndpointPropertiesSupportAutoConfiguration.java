@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -32,10 +33,14 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  *
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(
-        after = {EndpointsConfigurationPropertiesAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class
-        })
+@AutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class})
 public class EndpointPropertiesSupportAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+    public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+        return new EndpointsConfigurationProperties();
+    }
 
     @Bean
     public PropertyNameNormalizer propertyNameNormalizer() {
