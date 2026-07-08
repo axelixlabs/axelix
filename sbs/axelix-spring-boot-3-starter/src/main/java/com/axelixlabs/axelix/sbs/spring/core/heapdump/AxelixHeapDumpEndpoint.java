@@ -30,11 +30,11 @@ import org.springframework.lang.Nullable;
  * @author Sergey Cherkasov
  */
 @Endpoint(id = "axelix-heap-dump")
-public class AxelixHeapDumpEndpoint {
+class AxelixHeapDumpEndpoint {
 
     private final HeapDumpWebEndpoint delegate;
 
-    public AxelixHeapDumpEndpoint() {
+    AxelixHeapDumpEndpoint() {
         this.delegate = new HeapDumpWebEndpoint();
     }
 

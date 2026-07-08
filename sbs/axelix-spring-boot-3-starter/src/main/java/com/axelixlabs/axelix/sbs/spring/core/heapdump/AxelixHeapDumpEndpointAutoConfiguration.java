@@ -15,13 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.heapdump;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
 /**
  * Auto-configuration for the {@link AxelixHeapDumpEndpoint}.
@@ -33,7 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 public class AxelixHeapDumpEndpointAutoConfiguration {
 
     @Bean
-    public AxelixHeapDumpEndpoint axelixHeapDumpEndpoint() {
+    AxelixHeapDumpEndpoint axelixHeapDumpEndpoint() {
         return new AxelixHeapDumpEndpoint();
     }
 }

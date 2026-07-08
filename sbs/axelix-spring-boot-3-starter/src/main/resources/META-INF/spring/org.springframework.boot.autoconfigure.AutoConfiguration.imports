@@ -5,7 +5,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertie
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration
