@@ -224,33 +224,33 @@
         "enabled": "Включено",
         "disabled": "Отключено",
         "Java": {
-            "subtitle": "Мониторинг JVM в реальном времени · Проект Leyden · Сборка мусора",
-            "gcLoggingChartTitle": "Логирование сборщика мусора",
-            "gcLoggingChartSubtitle": "Покрытие вывода логов",
+            "subtitle": "Мониторинг Java экосистемы · Проект Leyden · Сборка мусора",
+            "gcLoggingChartTitle": "Настроенное GC Логирование",
+            "gcLoggingChartSubtitle": "Профиль Среды Выполнения",
             "lilliputChartTitle": "Внедрение Project Lilliput",
             "lilliputChartSubtitle": "Компактные заголовки объектов",
             "leydenChartTitle": "Внедрение Project Leyden",
             "leydenChartSubtitle": "Оптимизация JVM",
             "leydenChartCentreSubtitle": "Внедрено",
             "leydenChartRestTitle": "Не внедрено",
-            "gcDistributionChartTitle": "Распределение сборщиков мусора",
+            "gcDistributionChartTitle": "Распределение используемых GC",
             "gcDistributionChartSubtitle": "Профиль среды выполнения",
-            "gcDistributionChartCentreSubtitle": "Наиболее используемый"
+            "gcDistributionChartCentreSubtitle": "Основной"
         },
         "Persistence": {
-            "title": "Панель персистентности",
-            "subtitle": "Паттерны доступа к БД · Обнаружение N+1 · Пагинация в памяти",
+            "title": "Работа с Персистетным Хранилищем",
+            "subtitle": "Паттерны доступа к БД · Обнаружение N+1 · Pagination в памяти",
             "statFirstLabel": "Всего срабатываний",
-            "statSecondLabel": "Худший случай",
+            "statSecondLabel": "Самый Проблемный Сервис",
             "nPlusOneChartSubtitle": "Персистентность · антипаттерны запросов",
             "tooltipCount": "Количество",
-            "inMemoryPaginationChartTitle": "Пагинация в памяти",
+            "inMemoryPaginationChartTitle": "Pagination в памяти",
             "inMemoryPaginationChartSubtitle": "Персистентность · нагрузка на память"
         },
         "SpringFramework": {
             "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
             "osivChartTitle": "Open Session in View (OSIV)",
-            "osivChartSubtitle": "Охват сервисов с включённым OSIV"
+            "osivChartSubtitle": "Проблемы с производительностью"
         }
     },
     "About": {
