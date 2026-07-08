@@ -85,6 +85,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  * @since 28.07.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -106,7 +107,7 @@ class JwtAuthorizationFilterTest {
 
     // Cache and CacheManager names under test
     private static final String TEST_CACHE_1 = "cache";
-    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
+    private static final String MAIN_CACHE_MANAGER = "axelixMainCacheManager";
 
     private EnhancedCacheManager cacheManager;
 

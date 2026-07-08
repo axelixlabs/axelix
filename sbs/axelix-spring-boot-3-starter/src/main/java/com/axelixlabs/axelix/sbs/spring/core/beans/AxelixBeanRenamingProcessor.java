@@ -45,7 +45,7 @@ import org.springframework.util.StringUtils;
 public class AxelixBeanRenamingProcessor implements BeanDefinitionRegistryPostProcessor {
 
     /**
-     * Common packages for each sbs.
+     * Common packages for sbs.
      */
     private static final String TARGET_PACKAGE = "com.axelixlabs.axelix.sbs.spring.";
 

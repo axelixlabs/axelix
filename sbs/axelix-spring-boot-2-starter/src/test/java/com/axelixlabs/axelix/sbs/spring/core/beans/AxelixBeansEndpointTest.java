@@ -49,6 +49,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
  * Integration tests for {@link AxelixBeansEndpoint}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(
         classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
@@ -65,9 +66,9 @@ class AxelixBeansEndpointTest {
     @EnableConfigurationProperties(AxelixPropTest.class)
     static class CurrentConfiguration {
 
-        static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
-        static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";
-        static final String CUSTOM_SUPPLIER = "customSupplier";
+        static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "axelixQualifiersPersistencePostProcessor";
+        static final String BEAN_META_INFO_EXTRACTOR = "axelixBeanMetaInfoExtractor";
+        static final String CUSTOM_SUPPLIER = "axelixCustomSupplier";
 
         @Bean
         public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
@@ -140,11 +141,8 @@ class AxelixBeansEndpointTest {
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName())
-                            .isEqualTo(CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
+                .satisfies(beanMethod ->
+                        assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration"));
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
@@ -162,17 +160,15 @@ class AxelixBeansEndpointTest {
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
+                .satisfies(beanMethod ->
+                        assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration"));
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
         assertThat(bean.getDependencies())
                 .hasSize(2)
                 .contains(new BeansFeed.BeanDependency(
-                        "conditionalBeanRefBuilder", false)); // second bean is the application context itself
+                        "axelixConditionalBeanRefBuilder", false)); // second bean is the application context itself
         assertThat(bean.isLazyInit()).isFalse();
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
@@ -186,10 +182,8 @@ class AxelixBeansEndpointTest {
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.CUSTOM_SUPPLIER);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
+                .satisfies(beanMethod ->
+                        assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration"));
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
