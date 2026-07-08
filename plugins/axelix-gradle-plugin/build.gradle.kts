@@ -6,8 +6,8 @@ repositories {
     mavenCentral()
 }
 
-// The plugin must run inside Gradle 4.0 daemons, which require JDK 8.
-tasks.withType<JavaCompile>().configureEach {
+// The plugin must run inside Gradle 5.x daemons, which support JDK 11.
+tasks.compileJava {
     options.release = 11
 }
 

@@ -411,7 +411,7 @@ Detects Hibernate`s in-memory pagination caused by using
 together with a collection fetch.
 
 By default, transaction monitoring registers a Logback appender
-`com.axelixlabs.axelix.sbs.spring.core.transactions.hibernate.LogbackInMemoryPaginationAppender` that intercepts Hibernate
+`com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LogbackInMemoryPaginationAppender` that intercepts Hibernate
 warnings (HHH000104 in Hibernate 5.x and HHH90003004 in Hibernate 6.x–7.3.x).
 
 Set `axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled` to `false` if you want to prevent the

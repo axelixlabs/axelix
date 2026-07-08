@@ -41,6 +41,12 @@ public class Assert {
         }
     }
 
+    public static void state(Supplier<Boolean> stateProvider, String message) {
+        if (!stateProvider.get()) {
+            throw new IllegalStateException(message);
+        }
+    }
+
     public static void isTrue(boolean expression, Supplier<String> messageSupplier) {
         if (!expression) {
             throw new IllegalArgumentException(nullSafeGet(messageSupplier));

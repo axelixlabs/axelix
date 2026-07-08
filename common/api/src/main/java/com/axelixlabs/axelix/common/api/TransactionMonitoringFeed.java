@@ -195,22 +195,6 @@ public final class TransactionMonitoringFeed {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            TransactionExecution that = (TransactionExecution) o;
-            return startTimestampMs == that.startTimestampMs
-                    && endTimestampMs == that.endTimestampMs
-                    && Objects.equals(queries, that.queries);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(startTimestampMs, endTimestampMs, queries);
-        }
-
-        @Override
         public String toString() {
             return "TransactionExecution{" + "startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
@@ -224,12 +208,12 @@ public final class TransactionMonitoringFeed {
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static final class Query {
+
         private final String sql;
         private final Long startTimestampMs;
         private final Long endTimestampMs;
-
-        @Nullable
-        private final Boolean inMemoryPaginated;
+        private final @Nullable Boolean inMemoryPaginated;
+        private final @Nullable LazyLoadingTarget lazyLoadingTarget;
 
         /**
          * Creates a new Query.
@@ -245,11 +229,13 @@ public final class TransactionMonitoringFeed {
                 @JsonProperty("sql") String sql,
                 @JsonProperty("startTimestampMs") Long startTimestampMs,
                 @JsonProperty("endTimestampMs") Long endTimestampMs,
-                @JsonProperty("inMemoryPaginated") @Nullable Boolean inMemoryPaginated) {
+                @JsonProperty("inMemoryPaginated") @Nullable Boolean inMemoryPaginated,
+                @JsonProperty("lazyLoadingTarget") @Nullable LazyLoadingTarget lazyLoadingTarget) {
             this.sql = sql;
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
             this.inMemoryPaginated = inMemoryPaginated;
+            this.lazyLoadingTarget = lazyLoadingTarget;
         }
 
         public String getSql() {
@@ -264,26 +250,12 @@ public final class TransactionMonitoringFeed {
             return endTimestampMs;
         }
 
-        @Nullable
-        public Boolean isInMemoryPaginated() {
+        public @Nullable Boolean isInMemoryPaginated() {
             return inMemoryPaginated;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Query that = (Query) o;
-            return Objects.equals(sql, that.sql)
-                    && Objects.equals(startTimestampMs, that.startTimestampMs)
-                    && Objects.equals(endTimestampMs, that.endTimestampMs)
-                    && Objects.equals(inMemoryPaginated, that.inMemoryPaginated);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(sql, startTimestampMs, endTimestampMs, inMemoryPaginated);
+        public @Nullable LazyLoadingTarget getLazyLoadingTarget() {
+            return lazyLoadingTarget;
         }
 
         @Override
@@ -292,7 +264,45 @@ public final class TransactionMonitoringFeed {
                     + sql + '\'' + ", startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
                     + endTimestampMs + ", inMemoryPaginated="
-                    + inMemoryPaginated + '}';
+                    + inMemoryPaginated + ", lazyLoadingTarget="
+                    + lazyLoadingTarget + '}';
+        }
+    }
+
+    public static class LazyLoadingTarget {
+
+        /**
+         * The entity on which the assassination was lazy loaded
+         */
+        private final Class<?> ownerEntityClass;
+
+        /**
+         * The association
+         */
+        private final String associationPropertyName;
+
+        @JsonCreator
+        public LazyLoadingTarget(
+                @JsonProperty("ownerEntityClass") Class<?> ownerEntityClass,
+                @JsonProperty("associationPropertyName") String associationPropertyName) {
+            this.ownerEntityClass = ownerEntityClass;
+            this.associationPropertyName = associationPropertyName;
+        }
+
+        public Class<?> getOwnerEntityClass() {
+            return ownerEntityClass;
+        }
+
+        public String getAssociationPropertyName() {
+            return associationPropertyName;
+        }
+
+        public Class<?> ownerEntityClass() {
+            return ownerEntityClass;
+        }
+
+        public String associationPropertyName() {
+            return associationPropertyName;
         }
     }
 
@@ -332,25 +342,6 @@ public final class TransactionMonitoringFeed {
 
         public long getMedianDurationMs() {
             return medianDurationMs;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            ExecutionStats that = (ExecutionStats) o;
-            return averageDurationMs == that.averageDurationMs
-                    && maxDurationMs == that.maxDurationMs
-                    && medianDurationMs == that.medianDurationMs;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(averageDurationMs, maxDurationMs, medianDurationMs);
         }
 
         @Override

@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -27,7 +26,7 @@ import io.micrometer.core.instrument.Timer;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 
 /**
  * Default implementation of {@link AxelixMetricsPublisher}
@@ -46,22 +45,21 @@ public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
 
     @Override
     public void publishTransactionMetrics(
-            String className, String methodName, long durationMillis, TransactionStatus status, int queryCount) {
+            String className, String methodName, TransactionExecutionProfile transaction) {
         Timer.builder(AxelixMetricNames.TRANSACTION_DURATION)
                 .description("Duration of transactions")
                 .tag("class", className)
                 .tag("method", methodName)
-                .tag("status", status.getValue())
                 .publishPercentiles(0.5, 0.95, 0.99)
                 .register(meterRegistry)
-                .record(durationMillis, TimeUnit.MILLISECONDS);
+                .record(transaction.getTransactionDuration());
 
         Counter.builder(AxelixMetricNames.TRANSACTION_QUERIES)
                 .description("Total number of SQL queries executed inside transactions")
                 .tag("class", className)
                 .tag("method", methodName)
                 .register(meterRegistry)
-                .increment(queryCount);
+                .increment(transaction.getQueriesCount());
     }
 
     @Override

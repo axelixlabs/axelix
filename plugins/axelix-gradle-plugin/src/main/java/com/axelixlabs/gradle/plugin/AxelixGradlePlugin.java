@@ -23,8 +23,8 @@ import org.gradle.api.Project;
 /**
  * Axelix Gradle plugin entry point.
  *
- * <p>Compatible with Gradle 4.0 through 9.x. Only APIs present in BOTH Gradle 4.0 and 9.x may be
- * used here: no {@code tasks.register} (added in 4.9), no lazy {@code Provider}/{@code Property}
+ * <p>Compatible with Gradle 5.0 through 9.x. Only APIs present in BOTH Gradle 5.0 and 9.x may be
+ * used here: no lazy {@code Provider}/{@code Property}
  * wiring, no sourceSets/conventions access ({@code JavaPluginConvention} was removed in Gradle 9,
  * {@code JavaPluginExtension.getSourceSets()} was only added in 7.1).
  *
