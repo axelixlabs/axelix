@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatus;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 
 /**
  * Interface responsible for publishing application-level metrics to the underlying metrics system.
@@ -31,14 +31,11 @@ public interface AxelixMetricsPublisher {
     /**
      * Publishes aggregated transaction statistics.
      *
-     * @param className      the simple name of the target class executing the transaction
-     * @param methodName     the name of the target method executing the transaction
-     * @param durationMillis transaction execution duration in milliseconds
-     * @param status         the final outcome status of the transaction (e.g., "success" or "error")
-     * @param queryCount     the total number of SQL queries executed inside the transaction scope
+     * @param className   the simple name of the target class executing the transaction
+     * @param methodName  the name of the target method executing the transaction
+     * @param transaction executed transaction for which the metrics are supposed to be published.
      */
-    void publishTransactionMetrics(
-            String className, String methodName, long durationMillis, TransactionStatus status, int queryCount);
+    void publishTransactionMetrics(String className, String methodName, TransactionExecutionProfile transaction);
 
     /**
      * Increments the cache lookup counter based on the operation result type.

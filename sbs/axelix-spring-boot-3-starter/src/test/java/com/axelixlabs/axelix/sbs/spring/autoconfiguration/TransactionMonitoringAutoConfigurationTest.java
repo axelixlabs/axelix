@@ -26,16 +26,19 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,7 +62,6 @@ class TransactionMonitoringAutoConfigurationTest {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
             assertThat(context).hasSingleBean(TransactionStatsCollector.class);
-            assertThat(context).hasSingleBean(QueriesRecorder.class);
             assertThat(context).hasSingleBean(TransactionMonitoringService.class);
             assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
@@ -122,7 +124,6 @@ class TransactionMonitoringAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
-                    assertThat(context).doesNotHaveBean(QueriesRecorder.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringService.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
@@ -140,12 +141,67 @@ class TransactionMonitoringAutoConfigurationTest {
         runnerWithoutRequiredProperty.run(context -> {
             assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
-            assertThat(context).doesNotHaveBean(QueriesRecorder.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringService.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
             assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
+    }
+
+    @Test
+    void shouldHandleMultipleCustomBeans() {
+        contextRunner
+                .withUserConfiguration(CustomTransactionConfiguration.class)
+                .run(context -> {
+                    assertThat(context.getBean(TransactionStatsCollector.class))
+                            .isExactlyInstanceOf(CustomTransactionStatsCollector.class);
+                    assertThat(context.getBean(TransactionMonitoringService.class))
+                            .isExactlyInstanceOf(CustomTransactionMonitoringService.class);
+                    assertThat(context.getBean(TransactionMonitoringEndpoint.class))
+                            .isExactlyInstanceOf(CustomTransactionMonitoringEndpoint.class);
+                });
+    }
+
+    @TestConfiguration
+    static class CustomTransactionConfiguration {
+
+        @Bean
+        public TransactionStatsCollector transactionStatsCollector() {
+            return new CustomTransactionStatsCollector();
+        }
+
+        @Bean
+        public TransactionMonitoringService transactionMonitoringService(
+                TransactionStatsCollector transactionStatsCollector) {
+            return new CustomTransactionMonitoringService(transactionStatsCollector);
+        }
+
+        @Bean
+        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
+                TransactionMonitoringService transactionMonitoringService) {
+            return new CustomTransactionMonitoringEndpoint(transactionMonitoringService);
+        }
+    }
+
+    static class CustomTransactionStatsCollector extends DefaultTransactionStatsCollector {
+
+        public CustomTransactionStatsCollector() {
+            super(1000);
+        }
+    }
+
+    static class CustomTransactionMonitoringService extends DefaultTransactionMonitoringService {
+
+        public CustomTransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
+            super(transactionStatsCollector);
+        }
+    }
+
+    static class CustomTransactionMonitoringEndpoint extends TransactionMonitoringEndpoint {
+
+        public CustomTransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
+            super(transactionMonitoringService);
+        }
     }
 }

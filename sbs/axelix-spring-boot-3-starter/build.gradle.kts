@@ -27,6 +27,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
+    compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
     compileOnly("io.micrometer:micrometer-core")
