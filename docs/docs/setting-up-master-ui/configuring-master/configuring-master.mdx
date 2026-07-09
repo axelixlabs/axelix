@@ -167,7 +167,7 @@ The endpoint is `POST /api/internal/service/register`. It is gated by the same J
 
 On the Master side there are **no required overrides** — every property here has a working default. The feature is **on
 by default** (`enabled=true`), set it to `false` only if you want Master to refuse all heartbeats. The starter-side
-properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, `instance-name`) are documented in the
+properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, `instance-name-prefix`) are documented in the
 [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) page.
 
 <div className={styles.configTable}>
