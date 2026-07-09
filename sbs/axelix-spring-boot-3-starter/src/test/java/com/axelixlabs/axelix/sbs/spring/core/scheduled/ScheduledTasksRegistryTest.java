@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 

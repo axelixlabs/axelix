@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.threaddump;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import com.axelixlabs.axelix.sbs.spring.core.IgnoreArchitectureTest;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
