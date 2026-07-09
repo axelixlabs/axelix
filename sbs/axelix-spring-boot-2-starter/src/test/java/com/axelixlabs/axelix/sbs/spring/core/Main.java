@@ -41,9 +41,9 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProv
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndpointAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.

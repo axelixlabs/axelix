@@ -33,13 +33,13 @@ import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
  * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-thread-dump")
-public class ThreadDumpManagementEndpoint {
+class ThreadDumpManagementEndpoint {
 
     private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 
     private final ThreadDumpContentionMonitoringManagement management;
 
-    public ThreadDumpManagementEndpoint(ThreadDumpContentionMonitoringManagement management) {
+    ThreadDumpManagementEndpoint(ThreadDumpContentionMonitoringManagement management) {
         this.management = management;
     }
 

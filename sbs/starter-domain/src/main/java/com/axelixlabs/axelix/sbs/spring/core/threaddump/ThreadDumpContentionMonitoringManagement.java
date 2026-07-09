@@ -25,7 +25,7 @@ package com.axelixlabs.axelix.sbs.spring.core.threaddump;
  *
  * @author Sergey Cherkasov
  */
-public interface ThreadDumpContentionMonitoringManagement {
+interface ThreadDumpContentionMonitoringManagement {
 
     /**
      * Enables thread contention monitoring.

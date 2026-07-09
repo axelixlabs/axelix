@@ -24,7 +24,7 @@ import java.lang.management.ManagementFactory;
  *
  * @author Sergey Cherkasov
  */
-public class DefaultThreadDumpContentionMonitoringManagement implements ThreadDumpContentionMonitoringManagement {
+class DefaultThreadDumpContentionMonitoringManagement implements ThreadDumpContentionMonitoringManagement {
 
     @Override
     public void enable() {

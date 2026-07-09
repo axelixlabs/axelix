@@ -15,15 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.threaddump;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.threaddump.DefaultThreadDumpContentionMonitoringManagement;
-import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpContentionMonitoringManagement;
-import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndpoint;
 
 /**
  * Auto-configuration for Thread Dump management functionality.

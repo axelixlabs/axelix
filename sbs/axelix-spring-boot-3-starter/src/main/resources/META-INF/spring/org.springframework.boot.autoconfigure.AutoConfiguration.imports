@@ -18,7 +18,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAut
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration
