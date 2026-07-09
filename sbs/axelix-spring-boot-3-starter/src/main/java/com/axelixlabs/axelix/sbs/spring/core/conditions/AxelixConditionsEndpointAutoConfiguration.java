@@ -15,18 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalTargetUnwrapper;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTargetUnwrapper;
 
 /**
  * Auto-configuration for the {@link AxelixConditionsEndpoint}.

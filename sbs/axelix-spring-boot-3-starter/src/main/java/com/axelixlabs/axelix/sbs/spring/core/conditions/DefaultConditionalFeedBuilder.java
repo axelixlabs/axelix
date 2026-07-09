@@ -40,13 +40,12 @@ import com.axelixlabs.axelix.common.api.ConditionsFeed.PositiveCondition;
  * @author Nikita Kirilov
  * @author Sergey Cherkasov
  */
-public class DefaultConditionalFeedBuilder implements ConditionalFeedBuilder {
+class DefaultConditionalFeedBuilder implements ConditionalFeedBuilder {
 
     private final ConditionsReportEndpoint delegate;
     private final ConditionalTargetUnwrapper targetUnwrapper;
 
-    public DefaultConditionalFeedBuilder(
-            ConfigurableApplicationContext context, ConditionalTargetUnwrapper targetUnwrapper) {
+    DefaultConditionalFeedBuilder(ConfigurableApplicationContext context, ConditionalTargetUnwrapper targetUnwrapper) {
         this.delegate = new ConditionsReportEndpoint(context);
         this.targetUnwrapper = targetUnwrapper;
     }

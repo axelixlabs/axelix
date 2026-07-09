@@ -24,7 +24,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
@@ -44,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProvider
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpointAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.

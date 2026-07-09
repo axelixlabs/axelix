@@ -1,6 +1,6 @@
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration

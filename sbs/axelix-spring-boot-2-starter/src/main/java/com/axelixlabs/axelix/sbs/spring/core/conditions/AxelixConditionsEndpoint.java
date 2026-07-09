@@ -30,11 +30,11 @@ import com.axelixlabs.axelix.common.api.ConditionsFeed;
  * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-conditions")
-public class AxelixConditionsEndpoint {
+class AxelixConditionsEndpoint {
 
     private final ConditionalFeedBuilder builder;
 
-    public AxelixConditionsEndpoint(ConditionalFeedBuilder builder) {
+    AxelixConditionsEndpoint(ConditionalFeedBuilder builder) {
         this.builder = builder;
     }
 

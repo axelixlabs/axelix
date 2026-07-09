@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Sergey Cherkasov
  */
-public class UnwrappedTarget {
+class UnwrappedTarget {
 
     private final String className;
 
@@ -41,7 +41,7 @@ public class UnwrappedTarget {
      *                   Guaranteed to be present.
      * @param methodName the name of the method on which the conditional annotation was put.
      */
-    public UnwrappedTarget(String className, @Nullable String methodName) {
+    UnwrappedTarget(String className, @Nullable String methodName) {
         this.className = className;
         this.methodName = methodName;
     }

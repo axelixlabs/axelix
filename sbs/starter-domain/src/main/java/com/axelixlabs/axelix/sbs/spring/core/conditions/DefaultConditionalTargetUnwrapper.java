@@ -23,7 +23,7 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-public class DefaultConditionalTargetUnwrapper implements ConditionalTargetUnwrapper {
+class DefaultConditionalTargetUnwrapper implements ConditionalTargetUnwrapper {
 
     // See SpringBootCondition.getClassOrMethodName method in order to understand why we're doing this.
     // https://github.com/spring-projects/spring-boot/blob/main/core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition/SpringBootCondition.java#L74

@@ -23,7 +23,7 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-public interface ConditionalTargetUnwrapper {
+interface ConditionalTargetUnwrapper {
 
     /**
      * @param target the target condition.

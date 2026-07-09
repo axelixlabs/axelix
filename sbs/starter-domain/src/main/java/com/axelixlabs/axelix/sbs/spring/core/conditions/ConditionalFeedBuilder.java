@@ -26,7 +26,7 @@ import com.axelixlabs.axelix.common.api.ConditionsFeed;
  *
  * @author Sergey Cherkasov
  */
-public interface ConditionalFeedBuilder {
+interface ConditionalFeedBuilder {
 
     /**
      * @return feed of conditions inside the given application.
