@@ -24,7 +24,7 @@ import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
  *
  * @author Sergey Cherkasov
  */
-public interface ServiceMetricsGroupsAssembler {
+interface ServiceMetricsGroupsAssembler {
 
     /**
      * @return assembled {@link MetricsGroupsFeed}.

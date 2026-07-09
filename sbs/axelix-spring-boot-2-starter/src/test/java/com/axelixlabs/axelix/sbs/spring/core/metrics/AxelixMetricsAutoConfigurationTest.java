@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -28,8 +28,6 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.ServiceMetricsGroupsAssembler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

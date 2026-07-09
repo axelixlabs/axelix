@@ -34,13 +34,13 @@ import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.M
  *
  * @author Sergey Cherkasov
  */
-public class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroupsAssembler {
+class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroupsAssembler {
 
     public static final String OTHER_GROUP_NAME = "Others";
 
     private final MeterRegistry registry;
 
-    public DefaultServiceMetricsGroupsAssembler(MeterRegistry registry) {
+    DefaultServiceMetricsGroupsAssembler(MeterRegistry registry) {
         this.registry = registry;
     }
 

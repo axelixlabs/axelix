@@ -53,7 +53,7 @@ import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
  * @author Mikhail Polivakha
  */
 @Endpoint(id = "axelix-metrics")
-public class AxelixMetricsEndpoint {
+class AxelixMetricsEndpoint {
 
     private final MetricsEndpoint delegate;
     private final MeterRegistry registry;
@@ -64,7 +64,7 @@ public class AxelixMetricsEndpoint {
     private static final Set<Statistic> ACTUAL_VALUE_STATISTICS =
             Set.of(Statistic.VALUE, Statistic.TOTAL, Statistic.COUNT);
 
-    public AxelixMetricsEndpoint(
+    AxelixMetricsEndpoint(
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,
             ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler,
