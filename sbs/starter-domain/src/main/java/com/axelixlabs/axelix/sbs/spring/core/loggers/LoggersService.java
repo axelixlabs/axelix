@@ -21,15 +21,13 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
 /**
  * Service for managing Loggers.
  *
  * @author Nikita Kirillov
  */
-public interface LoggersService {
+interface LoggersService {
 
     /**
      * @return the feed of loggers that exists in this application

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -25,10 +25,6 @@ import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.DefaultLoggersService;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.LoggersService;
 
 /**
  * Auto-configuration for the {@link AxelixLoggersEndpoint}.

@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 /**
  * Exception thrown when a logger or a logger group is not found.
  *
  * @author Nikita Kirillov
  */
-public class LoggerNotFoundException extends RuntimeException {
+class LoggerNotFoundException extends RuntimeException {
 
     public static final String LOGGER_NOT_FOUND_MESSAGE = "Logger '%s' not found in Logging System";
 
     public static final String LOGGER_GROUP_NOT_FOUND_MESSAGE = "Logger group '%s' not found in Logger Groups";
 
-    public LoggerNotFoundException(String message) {
+    LoggerNotFoundException(String message) {
         super(message);
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.loggers.state;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  *
  * @author Mikhail Polivakha
  */
-public class DefaultLoggerChange implements LoggerChange {
+class DefaultLoggerChange implements LoggerChange {
 
     private static final Lazy<ScheduledExecutorService> CLEANUP_SCHEDULED;
 

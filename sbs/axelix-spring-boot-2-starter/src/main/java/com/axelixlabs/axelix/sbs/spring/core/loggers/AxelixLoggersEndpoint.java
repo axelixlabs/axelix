@@ -28,8 +28,6 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
 /**
  * Custom Spring Boot Actuator endpoint exposing the application's loggers.
@@ -38,11 +36,11 @@ import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundEx
  * @author Nikita Kirillov
  */
 @RestControllerEndpoint(id = "axelix-loggers")
-public class AxelixLoggersEndpoint {
+class AxelixLoggersEndpoint {
 
     private final LoggersService loggersService;
 
-    public AxelixLoggersEndpoint(LoggersService loggersService) {
+    AxelixLoggersEndpoint(LoggersService loggersService) {
         this.loggersService = loggersService;
     }
 

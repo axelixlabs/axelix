@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,14 +23,12 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.LoggersService;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link AxelixLoggersEndpointAutoConfiguration}.
  *
+ * @since 01.07.2026
  * @author Sergey Cherkasov
  */
 class AxelixLoggersEndpointAutoConfigurationTest {

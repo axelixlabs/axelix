@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import java.util.List;
 
@@ -24,17 +24,17 @@ import java.util.List;
  *
  * @author Nikita Kirillov
  */
-public class LogLevelNotFoundException extends RuntimeException {
+class LogLevelNotFoundException extends RuntimeException {
 
     public static final String LOG_LEVEL_REQUIRED_MESSAGE = "Log level cannot be null or blank";
 
     public static final String INVALID_LOG_LEVEL_MESSAGE = "Log level '%s' is invalid. Supported levels are: %s";
 
-    public LogLevelNotFoundException(String message) {
+    LogLevelNotFoundException(String message) {
         super(message);
     }
 
-    public LogLevelNotFoundException(String invalidLevel, List<String> supportedLevels, Throwable throwable) {
+    LogLevelNotFoundException(String invalidLevel, List<String> supportedLevels, Throwable throwable) {
         super(String.format(INVALID_LOG_LEVEL_MESSAGE, invalidLevel, String.join(", ", supportedLevels)), throwable);
     }
 }

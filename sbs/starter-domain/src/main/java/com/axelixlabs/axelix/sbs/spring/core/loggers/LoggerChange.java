@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.loggers.state;
+package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import java.time.Instant;
 
@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
-public interface LoggerChange {
+interface LoggerChange {
 
     /**
      * @return configured level for the given logger that was in effect before not only this, but any changes from Axelix side.

@@ -43,14 +43,10 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.state.DefaultLoggerChange;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.state.LoggerChange;
 
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException.LOG_LEVEL_REQUIRED_MESSAGE;
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException.LOGGER_GROUP_NOT_FOUND_MESSAGE;
-import static com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException.LOGGER_NOT_FOUND_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.LogLevelNotFoundException.LOG_LEVEL_REQUIRED_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.LoggerNotFoundException.LOGGER_GROUP_NOT_FOUND_MESSAGE;
+import static com.axelixlabs.axelix.sbs.spring.core.loggers.LoggerNotFoundException.LOGGER_NOT_FOUND_MESSAGE;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -59,7 +55,7 @@ import static java.util.Optional.ofNullable;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class DefaultLoggersService implements LoggersService {
+class DefaultLoggersService implements LoggersService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
@@ -67,7 +63,7 @@ public class DefaultLoggersService implements LoggersService {
     private final LoggerGroups loggerGroups;
     private final ConcurrentMap<String, LoggerChange> configuredLevelsCache;
 
-    public DefaultLoggersService(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
+    DefaultLoggersService(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
         this.loggingSystem = loggingSystem;
         this.loggerGroups = loggerGroups;
         // assume that end-users will not change that many loggers manually, 5 at most

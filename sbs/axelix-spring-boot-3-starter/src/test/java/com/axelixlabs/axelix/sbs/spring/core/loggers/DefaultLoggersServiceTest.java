@@ -31,7 +31,6 @@ import org.springframework.boot.logging.LoggingSystem;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
-import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
