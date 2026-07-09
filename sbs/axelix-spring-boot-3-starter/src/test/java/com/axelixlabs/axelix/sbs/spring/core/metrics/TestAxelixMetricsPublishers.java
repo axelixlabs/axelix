@@ -15,29 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
 
-import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
-
 /**
- * Auto-configuration for the {@link AxelixMetricsPublisher}.
+ * Test factory for {@link AxelixMetricsPublisher} instances.
  *
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
-@ConditionalOnBean(MeterRegistry.class)
-public class AxelixMetricsPublisherAutoConfiguration {
+public class TestAxelixMetricsPublishers {
 
-    @Bean
-    public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+    private TestAxelixMetricsPublishers() {}
+
+    public static AxelixMetricsPublisher create(MeterRegistry meterRegistry) {
         return new DefaultAxelixMetricsPublisher(meterRegistry);
     }
 }

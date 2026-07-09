@@ -59,7 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.TestAxelixMetricsPublishers;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
@@ -149,7 +149,7 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
 
         @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-            return new DefaultAxelixMetricsPublisher(meterRegistry);
+            return TestAxelixMetricsPublishers.create(meterRegistry);
         }
 
         @Bean

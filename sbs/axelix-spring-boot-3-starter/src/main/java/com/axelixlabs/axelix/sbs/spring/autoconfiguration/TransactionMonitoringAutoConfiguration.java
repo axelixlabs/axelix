@@ -39,6 +39,7 @@ import org.springframework.core.Ordered;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisherAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;

@@ -31,7 +31,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.TestAxelixMetricsPublishers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -61,7 +61,7 @@ class DefaultCacheOperationsDispatcherTest {
 
     @BeforeEach
     void setUp() {
-        AxelixMetricsPublisher axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(new SimpleMeterRegistry());
+        AxelixMetricsPublisher axelixMetricsPublisher = TestAxelixMetricsPublishers.create(new SimpleMeterRegistry());
         Map<String, CacheManager> managers = new HashMap<>();
 
         cacheManager1 = new DefaultEnhancedCacheManager(

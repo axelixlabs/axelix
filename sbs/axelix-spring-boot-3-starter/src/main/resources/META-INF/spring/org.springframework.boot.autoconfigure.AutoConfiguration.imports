@@ -10,7 +10,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfigur
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration
 com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisherAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration

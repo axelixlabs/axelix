@@ -54,7 +54,7 @@ import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.TestAxelixMetricsPublishers;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
@@ -537,7 +537,7 @@ class AxelixCachesEndpointTest {
 
         @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
-            return new DefaultAxelixMetricsPublisher(meterRegistry);
+            return TestAxelixMetricsPublishers.create(meterRegistry);
         }
 
         @Bean

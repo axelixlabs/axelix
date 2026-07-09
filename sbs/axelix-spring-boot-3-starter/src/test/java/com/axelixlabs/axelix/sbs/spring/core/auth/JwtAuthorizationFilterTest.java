@@ -80,7 +80,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.TestAxelixMetricsPublishers;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -465,7 +465,7 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public AxelixMetricsPublisher axelixMetricsPublisher() {
-            return new DefaultAxelixMetricsPublisher(new SimpleMeterRegistry());
+            return TestAxelixMetricsPublishers.create(new SimpleMeterRegistry());
         }
 
         @Bean(name = MAIN_CACHE_MANAGER)

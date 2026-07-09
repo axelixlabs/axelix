@@ -35,7 +35,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.TestAxelixMetricsPublishers;
 
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_ENABLED;
 import static com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames.CACHE_REQUESTS;
@@ -70,7 +70,7 @@ class DefaultEnhancedCacheTest {
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry();
-        axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(meterRegistry);
+        axelixMetricsPublisher = TestAxelixMetricsPublishers.create(meterRegistry);
 
         Mockito.lenient().when(delegate.getName()).thenReturn(CACHE_NAME);
         enhancedCache = new DefaultEnhancedCache(delegate, axelixMetricsPublisher);

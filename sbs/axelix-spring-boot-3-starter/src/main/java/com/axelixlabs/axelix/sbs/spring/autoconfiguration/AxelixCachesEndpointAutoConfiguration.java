@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisherAutoConfiguration;
 
 /**
  * Auto-configuration class for the caches custom actuator endpoint.

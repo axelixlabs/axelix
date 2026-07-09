@@ -33,7 +33,6 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoCo
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
@@ -47,6 +46,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEn
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisherAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.

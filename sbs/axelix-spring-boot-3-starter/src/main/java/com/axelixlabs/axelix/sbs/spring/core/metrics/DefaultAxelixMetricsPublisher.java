@@ -33,13 +33,13 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @author Nikita Kirillov
  */
-public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
+class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
 
     private final ConcurrentHashMap<String, Counter> cacheCounters = new ConcurrentHashMap<>();
 
     private final MeterRegistry meterRegistry;
 
-    public DefaultAxelixMetricsPublisher(MeterRegistry meterRegistry) {
+    DefaultAxelixMetricsPublisher(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
