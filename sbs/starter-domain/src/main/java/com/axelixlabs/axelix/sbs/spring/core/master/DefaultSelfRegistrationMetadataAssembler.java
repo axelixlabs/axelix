@@ -54,7 +54,8 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
         this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
-        this.instanceName = selfRegistrationConfigurationProperties.getInstanceNamePrefix() + "-" + generateNamePostfix();
+        this.instanceName =
+                selfRegistrationConfigurationProperties.getInstanceNamePrefix() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
     }
 
