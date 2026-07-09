@@ -74,11 +74,10 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             ShortBuildInfoProviderAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class,
-            AxelixLoggersEndpointAutoConfiguration.class,
             LibraryInformationProviderAutoConfiguration.class,
             AxelixLoggersEndpointAutoConfiguration.class,
             SecurityContextExecutorAutoConfiguration.class,
-            ValidationListenerAutoConfiguration.class
+            ValidationListenerAutoConfiguration.class,
         })
 @EnableCaching
 @EnableFeignClients
