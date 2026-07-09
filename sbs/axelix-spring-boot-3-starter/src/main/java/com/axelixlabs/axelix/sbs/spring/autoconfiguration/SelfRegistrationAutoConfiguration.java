@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 public class SelfRegistrationAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+    @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
     public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
         return new SelfRegistrationConfigurationProperties();
     }

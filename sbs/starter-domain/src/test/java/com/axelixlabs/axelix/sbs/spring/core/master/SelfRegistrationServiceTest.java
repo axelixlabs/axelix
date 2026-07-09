@@ -89,7 +89,7 @@ class SelfRegistrationServiceTest {
     static class SelfRegistrationServiceTestConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+        @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
         public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
             return new SelfRegistrationConfigurationProperties();
         }

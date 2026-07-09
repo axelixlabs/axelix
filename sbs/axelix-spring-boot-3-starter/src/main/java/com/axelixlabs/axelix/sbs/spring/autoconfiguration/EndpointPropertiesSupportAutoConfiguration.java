@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 public class EndpointPropertiesSupportAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+    @ConfigurationProperties(prefix = EndpointsConfigurationProperties.CONFIG_PROPS_PREFIX)
     public EndpointsConfigurationProperties endpointsConfigurationProperties() {
         return new EndpointsConfigurationProperties();
     }

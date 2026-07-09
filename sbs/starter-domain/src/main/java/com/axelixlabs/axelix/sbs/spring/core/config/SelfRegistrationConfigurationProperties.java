@@ -35,6 +35,8 @@ import com.axelixlabs.axelix.common.utils.Assert;
 @SuppressWarnings("NullAway.Init")
 public class SelfRegistrationConfigurationProperties implements Validatable {
 
+    public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.discovery";
+
     /**
      * The URL of the master that the service must connect to.
      */

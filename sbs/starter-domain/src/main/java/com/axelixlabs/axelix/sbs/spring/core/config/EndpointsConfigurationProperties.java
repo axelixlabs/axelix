@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class EndpointsConfigurationProperties {
 
+    public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.endpoints.config";
+
     public static final List<String> SANITIZE_ALL = List.of("*");
 
     /**

@@ -81,7 +81,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     static class CurrentConfig {
 
         @Bean
-        @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+        @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
         public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
             return new SelfRegistrationConfigurationProperties();
         }
