@@ -42,7 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.TranssactionStackCleanupFilter;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionStackCleanupFilter;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
@@ -123,11 +123,11 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public FilterRegistrationBean<TranssactionStackCleanupFilter> nPlusOneHolderCleanupFilterRegistration(
+    public FilterRegistrationBean<TransactionStackCleanupFilter> nPlusOneHolderCleanupFilterRegistration(
             TransactionAccessor transactionAccessor) {
-        FilterRegistrationBean<TranssactionStackCleanupFilter> registrationBean = new FilterRegistrationBean<>();
+        FilterRegistrationBean<TransactionStackCleanupFilter> registrationBean = new FilterRegistrationBean<>();
 
-        registrationBean.setFilter(new TranssactionStackCleanupFilter(transactionAccessor));
+        registrationBean.setFilter(new TransactionStackCleanupFilter(transactionAccessor));
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
 

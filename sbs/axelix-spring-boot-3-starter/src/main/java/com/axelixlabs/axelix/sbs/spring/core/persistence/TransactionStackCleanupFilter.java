@@ -35,11 +35,11 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @author Nikita Kirillov
  */
-public class TranssactionStackCleanupFilter implements Filter {
+public class TransactionStackCleanupFilter implements Filter {
 
     private final TransactionAccessor transactionAccessor;
 
-    public TranssactionStackCleanupFilter(TransactionAccessor transactionAccessor) {
+    public TransactionStackCleanupFilter(TransactionAccessor transactionAccessor) {
         this.transactionAccessor = transactionAccessor;
     }
 

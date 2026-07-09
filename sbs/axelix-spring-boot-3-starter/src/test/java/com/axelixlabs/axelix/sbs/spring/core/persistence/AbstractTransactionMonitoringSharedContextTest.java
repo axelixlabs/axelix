@@ -20,19 +20,33 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
@@ -50,6 +64,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -63,12 +78,6 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
 
@@ -95,7 +104,7 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
     AbstractTransactionMonitoringSharedContextTest.SharedTransactionTestConfiguration.class,
     JwtAuthTestConfiguration.class
 })
-abstract class AbstractTransactionMonitoringSharedContextTest {
+public abstract class AbstractTransactionMonitoringSharedContextTest {
 
     @TestConfiguration
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
@@ -124,14 +133,20 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
                 TransactionStatsCollector transactionStatsCollector,
                 TransactionAccessor transactionAccessor,
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, axelixMetricsPublisherObjectProvider, transactionAccessor);
+                    transactionStatsCollector,
+                    axelixMetricsPublisherObjectProvider,
+                    transactionAccessor);
+        }
+
+        @Bean
+        public TransactionAccessor transactionAccessor() {
+            return new TransactionAccessor();
         }
 
         @Bean
         public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                TransactionAccessor transactionAccessor) {
+            TransactionAccessor transactionAccessor) {
             return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
         }
 
@@ -152,23 +167,26 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
             return new DefaultAxelixMetricsPublisher(meterRegistry);
         }
 
-        @Bean
-        public TransactionAccessor transactionAccessor() {
-            return new TransactionAccessor();
-        }
-
         @EventListener(ApplicationReadyEvent.class)
         public void registerAppender() {
             new LogbackInMemoryPaginationAppenderRegistrar().register();
         }
 
         @Bean
-        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(
-                TransactionAccessor transactionAccessor) {
+        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(TransactionAccessor transactionAccessor) {
             return properties ->
                     properties.put(INTEGRATOR_PROVIDER, (IntegratorProvider) () -> List.of(new NPlusOneIntegrator(
                             new NPlusOneEntityLoadListener(transactionAccessor),
                             new NPlusOneCollectionLoadListener(transactionAccessor))));
+        }
+
+        @Bean
+        public NPlusOneTestHelper nPlusOneTestHelper(
+                N1OrderRepository orderRepository,
+                N1ItemRepository itemRepository,
+                N1CustomerRepository customerRepository,
+                N1ProfileRepository profileRepository) {
+            return new NPlusOneTestHelper(orderRepository, itemRepository, customerRepository, profileRepository);
         }
     }
 
@@ -310,11 +328,6 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         @Transactional
         Owner findByLastName(String lastName);
 
-        //        @Transactional(propagation = Propagation.SUPPORTS)
-        //        default List<Owner> findAll() {
-        //            return List.of(new Owner());
-        //        }
-
         @Transactional
         @Query(
                 value = "SELECT o FROM AbstractTransactionMonitoringSharedContextTest$Owner o JOIN FETCH o.pets",
@@ -449,6 +462,501 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         void testRequired(String lastName) {
             ownerRepository.findByLastName(lastName);
             helperService.testNestedRequiresNew();
+        }
+    }
+
+    // N+1
+    // -------------------------------------------------------------------------
+    // Entities
+    // -------------------------------------------------------------------------
+    @Entity
+    @Table(name = "n1_order")
+    public static class N1Order {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        @OneToMany(mappedBy = "n1Order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        List<N1Item> n1Items = new ArrayList<>();
+
+        @OneToMany(mappedBy = "n1Order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @BatchSize(size = 2)
+        List<N1Tag> tags = new ArrayList<>();
+
+        @OneToMany(mappedBy = "n1Order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @Fetch(FetchMode.SUBSELECT)
+        List<N1Comment> comments = new ArrayList<>();
+
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(name = "n1_order_notes", joinColumns = @JoinColumn(name = "order_id"))
+        @Column(name = "note")
+        List<String> notes = new ArrayList<>();
+
+        @ElementCollection(fetch = FetchType.LAZY)
+        @CollectionTable(name = "n1_order_labels", joinColumns = @JoinColumn(name = "order_id"))
+        @Column(name = "label")
+        @BatchSize(size = 2)
+        List<String> labels = new ArrayList<>();
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "customer_id")
+        N1Customer customer;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "supplier_id")
+        N1Supplier supplier;
+
+        @ManyToOne(fetch = FetchType.EAGER)
+        @JoinColumn(name = "warehouse_id")
+        N1Warehouse warehouse;
+
+        public N1Order addItem(N1Item n1Item) {
+            n1Items.add(n1Item);
+            return this;
+        }
+
+        public N1Order addTag(N1Tag tag) {
+            tags.add(tag);
+            return this;
+        }
+
+        public N1Order addComment(N1Comment comment) {
+            comments.add(comment);
+            return this;
+        }
+
+        public N1Order addNote(String note) {
+            notes.add(note);
+            return this;
+        }
+
+        public N1Order addLabel(String label) {
+            labels.add(label);
+            return this;
+        }
+
+        public N1Order setCustomer(N1Customer customer) {
+            this.customer = customer;
+            return this;
+        }
+
+        public N1Order setSupplier(N1Supplier supplier) {
+            this.supplier = supplier;
+            return this;
+        }
+
+        public N1Order setWarehouse(N1Warehouse warehouse) {
+            this.warehouse = warehouse;
+            return this;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_item")
+    public static class N1Item {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "order_id")
+        N1Order n1Order;
+
+        @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+        @JoinTable(
+                name = "n1_item_category",
+                joinColumns = @JoinColumn(name = "item_id"),
+                inverseJoinColumns = @JoinColumn(name = "category_id"))
+        List<N1Category> categories = new ArrayList<>();
+
+        @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+        @JoinTable(
+                name = "n1_item_label",
+                joinColumns = @JoinColumn(name = "item_id"),
+                inverseJoinColumns = @JoinColumn(name = "label_id"))
+        @BatchSize(size = 2)
+        List<N1Label> labels = new ArrayList<>();
+
+        public N1Item(N1Order n1Order) {
+            this.n1Order = n1Order;
+        }
+
+        public N1Item() {}
+
+        public N1Item addCategory(N1Category category) {
+            categories.add(category);
+            return this;
+        }
+
+        public N1Item addLabel(N1Label label) {
+            labels.add(label);
+            return this;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_tag")
+    public static class N1Tag {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String name;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "order_id")
+        N1Order n1Order;
+
+        public N1Tag() {}
+
+        public N1Tag(String name, N1Order n1Order) {
+            this.name = name;
+            this.n1Order = n1Order;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_comment")
+    public static class N1Comment {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String text;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "order_id")
+        N1Order n1Order;
+
+        public N1Comment() {}
+
+        public N1Comment(String text, N1Order n1Order) {
+            this.text = text;
+            this.n1Order = n1Order;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_category")
+    public static class N1Category {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String name;
+
+        public N1Category() {}
+
+        public N1Category(String name) {
+            this.name = name;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_label")
+    public static class N1Label {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String name;
+
+        public N1Label() {}
+
+        public N1Label(String name) {
+            this.name = name;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_customer")
+    public static class N1Customer {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        @JoinColumn(name = "profile_id")
+        N1Profile profile;
+
+        @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        @JoinColumn(name = "address_id")
+        N1Address address;
+
+        String name;
+
+        public N1Customer() {}
+
+        public N1Customer setProfile(N1Profile profile) {
+            this.profile = profile;
+            return this;
+        }
+
+        public N1Profile getProfile() {
+            return profile;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public N1Customer setAddress(N1Address address) {
+            this.address = address;
+            return this;
+        }
+
+        public N1Address getAddress() {
+            return address;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_profile")
+    public static class N1Profile {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String bio;
+
+        // Inverse side of @OneToOne — NOT tracked by NPlusOneEntityLoadListener
+        // because Hibernate resolves it via secondary SELECT (WHERE customer_id=?)
+        // bypassing EventType.LOAD entirely. See NPlusOneEntityLoadListener for details.
+        @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
+        N1Customer customer;
+
+        public N1Profile() {}
+
+        public N1Profile(String bio) {
+            this.bio = bio;
+        }
+
+        public N1Customer getCustomer() {
+            return customer;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getBio() {
+            return bio;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_supplier")
+    @BatchSize(size = 2)
+    public static class N1Supplier {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String name;
+
+        public N1Supplier() {}
+
+        public N1Supplier(Long id, String name) {
+            this.name = name;
+        }
+
+        public N1Supplier(String name) {
+            this.name = name;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_address")
+    @BatchSize(size = 2)
+    public static class N1Address {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String city;
+
+        public N1Address() {}
+
+        public N1Address(String city) {
+            this.city = city;
+        }
+
+        public String getCity() {
+            return city;
+        }
+    }
+
+    @Entity
+    @Table(name = "n1_warehouse")
+    public static class N1Warehouse {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        Long id;
+
+        String location;
+
+        public N1Warehouse() {}
+
+        public N1Warehouse(String location) {
+            this.location = location;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Repositories
+    // -------------------------------------------------------------------------
+    public interface N1OrderRepository extends JpaRepository<N1Order, Long> {
+
+        @Query("SELECT o FROM AbstractTransactionMonitoringSharedContextTest$N1Order o JOIN FETCH o.n1Items")
+        List<N1Order> findAllWithItemsJoinFetch();
+
+        @EntityGraph(attributePaths = "n1Items")
+        @Query("SELECT o FROM AbstractTransactionMonitoringSharedContextTest$N1Order o")
+        List<N1Order> findAllWithItemsEntityGraph();
+    }
+
+    public interface N1CustomerRepository extends JpaRepository<N1Customer, Long> {
+        @Query("SELECT c FROM AbstractTransactionMonitoringSharedContextTest$N1Customer c")
+        List<N1Customer> findAllWithProfile();
+    }
+
+    public interface N1ItemRepository extends JpaRepository<N1Item, Long> {}
+
+    public interface N1ProfileRepository extends JpaRepository<N1Profile, Long> {}
+
+    public interface N1SupplierRepository extends JpaRepository<N1Supplier, Long> {}
+
+    public interface N1WarehouseRepository extends JpaRepository<N1Warehouse, Long> {}
+
+    // -------------------------------------------------------------------------
+    // N+1 Test helper
+    // -------------------------------------------------------------------------
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static class NPlusOneTestHelper {
+
+        private final N1OrderRepository orderRepository;
+        private final N1ItemRepository itemRepository;
+        private final N1CustomerRepository customerRepository;
+        private final N1ProfileRepository profileRepository;
+
+        NPlusOneTestHelper(
+                N1OrderRepository orderRepository,
+                N1ItemRepository itemRepository,
+                N1CustomerRepository customerRepository,
+                N1ProfileRepository profileRepository) {
+            this.orderRepository = orderRepository;
+            this.itemRepository = itemRepository;
+            this.customerRepository = customerRepository;
+            this.profileRepository = profileRepository;
+        }
+
+        // N+1 cases
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessItems() {
+            orderRepository.findAll().forEach(o -> o.n1Items.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessNotes() {
+            orderRepository.findAll().forEach(o -> o.notes.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessCustomers() {
+            orderRepository.findAll().forEach(o -> o.customer.getName());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadItemsAndAccessCategories() {
+            itemRepository.findAll().forEach(i -> i.categories.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadCustomersAndAccessProfiles() {
+            customerRepository
+                    .findAllWithProfile()
+                    .forEach(customer -> customer.getProfile().getBio());
+        }
+
+        // Batch+1 cases
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessTags() {
+            orderRepository.findAll().forEach(o -> o.tags.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessLabels() {
+            orderRepository.findAll().forEach(o -> o.labels.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadItemsAndAccessLabels() {
+            itemRepository.findAll().forEach(i -> i.labels.size());
+        }
+
+        // Not tracked cases
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessCommentsSubselect() {
+            orderRepository.findAll().forEach(o -> o.comments.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersWithItemsJoinFetch() {
+            orderRepository.findAllWithItemsJoinFetch().forEach(o -> o.n1Items.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersWithItemsEntityGraph() {
+            orderRepository.findAllWithItemsEntityGraph().forEach(o -> o.n1Items.size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadProfilesAndAccessCustomers() {
+            // Important: OneToOne inverse side — NOT tracked, no N+1 detection
+            profileRepository.findAll().forEach(p -> p.getCustomer().getId());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersAndAccessSuppliers() {
+            orderRepository.findAll().forEach(o -> o.supplier.getName());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadCustomersAndAccessAddresses() {
+            customerRepository.findAll().stream()
+                    .filter(c -> c.getAddress() != null)
+                    .forEach(c -> c.getAddress().getCity());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOrdersEager() {
+            // EAGER — warehouse loaded immediately with order, no lazy load
+            orderRepository.findAll().forEach(order -> order.warehouse.getLocation());
         }
     }
 }
