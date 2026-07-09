@@ -33,11 +33,11 @@ import org.springframework.util.Assert;
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  */
-public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
+final class TriggerBasedTaskRescheduler implements TaskRescheduler {
 
     private final TaskScheduler taskScheduler;
 
-    public TriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
+    TriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 

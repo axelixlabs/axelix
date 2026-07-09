@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,15 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
-
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
 /**
  * Auto-configuration for scheduled task management functionality.

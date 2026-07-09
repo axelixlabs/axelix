@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TaskRescheduler;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskRescheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

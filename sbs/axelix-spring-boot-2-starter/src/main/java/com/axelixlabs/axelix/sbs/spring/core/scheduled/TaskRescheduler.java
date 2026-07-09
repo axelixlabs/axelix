@@ -44,7 +44,7 @@ import org.springframework.scheduling.config.Task;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-public interface TaskRescheduler {
+interface TaskRescheduler {
 
     /**
      * Re-schedules the provided Axelix's {@link ManagedScheduledTask}, in accordance to the rules provided by the new provided

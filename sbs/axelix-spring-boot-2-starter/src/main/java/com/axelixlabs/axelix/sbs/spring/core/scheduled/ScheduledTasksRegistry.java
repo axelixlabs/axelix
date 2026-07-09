@@ -41,7 +41,7 @@ import org.springframework.scheduling.config.Task;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent> {
+class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksRegistry.class);
 
@@ -49,7 +49,7 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     private final Collection<ScheduledTaskHolder> scheduledTaskHolders;
 
-    public ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders) {
+    ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders) {
         this.scheduledTaskHolders = scheduledTaskHolders;
     }
 

@@ -24,7 +24,7 @@ import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
  *
  * @author Sergey Cherkasov
  */
-public interface ScheduledTasksAssembler {
+interface ScheduledTasksAssembler {
 
     /**
      * @return assembled {@link ServiceScheduledTasks}.

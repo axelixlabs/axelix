@@ -15,7 +15,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfigura
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration

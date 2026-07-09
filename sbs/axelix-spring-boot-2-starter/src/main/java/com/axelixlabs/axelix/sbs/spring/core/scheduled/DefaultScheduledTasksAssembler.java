@@ -34,11 +34,11 @@ import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
+class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
 
     private final ScheduledTasksRegistry registry;
 
-    public DefaultScheduledTasksAssembler(ScheduledTasksRegistry registry) {
+    DefaultScheduledTasksAssembler(ScheduledTasksRegistry registry) {
         this.registry = registry;
     }
 

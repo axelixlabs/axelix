@@ -32,11 +32,11 @@ import org.springframework.scheduling.config.Task;
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  */
-public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
+final class IntervalBasedTaskRescheduler implements TaskRescheduler {
 
     private final TaskScheduler taskScheduler;
 
-    public IntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
+    IntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 

@@ -24,8 +24,8 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
  * @since 14.10.2025
  * @author Nikita Kirillov
  */
-public class ScheduledTaskNotFoundException extends RuntimeException {
-    public ScheduledTaskNotFoundException(String message) {
+class ScheduledTaskNotFoundException extends RuntimeException {
+    ScheduledTaskNotFoundException(String message) {
         super(message);
     }
 }

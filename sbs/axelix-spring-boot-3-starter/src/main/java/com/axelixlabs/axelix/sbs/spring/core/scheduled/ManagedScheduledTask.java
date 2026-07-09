@@ -39,7 +39,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  */
-public class ManagedScheduledTask {
+class ManagedScheduledTask {
 
     /**
      * Reflection field access to the package-private 'future' field in {@link ScheduledTask}.
@@ -65,7 +65,7 @@ public class ManagedScheduledTask {
         }
     }
 
-    public ManagedScheduledTask(String id, ScheduledTask scheduledTask) {
+    ManagedScheduledTask(String id, ScheduledTask scheduledTask) {
         this.id = id;
         this.scheduledTask = scheduledTask;
     }

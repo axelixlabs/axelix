@@ -40,13 +40,12 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest
  * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-scheduled-tasks")
-public class AxelixScheduledTasksEndpoint {
+class AxelixScheduledTasksEndpoint {
 
     private final ScheduledTaskService taskService;
     private final ScheduledTasksAssembler scheduledTasksAssembler;
 
-    public AxelixScheduledTasksEndpoint(
-            ScheduledTaskService taskService, ScheduledTasksAssembler scheduledTasksAssembler) {
+    AxelixScheduledTasksEndpoint(ScheduledTaskService taskService, ScheduledTasksAssembler scheduledTasksAssembler) {
         this.taskService = taskService;
         this.scheduledTasksAssembler = scheduledTasksAssembler;
     }

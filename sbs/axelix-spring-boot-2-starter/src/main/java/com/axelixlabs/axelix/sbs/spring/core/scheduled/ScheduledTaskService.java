@@ -41,7 +41,7 @@ import org.springframework.scheduling.support.CronTrigger;
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
  */
-public final class ScheduledTaskService {
+final class ScheduledTaskService {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTaskService.class);
 
@@ -49,7 +49,7 @@ public final class ScheduledTaskService {
     private final List<TaskRescheduler> taskReschedulers;
     private final ThreadPoolTaskExecutor taskExecutor;
 
-    public ScheduledTaskService(
+    ScheduledTaskService(
             ScheduledTasksRegistry registry,
             List<TaskRescheduler> taskReschedulers,
             ThreadPoolTaskExecutor taskExecutor) {
