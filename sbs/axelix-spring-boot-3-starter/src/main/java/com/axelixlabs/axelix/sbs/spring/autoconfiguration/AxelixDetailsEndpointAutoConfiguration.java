@@ -22,14 +22,12 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.actuate.autoconfigure.info.InfoContributorAutoConfiguration;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.details.AxelixDetailsEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.details.ServiceDetailsAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
@@ -39,24 +37,21 @@ import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
  * @since 30.10.2025
  * @author Nikita Kirillov, Sergey Cherkasov
  */
-@AutoConfiguration(after = {InfoContributorAutoConfiguration.class, GitInformationProviderAutoConfiguration.class})
+@AutoConfiguration(
+        after = {
+            InfoContributorAutoConfiguration.class,
+            GitInformationProviderAutoConfiguration.class,
+            LibraryInformationProviderAutoConfiguration.class
+        })
 @ConditionalOnAvailableEndpoint(endpoint = InfoEndpoint.class)
 public class AxelixDetailsEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixDetailsEndpoint axelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
         return new AxelixDetailsEndpoint(serviceDetailsAssembler);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public LibraryInformationProvider libraryInformationProvider() {
-        return new DefaultLibraryInformationProvider();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public ServiceDetailsAssembler serviceDetailsAssembler(
             GitInformationProvider gitInformationProvider,
             ObjectProvider<BuildProperties> providerBuildProperties,
