@@ -20,6 +20,16 @@ package com.axelixlabs.axelix.sbs.spring.core;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaAnnotation;
+import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaModifier;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.lang.syntax.elements.ClassesShouldConjunction;
+import com.tngtech.archunit.lang.syntax.elements.FieldsShouldConjunction;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.autoconfigure.data.cassandra.AutoConfigureDataCassandra;
@@ -59,6 +69,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.webservices.client.WebServiceClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -66,6 +78,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 
 /**
  * Tests that check for context pollution in Spring Boot tests
@@ -84,7 +99,7 @@ public class TestContextArchitectureTest {
      * <p>{@link TestContextArchitectureTest} verifies that these annotations are
      * not used in places where they would compromise context reuse or isolation.
      */
-    public static final List<Class<? extends Annotation>> RESTRICTED_TYPE_ANNOTATIONS = List.of(
+    public static final List<Class<? extends Annotation>> RESTRICTED_ANNOTATIONS = List.of(
             ContextConfiguration.class,
             ActiveProfiles.class,
             ContextHierarchy.class,
@@ -130,5 +145,58 @@ public class TestContextArchitectureTest {
             AutoConfigureMockRestServiceServer.class,
             AutoConfigureRestDocs.class,
             WebServiceClientTest.class,
-            ImportAutoConfiguration.class);
+            ImportAutoConfiguration.class,
+            MockBean.class,
+            SpyBean.class);
+
+    public static final JavaClasses IMPORTED_CLASSES =
+            new ClassFileImporter().importPackages("com.axelixlabs.axelix.sbs.spring.core");
+
+    @Test
+    void allTestClassesMustUtilizeSharedContext() {
+        ClassesShouldConjunction typeRule = classes()
+                .that()
+                .areNotAnnotatedWith(IgnoreTestContextArchitecture.class)
+                .and(areRegularJunitTestClasses())
+                .should()
+                .notBeMetaAnnotatedWith(areAnnotatedWithRestrictedAnnotations());
+
+        // Handles cases like @MockBean on fields, which also force new test context creation
+        FieldsShouldConjunction fieldRule = fields().that()
+                .areDeclaredInClassesThat()
+                .areNotAnnotatedWith(IgnoreTestContextArchitecture.class)
+                .and()
+                .areDeclaredInClassesThat(areRegularJunitTestClasses())
+                .should()
+                .notBeMetaAnnotatedWith(areAnnotatedWithRestrictedAnnotations());
+
+        typeRule.check(IMPORTED_CLASSES);
+
+        fieldRule.check(IMPORTED_CLASSES);
+    }
+
+    private DescribedPredicate<? super JavaAnnotation<?>> areAnnotatedWithRestrictedAnnotations() {
+        return new DescribedPredicate<>("restricted annotations") {
+            @Override
+            public boolean test(JavaAnnotation<?> javaAnnotation) {
+                JavaClass rawType = javaAnnotation.getRawType();
+
+                return RESTRICTED_ANNOTATIONS.stream().anyMatch(rawType::isEquivalentTo);
+            }
+        };
+    }
+
+    private DescribedPredicate<? super JavaClass> areRegularJunitTestClasses() {
+        return new DescribedPredicate<>("Shared context parent class") {
+
+            @Override
+            public boolean test(JavaClass javaClass) {
+                return notAbstract(javaClass) && javaClass.getName().endsWith("Test");
+            }
+
+            private static boolean notAbstract(JavaClass javaClass) {
+                return !javaClass.getModifiers().contains(JavaModifier.ABSTRACT);
+            }
+        };
+    }
 }
