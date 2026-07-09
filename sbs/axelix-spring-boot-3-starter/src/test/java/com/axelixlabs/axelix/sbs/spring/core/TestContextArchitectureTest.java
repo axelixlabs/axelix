@@ -28,6 +28,7 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.syntax.elements.ClassesShouldConjunction;
 import com.tngtech.archunit.lang.syntax.elements.FieldsShouldConjunction;
+import com.tngtech.archunit.lang.syntax.elements.MethodsShouldConjunction;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -76,11 +77,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 /**
  * Tests that check for context pollution in Spring Boot tests
@@ -147,7 +150,8 @@ public class TestContextArchitectureTest {
             WebServiceClientTest.class,
             ImportAutoConfiguration.class,
             MockBean.class,
-            SpyBean.class);
+            SpyBean.class,
+            DynamicPropertySource.class);
 
     public static final JavaClasses IMPORTED_CLASSES =
             new ClassFileImporter().importPackages("com.axelixlabs.axelix.sbs.spring.core");
@@ -170,9 +174,21 @@ public class TestContextArchitectureTest {
                 .should()
                 .notBeMetaAnnotatedWith(areAnnotatedWithRestrictedAnnotations());
 
+        // Handles cases like @DynamicPropertySource on methods, which also force new test context creation
+        MethodsShouldConjunction methodRule = methods()
+                .that()
+                .areDeclaredInClassesThat()
+                .areNotAnnotatedWith(IgnoreTestContextArchitecture.class)
+                .and()
+                .areDeclaredInClassesThat(areRegularJunitTestClasses())
+                .should()
+                .notBeMetaAnnotatedWith(areAnnotatedWithRestrictedAnnotations());
+
         typeRule.check(IMPORTED_CLASSES);
 
         fieldRule.check(IMPORTED_CLASSES);
+
+        methodRule.check(IMPORTED_CLASSES);
     }
 
     private DescribedPredicate<? super JavaAnnotation<?>> areAnnotatedWithRestrictedAnnotations() {
