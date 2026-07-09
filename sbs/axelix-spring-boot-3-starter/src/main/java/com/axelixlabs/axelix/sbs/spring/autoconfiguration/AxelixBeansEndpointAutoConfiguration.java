@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -45,13 +44,11 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
 public class AxelixBeansEndpointAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
     public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
         return new DefaultConditionalBeanRefBuilder();
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public BeanMetaInfoExtractor beanMetaInfoExtractor(
             ConfigurableApplicationContext configurableApplicationContext,
             ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
@@ -65,13 +62,11 @@ public class AxelixBeansEndpointAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder cachingBeansFeedBuilder) {
         return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
         return new QualifiersPersistencePostProcessor();
     }

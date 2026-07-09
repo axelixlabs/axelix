@@ -20,12 +20,9 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,30 +67,5 @@ class AxelixConditionsEndpointAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(AxelixConditionsEndpointAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(AxelixConditionsEndpoint.class);
         });
-    }
-
-    @Test
-    void shouldNotCreateDefaultEndpointWhenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomAxelixConditionsEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(AxelixConditionsEndpoint.class);
-                    assertThat(context.getBean(AxelixConditionsEndpoint.class))
-                            .isExactlyInstanceOf(CustomAxelixConditionsEndpoint.class);
-                });
-    }
-
-    @TestConfiguration
-    static class CustomAxelixConditionsEndpointConfig {
-        @Bean
-        public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
-            return new CustomAxelixConditionsEndpoint(conditionalFeedBuilder);
-        }
-    }
-
-    static class CustomAxelixConditionsEndpoint extends AxelixConditionsEndpoint {
-        public CustomAxelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
-            super(conditionalFeedBuilder);
-        }
     }
 }
