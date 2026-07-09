@@ -292,8 +292,9 @@ axelix.sbs.discovery.heartbeat-interval=15s
   собственной сети — только по имени хоста и порту.
 - `master-url` — это **полный** URL-адрес, включая `/api/internal/service/register`. Стартер отправляет его без
   изменений.
-- `instance-name-prefix` — это имя, которое Master показывает для этого сервиса в пользовательском интерфейсе и в MCP-ответах.
-  Выбирайте имя, которое переживает рестарты и реплики, — как правило, имя сервиса, а не имя пода.
+- `instance-name-prefix` — это основа имени, которое Master показывает для этого сервиса в пользовательском интерфейсе и в MCP-ответах.
+  К нему добавляется уникальный постфикс, чтобы имена сервисов оставались различными для разных реплик.
+  Выбирайте префикс, который переживает рестарты, — как правило, имя сервиса, а не имя пода.
 - Саморегистрация принимается Master из коробки (`axelix.master.discovery.self-registration.enabled` по умолчанию
   `true`), установите её в `false`, если хотите отказаться от heartbeat-сигналов. Master выселяет сервис после
   `axelix.master.discovery.self-registration.eviction.heartbeat-timeout` молчания (по умолчанию `45s`), поэтому держите
@@ -394,7 +395,7 @@ heartbeat-сигналы будут отклоняться с `401`.
 | `axelix.sbs.discovery.auto`                  | `false`                                                             | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
 | `axelix.sbs.discovery.master-url`            | *(не задано)* <span className={styles.required}>обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:8080/api/internal/service/register`. Обязательно при `auto=true`.    |
 | `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className={styles.required}>обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `auto=true`.                       |
-| `axelix.sbs.discovery.instance-name-prefix`  | *(не задано)* <span className={styles.required}>обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `auto=true`.                                                           |
+| `axelix.sbs.discovery.instance-name-prefix`  | *(не задано)* <span className={styles.required}>обязательное</span> | Префикс отображаемого имени, показываемого в Axelix UI и в MCP-ответах; к нему добавляется уникальный постфикс. Обязательно при `auto=true`.        |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                               | Интервал между heartbeat-сигналами. Должен быть меньше `heartbeat-timeout` выселения на Master.                                                    |
 
 </div>
