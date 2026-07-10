@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
 
 /**
  * Discovers HTTP service integrations based on {@link FeignClient} annotations
@@ -49,7 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDi
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public class FeignClientIntegrationDiscoverer implements IntegrationComponentDiscoverer<FeignIntegration> {
+class FeignClientIntegrationDiscoverer {
 
     private static final String UNKNOWN = "UNKNOWN";
 
@@ -57,12 +56,12 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
     private final DiscoveryClient discoveryClient;
 
-    public FeignClientIntegrationDiscoverer(ApplicationContext context, DiscoveryClient discoveryClient) {
+    FeignClientIntegrationDiscoverer(ApplicationContext context, DiscoveryClient discoveryClient) {
         this.context = context;
         this.discoveryClient = discoveryClient;
     }
 
-    public Set<FeignIntegration> discoverIntegrations() {
+    Set<FeignIntegration> discoverIntegrations() {
         return Arrays.stream(context.getBeanNamesForAnnotation(FeignClient.class))
                 .map(this::extractFeignClientClass)
                 .filter(Objects::nonNull)

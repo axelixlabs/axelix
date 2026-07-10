@@ -26,7 +26,7 @@ import java.util.Set;
  * @author Mikhail Polivakha
  */
 @Deprecated // I am not sure we need this abstraction
-public interface IntegrationComponentDiscoverer<T> {
+interface IntegrationComponentDiscoverer<T> {
 
     Set<T> discoverIntegrations();
 }

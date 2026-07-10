@@ -30,11 +30,11 @@ import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
  * @author Sergey Cherkasov
  */
 @Endpoint(id = "axelix-feign")
-public class AxelixFeignEndpoint {
+class AxelixFeignEndpoint {
 
     private final FeignClientIntegrationDiscoverer discoverer;
 
-    public AxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
+    AxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
         this.discoverer = discoverer;
     }
 

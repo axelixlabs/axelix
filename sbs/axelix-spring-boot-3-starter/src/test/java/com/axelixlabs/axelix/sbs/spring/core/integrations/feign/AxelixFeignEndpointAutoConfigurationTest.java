@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
 
 import feign.Feign;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClientFactoryBean;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.FeignClientIntegrationDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

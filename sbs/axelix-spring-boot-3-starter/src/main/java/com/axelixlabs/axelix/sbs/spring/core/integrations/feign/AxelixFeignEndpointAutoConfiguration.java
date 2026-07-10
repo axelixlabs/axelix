@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
 
 import feign.Feign;
 
@@ -29,10 +29,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.FeignClientFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.FeignClientIntegrationDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryClient;
 
 /**
  * Auto-configuration for discovering HTTP integrations based on Spring Cloud OpenFeign.
