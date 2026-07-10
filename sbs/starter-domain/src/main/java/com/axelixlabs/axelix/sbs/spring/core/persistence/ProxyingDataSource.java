@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 /**
  * A {@link DataSource} wrapper that returns proxy {@link Connection} instances
  * capable of collecting SQL query execution statistics.
@@ -36,12 +34,12 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-public class ProxyingDataSource implements DataSource {
+class ProxyingDataSource implements DataSource {
 
     private final DataSource delegate;
     private final TransactionAccessor transactionAccessor;
 
-    public ProxyingDataSource(DataSource delegate, TransactionAccessor transactionAccessor) {
+    ProxyingDataSource(DataSource delegate, TransactionAccessor transactionAccessor) {
         this.delegate = delegate;
         this.transactionAccessor = transactionAccessor;
     }

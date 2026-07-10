@@ -28,9 +28,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 /**
  * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
@@ -41,14 +38,14 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
-public class TransactionMonitoringInterceptor implements MethodInterceptor {
+class TransactionMonitoringInterceptor implements MethodInterceptor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
     private final TransactionAccessor transactionAccessor;
 
-    public TransactionMonitoringInterceptor(
+    TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
             @Nullable AxelixMetricsPublisher metricsPublisher,

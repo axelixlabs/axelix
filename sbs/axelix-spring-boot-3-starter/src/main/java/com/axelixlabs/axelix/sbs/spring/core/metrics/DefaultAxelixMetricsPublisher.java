@@ -26,7 +26,7 @@ import io.micrometer.core.instrument.Timer;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionExecutionProfile;
 
 /**
  * Default implementation of {@link AxelixMetricsPublisher}

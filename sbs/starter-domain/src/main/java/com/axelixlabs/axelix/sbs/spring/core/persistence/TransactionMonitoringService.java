@@ -17,30 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
 
 /**
- * Custom Spring Boot Actuator endpoint for transaction monitoring.
+ * This interface defines the contract for retrieving aggregated transaction execution metrics
+ * from monitored @Transactional methods.
  *
- * <p>Exposes real-time transaction execution statistics.
- *
- * @since 22.01.2026
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-transactions-monitoring")
-class TransactionMonitoringEndpoint {
+interface TransactionMonitoringService {
 
-    private final TransactionMonitoringService transactionMonitoringService;
-
-    TransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-        this.transactionMonitoringService = transactionMonitoringService;
-    }
-
-    @ReadOperation
-    public TransactionMonitoringFeed getTransactionStats() {
-        return transactionMonitoringService.getMonitoringFeed();
-    }
+    /**
+     * Returns a complete monitoring feed with transaction execution statistics.
+     */
+    TransactionMonitoringFeed getMonitoringFeed();
 }

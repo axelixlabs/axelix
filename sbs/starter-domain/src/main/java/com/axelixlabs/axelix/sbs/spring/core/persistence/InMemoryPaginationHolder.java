@@ -17,30 +17,28 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
-import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
-
 /**
- * Custom Spring Boot Actuator endpoint for transaction monitoring.
+ * Holds a thread-local flag indicating that the current query is subject to in-memory pagination.
+ * The flag is set by InMemoryPaginationAppender upon detecting a Hibernate warning,
+ * and cleared by {@link ProxyingPreparedStatement} after the query is recorded.
  *
- * <p>Exposes real-time transaction execution statistics.
- *
- * @since 22.01.2026
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-transactions-monitoring")
-class TransactionMonitoringEndpoint {
+final class InMemoryPaginationHolder {
 
-    private final TransactionMonitoringService transactionMonitoringService;
+    private static final ThreadLocal<Boolean> HOLDER = new ThreadLocal<>();
 
-    TransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-        this.transactionMonitoringService = transactionMonitoringService;
+    private InMemoryPaginationHolder() {}
+
+    public static void mark() {
+        HOLDER.set(Boolean.TRUE);
     }
 
-    @ReadOperation
-    public TransactionMonitoringFeed getTransactionStats() {
-        return transactionMonitoringService.getMonitoringFeed();
+    public static boolean isMarked() {
+        return Boolean.TRUE.equals(HOLDER.get());
+    }
+
+    public static void clear() {
+        HOLDER.remove();
     }
 }

@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 /**
  * A {@link Connection} wrapper that replaces {@link PreparedStatement} instances
  * with proxies collecting query execution statistics.
@@ -47,12 +45,12 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
-public class ProxyingConnection implements Connection {
+class ProxyingConnection implements Connection {
 
     private final Connection delegate;
     private final TransactionAccessor transactionAccessor;
 
-    public ProxyingConnection(Connection delegate, TransactionAccessor transactionAccessor) {
+    ProxyingConnection(Connection delegate, TransactionAccessor transactionAccessor) {
         this.delegate = delegate;
         this.transactionAccessor = transactionAccessor;
     }

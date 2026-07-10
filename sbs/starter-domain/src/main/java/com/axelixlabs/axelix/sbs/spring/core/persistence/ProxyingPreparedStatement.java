@@ -41,9 +41,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.InMemoryPaginationHolder;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 /**
  * A {@link PreparedStatement} wrapper that records execution statistics
  * for executed SQL queries.
@@ -52,13 +49,13 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @author Nikita Kirillov
  */
 @SuppressWarnings("PMD.CyclomaticComplexity")
-public class ProxyingPreparedStatement implements PreparedStatement {
+class ProxyingPreparedStatement implements PreparedStatement {
 
     private final String sql;
     private final PreparedStatement delegate;
     private final TransactionAccessor transactionAccessor;
 
-    public ProxyingPreparedStatement(String sql, PreparedStatement delegate, TransactionAccessor transactionAccessor1) {
+    ProxyingPreparedStatement(String sql, PreparedStatement delegate, TransactionAccessor transactionAccessor1) {
         this.sql = sql;
         this.delegate = delegate;
         this.transactionAccessor = transactionAccessor1;

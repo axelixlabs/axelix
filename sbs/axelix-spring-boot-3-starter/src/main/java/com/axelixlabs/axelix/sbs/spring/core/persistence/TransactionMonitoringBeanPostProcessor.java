@@ -47,8 +47,6 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
@@ -60,14 +58,14 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
-public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
+class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final TransactionAccessor transactionAccessor;
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
 
-    public TransactionMonitoringBeanPostProcessor(
+    TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector,
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
             TransactionAccessor transactionAccessor) {

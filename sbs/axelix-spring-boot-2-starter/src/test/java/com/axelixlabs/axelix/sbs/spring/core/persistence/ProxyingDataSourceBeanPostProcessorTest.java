@@ -27,8 +27,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

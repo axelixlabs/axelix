@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionExecutionProfile;
 
 /**
  * Interface responsible for publishing application-level metrics to the underlying metrics system.

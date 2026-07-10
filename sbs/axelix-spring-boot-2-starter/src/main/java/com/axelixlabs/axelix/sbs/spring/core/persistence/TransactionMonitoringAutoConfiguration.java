@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.sbs.spring.core.persistence;
+
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
+
+/**
+ * Auto-configuration for Transaction Monitoring infrastructure.
+ *
+ * @since 21.01.2026
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
+ * @author Ilya Naumov
+ * @author Vyacheslav Yanin
+ */
+@AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
+@ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
+public class TransactionMonitoringAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX)
+    public TransactionMonitoringConfigurationProperties transactionMonitoringConfigurationProperties() {
+        return new TransactionMonitoringConfigurationProperties();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionStatsCollector transactionStatsCollector(
+            TransactionMonitoringConfigurationProperties properties) {
+
+        return new DefaultTransactionStatsCollector(properties.getMaxTransactionsPerMethod());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionMonitoringService transactionMonitoringService(
+            TransactionStatsCollector transactionStatsCollector) {
+        return new DefaultTransactionMonitoringService(transactionStatsCollector);
+    }
+
+    @Bean
+    public TransactionAccessor transactionAccessor() {
+        return new TransactionAccessor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
+            TransactionMonitoringService transactionMonitoringService) {
+        return new TransactionMonitoringEndpoint(transactionMonitoringService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
+            TransactionStatsCollector transactionStatsCollector, TransactionAccessor transactionAccessor) {
+        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, transactionAccessor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+            TransactionAccessor transactionAccessor) {
+        return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
+    }
+
+    @Configuration
+    @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOGBACK)
+    @ConditionalOnProperty(
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
+    static class LogbackInMemoryPaginationAppenderConfiguration {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new LogbackInMemoryPaginationAppenderRegistrar().register();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnHibernateActive
+    @ConditionalOnLoggingSystem(ConditionalOnLoggingSystem.System.LOG4J2)
+    @ConditionalOnProperty(
+            prefix = "axelix.sbs.transaction.monitoring.in-memory-pagination-detection",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
+    static class Log4j2InMemoryPaginationAppenderConfiguration {
+
+        @EventListener(ApplicationReadyEvent.class)
+        public void registerAppender() {
+            new Log4j2InMemoryPaginationAppenderRegistrar().register();
+        }
+    }
+}

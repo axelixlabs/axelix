@@ -23,7 +23,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-public class SimpleSqlQueryRecord {
+class SimpleSqlQueryRecord {
 
     private final String sql;
     private final long durationMs;
@@ -36,7 +36,7 @@ public class SimpleSqlQueryRecord {
      * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started.
      * @param inMemoryPaginated whether Hibernate applied pagination in memory for this query.
      */
-    public SimpleSqlQueryRecord(String sql, long durationMs, long startTimestampMs, boolean inMemoryPaginated) {
+    SimpleSqlQueryRecord(String sql, long durationMs, long startTimestampMs, boolean inMemoryPaginated) {
         this.sql = sql;
         this.durationMs = durationMs;
         this.startTimestampMs = startTimestampMs;

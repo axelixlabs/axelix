@@ -17,30 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
-import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
-
 /**
- * Custom Spring Boot Actuator endpoint for transaction monitoring.
+ * Registers InMemoryPaginationAppender with the active logging backend.
  *
- * <p>Exposes real-time transaction execution statistics.
- *
- * @since 22.01.2026
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-transactions-monitoring")
-class TransactionMonitoringEndpoint {
+interface InMemoryPaginationAppenderRegistrar {
 
-    private final TransactionMonitoringService transactionMonitoringService;
-
-    TransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-        this.transactionMonitoringService = transactionMonitoringService;
-    }
-
-    @ReadOperation
-    public TransactionMonitoringFeed getTransactionStats() {
-        return transactionMonitoringService.getMonitoringFeed();
-    }
+    /**
+     * Registers the appender with the active logging backend.
+     * If the backend is not supported, this method should return silently.
+     */
+    void register();
 }

@@ -28,7 +28,7 @@ import java.util.Objects;
  * @author Mikhail Polivakha
  * @since 22.01.2026
  */
-public final class MethodClassKey {
+final class MethodClassKey {
     private final Method method;
     private final Class<?> targetClass;
 
@@ -36,7 +36,7 @@ public final class MethodClassKey {
      * @param method      the method being analyzed
      * @param targetClass the class where the method is invoked
      */
-    public MethodClassKey(Method method, Class<?> targetClass) {
+    MethodClassKey(Method method, Class<?> targetClass) {
         this.method = method;
         this.targetClass = targetClass;
     }

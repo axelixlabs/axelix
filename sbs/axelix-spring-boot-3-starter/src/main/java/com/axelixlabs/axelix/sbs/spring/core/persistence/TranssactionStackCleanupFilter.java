@@ -25,8 +25,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 /**
  * Servlet filter responsible for cleaning up the N+1 tracking context.
  * <p>
@@ -35,11 +33,11 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @author Nikita Kirillov
  */
-public class TranssactionStackCleanupFilter implements Filter {
+class TranssactionStackCleanupFilter implements Filter {
 
     private final TransactionAccessor transactionAccessor;
 
-    public TranssactionStackCleanupFilter(TransactionAccessor transactionAccessor) {
+    TranssactionStackCleanupFilter(TransactionAccessor transactionAccessor) {
         this.transactionAccessor = transactionAccessor;
     }
 

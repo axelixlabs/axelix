@@ -17,30 +17,35 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import java.util.Map;
 
-import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 
 /**
- * Custom Spring Boot Actuator endpoint for transaction monitoring.
+ * This interface defines the contract for collecting and retrieving transaction monitoring data
+ * from @Transactional method executions.
  *
- * <p>Exposes real-time transaction execution statistics.
- *
- * @since 22.01.2026
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-transactions-monitoring")
-class TransactionMonitoringEndpoint {
+interface TransactionStatsCollector {
 
-    private final TransactionMonitoringService transactionMonitoringService;
+    /**
+     * Records a transaction execution for statistical tracking.
+     *
+     * @param key the method and class identifier
+     * @param transactionExecutionProfile the transaction execution record
+     */
+    void recordTransaction(MethodClassKey key, TransactionExecutionProfile transactionExecutionProfile);
 
-    TransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-        this.transactionMonitoringService = transactionMonitoringService;
-    }
+    /**
+     * Returns the copy of all collected transaction statistics.
+     *
+     * @return map of method keys to their transaction statistics
+     */
+    Map<MethodClassKey, SlidingWindow<TransactionExecutionProfile>> getAllStats();
 
-    @ReadOperation
-    public TransactionMonitoringFeed getTransactionStats() {
-        return transactionMonitoringService.getMonitoringFeed();
-    }
+    /**
+     * Clears the stats
+     */
+    void clearStats();
 }

@@ -17,30 +17,30 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
-import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
 
 /**
- * Custom Spring Boot Actuator endpoint for transaction monitoring.
+ * Logback appender that detects Hibernate's in-memory pagination by intercepting
+ * the {@code HHH000104} warning emitted by Hibernate 5.x when {@code firstResult/maxResults}
+ * is specified with a collection fetch.
  *
- * <p>Exposes real-time transaction execution statistics.
- *
- * @since 22.01.2026
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-transactions-monitoring")
-class TransactionMonitoringEndpoint {
+class LogbackInMemoryPaginationAppender extends AppenderBase<ILoggingEvent> {
 
-    private final TransactionMonitoringService transactionMonitoringService;
+    // Only for Hibernate 5.x (Spring Boot 2.x).
+    private static final String HHH000104 = "HHH000104";
 
-    TransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-        this.transactionMonitoringService = transactionMonitoringService;
-    }
-
-    @ReadOperation
-    public TransactionMonitoringFeed getTransactionStats() {
-        return transactionMonitoringService.getMonitoringFeed();
+    @Override
+    protected void append(ILoggingEvent event) {
+        if (event.getLevel() != Level.WARN) {
+            return;
+        }
+        String message = event.getMessage();
+        if (message != null && (message.contains(HHH000104))) {
+            InMemoryPaginationHolder.mark();
+        }
     }
 }

@@ -46,10 +46,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

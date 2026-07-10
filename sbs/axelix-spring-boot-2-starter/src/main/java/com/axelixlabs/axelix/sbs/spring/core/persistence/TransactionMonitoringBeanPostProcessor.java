@@ -47,9 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
-
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
  * to enable real-time transaction monitoring and statistics collection.
@@ -60,7 +57,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
-public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
+class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
 
     private static final Set<Propagation> TRANSACTION_CREATING_TYPES =
             EnumSet.of(Propagation.REQUIRED, Propagation.REQUIRES_NEW, Propagation.NESTED);
@@ -69,7 +66,7 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final TransactionStatsCollector statsCollector;
     private final TransactionAccessor transactionAccessor;
 
-    public TransactionMonitoringBeanPostProcessor(
+    TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector, TransactionAccessor transactionAccessor) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;

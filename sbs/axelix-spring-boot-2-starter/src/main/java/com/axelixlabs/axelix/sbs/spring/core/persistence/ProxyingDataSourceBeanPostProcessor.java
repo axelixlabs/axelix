@@ -24,19 +24,17 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-
 /**
  * {@link BeanPostProcessor} that wraps {@link DataSource} beans with a monitoring
  * {@link ProxyingDataSource} to collect real-time SQL query execution statistics.
  *
  * @author Sergey Cherkasov
  */
-public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
+class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
 
     private final TransactionAccessor transactionAccessor;
 
-    public ProxyingDataSourceBeanPostProcessor(TransactionAccessor transactionAccessor) {
+    ProxyingDataSourceBeanPostProcessor(TransactionAccessor transactionAccessor) {
         this.transactionAccessor = transactionAccessor;
     }
 
