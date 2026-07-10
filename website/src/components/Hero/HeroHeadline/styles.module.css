@@ -18,7 +18,7 @@
 }
 
 .Lede {
-    margin-top: 28px;
+    margin-top: 48px;
     font-size: clamp(17px, 1.5vw, 20px);
     line-height: 1.45;
     color: var(--axelix-ink-2);
