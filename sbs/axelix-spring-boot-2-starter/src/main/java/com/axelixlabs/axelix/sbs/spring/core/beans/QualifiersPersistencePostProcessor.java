@@ -38,7 +38,7 @@ import org.springframework.core.type.MethodMetadata;
  *
  * @author Mikhail Polivakha
  */
-public class QualifiersPersistencePostProcessor implements BeanFactoryPostProcessor, Ordered {
+class QualifiersPersistencePostProcessor implements BeanFactoryPostProcessor, Ordered {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

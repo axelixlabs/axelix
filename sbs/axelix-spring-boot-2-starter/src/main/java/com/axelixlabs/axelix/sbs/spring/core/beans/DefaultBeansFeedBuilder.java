@@ -43,13 +43,13 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils;
  *
  * @author Mikhail Polivakha
  */
-public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
+class DefaultBeansFeedBuilder implements BeansFeedBuilder {
 
     private final BeansEndpoint delegate;
     private final BeanMetaInfoExtractor enricher;
     private final ConfigurableApplicationContext context;
 
-    public DefaultBeansFeedBuilder(BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
+    DefaultBeansFeedBuilder(BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
         // TODO: replace the actuator call with dedicated, self-written API
         this.delegate = new BeansEndpoint(context);
         this.enricher = enricher;

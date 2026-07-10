@@ -26,7 +26,7 @@ import com.axelixlabs.axelix.common.api.BeansFeed;
  *
  * @author Mikhail Polivakha
  */
-public interface BeansFeedBuilder {
+interface BeansFeedBuilder {
 
     /**
      * @return feed of beans inside the given application.

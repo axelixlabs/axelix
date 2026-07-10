@@ -29,7 +29,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * @author Nikita Kirillov
  */
 @NullMarked
-public interface BeanMetaInfoExtractor {
+interface BeanMetaInfoExtractor {
 
     /**
      * Enriches bean descriptor with additional analysis information.

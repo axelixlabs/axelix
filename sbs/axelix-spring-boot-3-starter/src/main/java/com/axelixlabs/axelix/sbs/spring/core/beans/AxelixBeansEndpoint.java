@@ -31,11 +31,11 @@ import com.axelixlabs.axelix.common.api.BeansFeed;
  * @author Mikhail Polivakha
  */
 @RestControllerEndpoint(id = "axelix-beans")
-public class AxelixBeansEndpoint {
+class AxelixBeansEndpoint {
 
     private final BeansFeedBuilder beansFeedBuilder;
 
-    public AxelixBeansEndpoint(BeansFeedBuilder beansFeedBuilder) {
+    AxelixBeansEndpoint(BeansFeedBuilder beansFeedBuilder) {
         this.beansFeedBuilder = beansFeedBuilder;
     }
 

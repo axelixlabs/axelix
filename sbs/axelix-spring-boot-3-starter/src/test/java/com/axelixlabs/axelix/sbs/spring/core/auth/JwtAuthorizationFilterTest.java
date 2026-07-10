@@ -37,7 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
@@ -47,7 +46,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
@@ -60,11 +58,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.beans.BeansTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
@@ -102,6 +96,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 @Import({
     JwtAuthorizationFilterTestConfiguration.class,
+    BeansTestConfiguration.class,
     AxelixCachesEndpoint.class,
     DefaultCacheOperationsDispatcher.class,
     EnvironmentTestConfig.class,
@@ -411,28 +406,6 @@ class JwtAuthorizationFilterTest {
         @Bean
         public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
             return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
-        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
-            return new QualifiersPersistencePostProcessor();
-        }
-
-        @Bean
-        public BeanMetaInfoExtractor beanMetaInfoExtractor(
-                ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
-        }
-
-        @Bean
-        public BeansFeedBuilder noOpBeanFeedBuilder() {
-            return () -> new BeansFeed(List.of());
-        }
-
-        @Bean
-        public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder noOpBeanFeedBuilder) {
-            return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
         }
 
         @Bean

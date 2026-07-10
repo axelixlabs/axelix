@@ -15,24 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * Auto-configuration class for {@link AxelixBeansEndpoint}.
+ * Auto-configuration class for the beans custom actuator endpoint.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
@@ -62,7 +56,7 @@ public class AxelixBeansEndpointAutoConfiguration {
     }
 
     @Bean
-    public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder cachingBeansFeedBuilder) {
+    public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder cachingBeansFeedBuilder) {
         return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
     }
 

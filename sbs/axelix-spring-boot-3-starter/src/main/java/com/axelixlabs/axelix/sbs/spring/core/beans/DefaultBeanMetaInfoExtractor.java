@@ -60,14 +60,14 @@ import static com.axelixlabs.axelix.common.api.BeansFeed.UnknownBean;
  * @since 04.07.2025
  */
 @NullMarked
-public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
+class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
     private final DefaultQualifiersRegistry qualifiersRegistry;
     private final ConfigurableListableBeanFactory beanFactory;
     private final ConditionsReportEndpoint delegateConditions;
     private final ConditionalBeanRefBuilder conditionalBeanRefBuilder;
 
-    public DefaultBeanMetaInfoExtractor(
+    DefaultBeanMetaInfoExtractor(
             ConfigurableApplicationContext configurableApplicationContext,
             ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
         this.beanFactory = configurableApplicationContext.getBeanFactory();

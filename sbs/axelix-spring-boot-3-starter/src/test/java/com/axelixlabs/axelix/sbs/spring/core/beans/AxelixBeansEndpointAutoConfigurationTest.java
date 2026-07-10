@@ -15,18 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;

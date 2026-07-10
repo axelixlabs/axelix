@@ -30,9 +30,9 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Mikhail Polivakha
  */
-public class DefaultQualifiersRegistry {
+class DefaultQualifiersRegistry {
 
-    public static final DefaultQualifiersRegistry INSTANCE = new DefaultQualifiersRegistry();
+    static final DefaultQualifiersRegistry INSTANCE = new DefaultQualifiersRegistry();
 
     private final ConcurrentMap<String, List<String>> cache;
 
@@ -41,11 +41,11 @@ public class DefaultQualifiersRegistry {
     }
 
     @NonNull
-    public List<String> getQualifiers(@NonNull String beanName) {
+    List<String> getQualifiers(@NonNull String beanName) {
         return Optional.ofNullable(cache.get(beanName)).orElse(new ArrayList<>());
     }
 
-    public void registerQualifiers(@NonNull String beanName, @NonNull List<String> qualifiers) {
+    void registerQualifiers(@NonNull String beanName, @NonNull List<String> qualifiers) {
         cache.compute(beanName, (s, existingQualifiers) -> {
             if (existingQualifiers == null || existingQualifiers.isEmpty()) {
                 existingQualifiers = new ArrayList<>();

@@ -32,7 +32,7 @@ import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-public final class BeanMetaInfo {
+final class BeanMetaInfo {
 
     @Nullable
     private final String autoConfigurationRef;
@@ -43,7 +43,7 @@ public final class BeanMetaInfo {
     private final List<String> qualifiers;
     private final BeansFeed.BeanSource beanSource;
 
-    public BeanMetaInfo(
+    BeanMetaInfo(
             @Nullable String autoConfigurationRef,
             ProxyType proxyType,
             boolean isLazyInit,
@@ -59,27 +59,27 @@ public final class BeanMetaInfo {
     }
 
     @Nullable
-    public String getAutoConfigurationRef() {
+    String getAutoConfigurationRef() {
         return autoConfigurationRef;
     }
 
-    public ProxyType getProxyType() {
+    ProxyType getProxyType() {
         return proxyType;
     }
 
-    public boolean isLazyInit() {
+    boolean isLazyInit() {
         return isLazyInit;
     }
 
-    public boolean isPrimary() {
+    boolean isPrimary() {
         return isPrimary;
     }
 
-    public List<String> getQualifiers() {
+    List<String> getQualifiers() {
         return qualifiers;
     }
 
-    public BeansFeed.BeanSource getBeanSource() {
+    BeansFeed.BeanSource getBeanSource() {
         return beanSource;
     }
 
