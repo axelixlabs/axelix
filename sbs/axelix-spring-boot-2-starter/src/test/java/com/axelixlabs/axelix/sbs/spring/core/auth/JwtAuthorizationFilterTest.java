@@ -107,7 +107,7 @@ class JwtAuthorizationFilterTest {
 
     // Cache and CacheManager names under test
     private static final String TEST_CACHE_1 = "cache";
-    private static final String MAIN_CACHE_MANAGER = "axelixMainCacheManager";
+    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
 
     private EnhancedCacheManager cacheManager;
 

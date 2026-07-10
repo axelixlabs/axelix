@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -41,64 +42,62 @@ import org.springframework.util.StringUtils;
  * But if the bean name already starts with the 'axelix' prefix, the processor ignores it.
  *
  * @author Vyacheslav Yanin
+ * @author Mikhail Polivakha
  */
 public class AxelixBeanRenamingProcessor implements BeanDefinitionRegistryPostProcessor {
 
     /**
-     * Common packages for sbs.
+     * Common packages for Axelix classes.
      */
-    private static final String TARGET_PACKAGE = "com.axelixlabs.axelix.sbs.spring.";
+    private static final String TARGET_PACKAGE = "com.axelixlabs.axelix";
 
-    private static final String PREFIX = "axelix";
+    public static final String PREFIX = "axelix";
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         String[] beanNames = registry.getBeanDefinitionNames().clone();
+
         for (String beanName : beanNames) {
             BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
             if (beanDefinition instanceof AbstractBeanDefinition) {
-                AbstractBeanDefinition abstractBeanDefinition = (AbstractBeanDefinition) beanDefinition;
-
-                if (isBeanCreatedViaBeanAnnotation(abstractBeanDefinition)) {
-                    String factoryBeanName = abstractBeanDefinition.getFactoryBeanName();
-
-                    if (isFactoryBeanRegistered(registry, factoryBeanName)) {
-                        BeanDefinition factoryBd = registry.getBeanDefinition(factoryBeanName);
-                        String factoryClassName = factoryBd.getBeanClassName();
-
-                        if (isAxelixBean(factoryClassName)) {
-                            if (beanName.startsWith(PREFIX)) {
-                                continue;
-                            }
-                            String newBeanName = PREFIX + StringUtils.capitalize(beanName);
-                            replaceBeanDefinition(registry, beanName, newBeanName, abstractBeanDefinition);
-                        }
-                    }
-                }
+                potentiallyRenameBeanDefinition(registry, beanName, (AbstractBeanDefinition) beanDefinition);
             }
         }
     }
 
-    private boolean isBeanCreatedViaBeanAnnotation(AbstractBeanDefinition abd) {
-        return abd.getFactoryMethodName() != null;
+    private void potentiallyRenameBeanDefinition(
+            BeanDefinitionRegistry registry, String beanName, AbstractBeanDefinition beanDefinition) {
+
+        if (isBeanCreatedViaBeanAnnotation(registry, beanDefinition)) {
+            Assert.notNull(
+                    beanDefinition.getFactoryBeanName(), "Enclosing class of the bean cannot be null at this point");
+
+            BeanDefinition factoryBd = registry.getBeanDefinition(beanDefinition.getFactoryBeanName());
+            String factoryClassName = factoryBd.getBeanClassName();
+
+            if (isAxelixBean(factoryClassName)) {
+                prependPostfixIfNotPresent(registry, beanName, beanDefinition);
+            }
+        }
     }
 
-    private boolean isFactoryBeanRegistered(BeanDefinitionRegistry registry, @Nullable String factoryBeanName) {
-        return factoryBeanName != null && registry.containsBeanDefinition(factoryBeanName);
+    private static void prependPostfixIfNotPresent(
+            BeanDefinitionRegistry registry, String beanName, AbstractBeanDefinition beanDefinition) {
+        if (!beanName.toLowerCase().startsWith(PREFIX)) {
+            String newBeanName = PREFIX + StringUtils.capitalize(beanName);
+            registry.removeBeanDefinition(beanName);
+            registry.registerBeanDefinition(newBeanName, beanDefinition);
+        }
+    }
+
+    private boolean isBeanCreatedViaBeanAnnotation(BeanDefinitionRegistry registry, AbstractBeanDefinition abd) {
+        return abd.getFactoryMethodName() != null
+                && abd.getFactoryBeanName() != null
+                && registry.containsBeanDefinition(abd.getFactoryBeanName());
     }
 
     private boolean isAxelixBean(@Nullable String factoryClassName) {
         return factoryClassName != null && factoryClassName.startsWith(TARGET_PACKAGE);
-    }
-
-    private void replaceBeanDefinition(
-            BeanDefinitionRegistry registry,
-            String beanName,
-            String newBeanName,
-            AbstractBeanDefinition abstractBeanDefinition) {
-        registry.removeBeanDefinition(beanName);
-        registry.registerBeanDefinition(newBeanName, abstractBeanDefinition);
-        registry.registerAlias(newBeanName, beanName);
     }
 
     @Override

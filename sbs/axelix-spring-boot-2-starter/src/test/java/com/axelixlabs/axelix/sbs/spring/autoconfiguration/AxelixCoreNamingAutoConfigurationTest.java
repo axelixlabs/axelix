@@ -28,7 +28,6 @@ import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Integration test for {@link AxelixCoreNamingAutoConfiguration}
@@ -37,8 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @since 05.07.2026
  */
 class AxelixCoreNamingAutoConfigurationTest {
-
-    private static final String PREFIX = "axelix";
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(AxelixCoreNamingAutoConfiguration.class));
@@ -53,7 +50,7 @@ class AxelixCoreNamingAutoConfigurationTest {
                     String[] beanNames = context.getBeanNamesForType(EndpointsConfigurationProperties.class);
                     assertThat(beanNames).isNotEmpty();
                     String actualBeanName = beanNames[0];
-                    assertThat(actualBeanName).startsWith(PREFIX);
+                    assertThat(actualBeanName).startsWith(AxelixBeanRenamingProcessor.PREFIX);
                     assertEquals("axelixEndpointsConfigurationProperties", actualBeanName);
                 });
     }
@@ -72,7 +69,6 @@ class AxelixCoreNamingAutoConfigurationTest {
                     String[] beanNames = context.getBeanNamesForType(AxelixHeapDumpEndpoint.class);
                     assertThat(beanNames).isNotEmpty();
                     String actualBeanName = beanNames[0];
-                    assertFalse(actualBeanName.startsWith(PREFIX + PREFIX));
                     assertEquals("axelixHeapDumpEndpoint", actualBeanName);
                 });
     }
