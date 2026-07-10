@@ -60,6 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(

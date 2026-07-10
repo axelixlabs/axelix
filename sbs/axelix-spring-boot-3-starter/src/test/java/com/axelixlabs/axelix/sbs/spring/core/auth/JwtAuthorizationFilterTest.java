@@ -92,6 +92,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Artemiy Degtyarev
+ * @author Vyacheslav Yanin
  *
  * @since 28.07.2025
  */

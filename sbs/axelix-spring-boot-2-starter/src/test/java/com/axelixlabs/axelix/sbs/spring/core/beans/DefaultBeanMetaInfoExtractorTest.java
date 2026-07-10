@@ -40,6 +40,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.api.BeansFeed.ComponentVariant;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
@@ -78,6 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 07.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
 class DefaultBeanMetaInfoExtractorTest {
@@ -345,6 +348,7 @@ class DefaultBeanMetaInfoExtractorTest {
     @EnableJpaRepositories(
             basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
             considerNestedRepositories = true)
+    @EnableAutoConfiguration(exclude = AxelixCoreNamingAutoConfiguration.class)
     @EntityScan(basePackageClasses = DefaultBeanAnalyzerTestConfig.MyEntity.class)
     public static class DefaultBeanAnalyzerTestConfig {
 

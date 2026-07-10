@@ -66,6 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  * @since 24.06.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
@@ -80,10 +81,10 @@ class AxelixCachesEndpointTest {
     private static final String TEST_CACHE_1 = "cache1";
     private static final String TEST_CACHE_2 = "cache2";
 
-    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
-    private static final String CLEAR_CACHE_MANAGER = "clearCacheManager";
-    private static final String ENABLE_CACHE_MANAGER = "enableCacheManager";
-    private static final String DISABLE_CACHE_MANAGER = "disableCacheManager";
+    private static final String MAIN_CACHE_MANAGER = "axelixMainCacheManager";
+    private static final String CLEAR_CACHE_MANAGER = "axelixClearCacheManager";
+    private static final String ENABLE_CACHE_MANAGER = "axelixEnableCacheManager";
+    private static final String DISABLE_CACHE_MANAGER = "axelixDisableCacheManager";
 
     private EnhancedCacheManager mainCacheManager;
     private EnhancedCacheManager clearCacheManager;

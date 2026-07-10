@@ -53,11 +53,12 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
+ * @author Vyacheslav Yanin
  */
 @TestConfiguration
 public class EnvSharedTestConfig {
 
-    public static final String SAMPLE_BEAN_NAME = "testBeanWithCustomAnnotations";
+    public static final String SAMPLE_BEAN_NAME = "axelixTestBeanWithCustomAnnotations";
 
     public static final String SANITIZE_ALL_ENVIRONMENT_SERVICE = "sanitizeAllEnvironmentService";
     public static final String EXPLICIT_SANITIZE_ENVIRONMENT_SERVICE = "explicitSanitizeEnvironmentService";
