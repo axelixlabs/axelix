@@ -14,7 +14,16 @@
 .configTable table td:nth-child(2) {
   font-size: 13px;
   word-break: break-word;
-  width: 260px;
+}
+
+.configTable table th:nth-child(1),
+.configTable table td:nth-child(1) {
+  width: 320px;
+}
+
+.configTable table th:nth-child(2),
+.configTable table td:nth-child(2) {
+  width: 200px;
 }
 
 .configTable table th:nth-child(3),

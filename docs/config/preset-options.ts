@@ -9,6 +9,8 @@ export const presetOptions: Preset.Options = {
     routeBasePath: '/',
     // Please change this to your repo.
     // Remove this to remove the "edit this page" links.
+
+    editUrl: 'https://github.com/axelixlabs/axelix/edit/master/docs/',
   },
   blog: false,
   theme: {

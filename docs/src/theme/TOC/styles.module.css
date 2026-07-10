@@ -1,0 +1,13 @@
+.TOCWrapper {
+    position: sticky;
+    top: 124px;
+    bottom: 30px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 154px);
+}
+
+.TOCFooter {
+    padding-top: 8px;
+}
