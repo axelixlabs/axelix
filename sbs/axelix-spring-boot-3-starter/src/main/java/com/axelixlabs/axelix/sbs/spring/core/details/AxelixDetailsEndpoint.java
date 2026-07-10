@@ -30,11 +30,11 @@ import com.axelixlabs.axelix.common.api.InstanceDetails;
  * @author Nikita Kirillov
  */
 @Endpoint(id = "axelix-details")
-public class AxelixDetailsEndpoint {
+class AxelixDetailsEndpoint {
 
     private final ServiceDetailsAssembler serviceDetailsAssembler;
 
-    public AxelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
+    AxelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
         this.serviceDetailsAssembler = serviceDetailsAssembler;
     }
 

@@ -41,13 +41,13 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNul
  * @since 29.10.2025
  * @author Nikita Kirillov
  */
-public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
+class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
 
     private final GitInformationProvider gitInformationProvider;
     private final @Nullable BuildProperties buildProperties;
     private final LibraryInformationProvider libraryInformationProvider;
 
-    public DefaultServiceDetailsAssembler(
+    DefaultServiceDetailsAssembler(
             GitInformationProvider gitInformationProvider,
             ObjectProvider<BuildProperties> providerBuildProperties,
             LibraryInformationProvider libraryInformationProvider) {

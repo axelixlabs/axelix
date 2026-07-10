@@ -25,7 +25,7 @@ import com.axelixlabs.axelix.common.api.InstanceDetails;
  * @since 29.10.2025
  * @author Nikita Kirillov
  */
-public interface ServiceDetailsAssembler {
+interface ServiceDetailsAssembler {
 
     /**
      * @return assembled {@link InstanceDetails}.

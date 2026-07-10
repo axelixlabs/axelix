@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+package com.axelixlabs.axelix.sbs.spring.core.details;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -25,9 +25,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.details.AxelixDetailsEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.details.ServiceDetailsAssembler;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
