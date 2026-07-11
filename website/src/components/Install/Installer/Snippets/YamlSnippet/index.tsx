@@ -64,7 +64,7 @@ export const YamlSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>instance-name</span>: <span className={styles.St}>my-app</span>
+                    <span className={styles.At}>instance-name-prefix</span>: <span className={styles.St}>my-app</span>
                 </span>
                 <span className={styles.Line}>
                     {"      "}

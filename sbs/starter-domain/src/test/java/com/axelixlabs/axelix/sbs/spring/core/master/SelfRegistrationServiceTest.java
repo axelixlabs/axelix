@@ -67,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @SpringBootTest(classes = SelfRegistrationServiceTest.TestApplication.class)
 @TestPropertySource(
         properties = {
-            "axelix.sbs.discovery.instance-name=testApp",
+            "axelix.sbs.discovery.instance-name-prefix=testApp",
             "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator",
             "axelix.sbs.discovery.heartbeat-interval=PT1S"
         })

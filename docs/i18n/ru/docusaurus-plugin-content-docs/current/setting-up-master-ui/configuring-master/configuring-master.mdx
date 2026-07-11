@@ -176,7 +176,7 @@ JWT, подписанный общим `axelix.master.auth.jwt.signing-key`. Mas
 На стороне Master **обязательных переопределений нет** — у каждого свойства здесь есть рабочее значение по умолчанию.
 Функция **включена по умолчанию** (`enabled=true`), установите в `false`, только если хотите, чтобы Master отказывался
 от всех heartbeat-сигналов. Свойства со стороны стартера, которые попадают *в* heartbeat-сигнал (`master-url`,
-`instance-actuator-url`, `instance-name`), описаны на странице [Настройка Spring Boot
+`instance-actuator-url`, `instance-name-prefix`), описаны на странице [Настройка Spring Boot
 Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
 
 <div className={styles.configTable}>

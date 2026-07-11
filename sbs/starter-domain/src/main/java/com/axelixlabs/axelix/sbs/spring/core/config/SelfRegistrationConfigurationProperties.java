@@ -43,10 +43,10 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
     private String masterUrl;
 
     /**
-     * The name of the service under which it will be registered in the master and subsequently displayed
-     * in wallboard, mcp, etc.
+     * The name prefix of the service under which it will be registered in the master and subsequently displayed
+     * in wallboard, mcp, etc. A unique postfix is appended to this prefix to form the final instance name.
      */
-    private String instanceName;
+    private String instanceNamePrefix;
 
     /**
      * The URL of the service, including the postfix for the actuator path, e.g. {@code https://my-app:6061/actuator}.
@@ -68,8 +68,8 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
         return instanceActuatorUrl;
     }
 
-    public String getInstanceName() {
-        return instanceName;
+    public String getInstanceNamePrefix() {
+        return instanceNamePrefix;
     }
 
     public Duration getHeartbeatInterval() {
@@ -86,8 +86,8 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
         this.instanceActuatorUrl = cleanInstanceActuatorUrl(instanceActuatorUrl);
     }
 
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
+    public void setInstanceNamePrefix(String instanceNamePrefix) {
+        this.instanceNamePrefix = instanceNamePrefix;
     }
 
     public void setHeartbeatInterval(@Nullable Duration heartbeatInterval) {
@@ -100,7 +100,7 @@ public class SelfRegistrationConfigurationProperties implements Validatable {
     public void validate() {
         validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
         validateRequiredProperty(instanceActuatorUrl, "axelix.sbs.discovery.instance-actuator-url");
-        validateRequiredProperty(instanceName, "axelix.sbs.discovery.instance-name");
+        validateRequiredProperty(instanceNamePrefix, "axelix.sbs.discovery.instance-name-prefix");
     }
 
     private void validateRequiredProperty(Object value, String propertyName) {
