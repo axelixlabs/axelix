@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.common.api.registration;
 
 import java.util.List;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -55,8 +55,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Mikhail Polivakha
  */
 @SpringBootTest
-@Import(BasicDiscoveryMetadataEndpointProberTest.ProberTestSecurityConfiguration.class)
-class BasicDiscoveryMetadataEndpointProberTest {
+@Import(ManagedServiceMetadataEndpointProberTest.ProberTestSecurityConfiguration.class)
+class ManagedServiceMetadataEndpointProberTest {
 
     @TestConfiguration
     static class ProberTestSecurityConfiguration {

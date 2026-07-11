@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.common.api.registration;
 
-import java.util.Objects;
-
 /**
  * The common git commit info.
  *
@@ -29,6 +27,7 @@ public final class GitInfo {
     private final String commitShaShort;
     private final String branch;
     // TODO: Migrate to Instant later on. The parsing of a timestamp needs to be taken carefully
+    // once we'll use our plugin system this no longer would be an issue.
     private final String commitTimestamp;
     private final CommitAuthor commitAuthor;
 
@@ -53,26 +52,6 @@ public final class GitInfo {
 
     public CommitAuthor commitAuthor() {
         return commitAuthor;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        GitInfo gitInfo = (GitInfo) o;
-        return Objects.equals(commitShaShort, gitInfo.commitShaShort)
-                && Objects.equals(branch, gitInfo.branch)
-                && Objects.equals(commitTimestamp, gitInfo.commitTimestamp)
-                && Objects.equals(commitAuthor, gitInfo.commitAuthor);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(commitShaShort, branch, commitTimestamp, commitAuthor);
     }
 
     @Override
@@ -113,23 +92,6 @@ public final class GitInfo {
 
         public String email() {
             return email;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CommitAuthor that = (CommitAuthor) o;
-            return Objects.equals(name, that.name) && Objects.equals(email, that.email);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, email);
         }
 
         @Override
