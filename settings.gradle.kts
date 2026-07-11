@@ -11,4 +11,5 @@ include(
     ":common:domain",
     ":common:utils",
     ":plugins:axelix-gradle-plugin",
+    ":plugins:axelix-maven-plugin",
 )
