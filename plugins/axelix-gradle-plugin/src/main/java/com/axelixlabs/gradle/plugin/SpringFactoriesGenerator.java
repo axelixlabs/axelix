@@ -19,10 +19,10 @@ package com.axelixlabs.gradle.plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 
 import org.gradle.api.GradleException;
@@ -35,9 +35,8 @@ import org.gradle.api.Task;
  */
 final class SpringFactoriesGenerator {
 
-    static final String GENERATE_TASK_NAME = "generateAxelixSpringFactories";
-
-    static final String SPRING_FACTORIES_CONTENT = "org.springframework.test.context.TestExecutionListener=\\\n"
+    public static final String GENERATE_TASK_NAME = "generateAxelixSpringFactories";
+    public static final String SPRING_FACTORIES_CONTENT = "org.springframework.test.context.TestExecutionListener=\\\n"
             + "digital.pragmatech.testing.SpringTestProfilerListener\n"
             + "org.springframework.context.ApplicationContextInitializer=\\\n"
             + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
@@ -45,14 +44,12 @@ final class SpringFactoriesGenerator {
     private SpringFactoriesGenerator() {}
 
     static void configure(final Project project) {
-        final File generatedDir = new File(BuildDirCompat.buildDir(project), "generated/axelix");
+        final File generatedDir = new File(BuildDirAccessor.buildDir(project), "generated/axelix");
 
         Task generateTask = project.getTasks().create(GENERATE_TASK_NAME);
         generateTask.setGroup("axelix");
         generateTask.setDescription("Generates META-INF/spring.factories registering the Spring Test Profiler.");
-        // getInputs().properties(Map) keeps the same signature on Gradle 4.0 and 9.x, while
-        // getInputs().property(String, Object) changed its return type in 4.3 and would throw
-        // NoSuchMethodError on 4.0 daemons.
+        // getInputs().properties(Map) keeps the same signature on Gradle 5.0 and 9.x
         generateTask.getInputs().properties(Collections.singletonMap("content", SPRING_FACTORIES_CONTENT));
         generateTask.getOutputs().dir(generatedDir);
         generateTask.doLast(task -> writeSpringFactories(generatedDir));
@@ -70,8 +67,14 @@ final class SpringFactoriesGenerator {
         if (!parent.isDirectory() && !parent.mkdirs()) {
             throw new GradleException("Cannot create directory " + parent);
         }
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(target.toPath()), StandardCharsets.UTF_8)) {
-            writer.write(SPRING_FACTORIES_CONTENT);
+
+        try {
+            Files.write(
+                Paths.get(target.getPath()),
+                SPRING_FACTORIES_CONTENT.getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND
+            );
         } catch (IOException e) {
             throw new GradleException("Failed to write " + target, e);
         }

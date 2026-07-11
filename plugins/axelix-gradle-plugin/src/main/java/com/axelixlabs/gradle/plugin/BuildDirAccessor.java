@@ -27,11 +27,11 @@ import org.gradle.util.GradleVersion;
  * old versions, {@code layout.buildDirectory} on 5.0+ where the former triggers deprecation
  * warnings (8.3+).
  */
-final class BuildDirCompat {
+final class BuildDirAccessor {
 
     private static final GradleVersion MODERN = GradleVersion.version("5.0");
 
-    private BuildDirCompat() {}
+    private BuildDirAccessor() {}
 
     static File buildDir(Project project) {
         if (GradleVersion.current().getBaseVersion().compareTo(MODERN) >= 0) {
