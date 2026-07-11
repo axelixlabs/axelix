@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @author Mikhail Polivakha
  */
+@SuppressWarnings("NullAway")
 public class TransactionStats {
 
     private Map<LazyLoadingTarget, Integer> nPlusOneOccasions;
