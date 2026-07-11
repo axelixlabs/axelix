@@ -35,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class DependencyUtils {
 
-    public static ModuleComponentIdentifier findInTheConfigurationClasspath(
+    public static @Nullable ModuleComponentIdentifier findInTheConfigurationClasspath(
             Project project, String configurationName, final String group, final String name) {
 
         // getAllDependencies (not getDependencies) so dependencies inherited from extended configurations
@@ -49,7 +49,15 @@ public class DependencyUtils {
         Configuration configurationCopy =
                 project.getConfigurations().detachedConfiguration(dependencies.toArray(new Dependency[0]));
 
-        return configurationCopy.getIncoming().getResolutionResult();
+        try {
+            return configurationCopy.getIncoming().getResolutionResult();
+        } catch (Exception e) {
+            project.getLogger()
+                    .error("Axelix Gradle plugin is not capable to resolve the runtime classpath dependency tree. "
+                            + "This is critical and plugin cannot work without it. Make sure your repositories are declared correctly adn you have "
+                            + "a stable internet connection");
+            throw e;
+        }
     }
 
     /**

@@ -59,38 +59,35 @@ class AxelixGradlePluginFunctionalTest {
 
     @ParameterizedTest
     @MethodSource("gradleVersionsUnderTest")
-    void addsBothProfilerAndThymeleafDependenciesToTestRuntimeClasspathWhenNothingPresent(String gradleVersion) throws IOException {
+    void addsBothProfilerAndThymeleafDependenciesToTestRuntimeClasspathWhenNothingPresent(String gradleVersion)
+            throws IOException {
         // given.
         writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.loadContent("no-thymeleaf-and-profiler.gradle"));
 
         // when.
-        BuildResult result = createRunner(
-            gradleVersion,
-            "printTestRuntimeClasspath",
-            "--stacktrace",
-            "-i"
-        ).build();
+        BuildResult result = createRunner(gradleVersion, "printTestRuntimeClasspath", "--stacktrace", "-i")
+                .build();
 
         // then.
         assertThat(result.task(":printTestRuntimeClasspath").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.getOutput()).contains(AxelixGradlePlugin.PROFILER_NAME + "-" + AxelixGradlePlugin.PROFILER_VERSION + ".jar");
-        assertThat(result.getOutput()).contains(AxelixGradlePlugin.THYMELEAF_NAME + "-" + AxelixGradlePlugin.THYMELEAF_VERSION + ".jar");
+        assertThat(result.getOutput())
+                .contains(AxelixGradlePlugin.PROFILER_NAME + "-" + AxelixGradlePlugin.PROFILER_VERSION + ".jar");
+        assertThat(result.getOutput())
+                .contains(AxelixGradlePlugin.THYMELEAF_NAME + "-" + AxelixGradlePlugin.THYMELEAF_VERSION + ".jar");
     }
 
     @ParameterizedTest
     @MethodSource("gradleVersionsUnderTest")
-    void doesNotContributeAnythingWhenProfilerAndThymeleafAreAlreadyInClassPath(String gradleVersion) throws IOException {
+    void doesNotContributeAnythingWhenProfilerAndThymeleafAreAlreadyInClassPath(String gradleVersion)
+            throws IOException {
         // given.
         writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.loadContent("preexisting-thymeleaf-and-profiler.gradle"));
 
         // when.
-        BuildResult result = createRunner(
-            gradleVersion,
-            "printDeclaredDeps",
-            "--stacktrace"
-        ).build();
+        BuildResult result =
+                createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
 
         // then.
         assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
@@ -103,40 +100,42 @@ class AxelixGradlePluginFunctionalTest {
 
     @ParameterizedTest
     @MethodSource("gradleVersionsUnderTest")
-    void noOpWhenDeclaredThymeleafVersionIsBelowMinimumAndProfilerIsNotPresent(String gradleVersion) throws IOException {
+    void noOpWhenDeclaredThymeleafVersionIsBelowMinimumAndProfilerIsNotPresent(String gradleVersion)
+            throws IOException {
         // given.
         writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.loadContent("preexisitng-incompatible-thymeleaf.gradle"));
 
         // when.
         BuildResult result =
-            createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
+                createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
 
         // then.
         assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(result.getOutput())
-            .contains(AxelixGradlePlugin.THYMELEAF_NAME + ":3.0.15.RELEASE")
-            .doesNotContain(AxelixGradlePlugin.THYMELEAF_DEPENDENCY)
-            .doesNotContain(AxelixGradlePlugin.PROFILER_NAME);
+                .contains(AxelixGradlePlugin.THYMELEAF_NAME + ":3.0.15.RELEASE")
+                .doesNotContain(AxelixGradlePlugin.THYMELEAF_DEPENDENCY)
+                .doesNotContain(AxelixGradlePlugin.PROFILER_NAME);
     }
 
     @ParameterizedTest
     @MethodSource("gradleVersionsUnderTest")
-    void shouldOnlyAddProfilerAndNotAlterTheThymeleafWhenCompatibleThymeleafIsInTheClassPath(String gradleVersion) throws IOException {
+    void shouldOnlyAddProfilerAndNotAlterTheThymeleafWhenCompatibleThymeleafIsInTheClassPath(String gradleVersion)
+            throws IOException {
         // given.
         writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
         writeFile("build.gradle", GradleProjectFixtures.loadContent("preexisitng-compatible-thymeleaf.gradle"));
 
         // when.
         BuildResult result =
-            createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
+                createRunner(gradleVersion, "printDeclaredDeps", "--stacktrace").build();
 
         // then.
         assertThat(result.task(":printDeclaredDeps").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertThat(result.getOutput())
-            .contains(AxelixGradlePlugin.THYMELEAF_NAME + ":3.1.6.RELEASE")
-            .doesNotContain(AxelixGradlePlugin.THYMELEAF_DEPENDENCY)
-            .contains(AxelixGradlePlugin.PROFILER_DEPENDENCY);
+                .contains(AxelixGradlePlugin.THYMELEAF_NAME + ":3.1.4.RELEASE")
+                .doesNotContain(AxelixGradlePlugin.THYMELEAF_DEPENDENCY)
+                .contains(AxelixGradlePlugin.PROFILER_DEPENDENCY);
     }
 
     private GradleRunner createRunner(String gradleVersion, String... arguments) {
@@ -144,8 +143,7 @@ class AxelixGradlePluginFunctionalTest {
                 .withProjectDir(projectDir.toFile())
                 .withPluginClasspath()
                 .withGradleVersion(gradleVersion)
-                .withArguments(arguments)
-                .withDebug(true);
+                .withArguments(arguments);
     }
 
     private void writeFile(String relativePath, String content) throws IOException {

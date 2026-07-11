@@ -20,6 +20,7 @@ package com.axelixlabs.gradle.plugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
 
@@ -108,12 +109,12 @@ public class AxelixGradlePlugin implements Plugin<Project> {
                         MIN_THYMELEAF_VERSION);
     }
 
-    private static ModuleComponentIdentifier findThymeleaf(Project project) {
+    private static @Nullable ModuleComponentIdentifier findThymeleaf(Project project) {
         return DependencyUtils.findInTheConfigurationClasspath(
                 project, TEST_RUNTIME_CLASSPATH, THYMELEAF_GROUP, THYMELEAF_NAME);
     }
 
-    private static ModuleComponentIdentifier findSpringBootTestProfilerDependency(Project project) {
+    private static @Nullable ModuleComponentIdentifier findSpringBootTestProfilerDependency(Project project) {
         return DependencyUtils.findInTheConfigurationClasspath(
                 project, TEST_RUNTIME_CLASSPATH, PROFILER_GROUP, PROFILER_NAME);
     }

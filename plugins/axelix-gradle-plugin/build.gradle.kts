@@ -35,12 +35,15 @@ dependencies {
     testImplementation(gradleTestKit())
 }
 
+val modernGradleVersions = listOf("8.10.2", "9.5.1")
+val legacyGradleVersions = listOf("5.0", "6.9", "7.6.4")
+
 // No single JVM can launch the whole supported Gradle range: Gradle 5-7 require Java <= 11 while
 // Gradle 9 requires Java >= 17. The matrix is therefore split across two test tasks bucketed by the
 // JDK each Gradle version can run on; the Gradle versions themselves are the behavioural axis.
 tasks.test {
     useJUnitPlatform()
-    systemProperty("axelix.test.gradle.versions", "8.10.2,9.5.1")
+    systemProperty("axelix.test.gradle.versions", modernGradleVersions.joinToString(separator = ","))
 }
 
 val legacyGradleTest by tasks.registering(Test::class) {
@@ -55,7 +58,7 @@ val legacyGradleTest by tasks.registering(Test::class) {
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(11)
     }
-    systemProperty("axelix.test.gradle.versions", "5.0,6.9,7.6.4")
+    systemProperty("axelix.test.gradle.versions", legacyGradleVersions.joinToString(separator = ","))
     shouldRunAfter(tasks.test)
 }
 
