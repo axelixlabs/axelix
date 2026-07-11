@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
@@ -61,7 +61,7 @@ class AxelixMetadataEndpointTest {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+            return () -> BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -81,14 +81,14 @@ class AxelixMetadataEndpointTest {
 
         // TODO: fallback to @Import once https://github.com/axelixlabs/axelix/issues/1305 is done
         @Bean
-        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+        public DefaultBasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 GitInformationProvider gitInformationProvider,
                 ShortBuildInfoProvider shortBuildInfoProvider,
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
-            return new DefaultServiceMetadataAssembler(
+            return new DefaultBasicRegistrationMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProvider,

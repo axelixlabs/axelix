@@ -66,7 +66,7 @@ public class HeartBeatApiTest {
     // language=json
     private static final String JSON_REQUEST = """
         {
-           "basicDiscoveryMetadata" : {
+           "basicRegistrationMetadata" : {
              "version": "1.0.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",

@@ -28,11 +28,11 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
+import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultHeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
-import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -52,9 +52,10 @@ public class HeartBeatAutoConfiguration {
 
     @Bean
     public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
-            ServiceMetadataAssembler serviceMetadataAssembler,
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
             HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
-        return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
+        return new DefaultHeartBeatMetadataAssembler(
+                basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
     }
 
     @Bean

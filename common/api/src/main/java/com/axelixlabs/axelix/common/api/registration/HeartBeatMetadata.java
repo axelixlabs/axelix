@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class HeartBeatMetadata {
 
-    private final BasicDiscoveryMetadata basicDiscoveryMetadata;
+    private final BasicRegistrationMetadata basicRegistrationMetadata;
     private final String instanceId;
     private final String instanceName;
     private final String instanceActuatorUrl;
@@ -38,7 +38,7 @@ public class HeartBeatMetadata {
     /**
      * Creates a new {@link HeartBeatMetadata}.
      *
-     * @param basicDiscoveryMetadata    the basic metadata of a service instance
+     * @param basicRegistrationMetadata    the basic metadata of a service instance
      * @param instanceId                unique identifier (uid) of the service
      * @param instanceName              name of the service
      * @param instanceActuatorUrl       the URL of the service, including the postfix for the actuator path,
@@ -47,20 +47,20 @@ public class HeartBeatMetadata {
      */
     @JsonCreator
     public HeartBeatMetadata(
-            @JsonProperty("basicDiscoveryMetadata") BasicDiscoveryMetadata basicDiscoveryMetadata,
+            @JsonProperty("basicRegistrationMetadata") BasicRegistrationMetadata basicRegistrationMetadata,
             @JsonProperty("instanceId") String instanceId,
             @JsonProperty("instanceName") String instanceName,
             @JsonProperty("instanceActuatorUrl") String instanceActuatorUrl,
             @JsonProperty("deploymentAt") String deploymentAt) {
-        this.basicDiscoveryMetadata = basicDiscoveryMetadata;
+        this.basicRegistrationMetadata = basicRegistrationMetadata;
         this.instanceId = instanceId;
         this.instanceName = instanceName;
         this.instanceActuatorUrl = instanceActuatorUrl;
         this.deploymentAt = deploymentAt;
     }
 
-    public BasicDiscoveryMetadata getBasicDiscoveryMetadata() {
-        return basicDiscoveryMetadata;
+    public BasicRegistrationMetadata getBasicDiscoveryMetadata() {
+        return basicRegistrationMetadata;
     }
 
     public String getInstanceId() {
@@ -83,7 +83,7 @@ public class HeartBeatMetadata {
     public String toString() {
         return "SelfRegistrationMetadata{"
                 + "basicDiscoveryMetadata="
-                + basicDiscoveryMetadata
+                + basicRegistrationMetadata
                 + ", instanceId='"
                 + instanceId
                 + '\''

@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HealthStatus;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HealthStatus;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
@@ -54,7 +54,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
             String deploymentAt,
             @Nullable Instant latestHeartBeat,
             String instanceActuatorUrl,
-            BasicDiscoveryMetadata metadata)
+            BasicRegistrationMetadata metadata)
             throws IllegalArgumentException {
 
         return new Instance(
@@ -75,7 +75,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 instanceActuatorUrl);
     }
 
-    private ApplicationId resolveApplicationId(String instanceId, BasicDiscoveryMetadata metadata) {
+    private ApplicationId resolveApplicationId(String instanceId, BasicRegistrationMetadata metadata) {
         if (!StringUtils.hasText(metadata.getGroupId()) || !StringUtils.hasText(metadata.getArtifactId())) {
             throw new IllegalArgumentException(
                     "Instance %s cannot be registered without a valid application id (both groupId and artifactId are mandatory)"

@@ -22,7 +22,7 @@ import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -42,7 +42,7 @@ class HistoricalApplicationSnapshotConverterTest {
     @Test
     void shouldMapAllFieldsCorrectly() {
         // given.
-        BasicDiscoveryMetadata metadata = TestMetadataFactory.create("org.springframework.samples", "petclinic");
+        BasicRegistrationMetadata metadata = TestMetadataFactory.create("org.springframework.samples", "petclinic");
 
         // when.
         HistoricalApplicationSnapshot snapshot = subject.currentSnapshot(metadata);

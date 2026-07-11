@@ -40,7 +40,7 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
 
     private final HeartBeatConfigurationProperties heartBeatConfigurationProperties;
 
-    private final ServiceMetadataAssembler serviceMetadataAssembler;
+    private final BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler;
 
     private final String instanceId;
 
@@ -49,10 +49,10 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
     private final String deploymentAt;
 
     public DefaultHeartBeatMetadataAssembler(
-            ServiceMetadataAssembler serviceMetadataAssembler,
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
             HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
         this.heartBeatConfigurationProperties = heartBeatConfigurationProperties;
-        this.serviceMetadataAssembler = serviceMetadataAssembler;
+        this.basicRegistrationMetadataAssembler = basicRegistrationMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
         this.instanceName = heartBeatConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
@@ -62,7 +62,7 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
     public HeartBeatMetadata assemble() {
 
         return new HeartBeatMetadata(
-                serviceMetadataAssembler.assemble(),
+                basicRegistrationMetadataAssembler.assemble(),
                 instanceId,
                 instanceName,
                 heartBeatConfigurationProperties.getInstanceActuatorUrl(),

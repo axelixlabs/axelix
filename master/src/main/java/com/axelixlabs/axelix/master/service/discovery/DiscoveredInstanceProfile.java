@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
@@ -26,4 +26,4 @@ import com.axelixlabs.axelix.master.domain.Instance;
  *
  * @author Mikhail Polivakha
  */
-public record DiscoveredInstanceProfile(Instance instance, BasicDiscoveryMetadata metadata) {}
+public record DiscoveredInstanceProfile(Instance instance, BasicRegistrationMetadata metadata) {}

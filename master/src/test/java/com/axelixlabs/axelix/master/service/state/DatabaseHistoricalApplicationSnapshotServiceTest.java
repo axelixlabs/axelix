@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
@@ -70,7 +70,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldReloadCurrentState() {
             // given.
-            BasicDiscoveryMetadata metadata = petclinicMetadata(true, true);
+            BasicRegistrationMetadata metadata = petclinicMetadata(true, true);
 
             // and given initially loaded state.
             subject.reloadCurrentState(metadata);
@@ -101,8 +101,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldReloadCurrentStateBulk() {
             // given.
-            BasicDiscoveryMetadata petclinic = petclinicMetadata(true, true);
-            BasicDiscoveryMetadata otherApp = otherAppMetadata();
+            BasicRegistrationMetadata petclinic = petclinicMetadata(true, true);
+            BasicRegistrationMetadata otherApp = otherAppMetadata();
 
             // when.
             subject.reloadCurrentStateBulk(List.of(petclinic, otherApp));
@@ -170,9 +170,9 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateJavaFeaturesAdoptionAcrossServices() {
             // given two distinct services with different Java/JVM features enabled.
-            BasicDiscoveryMetadata first =
+            BasicRegistrationMetadata first =
                     TestMetadataFactory.withFeatures("com.example", "service-a", true, true, true, false, true);
-            BasicDiscoveryMetadata second =
+            BasicRegistrationMetadata second =
                     TestMetadataFactory.withFeatures("com.example", "service-b", true, false, false, false, false);
             subject.reloadCurrentStateBulk(List.of(first, second));
 
@@ -196,11 +196,11 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateGarbageCollectorDistributionAcrossServices() {
             // given.
-            BasicDiscoveryMetadata first = TestMetadataFactory.withFeatures(
+            BasicRegistrationMetadata first = TestMetadataFactory.withFeatures(
                     "com.example", "service-a", false, false, false, false, false, GarbageCollector.G1);
-            BasicDiscoveryMetadata second = TestMetadataFactory.withFeatures(
+            BasicRegistrationMetadata second = TestMetadataFactory.withFeatures(
                     "com.example", "service-b", false, false, false, false, false, GarbageCollector.G1);
-            BasicDiscoveryMetadata third = TestMetadataFactory.withFeatures(
+            BasicRegistrationMetadata third = TestMetadataFactory.withFeatures(
                     "com.example", "service-c", false, false, false, false, false, GarbageCollector.ZGC);
             subject.reloadCurrentStateBulk(List.of(first, second, third));
 
@@ -216,9 +216,9 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldCountOnlyTheLatestSnapshotPerService() {
             // given a service whose latest snapshot has AppCDS disabled.
-            BasicDiscoveryMetadata staleMetadata =
+            BasicRegistrationMetadata staleMetadata =
                     TestMetadataFactory.withFeatures("com.example", "service-a", true, true, true, true, true);
-            BasicDiscoveryMetadata current =
+            BasicRegistrationMetadata current =
                     TestMetadataFactory.withFeatures("com.example", "service-a", false, false, false, false, false);
             subject.reloadCurrentState(staleMetadata);
             subject.reloadCurrentState(current);
@@ -259,11 +259,11 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldAggregateSpringFrameworkFeaturesAdoptionAcrossServices() {
             // given three services, two of which have OSIV enabled.
-            BasicDiscoveryMetadata first =
+            BasicRegistrationMetadata first =
                     TestMetadataFactory.withFeatures("com.example", "service-a", false, false, false, false, true);
-            BasicDiscoveryMetadata second =
+            BasicRegistrationMetadata second =
                     TestMetadataFactory.withFeatures("com.example", "service-b", false, false, false, false, true);
-            BasicDiscoveryMetadata third =
+            BasicRegistrationMetadata third =
                     TestMetadataFactory.withFeatures("com.example", "service-c", false, false, false, false, false);
             subject.reloadCurrentStateBulk(List.of(first, second, third));
 
@@ -288,7 +288,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         }
     }
 
-    private static BasicDiscoveryMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
+    private static BasicRegistrationMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
         return TestMetadataFactory.withFeatures(
                 "org.springframework.samples", "petclinic", appCdsEnabled, false, false, false, osivEnabled);
     }
@@ -307,7 +307,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false)));
     }
 
-    private static BasicDiscoveryMetadata otherAppMetadata() {
+    private static BasicRegistrationMetadata otherAppMetadata() {
         return TestMetadataFactory.withFeatures(
                 "com.example", "other-app", false, false, true, true, false, GarbageCollector.ZGC);
     }

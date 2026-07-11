@@ -343,7 +343,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         // language=json
         String selfRegistrationRequest = """
             {
-           "basicDiscoveryMetadata" : {
+           "basicRegistrationMetadata" : {
              "version": "1.0.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",
@@ -387,7 +387,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         // language=json
         String selfRegistrationRequest = """
             {
-           "basicDiscoveryMetadata" : {
+           "basicRegistrationMetadata" : {
              "version": "1.0.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",

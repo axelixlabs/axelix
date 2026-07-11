@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
@@ -130,15 +130,16 @@ class HeartBeatServiceTest {
 
         @Bean
         public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
-                ServiceMetadataAssembler serviceMetadataAssembler,
+                BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
                 HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
 
-            return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
+            return new DefaultHeartBeatMetadataAssembler(
+                    basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
         }
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+            return () -> BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -164,12 +165,12 @@ class HeartBeatServiceTest {
 
         @Bean
         InsightsInfoProvider insightsInfoProvider() {
-            return () -> new BasicDiscoveryMetadata.Insights(
-                    new BasicDiscoveryMetadata.HotSpot(List.of(), List.of(), List.of()), List.of());
+            return () -> new BasicRegistrationMetadata.Insights(
+                    new BasicRegistrationMetadata.HotSpot(List.of(), List.of(), List.of()), List.of());
         }
 
         @Bean
-        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+        public DefaultBasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 GitInformationProvider gitInformationProvider,
@@ -177,7 +178,7 @@ class HeartBeatServiceTest {
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
 
-            return new DefaultServiceMetadataAssembler(
+            return new DefaultBasicRegistrationMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProvider,

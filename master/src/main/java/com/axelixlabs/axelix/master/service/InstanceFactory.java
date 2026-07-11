@@ -21,7 +21,7 @@ import java.time.Instant;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -50,6 +50,6 @@ public interface InstanceFactory {
             String deploymentAt,
             @Nullable Instant latestHeartBeat,
             String instanceActuatorUrl,
-            BasicDiscoveryMetadata metadata)
+            BasicRegistrationMetadata metadata)
             throws IllegalArgumentException;
 }

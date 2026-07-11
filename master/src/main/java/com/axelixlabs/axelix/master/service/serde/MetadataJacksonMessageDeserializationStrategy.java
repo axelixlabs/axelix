@@ -22,24 +22,24 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link BasicDiscoveryMetadata}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link BasicRegistrationMetadata}.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
 @Component
 public class MetadataJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<BasicDiscoveryMetadata> {
+        extends JacksonMessageDeserializationStrategy<BasicRegistrationMetadata> {
 
     public MetadataJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<BasicDiscoveryMetadata> supported() {
-        return BasicDiscoveryMetadata.class;
+    public @NonNull Class<BasicRegistrationMetadata> supported() {
+        return BasicRegistrationMetadata.class;
     }
 }

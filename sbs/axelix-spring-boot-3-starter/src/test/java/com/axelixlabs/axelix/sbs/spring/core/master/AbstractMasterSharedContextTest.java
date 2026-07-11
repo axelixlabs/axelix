@@ -25,7 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
@@ -60,7 +60,7 @@ abstract class AbstractMasterSharedContextTest {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+            return () -> BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -80,14 +80,14 @@ abstract class AbstractMasterSharedContextTest {
 
         // TODO: fallback to @Import once https://github.com/axelixlabs/axelix/issues/1305 is done
         @Bean
-        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+        public DefaultBasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 GitInformationProvider gitInformationProvider,
                 ShortBuildInfoProvider shortBuildInfoProvider,
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
-            return new DefaultServiceMetadataAssembler(
+            return new DefaultBasicRegistrationMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProvider,

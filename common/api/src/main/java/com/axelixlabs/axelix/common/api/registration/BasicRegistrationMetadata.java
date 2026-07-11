@@ -26,7 +26,8 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 
 /**
- * Represents the basic metadata of a service instance as exposed by the custom starter actuator endpoint.
+ * Represents the basic metadata that is always required in order to register the service,
+ * regardless of the approach - either auto-discovery or self-registration.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
@@ -35,7 +36,7 @@ import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 @SuppressWarnings(
         "NullAway") // TODO: we need to think about nullability here. It is not obvious what the correct setup is in
 // this case UPDATE: this is going to be solved when migrating to out plugins system and during openapi migration
-public final class BasicDiscoveryMetadata {
+public final class BasicRegistrationMetadata {
 
     private final String version;
     private final String serviceVersion;
@@ -74,7 +75,7 @@ public final class BasicDiscoveryMetadata {
      * @param insights          the insight information discovered for the given service instance.
      */
     @JsonCreator
-    public BasicDiscoveryMetadata(
+    public BasicRegistrationMetadata(
             @JsonProperty("version") String version,
             @JsonProperty("serviceVersion") String serviceVersion,
             @JsonProperty("groupId") String groupId,

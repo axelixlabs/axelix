@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -87,7 +87,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<BasicDiscoveryMetadata> collectiveMetadata = discoveredInstances.stream()
+        Set<BasicRegistrationMetadata> collectiveMetadata = discoveredInstances.stream()
                 .map(DiscoveredInstanceProfile::metadata)
                 .collect(Collectors.toSet());
 

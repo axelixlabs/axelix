@@ -20,17 +20,17 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
- * Default implementation of {@link ServiceMetadataAssembler}.
+ * Default implementation of {@link BasicRegistrationMetadataAssembler}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler {
+public class DefaultBasicRegistrationMetadataAssembler implements BasicRegistrationMetadataAssembler {
 
     private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
@@ -43,7 +43,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final String groupId;
     private final String artifactId;
 
-    public DefaultServiceMetadataAssembler(
+    public DefaultBasicRegistrationMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             GitInformationProvider gitInformationProvider,
@@ -66,10 +66,10 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     }
 
     @Override
-    public BasicDiscoveryMetadata assemble() {
+    public BasicRegistrationMetadata assemble() {
         var gitCommitInfo = gitInformationProvider.getGitCommitInfo();
 
-        return new BasicDiscoveryMetadata(
+        return new BasicRegistrationMetadata(
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfoProvider.getShortBuildInfo().serviceVersion(),
                 groupId,
@@ -79,13 +79,13 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 GarbageCollectorInfoAssembler.getGarbageCollectorInfo(),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
-                new BasicDiscoveryMetadata.MemoryDetails(
+                new BasicRegistrationMetadata.MemoryDetails(
                         memoryMXBean.getHeapMemoryUsage().getUsed()),
                 insightsInfoProvider.getInsight());
     }
 
-    private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {
-        return new BasicDiscoveryMetadata.SoftwareVersions(
+    private BasicRegistrationMetadata.SoftwareVersions buildSoftwareVersionInUse() {
+        return new BasicRegistrationMetadata.SoftwareVersions(
                 libraryInformationProvider.getJavaVersion(),
                 libraryInformationProvider.getSpringBootVersion(),
                 libraryInformationProvider.getSpringVersion(),

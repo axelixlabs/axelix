@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +45,7 @@ class MetadataJacksonMessageDeserializationStrategyTest {
            }
            """;
 
-        BasicDiscoveryMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
+        BasicRegistrationMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.getVersion()).isEqualTo("1.0.0-SNAPSHOT");

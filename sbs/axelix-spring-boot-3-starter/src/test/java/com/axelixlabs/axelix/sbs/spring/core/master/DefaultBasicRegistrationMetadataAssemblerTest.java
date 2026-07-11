@@ -22,26 +22,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider.TEST_INSIGHTS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration test for {@link DefaultServiceMetadataAssembler}.
+ * Integration test for {@link DefaultBasicRegistrationMetadataAssembler}.
  *
  * @author Mikhail Polivakha
  * @author Artemiy Degtyarev
  */
-class DefaultServiceMetadataAssemblerTest extends AbstractMasterSharedContextTest {
+class DefaultBasicRegistrationMetadataAssemblerTest extends AbstractMasterSharedContextTest {
 
     @Autowired
-    private DefaultServiceMetadataAssembler subject;
+    private DefaultBasicRegistrationMetadataAssembler subject;
 
     @Test
     void shouldAssembleTheMetadataAboutGivenService() {
         // when.
-        BasicDiscoveryMetadata serviceMetadata = subject.assemble();
+        BasicRegistrationMetadata serviceMetadata = subject.assemble();
 
         // then.
         assertThat(serviceMetadata.getCommitShortSha()).isEqualTo("a8b0929");
@@ -49,7 +49,7 @@ class DefaultServiceMetadataAssemblerTest extends AbstractMasterSharedContextTes
         assertThat(serviceMetadata.getSoftwareVersions().getJava()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
-        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
+        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
         assertThat(serviceMetadata.getInsights()).isEqualTo(TEST_INSIGHTS);
     }

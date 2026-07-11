@@ -27,7 +27,7 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
@@ -118,7 +118,7 @@ public class DatabaseHistoricalApplicationSnapshotService {
     // with sqlite, and we even have the custom dialect. Still, Spring Data JDBC does not allow for extension of UPSERTs
     // for custom dialects. I have filed a ticket for that, so, I hope this is gonna get done.
     @Transactional
-    public void reloadCurrentState(BasicDiscoveryMetadata metadata) {
+    public void reloadCurrentState(BasicRegistrationMetadata metadata) {
         HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
 
         jdbcAggregateTemplate.deleteById(applicationSnapshot.snapshotId(), HistoricalApplicationSnapshot.class);
@@ -126,7 +126,7 @@ public class DatabaseHistoricalApplicationSnapshotService {
     }
 
     @Transactional
-    public void reloadCurrentStateBulk(Collection<BasicDiscoveryMetadata> metadata) {
+    public void reloadCurrentStateBulk(Collection<BasicRegistrationMetadata> metadata) {
         // TODO:
         //  The incoming metadata array can generally be quite large (up to a couple of thousand of instances).
         //  By mapping inside the transaction in the loop, we're effectively elongating the transaction unnecessarily

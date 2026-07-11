@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.InsightFeature;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -36,14 +36,14 @@ import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
 
 /**
- * Converter that is capable to conver the {@link BasicDiscoveryMetadata} into {@link HistoricalApplicationSnapshot}.
+ * Converter that is capable to conver the {@link BasicRegistrationMetadata} into {@link HistoricalApplicationSnapshot}.
  *
  * @author Mikhail Polivakha
  */
 @Component
 public class HistoricalApplicationSnapshotConverter {
 
-    public HistoricalApplicationSnapshot currentSnapshot(BasicDiscoveryMetadata metadata) {
+    public HistoricalApplicationSnapshot currentSnapshot(BasicRegistrationMetadata metadata) {
 
         return new HistoricalApplicationSnapshot(
                 new SnapshotId(metadata.getGroupId(), metadata.getArtifactId(), LocalDate.now(ZoneOffset.UTC)),
@@ -52,8 +52,8 @@ public class HistoricalApplicationSnapshotConverter {
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
     // nullability annotations.
-    private Insights fromDto(BasicDiscoveryMetadata metadata) {
-        BasicDiscoveryMetadata.Insights insights = metadata.getInsights();
+    private Insights fromDto(BasicRegistrationMetadata metadata) {
+        BasicRegistrationMetadata.Insights insights = metadata.getInsights();
         if (insights == null) {
             return defaultInsights();
         }
@@ -63,7 +63,7 @@ public class HistoricalApplicationSnapshotConverter {
                 fromSpringFramework(insights.getSpringFramework()));
     }
 
-    private HotSpot fromHotSpot(BasicDiscoveryMetadata.HotSpot hotSpot, GarbageCollector gcInUse) {
+    private HotSpot fromHotSpot(BasicRegistrationMetadata.HotSpot hotSpot, GarbageCollector gcInUse) {
         if (hotSpot == null) {
             return defaultHotSpot();
         }

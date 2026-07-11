@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
@@ -35,7 +35,7 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvid
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration test for {@link DefaultServiceMetadataAssembler}.
+ * Integration test for {@link DefaultBasicRegistrationMetadataAssembler}.
  *
  * @author Mikhail Polivakha
  */
@@ -43,19 +43,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
-    DefaultBasicDiscoveryMetadataAssemblerTest.CurrentConfig.class
+    DefaultBasicRegistrationMetadataAssemblerTest.CurrentConfig.class
 })
-class DefaultBasicDiscoveryMetadataAssemblerTest {
+class DefaultBasicRegistrationMetadataAssemblerTest {
 
     @Autowired
-    private DefaultServiceMetadataAssembler subject;
+    private DefaultBasicRegistrationMetadataAssembler subject;
 
     @TestConfiguration
     static class CurrentConfig {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+            return () -> BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -74,14 +74,14 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
         }
 
         @Bean
-        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+        public DefaultBasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 GitInformationProvider gitInformationProvider,
                 ShortBuildInfoProvider shortBuildInfoProvider,
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
-            return new DefaultServiceMetadataAssembler(
+            return new DefaultBasicRegistrationMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProvider,
@@ -96,7 +96,7 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
     @Test
     void shouldAssembleTheMetadataAboutGivenService() {
         // when.
-        BasicDiscoveryMetadata serviceMetadata = subject.assemble();
+        BasicRegistrationMetadata serviceMetadata = subject.assemble();
 
         // then.
         assertThat(serviceMetadata.getCommitShortSha()).isEqualTo("a8b0929");
@@ -106,7 +106,7 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
         assertThat(serviceMetadata.getSoftwareVersions().getJava()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
-        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
+        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
         assertThat(serviceMetadata.getInsights()).isEqualTo(TEST_INSIGHTS);
     }

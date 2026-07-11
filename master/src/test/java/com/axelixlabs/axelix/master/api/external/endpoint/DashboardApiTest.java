@@ -32,7 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -283,7 +283,7 @@ public class DashboardApiTest {
         jdbcTemplate.execute("DELETE FROM historical_application_snapshots");
     }
 
-    private static BasicDiscoveryMetadata metadata(
+    private static BasicRegistrationMetadata metadata(
             String groupId, String artifactId, GarbageCollector garbageCollector) {
         return TestMetadataFactory.withFeatures(
                 groupId, artifactId, false, false, false, false, false, garbageCollector);

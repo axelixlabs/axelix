@@ -19,10 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.Insights;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
@@ -43,7 +43,7 @@ public final class TestInsightsInfoProvider implements InsightsInfoProvider {
             List.of(new InsightFeature("OSIV", false)));
 
     @Override
-    public BasicDiscoveryMetadata.Insights getInsight() {
+    public BasicRegistrationMetadata.Insights getInsight() {
         return TEST_INSIGHTS;
     }
 }

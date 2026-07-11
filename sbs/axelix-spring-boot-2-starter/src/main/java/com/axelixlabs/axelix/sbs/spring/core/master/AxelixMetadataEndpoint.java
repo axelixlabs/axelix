@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides access to basic build information
@@ -37,17 +37,17 @@ public class AxelixMetadataEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(AxelixMetadataEndpoint.class);
 
-    private final ServiceMetadataAssembler serviceMetadataAssembler;
+    private final BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler;
 
-    public AxelixMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
-        this.serviceMetadataAssembler = serviceMetadataAssembler;
+    public AxelixMetadataEndpoint(BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler) {
+        this.basicRegistrationMetadataAssembler = basicRegistrationMetadataAssembler;
     }
 
     @ReadOperation
-    public BasicDiscoveryMetadata getMetadata() {
+    public BasicRegistrationMetadata getMetadata() {
         log.debug("Received request for metadata assembly");
 
-        BasicDiscoveryMetadata serviceMetadata = serviceMetadataAssembler.assemble();
+        BasicRegistrationMetadata serviceMetadata = basicRegistrationMetadataAssembler.assemble();
 
         log.debug("Assembled metadata for this service : {}", serviceMetadata);
 

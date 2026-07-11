@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.master.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 
 /**
- * Test fixture factory for {@link BasicDiscoveryMetadata}.
+ * Test fixture factory for {@link BasicRegistrationMetadata}.
  *
  * @author Mikhail Polivakha
  */
@@ -42,15 +42,16 @@ public final class TestMetadataFactory {
 
     private TestMetadataFactory() {}
 
-    public static BasicDiscoveryMetadata create(String groupId, String artifactId) {
+    public static BasicRegistrationMetadata create(String groupId, String artifactId) {
         return create(groupId, artifactId, GarbageCollector.G1);
     }
 
-    public static BasicDiscoveryMetadata create(String groupId, String artifactId, GarbageCollector garbageCollector) {
+    public static BasicRegistrationMetadata create(
+            String groupId, String artifactId, GarbageCollector garbageCollector) {
         return withFeatures(groupId, artifactId, true, false, false, false, true, garbageCollector);
     }
 
-    public static BasicDiscoveryMetadata withFeatures(
+    public static BasicRegistrationMetadata withFeatures(
             String groupId,
             String artifactId,
             boolean appCdsEnabled,
@@ -69,7 +70,7 @@ public final class TestMetadataFactory {
                 GarbageCollector.G1);
     }
 
-    public static BasicDiscoveryMetadata withFeatures(
+    public static BasicRegistrationMetadata withFeatures(
             String groupId,
             String artifactId,
             boolean appCdsEnabled,
@@ -78,10 +79,10 @@ public final class TestMetadataFactory {
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled,
             GarbageCollector garbageCollector) {
-        BasicDiscoveryMetadata.SoftwareVersions softwareVersions =
-                new BasicDiscoveryMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
+        BasicRegistrationMetadata.SoftwareVersions softwareVersions =
+                new BasicRegistrationMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
 
-        return new BasicDiscoveryMetadata(
+        return new BasicRegistrationMetadata(
                 DEFAULT_VERSION,
                 DEFAULT_SERVICE_VERSION,
                 groupId,
@@ -90,19 +91,19 @@ public final class TestMetadataFactory {
                 DEFAULT_JDK_VENDOR,
                 garbageCollector,
                 softwareVersions,
-                BasicDiscoveryMetadata.HealthStatus.UP,
-                new BasicDiscoveryMetadata.MemoryDetails(DEFAULT_HEAP),
+                BasicRegistrationMetadata.HealthStatus.UP,
+                new BasicRegistrationMetadata.MemoryDetails(DEFAULT_HEAP),
                 insights(appCdsEnabled, aotCacheEnabled, gcLoggingEnabled, compactObjectHeadersEnabled, osivEnabled));
     }
 
-    private static BasicDiscoveryMetadata.Insights insights(
+    private static BasicRegistrationMetadata.Insights insights(
             boolean appCdsEnabled,
             boolean aotCacheEnabled,
             boolean gcLoggingEnabled,
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled) {
-        return new BasicDiscoveryMetadata.Insights(
-                new BasicDiscoveryMetadata.HotSpot(
+        return new BasicRegistrationMetadata.Insights(
+                new BasicRegistrationMetadata.HotSpot(
                         List.of(
                                 feature(FeatureId.APP_CDS, appCdsEnabled),
                                 feature(FeatureId.AOT_CACHE, aotCacheEnabled)),
@@ -111,7 +112,7 @@ public final class TestMetadataFactory {
                 List.of(feature(FeatureId.OSIV, osivEnabled)));
     }
 
-    private static BasicDiscoveryMetadata.InsightFeature feature(FeatureId featureId, boolean enabled) {
-        return new BasicDiscoveryMetadata.InsightFeature(featureId.getId(), enabled);
+    private static BasicRegistrationMetadata.InsightFeature feature(FeatureId featureId, boolean enabled) {
+        return new BasicRegistrationMetadata.InsightFeature(featureId.getId(), enabled);
     }
 }

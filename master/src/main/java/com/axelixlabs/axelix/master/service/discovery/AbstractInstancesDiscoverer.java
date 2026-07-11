@@ -31,7 +31,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -100,13 +100,13 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         return result;
     }
 
-    protected record IntermediateInstanceProfile(ServiceInstance serviceInstance, BasicDiscoveryMetadata metadata) {}
+    protected record IntermediateInstanceProfile(ServiceInstance serviceInstance, BasicRegistrationMetadata metadata) {}
 
     private @Nullable IntermediateInstanceProfile getManagedServiceMetadata(ServiceInstance serviceInstance) {
         String actuatorUrl = serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
-            BasicDiscoveryMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
+            BasicRegistrationMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
 
             return new IntermediateInstanceProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {
@@ -130,7 +130,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     private boolean hasApplicationId(IntermediateInstanceProfile profile) {
-        BasicDiscoveryMetadata metadata = profile.metadata();
+        BasicRegistrationMetadata metadata = profile.metadata();
         if (StringUtils.hasText(metadata.getGroupId()) && StringUtils.hasText(metadata.getArtifactId())) {
             return true;
         } else {

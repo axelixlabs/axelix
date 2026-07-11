@@ -30,18 +30,18 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -92,7 +92,7 @@ public class AxelixMetadataEndpointConfiguration {
     }
 
     @Bean
-    public ServiceMetadataAssembler serviceMetadataAssembler(
+    public BasicRegistrationMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             GitInformationProvider gitInformationProvider,
@@ -102,7 +102,7 @@ public class AxelixMetadataEndpointConfiguration {
             ObjectProvider<BuildProperties> buildProperties) {
 
         BuildProperties resolvedBuildProperties = buildProperties.getIfAvailable();
-        return new DefaultServiceMetadataAssembler(
+        return new DefaultBasicRegistrationMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
                 axelixVersionDiscoverer,
                 gitInformationProvider,
@@ -116,22 +116,23 @@ public class AxelixMetadataEndpointConfiguration {
     }
 
     @Bean
-    public AxelixMetadataEndpoint axelixMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
-        return new AxelixMetadataEndpoint(serviceMetadataAssembler);
+    public AxelixMetadataEndpoint axelixMetadataEndpoint(
+            BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler) {
+        return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
     }
 
-    private BasicDiscoveryMetadata.HealthStatus getCurrentHealth(HealthEndpoint healthEndpoint) {
+    private BasicRegistrationMetadata.HealthStatus getCurrentHealth(HealthEndpoint healthEndpoint) {
         Status status = healthEndpoint.health().getStatus();
 
         if (status == Status.UP) {
-            return BasicDiscoveryMetadata.HealthStatus.UP;
+            return BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         if (status == Status.DOWN) {
-            return BasicDiscoveryMetadata.HealthStatus.DOWN;
+            return BasicRegistrationMetadata.HealthStatus.DOWN;
         }
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
-        return BasicDiscoveryMetadata.HealthStatus.UNKNOWN;
+        return BasicRegistrationMetadata.HealthStatus.UNKNOWN;
     }
 }

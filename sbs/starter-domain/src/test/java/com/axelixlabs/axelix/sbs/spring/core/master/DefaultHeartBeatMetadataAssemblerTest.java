@@ -34,9 +34,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.SpringVersion;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.Insights;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
@@ -72,7 +72,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
     private HeartBeatMetadataAssembler subject;
 
     @Autowired
-    private ServiceMetadataAssembler service;
+    private BasicRegistrationMetadataAssembler service;
 
     @Autowired
     private HeartBeatConfigurationProperties properties;
@@ -88,14 +88,15 @@ class DefaultHeartBeatMetadataAssemblerTest {
 
         @Bean
         public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
-                ServiceMetadataAssembler serviceMetadataAssembler,
+                BasicRegistrationMetadataAssembler basicRegistrationMetadataAssembler,
                 HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
-            return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
+            return new DefaultHeartBeatMetadataAssembler(
+                    basicRegistrationMetadataAssembler, heartBeatConfigurationProperties);
         }
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+            return () -> BasicRegistrationMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -125,14 +126,14 @@ class DefaultHeartBeatMetadataAssemblerTest {
         }
 
         @Bean
-        public DefaultServiceMetadataAssembler serviceMetadataAssembler(
+        public DefaultBasicRegistrationMetadataAssembler serviceMetadataAssembler(
                 HealthDetectionFunction healthDetectionFunction,
                 AxelixVersionDiscoverer axelixVersionDiscoverer,
                 GitInformationProvider gitInformationProvider,
                 ShortBuildInfoProvider shortBuildInfoProvider,
                 LibraryInformationProvider libraryInformationProvider,
                 InsightsInfoProvider insightsInfoProvider) {
-            return new DefaultServiceMetadataAssembler(
+            return new DefaultBasicRegistrationMetadataAssembler(
                     healthDetectionFunction,
                     axelixVersionDiscoverer,
                     gitInformationProvider,
@@ -148,7 +149,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
     void shouldAssembleTheHeartBeatMetadataAboutGivenService() {
         // when.
         HeartBeatMetadata metadata = subject.assemble();
-        BasicDiscoveryMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
+        BasicRegistrationMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
@@ -160,7 +161,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(basicMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(basicMetadata.getServiceVersion()).isEqualTo("1.1.3");
         assertThat(basicMetadata.getCommitShortSha()).isEqualTo("8f4b9f7");
-        assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
+        assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
         assertThat(basicMetadata.getGcInUse()).isNotNull();
         assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());
