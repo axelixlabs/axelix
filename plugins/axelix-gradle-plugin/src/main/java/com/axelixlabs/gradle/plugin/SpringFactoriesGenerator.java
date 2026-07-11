@@ -36,10 +36,11 @@ import org.gradle.api.Task;
 final class SpringFactoriesGenerator {
 
     public static final String GENERATE_TASK_NAME = "generateAxelixSpringFactories";
-    public static final String SPRING_FACTORIES_CONTENT = "org.springframework.test.context.TestExecutionListener=\\\n"
-            + "digital.pragmatech.testing.SpringTestProfilerListener\n"
-            + "org.springframework.context.ApplicationContextInitializer=\\\n"
-            + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
+    public static final String SPRING_FACTORIES_CONTENT =
+            "\norg.springframework.test.context.TestExecutionListener=\\\n"
+                    + "digital.pragmatech.testing.SpringTestProfilerListener\n"
+                    + "org.springframework.context.ApplicationContextInitializer=\\\n"
+                    + "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer\n";
 
     private SpringFactoriesGenerator() {}
 
@@ -70,11 +71,10 @@ final class SpringFactoriesGenerator {
 
         try {
             Files.write(
-                Paths.get(target.getPath()),
-                SPRING_FACTORIES_CONTENT.getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
-            );
+                    Paths.get(target.getPath()),
+                    SPRING_FACTORIES_CONTENT.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new GradleException("Failed to write " + target, e);
         }

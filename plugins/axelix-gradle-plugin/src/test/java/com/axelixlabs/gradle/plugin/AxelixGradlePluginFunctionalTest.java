@@ -34,6 +34,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for {@link AxelixGradlePlugin}.
+ *
+ * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
+ */
 class AxelixGradlePluginFunctionalTest {
 
     /**
@@ -73,8 +79,15 @@ class AxelixGradlePluginFunctionalTest {
                 .build();
 
         // then.
+        assertThat(result.getOutput())
+                .contains(AxelixGradlePlugin.PROFILER_DEPENDENCY)
+                .contains(AxelixGradlePlugin.THYMELEAF_DEPENDENCY);
+
+        // and.
         assertThat(result.task(":printTestRuntimeClasspath").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":" + SpringFactoriesGenerator.GENERATE_TASK_NAME)
+                        .getOutcome())
+                .isEqualTo(TaskOutcome.SUCCESS);
         assertGeneratedSpringFactoriesContainOnlyProfilerRegistration();
     }
 
@@ -87,14 +100,17 @@ class AxelixGradlePluginFunctionalTest {
         writeFile("build.gradle", GradleProjectFixtures.loadContent("preexisting-spring-factories.gradle"));
 
         // when.
-        BuildResult result =
-                createRunner(gradleVersion, "generateAxelixSpringFactories", "--stacktrace").build();
+        BuildResult result = createRunner(gradleVersion, SpringFactoriesGenerator.GENERATE_TASK_NAME, "--stacktrace")
+                .build();
 
         // then.
-        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":" + SpringFactoriesGenerator.GENERATE_TASK_NAME)
+                        .getOutcome())
+                .isEqualTo(TaskOutcome.SUCCESS);
         Path springFactories = projectDir.resolve("build/generated/axelix/META-INF/spring.factories");
         String actual = new String(Files.readAllBytes(springFactories), UTF_8);
-        assertThat(actual).isEqualTo(PREEXISTING_SPRING_FACTORIES_CONTENT + SpringFactoriesGenerator.SPRING_FACTORIES_CONTENT);
+        assertThat(actual)
+                .isEqualTo(PREEXISTING_SPRING_FACTORIES_CONTENT + SpringFactoriesGenerator.SPRING_FACTORIES_CONTENT);
     }
 
     @ParameterizedTest
@@ -150,7 +166,7 @@ class AxelixGradlePluginFunctionalTest {
 
         // when.
         BuildResult result = createRunner(
-                        gradleVersion, "printDeclaredDeps", "generateAxelixSpringFactories", "--stacktrace")
+                        gradleVersion, "printDeclaredDeps", SpringFactoriesGenerator.GENERATE_TASK_NAME, "--stacktrace")
                 .build();
 
         // then.
@@ -159,7 +175,9 @@ class AxelixGradlePluginFunctionalTest {
                 .contains(AxelixGradlePlugin.THYMELEAF_NAME + ":3.1.4.RELEASE")
                 .doesNotContain(AxelixGradlePlugin.THYMELEAF_DEPENDENCY)
                 .contains(AxelixGradlePlugin.PROFILER_DEPENDENCY);
-        assertThat(result.task(":generateAxelixSpringFactories").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.task(":" + SpringFactoriesGenerator.GENERATE_TASK_NAME)
+                        .getOutcome())
+                .isEqualTo(TaskOutcome.SUCCESS);
         assertGeneratedSpringFactoriesContainOnlyProfilerRegistration();
     }
 
@@ -171,7 +189,8 @@ class AxelixGradlePluginFunctionalTest {
     }
 
     private void assertSpringFactoriesAreNotGenerated(BuildResult result) {
-        assertThat(result.task(":generateAxelixSpringFactories")).isNull();
+        assertThat(result.task(":" + SpringFactoriesGenerator.GENERATE_TASK_NAME))
+                .isNull();
         assertThat(projectDir.resolve("build/generated/axelix/META-INF/spring.factories"))
                 .doesNotExist();
     }

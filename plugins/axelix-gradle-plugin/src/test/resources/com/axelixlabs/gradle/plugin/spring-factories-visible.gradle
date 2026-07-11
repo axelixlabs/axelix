@@ -1,8 +1,0 @@
-plugins {
-    id 'com.axelixlabs.axelix'
-}
-apply plugin: 'java'
-
-repositories { mavenCentral() }
-
-dependencies { testImplementation 'junit:junit:4.13.2' }
