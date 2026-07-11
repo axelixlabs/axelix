@@ -9,8 +9,8 @@ repositories { mavenCentral() }
 task printTestRuntimeClasspath {
     dependsOn configurations.testRuntimeClasspath
     doLast {
-        configurations.testRuntimeClasspath.files.each { f ->
-            println 'TRC>> ' + f.absolutePath
-        }
+      configurations.testRuntimeClasspath.allDependencies.each { d ->
+        println 'DEP>> ' + d.group + ':' + d.name + ':' + d.version
+      }
     }
 }

@@ -86,7 +86,7 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     private static void addJustSpringBootTestProfiler(Project project) {
         project.getLogger()
                 .info("Adding just Spring Boot Test Profiler of version {} to your tests classpath", PROFILER_VERSION);
-        project.getDependencies().add(TEST_RUNTIME_ONLY, PROFILER_DEPENDENCY);
+        configureSpringBootTestProfiler(project);
     }
 
     private static void addBothThymeleafAndSpringBootTestProfiler(Project project) {
@@ -96,7 +96,12 @@ public class AxelixGradlePlugin implements Plugin<Project> {
                         THYMELEAF_VERSION,
                         PROFILER_VERSION);
         project.getDependencies().add(TEST_IMPLEMENTATION, THYMELEAF_DEPENDENCY);
+        configureSpringBootTestProfiler(project);
+    }
+
+    private static void configureSpringBootTestProfiler(Project project) {
         project.getDependencies().add(TEST_RUNTIME_ONLY, PROFILER_DEPENDENCY);
+        SpringFactoriesGenerator.configure(project);
     }
 
     private static void logUnableToProfileSpringBootTests(Project project) {
