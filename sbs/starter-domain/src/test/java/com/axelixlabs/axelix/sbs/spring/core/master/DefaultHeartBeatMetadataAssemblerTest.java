@@ -35,11 +35,11 @@ import org.springframework.core.SpringVersion;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HotSpot;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.Insights;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;

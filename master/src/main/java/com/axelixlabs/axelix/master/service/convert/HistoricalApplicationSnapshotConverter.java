@@ -24,12 +24,12 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
-import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
@@ -52,18 +52,19 @@ public class HistoricalApplicationSnapshotConverter {
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
     // nullability annotations.
-    private Insights fromDto(BasicRegistrationMetadata metadata) {
-        BasicRegistrationMetadata.Insights insights = metadata.getInsights();
+    private com.axelixlabs.axelix.master.domain.Insights fromDto(BasicRegistrationMetadata metadata) {
+        Insights insights = metadata.getInsights();
         if (insights == null) {
             return defaultInsights();
         }
 
-        return new Insights(
+        return new com.axelixlabs.axelix.master.domain.Insights(
                 fromHotSpot(insights.getHotSpot(), metadata.getGcInUse()),
                 fromSpringFramework(insights.getSpringFramework()));
     }
 
-    private HotSpot fromHotSpot(BasicRegistrationMetadata.HotSpot hotSpot, GarbageCollector gcInUse) {
+    private HotSpot fromHotSpot(
+            com.axelixlabs.axelix.common.api.registration.insights.HotSpot hotSpot, GarbageCollector gcInUse) {
         if (hotSpot == null) {
             return defaultHotSpot();
         }
@@ -108,8 +109,8 @@ public class HistoricalApplicationSnapshotConverter {
         return gcInUse == null ? GarbageCollector.UNKNOWN : gcInUse;
     }
 
-    private Insights defaultInsights() {
-        return new Insights(defaultHotSpot(), new SpringFramework(false));
+    private com.axelixlabs.axelix.master.domain.Insights defaultInsights() {
+        return new com.axelixlabs.axelix.master.domain.Insights(defaultHotSpot(), new SpringFramework(false));
     }
 
     private HotSpot defaultHotSpot() {

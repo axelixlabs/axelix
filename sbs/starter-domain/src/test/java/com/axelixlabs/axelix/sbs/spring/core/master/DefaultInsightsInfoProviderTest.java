@@ -23,9 +23,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -53,7 +52,7 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
-        BasicRegistrationMetadata.Insights insights = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
         assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), APP_CDS, false);
@@ -87,7 +86,7 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(), gcLogDisabled(), vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"));
 
         // when.
-        BasicRegistrationMetadata.Insights insights = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
         assertFeatureEnabled(insights.getHotSpot().getProjectLeyden(), APP_CDS, true);
@@ -126,7 +125,7 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(), gcLogDisabled(), vmOptions("-XX:+UseCompactObjectHeaders"));
 
         // when.
-        BasicRegistrationMetadata.Insights insights = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
         assertFeatureEnabled(insights.getHotSpot().getProjectLilliputh(), COMPACT_OBJECT_HEADERS, true);
@@ -138,7 +137,7 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(osivEnabled(), gcLogDisabled(), emptyVmOptions());
 
         // when.
-        BasicRegistrationMetadata.Insights insights = subject.getInsight();
+        Insights insights = subject.getInsight();
 
         // then.
         assertFeatureEnabled(insights.getSpringFramework(), OSIV, true);

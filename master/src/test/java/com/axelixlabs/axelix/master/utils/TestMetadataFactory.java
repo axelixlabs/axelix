@@ -20,6 +20,9 @@ package com.axelixlabs.axelix.master.utils;
 import java.util.List;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 
@@ -96,14 +99,14 @@ public final class TestMetadataFactory {
                 insights(appCdsEnabled, aotCacheEnabled, gcLoggingEnabled, compactObjectHeadersEnabled, osivEnabled));
     }
 
-    private static BasicRegistrationMetadata.Insights insights(
+    private static Insights insights(
             boolean appCdsEnabled,
             boolean aotCacheEnabled,
             boolean gcLoggingEnabled,
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled) {
-        return new BasicRegistrationMetadata.Insights(
-                new BasicRegistrationMetadata.HotSpot(
+        return new Insights(
+                new HotSpot(
                         List.of(
                                 feature(FeatureId.APP_CDS, appCdsEnabled),
                                 feature(FeatureId.AOT_CACHE, aotCacheEnabled)),
@@ -112,7 +115,7 @@ public final class TestMetadataFactory {
                 List.of(feature(FeatureId.OSIV, osivEnabled)));
     }
 
-    private static BasicRegistrationMetadata.InsightFeature feature(FeatureId featureId, boolean enabled) {
-        return new BasicRegistrationMetadata.InsightFeature(featureId.getId(), enabled);
+    private static InsightFeature feature(FeatureId featureId, boolean enabled) {
+        return new InsightFeature(featureId.getId(), enabled);
     }
 }

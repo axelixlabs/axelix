@@ -17,12 +17,11 @@
  */
 package com.axelixlabs.axelix.common.api.registration;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 
 /**
@@ -287,127 +286,6 @@ public final class BasicRegistrationMetadata {
         @Override
         public String toString() {
             return "MemoryDetails{" + "heap=" + heap + '}';
-        }
-    }
-
-    /**
-     * Insight information discovered for the given service instance.
-     */
-    public static final class Insights {
-
-        private final HotSpot hotSpot;
-        private final List<InsightFeature> springFramework;
-
-        /**
-         * Creates a new Insight.
-         *
-         * @param hotSpot         the HotSpot-specific insight groups.
-         * @param springFramework the Spring Framework insight features.
-         */
-        @JsonCreator
-        public Insights(
-                @JsonProperty("hotSpot") HotSpot hotSpot,
-                @JsonProperty("springFramework") List<InsightFeature> springFramework) {
-            this.hotSpot = hotSpot;
-            this.springFramework = springFramework;
-        }
-
-        public HotSpot getHotSpot() {
-            return hotSpot;
-        }
-
-        public List<InsightFeature> getSpringFramework() {
-            return springFramework;
-        }
-
-        @Override
-        public String toString() {
-            return "Insight{" + "hotSpot=" + hotSpot + ", springFramework=" + springFramework + '}';
-        }
-    }
-
-    /**
-     * HotSpot-specific insight groups.
-     */
-    public static final class HotSpot {
-
-        private final List<InsightFeature> projectLeyden;
-        private final List<InsightFeature> gc;
-        private final List<InsightFeature> projectLilliputh;
-
-        /**
-         * Creates a new HotSpot.
-         *
-         * @param projectLeyden   the Project Leyden insight features.
-         * @param gc              the garbage collection insight features.
-         * @param projectLilliputh the Project Lilliputh insight features.
-         */
-        @JsonCreator
-        public HotSpot(
-                @JsonProperty("projectLeyden") List<InsightFeature> projectLeyden,
-                @JsonProperty("gc") List<InsightFeature> gc,
-                @JsonProperty("projectLilliputh") List<InsightFeature> projectLilliputh) {
-            this.projectLeyden = projectLeyden;
-            this.gc = gc;
-            this.projectLilliputh = projectLilliputh;
-        }
-
-        public List<InsightFeature> getProjectLeyden() {
-            return projectLeyden;
-        }
-
-        public List<InsightFeature> getGc() {
-            return gc;
-        }
-
-        public List<InsightFeature> getProjectLilliputh() {
-            return projectLilliputh;
-        }
-
-        @Override
-        public String toString() {
-            return "HotSpot{"
-                    + "projectLeyden="
-                    + projectLeyden
-                    + ", gc="
-                    + gc
-                    + ", projectLilliputh="
-                    + projectLilliputh
-                    + '}';
-        }
-    }
-
-    /**
-     * The specific insight feature discovered for the given service instance.
-     */
-    public static final class InsightFeature {
-
-        private final String featureId;
-        private final boolean enabled;
-
-        /**
-         * Creates a new InsightFeature.
-         *
-         * @param featureId the insight feature id.
-         * @param enabled   the enabled state of the insight feature.
-         */
-        @JsonCreator
-        public InsightFeature(@JsonProperty("featureId") String featureId, @JsonProperty("enabled") boolean enabled) {
-            this.featureId = featureId;
-            this.enabled = enabled;
-        }
-
-        public String getFeatureId() {
-            return featureId;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        @Override
-        public String toString() {
-            return "InsightFeature{" + "featureId='" + featureId + '\'' + ", enabled=" + enabled + '}';
         }
     }
 }

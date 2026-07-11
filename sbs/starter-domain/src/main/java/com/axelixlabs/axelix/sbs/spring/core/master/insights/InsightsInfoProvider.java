@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 
 /**
  * Provides insights discovered for the current service instance.
@@ -30,5 +30,5 @@ public interface InsightsInfoProvider {
     /**
      * @return the actual insight information.
      */
-    BasicRegistrationMetadata.Insights getInsight();
+    Insights getInsight();
 }
