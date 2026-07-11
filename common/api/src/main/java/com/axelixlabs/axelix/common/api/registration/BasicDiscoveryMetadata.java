@@ -145,44 +145,6 @@ public final class BasicDiscoveryMetadata {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BasicDiscoveryMetadata that = (BasicDiscoveryMetadata) o;
-        return Objects.equals(version, that.version)
-                && Objects.equals(serviceVersion, that.serviceVersion)
-                && Objects.equals(groupId, that.groupId)
-                && Objects.equals(artifactId, that.artifactId)
-                && Objects.equals(commitShortSha, that.commitShortSha)
-                && Objects.equals(jdkVendor, that.jdkVendor)
-                && Objects.equals(gcInUse, that.gcInUse)
-                && Objects.equals(softwareVersions, that.softwareVersions)
-                && healthStatus == that.healthStatus
-                && Objects.equals(memoryDetails, that.memoryDetails)
-                && Objects.equals(insights, that.insights);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                version,
-                serviceVersion,
-                groupId,
-                artifactId,
-                commitShortSha,
-                jdkVendor,
-                gcInUse,
-                softwareVersions,
-                healthStatus,
-                memoryDetails,
-                insights);
-    }
-
-    @Override
     public String toString() {
         return "ServiceMetadata{"
                 + "version='"
@@ -283,26 +245,6 @@ public final class BasicDiscoveryMetadata {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            SoftwareVersions that = (SoftwareVersions) o;
-            return Objects.equals(java, that.java)
-                    && Objects.equals(springBoot, that.springBoot)
-                    && Objects.equals(springFramework, that.springFramework)
-                    && Objects.equals(kotlin, that.kotlin);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(java, springBoot, springFramework, kotlin);
-        }
-
-        @Override
         public String toString() {
             return "SoftwareVersions{"
                     + "java='"
@@ -343,23 +285,6 @@ public final class BasicDiscoveryMetadata {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            MemoryDetails that = (MemoryDetails) o;
-            return heap == that.heap;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(heap);
-        }
-
-        @Override
         public String toString() {
             return "MemoryDetails{" + "heap=" + heap + '}';
         }
@@ -393,24 +318,6 @@ public final class BasicDiscoveryMetadata {
 
         public List<InsightFeature> getSpringFramework() {
             return springFramework;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Insights insights = (Insights) o;
-            return Objects.equals(hotSpot, insights.hotSpot)
-                    && Objects.equals(springFramework, insights.springFramework);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(hotSpot, springFramework);
         }
 
         @Override
@@ -458,25 +365,6 @@ public final class BasicDiscoveryMetadata {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            HotSpot hotSpot = (HotSpot) o;
-            return Objects.equals(projectLeyden, hotSpot.projectLeyden)
-                    && Objects.equals(gc, hotSpot.gc)
-                    && Objects.equals(projectLilliputh, hotSpot.projectLilliputh);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(projectLeyden, gc, projectLilliputh);
-        }
-
-        @Override
         public String toString() {
             return "HotSpot{"
                     + "projectLeyden="
@@ -515,23 +403,6 @@ public final class BasicDiscoveryMetadata {
 
         public boolean isEnabled() {
             return enabled;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            InsightFeature that = (InsightFeature) o;
-            return enabled == that.enabled && Objects.equals(featureId, that.featureId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(featureId, enabled);
         }
 
         @Override
