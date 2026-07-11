@@ -28,11 +28,7 @@ final class GradleProjectFixtures {
 
     private GradleProjectFixtures() {}
 
-    static String buildScript(String fixtureName) {
-        return load(fixtureName);
-    }
-
-    private static String load(String fixtureName) {
+    static String loadContent(String fixtureName) {
         try (InputStream in = GradleProjectFixtures.class.getResourceAsStream(fixtureName)) {
             if (in == null) {
                 throw new IllegalStateException("Missing test fixture: " + fixtureName);

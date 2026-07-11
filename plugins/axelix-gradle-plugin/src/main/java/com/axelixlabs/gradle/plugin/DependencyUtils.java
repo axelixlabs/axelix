@@ -38,9 +38,11 @@ public class DependencyUtils {
     public static ModuleComponentIdentifier findInTheConfigurationClasspath(
             Project project, String configurationName, final String group, final String name) {
 
-        DependencySet directlyDeclaredDependencies =
-                project.getConfigurations().getByName(configurationName).getDependencies();
-        return findDeclaredInClasspath(getResolvedGraph(project, directlyDeclaredDependencies), group, name);
+        // getAllDependencies (not getDependencies) so dependencies inherited from extended configurations
+        // are seen too, e.g. a thymeleaf declared on implementation propagates to testRuntimeClasspath.
+        DependencySet declaredDependencies =
+                project.getConfigurations().getByName(configurationName).getAllDependencies();
+        return findDeclaredInClasspath(getResolvedGraph(project, declaredDependencies), group, name);
     }
 
     private static ResolutionResult getResolvedGraph(Project project, DependencySet dependencies) {
@@ -65,7 +67,8 @@ public class DependencyUtils {
                 ModuleComponentIdentifier gav = resolveDependencyGAV((ResolvedDependencyResult) component);
 
                 if (gav != null
-                        && (gav.getGroup().equals(group) || gav.getModule().equals(name))) {
+                        && gav.getGroup().equals(group)
+                        && gav.getModule().equals(name)) {
                     return gav;
                 }
             }

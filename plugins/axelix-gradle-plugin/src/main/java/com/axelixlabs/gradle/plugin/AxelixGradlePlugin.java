@@ -38,11 +38,12 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
     private static final String TEST_IMPLEMENTATION = "testImplementation";
     private static final String TEST_RUNTIME_ONLY = "testRuntimeOnly";
+    private static final String TEST_RUNTIME_CLASSPATH = "testRuntimeClasspath";
 
-    static final String PROFILER_GROUP = "digital.pragmatech.testing";
-    static final String PROFILER_NAME = "spring-test-profiler";
-    static final String PROFILER_VERSION = "0.1.2";
-    static final String PROFILER_DEPENDENCY = PROFILER_GROUP + ":" + PROFILER_NAME + ":" + PROFILER_VERSION;
+    public static final String PROFILER_GROUP = "digital.pragmatech.testing";
+    public static final String PROFILER_NAME = "spring-test-profiler";
+    public static final String PROFILER_VERSION = "0.1.2";
+    public static final String PROFILER_DEPENDENCY = PROFILER_GROUP + ":" + PROFILER_NAME + ":" + PROFILER_VERSION;
 
     public static final String THYMELEAF_GROUP = "org.thymeleaf";
     public static final String THYMELEAF_NAME = "thymeleaf";
@@ -53,11 +54,13 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
     @Override
     public void apply(final Project project) {
-        project.getPluginManager().withPlugin("java", appliedPlugin -> configure(project));
+        // Detection is deferred to afterEvaluate: the build script's dependencies {} block runs after
+        // the java plugin is applied, so inspecting the configurations any earlier would always see them
+        // empty and wrongly contribute dependencies the user already declared.
+        project.getPluginManager().withPlugin("java", appliedPlugin -> project.afterEvaluate(this::configure));
     }
 
     private void configure(Project project) {
-
         ModuleComponentIdentifier springBootTestProfiler = findSpringBootTestProfilerDependency(project);
 
         if (springBootTestProfiler == null) {
@@ -107,11 +110,11 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
     private static ModuleComponentIdentifier findThymeleaf(Project project) {
         return DependencyUtils.findInTheConfigurationClasspath(
-                project, TEST_IMPLEMENTATION, THYMELEAF_GROUP, THYMELEAF_NAME);
+                project, TEST_RUNTIME_CLASSPATH, THYMELEAF_GROUP, THYMELEAF_NAME);
     }
 
     private static ModuleComponentIdentifier findSpringBootTestProfilerDependency(Project project) {
         return DependencyUtils.findInTheConfigurationClasspath(
-                project, TEST_RUNTIME_ONLY, PROFILER_GROUP, PROFILER_NAME);
+                project, TEST_RUNTIME_CLASSPATH, PROFILER_GROUP, PROFILER_NAME);
     }
 }
