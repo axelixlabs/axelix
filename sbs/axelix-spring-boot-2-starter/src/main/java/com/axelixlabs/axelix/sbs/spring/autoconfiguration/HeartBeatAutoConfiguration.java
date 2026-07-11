@@ -26,55 +26,55 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultHeartBeatMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 
 /**
- * Auto-configuration for instance self-registration.
+ * Autoconfiguration for heart-beating of the Instance.
  *
  * @since 04.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
-@ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "auto", havingValue = "true")
-public class SelfRegistrationAutoConfiguration {
+@ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
+public class HeartBeatAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
-    public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
-        return new SelfRegistrationConfigurationProperties();
+    @ConfigurationProperties(prefix = HeartBeatConfigurationProperties.CONFIG_PROPS_PREFIX)
+    public HeartBeatConfigurationProperties heartBeatConfigurationProperties() {
+        return new HeartBeatConfigurationProperties();
     }
 
     @Bean
-    public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
+    public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-        return new DefaultSelfRegistrationMetadataAssembler(
-                serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+            HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
+
+        return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
     }
 
     @Bean
-    public SelfRegistrationService selfRegistrationService(
-            SelfRegistrationConfigurationProperties properties,
+    public HeartBeatService heartBeatService(
+            HeartBeatConfigurationProperties properties,
             ObjectMapper objectMapper,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
+            HeartBeatMetadataAssembler heartBeatMetadataAssembler,
             JwtEncoderService jwtEncoderService) {
-        return new SelfRegistrationService(
-                new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
+        return new HeartBeatService(
+                new SLF4JLogger(LoggerFactory.getLogger(HeartBeatService.class)),
                 objectMapper::writeValueAsString,
                 properties,
-                selfRegistrationMetadataAssembler,
+                heartBeatMetadataAssembler,
                 jwtEncoderService);
     }
 
     @Bean
-    public SelfRegistrationLifecycleListener selfRegistrationLifecycleListener(
-            SelfRegistrationService selfRegistrationService) {
-        return new SelfRegistrationLifecycleListener(selfRegistrationService);
+    public HeartBeatLifecycleIgnitor heartBeatLifecycleIgnitor(HeartBeatService heartBeatService) {
+        return new HeartBeatLifecycleIgnitor(heartBeatService);
     }
 }

@@ -41,7 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
@@ -58,21 +58,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
- * Integration test for {@link SelfRegistrationService}
+ * Integration test for {@link HeartBeatService}
  *
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(classes = SelfRegistrationServiceTest.TestApplication.class)
+@SpringBootTest(classes = HeartBeatServiceTest.TestApplication.class)
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator",
             "axelix.sbs.discovery.heartbeat-interval=PT1S"
         })
-@Import({SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class})
-class SelfRegistrationServiceTest {
+@Import({HeartBeatServiceTest.HeartBeatServiceTestConfiguration.class})
+class HeartBeatServiceTest {
 
     private static MockWebServer mockWebServer;
 
@@ -80,18 +80,18 @@ class SelfRegistrationServiceTest {
     static class TestApplication {}
 
     @Autowired
-    private SelfRegistrationService selfRegistrationService;
+    private HeartBeatService heartBeatService;
 
     @Autowired
     private JwtDecoderService jwtDecoderService;
 
     @TestConfiguration
-    static class SelfRegistrationServiceTestConfiguration {
+    static class HeartBeatServiceTestConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
-        public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
-            return new SelfRegistrationConfigurationProperties();
+        @ConfigurationProperties(prefix = HeartBeatConfigurationProperties.CONFIG_PROPS_PREFIX)
+        public HeartBeatConfigurationProperties heartBeatConfigurationProperties() {
+            return new HeartBeatConfigurationProperties();
         }
 
         @Bean
@@ -116,25 +116,24 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
-        public SelfRegistrationService selfRegistrationService(
-                SelfRegistrationConfigurationProperties properties,
-                SelfRegistrationMetadataAssembler metadataAssembler,
+        public HeartBeatService heartBeatService(
+                HeartBeatConfigurationProperties properties,
+                HeartBeatMetadataAssembler metadataAssembler,
                 JwtEncoderService jwtEncoderService) {
-            return new SelfRegistrationService(
+            return new HeartBeatService(
                     new NoOpLogger(),
-                    SelfRegistrationServiceTest::serialize,
+                    HeartBeatServiceTest::serialize,
                     properties,
                     metadataAssembler,
                     jwtEncoderService);
         }
 
         @Bean
-        public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
+        public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+                HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
 
-            return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+            return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
         }
 
         @Bean
@@ -209,11 +208,11 @@ class SelfRegistrationServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        selfRegistrationService.scheduleSelfRegistration();
+        heartBeatService.scheduleHeartBeat();
     }
 
     @Test
-    void shouldRegisterOnApplicationEvent() throws Exception {
+    void shouldHeartbeatOnApplicationEvent() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
@@ -226,7 +225,7 @@ class SelfRegistrationServiceTest {
         assertThat(body).contains("testApp");
         assertThat(body).contains("http://localhost:8089/actuator");
 
-        String authHeader = request.getHeader(SelfRegistrationService.AUTHORIZATION_HEADER);
+        String authHeader = request.getHeader(HeartBeatService.AUTHORIZATION_HEADER);
         assertThat(authHeader).startsWith(AuthenticationSchemes.BEARER.prefix());
 
         String token =
@@ -277,7 +276,7 @@ class SelfRegistrationServiceTest {
     }
 
     private static String serialize(Object payload) {
-        SelfRegistrationMetadata metadata = (SelfRegistrationMetadata) payload;
+        HeartBeatMetadata metadata = (HeartBeatMetadata) payload;
         return "{\"instanceName\":\""
                 + metadata.getInstanceName()
                 + "\",\"instanceActuatorUrl\":\""

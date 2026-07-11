@@ -339,7 +339,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldKeepSelfRegistrationInstance() {
+    void shouldKeepSelfRegisteredInstance() {
         // language=json
         String selfRegistrationRequest = """
             {
@@ -383,7 +383,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldKeepSelfRegistrationAndDeregisterK8sInstance() {
+    void shouldKeepSelfRegisteredAndDeregisterK8sInstance() {
         // language=json
         String selfRegistrationRequest = """
             {

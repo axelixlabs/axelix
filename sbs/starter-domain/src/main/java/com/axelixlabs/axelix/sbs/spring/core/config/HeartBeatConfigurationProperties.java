@@ -26,14 +26,16 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
- * Configuration properties for self-registration of the service instance.
+ * Configuration properties for heart-beating of the service instance.
  *
  * @since 05.02.2026
+ *
  * @author Nikita Kirillov
  * @author Cherkasov Sergey
+ * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway.Init")
-public class SelfRegistrationConfigurationProperties implements Validatable {
+public class HeartBeatConfigurationProperties implements Validatable {
 
     public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.discovery";
 

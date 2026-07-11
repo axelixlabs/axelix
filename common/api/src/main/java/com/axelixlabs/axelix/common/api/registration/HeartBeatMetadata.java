@@ -17,19 +17,17 @@
  */
 package com.axelixlabs.axelix.common.api.registration;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents extended service instance metadata supplied as part of the self-registration process.
+ * Represents extended service instance metadata supplied as part of the heartbeat process.
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public class SelfRegistrationMetadata {
+public class HeartBeatMetadata {
 
     private final BasicDiscoveryMetadata basicDiscoveryMetadata;
     private final String instanceId;
@@ -38,7 +36,7 @@ public class SelfRegistrationMetadata {
     private final String deploymentAt;
 
     /**
-     * Creates a new {@link SelfRegistrationMetadata}.
+     * Creates a new {@link HeartBeatMetadata}.
      *
      * @param basicDiscoveryMetadata    the basic metadata of a service instance
      * @param instanceId                unique identifier (uid) of the service
@@ -48,7 +46,7 @@ public class SelfRegistrationMetadata {
      * @param deploymentAt              timestamp when the service was created
      */
     @JsonCreator
-    public SelfRegistrationMetadata(
+    public HeartBeatMetadata(
             @JsonProperty("basicDiscoveryMetadata") BasicDiscoveryMetadata basicDiscoveryMetadata,
             @JsonProperty("instanceId") String instanceId,
             @JsonProperty("instanceName") String instanceName,
@@ -79,24 +77,6 @@ public class SelfRegistrationMetadata {
 
     public String getDeploymentAt() {
         return deploymentAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SelfRegistrationMetadata that = (SelfRegistrationMetadata) o;
-        return Objects.equals(basicDiscoveryMetadata, that.basicDiscoveryMetadata)
-                && Objects.equals(instanceId, that.instanceId)
-                && Objects.equals(instanceName, that.instanceName)
-                && Objects.equals(instanceActuatorUrl, that.instanceActuatorUrl)
-                && Objects.equals(deploymentAt, that.deploymentAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(basicDiscoveryMetadata, instanceId, instanceName, instanceActuatorUrl, deploymentAt);
     }
 
     @Override

@@ -30,10 +30,10 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
@@ -41,27 +41,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
- * Integration tests for {@link SelfRegistrationAutoConfiguration}
+ * Integration tests for {@link HeartBeatAutoConfiguration}
  *
  * @author Sergey Cherkasov
  */
-class SelfRegistrationAutoConfigurationTest {
+class HeartBeatAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("axelix.sbs.discovery.auto=true")
             .withUserConfiguration(RequiredDependenciesConfig.class)
-            .withConfiguration(AutoConfigurations.of(
-                    SelfRegistrationAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
+            .withConfiguration(
+                    AutoConfigurations.of(HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(SelfRegistrationAutoConfiguration.class);
+            assertThat(context).hasSingleBean(HeartBeatAutoConfiguration.class);
             assertThat(context).hasSingleBean(ValidationListener.class);
-            assertThat(context).hasSingleBean(SelfRegistrationConfigurationProperties.class);
-            assertThat(context).hasSingleBean(SelfRegistrationMetadataAssembler.class);
-            assertThat(context).hasSingleBean(SelfRegistrationService.class);
-            assertThat(context).hasSingleBean(SelfRegistrationLifecycleListener.class);
+            assertThat(context).hasSingleBean(HeartBeatConfigurationProperties.class);
+            assertThat(context).hasSingleBean(HeartBeatMetadataAssembler.class);
+            assertThat(context).hasSingleBean(HeartBeatService.class);
+            assertThat(context).hasSingleBean(HeartBeatLifecycleIgnitor.class);
         });
     }
 
@@ -69,12 +69,12 @@ class SelfRegistrationAutoConfigurationTest {
     void shouldNotActivateAutoConfiguration_withoutRequiredProperty() {
         new ApplicationContextRunner()
                 .withUserConfiguration(RequiredDependenciesConfig.class)
-                .withConfiguration(AutoConfigurations.of(SelfRegistrationAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(HeartBeatAutoConfiguration.class))
                 .run(context -> {
-                    assertThat(context).doesNotHaveBean(SelfRegistrationAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationConfigurationProperties.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationService.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationLifecycleListener.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatConfigurationProperties.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatService.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatLifecycleIgnitor.class);
                 });
     }
 
@@ -83,12 +83,12 @@ class SelfRegistrationAutoConfigurationTest {
         new ApplicationContextRunner()
                 .withPropertyValues("axelix.sbs.discovery.auto=false")
                 .withUserConfiguration(RequiredDependenciesConfig.class)
-                .withConfiguration(AutoConfigurations.of(SelfRegistrationAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(HeartBeatAutoConfiguration.class))
                 .run(context -> {
-                    assertThat(context).doesNotHaveBean(SelfRegistrationAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationConfigurationProperties.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationService.class);
-                    assertThat(context).doesNotHaveBean(SelfRegistrationLifecycleListener.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatConfigurationProperties.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatService.class);
+                    assertThat(context).doesNotHaveBean(HeartBeatLifecycleIgnitor.class);
                 });
     }
 

@@ -17,15 +17,29 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import org.jspecify.annotations.NonNull;
+
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 
 /**
- * Assembles {@link SelfRegistrationMetadata} about this particular instance.
+ * Listens for {@link ApplicationReadyEvent} and starts the self-registration
+ * heartbeat process.
  *
- * @since 04.02.2026
+ * @see HeartBeatService#scheduleHeartBeat
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public interface SelfRegistrationMetadataAssembler {
+public class HeartBeatLifecycleIgnitor implements ApplicationListener<ApplicationReadyEvent> {
 
-    SelfRegistrationMetadata assemble();
+    private final HeartBeatService heartBeatService;
+
+    public HeartBeatLifecycleIgnitor(HeartBeatService heartBeatService) {
+        this.heartBeatService = heartBeatService;
+    }
+
+    @Override
+    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+        heartBeatService.scheduleHeartBeat();
+    }
 }

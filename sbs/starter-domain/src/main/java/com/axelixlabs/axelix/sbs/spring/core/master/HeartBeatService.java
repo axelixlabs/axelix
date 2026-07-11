@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
@@ -40,7 +40,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class SelfRegistrationService implements Closeable {
+public class HeartBeatService implements Closeable {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final PasswordlessUser TECH_USER =
@@ -58,8 +58,8 @@ public class SelfRegistrationService implements Closeable {
 
     private final HttpClient httpClient;
     private final JsonSerializationFunction serializationFunction;
-    private final SelfRegistrationConfigurationProperties properties;
-    private final SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler;
+    private final HeartBeatConfigurationProperties properties;
+    private final HeartBeatMetadataAssembler heartBeatMetadataAssembler;
     private final ScheduledExecutorService executor;
     private final Logger logger;
     private final JwtEncoderService jwtEncoderService;
@@ -67,11 +67,11 @@ public class SelfRegistrationService implements Closeable {
     @SuppressWarnings("NullAway.Init")
     private volatile String currentToken;
 
-    public SelfRegistrationService(
+    public HeartBeatService(
             Logger logger,
             JsonSerializationFunction serializationFunction,
-            SelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
+            HeartBeatConfigurationProperties properties,
+            HeartBeatMetadataAssembler heartBeatMetadataAssembler,
             JwtEncoderService jwtEncoderService) {
 
         this.logger = logger;
@@ -80,7 +80,7 @@ public class SelfRegistrationService implements Closeable {
                 HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
         this.properties = properties;
         this.serializationFunction = serializationFunction;
-        this.selfRegistrationMetadataAssembler = selfRegistrationMetadataAssembler;
+        this.heartBeatMetadataAssembler = heartBeatMetadataAssembler;
 
         this.executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable);
@@ -89,17 +89,17 @@ public class SelfRegistrationService implements Closeable {
         });
     }
 
-    public void scheduleSelfRegistration() {
+    public void scheduleHeartBeat() {
         currentToken = jwtEncoderService.generateToken(TECH_USER);
         executor.scheduleAtFixedRate(
-                this::register, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
+                this::heartbeat, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
 
-    private void register() {
-        SelfRegistrationMetadata selfRegistrationMetadata = selfRegistrationMetadataAssembler.assemble();
+    private void heartbeat() {
+        HeartBeatMetadata heartBeatMetadata = heartBeatMetadataAssembler.assemble();
 
         try {
-            HttpResponse<Void> response = sendRequest(selfRegistrationMetadata, properties.getMasterUrl());
+            HttpResponse<Void> response = sendRequest(heartBeatMetadata, properties.getMasterUrl());
 
             int statusCode = response.statusCode();
 
@@ -124,10 +124,10 @@ public class SelfRegistrationService implements Closeable {
         return statusCode == 401;
     }
 
-    private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)
+    private HttpResponse<Void> sendRequest(@NonNull HeartBeatMetadata heartBeatMetadata, String url)
             throws IOException, InterruptedException {
         HttpPayload payload = HttpPayload.json(
-                serializationFunction.serialize(selfRegistrationMetadata).getBytes(StandardCharsets.UTF_8));
+                serializationFunction.serialize(heartBeatMetadata).getBytes(StandardCharsets.UTF_8));
         HttpRequest request = buildHttpRequest(url, payload);
         return httpClient.send(request, HttpResponse.BodyHandlers.discarding());
     }

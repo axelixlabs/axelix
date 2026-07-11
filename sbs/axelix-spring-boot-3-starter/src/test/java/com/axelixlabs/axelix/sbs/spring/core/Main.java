@@ -39,11 +39,11 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisher
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.HeartBeatAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
@@ -73,7 +73,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             AxelixFeignEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
-            SelfRegistrationAutoConfiguration.class,
+            HeartBeatAutoConfiguration.class,
             ScheduledTaskManagementAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class,

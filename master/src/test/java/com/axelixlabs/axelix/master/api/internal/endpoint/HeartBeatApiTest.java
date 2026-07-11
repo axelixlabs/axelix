@@ -53,13 +53,13 @@ import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link SelfRegisteredApi}
+ * Integration tests for {@link HeartBeatApi}
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SelfRegisteredApiTest {
+public class HeartBeatApiTest {
 
     private static final String TEST_INSTANCE_ID = "3c994958-924f-4a12-87d0-a8782e97af10";
 

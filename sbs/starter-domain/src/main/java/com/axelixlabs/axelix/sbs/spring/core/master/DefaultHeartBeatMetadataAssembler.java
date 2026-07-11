@@ -21,24 +21,24 @@ import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 
 /**
- * Default implementation of {@link SelfRegistrationMetadataAssembler}.
+ * Default implementation of {@link HeartBeatMetadataAssembler}.
  *
  * @since 05.02.2026
  * @author Nikita Kirillov
  * @author Ilya Naumov
  */
-public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistrationMetadataAssembler {
+public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssembler {
 
     private static final char[] NAME_POSTFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
     private static final int NAME_POSTFIX_LENGTH = 8;
 
     private final Random random = new Random();
 
-    private final SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
+    private final HeartBeatConfigurationProperties heartBeatConfigurationProperties;
 
     private final ServiceMetadataAssembler serviceMetadataAssembler;
 
@@ -48,24 +48,24 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     private final String deploymentAt;
 
-    public DefaultSelfRegistrationMetadataAssembler(
+    public DefaultHeartBeatMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-        this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
+            HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
+        this.heartBeatConfigurationProperties = heartBeatConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
-        this.instanceName = selfRegistrationConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
+        this.instanceName = heartBeatConfigurationProperties.getInstanceName() + "-" + generateNamePostfix();
         this.deploymentAt = Instant.now().toString();
     }
 
     @Override
-    public SelfRegistrationMetadata assemble() {
+    public HeartBeatMetadata assemble() {
 
-        return new SelfRegistrationMetadata(
+        return new HeartBeatMetadata(
                 serviceMetadataAssembler.assemble(),
                 instanceId,
                 instanceName,
-                selfRegistrationConfigurationProperties.getInstanceActuatorUrl(),
+                heartBeatConfigurationProperties.getInstanceActuatorUrl(),
                 deploymentAt);
     }
 

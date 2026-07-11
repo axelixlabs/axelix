@@ -43,18 +43,19 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 
 /**
- * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#AUTHORIZATION} header.
+ * Auth filter that is supposed to act like a central point for authenticating and authorizing the heartbeats.
  *
  * @author Nikita Kirilllov
+ * @author Mikhail Polivakha
  */
 @Component
-@Order(FiltersOrder.SELF_REGISTRATION_JWT_AUTHORIZATION_FILTER)
-public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter {
+@Order(FiltersOrder.HEART_BEAT_JWT_AUTHORIZATION_FILTER)
+public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final WebIdentityAccessManager webIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
 
-    public SelfRegistrationJwtAuthorizationFilter(
+    public HeartBeatJwtAuthorizationFilter(
             WebIdentityAccessManager webIdentityAccessManager, SecurityContextExecutor securityContextExecutor) {
         this.webIdentityAccessManager = webIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;

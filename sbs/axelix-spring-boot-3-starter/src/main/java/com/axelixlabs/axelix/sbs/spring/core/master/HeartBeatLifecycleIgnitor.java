@@ -26,19 +26,19 @@ import org.springframework.context.ApplicationListener;
  * Listens for {@link ApplicationReadyEvent} and starts the self-registration
  * heartbeat process.
  *
- * @see SelfRegistrationService#scheduleSelfRegistration
+ * @see HeartBeatService#scheduleHeartBeat
  * @author Nikita Kirillov
  */
-public class SelfRegistrationLifecycleListener implements ApplicationListener<ApplicationReadyEvent> {
+public class HeartBeatLifecycleIgnitor implements ApplicationListener<ApplicationReadyEvent> {
 
-    private final SelfRegistrationService selfRegistrationService;
+    private final HeartBeatService heartBeatService;
 
-    public SelfRegistrationLifecycleListener(SelfRegistrationService selfRegistrationService) {
-        this.selfRegistrationService = selfRegistrationService;
+    public HeartBeatLifecycleIgnitor(HeartBeatService heartBeatService) {
+        this.heartBeatService = heartBeatService;
     }
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-        selfRegistrationService.scheduleSelfRegistration();
+        heartBeatService.scheduleHeartBeat();
     }
 }

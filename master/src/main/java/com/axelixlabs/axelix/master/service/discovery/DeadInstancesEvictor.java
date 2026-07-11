@@ -30,14 +30,15 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 
 /**
- * Evicts self-registered instances that haven't sent a heartbeat within the timeout period.
+ * Evicts instances that haven't sent a heartbeat within the timeout period. Axelix
+ * Master considers such instances as "dead".
  *
  * @author Nikita Kirillov
  */
 @Service
-public class SelfRegistrationInstanceEvictionScheduler {
+public class DeadInstancesEvictor {
 
-    private static final Logger logger = LoggerFactory.getLogger(SelfRegistrationInstanceEvictionScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeadInstancesEvictor.class);
 
     private final InstanceRepository instanceRepository;
 
@@ -49,12 +50,12 @@ public class SelfRegistrationInstanceEvictionScheduler {
     @Value("${axelix.master.discovery.self-registration.eviction.heartbeat-timeout}")
     private Duration heartbeatTimeout;
 
-    public SelfRegistrationInstanceEvictionScheduler(InstanceRepository instanceRepository) {
+    public DeadInstancesEvictor(InstanceRepository instanceRepository) {
         this.instanceRepository = instanceRepository;
     }
 
     @Scheduled(cron = "${axelix.master.discovery.self-registration.eviction.schedule}")
-    public void evictStaleInstances() {
+    public void evictDeadInstances() {
         Instant threshold = Instant.now().minus(heartbeatTimeout);
         int evictedCount = instanceRepository.deleteWhereHeartbeatOlderThan(threshold);
 

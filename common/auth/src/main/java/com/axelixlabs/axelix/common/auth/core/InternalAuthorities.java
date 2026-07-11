@@ -30,7 +30,7 @@ public class InternalAuthorities {
     /**
      * The authority that allows the potential Spring Boot service candidate to register itself inside Axelix Master.
      */
-    public static final InternalAuthority SELF_REGISTER_AUTHORITY = new InternalAuthority("INTERNAL.SELF_REGISTER");
+    public static final InternalAuthority HEART_BEATING_AUTHORITY = new InternalAuthority("INTERNAL.HEARTBEAT");
 
     public static final class InternalAuthority implements Authority {
 

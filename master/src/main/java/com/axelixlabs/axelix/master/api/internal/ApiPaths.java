@@ -26,16 +26,11 @@ public final class ApiPaths {
 
     private ApiPaths() {}
 
-    public static final class SelfRegistryApi {
+    public static final class HeartBeatApi {
 
         /**
-         * Base path for all self-registration services APIs.
+         * Endpoint for accepting the heartbeat.
          */
-        public static final String MAIN = "/service";
-
-        /**
-         * Endpoint for service self-registration.
-         */
-        public static final String SERVICE_REGISTER = "/register";
+        public static final String SERVICE_REGISTER = "/service/register";
     }
 }

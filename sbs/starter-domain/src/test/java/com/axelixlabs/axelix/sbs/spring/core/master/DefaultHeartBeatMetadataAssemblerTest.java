@@ -38,30 +38,30 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HotSpot;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.Insights;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration test for {@link DefaultSelfRegistrationMetadataAssembler}.
+ * Integration test for {@link DefaultHeartBeatMetadataAssembler}.
  *
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Ilya Naumov
  */
-@SpringBootTest(classes = DefaultSelfRegistrationMetadataAssemblerTest.TestApplication.class)
+@SpringBootTest(classes = DefaultHeartBeatMetadataAssemblerTest.TestApplication.class)
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.master-url=http://localhost:8080/",
             "axelix.sbs.discovery.instance-actuator-url=http://localhost:8089/actuator"
         })
-class DefaultSelfRegistrationMetadataAssemblerTest {
+class DefaultHeartBeatMetadataAssemblerTest {
 
     @SpringBootConfiguration
     @EnableAutoConfiguration
@@ -69,29 +69,28 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     static class TestApplication {}
 
     @Autowired
-    private SelfRegistrationMetadataAssembler subject;
+    private HeartBeatMetadataAssembler subject;
 
     @Autowired
     private ServiceMetadataAssembler service;
 
     @Autowired
-    private SelfRegistrationConfigurationProperties properties;
+    private HeartBeatConfigurationProperties properties;
 
     @TestConfiguration
     static class CurrentConfig {
 
         @Bean
-        @ConfigurationProperties(prefix = SelfRegistrationConfigurationProperties.CONFIG_PROPS_PREFIX)
-        public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
-            return new SelfRegistrationConfigurationProperties();
+        @ConfigurationProperties(prefix = HeartBeatConfigurationProperties.CONFIG_PROPS_PREFIX)
+        public HeartBeatConfigurationProperties heartBeatConfigurationProperties() {
+            return new HeartBeatConfigurationProperties();
         }
 
         @Bean
-        public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
+        public HeartBeatMetadataAssembler heartBeatMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
-            return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                HeartBeatConfigurationProperties heartBeatConfigurationProperties) {
+            return new DefaultHeartBeatMetadataAssembler(serviceMetadataAssembler, heartBeatConfigurationProperties);
         }
 
         @Bean
@@ -146,9 +145,9 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     }
 
     @Test
-    void shouldAssembleTheSelfRegistrationMetadataAboutGivenService() {
+    void shouldAssembleTheHeartBeatMetadataAboutGivenService() {
         // when.
-        SelfRegistrationMetadata metadata = subject.assemble();
+        HeartBeatMetadata metadata = subject.assemble();
         BasicDiscoveryMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
 
         // then.
@@ -170,8 +169,8 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     @Test // GH-1292
     void shouldReturnStableInstanceNameOnRepeatedCalls() {
         // when.
-        SelfRegistrationMetadata firstMetadata = subject.assemble();
-        SelfRegistrationMetadata secondMetadata = subject.assemble();
+        HeartBeatMetadata firstMetadata = subject.assemble();
+        HeartBeatMetadata secondMetadata = subject.assemble();
 
         // then.
         assertThat(firstMetadata.getInstanceName()).isEqualTo(secondMetadata.getInstanceName());
@@ -180,14 +179,12 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     @Test // GH-1292
     void shouldReturnDifferentInstanceNameForDifferentInstances() {
         // given.
-        DefaultSelfRegistrationMetadataAssembler assembler1 =
-                new DefaultSelfRegistrationMetadataAssembler(service, properties);
-        DefaultSelfRegistrationMetadataAssembler assembler2 =
-                new DefaultSelfRegistrationMetadataAssembler(service, properties);
+        DefaultHeartBeatMetadataAssembler assembler1 = new DefaultHeartBeatMetadataAssembler(service, properties);
+        DefaultHeartBeatMetadataAssembler assembler2 = new DefaultHeartBeatMetadataAssembler(service, properties);
 
         // when.
-        SelfRegistrationMetadata metadata1 = assembler1.assemble();
-        SelfRegistrationMetadata metadata2 = assembler2.assemble();
+        HeartBeatMetadata metadata1 = assembler1.assemble();
+        HeartBeatMetadata metadata2 = assembler2.assemble();
 
         // then.
         assertThat(metadata1.getInstanceName()).startsWith("testApp-");

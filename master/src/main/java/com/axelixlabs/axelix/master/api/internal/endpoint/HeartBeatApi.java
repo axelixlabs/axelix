@@ -28,9 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -45,22 +44,21 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  */
 @Hidden
 @InternalApiRestController
-@RequestMapping(path = ApiPaths.SelfRegistryApi.MAIN)
 @ConditionalOnProperty(
         prefix = "axelix.master.discovery.self-registration",
         name = "enabled",
         havingValue = "true",
         matchIfMissing = true)
-public class SelfRegisteredApi {
+public class HeartBeatApi {
 
-    private static final Logger log = LoggerFactory.getLogger(SelfRegisteredApi.class);
+    private static final Logger log = LoggerFactory.getLogger(HeartBeatApi.class);
 
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
 
-    public SelfRegisteredApi(
+    public HeartBeatApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
@@ -71,8 +69,8 @@ public class SelfRegisteredApi {
         this.transactionTemplate = transactionTemplate;
     }
 
-    @PostMapping(path = ApiPaths.SelfRegistryApi.SERVICE_REGISTER)
-    public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
+    @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
+    public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
 
         try {
             Instance instance = instanceFactory.createInstance(

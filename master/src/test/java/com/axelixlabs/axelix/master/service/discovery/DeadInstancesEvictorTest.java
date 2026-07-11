@@ -37,18 +37,18 @@ import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link SelfRegistrationInstanceEvictionScheduler}
+ * Integration tests for {@link DeadInstancesEvictor}
  *
  * @author Nikita Kirillov
  */
 @SpringBootTest(properties = "axelix.master.discovery.self.eviction.interval=60000000")
-class SelfRegistrationInstanceEvictionSchedulerTest {
+class DeadInstancesEvictorTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;
 
     @Autowired
-    private SelfRegistrationInstanceEvictionScheduler selfRegistrationInstanceEvictionScheduler;
+    private DeadInstancesEvictor deadInstancesEvictor;
 
     @Autowired
     private InstanceRepository instanceRepository;
@@ -66,7 +66,7 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
         registerInstance(instanceId, latestHeartBeat);
 
         // when
-        selfRegistrationInstanceEvictionScheduler.evictStaleInstances();
+        deadInstancesEvictor.evictDeadInstances();
 
         // then
         assertThat(instanceRegistry.get(InstanceId.of(instanceId))).isEmpty();
@@ -83,7 +83,7 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
         registerInstance(noHeartbeatInstanceId, null);
 
         // when
-        selfRegistrationInstanceEvictionScheduler.evictStaleInstances();
+        deadInstancesEvictor.evictDeadInstances();
 
         // then
         assertThat(instanceRegistry.get(InstanceId.of(staleInstanceId))).isEmpty();
@@ -108,7 +108,7 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
         }
 
         // when
-        selfRegistrationInstanceEvictionScheduler.evictStaleInstances();
+        deadInstancesEvictor.evictDeadInstances();
 
         // then
         assertThat(staleIds)
