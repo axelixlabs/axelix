@@ -17,18 +17,22 @@ jobs:
   check-linked-issues:
     # External contributors can open PRs without targeting a specific issue.
     #
-    # OWNER - Author is the owner of the repository.
-    # MEMBER - Author is a member of the organization that owns the repository.
-    # COLLABORATOR - Author has been invited to collaborate on the repository.
+    # read  - Default access granted to anyone on a public repository, including external contributors.
+    # write - Granted to org members, added collaborators, and the org owner.
+    # admin - Granted to repository/organization administrators.
     #
-    # see https://docs.github.com/en/graphql/reference/issues#enums
-    if: >-
-      github.event.pull_request.author_association == 'OWNER' ||
-      github.event.pull_request.author_association == 'MEMBER' ||
-      github.event.pull_request.author_association == 'COLLABORATOR'
+    # see https://docs.github.com/en/rest/collaborators/collaborators#get-repository-permissions-for-a-user
     runs-on: ubuntu-latest
     steps:
+      - name: Check author permission
+        id: check-permission
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.event.pull_request.user.login }}
+
       - name: Check for linked issues
+        if: steps.check-permission.outputs.require-result == 'true'
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring, dependencies, docs, security"
