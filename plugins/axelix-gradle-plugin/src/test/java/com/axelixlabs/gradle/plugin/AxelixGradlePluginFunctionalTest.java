@@ -44,10 +44,7 @@ class AxelixGradlePluginFunctionalTest {
 
     /**
      * Gradle versions exercised by the enclosing test task, supplied as a comma-separated list via the
-     * {@code axelix.test.gradle.versions} system property. No single JVM can launch the whole supported
-     * range (Gradle 5-7 require Java &lt;= 11, Gradle 9 requires Java &gt;= 17), so the {@code test} and
-     * {@code legacyGradleTest} tasks each pass the subset valid for their toolchain. Falls back to a single
-     * modern version for IDE runs.
+     * {@code axelix.test.gradle.versions} system property. Falls back to a single modern version for IDE runs.
      */
     static List<String> gradleVersionsUnderTest() {
         String versions = System.getProperty("axelix.test.gradle.versions");

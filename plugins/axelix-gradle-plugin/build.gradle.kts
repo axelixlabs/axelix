@@ -35,18 +35,35 @@ dependencies {
     testImplementation(gradleTestKit())
 }
 
-val modernGradleVersions = listOf("8.10.2", "9.5.1")
-val legacyGradleVersions = listOf("5.0", "6.9", "7.6.4")
+val java25CompatibleGradle = listOf("9.5.1")
+val java21CompatibleGradle = listOf("8.10.2")
+val java11CompatibleGradle = listOf("5.0", "6.9", "7.6.4")
 
-// No single JVM can launch the whole supported Gradle range: Gradle 5-7 require Java <= 11 while
-// Gradle 9 requires Java >= 17. The matrix is therefore split across two test tasks bucketed by the
-// JDK each Gradle version can run on; the Gradle versions themselves are the behavioural axis.
+// No single JVM can launch the whole supported Gradle range: Gradle 5-7 require Java <= 11,
+// Gradle 8.10 requires Java <= 23, while Gradle 9 runs on the build JDK (Java 25 on CI).
+// The matrix is therefore split across test tasks bucketed by the JDK each Gradle version can run on.
 tasks.test {
     useJUnitPlatform()
-    systemProperty("axelix.test.gradle.versions", modernGradleVersions.joinToString(separator = ","))
+    systemProperty("axelix.test.gradle.versions", java25CompatibleGradle.joinToString(separator = ","))
 }
 
-val legacyGradleTest by tasks.registering(Test::class) {
+val java21Test by tasks.registering(Test::class) {
+    description = "Runs the functional tests against Gradle 8.10.x on a Java 21 toolchain."
+    group = "verification"
+    useJUnitPlatform()
+
+    val testSourceSet = sourceSets.test.get()
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    systemProperty("axelix.test.gradle.versions", java21CompatibleGradle.joinToString(separator = ","))
+    shouldRunAfter(tasks.test)
+}
+
+val java11Test by tasks.registering(Test::class) {
     description = "Runs the functional tests against legacy Gradle versions on a Java 11 toolchain."
     group = "verification"
     useJUnitPlatform()
@@ -58,10 +75,10 @@ val legacyGradleTest by tasks.registering(Test::class) {
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(11)
     }
-    systemProperty("axelix.test.gradle.versions", legacyGradleVersions.joinToString(separator = ","))
-    shouldRunAfter(tasks.test)
+    systemProperty("axelix.test.gradle.versions", java11CompatibleGradle.joinToString(separator = ","))
+    shouldRunAfter(java21Test)
 }
 
 tasks.check {
-    dependsOn(tasks.test)
+    dependsOn(tasks.test, java21Test, java11Test)
 }
