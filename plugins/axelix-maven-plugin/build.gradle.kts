@@ -17,7 +17,7 @@ dependencies {
 
     compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.15.2")
 
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.apache.maven.shared:maven-verifier:1.8.0")
 
