@@ -8,7 +8,7 @@ export const themeConfig: Preset.ThemeConfig = {
   colorMode: {
     respectPrefersColorScheme: true,
   },
-  navbar,
+  navbar: navbar,
   prism: {
     theme: prismThemes.github,
     darkTheme: prismThemes.vsDark,

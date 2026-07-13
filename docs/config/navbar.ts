@@ -61,12 +61,6 @@ export const navbar: Navbar = {
       className: 'navbar__tab',
     },
     {
-      to: '/product/introduction',
-      label: 'Docs',
-      position: 'right',
-      className: 'navbar__pill',
-    },
-    {
       href: 'https://axelix.io/blog',
       label: 'Blog',
       position: 'right',
