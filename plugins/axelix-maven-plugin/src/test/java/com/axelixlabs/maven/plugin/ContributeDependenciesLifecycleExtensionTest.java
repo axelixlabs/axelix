@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,9 +72,16 @@ class ContributeDependenciesLifecycleExtensionTest {
         verifier.verify(true);
 
         assertThat(readLogFile(baseDir)).contains("org.thymeleaf:thymeleaf:jar:3.1.5.RELEASE");
+        assertThat(readLogFile(baseDir)).doesNotContain("org.thymeleaf:thymeleaf:jar:3.0.15.RELEASE");
     }
 
-    private static @NonNull String readLogFile(String baseDir) throws IOException {
+    /**
+     * Read maven log file from test-project base directory
+     * @param baseDir Project base directory
+     * @return log content
+     * @throws IOException
+     */
+    private static String readLogFile(String baseDir) throws IOException {
         Path logFilePath = Paths.get(baseDir + "/log.txt");
 
         return Files.readString(logFilePath);
