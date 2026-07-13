@@ -34,6 +34,8 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
 
 /**
  * Contributes dependencies to maven project
+ *
+ * @author Artemiy Degtyarev
  */
 @Named("contributeDependenciesLifecycleExtension")
 @Singleton
@@ -51,15 +53,30 @@ public class ContributeDependenciesLifecycleExtension extends AbstractMavenLifec
 
     @Override
     public void afterProjectsRead(MavenSession session) {
-        session.getAllProjects().forEach(it -> contributeProjectDependencies(it, session.getRepositorySession()));
+        try {
+            session.getAllProjects().forEach(it -> contributeProjectDependencies(it, session.getRepositorySession()));
+        } finally {
+            dependencyUtils.cleanupCache();
+        }
     }
 
+    /**
+     * Contribute project dependencies
+     *
+     * @param mavenProject Maven project
+     * @param repositorySystemSession Maven repository system session
+     */
     private void contributeProjectDependencies(
             MavenProject mavenProject, RepositorySystemSession repositorySystemSession) {
         contributeProfilerDependency(mavenProject, repositorySystemSession);
         contributeThymeleafDependency(mavenProject, repositorySystemSession);
     }
 
+    /**
+     * Add thymeleaf dependency if current version is lower than {@code 3.1.3}
+     * @param mavenProject Maven project
+     * @param repositorySystemSession Maven repository system session
+     */
     private void contributeThymeleafDependency(
             MavenProject mavenProject, RepositorySystemSession repositorySystemSession) {
         Optional<Artifact> dependency = dependencyUtils.getResolvedDependency(
@@ -76,6 +93,10 @@ public class ContributeDependenciesLifecycleExtension extends AbstractMavenLifec
         }
     }
 
+    /**
+     * Add thymeleaf dependency to project
+     * @param mavenProject Maven project
+     */
     private void addThymeleafDependency(MavenProject mavenProject) {
         Dependency dependency = new Dependency();
         dependency.setGroupId(THYMELEAF_GROUP_ID);
@@ -85,6 +106,11 @@ public class ContributeDependenciesLifecycleExtension extends AbstractMavenLifec
         mavenProject.getDependencies().add(dependency);
     }
 
+    /**
+     * Add profiler dependency to maven project when hasn't
+     * @param mavenProject Maven project
+     * @param repositorySystemSession Maven repository system session
+     */
     private void contributeProfilerDependency(
             MavenProject mavenProject, RepositorySystemSession repositorySystemSession) {
         if (!dependencyUtils.containsDependency(

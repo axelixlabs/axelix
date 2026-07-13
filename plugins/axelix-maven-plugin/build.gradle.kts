@@ -14,9 +14,9 @@ tasks.compileJava {
 
 dependencies {
     implementation(project(":common:utils"))
-    implementation("org.apache.maven:maven-plugin-api:3.9.16")
-    implementation("org.apache.maven:maven-core:3.9.16")
 
+    compileOnly("org.apache.maven:maven-plugin-api:3.9.16")
+    compileOnly("org.apache.maven:maven-core:3.9.16")
     compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.15.2")
 
     testImplementation(platform("org.junit:junit-bom:5.14.4"))
@@ -43,11 +43,12 @@ tasks.test {
 }
 
 tasks.shadowJar {
-    archiveClassifier = ""
-
-    dependencies {
-        exclude(dependency("org.apache.maven:maven-core:3.9.16"))
+    dependsOn(tasks.named("generateMavenPluginDescriptor"))
+    from("build/mavenPlugin/descriptor/META-INF/maven") {
+        into("META-INF/maven")
     }
+
+    archiveClassifier = ""
 }
 
 tasks.jar {
