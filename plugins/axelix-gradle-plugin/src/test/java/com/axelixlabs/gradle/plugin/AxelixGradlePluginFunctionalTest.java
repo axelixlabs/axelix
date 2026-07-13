@@ -31,6 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static com.axelixlabs.gradle.plugin.SpringTestProfilerReportCopy.COPY_PROFILER_REPORT_TASK_NAME;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -176,6 +177,21 @@ class AxelixGradlePluginFunctionalTest {
                         .getOutcome())
                 .isEqualTo(TaskOutcome.SUCCESS);
         assertGeneratedSpringFactoriesContainOnlyProfilerRegistration();
+    }
+
+    @ParameterizedTest
+    @MethodSource("gradleVersionsUnderTest")
+    void shouldCopyProfilerReport(String gradleVersion) throws IOException {
+        writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
+        writeFile("build.gradle", GradleProjectFixtures.loadContent("no-thymeleaf-and-profiler.gradle"));
+        writeFile("build/spring-test-profiler/latest.html", "some-content");
+
+        BuildResult result = createRunner(gradleVersion, COPY_PROFILER_REPORT_TASK_NAME).build();
+
+        assertThat(result.task(":copyProfilerReport").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+
+        Path path = projectDir.resolve("build/resources/main/profiler-reports");
+        assertThat(path).exists();
     }
 
     private void assertGeneratedSpringFactoriesContainOnlyProfilerRegistration() throws IOException {

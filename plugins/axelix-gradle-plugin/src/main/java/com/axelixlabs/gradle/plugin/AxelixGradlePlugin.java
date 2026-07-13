@@ -102,6 +102,7 @@ public class AxelixGradlePlugin implements Plugin<Project> {
     private static void configureSpringBootTestProfiler(Project project) {
         project.getDependencies().add(TEST_RUNTIME_ONLY, PROFILER_DEPENDENCY);
         SpringFactoriesGenerator.configure(project);
+        SpringTestProfilerReportCopy.configure(project);
     }
 
     private static void logUnableToProfileSpringBootTests(Project project) {
