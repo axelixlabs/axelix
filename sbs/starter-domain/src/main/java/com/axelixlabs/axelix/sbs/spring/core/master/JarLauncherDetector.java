@@ -15,27 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.testutils;
-
-import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
 /**
- * No-Op logger for tests.
+ * Detects whether the application is launched by Spring Boot {@code JarLauncher}.
  *
- * @author Mikhail Polivakha
  * @author Ilya Naumov
  */
-public final class NoOpLogger implements Logger {
+public interface JarLauncherDetector {
+    /**
+     * Determines whether the current thread's context ClassLoader or any of its
+     * parents matches a ClassLoader used by {@code JarLauncher}.
+     *
+     * @return {@code true} if a matching ClassLoader is found in the hierarchy
+     */
+    boolean isThreadContextClassLoaderHierarchyMatching();
 
-    @Override
-    public void trace(String message, Object... args) {}
-
-    @Override
-    public void info(String message, Object... args) {}
-
-    @Override
-    public void debug(String message, Object... args) {}
-
-    @Override
-    public void warn(String message, Object... args) {}
+    /**
+     * Determines whether a library class loader matches a ClassLoader used
+     * by {@code JarLauncher}.
+     *
+     * @return {@code true} if a library class loader matches
+     */
+    boolean isLibraryClassLoaderMatching();
 }

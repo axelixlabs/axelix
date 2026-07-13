@@ -15,27 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.testutils;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
+import java.net.URL;
 
 /**
- * No-Op logger for tests.
+ * Inspects the manifest of a JAR file.
  *
- * @author Mikhail Polivakha
  * @author Ilya Naumov
  */
-public final class NoOpLogger implements Logger {
-
-    @Override
-    public void trace(String message, Object... args) {}
-
-    @Override
-    public void info(String message, Object... args) {}
-
-    @Override
-    public void debug(String message, Object... args) {}
-
-    @Override
-    public void warn(String message, Object... args) {}
+public interface JarManifestInspector {
+    /**
+     * Checks whether the JAR at the given location has a non-empty {@code Class-Path}
+     * attribute in its MANIFEST.MF.
+     *
+     * @param jarLocation the URL of the JAR file to inspect (only {@code file} protocol is supported)
+     * @return {@code true} if the manifest contains a non-blank Class-Path attribute
+     */
+    boolean hasNonEmptyClassPath(URL jarLocation);
 }

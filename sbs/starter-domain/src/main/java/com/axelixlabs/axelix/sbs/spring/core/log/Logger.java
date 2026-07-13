@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
  * SLF4J 1. So we have to abstract it away.
  *
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
 public interface Logger {
 
@@ -44,4 +45,9 @@ public interface Logger {
      * Debug-log message
      */
     void debug(String message, @Nullable Object @Nullable ... args);
+
+    /**
+     * Warn-log message
+     */
+    void warn(String message, @Nullable Object @Nullable ... args);
 }
