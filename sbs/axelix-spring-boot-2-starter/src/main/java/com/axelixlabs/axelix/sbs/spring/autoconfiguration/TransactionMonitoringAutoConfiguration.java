@@ -17,29 +17,44 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.List;
+
+import javax.servlet.DispatcherType;
+
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.TranssactionStackCleanupFilter;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+
+import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
 
 /**
  * Auto-configuration for Transaction Monitoring infrastructure.
@@ -99,6 +114,36 @@ public class TransactionMonitoringAutoConfiguration {
     public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
             TransactionAccessor transactionAccessor) {
         return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public FilterRegistrationBean<TranssactionStackCleanupFilter> nPlusOneHolderCleanupFilterRegistration(
+            TransactionAccessor transactionAccessor) {
+        FilterRegistrationBean<TranssactionStackCleanupFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new TranssactionStackCleanupFilter(transactionAccessor));
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
+
+        registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR);
+
+        return registrationBean;
+    }
+
+    @Configuration
+    @ConditionalOnHibernateActive
+    static class HibernateRelatedConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(
+                TransactionAccessor transactionAccessor) {
+            return properties ->
+                    properties.put(INTEGRATOR_PROVIDER, (IntegratorProvider) () -> List.of(new NPlusOneIntegrator(
+                            new NPlusOneEntityLoadListener(transactionAccessor),
+                            new NPlusOneCollectionLoadListener(transactionAccessor))));
+        }
     }
 
     @Configuration
