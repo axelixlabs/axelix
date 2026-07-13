@@ -33,11 +33,17 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.jayway.jsonpath.JsonPath;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.jpa.boot.spi.IntegratorProvider;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -61,6 +67,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
@@ -73,6 +82,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
 
 /**
  * Integration test for {@link TransactionMonitoringEndpoint}
@@ -99,11 +109,20 @@ class TransactionMonitoringEndpointTest {
     private OwnerRepository ownerRepository;
 
     @Autowired
+    private PetRepository petRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearStats();
+        petRepository.deleteAll();
+        tagRepository.deleteAll();
+        ownerRepository.deleteAll();
     }
 
     @Test
@@ -237,11 +256,15 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_0_, transactio0_.last_name as last_nam2_1_0_ from owner transactio0_ where transactio0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
-                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"lazyLoadingTarget\" : {\n"
+                                + "          \"ownerEntityClass\" : \"com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpointTest$Owner\",\n"
+                                + "          \"associationPropertyName\" : \"pets\"\n"
+                                + "        }\n"
                                 + "      }, {\n"
-                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_1_0_, pets0_.id as id1_1_0_, pets0_.id as id1_1_1_, pets0_.name as name2_1_1_, pets0_.owner_id as owner_id3_1_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
+                                + "        \"sql\" : \"select pets0_.owner_id as owner_id4_2_0_, pets0_.id as id1_2_0_, pets0_.id as id1_2_1_, pets0_.category_id as category3_2_1_, pets0_.name as name2_2_1_, pets0_.owner_id as owner_id4_2_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -293,7 +316,7 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_1_, transactio0_.last_name as last_nam2_1_1_, tags1_.owner_id as owner_id3_3_3_, tags1_.id as id1_3_3_, tags1_.id as id1_3_0_, tags1_.name as name2_3_0_, tags1_.owner_id as owner_id3_3_0_ from owner transactio0_ left outer join tag tags1_ on transactio0_.id=tags1_.owner_id where transactio0_.id=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      }, {\n"
@@ -347,7 +370,7 @@ class TransactionMonitoringEndpointTest {
                                 + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "      \"queries\" : [ {\n"
-                                + "        \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_1_, transactio0_.last_name as last_nam2_1_ from owner transactio0_ where transactio0_.last_name=?\",\n"
                                 + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                                 + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                                 + "      } ]\n"
@@ -447,7 +470,7 @@ class TransactionMonitoringEndpointTest {
                         + "          \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "          \"queries\" : [\n"
                         + "            {\n"
-                        + "              \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                        + "              \"sql\" : \"select transactio0_.id as id1_1_, transactio0_.last_name as last_nam2_1_ from owner transactio0_ where transactio0_.last_name=?\",\n"
                         + "              \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
                         + "              \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
                         + "            }\n"
@@ -525,6 +548,113 @@ class TransactionMonitoringEndpointTest {
         assertThat(inMemoryPaginatedFlags).contains(true);
     }
 
+    @Test
+    void shouldMarkCollectionNPlusOne() {
+        // given.
+        Owner owner1 = new Owner();
+        owner1.addPet(new Pet("pet1", owner1));
+        Owner owner2 = new Owner();
+        owner2.addPet(new Pet("pet2", owner2));
+
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+
+        // when. (will cause collection N+1)
+        propagationTestHelper.loadOwnersAndAccessPets();
+
+        // then.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                // language=json
+                .isEqualTo("{\n"
+                        + "  \"entrypoints\" : [ {\n"
+                        + "    \"className\" : \"#{json-unit.ignore}\",\n"
+                        + "    \"methodName\" : \"loadOwnersAndAccessPets\",\n"
+                        + "    \"executions\" : [ {\n"
+                        + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "      \"queries\" : [ {\n"
+                        + "        \"sql\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"lazyLoadingTarget\" : {\n"
+                        + "          \"ownerEntityClass\" : \"com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpointTest$Owner\",\n"
+                        + "          \"associationPropertyName\" : \"pets\"\n"
+                        + "        }\n"
+                        + "      }, {\n"
+                        + "        \"sql\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"lazyLoadingTarget\" : {\n"
+                        + "          \"ownerEntityClass\" : \"com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpointTest$Owner\",\n"
+                        + "          \"associationPropertyName\" : \"pets\"\n"
+                        + "        }\n"
+                        + "      }, {\n"
+                        + "        \"sql\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                        + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                        + "      } ]\n"
+                        + "    } ],\n"
+                        + "    \"executionStats\" : \"#{json-unit.ignore}\"\n"
+                        + "  } ]\n"
+                        + "}");
+    }
+
+    @Test
+    void shouldMarkCollectionBatchPlusOne() {
+        // given.
+        Owner owner1 = new Owner();
+        owner1.addTag(new Tag("tag1", owner1));
+        Owner owner2 = new Owner();
+        owner2.addTag(new Tag("tag2", owner2));
+        Owner owner3 = new Owner();
+        owner3.addTag(new Tag("tag3", owner3));
+
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+        ownerRepository.save(owner3);
+
+        // when. (will cause collection Batch+1)
+        propagationTestHelper.loadOwnersAndAccessTags();
+
+        // then.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("loadOwnersAndAccessTags");
+
+        List<String> lazyLoadingAssociations = JsonPath.read(
+                responseBody, "$.entrypoints[0].executions[0].queries[*].lazyLoadingTarget.associationPropertyName");
+
+        assertThat(lazyLoadingAssociations).isNotEmpty().allMatch("tags"::equals);
+    }
+
+    @Test
+    @Disabled("X-to-one lazy loading interception is not implemented yet.")
+    void shouldRecognizeXToOneLazyLoading() {
+        // given.
+        Owner owner1 = new Owner().setLastName("owner1");
+        Owner owner2 = new Owner().setLastName("owner2");
+        ownerRepository.save(owner1);
+        ownerRepository.save(owner2);
+
+        petRepository.save(new Pet("pet1", owner1));
+        petRepository.save(new Pet("pet2", owner2));
+
+        // when. (will cause entity N+1 — pet.getOwner() triggers separate SELECT per pet)
+        propagationTestHelper.loadPetsAndAccessOwners();
+
+        // then.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("loadPetsAndAccessOwners");
+
+        List<String> lazyLoadingAssociations = JsonPath.read(
+                responseBody, "$.entrypoints[0].executions[0].queries[*].lazyLoadingTarget.associationPropertyName");
+
+        assertThat(lazyLoadingAssociations).isNotEmpty().allMatch("owner"::equals);
+    }
+
     @ProtectedEndpointTests(
             method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
             path = "/actuator/axelix-transactions-monitoring")
@@ -578,8 +708,17 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
+                OwnerRepository ownerRepository, PetRepository petRepository, @Lazy PropagationTestHelper self) {
+            return new PropagationTestHelper(ownerRepository, petRepository, self);
+        }
+
+        @Bean
+        public HibernatePropertiesCustomizer axelixhibernatePropertiesCustomizer(
+                TransactionAccessor transactionAccessor) {
+            return properties ->
+                    properties.put(INTEGRATOR_PROVIDER, (IntegratorProvider) () -> List.of(new NPlusOneIntegrator(
+                            new NPlusOneEntityLoadListener(transactionAccessor),
+                            new NPlusOneCollectionLoadListener(transactionAccessor))));
         }
 
         @EventListener(ApplicationReadyEvent.class)
@@ -600,6 +739,10 @@ class TransactionMonitoringEndpointTest {
 
         @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
         private List<Pet> pets = new ArrayList<>();
+
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @BatchSize(size = 2)
+        private List<Tag> tags = new ArrayList<>();
 
         public List<Pet> getPets() {
             return pets;
@@ -622,6 +765,14 @@ class TransactionMonitoringEndpointTest {
             this.pets.add(pet);
             return this;
         }
+
+        public List<Tag> getTags() {
+            return tags;
+        }
+
+        public void addTag(Tag tag) {
+            this.tags.add(tag);
+        }
     }
 
     @Entity
@@ -638,11 +789,68 @@ class TransactionMonitoringEndpointTest {
         @JoinColumn(name = "owner_id")
         private Owner owner;
 
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "category_id")
+        private Category category;
+
         public Pet() {}
 
         public Pet(String name, Owner owner) {
             this.name = name;
             this.owner = owner;
+        }
+
+        public Owner getOwner() {
+            return owner;
+        }
+
+        public Category getCategory() {
+            return category;
+        }
+    }
+
+    @Entity
+    @Table(name = "tag")
+    static class Tag {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String name;
+
+        @ManyToOne
+        @JoinColumn(name = "owner_id")
+        @OnDelete(action = OnDeleteAction.CASCADE)
+        private Owner owner;
+
+        public Tag() {}
+
+        public Tag(String name, Owner owner) {
+            this.name = name;
+            this.owner = owner;
+        }
+    }
+
+    @Entity
+    @Table(name = "category")
+    @BatchSize(size = 2)
+    static class Category {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String name;
+
+        public Category() {}
+
+        public Category(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 
@@ -658,13 +866,20 @@ class TransactionMonitoringEndpointTest {
         Page<Owner> findAllWithPets(Pageable pageable);
     }
 
+    interface PetRepository extends JpaRepository<Pet, Long> {}
+
+    interface TagRepository extends JpaRepository<Tag, Long> {}
+
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
         private final PropagationTestHelper self;
+        private final PetRepository petRepository;
 
-        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+        public PropagationTestHelper(
+                OwnerRepository ownerRepository, PetRepository petRepository, @Lazy PropagationTestHelper self) {
             this.ownerRepository = ownerRepository;
+            this.petRepository = petRepository;
             this.self = self;
         }
 
@@ -727,6 +942,24 @@ class TransactionMonitoringEndpointTest {
         @Transactional(propagation = Propagation.REQUIRES_NEW)
         public void findAllWithPetsPageable() {
             ownerRepository.findAllWithPets(PageRequest.of(0, 5));
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOwnersAndAccessPets() {
+            List<Owner> owners = ownerRepository.findAll();
+            owners.forEach(o -> o.getPets().size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadOwnersAndAccessTags() {
+            List<Owner> owners = ownerRepository.findAll();
+            owners.forEach(o -> o.getTags().size());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void loadPetsAndAccessOwners() {
+            List<Pet> pets = petRepository.findAll();
+            pets.forEach(p -> p.getOwner().getId());
         }
     }
 }
