@@ -1,0 +1,82 @@
+.CodeBlock {
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 60% 55% at 88% 0%, color-mix(in srgb, var(--axelix-green-500) 16%, transparent), transparent 62%),
+        var(--axelix-green-900);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 24%, transparent);
+    box-shadow: 0 20px 50px -30px rgb(0 0 0 / 80%);
+}
+
+.Bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #081808;
+    border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 16%, transparent);
+    font-family: var(--axelix-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: #b8bfc9;
+}
+
+.FileName {
+    margin-left: 6px;
+    color: #fff;
+}
+
+.Tag {
+    margin-left: auto;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #e8894f;
+    background-color: color-mix(in srgb, #e8894f 14%, transparent);
+    border: 1px solid color-mix(in srgb, #e8894f 32%, transparent);
+}
+
+.Body {
+    display: flex;
+    flex: 1;
+    background-color: color-mix(in srgb, #0d2105 65%, transparent);
+}
+
+.Snippet {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 16px 18px;
+    font-family: var(--axelix-code);
+    font-size: 12.5px;
+    line-height: 1.72;
+    color: #fff;
+    counter-reset: ln;
+    overflow-x: auto;
+}
+
+.Line {
+    display: block;
+    position: relative;
+    padding-left: 34px;
+    counter-increment: ln;
+    white-space: pre;
+
+    &::before {
+        content: counter(ln);
+        position: absolute;
+        left: 0;
+        width: 22px;
+        text-align: right;
+        color: rgb(255 255 255 / 30%);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.Keyword {
+    color: #6ea8ff;
+}

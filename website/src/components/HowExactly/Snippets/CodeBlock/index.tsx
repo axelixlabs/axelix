@@ -15,14 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { Capabilities } from "./Capabilities";
-export { Enterprise } from "./Enterprise";
-export { HowExactly } from "./HowExactly";
-export { Install } from "./Install";
-export { Problem } from "./Problem";
-export { ReferenceApp } from "./ReferenceApp";
-export { Footer } from "./Footer";
-export { Header } from "./Header";
-export { Hero } from "./Hero";
-export { FAQ } from "./FAQ";
-export { Metric } from "./Metric";
+import { ReactNode } from "react";
+
+import styles from "../shared.module.css";
+
+interface IProps {
+    fileName: string;
+    tag: string;
+    children: ReactNode;
+}
+
+export const CodeBlock = ({ fileName, tag, children }: IProps) => {
+    return (
+        <div className={styles.CodeBlock}>
+            <div className={styles.Bar}>
+                <span className={styles.FileName}>{fileName}</span>
+                <span className={styles.Tag}>{tag}</span>
+            </div>
+            <div className={styles.Body}>{children}</div>
+        </div>
+    );
+};

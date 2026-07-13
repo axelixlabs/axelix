@@ -1,0 +1,54 @@
+.MainWrapper {
+    position: relative;
+    padding-block: 128px 136px;
+    color: #e7eee0;
+    background:
+        radial-gradient(ellipse 70% 60% at 12% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 95% 100%, color-mix(in srgb, var(--axelix-green-500) 18%, transparent), transparent 65%),
+        var(--axelix-green-900);
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-image: radial-gradient(color-mix(in srgb, var(--axelix-green-400) 22%, transparent) 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 85%);
+    }
+
+    @media (width <= 980px) {
+        padding-block: 96px 104px;
+    }
+}
+
+.ContentWrapper {
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    gap: 40px;
+    align-items: start;
+
+    @media (width <=980px) {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+.ClosingText {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+    font-size: clamp(18px, 1.8vw, 24px);
+    line-height: 1.45;
+    color: #e9ece4;
+    letter-spacing: -0.012em;
+}
+
+.ClosingTextBold {
+    color: #fff;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+}

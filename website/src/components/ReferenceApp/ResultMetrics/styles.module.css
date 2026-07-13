@@ -1,0 +1,9 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (width <=540px) {
+        grid-template-columns: 1fr;
+    }
+}

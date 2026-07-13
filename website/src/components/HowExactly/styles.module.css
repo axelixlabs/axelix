@@ -1,0 +1,47 @@
+.MainWrapper {
+    padding-block: 128px 136px;
+    background-color: var(--axelix-bg);
+    border-top: 1px solid var(--axelix-line);
+
+    @media (width <= 980px) {
+        padding-block: 96px 104px;
+    }
+}
+
+.Zigzag {
+    display: flex;
+    flex-direction: column;
+    gap: 65px;
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    align-items: stretch;
+
+    @media (width <=900px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+.Reversed {
+    & > *:first-child {
+        order: 2;
+    }
+
+    & > *:last-child {
+        order: 1;
+    }
+
+    @media (width <=900px) {
+        & > *:first-child {
+            order: 1;
+        }
+
+        & > *:last-child {
+            order: 2;
+        }
+    }
+}

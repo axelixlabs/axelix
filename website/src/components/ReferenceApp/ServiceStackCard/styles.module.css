@@ -1,0 +1,99 @@
+.MainWrapper {
+    border-radius: 16px;
+    background-color: color-mix(in srgb, #050f01 92%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
+    box-shadow: 0 30px 70px -34px rgb(0 0 0 / 85%);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: #bdd3a0;
+    text-transform: uppercase;
+}
+
+.Lhs {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--axelix-green-400);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--axelix-green-400) 25%, transparent);
+    animation: pulse 1.6s infinite;
+}
+
+.Tag {
+    padding: 3px 9px;
+    border-radius: 999px;
+    color: #bde08f;
+    background-color: color-mix(in srgb, var(--axelix-green-500) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 30%, transparent);
+    letter-spacing: 0.06em;
+}
+
+.Stack {
+    padding: 2px 0 6px;
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 7px 20px;
+
+    & + & {
+        border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 12%, transparent);
+    }
+}
+
+.Key {
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e8efdd;
+}
+
+.Value {
+    font-weight: 500;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: -0.005em;
+}
+
+.Footer {
+    padding: 11px 22px;
+    border-top: 1px solid color-mix(in srgb, var(--axelix-green-400) 18%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--axelix-mono);
+    font-size: 11.5px;
+    color: #9aa0a6;
+    letter-spacing: 0.06em;
+}
+
+.SourceLink {
+    color: #e7eee0;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    font-family: var(--axelix-font);
+    font-size: 13px;
+}

@@ -15,14 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { Capabilities } from "./Capabilities";
-export { Enterprise } from "./Enterprise";
-export { HowExactly } from "./HowExactly";
-export { Install } from "./Install";
-export { Problem } from "./Problem";
-export { ReferenceApp } from "./ReferenceApp";
-export { Footer } from "./Footer";
-export { Header } from "./Header";
-export { Hero } from "./Hero";
-export { FAQ } from "./FAQ";
-export { Metric } from "./Metric";
+import styles from "./styles.module.css";
+
+export const HowExactlyTopSection = () => {
+    return (
+        <div className={styles.MainWrapper}>
+            <span className={styles.Eyebrow}>How exactly?</span>
+            <h2 className={styles.Title}>
+                No magic — Axelix pinpoints the <span className={styles.AccentText}>real problems</span>, layer by
+                layer.
+            </h2>
+            <p className={styles.Lead}>
+                Every gain above starts with a concrete problem Axelix detected and surfaced — from the JVM up through
+                the framework and into the data layer.
+            </p>
+        </div>
+    );
+};
