@@ -96,6 +96,17 @@ jobs:
         uses: helm/kind-action@v1
         with:
           cluster_name: ${{ env.KIND_CLUSTER_NAME }}
+          config: master-e2e-tests/k8s/kind-config.yaml
+
+      - name: Install ingress-nginx
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+          kubectl wait \
+            --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=120s
 
       - name: Install ingress-nginx
         run: |
@@ -193,9 +204,30 @@ jobs:
         run: |
           echo "127.0.0.1 master" | sudo tee -a /etc/hosts
 
+          if [[ "$AUTH_OAUTH2" == "true" ]]; then
+            echo "127.0.0.1 keycloak" | sudo tee -a /etc/hosts
+          fi
+
+      - name: Deploy Keycloak if needed
+        if: env.AUTH_OAUTH2 == 'true'
+        run: |
+          kubectl create configmap keycloak-realm \
+            --from-file=realm.json=master-e2e-tests/k8s/realm-export.json \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl apply -f master-e2e-tests/k8s/keycloak.yaml
+          kubectl rollout status deployment/keycloak --timeout=60s
+          kubectl wait --for=condition=Ready pod -l app=keycloak --timeout=60s
+               
+          # Expose Keycloak on the runner so browser-based E2E tests can reach it
+          # using the same hostname configured by the Axelix-Master.
+          kubectl port-forward svc/keycloak 8080:8080 &
+          sleep 5
+
       - name: Prepare Master Helm set
         id: master_set
         run: |
+
           MASTER_SET="--set image.name=$MASTER_IMAGE_NAME \
                        --set image.ref=$MASTER_IMAGE_TAG \
                        --set image.pullPolicy=Never \
@@ -210,8 +242,15 @@ jobs:
                        --set axelix.master.discovery.auto.enabled=$DISCOVERY_AUTO \
                        --set axelix.master.discovery.selfRegistration.enabled=$DISCOVERY_SELF_REG \
                        --set axelix.master.auth.options.local.enabled=$AUTH_LOCAL \
-                       --set axelix.master.auth.options.oauth2.enabled=$AUTH_OAUTH2 \
-                       --set axelix.master.mcpServer.enabled=$MCP_ENABLED"
+                       --set axelix.master.auth.options.oauth2.enabled=$AUTH_OAUTH2"
+
+          if [[ "$AUTH_OAUTH2" == "true" ]]; then
+            MASTER_SET="$MASTER_SET \
+              --set axelix.master.auth.options.oauth2.issuerUri=http://keycloak:8080/realms/axelix-e2e-test \
+              --set axelix.master.auth.options.oauth2.baseUrl=http://master \
+              --set axelix.master.auth.options.oauth2.clientId=axelix-master \
+              --set axelix.master.auth.options.oauth2.clientSecret=BzHUj1aqicvMu0dJBatDOI2rYOe9yf2N"
+          fi
 
           echo "MASTER_SET=$MASTER_SET" >> $GITHUB_ENV
 
@@ -256,17 +295,11 @@ jobs:
             --namespace selfreg \
             --create-namespace \
 
-          kubectl port-forward svc/axelix-master 8080:8080 > /tmp/port-forward.log 2>&1 &
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:8080/actuator/health && break
-            sleep 1
-          done
-
       - name: Run Master E2E tests
         run: |
           ./gradlew :master-e2e-tests:e2eTest \
             -Paxelix.e2e.run=true \
-            -Paxelix.e2e.masterBaseUrl=http://master:8080 \
+            -Paxelix.e2e.masterBaseUrl=http://master \
             -Paxelix.e2e.mcpEnabled=$MCP_ENABLED \
             -Paxelix.e2e.discoveryModeAutoEnabled=$DISCOVERY_AUTO \
             -Paxelix.e2e.discoveryModeSelfRegEnabled=$DISCOVERY_SELF_REG \
@@ -281,6 +314,11 @@ jobs:
           
           echo "---- axelix-master logs ----"
           kubectl logs deploy/axelix-master --tail=300 || true
+          
+          if kubectl get deploy/keycloak &>/dev/null; then
+            echo "---- keycloak logs ----"
+            kubectl logs deploy/keycloak --tail=300 || true
+          fi
           
           if kubectl get deploy/notification-service-automatic-discovery &>/dev/null; then
             echo "---- notification-service-automatic-discovery logs ----"
@@ -299,7 +337,7 @@ jobs:
           
           echo "---- ingresses ----"
           kubectl get ingress -A
-          
+
           echo "---- ingress controller logs ----"
           kubectl logs -n ingress-nginx deploy/ingress-nginx-controller --tail=300 || true
 
