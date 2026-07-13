@@ -39,6 +39,11 @@ public class DefaultJarLauncherDetector implements JarLauncherDetector {
         this.libraryClass = libraryClass;
     }
 
+    /**
+     * Walks up the thread's context ClassLoader hierarchy and checks if any
+     * ClassLoader name matches the Spring Boot {@code JarLauncher} ClassLoader
+     * pattern.
+     */
     @Override
     public boolean isThreadContextClassLoaderHierarchyMatching() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -52,9 +57,16 @@ public class DefaultJarLauncherDetector implements JarLauncherDetector {
         return false;
     }
 
+    /**
+     * Checks if the ClassLoader that loaded the configured library class matches
+     * the Spring Boot {@code JarLauncher} ClassLoader pattern.
+     */
     @Override
     public boolean isLibraryClassLoaderMatching() {
         ClassLoader classLoader = libraryClass.getClassLoader();
+        if (classLoader == null) {
+            return false;
+        }
         String loaderName = classLoader.getClass().getName();
         return isClassLoaderNameMatches(loaderName);
     }

@@ -108,6 +108,18 @@ class DefaultJarManifestInspectorTest {
         assertThat(result).isFalse();
     }
 
+    @Test // GH-1219
+    void returnsFalse_whenFileDoesNotExist() throws Exception {
+        // given.
+        URL nonExistentUrl = new File(tempDir, "nonexistent.jar").toURI().toURL();
+
+        // when.
+        boolean result = inspector.hasNonEmptyClassPath(nonExistentUrl);
+
+        // then.
+        assertThat(result).isFalse();
+    }
+
     private File createJarWithClassPathAttribute(String classPathValue) throws IOException {
         File jarFile = new File(tempDir, "valid.jar");
         Manifest manifest = new Manifest();

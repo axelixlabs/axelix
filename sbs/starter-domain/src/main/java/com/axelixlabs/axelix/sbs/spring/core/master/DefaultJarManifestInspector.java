@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -40,20 +41,37 @@ public class DefaultJarManifestInspector implements JarManifestInspector {
         this.logger = logger;
     }
 
+    /**
+     * Checks whether the JAR at the given location has a non-empty {@code Class-Path}
+     * attribute in its MANIFEST.MF. Only {@code file} protocol is supported.
+     * Returns {@code false} for non-file URLs, non-JAR files, or if the manifest
+     * cannot be read.
+     */
     @Override
     public boolean hasNonEmptyClassPath(URL jarLocation) {
         String protocol = jarLocation.getProtocol();
-        String path = jarLocation.getPath();
-        if (!"file".equals(protocol) || !path.toLowerCase().endsWith(".jar")) {
+        if (!"file".equals(protocol)) {
             return false;
         }
 
-        String classPathValue = readManifestClassPath(path);
+        File file;
+        try {
+            file = new File(jarLocation.toURI());
+        } catch (URISyntaxException e) {
+            logger.warn("Invalid JAR location URI: {}", jarLocation, e);
+            return false;
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".jar")) {
+            return false;
+        }
+
+        String classPathValue = readManifestClassPath(file);
         return classPathValue != null && !classPathValue.isBlank();
     }
 
-    private @Nullable String readManifestClassPath(String path) {
-        try (JarFile jarFile = new JarFile(new File(path))) {
+    private @Nullable String readManifestClassPath(File file) {
+        try (JarFile jarFile = new JarFile(file)) {
             Manifest manifest = jarFile.getManifest();
             if (manifest == null) {
                 return null;
@@ -64,7 +82,7 @@ public class DefaultJarManifestInspector implements JarManifestInspector {
             }
             return attributes.getValue(Attributes.Name.CLASS_PATH);
         } catch (IOException e) {
-            logger.warn("Failed to read manifest from {}", path, e);
+            logger.warn("Failed to read manifest from {}", file.getPath(), e);
             return null;
         }
     }
