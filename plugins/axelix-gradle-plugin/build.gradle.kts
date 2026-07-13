@@ -28,10 +28,10 @@ gradlePlugin {
 dependencies {
     api(project(":common:utils"))
 
-    testImplementation(platform("org.junit:junit-bom:5.14.0"))
+    testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.assertj:assertj-core:3.27.6")
+    testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation(gradleTestKit())
 }
 

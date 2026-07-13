@@ -1,3 +1,4 @@
+import Dependencies.jspecifyVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -5,13 +6,13 @@ plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
     // What version of Kotlin are we going to use here...?
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.0"
 }
 
 val springBootVersion = "3.0.13"
 val springCloudVersion = "2022.0.4"
 
-val jsonUnitAssertJVersion = "2.38.0"
+val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     // Self
@@ -49,7 +50,7 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.1")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.2")
     testImplementation("com.tngtech.archunit:archunit:1.4.2")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 }
@@ -76,6 +77,7 @@ testing {
             dependencies {
                 implementation("org.jetbrains.lincheck:lincheck:3.6")
                 implementation("org.jetbrains.kotlin:kotlin-stdlib")
+                implementation("org.jspecify:jspecify:${jspecifyVersion}")
 
                 // This is the dependency for the compiled production. Additional Test Suites do not have them
                 // in any of their Gradle configurations.
