@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.maven.plugin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,7 @@ public class DependencyUtils {
     @Inject
     private ProjectDependenciesResolver resolver;
 
-    private List<Artifact> resolvedDependencies = null;
+    private final Map<MavenProject, List<Artifact>> resolvedDependencies = new HashMap<>();
 
     /**
      * Is project dependency present. Includes transitive
@@ -71,17 +73,26 @@ public class DependencyUtils {
      */
     public Optional<Artifact> getResolvedDependency(
             MavenProject mavenProject, RepositorySystemSession repoSession, String groupId, String artifactId) {
-        if (resolvedDependencies == null) {
-            resolveDependencies(mavenProject, repoSession);
-        }
+        List<Artifact> artifacts =
+                resolvedDependencies.computeIfAbsent(mavenProject, k -> resolveDependencies(k, repoSession));
 
-        return resolvedDependencies.stream()
+        return artifacts.stream()
                 .filter(it ->
                         it.getGroupId().equals(groupId) && it.getArtifactId().equals(artifactId))
                 .findAny();
     }
 
-    public void resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession) {
+    public void cleanupCache() {
+        resolvedDependencies.clear();
+    }
+
+    /**
+     * Resolve maven project dependencies
+     * @param mavenProject maven project
+     * @param repoSession maven repository session
+     * @return List of project dependencies
+     */
+    private List<Artifact> resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession) {
         DefaultDependencyResolutionRequest request = new DefaultDependencyResolutionRequest(mavenProject, repoSession);
 
         DependencyResolutionResult result;
@@ -93,7 +104,6 @@ public class DependencyUtils {
             throw new RuntimeException(e);
         }
 
-        resolvedDependencies =
-                result.getDependencies().stream().map(Dependency::getArtifact).collect(Collectors.toList());
+        return result.getDependencies().stream().map(Dependency::getArtifact).collect(Collectors.toList());
     }
 }
