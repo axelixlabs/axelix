@@ -1,3 +1,4 @@
+import Dependencies.jspecifyVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -76,6 +77,7 @@ testing {
             dependencies {
                 implementation("org.jetbrains.lincheck:lincheck:3.6")
                 implementation("org.jetbrains.kotlin:kotlin-stdlib")
+                implementation("org.jspecify:jspecify:${jspecifyVersion}")
 
                 // This is the dependency for the compiled production. Additional Test Suites do not have them
                 // in any of their Gradle configurations.
