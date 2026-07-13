@@ -19,6 +19,7 @@ package com.axelixlabs.gradle.plugin;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.jvm.tasks.Jar;
 
 import java.io.File;
 
@@ -48,5 +49,7 @@ final class SpringTestProfilerReportCopy {
                 spec.into(destinationDir);
             });
         });
+
+        project.getTasks().withType(Jar.class).all(jar -> jar.dependsOn(copyTask));
     }
 }

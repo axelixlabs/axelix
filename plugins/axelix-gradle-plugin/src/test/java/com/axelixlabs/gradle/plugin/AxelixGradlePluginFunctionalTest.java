@@ -190,7 +190,7 @@ class AxelixGradlePluginFunctionalTest {
 
         assertThat(result.task(":copyProfilerReport").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        Path path = projectDir.resolve("build/resources/main/profiler-reports");
+        Path path = projectDir.resolve("build/resources/main/profiler-reports/latest.html");
         assertThat(path).exists();
     }
 
