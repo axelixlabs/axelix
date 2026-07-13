@@ -50,6 +50,7 @@ final class SpringTestProfilerReportCopy {
             });
         });
 
-        project.getTasks().withType(Jar.class).all(jar -> jar.dependsOn(copyTask));
+        project.getTasks().withType(Jar.class).all(jar -> jar.mustRunAfter(copyTask));
+        project.getTasks().getByName("build").dependsOn(copyTask);
     }
 }
