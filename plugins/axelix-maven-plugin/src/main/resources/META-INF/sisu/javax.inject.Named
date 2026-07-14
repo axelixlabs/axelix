@@ -1,0 +1,2 @@
+com.axelixlabs.axelix.maven.plugin.ContributeDependenciesLifecycleExtension
+com.axelixlabs.axelix.maven.plugin.DependencyResolver
