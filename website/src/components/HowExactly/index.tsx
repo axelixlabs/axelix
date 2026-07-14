@@ -16,6 +16,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 "use client";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
+
 import { ApplicationYmlSnippet } from "./Snippets/ApplicationYmlSnippet";
 import { DockerfileSnippet } from "./Snippets/DockerfileSnippet";
 import { OrderServiceSnippet } from "./Snippets/OrderServiceSnippet";
@@ -23,7 +25,6 @@ import { OrderServiceSnippet } from "./Snippets/OrderServiceSnippet";
 import { HowExactlyTopSection } from "./HowExactlyTopSection";
 import { LayerCard } from "./LayerCard";
 import styles from "./styles.module.css";
-import { useScrollReveal } from "./useScrollReveal";
 
 const layers = [
     {

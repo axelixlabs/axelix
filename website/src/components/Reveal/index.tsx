@@ -15,30 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Capabilities, Enterprise, FAQ, Hero, HowExactly, Install, ReferenceApp, Reveal } from "@/components";
+"use client";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-export default function Page() {
-    return (
-        <>
-            <Reveal>
-                <Hero />
-            </Reveal>
-            <Reveal>
-                <ReferenceApp />
-            </Reveal>
-            <HowExactly />
-            <Reveal>
-                <Capabilities />
-            </Reveal>
-            <Reveal>
-                <Install />
-            </Reveal>
-            <Reveal>
-                <Enterprise />
-            </Reveal>
-            <Reveal>
-                <FAQ />
-            </Reveal>
-        </>
-    );
+import { ReactNode } from "react";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    children: ReactNode;
 }
+
+export const Reveal = ({ children }: IProps) => {
+    const [ref, visible] = useScrollReveal<HTMLDivElement>();
+
+    return (
+        <div ref={ref} className={`${styles.Reveal} ${visible ? styles.Visible : ""}`}>
+            {children}
+        </div>
+    );
+};
