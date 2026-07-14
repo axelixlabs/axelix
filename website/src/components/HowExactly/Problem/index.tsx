@@ -36,7 +36,7 @@ export const Problem = ({ title, description }: IProps) => {
     const [open, setOpen] = useState(false);
 
     return (
-        <li className={styles.Item}>
+        <li className={`${styles.Item} ${open ? styles.ItemOpen : ""}`}>
             <button
                 type="button"
                 className={styles.Header}
@@ -46,7 +46,11 @@ export const Problem = ({ title, description }: IProps) => {
                 <span className={styles.Title}>{title}</span>
                 <span className={`${styles.Chevron} ${open ? styles.Open : ""}`} aria-hidden="true" />
             </button>
-            {open && <div className={styles.Description}>{description}</div>}
+            <div className={styles.Description}>
+                <div className={styles.DescriptionInner}>
+                    <div className={styles.DescriptionContent}>{description}</div>
+                </div>
+            </div>
         </li>
     );
 };

@@ -61,6 +61,21 @@
 }
 
 .Description {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ItemOpen .Description {
+    grid-template-rows: 1fr;
+}
+
+.DescriptionInner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.DescriptionContent {
     padding: 0 2px 14px 19px;
     font-size: 13.5px;
     line-height: 1.5;
