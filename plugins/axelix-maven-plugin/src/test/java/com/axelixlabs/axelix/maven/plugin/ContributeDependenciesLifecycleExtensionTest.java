@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.maven.plugin;
+package com.axelixlabs.axelix.maven.plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Test for {@link ContributeDependenciesLifecycleExtension}
  *
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
 class ContributeDependenciesLifecycleExtensionTest {
 
@@ -40,39 +41,50 @@ class ContributeDependenciesLifecycleExtensionTest {
 
     @Test
     void should_add_profiler_dependency_if_not_present() throws VerificationException, IOException {
+        // given.
         String baseDir = CURRENT_DIR + "/src/integrationTest/without-deps";
-
         Verifier verifier = new Verifier(baseDir);
-        verifier.executeGoal("dependency:list");
 
+        // when.
+        verifier.executeGoal("dependency:list");
         verifier.verify(true);
 
-        assertThat(readLogFile(baseDir)).contains("digital.pragmatech.testing:spring-test-profiler:jar:0.1.2:test");
+        // then.
+        String logOutput = readLogFile(baseDir);
+        assertThat(logOutput).contains("digital.pragmatech.testing:spring-test-profiler:jar:0.1.2:test");
+        assertThat(logOutput).contains("org.thymeleaf:thymeleaf:jar:3.1.5.RELEASE:test");
     }
 
     @Test
     void should_not_add_profiler_dependency_if_present() throws VerificationException, IOException {
+        // given.
         String baseDir = CURRENT_DIR + "/src/integrationTest/contains-deps";
-
         Verifier verifier = new Verifier(baseDir);
-        verifier.executeGoal("dependency:list");
 
+        // when.
+        verifier.executeGoal("dependency:list");
         verifier.verify(true);
 
-        assertThat(readLogFile(baseDir)).contains("digital.pragmatech.testing:spring-test-profiler:jar:0.1.1:test");
+        // then.
+        String logOutput = readLogFile(baseDir);
+        assertThat(logOutput).contains("digital.pragmatech.testing:spring-test-profiler:jar:0.1.1:test");
+        assertThat(logOutput).doesNotContain("org.thymeleaf:thymeleaf:3.1.5.RELEASE:test");
     }
 
     @Test
-    void should_add_thymeleaf_present_if_lower_than_min() throws VerificationException, IOException {
+    void should_noop_when_thymeleaf_is_lower_than_min() throws VerificationException, IOException {
+        // given.
         String baseDir = CURRENT_DIR + "/src/integrationTest/lower-thymeleaf";
-
         Verifier verifier = new Verifier(baseDir);
-        verifier.executeGoal("dependency:list");
 
+        // when.
+        verifier.executeGoal("dependency:list");
         verifier.verify(true);
 
-        assertThat(readLogFile(baseDir)).contains("org.thymeleaf:thymeleaf:jar:3.1.5.RELEASE");
-        assertThat(readLogFile(baseDir)).doesNotContain("org.thymeleaf:thymeleaf:jar:3.0.15.RELEASE");
+        // then.
+        String logOutput = readLogFile(baseDir);
+        assertThat(logOutput).contains("org.thymeleaf:thymeleaf:jar:3.0.15.RELEASE");
+        assertThat(logOutput).doesNotContain("digital.pragmatech.testing:spring-test-profiler");
     }
 
     /**

@@ -15,12 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.maven.plugin;
+package com.axelixlabs.axelix.maven.plugin;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -42,57 +39,25 @@ import org.slf4j.LoggerFactory;
  * Utilities for working with dependencies
  *
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
-@Named("dependencyUtils")
+@Named
 @Singleton
-public class DependencyUtils {
-    private static final Logger log = LoggerFactory.getLogger(DependencyUtils.class);
+public class DependencyResolver {
+
+    private static final Logger log = LoggerFactory.getLogger(DependencyResolver.class);
 
     @Inject
     private ProjectDependenciesResolver resolver;
 
-    private final Map<MavenProject, List<Artifact>> resolvedDependencies = new HashMap<>();
-
     /**
-     * Is project dependency present. Includes transitive
+     * Resolve maven project dependencies.
      *
-     * @param groupId    dependency group id
-     * @param artifactId dependency artifactId
-     */
-    public boolean containsDependency(
-            MavenProject mavenProject, RepositorySystemSession repoSession, String groupId, String artifactId) {
-        return getResolvedDependency(mavenProject, repoSession, groupId, artifactId)
-                .isPresent();
-    }
-
-    /**
-     * Get project dependency. Includes transitive
-     *
-     * @param groupId    dependency group id
-     * @param artifactId dependency artifactId
-     */
-    public Optional<Artifact> getResolvedDependency(
-            MavenProject mavenProject, RepositorySystemSession repoSession, String groupId, String artifactId) {
-        List<Artifact> artifacts =
-                resolvedDependencies.computeIfAbsent(mavenProject, k -> resolveDependencies(k, repoSession));
-
-        return artifacts.stream()
-                .filter(it ->
-                        it.getGroupId().equals(groupId) && it.getArtifactId().equals(artifactId))
-                .findAny();
-    }
-
-    public void cleanupCache() {
-        resolvedDependencies.clear();
-    }
-
-    /**
-     * Resolve maven project dependencies
      * @param mavenProject maven project
      * @param repoSession maven repository session
      * @return List of project dependencies
      */
-    private List<Artifact> resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession) {
+    public List<Artifact> resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession) {
         DefaultDependencyResolutionRequest request = new DefaultDependencyResolutionRequest(mavenProject, repoSession);
 
         DependencyResolutionResult result;

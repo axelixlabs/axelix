@@ -1,2 +1,2 @@
-com.axelixlabs.maven.plugin.ContributeDependenciesLifecycleExtension
-com.axelixlabs.maven.plugin.DependencyUtils
+com.axelixlabs.axelix.maven.plugin.ContributeDependenciesLifecycleExtension
+com.axelixlabs.axelix.maven.plugin.DependencyResolver
