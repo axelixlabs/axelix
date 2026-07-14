@@ -26,6 +26,9 @@ export const DockerfileSnippet = () => {
                     <span className={styles.Line}>
                         <span className={styles.Keyword}>FROM</span> eclipse-temurin:25-jdk
                     </span>
+                    <span className={styles.Line}>
+                        <span className={styles.Keyword}>USER</span> app:app
+                    </span>
                     <br />
                     <span className={styles.Line}>
                         <span className={styles.Keyword}>WORKDIR</span> /app
@@ -36,11 +39,14 @@ export const DockerfileSnippet = () => {
                     </span>
                     <br />
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>ENV </span> JAVA_OPTS=&quot;-Xmx512m -X...&quot;
+                        <span className={styles.Keyword}>ENV </span>JAVA_OPTS=&quot;-Xmx512m -X...&quot;
+                    </span>
+                    <span className={styles.Line}>
+                        <span className={styles.Keyword}>ENV </span>TZ=America/Los_Angeles
                     </span>
                     <br />
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>ENTRYPOINT </span> [&quot;sh&quot;, &quot;-c&quot;,
+                        <span className={styles.Keyword}>ENTRYPOINT </span>[&quot;sh&quot;, &quot;-c&quot;,
                         <span>{' "java $JAVA_OPTS -jar app.jar"]'}</span>
                     </span>
                 </code>

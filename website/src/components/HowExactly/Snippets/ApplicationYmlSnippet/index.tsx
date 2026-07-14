@@ -33,12 +33,13 @@ export const ApplicationYmlSnippet = () => {
                         {"    show-sql: "}
                         <span className={styles.Keyword}>true</span>
                     </span>
+                    <br />
                     <span className={styles.Line}>management:</span>
                     <span className={styles.Line}>{"  endpoints:"}</span>
                     <span className={styles.Line}>{"    web:"}</span>
                     <span className={styles.Line}>{"      exposure:"}</span>
                     <span className={styles.Line}>
-                        {'        include: '}
+                        {"        include: "}
                         <span className={styles.Keyword}>{'"*"'}</span>
                     </span>
                 </code>
