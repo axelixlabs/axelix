@@ -217,6 +217,7 @@
             "Kotlin": "Kotlin",
             "JdkVendor": "JDK Vendor"
         },
+        "mostUsed": "Популярная",
         "healthStatus": "Состояние системы",
         "totalCount": "Общее кол-во",
         "statistics": "Статистика",

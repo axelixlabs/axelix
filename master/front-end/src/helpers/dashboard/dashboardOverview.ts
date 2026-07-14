@@ -15,10 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { PieLabelRenderProps } from "recharts";
-
 import type { EInstanceStatus, IDistribution, IHealthStatus } from "models";
-import { HEALTH_STATUSES_COLORS, RADIAN, pickColor } from "utils";
+import { HEALTH_STATUSES_COLORS } from "utils";
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
     const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];
@@ -41,9 +39,8 @@ export const prepareDistributionDataPerChart = (distributions: IDistribution[]) 
                 return ver1.localeCompare(ver2);
             })
             .map(([version, value]) => ({
-                name: version,
+                categoryName: version,
                 value: value,
-                versionColor: pickColor(softwareComponentName, version),
             }));
 
         return {
@@ -51,24 +48,4 @@ export const prepareDistributionDataPerChart = (distributions: IDistribution[]) 
             versions: parsedVersions,
         };
     });
-};
-
-/**
- * Function that renders an inner label (the actual value for the given category)
- */
-export const calculateInnerValueCoordinates = (props: PieLabelRenderProps, totalValuesCount: number) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, value } = props;
-
-    const hasOnlyOneCategory = totalValuesCount == value;
-
-    // Converting the radian-based coordinates to cartesian.
-    // If it has only one category then display in the center
-    const radius = hasOnlyOneCategory ? 0 : innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle! * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle! * RADIAN);
-
-    const percentage = Math.floor((value / totalValuesCount) * 100);
-    const displayedValue = `${value} (${percentage}%)`;
-
-    return [x, y, displayedValue];
 };

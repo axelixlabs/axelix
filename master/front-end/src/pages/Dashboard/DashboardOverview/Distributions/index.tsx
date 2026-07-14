@@ -15,16 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
-import {
-    calculateInnerValueCoordinates,
-    createWallboardFilterSearchParam,
-    prepareDistributionDataPerChart,
-} from "helpers";
+import { DashboardDonutChart } from "components";
+import { createWallboardFilterSearchParam, prepareDistributionDataPerChart } from "helpers";
 import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
 import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "utils";
 
@@ -42,19 +37,6 @@ export function Distributions({ distributions }: IProps) {
     const navigate = useNavigate();
 
     const components = prepareDistributionDataPerChart(distributions);
-
-    /**
-     * Function that renders an inner label (the actual value for the given category)
-     */
-    const renderInnerLabel = (props: PieLabelRenderProps, totalCategoriesCount: number): JSX.Element => {
-        const [x, y, value] = calculateInnerValueCoordinates(props, totalCategoriesCount);
-
-        return (
-            <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central">
-                {value}
-            </text>
-        );
-    };
 
     const clickHandler = (
         e: React.MouseEvent | undefined,
@@ -91,57 +73,44 @@ export function Distributions({ distributions }: IProps) {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.distributions")}</div>
                 <div className={styles.ChartsWrapper}>
                     {components.map(({ softwareComponentName, versions }) => {
                         const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
-                        const isClickable = Boolean(wallboardFilterComponent);
+                        const isPieClickable = Boolean(wallboardFilterComponent);
+
+                        let mostUsedCategoryName = "";
+
+                        if (versions.length > 0) {
+                            const mostUsedVersion = versions.reduce((currentMostUsedVersion, version) => {
+                                if (version.value > currentMostUsedVersion.value) {
+                                    return version;
+                                }
+
+                                return currentMostUsedVersion;
+                            });
+
+                            mostUsedCategoryName = mostUsedVersion.categoryName;
+                        }
 
                         return (
-                            <div className={styles.SingleChartWrapper} key={softwareComponentName}>
-                                <div className={styles.CardTitle}>
-                                    {t(`Dashboard.components.${softwareComponentName}`)}
-                                </div>
-
-                                <ResponsiveContainer height={330} width="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={versions}
-                                            nameKey="name"
-                                            dataKey="value"
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius={100}
-                                            label={(props: PieLabelRenderProps) => {
-                                                let sum = 0;
-
-                                                for (const version of versions) {
-                                                    sum += version.value;
-                                                }
-
-                                                return renderInnerLabel(props, sum);
-                                            }}
-                                            labelLine={false}
-                                            stroke={versions.length > 1 ? "#fff" : "none"}
-                                            onClick={(entry, _index, e) => {
-                                                if (entry.name !== undefined) {
-                                                    clickHandler(e, wallboardFilterComponent, entry.name);
-                                                }
-                                            }}
-                                        >
-                                            {versions.map(({ versionColor }) => (
-                                                <Cell
-                                                    key={versionColor}
-                                                    fill={versionColor}
-                                                    className={isClickable ? styles.ClickableCell : ""}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
+                            <DashboardDonutChart
+                                data={versions}
+                                heading={{
+                                    title: t(`Dashboard.components.${softwareComponentName}`),
+                                    subtitle: "Placeholder",
+                                }}
+                                centre={{
+                                    title: mostUsedCategoryName,
+                                    subtitle: t("Dashboard.mostUsed"),
+                                }}
+                                onPieClick={(version, event) => clickHandler(event, wallboardFilterComponent, version)}
+                                isPieClickable={isPieClickable}
+                                rest={{
+                                    show: false,
+                                }}
+                                calculateLegendPercentages
+                                key={softwareComponentName}
+                            />
                         );
                     })}
                 </div>

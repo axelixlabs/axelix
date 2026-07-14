@@ -217,6 +217,7 @@
             "Kotlin": "Kotlin",
             "JdkVendor": "JDK Vendor"
         },
+        "mostUsed": "Most used",
         "healthStatus": "Health Status",
         "totalCount": "Total Count",
         "statistics": "Statistics",
