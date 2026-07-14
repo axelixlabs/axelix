@@ -18,7 +18,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 22px;
-    align-items: stretch;
+    align-items: start;
     opacity: 0;
     transform: translateY(32px);
     transition:
