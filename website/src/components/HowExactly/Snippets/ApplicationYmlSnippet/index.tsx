@@ -29,8 +29,18 @@ export const ApplicationYmlSnippet = () => {
                         {"    open-in-view: "}
                         <span className={styles.Keyword}>true</span>
                     </span>
-                    <span className={styles.Line}>{"    hibernate:"}</span>
-                    <span className={styles.Line}>{"      ddl-auto: create"}</span>
+                    <span className={styles.Line}>
+                        {"    show-sql: "}
+                        <span className={styles.Keyword}>true</span>
+                    </span>
+                    <span className={styles.Line}>management:</span>
+                    <span className={styles.Line}>{"  endpoints:"}</span>
+                    <span className={styles.Line}>{"    web:"}</span>
+                    <span className={styles.Line}>{"      exposure:"}</span>
+                    <span className={styles.Line}>
+                        {'        include: '}
+                        <span className={styles.Keyword}>{'"*"'}</span>
+                    </span>
                 </code>
             </pre>
         </CodeBlock>

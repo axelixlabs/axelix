@@ -20,26 +20,29 @@ import styles from "../shared.module.css";
 
 export const DockerfileSnippet = () => {
     return (
-        <CodeBlock fileName="Dockerfile" tag="untuned">
+        <CodeBlock fileName="Dockerfile" tag="suboptimal">
             <pre className={styles.Snippet}>
                 <code>
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>FROM</span> eclipse-temurin:17-jdk
+                        <span className={styles.Keyword}>FROM</span> eclipse-temurin:25-jdk
                     </span>
+                    <br />
                     <span className={styles.Line}>
                         <span className={styles.Keyword}>WORKDIR</span> /app
                     </span>
+                    <br />
                     <span className={styles.Line}>
                         <span className={styles.Keyword}>COPY</span> target/orders.jar app.jar
                     </span>
-                    <span className={styles.Line}>...</span>
+                    <br />
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>ENV</span> JAVA_OPTS=&quot;-Xmx512m&quot;
+                        <span className={styles.Keyword}>ENV </span> JAVA_OPTS=&quot;-Xmx512m -X...&quot;
                     </span>
+                    <br />
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>ENTRYPOINT</span> [&quot;sh&quot;,&quot;-c&quot;,
+                        <span className={styles.Keyword}>ENTRYPOINT </span> [&quot;sh&quot;, &quot;-c&quot;,
+                        <span>{' "java $JAVA_OPTS -jar app.jar"]'}</span>
                     </span>
-                    <span className={styles.Line}>{'  "java $JAVA_OPTS -jar app.jar"]'}</span>
                 </code>
             </pre>
         </CodeBlock>

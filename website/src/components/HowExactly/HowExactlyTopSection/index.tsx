@@ -22,12 +22,13 @@ export const HowExactlyTopSection = () => {
         <div className={styles.MainWrapper}>
             <span className={styles.Eyebrow}>How exactly?</span>
             <h2 className={styles.Title}>
-                No magic — Axelix pinpoints the <span className={styles.AccentText}>real problems</span>, layer by
-                layer.
+                No magic. Axelix pinpoints the <span className={styles.AccentText}>real problems</span>, on various
+                layers.
             </h2>
             <p className={styles.Lead}>
-                Every gain above starts with a concrete problem Axelix detected and surfaced — from the JVM up through
-                the framework and into the data layer.
+                Every gain above starts with a concrete problem Axelix detected and surfaced: from the JVM up through
+                the framework and into the data layer. The examples below are simplified, yet they generally reflect the
+                real-world conditions based on our experience.
             </p>
         </div>
     );

@@ -17,11 +17,14 @@
  */
 import { ReactNode } from "react";
 
+import { Problem } from "../Problem";
+
 import styles from "./styles.module.css";
 
 export interface IBullet {
     id: string;
     content: ReactNode;
+    description: ReactNode;
 }
 
 interface IProps {
@@ -41,10 +44,8 @@ export const LayerCard = ({ index, level, title, subtitle, items }: IProps) => {
             <h3 className={styles.Title}>{title}</h3>
             <p className={styles.Subtitle}>{subtitle}</p>
             <ul className={styles.List}>
-                {items.map(({ id, content }) => (
-                    <li key={id} className={styles.Item}>
-                        {content}
-                    </li>
+                {items.map(({ id, content, description }) => (
+                    <Problem key={id} title={content} description={description} />
                 ))}
             </ul>
         </article>

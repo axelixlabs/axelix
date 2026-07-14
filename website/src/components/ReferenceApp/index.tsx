@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ReferenceAppTopSection } from "./ReferenceAppTopSection";
+import ReferenceAppTopSection from "./ReferenceAppTopSection";
 import { ResultMetrics } from "./ResultMetrics";
 import { ServiceStackCard } from "./ServiceStackCard";
 import styles from "./styles.module.css";
@@ -32,9 +32,12 @@ export const ReferenceApp = () => {
                 </div>
 
                 <p className={styles.ClosingText}>
-                    No rewrite, no new framework.{" "}
-                    <b className={styles.ClosingTextBold}>Apply the suggestions Axelix provides</b> to a stock Java 17 ·
-                    Spring Boot · Hibernate · PostgreSQL service — and the numbers move on their own.
+                    No massive rewrite, no new framework.{" "}
+                    <b className={styles.ClosingTextBold}>
+                        Just apply the suggestions Axelix provides (either manually, or with AI Agents with the help of
+                        an embedded MCP server)
+                    </b>{" "}
+                    to a regular Java Spring Boot application and watch the results.
                 </p>
             </div>
         </section>

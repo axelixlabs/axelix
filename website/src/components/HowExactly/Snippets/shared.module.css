@@ -80,3 +80,8 @@
 .Keyword {
     color: #6ea8ff;
 }
+
+.Comment {
+    color: #7a9c6b;
+    font-style: italic;
+}

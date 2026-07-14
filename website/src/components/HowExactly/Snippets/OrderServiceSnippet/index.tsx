@@ -20,23 +20,40 @@ import styles from "../shared.module.css";
 
 export const OrderServiceSnippet = () => {
     return (
-        <CodeBlock fileName="OrderService.java" tag="transaction issue">
+        <CodeBlock fileName="OrderService.java" tag="quiet time-ticking bomb">
             <pre className={styles.Snippet}>
                 <code>
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>@Transactional</span>
+                        <span className={styles.Keyword}>@Transactional</span>(readOnly ={" "}
+                        <span className={styles.Keyword}>true</span>)
                     </span>
                     <span className={styles.Line}>
-                        <span className={styles.Keyword}>public</span> List&lt;OrderDto&gt; recent() {"{"}
+                        <span className={styles.Keyword}>public </span> Page&lt;OrderSummary&gt; recentOrders(Filter
+                        filter, Pageable page) {"{"}
                     </span>
+                    <br />
                     <span className={styles.Line}>
                         {"  "}
-                        <span className={styles.Keyword}>return</span> repo.findAll()
+                        <span className={styles.Keyword}>return</span>{" "}
+                        orderRepository.findAll(OrderSpecs.matching(filter), page)
                     </span>
-                    <span className={styles.Line}>{"    .stream()"}</span>
-                    <span className={styles.Line}>{"    .map(o -> o.getItems()"}</span>
-                    <span className={styles.Line}>{"               .size())"}</span>
-                    <span className={styles.Line}>{"    .toList();"}</span>
+                    <span className={styles.Line}>{"    .map(order -> {"}</span>
+                    <span className={styles.Line}>
+                        {"      "}
+                        <span className={styles.Keyword}>var</span> items = order.getLineItems();
+                        {"   "}
+                    </span>
+                    <span className={styles.Line}>
+                        {"      "}
+                        <span className={styles.Keyword}>var</span> fx = pricingClient.get()
+                    </span>
+                    <span className={styles.Line}>{'          .uri("/fx/{ccy}", order.currency())'}</span>
+                    <span className={styles.Line}>{"          .retrieve().body(FxRate.class);"}</span>
+                    <span className={styles.Line}>
+                        {"      "}
+                        <span className={styles.Keyword}>return</span> orderMapper.toSummary(order, items, fx);
+                    </span>
+                    <span className={styles.Line}>{"    });"}</span>
                     <span className={styles.Line}>{"}"}</span>
                 </code>
             </pre>

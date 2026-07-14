@@ -17,15 +17,15 @@
  */
 import styles from "./styles.module.css";
 
-export const ReferenceAppTopSection = () => {
+const ReferenceAppTopSection = () => {
     return (
         <div className={styles.MainWrapper}>
-            <span className={styles.Eyebrow}>A regular Java service</span>
+            <span className={styles.Eyebrow}>what does Axelix offer</span>
             <h2 className={styles.Title}>
-                The most <span className={styles.AccentText}>ordinary</span> app you can find.
-                <br />
-                <span className="UnderlinedText">Apply Axelix, and watch it change.</span>
+                Axelix provides vital <span className={styles.AccentText}>insights</span> for Java apps.{" "}
+                <span className="UnderlinedText">Apply them, and watch your service change</span>
             </h2>
         </div>
     );
 };
+export default ReferenceAppTopSection;
