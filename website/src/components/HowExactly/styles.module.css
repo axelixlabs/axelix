@@ -19,10 +19,28 @@
     grid-template-columns: 1fr 1fr;
     gap: 22px;
     align-items: stretch;
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+        opacity 0.7s ease,
+        transform 0.7s ease;
 
     @media (width <=900px) {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+}
+
+.RowVisible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Row {
+        opacity: 1;
+        transform: none;
+        transition: none;
     }
 }
 

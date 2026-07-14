@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+"use client";
 import { ApplicationYmlSnippet } from "./Snippets/ApplicationYmlSnippet";
 import { DockerfileSnippet } from "./Snippets/DockerfileSnippet";
 import { OrderServiceSnippet } from "./Snippets/OrderServiceSnippet";
@@ -22,6 +23,7 @@ import { OrderServiceSnippet } from "./Snippets/OrderServiceSnippet";
 import { HowExactlyTopSection } from "./HowExactlyTopSection";
 import { LayerCard } from "./LayerCard";
 import styles from "./styles.module.css";
+import { useScrollReveal } from "./useScrollReveal";
 
 const layers = [
     {
@@ -156,6 +158,21 @@ const layers = [
     },
 ];
 
+const ZigzagRow = ({ layer, reversed }: { layer: (typeof layers)[number]; reversed: boolean }) => {
+    const [ref, visible] = useScrollReveal<HTMLDivElement>();
+    const { index, level, title, subtitle, items, snippet } = layer;
+
+    return (
+        <div
+            ref={ref}
+            className={`${styles.Row} ${reversed ? styles.Reversed : ""} ${visible ? styles.RowVisible : ""}`}
+        >
+            <LayerCard index={index} level={level} title={title} subtitle={subtitle} items={items} />
+            {snippet}
+        </div>
+    );
+};
+
 export const HowExactly = () => {
     return (
         <section className={styles.MainWrapper} id="how">
@@ -163,11 +180,8 @@ export const HowExactly = () => {
                 <HowExactlyTopSection />
 
                 <div className={styles.Zigzag}>
-                    {layers.map(({ index, level, title, subtitle, items, snippet }, layerIndex) => (
-                        <div key={index} className={`${styles.Row} ${layerIndex % 2 === 1 ? styles.Reversed : ""}`}>
-                            <LayerCard index={index} level={level} title={title} subtitle={subtitle} items={items} />
-                            {snippet}
-                        </div>
+                    {layers.map((layer, layerIndex) => (
+                        <ZigzagRow key={layer.index} layer={layer} reversed={layerIndex % 2 === 1} />
                     ))}
                 </div>
             </div>
