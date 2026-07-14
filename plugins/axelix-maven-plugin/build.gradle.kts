@@ -8,7 +8,7 @@ repositories {
 }
 
 tasks.compileJava {
-    options.release = 8
+    options.release = 11
 }
 
 dependencies {
@@ -33,6 +33,7 @@ tasks.publishToMavenLocal {
     dependsOn(tasks.named("generateMavenPluginDescriptor"))
 }
 
+// Publication to local .m2 repository needed for the maven verifier to run e2e tests
 tasks.test {
     dependsOn(tasks.named("publishToMavenLocal"))
     useJUnitPlatform()
