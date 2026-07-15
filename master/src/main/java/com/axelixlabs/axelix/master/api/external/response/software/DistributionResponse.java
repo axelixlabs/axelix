@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.response.software;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,12 +27,14 @@ import org.jspecify.annotations.NonNull;
  * Response that contains the summary of used versions for the
  * <strong>single software component</strong> used in the ecosystem.
  *
+ * <p>Version values are expressed as percentages of instances that use this
+ * software component (0–100), not as absolute counts.
+ *
  * @author Mikhail Polivakha
  */
 public class DistributionResponse {
 
     private final String softwareComponentName;
-
     private final Map<String, Long> versions;
 
     /**
@@ -53,7 +56,16 @@ public class DistributionResponse {
         return softwareComponentName;
     }
 
+    /**
+     * @return version → percentage of instances (within this software component) that use that version. Invoked by Jackson during serialization
+     */
     public Map<String, Long> getVersions() {
-        return versions;
+        long total = versions.values().stream().mapToLong(Long::longValue).sum();
+        if (total == 0) {
+            return Map.of();
+        }
+
+        return versions.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Math.round((entry.getValue() * 100.0) / total)));
     }
 }

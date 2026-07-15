@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus } from "models";
+import type { EInstanceStatus, IChartData } from "models";
 
 export interface IDistribution {
     /**
@@ -26,7 +26,8 @@ export interface IDistribution {
     /**
      * Key–value map of versions.
      *
-     * Key - the version, value - the amount of software components of that version deployed.
+     * Key - the version, value - percentage (0–100) of instances using that version
+     * within this software component.
      */
     versions: Record<string, number>;
 }
@@ -65,6 +66,11 @@ export interface IMemoryUsage {
      * Total resident set size (RSS) memory usage
      */
     totalHeapSize: IMemoryMetric;
+}
+
+export interface IExtendedChartData {
+    softwareComponentName: string;
+    versions: IChartData[];
 }
 
 interface IMemoryMetric {

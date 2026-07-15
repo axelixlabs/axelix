@@ -17,6 +17,7 @@
  */
 export { DashboardPagesFirstSection } from "./Dashboard/DashboardPagesFirstSection";
 export { NoRequiredAuthorityTooltip } from "./NoRequiredAuthorityTooltip";
+export { DashboardDonutChart } from "./Dashboard/DashboardDonutChart";
 export { DashboardGauge } from "./Dashboard/DashboardGauge";
 export { DashboardCard } from "./Dashboard/DashboardCard";
 export { LanguageSwitcher } from "./LanguageSwitcher";

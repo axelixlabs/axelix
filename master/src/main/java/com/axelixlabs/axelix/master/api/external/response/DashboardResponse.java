@@ -23,10 +23,10 @@ import java.util.Map;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 
 /**
- * @param distributions the list of software distributions in use along with counters.
- *                      This would, among other things, include the Java version usage
- *                      by each version, the JDK vendor usage by vendor name, Spring Boot
- *                      usage by version etc.
+ * @param distributions the list of software distributions in use, with version adoption
+ *                      expressed as percentages (0–100). This would, among other things,
+ *                      include the Java version usage by each version, Spring Boot usage
+ *                      by version etc.
  * @author Mikhail Polivakha
  */
 public record DashboardResponse(

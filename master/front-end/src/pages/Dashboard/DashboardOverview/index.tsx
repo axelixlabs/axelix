@@ -16,18 +16,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData, getTotalStatusesCount } from "helpers";
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { fetchData } from "helpers";
 import { type IDashboardResponseBody, StatefulRequest } from "models";
 import { getDashboardOverviewData } from "services";
 
-import { Distributions } from "./Distributions";
-import { HealthStatuses } from "./HealthStatuses";
-import { MemoryCards } from "./MemoryCards";
-import styles from "./styles.module.css";
+import Distributions from "./Distributions";
 
 const DashboardOverview = () => {
+    const { t } = useTranslation();
     const [dashboardData, setDashboardData] = useState(StatefulRequest.loading<IDashboardResponseBody>());
 
     useEffect(() => {
@@ -43,18 +42,14 @@ const DashboardOverview = () => {
     }
 
     const distributions = dashboardData.response!.distributions;
-    const statuses = dashboardData.response!.healthStatus.statuses;
-    const memoryUsage = dashboardData.response!.memoryUsage;
-
-    const statusesTotalCount = getTotalStatusesCount(statuses);
 
     return (
         <>
+            <DashboardPagesFirstSection
+                title={t("Dashboard.distributions")}
+                subtitle={t("Dashboard.distributionsSubtitle")}
+            />
             <Distributions distributions={distributions} />
-            <div className={styles.DashboardSecondSectionWrapper}>
-                <HealthStatuses statuses={statuses} statusesTotalCount={statusesTotalCount} />
-                <MemoryCards memoryUsage={memoryUsage} statusesTotalCount={statusesTotalCount} />
-            </div>
         </>
     );
 };

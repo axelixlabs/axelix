@@ -17,10 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
+import { DashboardDonutChart } from "components";
 import type { IChartData } from "models";
 import { AOT_CACHE_FEATURE_ID, APP_CDS_FEATURE_ID } from "utils";
-
-import { DashboardDonutChart } from "../DashboardDonutChart";
 
 interface IProps {
     projectLeydenData: IChartData[];

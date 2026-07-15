@@ -102,24 +102,24 @@ class DefaultDashboardServiceTest {
 
         DistributionResponse java = findDistribution(distributions, SoftwareDistributions.JAVA);
         assertThat(java.getVersions()).hasSize(2);
-        assertThat(java.getVersions()).extractingByKey("21").isEqualTo(2L);
-        assertThat(java.getVersions()).extractingByKey("25").isEqualTo(1L);
+        assertThat(java.getVersions()).extractingByKey("21").isEqualTo(67L);
+        assertThat(java.getVersions()).extractingByKey("25").isEqualTo(33L);
 
         DistributionResponse springBoot = findDistribution(distributions, SoftwareDistributions.SPRING_BOOT);
         assertThat(springBoot.getVersions()).hasSize(3);
-        assertThat(springBoot.getVersions()).extractingByKey("3.4").isEqualTo(1L);
-        assertThat(springBoot.getVersions()).extractingByKey("3.5").isEqualTo(1L);
-        assertThat(springBoot.getVersions()).extractingByKey("4.0").isEqualTo(1L);
+        assertThat(springBoot.getVersions()).extractingByKey("3.4").isEqualTo(33L);
+        assertThat(springBoot.getVersions()).extractingByKey("3.5").isEqualTo(33L);
+        assertThat(springBoot.getVersions()).extractingByKey("4.0").isEqualTo(33L);
 
         DistributionResponse springFramework = findDistribution(distributions, SoftwareDistributions.SPRING_FRAMEWORK);
         assertThat(springFramework.getVersions()).hasSize(3);
-        assertThat(springFramework.getVersions()).extractingByKey("6.1").isEqualTo(1L);
-        assertThat(springFramework.getVersions()).extractingByKey("6.2").isEqualTo(1L);
-        assertThat(springFramework.getVersions()).extractingByKey("7.0").isEqualTo(1L);
+        assertThat(springFramework.getVersions()).extractingByKey("6.1").isEqualTo(33L);
+        assertThat(springFramework.getVersions()).extractingByKey("6.2").isEqualTo(33L);
+        assertThat(springFramework.getVersions()).extractingByKey("7.0").isEqualTo(33L);
 
         DistributionResponse kotlin = findDistribution(distributions, SoftwareDistributions.KOTLIN);
         assertThat(kotlin.getVersions()).hasSize(1);
-        assertThat(kotlin.getVersions()).extractingByKey("2.0").isEqualTo(1L);
+        assertThat(kotlin.getVersions()).extractingByKey("2.0").isEqualTo(100L);
     }
 
     private DistributionResponse findDistribution(List<DistributionResponse> distributions, String name) {

@@ -2,32 +2,8 @@
     margin-bottom: 40px;
 }
 
-.Title {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
 .ChartsWrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    justify-content: center;
-    gap: 8px;
-}
-
-.SingleChartWrapper {
-    display: grid;
-    place-items: center;
-    padding: 8px;
-    border: 1px solid var(--axelix-medium-grey);
-    border-radius: var(--axelix-border-radius-large);
-    box-shadow: var(--axelix-box-shadow-bold);
-}
-
-.CardTitle {
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.ClickableCell {
-    cursor: pointer;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
 }

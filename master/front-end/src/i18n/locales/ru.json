@@ -210,13 +210,16 @@
     },
     "Dashboard": {
         "distributions": "Карта Системы",
+        "distributionsSubtitle": "Состояние актуальных версий в рамках экосистемы",
         "components" : {
+            "subtitle": "Версия Компонента",
             "SpringBoot" : "Spring Boot",
             "SpringFramework" : "Spring Framework",
             "Java" : "Java",
             "Kotlin": "Kotlin",
             "JdkVendor": "JDK Vendor"
         },
+        "mostUsed": "Основная",
         "healthStatus": "Состояние системы",
         "totalCount": "Общее кол-во",
         "statistics": "Статистика",

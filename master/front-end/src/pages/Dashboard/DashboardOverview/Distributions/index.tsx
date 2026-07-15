@@ -15,16 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
+import { type NavigateFunction, useNavigate } from "react-router";
 
-import {
-    calculateInnerValueCoordinates,
-    createWallboardFilterSearchParam,
-    prepareDistributionDataPerChart,
-} from "helpers";
+import { DashboardDonutChart } from "components";
+import { createWallboardFilterSearchParam, findMostUsed, prepareDistributionDataPerChart } from "helpers";
 import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
 import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "utils";
 
@@ -37,115 +32,79 @@ interface IProps {
     distributions: IDistribution[];
 }
 
-export function Distributions({ distributions }: IProps) {
+const clickHandler = (
+    e: React.MouseEvent | undefined,
+    wallboardFilterComponent: EWallboardFilterKey,
+    version: string,
+    navigate: NavigateFunction,
+): void => {
+    const wallboardFilterSearchParam = createWallboardFilterSearchParam(
+        wallboardFilterComponent,
+        EWallboardFilterOperator.EQUAL,
+        version,
+    );
+
+    const filterParams = new URLSearchParams();
+    filterParams.set(SEARCH_PARAMS_FILTER, wallboardFilterSearchParam);
+
+    const targetPath = `/wallboard?${filterParams}`;
+
+    // Unfortunately, we have to handle the browser hotkeys manually below.
+    // See the reasoning the comment.
+    // https://github.com/axelixlabs/axelix/pull/721/changes#r2823263592
+    const isModifiedEvent = e && (e.ctrlKey || e.metaKey || e.shiftKey);
+
+    if (isModifiedEvent) {
+        window.open(targetPath, "_blank");
+    } else {
+        navigate(targetPath);
+    }
+};
+
+function Distributions({ distributions }: IProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
     const components = prepareDistributionDataPerChart(distributions);
 
-    /**
-     * Function that renders an inner label (the actual value for the given category)
-     */
-    const renderInnerLabel = (props: PieLabelRenderProps, totalCategoriesCount: number): JSX.Element => {
-        const [x, y, value] = calculateInnerValueCoordinates(props, totalCategoriesCount);
-
-        return (
-            <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central">
-                {value}
-            </text>
-        );
-    };
-
-    const clickHandler = (
-        e: React.MouseEvent | undefined,
-        wallboardFilterComponent: EWallboardFilterKey | undefined,
-        version: string | undefined,
-    ): void => {
-        if (!wallboardFilterComponent || version === undefined) {
-            return;
-        }
-
-        const wallboardFilterSearchParam = createWallboardFilterSearchParam(
-            wallboardFilterComponent,
-            EWallboardFilterOperator.EQUAL,
-            version,
-        );
-
-        const filterParams = new URLSearchParams();
-        filterParams.set(SEARCH_PARAMS_FILTER, wallboardFilterSearchParam);
-
-        const targetPath = `/wallboard?${filterParams}`;
-
-        // Unfortunately, we have to handle the browser hotkeys manually below.
-        // See the reasoning the comment.
-        // https://github.com/axelixlabs/axelix/pull/721/changes#r2823263592
-        const isModifiedEvent = e && (e.ctrlKey || e.metaKey || e.shiftKey);
-
-        if (isModifiedEvent) {
-            window.open(targetPath, "_blank");
-        } else {
-            navigate(targetPath);
-        }
-    };
-
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.distributions")}</div>
                 <div className={styles.ChartsWrapper}>
-                    {components.map(({ softwareComponentName, versions }) => {
-                        const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
-                        const isClickable = Boolean(wallboardFilterComponent);
+                    {components
+                        .filter(({ versions }) => versions.length)
+                        .map(({ softwareComponentName, versions }) => {
+                            const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
 
-                        return (
-                            <div className={styles.SingleChartWrapper} key={softwareComponentName}>
-                                <div className={styles.CardTitle}>
-                                    {t(`Dashboard.components.${softwareComponentName}`)}
-                                </div>
+                            const mostUsedCategoryName = findMostUsed(versions);
 
-                                <ResponsiveContainer height={330} width="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={versions}
-                                            nameKey="name"
-                                            dataKey="value"
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius={100}
-                                            label={(props: PieLabelRenderProps) => {
-                                                let sum = 0;
-
-                                                for (const version of versions) {
-                                                    sum += version.value;
-                                                }
-
-                                                return renderInnerLabel(props, sum);
-                                            }}
-                                            labelLine={false}
-                                            stroke={versions.length > 1 ? "#fff" : "none"}
-                                            onClick={(entry, _index, e) => {
-                                                if (entry.name !== undefined) {
-                                                    clickHandler(e, wallboardFilterComponent, entry.name);
-                                                }
-                                            }}
-                                        >
-                                            {versions.map(({ versionColor }) => (
-                                                <Cell
-                                                    key={versionColor}
-                                                    fill={versionColor}
-                                                    className={isClickable ? styles.ClickableCell : ""}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                        );
-                    })}
+                            return (
+                                <DashboardDonutChart
+                                    data={versions}
+                                    heading={{
+                                        title: t(`Dashboard.components.${softwareComponentName}`),
+                                        subtitle: t(`Dashboard.components.subtitle`),
+                                    }}
+                                    centre={{
+                                        title: mostUsedCategoryName,
+                                        subtitle: t("Dashboard.mostUsed"),
+                                    }}
+                                    onPieClick={(version, event) => {
+                                        if (wallboardFilterComponent && version) {
+                                            clickHandler(event, wallboardFilterComponent, version, navigate);
+                                        }
+                                    }}
+                                    rest={{
+                                        show: false,
+                                    }}
+                                    key={softwareComponentName}
+                                />
+                            );
+                        })}
                 </div>
             </div>
         </>
     );
 }
+
+export default Distributions;

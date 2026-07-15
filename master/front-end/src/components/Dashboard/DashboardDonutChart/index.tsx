@@ -20,10 +20,9 @@ import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { DashboardCard } from "components";
 import type { IChartData } from "models";
 
-import { DashboardChartTooltip } from "../DashboardChartTooltip";
-import { DashboardDonutCentre } from "../DashboardDonutCentre";
-import { DashboardLegendItem } from "../DashboardLegendItem";
-
+import { DashboardChartTooltip } from "./DashboardChartTooltip";
+import { DashboardDonutCentre } from "./DashboardDonutCentre";
+import { DashboardLegendItem } from "./DashboardLegendItem";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -46,6 +45,12 @@ interface IProps {
      * Rest category configuration.
      */
     rest: IRestCategory;
+
+    /**
+     * Called when a pie segment is clicked. If this function is not supplied, the
+     * pie is deemed to be non-clickable.
+     */
+    onPieClick?: (categoryName: string, event: React.MouseEvent) => void;
 }
 
 export interface ITitle {
@@ -68,7 +73,7 @@ export interface IRestCategory {
 // TODO: Fix colors in future
 const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 
-export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => {
+export const DashboardDonutChart = ({ data, heading, rest, centre, onPieClick }: IProps) => {
     const chartData = data.map(({ categoryName, value }, index) => ({
         name: categoryName,
         value,
@@ -99,6 +104,12 @@ export const DashboardDonutChart = ({ data, heading, rest, centre }: IProps) => 
                                 paddingAngle={3}
                                 dataKey="value"
                                 stroke="none"
+                                cursor={onPieClick ? "pointer" : "default"}
+                                onClick={({ name }, _index, event) => {
+                                    if (name && onPieClick) {
+                                        onPieClick(name, event);
+                                    }
+                                }}
                             />
                             <Tooltip content={<DashboardChartTooltip />} wrapperStyle={{ zIndex: 10 }} />
                         </PieChart>
