@@ -45,9 +45,17 @@ internal class JavaFileParser {
     private fun extractPackageName(lines: List<String>): String {
         for (line in lines) {
             val trimmed = line.trim()
-            if (trimmed.startsWith("package ") && trimmed.endsWith(";")) {
-                return trimmed.substring(8, trimmed.length - 1).trim()
+            if (isCommentRow(trimmed)) {
+                continue
             }
+
+            if (trimmed.startsWith("package ") && trimmed.contains(";")) {
+                val packageLine = trimmed.substringBefore(";")
+                if (packageLine.length > 8) {
+                    return packageLine.substring(8).trim()
+                }
+            }
+
             // If class declaration reached without @AutoConfiguration - this class isn't an auto-config candidate
             if (trimmed.matches(ANY_CLASS_HEADER_REGEX)) {
                 break
@@ -56,10 +64,15 @@ internal class JavaFileParser {
         return ""
     }
 
+    private fun isCommentRow(trimmed: String): Boolean = trimmed.isEmpty() ||
+            trimmed.startsWith("//") ||
+            trimmed.startsWith("/*") ||
+            trimmed.startsWith("*")
+
     private fun containsAutoConfigurationAnnotation(lines: List<String>): Boolean {
         for (line in lines) {
             val trimmed = line.trim()
-            if (trimmed.isEmpty() || trimmed.startsWith("//") || trimmed.startsWith("/*")) {
+            if (isCommentRow(trimmed)) {
                 continue
             }
             if (trimmed.contains(TARGET_ANNOTATION)) {
