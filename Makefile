@@ -1,5 +1,5 @@
 .PHONY: clean clean-playgrounds clean-all build build-playground build-all spotless spotless-all \
-        publish-local publish-starter-sb-2 publish-starter-sb-3 \
+        publish-local build-plugins publish-starter-sb-2 publish-starter-sb-3 \
         build-spring-petclinic-maven-sb-2 build-notification-service-gradle-sb-2 \
         build-feature-service-maven-sb-3 build-spring-petclinic-gradle-sb-3
 
@@ -33,6 +33,9 @@ publish-local:
 build:
 	@echo "=== Running Backend Build ==="
 	./gradlew build
+
+build-plugins:
+	./gradlew :plugins:axelix-gradle-plugin:build :plugins:axelix-maven-plugin:build
 
 build-all: build
 	$(MAKE) build-playground BUILD_SB2="true" BUILD_SB3="true"
