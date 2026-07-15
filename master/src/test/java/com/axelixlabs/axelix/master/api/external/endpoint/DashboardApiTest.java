@@ -63,28 +63,28 @@ public class DashboardApiTest {
             {
               "softwareComponentName": "SpringBoot",
               "versions": {
-                "3.5": 2,
-                "2.7": 1
+                "3.5": 67,
+                "2.7": 33
               }
             },
             {
               "softwareComponentName": "SpringFramework",
               "versions": {
-                "6.0": 2,
-                "5.3": 1
+                "6.0": 67,
+                "5.3": 33
               }
             },
             {
               "softwareComponentName": "Java",
               "versions": {
-                "25": 2,
-                "17": 1
+                "25": 67,
+                "17": 33
               }
             },
             {
               "softwareComponentName": "Kotlin",
               "versions": {
-                "1.9": 1
+                "1.9": 100
               }
             }
           ],
