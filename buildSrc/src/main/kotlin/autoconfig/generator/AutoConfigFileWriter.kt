@@ -15,53 +15,50 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.plugin.autoconfig.generator;
+package autoconfig.generator
 
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
+import org.gradle.api.logging.Logging
+import java.io.File
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 
 /**
  * Writes the auto-configuration import file for Spring Boot.
- * <p>
+ *
  * Generates a file containing fully qualified names of classes annotated with
- * {@code @AutoConfiguration}.
+ * `@AutoConfiguration`.
  * If the list of classes is empty, the output file is deleted to prevent stale entries.
  *
  * @author Vyacheslav Yanin
  * @see GenerateImportsByAnnotationTask
  */
-final class AutoConfigFileWriter {
+internal class AutoConfigFileWriter {
 
-    private static final Logger log = Logging.getLogger(AutoConfigFileWriter.class);
-
-    private static final String HEADER =
-        "# Generated programmatically by scanning @AutoConfiguration annotation\n";
-
-    public void write(File outputFile, List<String> classes) throws IOException {
-        ensureParentDirectoryExists(outputFile);
+    @Throws(IOException::class)
+    fun write(outputFile: File, classes: List<String>) {
+        ensureParentDirectoryExists(outputFile)
 
         if (classes.isEmpty()) {
-            Files.deleteIfExists(outputFile.toPath());
-            return;
+            Files.deleteIfExists(outputFile.toPath())
+            return
         }
 
-        String content = HEADER + String.join("\n", classes) + "\n";
-        Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
-
-        log.lifecycle("Axelix Plugin: Found and registered {} @AutoConfiguration classes.",
-            classes.size());
+        val content = HEADER + classes.joinToString("\n") + "\n"
+        Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8)
+        log.lifecycle("Axelix Plugin: Found and registered {} @AutoConfiguration classes.", classes.size)
     }
 
-    private void ensureParentDirectoryExists(File file) throws IOException {
-        File parent = file.getParentFile();
+    @Throws(IOException::class)
+    private fun ensureParentDirectoryExists(file: File) {
+        val parent = file.parentFile
         if (parent != null && !parent.exists()) {
-            Files.createDirectories(parent.toPath());
+            Files.createDirectories(parent.toPath())
         }
+    }
+
+    companion object {
+        private val log = Logging.getLogger(AutoConfigFileWriter::class.java)
+        private const val HEADER = "# Generated programmatically by scanning @AutoConfiguration annotation\n"
     }
 }
