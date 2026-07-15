@@ -20,28 +20,30 @@ package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
+
 /**
- * Key that identifies the transactional method. Strictly speaking, the method is not
+ * Aggregated count of lazy-loading (N+1) occasions for a particular association.
  *
  * @author Mikhail Polivakha
  */
-public class TransactionalKey {
+public class CountedLazyLoadingTarget {
 
-    private final String className;
-    private final String methodName;
+    private final LazyLoadingTarget target;
+    private final int count;
 
     @JsonCreator
-    public TransactionalKey(
-            @JsonProperty("className") String className, @JsonProperty("methodName") String methodName) {
-        this.className = className;
-        this.methodName = methodName;
+    public CountedLazyLoadingTarget(
+            @JsonProperty("target") LazyLoadingTarget target, @JsonProperty("count") int count) {
+        this.target = target;
+        this.count = count;
     }
 
-    public String getClassName() {
-        return className;
+    public LazyLoadingTarget getTarget() {
+        return target;
     }
 
-    public String getMethodName() {
-        return methodName;
+    public int getCount() {
+        return count;
     }
 }

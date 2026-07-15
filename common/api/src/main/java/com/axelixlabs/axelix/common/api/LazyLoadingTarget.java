@@ -20,6 +20,11 @@ package com.axelixlabs.axelix.common.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * The particular association that presumably was lazy loaded.
+ *
+ * @author Mikhail Polivakha
+ */
 public class LazyLoadingTarget {
 
     /**

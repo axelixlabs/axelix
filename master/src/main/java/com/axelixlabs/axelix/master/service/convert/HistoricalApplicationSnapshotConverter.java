@@ -27,6 +27,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -61,7 +62,15 @@ public class HistoricalApplicationSnapshotConverter {
 
         return new com.axelixlabs.axelix.master.domain.Insights(
                 fromHotSpot(insights.getHotSpot(), metadata.getGcInUse()),
-                fromSpringFramework(insights.getSpringFramework()));
+                fromSpringFramework(insights.getSpringFramework()),
+                fromPersistenceInsights(insights.getPersistenceInsights()));
+    }
+
+    private PersistenceInsights fromPersistenceInsights(PersistenceInsights persistenceInsights) {
+        if (persistenceInsights == null || persistenceInsights.getTransactions() == null) {
+            return new PersistenceInsights(List.of());
+        }
+        return persistenceInsights;
     }
 
     private HotSpot fromHotSpot(HotSpotInsights hotSpotInsights, GarbageCollector gcInUse) {
@@ -110,7 +119,8 @@ public class HistoricalApplicationSnapshotConverter {
     }
 
     private com.axelixlabs.axelix.master.domain.Insights defaultInsights() {
-        return new com.axelixlabs.axelix.master.domain.Insights(defaultHotSpot(), new SpringFramework(false));
+        return new com.axelixlabs.axelix.master.domain.Insights(
+                defaultHotSpot(), new SpringFramework(false), new PersistenceInsights(List.of()));
     }
 
     private HotSpot defaultHotSpot() {

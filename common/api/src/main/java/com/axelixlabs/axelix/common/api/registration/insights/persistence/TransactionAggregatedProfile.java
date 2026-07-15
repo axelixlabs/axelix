@@ -17,9 +17,11 @@
  */
 package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
+import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Aggregated information about a particular transactional method in the Instance.
@@ -30,20 +32,21 @@ public class TransactionAggregatedProfile {
 
     private final TransactionOrigin transactionOrigin;
     private final TransactionalKey transactionalKey;
-    private final TransactionQueriesStats transactionQueriesStats;
-    private final Map<LazyLoadingTarget, Integer> lazyLoadingTarget;
+    private final TransactionOverallStats transactionOverallStats;
+    private final List<CountedLazyLoadingTarget> lazyLoadingTargets;
     private final Map<String, Integer> inMemoryPagination;
 
+    @JsonCreator
     public TransactionAggregatedProfile(
-            TransactionOrigin transactionOrigin,
-            TransactionalKey transactionalKey,
-            TransactionQueriesStats transactionQueriesStats,
-            Map<LazyLoadingTarget, Integer> lazyLoadingTarget,
-            Map<String, Integer> inMemoryPagination) {
+            @JsonProperty("transactionOrigin") TransactionOrigin transactionOrigin,
+            @JsonProperty("transactionalKey") TransactionalKey transactionalKey,
+            @JsonProperty("transactionOverallStats") TransactionOverallStats transactionOverallStats,
+            @JsonProperty("lazyLoadingTargets") List<CountedLazyLoadingTarget> lazyLoadingTargets,
+            @JsonProperty("inMemoryPagination") Map<String, Integer> inMemoryPagination) {
         this.transactionOrigin = transactionOrigin;
         this.transactionalKey = transactionalKey;
-        this.transactionQueriesStats = transactionQueriesStats;
-        this.lazyLoadingTarget = lazyLoadingTarget;
+        this.transactionOverallStats = transactionOverallStats;
+        this.lazyLoadingTargets = lazyLoadingTargets;
         this.inMemoryPagination = inMemoryPagination;
     }
 
@@ -55,12 +58,12 @@ public class TransactionAggregatedProfile {
         return transactionalKey;
     }
 
-    public TransactionQueriesStats getTransactionQueriesStats() {
-        return transactionQueriesStats;
+    public TransactionOverallStats getTransactionOverallStats() {
+        return transactionOverallStats;
     }
 
-    public Map<LazyLoadingTarget, Integer> getLazyLoadingTarget() {
-        return lazyLoadingTarget;
+    public List<CountedLazyLoadingTarget> getLazyLoadingTargets() {
+        return lazyLoadingTargets;
     }
 
     public Map<String, Integer> getInMemoryPagination() {

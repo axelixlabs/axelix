@@ -580,6 +580,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
                 .isFalse();
         assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
+        assertThat(snapshot.insights().persistenceInsights().getTransactions()).isEmpty();
     }
 
     @Test

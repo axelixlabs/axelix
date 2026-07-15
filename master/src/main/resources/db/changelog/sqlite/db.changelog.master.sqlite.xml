@@ -11,4 +11,5 @@
   <include relativeToChangelogFile="true" file="changelog/1.0.0-drop-vm-features.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.0.0-add-application-id-to-instances.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.0.0-create-historical-application-snapshots-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.0.0-add-persistence-insights-to-historical-application-snapshots.xml"/>
 </databaseChangeLog>

@@ -27,10 +27,11 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionQueriesStats;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOverallStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
@@ -102,7 +103,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                             new TransactionalKey(
                                     key.getTargetClass().getName(),
                                     key.getMethod().getName()),
-                            new TransactionQueriesStats(
+                            new TransactionOverallStats(
                                     performanceStats.getMinMs(),
                                     performanceStats.getMaxMs(),
                                     performanceStats.getAvgMs()),
@@ -114,13 +115,16 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return new PersistenceInsights(transactions);
     }
 
-    private static Map<LazyLoadingTarget, Integer> convertLazyLoadingTargets(
+    private static List<CountedLazyLoadingTarget> convertLazyLoadingTargets(
             Map<com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget, Integer>
                     nPlusOneOccasions) {
-        Map<LazyLoadingTarget, Integer> result = new HashMap<>(nPlusOneOccasions.size());
-        nPlusOneOccasions.forEach((target, count) ->
-                result.put(new LazyLoadingTarget(target.ownerEntityClass(), target.associationPropertyName()), count));
-        return result;
+        return nPlusOneOccasions.entrySet().stream()
+                .map(entry -> new CountedLazyLoadingTarget(
+                        new LazyLoadingTarget(
+                                entry.getKey().ownerEntityClass(),
+                                entry.getKey().associationPropertyName()),
+                        entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     private InsightFeature getAppCdsFeature() {

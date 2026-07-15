@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
@@ -120,7 +121,24 @@ public class HeartBeatApiTest {
                  }
                ],
                "persistenceInsights" : {
-                 "transactions" : [ ]
+                 "transactions" : [
+                   {
+                     "transactionOrigin" : "APPLICATION_DECLARATIVE",
+                     "transactionalKey" : {
+                       "className" : "com.example.OwnerService",
+                       "methodName" : "saveOwner"
+                     },
+                     "transactionOverallStats" : {
+                       "minMs" : 1,
+                       "maxMs" : 10,
+                       "averageMs" : 5
+                     },
+                     "lazyLoadingTargets" : [ ],
+                     "inMemoryPagination" : {
+                       "com.example.Pet" : 2
+                     }
+                   }
+                 ]
                }
              }
            },
@@ -191,6 +209,19 @@ public class HeartBeatApiTest {
         assertThat(snapshot.insights().hotSpot().projectLilliput().compactObjectHeadersEnabled())
                 .isFalse();
         assertThat(snapshot.insights().springFramework().osivEnabled()).isTrue();
+        assertThat(snapshot.insights().persistenceInsights().getTransactions())
+                .hasSize(1)
+                .first()
+                .satisfies(profile -> {
+                    assertThat(profile.getTransactionOrigin()).isEqualTo(TransactionOrigin.APPLICATION_DECLARATIVE);
+                    assertThat(profile.getTransactionalKey().getClassName()).isEqualTo("com.example.OwnerService");
+                    assertThat(profile.getTransactionalKey().getMethodName()).isEqualTo("saveOwner");
+                    assertThat(profile.getTransactionOverallStats().getMinMs()).isEqualTo(1);
+                    assertThat(profile.getTransactionOverallStats().getMaxMs()).isEqualTo(10);
+                    assertThat(profile.getTransactionOverallStats().getAverageMs())
+                            .isEqualTo(5);
+                    assertThat(profile.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
+                });
     }
 
     @ParameterizedTest(name = "{0}")

@@ -17,8 +17,25 @@
  */
 package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
+/**
+ * The origin of the transaction, i.e. how exactly the transaction was created.
+ *
+ * @author Mikhail Polivakha
+ */
 public enum TransactionOrigin {
+
+    /**
+     * Various spring infrastructure, such as TransactionalRepositoryFactoryBeanSupport can open the transaction.
+     */
     SPRING_INFRASTRUCTURE,
+
+    /**
+     * Declaratively by the application code i.e. via @Transactonal
+     */
     APPLICATION_DECLARATIVE,
+
+    /**
+     * Imperatively by the application code i.e. via TransactionTemplate or via TransactionManager
+     */
     APPLICATION_IMPERATIVE
 }

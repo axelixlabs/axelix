@@ -83,6 +83,34 @@ public final class TestMetadataFactory {
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled,
             GarbageCollector garbageCollector) {
+        return withFeatures(
+                groupId,
+                artifactId,
+                appCdsEnabled,
+                aotCacheEnabled,
+                gcLoggingEnabled,
+                compactObjectHeadersEnabled,
+                osivEnabled,
+                garbageCollector,
+                new PersistenceInsights(List.of()));
+    }
+
+    public static BasicRegistrationMetadata withPersistenceInsights(
+            String groupId, String artifactId, PersistenceInsights persistenceInsights) {
+        return withFeatures(
+                groupId, artifactId, true, false, false, false, true, GarbageCollector.G1, persistenceInsights);
+    }
+
+    public static BasicRegistrationMetadata withFeatures(
+            String groupId,
+            String artifactId,
+            boolean appCdsEnabled,
+            boolean aotCacheEnabled,
+            boolean gcLoggingEnabled,
+            boolean compactObjectHeadersEnabled,
+            boolean osivEnabled,
+            GarbageCollector garbageCollector,
+            PersistenceInsights persistenceInsights) {
         BasicRegistrationMetadata.SoftwareVersions softwareVersions =
                 new BasicRegistrationMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
 
@@ -97,7 +125,13 @@ public final class TestMetadataFactory {
                 softwareVersions,
                 BasicRegistrationMetadata.HealthStatus.UP,
                 new BasicRegistrationMetadata.MemoryDetails(DEFAULT_HEAP),
-                insights(appCdsEnabled, aotCacheEnabled, gcLoggingEnabled, compactObjectHeadersEnabled, osivEnabled));
+                insights(
+                        appCdsEnabled,
+                        aotCacheEnabled,
+                        gcLoggingEnabled,
+                        compactObjectHeadersEnabled,
+                        osivEnabled,
+                        persistenceInsights));
     }
 
     private static Insights insights(
@@ -105,7 +139,8 @@ public final class TestMetadataFactory {
             boolean aotCacheEnabled,
             boolean gcLoggingEnabled,
             boolean compactObjectHeadersEnabled,
-            boolean osivEnabled) {
+            boolean osivEnabled,
+            PersistenceInsights persistenceInsights) {
         return new Insights(
                 new HotSpotInsights(
                         List.of(
@@ -114,7 +149,7 @@ public final class TestMetadataFactory {
                         List.of(feature(FeatureId.GC_LOGGING_ENABLED, gcLoggingEnabled)),
                         List.of(feature(FeatureId.COMPACT_OBJECT_HEADERS, compactObjectHeadersEnabled))),
                 List.of(feature(FeatureId.OSIV, osivEnabled)),
-                new PersistenceInsights(List.of()));
+                persistenceInsights);
     }
 
     private static InsightFeature feature(FeatureId featureId, boolean enabled) {

@@ -20,16 +20,21 @@ package com.axelixlabs.axelix.master.domain;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+
 /**
  * Insight information discovered for the given service instance.
  *
- * @param hotSpot         the HotSpot-specific insights
- * @param springFramework the Spring Framework-specific insights
+ * @param hotSpot              the HotSpot-specific insights
+ * @param springFramework      the Spring Framework-specific insights
+ * @param persistenceInsights  persistence transactional insights received during heartbeat
  *
  * @author Mikhail Polivakha
  */
 public record Insights(
-        @Embedded.Empty HotSpot hotSpot, @Embedded.Empty SpringFramework springFramework) {
+        @Embedded.Empty HotSpot hotSpot,
+        @Embedded.Empty SpringFramework springFramework,
+        @Column("persistence_insights") PersistenceInsights persistenceInsights) {
 
     /**
      * @param projectLeyden Project Leyden-specific insights

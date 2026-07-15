@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.zaxxer.hikari.HikariConfig;
 import org.jspecify.annotations.NonNull;
@@ -44,6 +45,7 @@ import org.springframework.data.jdbc.core.dialect.JdbcPostgresDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
@@ -98,14 +100,17 @@ public class PersistenceAutoConfiguration {
 
         @Override
         protected @NonNull List<?> userConverters() {
-            return List.of(
+            List<?> superConverters = super.userConverters();
+
+            List<?> thisConverters = List.of(
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
                     new LocalDateToStringConverter(),
                     new StringToLocalDateConverter(),
-                    new IntegerToBooleanConverter(),
-                    new RolesWritingConverter(jsonMapper),
-                    new RolesReadingConverter(jsonMapper));
+                    new IntegerToBooleanConverter());
+
+            return Stream.concat(superConverters.stream(), thisConverters.stream())
+                    .toList();
         }
 
         /**
@@ -218,7 +223,11 @@ public class PersistenceAutoConfiguration {
 
         @Override
         protected @NonNull List<?> userConverters() {
-            return List.of(new RolesWritingConverter(jsonMapper), new RolesReadingConverter(jsonMapper));
+            return List.of(
+                    new RolesWritingConverter(jsonMapper),
+                    new RolesReadingConverter(jsonMapper),
+                    new PersistenceInsightsWritingConverter(jsonMapper),
+                    new PersistenceInsightsReadingConverter(jsonMapper));
         }
 
         @WritingConverter
@@ -232,8 +241,7 @@ public class PersistenceAutoConfiguration {
 
             @Override
             public String convert(UserEntity.Roles source) {
-                Set<String> roles = source == null ? Set.of() : source.values();
-                return jsonMapper.writeValueAsString(roles);
+                return jsonMapper.writeValueAsString(source.values());
             }
         }
 
@@ -248,11 +256,44 @@ public class PersistenceAutoConfiguration {
 
             @Override
             public UserEntity.Roles convert(String source) {
-                if (source == null || source.isBlank()) {
+                if (source.isBlank()) {
                     return new UserEntity.Roles(Set.of());
                 }
                 Set<String> roles = jsonMapper.readValue(source, new TypeReference<>() {});
                 return new UserEntity.Roles(roles);
+            }
+        }
+
+        @WritingConverter
+        public static class PersistenceInsightsWritingConverter implements Converter<PersistenceInsights, String> {
+
+            private final JsonMapper jsonMapper;
+
+            public PersistenceInsightsWritingConverter(JsonMapper jsonMapper) {
+                this.jsonMapper = jsonMapper;
+            }
+
+            @Override
+            public String convert(PersistenceInsights source) {
+                return jsonMapper.writeValueAsString(source);
+            }
+        }
+
+        @ReadingConverter
+        public static class PersistenceInsightsReadingConverter implements Converter<String, PersistenceInsights> {
+
+            private final JsonMapper jsonMapper;
+
+            public PersistenceInsightsReadingConverter(JsonMapper jsonMapper) {
+                this.jsonMapper = jsonMapper;
+            }
+
+            @Override
+            public PersistenceInsights convert(String source) {
+                if (source.isBlank()) {
+                    return new PersistenceInsights(List.of());
+                }
+                return jsonMapper.readValue(source, PersistenceInsights.class);
             }
         }
     }
