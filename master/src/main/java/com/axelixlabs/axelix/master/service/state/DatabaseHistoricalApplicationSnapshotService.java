@@ -112,17 +112,11 @@ public class DatabaseHistoricalApplicationSnapshotService {
         return repository.findLatestApplicationSnapshot(applicationId.groupId(), applicationId.artifactId());
     }
 
-    // TODO:
-    //
-    // Although Spring Data JDBC supports upserts, we cannot use it here, since we by default Axelix Master works
-    // with sqlite, and we even have the custom dialect. Still, Spring Data JDBC does not allow for extension of UPSERTs
-    // for custom dialects. I have filed a ticket for that, so, I hope this is gonna get done.
     @Transactional
     public void reloadCurrentState(BasicRegistrationMetadata metadata) {
         HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
 
-        jdbcAggregateTemplate.deleteById(applicationSnapshot.snapshotId(), HistoricalApplicationSnapshot.class);
-        jdbcAggregateTemplate.insert(applicationSnapshot);
+        jdbcAggregateTemplate.upsert(applicationSnapshot);
     }
 
     @Transactional
