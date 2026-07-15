@@ -22,8 +22,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.it.VerificationException;
@@ -37,11 +40,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link GenerateSpringFactoriesMojo}
  *
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
 class GenerateSpringFactoriesMojoTest {
-    public static final String CURRENT_DIR = new File("").getAbsolutePath();
-    public static final String SPRING_FACTORIES_PATH = "/META-INF/spring.factories";
-    public static final String GENERATED_RESOURCES_PATH = "/target/generated-test-resources/axelix";
+
+    private static final String CURRENT_DIR = new File("").getAbsolutePath();
+    private static final String SPRING_FACTORIES_PATH = "META-INF/spring.factories";
+    private static final String GENERATED_RESOURCES_PATH = "target/generated-test-resources/axelix";
+
+    private static final String TEST_EXECUTION_LISTENER_KEY = "org.springframework.test.context.TestExecutionListener";
+    private static final String APPLICATION_CONTEXT_INITIALIZER_KEY =
+            "org.springframework.context.ApplicationContextInitializer";
+    private static final String PROFILER_LISTENER = "digital.pragmatech.testing.SpringTestProfilerListener";
+    private static final String CONTEXT_DIAGNOSTIC_INITIALIZER =
+            "digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer";
+    private static final String PREEXISTING_LISTENER = "someTestClass";
 
     private String baseDir;
 
@@ -51,52 +64,44 @@ class GenerateSpringFactoriesMojoTest {
     }
 
     @Test
-    void should_generate_new_spring_factories_if_not_exists() throws VerificationException {
-        // given
+    void should_generate_new_spring_factories_if_not_exists() throws VerificationException, IOException {
+        // given.
         baseDir = CURRENT_DIR + "/src/integrationTest/generate-new-spring-factories";
         Verifier verifier = new Verifier(baseDir);
 
-        // when
+        // when.
         verifier.executeGoal("test");
         verifier.verify(true);
 
-        // then
-        Path path = getGeneratedSpringFactoriesDirectory();
-        assertThat(path).exists();
+        // then.
+        Path testClasspathSpringFactories = getTestClasspathSpringFactoriesPath();
+        assertThat(testClasspathSpringFactories).exists();
+        Properties properties = loadProperties(testClasspathSpringFactories);
 
-        Path finalResourcePath = getTestClasspathSpringFactoriesDirectory();
-        assertThat(finalResourcePath).exists();
+        assertContainsExactlyClasses(properties, TEST_EXECUTION_LISTENER_KEY, Set.of(PROFILER_LISTENER));
+        assertContainsExactlyClasses(
+                properties, APPLICATION_CONTEXT_INITIALIZER_KEY, Set.of(CONTEXT_DIAGNOSTIC_INITIALIZER));
     }
 
     @Test
     void should_merge_spring_factories() throws VerificationException, IOException {
-        // given
+        // given.
         baseDir = CURRENT_DIR + "/src/integrationTest/merge-spring-factories";
         Verifier verifier = new Verifier(baseDir);
 
-        // when
+        // when.
         verifier.executeGoal("test");
         verifier.verify(true);
 
-        // then
-        Path generatedSpringFactoriesDirectory = getGeneratedSpringFactoriesDirectory();
-        assertThat(generatedSpringFactoriesDirectory).exists();
+        // then.
+        Path testClasspathSpringFactories = getTestClasspathSpringFactoriesPath();
+        assertThat(testClasspathSpringFactories).exists();
+        Properties properties = loadProperties(testClasspathSpringFactories);
 
-        Properties generatedSpringFactories = new Properties();
-        generatedSpringFactories.load(Files.newInputStream(generatedSpringFactoriesDirectory));
-
-        String springFactoriesKey = "org.springframework.test.context.TestExecutionListener";
-        String springFactoriesValue = "someTestClass,digital.pragmatech.testing.SpringTestProfilerListener";
-
-        assertThat(generatedSpringFactories).containsEntry(springFactoriesKey, springFactoriesValue);
-
-        Path testClasspathSpringFactoriesDirectory = getTestClasspathSpringFactoriesDirectory();
-        assertThat(testClasspathSpringFactoriesDirectory).exists();
-
-        Properties testClasspathSpringFactories = new Properties();
-        testClasspathSpringFactories.load(Files.newInputStream(testClasspathSpringFactoriesDirectory));
-
-        assertThat(testClasspathSpringFactories).containsEntry(springFactoriesKey, springFactoriesValue);
+        assertContainsExactlyClasses(
+                properties, TEST_EXECUTION_LISTENER_KEY, Set.of(PREEXISTING_LISTENER, PROFILER_LISTENER));
+        assertContainsExactlyClasses(
+                properties, APPLICATION_CONTEXT_INITIALIZER_KEY, Set.of(CONTEXT_DIAGNOSTIC_INITIALIZER));
     }
 
     /**
@@ -121,19 +126,22 @@ class GenerateSpringFactoriesMojoTest {
         }
     }
 
-    /**
-     * Get path of {@code spring.factories} in test classpath
-     * @return Path of {@code spring.factories} in test classpath
-     */
-    private Path getTestClasspathSpringFactoriesDirectory() {
-        return Paths.get(baseDir, "/target/test-classes", SPRING_FACTORIES_PATH);
+    private Path getTestClasspathSpringFactoriesPath() {
+        return Paths.get(baseDir, "target/test-classes", SPRING_FACTORIES_PATH);
     }
 
-    /**
-     * Get path of generated {@code spring.factories}
-     * @return Path of generated {@code spring.factories}
-     */
-    private Path getGeneratedSpringFactoriesDirectory() {
-        return Paths.get(baseDir, GENERATED_RESOURCES_PATH, SPRING_FACTORIES_PATH);
+    private static Properties loadProperties(Path path) throws IOException {
+        Properties properties = new Properties();
+        properties.load(Files.newInputStream(path));
+        return properties;
+    }
+
+    private static void assertContainsExactlyClasses(Properties properties, String key, Set<String> expectedClasses) {
+        assertThat(properties).containsKey(key);
+        Set<String> actualClasses = Arrays.stream(((String) properties.get(key)).split(","))
+                .map(String::trim)
+                .filter(className -> !className.isEmpty())
+                .collect(Collectors.toSet());
+        assertThat(actualClasses).containsExactlyInAnyOrderElementsOf(expectedClasses);
     }
 }

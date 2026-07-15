@@ -24,15 +24,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.maven.model.FileSet;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -43,9 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Mojo that generates {@code spring.factories} file for {@code spring-test-profiler}
+ * Mojo that generates {@code spring.factories} file for {@code spring-test-profiler}.
+ *
+ * @implNote Note, that there may be the case, that the end-user will have the spring.factories in hte META-INF
+ *           for the tests already. And we cannot just add spring.factories and overwrite it. As a result, this mojo
+ *           tries to merge the existing spring.factories (if found any) with the one that we want to add.
  *
  * @author Artemiy Degtyarev
+ * @author Mikhail Polivakha
  */
 @Mojo(name = "axelix-generate-spring-factories", defaultPhase = LifecyclePhase.GENERATE_TEST_RESOURCES)
 public class GenerateSpringFactoriesMojo extends AbstractMojo {
@@ -67,14 +71,18 @@ public class GenerateSpringFactoriesMojo extends AbstractMojo {
 
     @Override
     public void execute() {
-        List<Resource> testResources = mavenProject.getTestResources();
+        List<Map<String, Set<String>>> factories = new ArrayList<>();
 
-        List<Map<String, Set<String>>> factories = testResources.stream()
-                .map(FileSet::getDirectory)
-                .map(path -> path + "/META-INF/spring.factories")
-                .filter(path -> new File(path).exists())
-                .map(springFactoriesUtilities::load)
-                .collect(Collectors.toList());
+        for (Resource testResource : mavenProject.getTestResources()) {
+            File springFactories = new File(testResource.getDirectory(), SPRING_FACTORIES_PATH);
+
+            if (springFactories.exists()) {
+                factories.add(springFactoriesUtilities.load(springFactories.getAbsolutePath()));
+                // Maven resources plugin does not overwrite by default; exclude the original so the
+                // merged generated file is what ends up on the test classpath.
+                testResource.addExclude(SPRING_FACTORIES_PATH);
+            }
+        }
 
         factories.add(PROFILER_SPRING_FACTORIES);
 

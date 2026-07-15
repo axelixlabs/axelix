@@ -78,7 +78,8 @@ public class SpringFactoriesUtilities {
     }
 
     /**
-     * Load {@code spring.factories} to map
+     * Loads {@code spring.factories} to map
+     *
      * @param path Path of {@code spring.factories} file
      * @return Map of properties
      */
@@ -102,12 +103,6 @@ public class SpringFactoriesUtilities {
         return result;
     }
 
-    /**
-     * Load java properties from {@code spring.factories} file
-     * @param path Path of {@code spring.factories} file
-     * @return Properties from {@code spring.factories} file
-     * @throws IOException
-     */
     private static Properties loadProperties(String path) throws IOException {
         try (InputStream stream = Files.newInputStream(Path.of(path))) {
             Properties properties = new Properties();
