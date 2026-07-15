@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.maven.plugin;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -66,8 +67,10 @@ public class SpringFactoriesUtilities {
 
         for (Map<String, Set<String>> map : properties) {
             map.forEach((k, v) -> result.merge(k, v, (cur, incoming) -> {
-                cur.addAll(incoming);
-                return cur;
+                HashSet<String> merged = new HashSet<>(cur);
+                merged.addAll(incoming);
+
+                return merged;
             }));
         }
 
@@ -106,9 +109,11 @@ public class SpringFactoriesUtilities {
      * @throws IOException
      */
     private static Properties loadProperties(String path) throws IOException {
-        Properties properties = new Properties();
-        properties.load(Files.newInputStream(Path.of(path)));
+        try (InputStream stream = Files.newInputStream(Path.of(path))) {
+            Properties properties = new Properties();
+            properties.load(stream);
 
-        return properties;
+            return properties;
+        }
     }
 }

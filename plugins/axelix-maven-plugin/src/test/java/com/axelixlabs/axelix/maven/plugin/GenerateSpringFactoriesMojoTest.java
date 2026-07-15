@@ -52,12 +52,15 @@ class GenerateSpringFactoriesMojoTest {
 
     @Test
     void should_generate_new_spring_factories_if_not_exists() throws VerificationException {
+        // given
         baseDir = CURRENT_DIR + "/src/integrationTest/generate-new-spring-factories";
         Verifier verifier = new Verifier(baseDir);
 
+        // when
         verifier.executeGoal("test");
         verifier.verify(true);
 
+        // then
         Path path = getGeneratedSpringFactoriesDirectory();
         assertThat(path).exists();
 
@@ -67,12 +70,15 @@ class GenerateSpringFactoriesMojoTest {
 
     @Test
     void should_merge_spring_factories() throws VerificationException, IOException {
+        // given
         baseDir = CURRENT_DIR + "/src/integrationTest/merge-spring-factories";
         Verifier verifier = new Verifier(baseDir);
 
+        // when
         verifier.executeGoal("test");
         verifier.verify(true);
 
+        // then
         Path generatedSpringFactoriesDirectory = getGeneratedSpringFactoriesDirectory();
         assertThat(generatedSpringFactoriesDirectory).exists();
 
@@ -99,7 +105,12 @@ class GenerateSpringFactoriesMojoTest {
      * @throws IOException
      */
     private static void cleanupTestFolder(String baseDir) throws IOException {
-        try (Stream<Path> walk = Files.walk(Paths.get(baseDir + "/target"))) {
+        Path targetDir = Paths.get(baseDir + "/target");
+        if (!Files.exists(targetDir)) {
+            return;
+        }
+
+        try (Stream<Path> walk = Files.walk(targetDir)) {
             walk.sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
                     Files.delete(path);
