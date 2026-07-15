@@ -24,7 +24,6 @@ import jakarta.servlet.DispatcherType;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,7 +40,6 @@ import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigu
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TranssactionStackCleanupFilter;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
@@ -60,13 +58,14 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * Auto-configuration for Transaction Monitoring infrastructure.
  *
  * @since 21.01.2026
+ *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  * @author Ilya Naumov
  * @author Vyacheslav Yanin
+ * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
-@ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean

@@ -23,7 +23,6 @@ import javax.servlet.DispatcherType;
 
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,7 +38,6 @@ import org.springframework.core.Ordered;
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TranssactionStackCleanupFilter;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnHibernateActive;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.ConditionalOnLoggingSystem;
@@ -64,7 +62,6 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Vyacheslav Yanin
  */
 @AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean

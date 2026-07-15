@@ -64,10 +64,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneColle
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
@@ -101,17 +99,6 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
     @EntityScan(basePackageClasses = {Owner.class, Pet.class})
     static class SharedTransactionTestConfiguration {
-
-        @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint() {
-            return new TransactionMonitoringEndpoint();
-        }
-
-        @Bean
-        public TransactionMonitoringService transactionMonitoringService(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new DefaultTransactionMonitoringService(transactionStatsCollector);
-        }
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
