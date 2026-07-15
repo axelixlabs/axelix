@@ -153,7 +153,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
     void shouldAssembleTheHeartBeatMetadataAboutGivenService() {
         // when.
         HeartBeatMetadata metadata = subject.assemble();
-        BasicRegistrationMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
+        BasicRegistrationMetadata basicMetadata = metadata.getBasicRegistrationMetadata();
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();

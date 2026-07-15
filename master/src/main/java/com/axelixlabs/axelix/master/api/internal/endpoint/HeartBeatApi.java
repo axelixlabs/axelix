@@ -79,11 +79,11 @@ public class HeartBeatApi {
                     request.getDeploymentAt(),
                     Instant.now(),
                     request.getInstanceActuatorUrl(),
-                    request.getBasicDiscoveryMetadata());
+                    request.getBasicRegistrationMetadata());
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
-                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicDiscoveryMetadata());
+                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicRegistrationMetadata());
             });
 
             return ResponseEntity.noContent().build();

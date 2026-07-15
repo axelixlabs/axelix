@@ -59,7 +59,7 @@ public class HeartBeatMetadata {
         this.deploymentAt = deploymentAt;
     }
 
-    public BasicRegistrationMetadata getBasicDiscoveryMetadata() {
+    public BasicRegistrationMetadata getBasicRegistrationMetadata() {
         return basicRegistrationMetadata;
     }
 
