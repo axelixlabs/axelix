@@ -47,20 +47,10 @@ interface IProps {
     rest: IRestCategory;
 
     /**
-     * Called when a pie segment is clicked.
+     * Called when a pie segment is clicked. If this function is not supplied, the
+     * pie is deemed to be non-clickable.
      */
     onPieClick?: (categoryName: string, event: React.MouseEvent) => void;
-
-    /**
-     * Enables pie segment click interactions.
-     */
-    isPieClickable?: boolean;
-
-    /**
-     * Shows percentages in the legend instead of raw values.
-     * Should not be used with a rest segment.
-     */
-    calculateLegendPercentages?: boolean;
 }
 
 export interface ITitle {
@@ -83,15 +73,7 @@ export interface IRestCategory {
 // TODO: Fix colors in future
 const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 
-export const DashboardDonutChart = ({
-    data,
-    heading,
-    rest,
-    centre,
-    onPieClick,
-    isPieClickable,
-    calculateLegendPercentages,
-}: IProps) => {
+export const DashboardDonutChart = ({ data, heading, rest, centre, onPieClick }: IProps) => {
     const chartData = data.map(({ categoryName, value }, index) => ({
         name: categoryName,
         value,
@@ -122,10 +104,10 @@ export const DashboardDonutChart = ({
                                 paddingAngle={3}
                                 dataKey="value"
                                 stroke="none"
-                                cursor={isPieClickable ? "pointer" : "default"}
+                                cursor={onPieClick ? "pointer" : "default"}
                                 onClick={({ name }, _index, event) => {
-                                    if (name && isPieClickable) {
-                                        onPieClick?.(name, event);
+                                    if (name && onPieClick) {
+                                        onPieClick(name, event);
                                     }
                                 }}
                             />
@@ -137,23 +119,9 @@ export const DashboardDonutChart = ({
                 </div>
 
                 <div className={styles.LegendWrapper}>
-                    {chartData.map(({ name, fill, value }) => {
-                        let displayValue = value;
-
-                        if (calculateLegendPercentages) {
-                            const calculatedPercentage = totalValue === 0 ? 0 : Math.round((value / totalValue) * 100);
-                            displayValue = calculatedPercentage;
-                        }
-
-                        return (
-                            <DashboardLegendItem
-                                key={name}
-                                circleColor={fill}
-                                label={name}
-                                value={`${displayValue}%`}
-                            />
-                        );
-                    })}
+                    {chartData.map(({ name, fill, value }) => (
+                        <DashboardLegendItem key={name} circleColor={fill} label={name} value={`${value}%`} />
+                    ))}
                 </div>
             </div>
         </DashboardCard>

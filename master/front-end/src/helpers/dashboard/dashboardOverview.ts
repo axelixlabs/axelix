@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus, IDistribution, IHealthStatus } from "models";
+import type { EInstanceStatus, IChartData, IDistribution, IExtendedChartData, IHealthStatus } from "models";
 import { HEALTH_STATUSES_COLORS } from "utils";
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
@@ -28,24 +28,29 @@ export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses
     }));
 };
 
-export const getTotalStatusesCount = (statuses: IHealthStatus["statuses"]): number => {
-    return Object.entries(statuses).reduce((acc, [, statusCount]) => acc + statusCount, 0);
-};
-
-export const prepareDistributionDataPerChart = (distributions: IDistribution[]) => {
+export const prepareDistributionDataPerChart = (distributions: IDistribution[]): IExtendedChartData[] => {
     return distributions.map(({ softwareComponentName, versions }) => {
-        const parsedVersions = Object.entries(versions)
-            .sort(([ver1], [ver2]) => {
-                return ver1.localeCompare(ver2);
-            })
-            .map(([version, value]) => ({
-                categoryName: version,
-                value: value,
-            }));
+        const parsedVersions = Object.entries(versions).map(
+            ([version, value]) =>
+                ({
+                    categoryName: version,
+                    value: value,
+                }) as IChartData,
+        );
 
         return {
             softwareComponentName: softwareComponentName,
             versions: parsedVersions,
         };
     });
+};
+
+export const findMostUsed = (records: IChartData[]) => {
+    return records.reduce((currentMostUsed, incoming) => {
+        if (incoming.value > currentMostUsed.value) {
+            return incoming;
+        }
+
+        return currentMostUsed;
+    }).categoryName;
 };

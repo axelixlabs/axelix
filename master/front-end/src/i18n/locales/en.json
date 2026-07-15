@@ -210,7 +210,9 @@
     },
     "Dashboard": {
         "distributions": "System's Map",
+        "distributionsSubtitle": "View the used versions of most important software components",
         "components" : {
+            "subtitle": "Software Component Version",
             "SpringBoot" : "Spring Boot",
             "SpringFramework" : "Spring Framework",
             "Java" : "Java",

@@ -23,7 +23,7 @@ import { fetchData } from "helpers";
 import { type IDashboardResponseBody, StatefulRequest } from "models";
 import { getDashboardOverviewData } from "services";
 
-import { Distributions } from "./Distributions";
+import Distributions from "./Distributions";
 
 const DashboardOverview = () => {
     const { t } = useTranslation();
@@ -47,7 +47,7 @@ const DashboardOverview = () => {
         <>
             <DashboardPagesFirstSection
                 title={t("Dashboard.distributions")}
-                subtitle="Placeholder Placeholder Placeholder"
+                subtitle={t("Dashboard.distributionsSubtitle")}
             />
             <Distributions distributions={distributions} />
         </>
