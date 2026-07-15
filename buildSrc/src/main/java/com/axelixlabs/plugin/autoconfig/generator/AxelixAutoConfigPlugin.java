@@ -21,7 +21,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.TaskProvider;
 
 import java.io.File;
 
@@ -39,38 +38,29 @@ import java.io.File;
  */
 public class AxelixAutoConfigPlugin implements Plugin<Project> {
 
-    /**
-     * The name of the target Gradle compilation task that will depend on the metadata generator.
-     */
-    private static final String OWNER_TASK_NAME = "compileJava";
-
-    private static final String IMPORTS_FILE_NAME =
+    private static final String TASK_NAME = "generateAutoConfigImports";
+    private static final String IMPORTS_FILE_PATH =
         "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports";
 
     @Override
     public void apply(Project project) {
-        project.getPlugins().withId("java", javaPlugin -> {
-            JavaPluginExtension javaExtension = project.getExtensions().getByType(JavaPluginExtension.class);
-            SourceSet mainSourceSet = javaExtension.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-
-            File resourcesSrcDir = mainSourceSet.getResources().getSrcDirs().iterator().next();
-            File importsFile = new File(resourcesSrcDir, IMPORTS_FILE_NAME);
-
-            registerTask(project, mainSourceSet, importsFile);
-        });
+        project.getPlugins().withId("java", javaPlugin -> registerTask(project));
     }
 
-    private void registerTask(Project project, SourceSet mainSourceSet, File importsFile) {
-        TaskProvider<GenerateImportsByAnnotationTask> generateTask = project.getTasks().register(
-            "generateAutoConfigImports",
-            GenerateImportsByAnnotationTask.class,
-            task -> {
-                task.getSourceDirectories().from(mainSourceSet.getJava().getSrcDirs());
-                task.getOutputFile().set(importsFile);
-            }
-        );
+    private void registerTask(Project project) {
+        project.getTasks().register(TASK_NAME, GenerateImportsByAnnotationTask.class, task -> {
+            SourceSet mainSourceSet = project.getExtensions()
+                .getByType(JavaPluginExtension.class)
+                .getSourceSets()
+                .getByName(SourceSet.MAIN_SOURCE_SET_NAME);
 
-        project.getTasks().named(OWNER_TASK_NAME)
-            .configure(compileJavaTask -> compileJavaTask.dependsOn(generateTask));
+            task.getSourceDirectories().from(mainSourceSet.getJava().getSrcDirs());
+
+            File resourcesDir = mainSourceSet.getResources().getSrcDirs().iterator().next();
+            task.getOutputFile().set(new File(resourcesDir, IMPORTS_FILE_PATH));
+
+            task.setDescription("Generates Spring Boot auto-configuration imports file in src/main/resources");
+            task.setGroup("axelix");
+        });
     }
 }

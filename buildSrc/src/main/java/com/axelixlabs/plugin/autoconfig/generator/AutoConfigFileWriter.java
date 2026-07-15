@@ -47,7 +47,7 @@ final class AutoConfigFileWriter {
         ensureParentDirectoryExists(outputFile);
 
         if (classes.isEmpty()) {
-            deleteIfExists(outputFile);
+            Files.deleteIfExists(outputFile.toPath());
             return;
         }
 
@@ -62,12 +62,6 @@ final class AutoConfigFileWriter {
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
             Files.createDirectories(parent.toPath());
-        }
-    }
-
-    private void deleteIfExists(File file) throws IOException {
-        if (file.exists()) {
-            Files.delete(file.toPath());
         }
     }
 }
