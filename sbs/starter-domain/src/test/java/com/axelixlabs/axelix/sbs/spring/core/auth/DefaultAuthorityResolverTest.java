@@ -143,7 +143,6 @@ public class DefaultAuthorityResolverTest {
                 Arguments.of("/axelix-thread-dump", HttpMethod.GET),
                 Arguments.of("/axelix-thread-dump/enable", HttpMethod.POST),
                 Arguments.of("/axelix-thread-dump/disable", HttpMethod.POST),
-                Arguments.of("/axelix-transactions-monitoring", HttpMethod.GET),
                 Arguments.of("/axelix-feign", HttpMethod.GET));
     }
 }

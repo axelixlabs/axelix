@@ -144,7 +144,10 @@ class AxelixMetadataEndpointTest {
                         + "    },\n"
                         + "    \"springFramework\" : [\n"
                         + "      { \"featureId\" : \"OSIV\", \"enabled\" : false }\n"
-                        + "    ]\n"
+                        + "    ],\n"
+                        + "    \"persistenceInsights\" : {\n"
+                        + "      \"transactions\" : [ ]\n"
+                        + "    }\n"
                         + "  }\n"
                         + "}");
     }

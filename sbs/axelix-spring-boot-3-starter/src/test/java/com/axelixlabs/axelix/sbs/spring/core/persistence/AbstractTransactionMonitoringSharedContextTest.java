@@ -53,7 +53,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,7 +87,6 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
 @Import({
     AbstractTransactionMonitoringSharedContextTest.SharedTransactionTestConfiguration.class,
     JwtAuthTestConfiguration.class

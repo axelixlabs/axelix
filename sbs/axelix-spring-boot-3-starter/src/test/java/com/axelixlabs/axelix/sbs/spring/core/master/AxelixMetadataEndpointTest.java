@@ -73,7 +73,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
                 "heap" : "#{json-unit.ignore}"
               },
               "insights" : {
-                "hotSpotInsights" : {
+                "hotSpot" : {
                   "projectLeyden" : [
                     { "featureId" : "AppCDS", "enabled" : true },
                     { "featureId" : "AotCache", "enabled" : false }
@@ -88,7 +88,10 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
                 },
                 "springFramework" : [
                   { "featureId" : "OSIV", "enabled" : false }
-                ]
+                ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """);

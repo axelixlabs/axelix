@@ -85,7 +85,7 @@ public class HeartBeatApiTest {
                "heap" : 12000
              },
              "insights" : {
-               "hotSpotInsights" : {
+               "hotSpot" : {
                  "projectLeyden" : [
                    {
                      "featureId" : "AotCache",
@@ -118,7 +118,10 @@ public class HeartBeatApiTest {
                    "featureId" : "OSIV",
                    "enabled" : true
                  }
-               ]
+               ],
+               "persistenceInsights" : {
+                 "transactions" : [ ]
+               }
              }
            },
            "instanceId" : "%s",

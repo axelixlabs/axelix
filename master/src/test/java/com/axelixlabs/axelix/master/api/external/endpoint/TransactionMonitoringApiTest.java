@@ -20,11 +20,8 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 import java.io.IOException;
 import java.util.UUID;
 
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +44,6 @@ import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Integration tests for {@link TransactionMonitoringApi}.
@@ -56,6 +52,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
+// TODO: re-implement
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TransactionMonitoringApiTest {
 
@@ -145,24 +142,7 @@ class TransactionMonitoringApiTest {
 
     @BeforeEach
     void prepare() {
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                String path = request.getPath();
-                assert path != null;
-
-                if (path.equals("/" + activeInstanceId + "/actuator/axelix-transactions-monitoring")
-                        && request.getMethod().equals("GET")) {
-                    return new MockResponse()
-                            .setBody(ACTUAL_AND_EXPECTED_TRANSACTION_MONITORING_JSON)
-                            .addHeader("Content-Type", APPLICATION_JSON_VALUE);
-                } else {
-                    return new MockResponse().setResponseCode(404);
-                }
-            }
-        });
-        registry.reload(
-                TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        // TODO:
     }
 
     @AfterEach

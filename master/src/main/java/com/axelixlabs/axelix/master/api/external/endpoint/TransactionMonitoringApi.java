@@ -25,13 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
-import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -57,7 +54,6 @@ public class TransactionMonitoringApi {
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     public byte[] getTransactionFeed(@PathVariable("instanceId") String instanceId) {
-        return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.TRANSACTION_STATS_GET, NoHttpPayload.INSTANCE);
+        return new byte[0]; // TODO: implement based on new API
     }
 }

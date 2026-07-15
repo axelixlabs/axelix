@@ -19,6 +19,9 @@ package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Insights of a particular Instance related to persistence.
  *
@@ -31,7 +34,8 @@ public class PersistenceInsights {
      */
     private final List<TransactionAggregatedProfile> transactions;
 
-    public PersistenceInsights(List<TransactionAggregatedProfile> transactions) {
+    @JsonCreator
+    public PersistenceInsights(@JsonProperty("transactions") List<TransactionAggregatedProfile> transactions) {
         this.transactions = transactions;
     }
 

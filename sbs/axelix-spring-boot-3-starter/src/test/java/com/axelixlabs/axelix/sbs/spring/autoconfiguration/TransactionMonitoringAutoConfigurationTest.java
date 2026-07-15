@@ -48,7 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TransactionMonitoringAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withPropertyValues("management.endpoints.web.exposure.include=axelix-transactions-monitoring")
             .withConfiguration(AutoConfigurations.of(TransactionMonitoringAutoConfiguration.class));
 
     @Test
@@ -107,33 +106,5 @@ class TransactionMonitoringAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
                     assertThat(context).doesNotHaveBean(Log4j2InMemoryPaginationAppenderConfiguration.class);
                 });
-    }
-
-    @Test
-    void shouldNotActivateAutoConfiguration_whenEndpointDisabled() {
-        contextRunner // Overriding the property value to test the disabled state
-                .withPropertyValues("management.endpoints.web.exposure.exclude=axelix-transactions-monitoring")
-                .run(context -> {
-                    assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
-                    assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
-                    assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
-                    assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
-                });
-    }
-
-    @Test
-    void shouldNotActivateAutoConfiguration_withoutRequiredProperty() {
-        ApplicationContextRunner runnerWithoutRequiredProperty = new ApplicationContextRunner()
-                .withConfiguration(
-                        AutoConfigurations.of(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class));
-
-        runnerWithoutRequiredProperty.run(context -> {
-            assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
-            assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
-            assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
-            assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
-            assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
-        });
     }
 }

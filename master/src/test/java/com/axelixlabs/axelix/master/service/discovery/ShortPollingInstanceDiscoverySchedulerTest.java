@@ -511,7 +511,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "heap" : 12000
               },
               "insights" : {
-                "hotSpotInsights" : {
+                "hotSpot" : {
                   "projectLeyden" : [
                     {
                       "featureId" : "AotCache",
@@ -540,7 +540,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                     "featureId" : "OSIV",
                     "enabled" : true
                   }
-                ]
+                ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
         """;

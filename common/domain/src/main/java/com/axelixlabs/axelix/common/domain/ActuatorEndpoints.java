@@ -128,10 +128,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING =
             endpoint("/axelix-thread-dump/disable", HttpMethod.POST);
 
-    // @Transaction monitoring
-    public static final ActuatorEndpoint TRANSACTION_STATS_GET =
-            endpoint("/axelix-transactions-monitoring", HttpMethod.GET);
-
     // Feign Client
     public static final ActuatorEndpoint GET_FEIGN_CLIENT = endpoint("/axelix-feign", HttpMethod.GET);
 

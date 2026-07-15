@@ -281,13 +281,6 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor);
     }
 
-    // @Transaction monitoring
-    @Bean
-    public ProxyingEndpointProber transactionMonitoringProxyingEndpointProper() {
-        return new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_GET, securityContextExecutor);
-    }
-
     // Feign Client
     @Bean
     public ProxyingEndpointProber getFeignClientEndpointProber() {
