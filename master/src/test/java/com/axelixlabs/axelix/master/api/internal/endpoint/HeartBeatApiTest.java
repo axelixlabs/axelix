@@ -85,7 +85,7 @@ public class HeartBeatApiTest {
                "heap" : 12000
              },
              "insights" : {
-               "hotSpot" : {
+               "hotSpotInsights" : {
                  "projectLeyden" : [
                    {
                      "featureId" : "AotCache",

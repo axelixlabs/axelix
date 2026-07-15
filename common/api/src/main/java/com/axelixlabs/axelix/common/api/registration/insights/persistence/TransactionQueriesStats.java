@@ -15,12 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
+package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
-/**
- * This interface defines the contract for retrieving aggregated transaction execution metrics
- * from monitored @Transactional methods.
- *
- * @author Nikita Kirillov
- */
-public interface TransactionMonitoringService {}
+public class TransactionQueriesStats {
+
+    private final long minMs;
+    private final long maxMs;
+    private final long averageMs;
+
+    public TransactionQueriesStats(long minMs, long max, long averageMs) {
+        this.minMs = minMs;
+        this.maxMs = max;
+        this.averageMs = averageMs;
+    }
+
+    public long getMinMs() {
+        return minMs;
+    }
+
+    public long getMaxMs() {
+        return maxMs;
+    }
+
+    public long getAverageMs() {
+        return averageMs;
+    }
+}

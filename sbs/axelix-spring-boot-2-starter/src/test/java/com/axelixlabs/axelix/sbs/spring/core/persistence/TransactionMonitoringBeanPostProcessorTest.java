@@ -131,7 +131,7 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30);
+            return new DefaultTransactionStatsCollector();
         }
 
         @Bean

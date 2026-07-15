@@ -29,6 +29,8 @@ import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.APP_CDS;
@@ -49,7 +51,8 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsDisabledInsights_whenOptionsAreEmptyAndOsivDisabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -69,7 +72,8 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(
                 osivDisabled(),
                 gcLogDisabled(),
-                vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"));
+                vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"),
+                emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -83,7 +87,10 @@ class DefaultInsightsInfoProviderTest {
     void returnsAppCdsEnabled_whenSharedArchiveFilePresent() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogDisabled(), vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"));
+                osivDisabled(),
+                gcLogDisabled(),
+                vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"),
+                emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -95,7 +102,8 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsGcLoggingEnabled_whenGcLogServiceReportsEnabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogEnabled(), emptyVmOptions());
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(), gcLogEnabled(), emptyVmOptions(), emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -108,7 +116,8 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsGcLoggingDisabled_whenGcLogServiceReportsDisabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions());
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -122,7 +131,10 @@ class DefaultInsightsInfoProviderTest {
     void returnsCompactObjectHeadersEnabled_whenOptionPresent() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogDisabled(), vmOptions("-XX:+UseCompactObjectHeaders"));
+                osivDisabled(),
+                gcLogDisabled(),
+                vmOptions("-XX:+UseCompactObjectHeaders"),
+                emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -134,7 +146,8 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsOsivEnabled_whenOpenSessionInViewEnabled() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(osivEnabled(), gcLogDisabled(), emptyVmOptions());
+        var subject = new DefaultInsightsInfoProvider(
+                osivEnabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();
@@ -155,6 +168,10 @@ class DefaultInsightsInfoProviderTest {
                 .filter(f -> featureId.getId().equals(f.getFeatureId()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static TransactionStatsCollector emptyTransactionStatsCollector() {
+        return new DefaultTransactionStatsCollector();
     }
 
     private static VmOptionsAccessor emptyVmOptions() {

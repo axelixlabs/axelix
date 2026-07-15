@@ -24,6 +24,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
@@ -63,16 +64,15 @@ public class HistoricalApplicationSnapshotConverter {
                 fromSpringFramework(insights.getSpringFramework()));
     }
 
-    private HotSpot fromHotSpot(
-            com.axelixlabs.axelix.common.api.registration.insights.HotSpot hotSpot, GarbageCollector gcInUse) {
-        if (hotSpot == null) {
+    private HotSpot fromHotSpot(HotSpotInsights hotSpotInsights, GarbageCollector gcInUse) {
+        if (hotSpotInsights == null) {
             return defaultHotSpot();
         }
 
         return new HotSpot(
-                fromProjectLeyden(hotSpot.getProjectLeyden()),
-                fromGarbageCollector(hotSpot.getGc(), gcInUse),
-                fromProjectLilliput(hotSpot.getProjectLilliputh()));
+                fromProjectLeyden(hotSpotInsights.getProjectLeyden()),
+                fromGarbageCollector(hotSpotInsights.getGc(), gcInUse),
+                fromProjectLilliput(hotSpotInsights.getProjectLilliputh()));
     }
 
     private ProjectLeyden fromProjectLeyden(List<InsightFeature> features) {

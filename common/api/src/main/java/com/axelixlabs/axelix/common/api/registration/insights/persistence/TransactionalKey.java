@@ -15,12 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
+package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
 /**
- * This interface defines the contract for retrieving aggregated transaction execution metrics
- * from monitored @Transactional methods.
+ * Key that identifies the transactional method. Strictly speaking, the method is not
  *
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public interface TransactionMonitoringService {}
+public class TransactionalKey {
+
+    private final String className;
+    private final String methodName;
+
+    public TransactionalKey(String className, String methodName) {
+        this.className = className;
+        this.methodName = methodName;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+}

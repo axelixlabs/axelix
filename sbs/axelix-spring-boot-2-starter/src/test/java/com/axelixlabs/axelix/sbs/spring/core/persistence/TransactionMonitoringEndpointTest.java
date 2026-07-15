@@ -673,9 +673,8 @@ class TransactionMonitoringEndpointTest {
     static class TransactionMonitoringEndpointTestConfiguration {
 
         @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-                TransactionMonitoringService transactionMonitoringService) {
-            return new TransactionMonitoringEndpoint(transactionMonitoringService);
+        public TransactionMonitoringEndpoint transactionMonitoringEndpoint() {
+            return new TransactionMonitoringEndpoint();
         }
 
         @Bean
@@ -686,7 +685,7 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30);
+            return new DefaultTransactionStatsCollector();
         }
 
         @Bean

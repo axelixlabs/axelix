@@ -17,10 +17,31 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
-/**
- * This interface defines the contract for retrieving aggregated transaction execution metrics
- * from monitored @Transactional methods.
- *
- * @author Nikita Kirillov
- */
-public interface TransactionMonitoringService {}
+public class PerformanceStats {
+
+    private long minMs = -1;
+    private long maxMs = -1;
+    private long avgMs = -1;
+    private long transactionsRecorded = -1;
+
+    public void recordTransaction(TransactionExecutionProfile transaction) {
+        long transactionDurationMs = transaction.getTransactionDuration().toMillis();
+
+        this.minMs = Math.min(transactionDurationMs, minMs);
+        this.maxMs = Math.max(transactionDurationMs, maxMs);
+        this.avgMs = (avgMs * transactionsRecorded + transactionDurationMs) / (transactionsRecorded + 1);
+        this.transactionsRecorded++;
+    }
+
+    public long getMinMs() {
+        return minMs;
+    }
+
+    public long getMaxMs() {
+        return maxMs;
+    }
+
+    public long getAvgMs() {
+        return avgMs;
+    }
+}

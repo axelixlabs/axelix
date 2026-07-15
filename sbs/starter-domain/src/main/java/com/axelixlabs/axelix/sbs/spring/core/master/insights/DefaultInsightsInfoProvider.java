@@ -17,15 +17,28 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionQueriesStats;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.PerformanceStats;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStats;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmOptions.AOT_CACHE_OPTION;
 import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmOptions.SHARED_ARCHIVE_FILE;
@@ -43,6 +56,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
 
     private final GcLogService gcLogService;
     private final VmOptionsAccessor vmOptionsAccessor;
+    private final TransactionStatsCollector transactionStatsCollector;
 
     /**
      * Creates a new DefaultInsightsInfoProvider.
@@ -52,10 +66,12 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     public DefaultInsightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             GcLogService gcLogService,
-            VmOptionsAccessor vmOptionsAccessor) {
+            VmOptionsAccessor vmOptionsAccessor,
+            TransactionStatsCollector transactionStatsCollector) {
         this.openSessionInViewStateProvider = openSessionInViewStateProvider;
         this.gcLogService = gcLogService;
         this.vmOptionsAccessor = vmOptionsAccessor;
+        this.transactionStatsCollector = transactionStatsCollector;
     }
 
     @Override
@@ -63,12 +79,48 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         GcLogStatus gcLogStatus = gcLogService.getStatus();
 
         return new Insights(
-                new HotSpot(
+                new HotSpotInsights(
                         List.of(getAppCdsFeature(), getAotCacheFeature()),
                         List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature(gcLogStatus)),
                         List.of(getCompressedObjectHeadersFeature())),
                 List.of(new InsightFeature(
-                        FeatureId.OSIV.getId(), openSessionInViewStateProvider.isOpenSessionInViewEnabled())));
+                        FeatureId.OSIV.getId(), openSessionInViewStateProvider.isOpenSessionInViewEnabled())),
+                assemblePersistenceInsights());
+    }
+
+    private PersistenceInsights assemblePersistenceInsights() {
+        Map<MethodClassKey, TransactionStats> stats = transactionStatsCollector.getCopyOfStats();
+
+        List<TransactionAggregatedProfile> transactions = stats.entrySet().stream()
+                .map(entry -> {
+                    MethodClassKey key = entry.getKey();
+                    TransactionStats transactionStats = entry.getValue();
+                    PerformanceStats performanceStats = transactionStats.getPerformanceStats();
+
+                    return new TransactionAggregatedProfile(
+                            TransactionOrigin.APPLICATION_DECLARATIVE,
+                            new TransactionalKey(
+                                    key.getTargetClass().getName(),
+                                    key.getMethod().getName()),
+                            new TransactionQueriesStats(
+                                    performanceStats.getMinMs(),
+                                    performanceStats.getMaxMs(),
+                                    performanceStats.getAvgMs()),
+                            convertLazyLoadingTargets(transactionStats.getNPlusOneOccasions()),
+                            new HashMap<>(transactionStats.getInMemoryPaginatedEntities()));
+                })
+                .collect(Collectors.toList());
+
+        return new PersistenceInsights(transactions);
+    }
+
+    private static Map<LazyLoadingTarget, Integer> convertLazyLoadingTargets(
+            Map<com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget, Integer>
+                    nPlusOneOccasions) {
+        Map<LazyLoadingTarget, Integer> result = new HashMap<>(nPlusOneOccasions.size());
+        nPlusOneOccasions.forEach((target, count) ->
+                result.put(new LazyLoadingTarget(target.ownerEntityClass(), target.associationPropertyName()), count));
+        return result;
     }
 
     private InsightFeature getAppCdsFeature() {

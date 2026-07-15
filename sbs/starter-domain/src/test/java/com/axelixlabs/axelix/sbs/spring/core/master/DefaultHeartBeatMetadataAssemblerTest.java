@@ -38,8 +38,9 @@ import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -122,7 +123,10 @@ class DefaultHeartBeatMetadataAssemblerTest {
 
         @Bean
         InsightsInfoProvider insightsInfoProvider() {
-            return () -> new Insights(new HotSpot(List.of(), List.of(), List.of()), List.of());
+            return () -> new Insights(
+                    new HotSpotInsights(List.of(), List.of(), List.of()),
+                    List.of(),
+                    new PersistenceInsights(List.of()));
         }
 
         @Bean

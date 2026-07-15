@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * HotSpot-specific insight groups.
  */
-public final class HotSpot {
+public final class HotSpotInsights {
 
     private final List<InsightFeature> projectLeyden;
     private final List<InsightFeature> gc;
@@ -39,7 +39,7 @@ public final class HotSpot {
      * @param projectLilliputh the Project Lilliputh insight features.
      */
     @JsonCreator
-    public HotSpot(
+    public HotSpotInsights(
             @JsonProperty("projectLeyden") List<InsightFeature> projectLeyden,
             @JsonProperty("gc") List<InsightFeature> gc,
             @JsonProperty("projectLilliputh") List<InsightFeature> projectLilliputh) {

@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 
 /**
@@ -35,19 +34,17 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
  */
 public class DefaultTransactionStatsCollector implements TransactionStatsCollector {
 
-    private final ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionExecutionProfile>> statsMap =
-            new ConcurrentHashMap<>();
-    private final int maxTransactionsPerMethod;
+    private final ConcurrentHashMap<MethodClassKey, TransactionStats> statsMap;
 
-    public DefaultTransactionStatsCollector(int maxTransactionsPerMethod) {
-        this.maxTransactionsPerMethod = maxTransactionsPerMethod;
+    public DefaultTransactionStatsCollector() {
+        this.statsMap = new ConcurrentHashMap<>();
     }
 
     @Override
     public void recordTransaction(MethodClassKey key, TransactionExecutionProfile transactionRecord) {
         statsMap.compute(key, (k, stats) -> {
             if (stats == null) {
-                stats = new SlidingWindow<>(maxTransactionsPerMethod);
+                stats = new TransactionStats();
             }
             stats.put(transactionRecord);
             return stats;
@@ -55,7 +52,7 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
     }
 
     @Override
-    public Map<MethodClassKey, SlidingWindow<TransactionExecutionProfile>> getAllStats() {
+    public Map<MethodClassKey, TransactionStats> getCopyOfStats() {
         return Collections.unmodifiableMap(statsMap);
     }
 

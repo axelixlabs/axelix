@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
+package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 
-/**
- * This interface defines the contract for retrieving aggregated transaction execution metrics
- * from monitored @Transactional methods.
- *
- * @author Nikita Kirillov
- */
-public interface TransactionMonitoringService {}
+public enum TransactionOrigin {
+    SPRING_INFRASTRUCTURE,
+    APPLICATION_DECLARATIVE,
+    APPLICATION_IMPERATIVE
+}

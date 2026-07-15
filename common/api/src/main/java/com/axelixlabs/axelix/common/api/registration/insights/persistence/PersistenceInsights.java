@@ -15,12 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
+package com.axelixlabs.axelix.common.api.registration.insights.persistence;
+
+import java.util.List;
 
 /**
- * This interface defines the contract for retrieving aggregated transaction execution metrics
- * from monitored @Transactional methods.
+ * Insights of a particular Instance related to persistence.
  *
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public interface TransactionMonitoringService {}
+public class PersistenceInsights {
+
+    /**
+     * The aggregated information about the transactions inside the Instance.
+     */
+    private final List<TransactionAggregatedProfile> transactions;
+
+    public PersistenceInsights(List<TransactionAggregatedProfile> transactions) {
+        this.transactions = transactions;
+    }
+
+    public List<TransactionAggregatedProfile> getTransactions() {
+        return transactions;
+    }
+}

@@ -19,9 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpot;
+import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
@@ -33,13 +34,14 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvide
 public final class TestInsightsInfoProvider implements InsightsInfoProvider {
 
     public static final Insights TEST_INSIGHTS = new Insights(
-            new HotSpot(
+            new HotSpotInsights(
                     List.of(new InsightFeature("AppCDS", true), new InsightFeature("AotCache", false)),
                     List.of(
                             new InsightFeature("GCLoggingEnabled", true),
                             new InsightFeature("GCLogFileSpecified", false)),
                     List.of(new InsightFeature("CompactObjectHeaders", true))),
-            List.of(new InsightFeature("OSIV", false)));
+            List.of(new InsightFeature("OSIV", false)),
+            new PersistenceInsights(List.of()));
 
     @Override
     public Insights getInsight() {

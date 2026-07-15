@@ -175,16 +175,15 @@ class TransactionMonitoringAutoConfigurationTest {
         }
 
         @Bean
-        public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-                TransactionMonitoringService transactionMonitoringService) {
-            return new CustomTransactionMonitoringEndpoint(transactionMonitoringService);
+        public TransactionMonitoringEndpoint transactionMonitoringEndpoint() {
+            return new CustomTransactionMonitoringEndpoint();
         }
     }
 
     static class CustomTransactionStatsCollector extends DefaultTransactionStatsCollector {
 
         public CustomTransactionStatsCollector() {
-            super(1000);
+            super();
         }
     }
 
@@ -197,8 +196,8 @@ class TransactionMonitoringAutoConfigurationTest {
 
     static class CustomTransactionMonitoringEndpoint extends TransactionMonitoringEndpoint {
 
-        public CustomTransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
-            super(transactionMonitoringService);
+        public CustomTransactionMonitoringEndpoint() {
+            super();
         }
     }
 }

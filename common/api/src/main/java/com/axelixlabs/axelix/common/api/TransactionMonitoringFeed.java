@@ -269,43 +269,6 @@ public final class TransactionMonitoringFeed {
         }
     }
 
-    public static class LazyLoadingTarget {
-
-        /**
-         * The entity on which the assassination was lazy loaded
-         */
-        private final Class<?> ownerEntityClass;
-
-        /**
-         * The association
-         */
-        private final String associationPropertyName;
-
-        @JsonCreator
-        public LazyLoadingTarget(
-                @JsonProperty("ownerEntityClass") Class<?> ownerEntityClass,
-                @JsonProperty("associationPropertyName") String associationPropertyName) {
-            this.ownerEntityClass = ownerEntityClass;
-            this.associationPropertyName = associationPropertyName;
-        }
-
-        public Class<?> getOwnerEntityClass() {
-            return ownerEntityClass;
-        }
-
-        public String getAssociationPropertyName() {
-            return associationPropertyName;
-        }
-
-        public Class<?> ownerEntityClass() {
-            return ownerEntityClass;
-        }
-
-        public String associationPropertyName() {
-            return associationPropertyName;
-        }
-    }
-
     /**
      * Aggregated execution statistics for a transactional entrypoint.
      */

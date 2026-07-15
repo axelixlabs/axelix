@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
 import java.util.Map;
 
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 
 /**
@@ -43,7 +42,7 @@ public interface TransactionStatsCollector {
      *
      * @return map of method keys to their transaction statistics
      */
-    Map<MethodClassKey, SlidingWindow<TransactionExecutionProfile>> getAllStats();
+    Map<MethodClassKey, TransactionStats> getCopyOfStats();
 
     /**
      * Clears the stats

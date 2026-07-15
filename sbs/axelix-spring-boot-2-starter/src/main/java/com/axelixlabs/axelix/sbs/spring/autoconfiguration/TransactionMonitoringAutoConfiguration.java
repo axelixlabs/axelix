@@ -48,10 +48,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LogbackInMemo
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneCollectionLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneEntityLoadListener;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneIntegrator;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
@@ -77,29 +75,13 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TransactionStatsCollector transactionStatsCollector(
-            TransactionMonitoringConfigurationProperties properties) {
-
-        return new DefaultTransactionStatsCollector(properties.getMaxTransactionsPerMethod());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TransactionMonitoringService transactionMonitoringService(
-            TransactionStatsCollector transactionStatsCollector) {
-        return new DefaultTransactionMonitoringService(transactionStatsCollector);
+    public TransactionStatsCollector transactionStatsCollector() {
+        return new DefaultTransactionStatsCollector();
     }
 
     @Bean
     public TransactionAccessor transactionAccessor() {
         return new TransactionAccessor();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-            TransactionMonitoringService transactionMonitoringService) {
-        return new TransactionMonitoringEndpoint(transactionMonitoringService);
     }
 
     @Bean

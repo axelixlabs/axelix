@@ -73,7 +73,7 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
                 "heap" : "#{json-unit.ignore}"
               },
               "insights" : {
-                "hotSpot" : {
+                "hotSpotInsights" : {
                   "projectLeyden" : [
                     { "featureId" : "AppCDS", "enabled" : true },
                     { "featureId" : "AotCache", "enabled" : false }

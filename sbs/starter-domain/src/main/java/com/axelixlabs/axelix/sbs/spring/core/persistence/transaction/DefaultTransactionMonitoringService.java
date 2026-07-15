@@ -18,19 +18,16 @@
 package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
+import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.Query;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionalEntrypoint;
-import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 
 /**
  * Service providing access to transaction monitoring data and statistics.
@@ -46,21 +43,6 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
 
     public DefaultTransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
         this.transactionStatsCollector = transactionStatsCollector;
-    }
-
-    @Override
-    public TransactionMonitoringFeed getMonitoringFeed() {
-        Map<MethodClassKey, SlidingWindow<TransactionExecutionProfile>> statsMap =
-                transactionStatsCollector.getAllStats();
-
-        List<TransactionalEntrypoint> methodStats = statsMap.entrySet().stream()
-                .map(entry -> createTransactionalEntrypoint(
-                        entry.getKey().getTargetClass().getName(),
-                        entry.getKey().getMethod().getName(),
-                        entry.getValue().get()))
-                .collect(Collectors.toList());
-
-        return new TransactionMonitoringFeed(methodStats);
     }
 
     private TransactionalEntrypoint createTransactionalEntrypoint(
@@ -133,11 +115,10 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
                 .collect(Collectors.toList());
     }
 
-    private static TransactionMonitoringFeed.@Nullable LazyLoadingTarget convertLazyLoadingTarget(
+    private static @Nullable LazyLoadingTarget convertLazyLoadingTarget(
             TransactionExecutionProfile.AnalyzedSqlQueryRecord query) {
         return Optional.ofNullable(query.getLazyLoadingTarget())
-                .map(it -> new TransactionMonitoringFeed.LazyLoadingTarget(
-                        it.ownerEntityClass(), it.associationPropertyName()))
+                .map(it -> new LazyLoadingTarget(it.ownerEntityClass(), it.associationPropertyName()))
                 .orElse(null);
     }
 }

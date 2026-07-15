@@ -22,38 +22,50 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+
 /**
  * Insight information discovered for the given service instance.
  */
 public final class Insights {
 
-    private final HotSpot hotSpot;
+    private final HotSpotInsights hotSpotInsights;
     private final List<InsightFeature> springFramework;
+    private final PersistenceInsights persistenceInsights;
 
     /**
      * Creates a new Insight.
      *
-     * @param hotSpot         the HotSpot-specific insight groups.
+     * @param hotSpotInsights         the HotSpot-specific insight groups.
      * @param springFramework the Spring Framework insight features.
      */
     @JsonCreator
     public Insights(
-            @JsonProperty("hotSpot") HotSpot hotSpot,
-            @JsonProperty("springFramework") List<InsightFeature> springFramework) {
-        this.hotSpot = hotSpot;
+            @JsonProperty("hotSpot") HotSpotInsights hotSpotInsights,
+            @JsonProperty("springFramework") List<InsightFeature> springFramework,
+            @JsonProperty("persistenceInsights") PersistenceInsights persistenceInsights) {
+        this.hotSpotInsights = hotSpotInsights;
         this.springFramework = springFramework;
+        this.persistenceInsights = persistenceInsights;
     }
 
-    public HotSpot getHotSpot() {
-        return hotSpot;
+    public HotSpotInsights getHotSpot() {
+        return hotSpotInsights;
     }
 
     public List<InsightFeature> getSpringFramework() {
         return springFramework;
     }
 
+    public PersistenceInsights getPersistenceInsights() {
+        return persistenceInsights;
+    }
+
     @Override
     public String toString() {
-        return "Insight{" + "hotSpot=" + hotSpot + ", springFramework=" + springFramework + '}';
+        return "Insights{" + "hotSpotInsights="
+                + hotSpotInsights + ", springFramework="
+                + springFramework + ", persistenceInsights="
+                + persistenceInsights + '}';
     }
 }

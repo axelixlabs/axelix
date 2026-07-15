@@ -50,10 +50,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneInteg
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
@@ -79,24 +77,8 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TransactionStatsCollector transactionStatsCollector(
-            TransactionMonitoringConfigurationProperties properties) {
-
-        return new DefaultTransactionStatsCollector(properties.getMaxTransactionsPerMethod());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TransactionMonitoringService transactionMonitoringService(
-            TransactionStatsCollector transactionStatsCollector) {
-        return new DefaultTransactionMonitoringService(transactionStatsCollector);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
-            TransactionMonitoringService transactionMonitoringService) {
-        return new TransactionMonitoringEndpoint(transactionMonitoringService);
+    public TransactionStatsCollector transactionStatsCollector() {
+        return new DefaultTransactionStatsCollector();
     }
 
     @Bean
