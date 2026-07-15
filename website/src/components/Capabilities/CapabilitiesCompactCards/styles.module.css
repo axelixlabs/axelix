@@ -13,6 +13,11 @@
     }
 }
 
+.MainWrapper > a {
+    display: flex;
+    flex-direction: column;
+}
+
 .Icon {
     width: 28px;
     height: 28px;

@@ -13,10 +13,16 @@
     }
 }
 
+.MainWrapper > a {
+    display: flex;
+    flex-direction: column;
+}
+
 .Card {
     min-height: 300px;
     display: flex;
     flex-direction: column;
+    justify-content: start;
     row-gap: 18px;
 }
 
@@ -41,7 +47,7 @@
 }
 
 .Description {
-    margin: 0;
+    margin: 11px 0 0;
     font-size: 13.5px;
     line-height: 1.5;
     color: var(--axelix-ink-3);

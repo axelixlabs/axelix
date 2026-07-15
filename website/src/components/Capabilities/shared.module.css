@@ -1,4 +1,5 @@
 .Card {
+    height: 100%;
     background-color: rgb(255 255 255 / 75%);
     border: 1px solid var(--axelix-line-2);
     border-radius: 14px;

@@ -23,13 +23,13 @@ export const InstallTopSection = () => {
             <div>
                 <span className={styles.Eyebrow}>Install</span>
                 <h2 className={styles.Title}>
-                    Three commands. <span className="UnderlinedText">No agent, no JVM flags, no redeploys.</span>
+                    Install Axelix Master. Add library & plugin - <span className="UnderlinedText">that&#39;s all you need</span>
                 </h2>
             </div>
             <p className={styles.IntroText}>
-                Pick how you run things — Docker, Compose, or Kubernetes. Spin up the master, drop the starter into your
-                app, point it at the master. The service shows up in the console{" "}
-                <em className={styles.AccentText}>and</em> on the MCP server within seconds.
+                Pick how you run things - Docker Compose, Kubernetes or even on just VMs or bare metal. Install the
+                Axelix Master, drop the starter and plugin into your app. The installation is intentionally very simple
+                and requires very small amount of configuration.
             </p>
         </div>
     );

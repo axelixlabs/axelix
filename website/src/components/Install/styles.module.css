@@ -1,6 +1,6 @@
 .MainWrapper {
   position: relative;
-  padding-block: 88px 136px;
+  padding-block: 88px;
   border-top: 1px solid var(--axelix-line);
   background: var(--axelix-bg);
 

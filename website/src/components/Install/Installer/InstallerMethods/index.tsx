@@ -40,7 +40,7 @@ const METHODS: IInstallMethods[] = [
     },
     {
         key: EInstallMethod.BARE,
-        label: "Bare Metal",
+        label: "Bare Metal / VMs",
         icon: <ServerIcon width="22" height="22" />,
     },
 ];
@@ -63,7 +63,7 @@ const METHODS_DATA: TInstallMethodData = {
     },
     [EInstallMethod.BARE]: {
         description:
-            "Installing Axelix on bare metal without containerization is also possible by directly launching a JAR file",
+            "Installing Axelix on bare metal or VMs without containerization is also possible by directly launching a JAR file",
         href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar",
     },
 };
