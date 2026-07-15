@@ -26,7 +26,7 @@ export default function Page() {
             <Reveal>
                 <ReferenceApp />
             </Reveal>
-            <HowExactly />
+                <HowExactly />
             <Reveal>
                 <Capabilities />
             </Reveal>

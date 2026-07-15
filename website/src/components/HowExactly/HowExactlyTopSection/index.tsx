@@ -23,7 +23,7 @@ export const HowExactlyTopSection = () => {
             <span className={styles.Eyebrow}>How exactly?</span>
             <h2 className={styles.Title}>
                 No magic. Axelix pinpoints the <span className={styles.AccentText}>real problems</span>, on various
-                layers.
+                layers
             </h2>
             <p className={styles.Lead}>
                 Every gain above starts with a concrete problem Axelix detected and surfaced: from the JVM up through

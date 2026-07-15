@@ -20,7 +20,7 @@ import styles from "./styles.module.css";
 const ReferenceAppTopSection = () => {
     return (
         <div className={styles.MainWrapper}>
-            <span className={styles.Eyebrow}>what does Axelix offer</span>
+            <span className={styles.Eyebrow}>what does Axelix offer?</span>
             <h2 className={styles.Title}>
                 Axelix provides vital <span className={styles.AccentText}>insights</span> for Java apps.{" "}
                 <span className="UnderlinedText">Apply them, and watch your service change</span>
