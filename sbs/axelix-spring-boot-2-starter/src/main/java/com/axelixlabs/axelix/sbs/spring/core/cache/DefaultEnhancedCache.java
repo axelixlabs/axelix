@@ -28,6 +28,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
+import com.axelixlabs.axelix.sbs.spring.core.cache.CacheLookup.Outcome;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
  * Cache implementation that can be dynamically enabled or disabled at runtime.
@@ -43,11 +45,14 @@ public class DefaultEnhancedCache implements EnhancedCache {
     private final AtomicBoolean enabled;
     private final SlidingWindow<CacheLookup> cacheLookupHistory;
 
-    public DefaultEnhancedCache(@NonNull Cache delegate) {
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
+
+    public DefaultEnhancedCache(@NonNull Cache delegate, @Nullable AxelixMetricsPublisher metricsPublisher) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
         // TODO: We need to find a way to allow for configuring those values
         this.cacheLookupHistory = new SlidingWindow<>(200);
+        this.metricsPublisher = metricsPublisher;
     }
 
     @Override
@@ -93,8 +98,16 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
         if (result == null) {
             cacheLookupHistory.put(CacheLookup.miss());
+
+            if (metricsPublisher != null) {
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
+            }
         } else {
             cacheLookupHistory.put(CacheLookup.hit());
+
+            if (metricsPublisher != null) {
+                metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
+            }
         }
         return result;
     }
@@ -122,7 +135,19 @@ public class DefaultEnhancedCache implements EnhancedCache {
                 return valueLoader.call();
             });
 
-            cacheLookupHistory.put(miss.get() ? CacheLookup.miss() : CacheLookup.hit());
+            if (miss.get()) {
+                cacheLookupHistory.put(CacheLookup.miss());
+
+                if (metricsPublisher != null) {
+                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.MISS);
+                }
+            } else {
+                cacheLookupHistory.put(CacheLookup.hit());
+
+                if (metricsPublisher != null) {
+                    metricsPublisher.incrementCacheLookup(delegate.getName(), Outcome.HIT);
+                }
+            }
         }
 
         return value;

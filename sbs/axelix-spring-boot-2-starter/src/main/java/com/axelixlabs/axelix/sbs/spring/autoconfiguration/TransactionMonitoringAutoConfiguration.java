@@ -23,6 +23,7 @@ import javax.servlet.DispatcherType;
 
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,6 +37,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TranssactionStackCleanupFilter;
@@ -61,7 +63,7 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Ilya Naumov
  * @author Vyacheslav Yanin
  */
-@AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
+@AutoConfiguration(after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean
@@ -84,8 +86,11 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector transactionStatsCollector, TransactionAccessor transactionAccessor) {
-        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, transactionAccessor);
+            TransactionStatsCollector transactionStatsCollector,
+            TransactionAccessor transactionAccessor,
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+        return new TransactionMonitoringBeanPostProcessor(
+                transactionStatsCollector, metricsPublisherObjectProvider, transactionAccessor);
     }
 
     @Bean

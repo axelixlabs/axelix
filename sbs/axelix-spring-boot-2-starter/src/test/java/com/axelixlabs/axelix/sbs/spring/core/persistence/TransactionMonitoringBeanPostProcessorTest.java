@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -136,8 +138,11 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, TransactionAccessor transactionAccessor) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, transactionAccessor);
+                TransactionStatsCollector transactionStatsCollector,
+                TransactionAccessor transactionAccessor,
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+            return new TransactionMonitoringBeanPostProcessor(
+                    transactionStatsCollector, axelixMetricsPublisherObjectProvider, transactionAccessor);
         }
 
         @Bean

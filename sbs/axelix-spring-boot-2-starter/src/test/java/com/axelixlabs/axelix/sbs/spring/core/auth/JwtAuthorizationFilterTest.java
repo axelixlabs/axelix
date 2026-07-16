@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -76,6 +78,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -448,8 +452,14 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CacheManagerBeanPostProcessor();
+        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
+        }
+
+        @Bean
+        public AxelixMetricsPublisher axelixMetricsPublisher() {
+            return new DefaultAxelixMetricsPublisher(new SimpleMeterRegistry());
         }
 
         @Bean(name = MAIN_CACHE_MANAGER)

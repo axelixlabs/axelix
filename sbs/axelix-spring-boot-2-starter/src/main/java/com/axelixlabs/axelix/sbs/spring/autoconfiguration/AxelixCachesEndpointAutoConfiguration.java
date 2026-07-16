@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
@@ -31,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.CacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 
 /**
  * {@code CacheDispatcherAutoConfiguration} provides auto-configuration
@@ -53,7 +55,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = {CacheAutoConfiguration.class})
+@AutoConfiguration(after = {CacheAutoConfiguration.class, AxelixMetricsPublisherAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = AxelixCachesEndpoint.class)
 public class AxelixCachesEndpointAutoConfiguration {
 
@@ -76,7 +78,8 @@ public class AxelixCachesEndpointAutoConfiguration {
     }
 
     @Bean
-    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-        return new CacheManagerBeanPostProcessor();
+    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+        return new CacheManagerBeanPostProcessor(metricsPublisherObjectProvider);
     }
 }

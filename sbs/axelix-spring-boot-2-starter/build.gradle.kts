@@ -25,6 +25,7 @@ dependencies {
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
+    compileOnly("io.micrometer:micrometer-core")
     compileOnly("org.springframework.boot:spring-boot-starter-log4j2")
 
     // processor

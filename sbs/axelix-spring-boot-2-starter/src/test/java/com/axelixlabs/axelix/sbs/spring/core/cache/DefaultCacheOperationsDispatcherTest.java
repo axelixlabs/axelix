@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +30,8 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -58,12 +61,15 @@ class DefaultCacheOperationsDispatcherTest {
 
     @BeforeEach
     void setUp() {
+        AxelixMetricsPublisher axelixMetricsPublisher = new DefaultAxelixMetricsPublisher(new SimpleMeterRegistry());
         Map<String, CacheManager> managers = new HashMap<>();
 
         cacheManager1 = new DefaultEnhancedCacheManager(
-                TEST_CACHE_MANAGER_1, new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2));
-        cacheManager2 =
-                new DefaultEnhancedCacheManager(TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2));
+                TEST_CACHE_MANAGER_1,
+                new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2),
+                axelixMetricsPublisher);
+        cacheManager2 = new DefaultEnhancedCacheManager(
+                TEST_CACHE_MANAGER_2, new ConcurrentMapCacheManager(TEST_CACHE_2), axelixMetricsPublisher);
         managers.put(TEST_CACHE_MANAGER_1, cacheManager1);
         managers.put(TEST_CACHE_MANAGER_2, cacheManager2);
 

@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -44,14 +45,17 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
+    private final @Nullable AxelixMetricsPublisher metricsPublisher;
     private final TransactionAccessor transactionAccessor;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
+            @Nullable AxelixMetricsPublisher metricsPublisher,
             TransactionAccessor transactionAccessor) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
+        this.metricsPublisher = metricsPublisher;
         this.transactionAccessor = transactionAccessor;
     }
 
@@ -73,6 +77,11 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                 TransactionExecutionProfile transactionProfile = transactionAccessor.recordTransactionCompletion();
 
                 statsCollector.recordTransaction(key, transactionProfile);
+
+                if (metricsPublisher != null) {
+                    metricsPublisher.publishTransactionMetrics(
+                            declaringClass.getSimpleName(), method.getName(), transactionProfile);
+                }
             }
         }
 

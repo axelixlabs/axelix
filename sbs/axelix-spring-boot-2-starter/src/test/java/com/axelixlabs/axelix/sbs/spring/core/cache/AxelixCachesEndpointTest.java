@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.cache;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -28,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -50,6 +52,8 @@ import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -528,8 +532,14 @@ class AxelixCachesEndpointTest {
         }
 
         @Bean
-        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
-            return new CacheManagerBeanPostProcessor();
+        public AxelixMetricsPublisher axelixMetricsPublisher(MeterRegistry meterRegistry) {
+            return new DefaultAxelixMetricsPublisher(meterRegistry);
+        }
+
+        @Bean
+        public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor(
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+            return new CacheManagerBeanPostProcessor(axelixMetricsPublisherObjectProvider);
         }
 
         @Bean(name = MAIN_CACHE_MANAGER)
