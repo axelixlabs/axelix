@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.maven.plugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.it.VerificationException;
@@ -35,8 +37,10 @@ class CopyProfilerReportsMojoTest {
     public static final String CURRENT_DIR = new File("").getAbsolutePath();
 
     @Test
-    void should_copy_report() throws VerificationException {
+    void should_copy_report() throws VerificationException, IOException {
         String baseDir = CURRENT_DIR + "/src/integrationTest/copy-report";
+        Path classpathReportPath = Path.of(baseDir, "target/classes/spring-test-profiler/latest.html");
+        Files.deleteIfExists(classpathReportPath);
 
         Verifier verifier = new Verifier(baseDir);
         verifier.setAutoclean(false);
@@ -45,7 +49,6 @@ class CopyProfilerReportsMojoTest {
 
         verifier.verify(true);
 
-        Path classpathReportPath = Path.of(baseDir, "/target/classes/spring-test-profiler/latest.html");
         assertThat(classpathReportPath).exists();
     }
 }

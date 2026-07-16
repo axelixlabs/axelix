@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.maven.plugin;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -59,8 +60,7 @@ public class CopyProfilerReportsMojo extends AbstractMojo {
                     try {
                         Files.createDirectories(dest);
                     } catch (IOException e) {
-                        getLog().error("Failed to create directory when copying reports");
-                        throw new RuntimeException(e);
+                        throw new UncheckedIOException(e);
                     }
                     return;
                 }
@@ -68,13 +68,13 @@ public class CopyProfilerReportsMojo extends AbstractMojo {
                 try {
                     Files.copy(path, dest, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
-                    getLog().error("Failed to copy profiler-report file");
-                    throw new RuntimeException(e);
+                    throw new UncheckedIOException(e);
                 }
             });
         } catch (IOException e) {
-            getLog().error("Failed to open stream to reports folder");
-            throw new RuntimeException(e);
+            throw new MojoExecutionException("Failed to open stream to reports folder", e);
+        } catch (UncheckedIOException e) {
+            throw new MojoExecutionException("Failed to copy profiler reports", e.getCause());
         }
     }
 }
