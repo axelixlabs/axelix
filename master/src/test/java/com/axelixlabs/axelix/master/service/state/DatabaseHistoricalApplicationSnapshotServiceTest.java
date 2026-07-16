@@ -44,6 +44,9 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFramew
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -63,6 +66,9 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
 
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @Autowired
+    private InstanceRepository instanceRepository;
 
     @BeforeEach
     @AfterEach
@@ -294,6 +300,66 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                     .extracting(AggregatedFeature::adoptionPercentage)
                     .containsOnly(0.0);
             assertThat(dashboard.garbageCollectorDistribution()).isEmpty();
+        }
+    }
+
+    @Nested
+    class PersistenceInsightsTests {
+
+        @BeforeEach
+        @AfterEach
+        void cleanInstances() {
+            instanceRepository.deleteAll();
+        }
+
+        @Test
+        void shouldReturnPersistenceInsights() {
+            // given.
+            String instanceId = "instance-with-persistence-insights";
+            String groupId = "org.springframework.samples";
+            String artifactId = "petclinic";
+            TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
+                    TransactionOrigin.APPLICATION_DECLARATIVE,
+                    new TransactionalKey("com.example.OwnerService", "saveOwner"),
+                    new TransactionOverallStats(1, 10, 5),
+                    List.of(),
+                    Map.of("com.example.Pet", 2));
+            BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
+                    groupId, artifactId, new PersistenceInsights(List.of(profile)));
+            jdbcAggregateTemplate.insert(TestInstanceFactory.create(instanceId, groupId, artifactId));
+            subject.reloadCurrentState(metadata);
+
+            // when.
+            PersistenceInsights result = subject.getLatestPersistenceInsights(InstanceId.of(instanceId));
+
+            // then.
+            assertThat(result).isNotNull();
+            assertThat(result.getTransactions()).hasSize(1).first().satisfies(stored -> {
+                assertThat(stored.getTransactionOrigin()).isEqualTo(TransactionOrigin.APPLICATION_DECLARATIVE);
+                assertThat(stored.getTransactionalKey().getClassName()).isEqualTo("com.example.OwnerService");
+                assertThat(stored.getTransactionalKey().getMethodName()).isEqualTo("saveOwner");
+                assertThat(stored.getTransactionOverallStats().getMinMs()).isEqualTo(1);
+                assertThat(stored.getTransactionOverallStats().getMaxMs()).isEqualTo(10);
+                assertThat(stored.getTransactionOverallStats().getAverageMs()).isEqualTo(5);
+                assertThat(stored.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
+            });
+        }
+
+        @Test
+        void shouldReturnEmptyPersistenceInsights() {
+            // given.
+            String instanceId = "instance-without-persistence-insights";
+            String groupId = "com.example";
+            String artifactId = "service-a";
+            jdbcAggregateTemplate.insert(TestInstanceFactory.create(instanceId, groupId, artifactId));
+            subject.reloadCurrentState(TestMetadataFactory.create(groupId, artifactId));
+
+            // when.
+            PersistenceInsights result = subject.getLatestPersistenceInsights(InstanceId.of(instanceId));
+
+            // then.
+            assertThat(result).isNotNull();
+            assertThat(result.getTransactions()).isEmpty();
         }
     }
 

@@ -20,9 +20,10 @@ package com.axelixlabs.axelix.master.repository;
 import java.util.List;
 
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 
@@ -31,7 +32,8 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Snapsho
  *
  * @author Mikhail Polivakha
  */
-public interface HistoricalApplicationSnapshotRepository extends Repository<HistoricalApplicationSnapshot, SnapshotId> {
+public interface HistoricalApplicationSnapshotRepository
+        extends CrudRepository<HistoricalApplicationSnapshot, SnapshotId> {
 
     /**
      * Aggregates the adoption of the tracked Java/JVM features across the entire ecosystem. For every
@@ -72,6 +74,25 @@ public interface HistoricalApplicationSnapshotRepository extends Repository<Hist
             GROUP BY s.gc_in_use
             """)
     List<GarbageCollectorDistributionAggregate> aggregateLatestGarbageCollectorDistribution();
+
+    @Query("""
+            SELECT
+                has.persistence_insights
+            FROM historical_application_snapshots has
+            INNER JOIN instances i
+            ON
+                i.artifact_id = has.artifact_id
+                AND i.group_id = has.group_id
+            WHERE
+                i.instance_id = :instanceId
+                AND has.date = (
+                    SELECT MAX(latest.date)
+                    FROM historical_application_snapshots latest
+                    WHERE latest.group_id = has.group_id
+                      AND latest.artifact_id = has.artifact_id
+                )
+            """)
+    PersistenceInsights findLatestPersistenceInsightsForInstance(@Param("instanceId") String instanceId);
 
     /**
      * Aggregates the adoption of the tracked Spring Framework features across the entire ecosystem. For

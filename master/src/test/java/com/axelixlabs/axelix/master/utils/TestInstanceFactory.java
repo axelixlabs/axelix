@@ -48,6 +48,29 @@ public final class TestInstanceFactory {
         return create(id, DEFAULT_URL);
     }
 
+    public static Instance create(String id, String groupId, String artifactId) {
+        return withApplicationId(id, ApplicationId.of(groupId, artifactId));
+    }
+
+    public static Instance withApplicationId(String id, ApplicationId applicationId) {
+        return new Instance(
+                InstanceId.of(id),
+                applicationId,
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                "25",
+                "3.5.2",
+                "6.0.2",
+                null,
+                "BellSoft",
+                "df027cf",
+                Instant.now(),
+                Instant.now(),
+                DEFAULT_STATUS,
+                new MemoryUsage(1000L),
+                DEFAULT_URL);
+    }
+
     public static Instance create(String id, @Nullable Instant instant) {
         return createInstanceWithHeartbeat(id, instant);
     }

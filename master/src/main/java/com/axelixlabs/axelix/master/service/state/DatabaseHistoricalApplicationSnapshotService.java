@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboar
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.GarbageCollectorDistributionAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
@@ -117,6 +119,11 @@ public class DatabaseHistoricalApplicationSnapshotService {
         HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
 
         jdbcAggregateTemplate.upsert(applicationSnapshot);
+    }
+
+    @Transactional(readOnly = true)
+    public PersistenceInsights getLatestPersistenceInsights(InstanceId instanceId) {
+        return repository.findLatestPersistenceInsightsForInstance(instanceId.instanceId());
     }
 
     @Transactional
