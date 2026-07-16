@@ -361,6 +361,28 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getTransactions()).isEmpty();
         }
+
+        @Test
+        void shouldReturnNullWhenInstanceIsNotFound() {
+            // when.
+            PersistenceInsights result = subject.getLatestPersistenceInsights(InstanceId.of("missing-instance-id"));
+
+            // then.
+            assertThat(result).isNull();
+        }
+
+        @Test
+        void shouldReturnNullWhenNoSnapshotExists() {
+            // given.
+            String instanceId = "instance-without-snapshot";
+            jdbcAggregateTemplate.insert(TestInstanceFactory.create(instanceId));
+
+            // when.
+            PersistenceInsights result = subject.getLatestPersistenceInsights(InstanceId.of(instanceId));
+
+            // then.
+            assertThat(result).isNull();
+        }
     }
 
     @Nested

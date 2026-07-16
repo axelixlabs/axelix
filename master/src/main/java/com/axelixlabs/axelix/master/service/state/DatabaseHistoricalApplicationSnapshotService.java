@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,7 +124,7 @@ public class DatabaseHistoricalApplicationSnapshotService {
     }
 
     @Transactional(readOnly = true)
-    public PersistenceInsights getLatestPersistenceInsights(InstanceId instanceId) {
+    public @Nullable PersistenceInsights getLatestPersistenceInsights(InstanceId instanceId) {
         return repository.findLatestPersistenceInsightsForInstance(instanceId.instanceId());
     }
 
