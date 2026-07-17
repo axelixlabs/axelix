@@ -43,9 +43,4 @@ public interface TransactionStatsCollector {
      * @return map of method keys to their transaction statistics
      */
     Map<MethodClassKey, TransactionStats> getCopyOfStats();
-
-    /**
-     * Clears the stats
-     */
-    void clearStats();
 }

@@ -55,9 +55,4 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
     public Map<MethodClassKey, TransactionStats> getCopyOfStats() {
         return Collections.unmodifiableMap(statsMap);
     }
-
-    @Override
-    public void clearStats() {
-        statsMap.clear();
-    }
 }
