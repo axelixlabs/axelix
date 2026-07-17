@@ -24,6 +24,7 @@ import java.util.Deque;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.utils.Assert;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 
@@ -60,6 +61,20 @@ public class TransactionAccessor {
 
         if (currentTransactionProfile != null) {
             currentTransactionProfile.recordQuery(sqlQueryRecord);
+        }
+    }
+
+    /**
+     * Record the given blocking call to an external system to the current transaction.
+     * <p>
+     * Just like with the sql queries, if there is no active transaction for the current {@link Thread},
+     * the call is just ignored, as it does not block any transaction.
+     */
+    public void recordExternalCall(SimpleExternalCallRecord externalCall) {
+        TransactionExecutionProfile currentTransactionProfile = getCurrentTransactionProfile();
+
+        if (currentTransactionProfile != null) {
+            currentTransactionProfile.recordExternalCall(externalCall);
         }
     }
 

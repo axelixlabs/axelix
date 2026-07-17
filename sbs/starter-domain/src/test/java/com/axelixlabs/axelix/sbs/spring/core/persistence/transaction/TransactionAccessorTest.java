@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile.AnalyzedSqlQueryRecord;
@@ -47,6 +48,10 @@ class TransactionAccessorTest {
 
     private static SimpleSqlQueryRecord query(String sql) {
         return new SimpleSqlQueryRecord(sql, 5L, 1_000L, false);
+    }
+
+    private static SimpleExternalCallRecord externalCall(String target, long durationMs) {
+        return new SimpleExternalCallRecord(SimpleExternalCallRecord.TypeExternal.REST_TEMPLATE, target, durationMs);
     }
 
     @Nested
@@ -110,6 +115,88 @@ class TransactionAccessorTest {
                     .hasSize(1)
                     .extracting(AnalyzedSqlQueryRecord::getSql)
                     .containsExactly("select 1");
+        }
+    }
+
+    @Nested
+    class RecordExternalCall {
+
+        @Test
+        void shouldRecordExternalCallIntoActiveTransaction() {
+            // given.
+            subject.recordNewTransactionStarted();
+
+            // when.
+            subject.recordExternalCall(externalCall("GET https://payments/charge", 15L));
+            TransactionExecutionProfile profile = subject.recordTransactionCompletion();
+
+            // then.
+            assertThat(profile.getAggregatedExternalCalls())
+                    .hasSize(1)
+                    .extracting(agg -> agg.getExternalCall().getTarget())
+                    .containsExactly("GET https://payments/charge");
+        }
+
+        @Test
+        void shouldRecordExternalCallsAlongsideSqlQueries() {
+            // given.
+            subject.recordNewTransactionStarted();
+
+            // when.
+            subject.recordSqlQuery(query("select 1"));
+            subject.recordExternalCall(externalCall("GET https://payments/charge", 15L));
+            TransactionExecutionProfile profile = subject.recordTransactionCompletion();
+
+            // then.
+            assertThat(profile.getRecordedQueries()).hasSize(1);
+            assertThat(profile.getAggregatedExternalCalls()).hasSize(1);
+        }
+
+        @Test
+        void shouldSilentlyIgnoreExternalCallWhenNoTransactionIsActive() {
+            // given.
+            // no transaction has been started
+
+            // when then.
+            assertThatCode(() -> subject.recordExternalCall(externalCall("GET https://payments/charge", 15L)))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        void shouldNotLeakExternalCallRecordedOutsideTransactionIntoTheNextTransaction() {
+            // given.
+            subject.recordExternalCall(externalCall("GET https://orphan", 15L));
+
+            // when.
+            subject.recordNewTransactionStarted();
+            subject.recordExternalCall(externalCall("GET https://payments/charge", 15L));
+            TransactionExecutionProfile profile = subject.recordTransactionCompletion();
+
+            // then.
+            assertThat(profile.getAggregatedExternalCalls())
+                    .hasSize(1)
+                    .extracting(agg -> agg.getExternalCall().getTarget())
+                    .containsExactly("GET https://payments/charge");
+        }
+
+        @Test
+        void shouldAggregateRepeatedCallsToTheSameTarget() {
+            // given.
+            subject.recordNewTransactionStarted();
+
+            // when.
+            subject.recordExternalCall(externalCall("GET https://payments/charge", 10L));
+            subject.recordExternalCall(externalCall("GET https://payments/charge", 30L));
+            TransactionExecutionProfile profile = subject.recordTransactionCompletion();
+
+            // then. The two calls fold into one aggregated endpoint.
+            assertThat(profile.getAggregatedExternalCalls()).hasSize(1);
+
+            PerformanceStats stats = profile.getAggregatedExternalCalls().get(0).getStats();
+            assertThat(stats.getMinMs()).isEqualTo(10L);
+            assertThat(stats.getMaxMs()).isEqualTo(30L);
+            assertThat(stats.getAvgMs()).isEqualTo(20L);
+            assertThat(stats.getRecorded()).isEqualTo(2L);
         }
     }
 

@@ -50,7 +50,7 @@ public class TransactionStats {
 
     public void put(TransactionExecutionProfile transaction) {
         updateProblemsProfilers(transaction);
-        performanceStats.recordTransaction(transaction);
+        performanceStats.record(transaction.getTransactionDuration().toMillis());
     }
 
     private void updateProblemsProfilers(TransactionExecutionProfile transaction) {

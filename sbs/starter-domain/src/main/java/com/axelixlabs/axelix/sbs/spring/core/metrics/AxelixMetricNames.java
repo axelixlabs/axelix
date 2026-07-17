@@ -26,6 +26,7 @@ public final class AxelixMetricNames {
 
     public static final String TRANSACTION_DURATION = "axelix_transaction_duration";
     public static final String TRANSACTION_QUERIES = "axelix_transaction_queries";
+    public static final String TRANSACTION_EXTERNAL_CALLS = "axelix_transaction_external_calls";
     public static final String CACHE_REQUESTS = "axelix_cache_requests";
     public static final String CACHE_ENABLED = "axelix_cache_enabled";
 

@@ -25,6 +25,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.utils.Assert;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 
@@ -34,19 +35,24 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTa
  * @author Mikhail Polivakha
  */
 public class TransactionExecutionProfile {
-
     private final List<AnalyzedSqlQueryRecord> recordedQueries;
+    private final List<SimpleExternalCallRecord> recordedExternalCalls;
     private final Instant startedAt;
     private @Nullable Instant finishedAt;
 
     public TransactionExecutionProfile(Instant startedAt) {
         this.recordedQueries = new ArrayList<>(4);
+        this.recordedExternalCalls = new ArrayList<>(4);
         this.startedAt = startedAt;
         this.finishedAt = null;
     }
 
     public void recordQuery(SimpleSqlQueryRecord sqlQueryRecord) {
         recordedQueries.add(new AnalyzedSqlQueryRecord(sqlQueryRecord));
+    }
+
+    public void recordExternalCall(SimpleExternalCallRecord externalCall) {
+        recordedExternalCalls.add(externalCall);
     }
 
     public void recordLazyLoading(LazyLoadingTarget lazyLoadingTarget) {
@@ -101,6 +107,33 @@ public class TransactionExecutionProfile {
         return recordedQueries.size();
     }
 
+    public int getExternalCallCount() {
+        return recordedExternalCalls.size();
+    }
+
+    /**
+     * Fold the raw recorded external calls into one {@link AggregatedExternalCall}
+     * per {@code (type, target)} endpoint, carrying the running min/max/avg duration across the calls to it.
+     */
+    public List<AggregatedExternalCall> getAggregatedExternalCalls() {
+        List<AggregatedExternalCall> aggregated = new ArrayList<>();
+
+        for (SimpleExternalCallRecord call : recordedExternalCalls) {
+            AggregatedExternalCall endpoint = aggregated.stream()
+                    .filter(a -> a.getExternalCall().getType() == call.getType()
+                            && a.getExternalCall().getTarget().equals(call.getTarget()))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        AggregatedExternalCall created = new AggregatedExternalCall(call);
+                        aggregated.add(created);
+                        return created;
+                    });
+            endpoint.record(call.getDurationMs());
+        }
+
+        return aggregated;
+    }
+
     public static class AnalyzedSqlQueryRecord {
 
         private final SimpleSqlQueryRecord queryRecord;
@@ -142,6 +175,33 @@ public class TransactionExecutionProfile {
 
         public @Nullable LazyLoadingTarget getLazyLoadingTarget() {
             return lazyLoadingTarget;
+        }
+    }
+
+    /**
+     * Aggregate of all the calls to a single {@code (type, target)} external endpoint within the transaction,
+     * carrying the running min/max/avg duration across them.
+     */
+    public static class AggregatedExternalCall {
+
+        private final SimpleExternalCallRecord externalCall;
+        private final PerformanceStats stats;
+
+        AggregatedExternalCall(SimpleExternalCallRecord externalCall) {
+            this.externalCall = externalCall;
+            this.stats = new PerformanceStats();
+        }
+
+        void record(long durationMs) {
+            stats.record(durationMs);
+        }
+
+        public SimpleExternalCallRecord getExternalCall() {
+            return externalCall;
+        }
+
+        public PerformanceStats getStats() {
+            return stats;
         }
     }
 }
