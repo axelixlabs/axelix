@@ -70,7 +70,7 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
     }
 
     @Test
-    void testServicesAreProxied() {
+    void testSpringProxyingMechanismIsNotBroken() {
         assertThat(AopUtils.isCglibProxy(propagationTestHelper)).isTrue();
         assertThat(AopUtils.isCglibProxy(propagationTestService)).isTrue();
 
@@ -84,7 +84,7 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
             List<Advisor> advisors = Arrays.asList(((Advised) bean).getAdvisors());
 
             boolean hasMonitoringInterceptor = advisors.stream()
-                    .anyMatch(advisor -> advisor.getAdvice() instanceof TransactionMonitoringInterceptor);
+                    .allMatch(advisor -> advisor.getAdvice() instanceof TransactionMonitoringInterceptor);
 
             assertThat(hasMonitoringInterceptor).isTrue();
         }
