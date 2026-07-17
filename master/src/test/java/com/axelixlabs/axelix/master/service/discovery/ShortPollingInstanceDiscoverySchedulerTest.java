@@ -142,7 +142,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "groupId" : "org.springframework.samples",
-              "artifactId" : "petclinic",
+              "artifactId" : "%s",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
               "softwareVersions" : {
@@ -158,10 +158,12 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             }
         """;
 
-        mockWebServer.enqueue(
-                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
-        mockWebServer.enqueue(
-                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(response.formatted("app1"))
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(response.formatted("app2"))
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
         ServiceInstance k8sInstance1 = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance1Id)
