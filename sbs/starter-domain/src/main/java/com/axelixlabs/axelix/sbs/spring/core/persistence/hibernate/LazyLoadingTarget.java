@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate;
 
+import java.util.Objects;
+
 public class LazyLoadingTarget {
 
     /**
@@ -40,5 +42,20 @@ public class LazyLoadingTarget {
 
     public String associationPropertyName() {
         return associationPropertyName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        LazyLoadingTarget that = (LazyLoadingTarget) o;
+        return Objects.equals(ownerEntityClass, that.ownerEntityClass)
+                && Objects.equals(associationPropertyName, that.associationPropertyName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ownerEntityClass, associationPropertyName);
     }
 }

@@ -66,8 +66,11 @@ public class TransactionStats {
 
             if (recordedQuery.isInMemoryPaginated()) {
                 String selectionTarget = parseSelectionTarget(recordedQuery);
-                incomingInMemoryPaginationMap.compute(
-                        selectionTarget, (target, counter) -> counter == null ? 1 : counter + 1);
+
+                if (selectionTarget != null) {
+                    incomingInMemoryPaginationMap.compute(
+                            selectionTarget, (target, counter) -> counter == null ? 1 : counter + 1);
+                }
             }
         }
 
@@ -84,20 +87,41 @@ public class TransactionStats {
         return old == null ? incoming : Math.max(old, incoming);
     }
 
-    private static @NonNull String parseSelectionTarget(
+    /**
+     * Extracts the primary selection target (table / entity name) that follows the {@code FROM} clause.
+     *
+     * @return the first token after {@code FROM}, or {@code null} when the SQL has no recognizable {@code FROM} clause
+     */
+    private static @Nullable String parseSelectionTarget(
             TransactionExecutionProfile.AnalyzedSqlQueryRecord recordedQuery) {
-        int index = recordedQuery.getSql().indexOf(" from ");
+        String sql = recordedQuery.getSql();
+        int index = sql.indexOf(" from ");
 
         if (index == -1) {
-            index = recordedQuery.getSql().indexOf(" FROM ");
+            index = sql.indexOf(" FROM ");
         }
 
         if (index == -1) {
-            // o_0, how can it be? warning and skip
+            return null;
         }
-        String trimmedSql = recordedQuery.getSql().substring(index + 6).trim();
-        int tailingWhitespace = trimmedSql.indexOf("\\s+"); // whitespace
-        return trimmedSql.substring(0, tailingWhitespace);
+
+        String afterFrom = sql.substring(index + " from ".length()).trim();
+        int whitespaceIndex = indexOfFirstWhitespace(afterFrom);
+
+        if (whitespaceIndex == -1) {
+            return afterFrom;
+        }
+
+        return afterFrom.substring(0, whitespaceIndex);
+    }
+
+    private static int indexOfFirstWhitespace(@NonNull String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public PerformanceStats getPerformanceStats() {
