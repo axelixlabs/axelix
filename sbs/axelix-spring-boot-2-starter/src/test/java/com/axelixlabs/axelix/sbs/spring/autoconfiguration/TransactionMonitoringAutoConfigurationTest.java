@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.LogbackInMemoryPaginationAppenderConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +58,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionStatsCollector.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
+            assertThat(context).hasSingleBean(ExternalCallRestTemplateCustomizer.class);
             assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
