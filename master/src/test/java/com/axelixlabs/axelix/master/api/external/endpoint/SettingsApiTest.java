@@ -37,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -218,6 +219,62 @@ class SettingsApiTest {
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
+        }
+    }
+
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @AutoConfigureTestRestTemplate
+    @TestPropertySource(
+            properties = {
+                "axelix.master.auth.options.local.enabled=true",
+                "axelix.master.auth.options.super-admin.credentials.password=admin",
+                "axelix.master.auth.options.super-admin.credentials.username=admin",
+                "axelix.master.auth.options.oauth2.enabled=true",
+                // Distinct issuer keeps this test in its own Spring context (and thus a freshly-resolved
+                // OIDC metadata Lazy), so the mock throwing is not masked by a cached, already-resolved value.
+                "axelix.master.auth.options.oauth2.issuer-uri=http://unreachable.provider.test",
+                "axelix.master.auth.options.oauth2.client-id=test-client",
+                "axelix.master.auth.options.oauth2.client-secret=test-secret",
+                "axelix.master.auth.options.oauth2.base-url=http://localhost:3000"
+            })
+    @Nested
+    class WhenOAuth2ProviderUnreachable {
+
+        // The OIDC option is dropped so that the UI still loads and local/super-admin login remain usable.
+        private static final String EXPECTED_JSON =
+                // language=json
+                """
+                {
+                  "authenticationOptions": [
+                    {
+                      "type": "super-admin"
+                    },
+                    {
+                      "type": "local"
+                    }
+                  ],
+                  "isMcpServerEnabled" : false
+                }
+                """;
+
+        @Autowired
+        private TestRestTemplate restTemplate;
+
+        @MockitoBean
+        private OidcMetadataProvider oidcMetadataProvider;
+
+        @BeforeEach
+        void prepare() {
+            Mockito.when(oidcMetadataProvider.getAuthorizationEndpoint())
+                    .thenThrow(new OidcMetadataUnavailableException("http://unreachable.provider.test"));
+        }
+
+        @Test
+        void shouldOmitOidcAndReturnOtherProviders() {
+            ResponseEntity<String> response = restTemplate.getForEntity("/api/external/settings", String.class);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThatJson(response.getBody()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_JSON);
         }
     }
 }

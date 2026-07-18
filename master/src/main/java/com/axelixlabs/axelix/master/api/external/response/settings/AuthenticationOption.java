@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Interface that represent a specific authentication option.
  *
@@ -33,4 +35,18 @@ public sealed interface AuthenticationOption
      * @return the type identifier, e.g. {@code "oidc"} or {@code login-password}
      */
     String type();
+
+    /**
+     * Whether this authentication option can currently be offered to the user.
+     * <p>
+     * Options that depend on an external system (e.g. an OIDC provider) may become temporarily
+     * unavailable. Such options are excluded from the settings response so that the UI still loads
+     * and the remaining options stay usable, instead of failing the whole response.
+     *
+     * @return {@code true} if the option should be exposed, {@code false} to omit it
+     */
+    @JsonIgnore
+    default boolean isAvailable() {
+        return true;
+    }
 }
