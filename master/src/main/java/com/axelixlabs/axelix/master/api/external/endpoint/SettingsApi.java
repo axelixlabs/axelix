@@ -51,6 +51,8 @@ public class SettingsApi {
 
     @GetMapping(path = ApiPaths.SettingsApi.SETTINGS)
     public AxelixSettings getAxelixSettings() {
-        return new AxelixSettings(authSettings, isMcpServerEnabled);
+        List<AuthenticationOption> availableOptions =
+                authSettings.stream().filter(AuthenticationOption::isAvailable).toList();
+        return new AxelixSettings(availableOptions, isMcpServerEnabled);
     }
 }

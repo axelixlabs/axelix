@@ -17,9 +17,11 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.axelixlabs.axelix.common.utils.Lazy;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 
 /**
  * Authentication settings for OAuth2/OIDC userOrigin.
@@ -51,6 +53,22 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
 
     public String getAuthorizationEndpoint() {
         return authorizationEndpointResolver.require();
+    }
+
+    /**
+     * The OIDC option is only available when the provider's metadata (and thus the authorization
+     * endpoint) can be resolved. When the provider is unreachable we omit this option rather than
+     * failing the whole settings response during serialization.
+     */
+    @Override
+    @JsonIgnore
+    public boolean isAvailable() {
+        try {
+            authorizationEndpointResolver.require();
+            return true;
+        } catch (OidcMetadataUnavailableException e) {
+            return false;
+        }
     }
 
     public String getClientId() {
