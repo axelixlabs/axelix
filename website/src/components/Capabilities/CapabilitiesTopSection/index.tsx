@@ -22,9 +22,9 @@ export const CapabilitiesTopSection = () => {
         <>
             <div className={styles.MainWrapper}>
                 <div>
-                    <span className={styles.Eyebrow}>Capabilities</span>
+                    <span className={styles.Eyebrow}>Debugging</span>
                     <h2 className={styles.Title}>
-                        Secure Spring Boot Diagnostics for both <span className={styles.GreenText}>Humans</span> &{" "}
+                        Secure Spring Boot Runtime Debugging for both <span className={styles.GreenText}>Humans</span> &{" "}
                         <span className={styles.BlueText}>AI Agents</span>
                     </h2>
                 </div>

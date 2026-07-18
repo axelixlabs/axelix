@@ -25,7 +25,8 @@ import {
 import { IInstallConfigurationOptions, IInstallSpringBootOptions } from "@/models";
 
 export const NAV_LINKS: INavLink[] = [
-    { href: "#capabilities", label: "Capabilities" },
+    { href: "#reference-app", label: "Why Axelix?" },
+    { href: "#capabilities", label: "Debugging" },
     { href: "#install", label: "Install" },
     { href: "#enterprise", label: "Enterprise" },
     { href: "#faq", label: "FAQ" },

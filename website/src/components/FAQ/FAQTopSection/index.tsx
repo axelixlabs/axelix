@@ -27,8 +27,8 @@ export const FAQTopSection = () => {
                 </h2>
             </div>
             <p className={styles.IntroText}>
-                Everything you&apos;d ask before pointing answer console at your fleet — license, safety, platform
-                support, and what&apos;s next.
+                Everything you&apos;d ask before installing it into production - license, safety, platform support, and
+                what&apos;s next.
             </p>
         </div>
     );
