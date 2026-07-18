@@ -40,8 +40,6 @@ internal class AutoConfigClassScanner {
         private const val TARGET_ANNOTATION_DESCRIPTOR = "Lorg/springframework/boot/autoconfigure/AutoConfiguration;"
     }
 
-    private val classFile = ClassFile.of()
-
     fun scanForAutoConfigurations(directories: Set<File>): List<String> {
         val classes = LinkedHashSet<String>()
         directories.forEach { dir ->
@@ -69,6 +67,7 @@ internal class AutoConfigClassScanner {
 
     private fun addClassToAutoConfigListIfHasAnnotation(classPath: Path?, classes: LinkedHashSet<String>) {
         try {
+            val classFile = ClassFile.of()
             val model = classFile.parse(classPath)
 
             if (hasAutoConfigurationAnnotation(model)) {
