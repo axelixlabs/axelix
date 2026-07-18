@@ -524,7 +524,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(new LazyLoadingTarget(String.class, associationPropertyName), count);
+        return new CountedLazyLoadingTarget(
+                new LazyLoadingTarget(String.class.getName(), associationPropertyName), count);
     }
 
     private static HistoricalApplicationSnapshot persistenceSnapshot(

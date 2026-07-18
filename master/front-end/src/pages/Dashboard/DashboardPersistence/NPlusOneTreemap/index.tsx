@@ -65,7 +65,7 @@ export const NPlusOneTreemap = ({ nPlusOneEntries }: IProps) => {
         },
         {
             label: t("Dashboard.Persistence.statSecondLabel"),
-            value: `${maxOccurrences.appName}`,
+            value: `${maxOccurrences ? maxOccurrences.appName : "All Clear!"}`,
             color: "#f59e0b",
         },
     ];

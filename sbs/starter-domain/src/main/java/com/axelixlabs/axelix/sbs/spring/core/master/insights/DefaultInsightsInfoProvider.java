@@ -121,7 +121,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return nPlusOneOccasions.entrySet().stream()
                 .map(entry -> new CountedLazyLoadingTarget(
                         new LazyLoadingTarget(
-                                entry.getKey().ownerEntityClass(),
+                                entry.getKey().ownerEntityClass().getName(),
                                 entry.getKey().associationPropertyName()),
                         entry.getValue()))
                 .collect(Collectors.toList());

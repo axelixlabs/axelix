@@ -339,6 +339,7 @@ public class DashboardApiTest {
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(new LazyLoadingTarget(String.class, associationPropertyName), count);
+        return new CountedLazyLoadingTarget(
+                new LazyLoadingTarget(String.class.getName(), associationPropertyName), count);
     }
 }

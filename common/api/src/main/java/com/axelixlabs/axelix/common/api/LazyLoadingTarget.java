@@ -28,9 +28,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LazyLoadingTarget {
 
     /**
-     * The entity on which the assassination was lazy loaded
+     * The fully qualified name of the entity on which the association was lazy loaded. Deliberately kept as a
+     * plain {@link String} rather than a {@link Class}: the class belongs to the monitored application and is not
+     * present on the Axelix Master classpath, so deserializing it into a {@link Class} on the master side would fail.
      */
-    private final Class<?> ownerEntityClass;
+    private final String ownerEntityClass;
 
     /**
      * The association
@@ -39,13 +41,13 @@ public class LazyLoadingTarget {
 
     @JsonCreator
     public LazyLoadingTarget(
-            @JsonProperty("ownerEntityClass") Class<?> ownerEntityClass,
+            @JsonProperty("ownerEntityClass") String ownerEntityClass,
             @JsonProperty("associationPropertyName") String associationPropertyName) {
         this.ownerEntityClass = ownerEntityClass;
         this.associationPropertyName = associationPropertyName;
     }
 
-    public Class<?> getOwnerEntityClass() {
+    public String getOwnerEntityClass() {
         return ownerEntityClass;
     }
 
@@ -53,7 +55,7 @@ public class LazyLoadingTarget {
         return associationPropertyName;
     }
 
-    public Class<?> ownerEntityClass() {
+    public String ownerEntityClass() {
         return ownerEntityClass;
     }
 
