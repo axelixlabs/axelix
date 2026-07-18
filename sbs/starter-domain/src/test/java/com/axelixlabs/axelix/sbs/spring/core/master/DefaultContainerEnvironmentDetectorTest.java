@@ -46,46 +46,37 @@ class DefaultContainerEnvironmentDetectorTest {
     @Mock
     private DockerDetector dockerDetector;
 
-    @Mock
-    private FirstPidInspector firstPidInspector;
-
     @InjectMocks
     private DefaultContainerDetector subject;
 
     @ParameterizedTest // GH-1219
     @MethodSource("anyContainerMarks")
-    void returnTrue_whenHasAnyMarker(
-            Boolean hasK8sEnvironmentVariable, Boolean hasDockerEnvironmentFile, Boolean isFirstPidNotInitialProcess) {
+    void returnTrue_whenHasAnyMarker(Boolean hasKubernetesMarker, Boolean hasDockerMarker) {
         // given.
-        when(kubernetesDetector.hasKubernetesServiceHostVariable()).thenReturn(hasK8sEnvironmentVariable);
-        lenient().when(dockerDetector.hasDockerEnvironmentFile()).thenReturn(hasDockerEnvironmentFile);
-        lenient().when(firstPidInspector.isFirstPidNotInitialProcess()).thenReturn(isFirstPidNotInitialProcess);
+        when(kubernetesDetector.hasKubernetesMarker()).thenReturn(hasKubernetesMarker);
+        lenient().when(dockerDetector.hasDockerMarker()).thenReturn(hasDockerMarker);
 
         // when.
-        assertThat(subject.isRunningInContainer())
-                // then.
-                .isTrue();
+        boolean result = subject.isRunningInContainer();
+
+        // then.
+        assertThat(result).isTrue();
     }
 
     @Test // GH-1219
     void returnFalse_whenNoContainerMarkers() {
         // given.
-        doReturn(false).when(kubernetesDetector).hasKubernetesServiceHostVariable();
-        doReturn(false).when(dockerDetector).hasDockerEnvironmentFile();
-        doReturn(false).when(firstPidInspector).isFirstPidNotInitialProcess();
+        doReturn(false).when(kubernetesDetector).hasKubernetesMarker();
+        doReturn(false).when(dockerDetector).hasDockerMarker();
+
         // when.
-        assertThat(subject.isRunningInContainer())
-                // then.
-                .isFalse();
+        boolean result = subject.isRunningInContainer();
+
+        // then.
+        assertThat(result).isFalse();
     }
 
     private static Stream<Arguments> anyContainerMarks() {
-        return Stream.of(
-                // K8S mark
-                Arguments.of(true, false, false),
-                // Docker mark
-                Arguments.of(false, true, false),
-                // PID mark
-                Arguments.of(false, false, true));
+        return Stream.of(Arguments.of(true, false), Arguments.of(false, true));
     }
 }

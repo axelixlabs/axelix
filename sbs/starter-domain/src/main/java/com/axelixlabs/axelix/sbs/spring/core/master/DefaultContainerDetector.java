@@ -25,13 +25,10 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 public class DefaultContainerDetector implements ContainerEnvironmentDetector {
     private final KubernetesDetector kubernetesDetector;
     private final DockerDetector dockerDetector;
-    private final FirstPidInspector firstPidInspector;
 
-    public DefaultContainerDetector(
-            KubernetesDetector kubernetesDetector, DockerDetector dockerDetector, FirstPidInspector firstPidInspector) {
+    public DefaultContainerDetector(KubernetesDetector kubernetesDetector, DockerDetector dockerDetector) {
         this.kubernetesDetector = kubernetesDetector;
         this.dockerDetector = dockerDetector;
-        this.firstPidInspector = firstPidInspector;
     }
 
     /**
@@ -39,21 +36,16 @@ public class DefaultContainerDetector implements ContainerEnvironmentDetector {
      *
      * <p>The detection evaluates the following signals in order:
      * <ol>
-     *   <li>Presence of the Kubernetes environment variable.</li>
-     *   <li>Presence of the Docker marker file.</li>
-     *   <li>Whether PID 1 is a well-known system init process.</li>
+     *   <li>Presence of the Kubernetes marker.</li>
+     *   <li>Presence of the Docker marker.</li>
      * </ol>
      */
     @Override
     public boolean isRunningInContainer() {
-        if (kubernetesDetector.hasKubernetesServiceHostVariable()) {
+        if (kubernetesDetector.hasKubernetesMarker()) {
             return true;
         }
 
-        if (dockerDetector.hasDockerEnvironmentFile()) {
-            return true;
-        }
-
-        return firstPidInspector.isFirstPidNotInitialProcess();
+        return dockerDetector.hasDockerMarker();
     }
 }

@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
  * Detects whether the application is running inside a Docker container.
@@ -26,15 +26,32 @@ import java.nio.file.Paths;
  * @author Ilya Naumov
  */
 public class DockerDetector {
-    private static final String DOCKER_ENVIRONMENT_PATH = "/.dockerenv";
+    private static final Path DEFAULT_DOCKER_ENV_PATH = Path.of("/.dockerenv");
+
+    private final Path dockerEnvPath;
 
     /**
-     * Checks whether the Docker environment marker file exists,
-     * which indicates a Docker container environment.
+     * Creates a detector using the default /.dockerenv path.
+     */
+    public DockerDetector() {
+        this(DEFAULT_DOCKER_ENV_PATH);
+    }
+
+    /**
+     * Creates a detector using the specified Docker environment marker path.
+     *
+     * @param dockerEnvPath path to the Docker environment marker file
+     */
+    public DockerDetector(Path dockerEnvPath) {
+        this.dockerEnvPath = dockerEnvPath;
+    }
+
+    /**
+     * Checks whether the Docker environment marker file exists, which indicates a Docker container environment.
      *
      * @return {@code true} if the Docker environment marker file is present
      */
-    public boolean hasDockerEnvironmentFile() {
-        return Files.exists(Paths.get(DOCKER_ENVIRONMENT_PATH));
+    public boolean hasDockerMarker() {
+        return Files.exists(dockerEnvPath);
     }
 }

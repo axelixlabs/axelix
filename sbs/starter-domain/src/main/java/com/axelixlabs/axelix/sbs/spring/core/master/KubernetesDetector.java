@@ -31,7 +31,7 @@ public class KubernetesDetector {
      *
      * @return {@code true} if the Kubernetes service host variable is present
      */
-    public boolean hasKubernetesServiceHostVariable() {
+    public boolean hasKubernetesMarker() {
         return System.getenv(K8S_SERVICE_HOST_VARIABLE) != null;
     }
 }
