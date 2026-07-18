@@ -35,6 +35,12 @@ import java.nio.file.Files
  */
 internal class AutoConfigFileWriter {
 
+    companion object {
+        private val log = Logging.getLogger(AutoConfigFileWriter::class.java)
+        private const val HEADER = "# Generated programmatically by scanning @AutoConfiguration annotation\n"
+        private const val LINE_SEPARATOR = "\n"
+    }
+
     @Throws(IOException::class)
     fun write(outputFile: File, classes: List<String>) {
         ensureParentDirectoryExists(outputFile)
@@ -44,7 +50,7 @@ internal class AutoConfigFileWriter {
             return
         }
 
-        val content = HEADER + classes.joinToString("\n") + "\n"
+        val content = HEADER + classes.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
         Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8)
         log.lifecycle("Axelix Plugin: Found and registered {} @AutoConfiguration classes.", classes.size)
     }
@@ -55,10 +61,5 @@ internal class AutoConfigFileWriter {
         if (parent != null && !parent.exists()) {
             Files.createDirectories(parent.toPath())
         }
-    }
-
-    companion object {
-        private val log = Logging.getLogger(AutoConfigFileWriter::class.java)
-        private const val HEADER = "# Generated programmatically by scanning @AutoConfiguration annotation\n"
     }
 }

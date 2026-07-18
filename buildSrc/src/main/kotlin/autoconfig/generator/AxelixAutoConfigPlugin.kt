@@ -19,6 +19,7 @@ package autoconfig.generator
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.register
@@ -29,7 +30,7 @@ import java.io.File
  *
  * This plugin automates the creation and synchronization of the Spring Boot configuration file:
  * `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.
- * The plugin scans the Java source files for the `@AutoConfiguration` annotation
+ * The plugin scans the Java classes for the `@AutoConfiguration` annotation
  * and populates the imports file automatically.
  *
  * @author Vyacheslav Yanin
@@ -37,33 +38,41 @@ import java.io.File
  */
 class AxelixAutoConfigPlugin : Plugin<Project> {
 
-    override fun apply(project: Project) {
-        project.plugins.withId("java") {
-            registerTask(project)
-        }
-    }
-
-    private fun registerTask(project: Project) {
-        project.tasks.register<GenerateImportsByAnnotationTask>(TASK_NAME) {
-
-            val mainSourceSet = project.extensions
-                .getByType(JavaPluginExtension::class.java)
-                .sourceSets
-                .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-
-            sourceDirectories.from(mainSourceSet.java.srcDirs)
-
-            val resourcesDir = mainSourceSet.resources.srcDirs.first()
-            outputFile.set(File(resourcesDir, IMPORTS_FILE_PATH))
-
-            description = "Generates Spring Boot auto-configuration imports file in src/main/resources"
-            group = "axelix"
-        }
-    }
-
     companion object {
         private const val TASK_NAME = "generateAutoConfigImports"
         private const val IMPORTS_FILE_PATH =
             "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
+    }
+
+    override fun apply(project: Project) {
+        project.plugins.withId("java") {
+            registerTask(project)
+            configureAutoExecution(project)
+        }
+    }
+
+    private fun registerTask(project: Project) {
+        val mainSourceSet = project.extensions
+            .getByType(JavaPluginExtension::class.java)
+            .sourceSets
+            .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+
+        project.tasks.register<GenerateImportsByAnnotationTask>(TASK_NAME) {
+            classDirectories.from(mainSourceSet.output.classesDirs)
+
+            val resourcesDir = mainSourceSet.resources.srcDirs.firstOrNull()
+                ?: project.layout.buildDirectory.dir("resources/main").get().asFile
+
+            outputFile.set(File(resourcesDir, IMPORTS_FILE_PATH))
+
+            description = "Generates Spring Boot auto-configuration imports file from compiled classes"
+            group = "axelix"
+        }
+    }
+
+    private fun configureAutoExecution(project: Project) {
+        project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME) {
+            finalizedBy(TASK_NAME)
+        }
     }
 }
