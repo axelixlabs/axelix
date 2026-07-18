@@ -22,35 +22,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,9 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@SpringBootTest
-@Import(TransactionMonitoringBeanPostProcessorTest.TransactionMonitoringBeanPostProcessorTestConfiguration.class)
-class TransactionMonitoringBeanPostProcessorTest {
+class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMonitoringSharedContextTest {
 
     @Autowired
     private OwnerRepository ownerRepository;
@@ -124,122 +102,5 @@ class TransactionMonitoringBeanPostProcessorTest {
         key = new MethodClassKey(testFromNonTransactional, PropagationTestHelper.class);
 
         assertThat(propagationCache).containsKey(key);
-    }
-
-    @TestConfiguration
-    @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = Owner.class)
-    static class TransactionMonitoringBeanPostProcessorTestConfiguration {
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector();
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector,
-                TransactionAccessor transactionAccessor,
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
-            return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, axelixMetricsPublisherObjectProvider, transactionAccessor);
-        }
-
-        @Bean
-        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                TransactionAccessor transactionAccessor) {
-            return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
-        }
-
-        @Bean
-        public TransactionAccessor transactionAccessor() {
-            return new TransactionAccessor();
-        }
-
-        @Bean
-        public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
-        }
-
-        @Bean
-        public PropagationTestService propagationTestService(
-                OwnerRepository ownerRepository, PropagationTestHelper helper) {
-            return new PropagationTestService(ownerRepository, helper);
-        }
-    }
-
-    @Entity
-    static class Owner {
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        private String lastName;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-    }
-
-    interface OwnerRepository extends JpaRepository<Owner, Long> {
-
-        @Transactional
-        default Owner findByLastName(String lastName) {
-            return new Owner();
-        }
-
-        @Transactional(propagation = Propagation.SUPPORTS)
-        default List<Owner> findAll() {
-            return List.of(new Owner());
-        }
-    }
-
-    static class PropagationTestHelper {
-
-        private final OwnerRepository ownerRepository;
-        private final PropagationTestHelper self;
-
-        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            this.ownerRepository = ownerRepository;
-            this.self = self;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testRequiresNew(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testNestedRequiresNew() {
-            ownerRepository.findByLastName("Franklin");
-        }
-
-        @Transactional(propagation = Propagation.MANDATORY)
-        public void testMandatory(String lastName) {
-            ownerRepository.findByLastName(lastName);
-        }
-    }
-
-    static class PropagationTestService {
-
-        private final OwnerRepository ownerRepository;
-        private final PropagationTestHelper helperService;
-
-        public PropagationTestService(OwnerRepository ownerRepository, PropagationTestHelper helperService) {
-            this.ownerRepository = ownerRepository;
-            this.helperService = helperService;
-        }
-
-        @Transactional(propagation = Propagation.REQUIRED)
-        void testRequired(String lastName) {
-            ownerRepository.findByLastName(lastName);
-            helperService.testNestedRequiresNew();
-        }
     }
 }
