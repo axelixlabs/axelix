@@ -42,10 +42,10 @@ const metrics = [
     },
     {
         label: "Startup time",
-        value: "−41%",
+        value: "−30%",
         unit: "faster",
-        was: { amount: "6.4 s", widthPercent: "100%" },
-        now: { amount: "3.8 s", widthPercent: "59%" },
+        was: { amount: "4.33 s", widthPercent: "100%" },
+        now: { amount: "3.07 s", widthPercent: "71%" },
     },
 ];
 

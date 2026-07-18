@@ -21,17 +21,17 @@ export const HeroHeadline = () => {
     return (
         <>
             <h1 className={styles.Title}>
-                <span className={styles.GreenText}>AI-Native</span> platform{" "}
-                <span>
-                    to upgrade your <span className={styles.GreenText}>Spring&nbsp;Boot</span> services to the next
-                    level
-                </span>
+                <h1 className={styles.Title}>
+                    Make sure your <span className={styles.GreenText}>Java</span> microservices are ready for the{" "}
+                    <span className={styles.GreenText}>AI</span> era.
+                </h1>
             </h1>
 
             <p className={styles.Lede}>
-                Axelix is the <span className={styles.GreenTextBold}>AI-Native</span>, Open Core solution designed to
-                ensure that your Spring Boot deployments are performing as good as they possibly can.{" "}
-                <span className={styles.GreenTextBold}>At scale</span>.
+                The <span className={styles.GreenTextBold}>AI-Native</span>, Open Core solution for the AI era: its
+                open-source core <span className={styles.GreenTextBold}>pinpoints</span> what holds your Java back,
+                while while Axelix Enterprise <span className={styles.GreenTextBold}>enforces</span> optimization
+                policies whole ecosystem. <span className={styles.GreenTextBold}>At scale</span>.
             </p>
         </>
     );
