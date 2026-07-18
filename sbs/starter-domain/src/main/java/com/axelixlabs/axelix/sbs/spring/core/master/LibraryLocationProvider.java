@@ -17,25 +17,25 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.net.URL;
+
 /**
- * Detects whether the application is launched by Spring Boot {@code JarLauncher}.
+ * Provides information about the location from which the library is loaded.
  *
  * @author Ilya Naumov
  */
-public interface JarLauncherDetector {
-    /**
-     * Determines whether the current thread's context ClassLoader or any of its
-     * parents matches a ClassLoader used by {@code JarLauncher}.
-     *
-     * @return {@code true} if a matching ClassLoader is found in the hierarchy
-     */
-    boolean isThreadContextClassLoaderHierarchyMatching();
+public class LibraryLocationProvider {
 
     /**
-     * Determines whether a library class loader matches a ClassLoader used
-     * by {@code JarLauncher}.
+     * Returns whether the library is loaded from a file-based location.
      *
-     * @return {@code true} if a library class loader matches
+     * @return {@code true} if the library's code source uses the {@code file} protocol
      */
-    boolean isLibraryClassLoaderMatching();
+    public boolean hasFileProtocol() {
+        URL libraryLocation = LibraryLocationProvider.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation();
+        return "file".equals(libraryLocation.getProtocol());
+    }
 }

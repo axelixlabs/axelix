@@ -23,7 +23,6 @@ import org.jspecify.annotations.Nullable;
  * SLF4J implementation for {@link Logger}.
  *
  * @author Mikhail Polivakha
- * @author Ilya Naumov
  */
 public class SLF4JLogger implements Logger {
 
@@ -46,10 +45,5 @@ public class SLF4JLogger implements Logger {
     @Override
     public void debug(String message, @Nullable Object @Nullable ... args) {
         delegate.debug(message, args);
-    }
-
-    @Override
-    public void warn(String message, @Nullable Object @Nullable ... args) {
-        delegate.warn(message, args);
     }
 }

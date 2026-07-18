@@ -17,20 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.net.URL;
-
 /**
- * Inspects the manifest of a JAR file.
+ * Detects whether the current application is running inside a container.
  *
  * @author Ilya Naumov
  */
-public interface JarManifestInspector {
+public interface ContainerEnvironmentDetector {
     /**
-     * Checks whether the JAR at the given location has a non-empty {@code Class-Path}
-     * attribute in its MANIFEST.MF.
-     *
-     * @param jarLocation the URL of the JAR file to inspect (only {@code file} protocol is supported)
-     * @return {@code true} if the manifest contains a non-blank Class-Path attribute
+     * @return {@code true} if running in a container
      */
-    boolean hasNonEmptyClassPath(URL jarLocation);
+    boolean isRunningInContainer();
 }

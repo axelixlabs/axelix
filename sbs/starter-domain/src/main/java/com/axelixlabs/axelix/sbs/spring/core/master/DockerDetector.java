@@ -15,35 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.log;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import org.jspecify.annotations.Nullable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
- * SLF4J implementation for {@link Logger}.
+ * Detects whether the application is running inside a Docker container.
  *
- * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
-public class SLF4JLogger implements Logger {
+public class DockerDetector {
+    private static final String DOCKER_ENVIRONMENT_PATH = "/.dockerenv";
 
-    private final org.slf4j.Logger delegate;
-
-    public SLF4JLogger(org.slf4j.Logger delegate) {
-        this.delegate = delegate;
-    }
-
-    @Override
-    public void trace(String message, @Nullable Object @Nullable ... args) {
-        delegate.trace(message, args);
-    }
-
-    @Override
-    public void info(String message, @Nullable Object @Nullable ... args) {
-        delegate.info(message, args);
-    }
-
-    @Override
-    public void debug(String message, @Nullable Object @Nullable ... args) {
-        delegate.debug(message, args);
+    /**
+     * Checks whether the Docker environment marker file exists,
+     * which indicates a Docker container environment.
+     *
+     * @return {@code true} if the Docker environment marker file is present
+     */
+    public boolean hasDockerEnvironmentFile() {
+        return Files.exists(Paths.get(DOCKER_ENVIRONMENT_PATH));
     }
 }

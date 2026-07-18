@@ -15,35 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.log;
-
-import org.jspecify.annotations.Nullable;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
 /**
- * SLF4J implementation for {@link Logger}.
+ * Provides the current Layered Image state.
  *
- * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
-public class SLF4JLogger implements Logger {
-
-    private final org.slf4j.Logger delegate;
-
-    public SLF4JLogger(org.slf4j.Logger delegate) {
-        this.delegate = delegate;
-    }
-
-    @Override
-    public void trace(String message, @Nullable Object @Nullable ... args) {
-        delegate.trace(message, args);
-    }
-
-    @Override
-    public void info(String message, @Nullable Object @Nullable ... args) {
-        delegate.info(message, args);
-    }
-
-    @Override
-    public void debug(String message, @Nullable Object @Nullable ... args) {
-        delegate.debug(message, args);
-    }
+public interface LayeredImageStateProvider {
+    /**
+     * @return {@code true} if Layered Image is enabled.
+     */
+    boolean isLayeredImageEnabled();
 }

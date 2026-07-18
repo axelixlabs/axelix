@@ -15,35 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.log;
-
-import org.jspecify.annotations.Nullable;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
 /**
- * SLF4J implementation for {@link Logger}.
+ * Detects whether the application is running in a Kubernetes environment.
  *
- * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
-public class SLF4JLogger implements Logger {
+public class KubernetesDetector {
+    private static final String K8S_SERVICE_HOST_VARIABLE = "KUBERNETES_SERVICE_HOST";
 
-    private final org.slf4j.Logger delegate;
-
-    public SLF4JLogger(org.slf4j.Logger delegate) {
-        this.delegate = delegate;
-    }
-
-    @Override
-    public void trace(String message, @Nullable Object @Nullable ... args) {
-        delegate.trace(message, args);
-    }
-
-    @Override
-    public void info(String message, @Nullable Object @Nullable ... args) {
-        delegate.info(message, args);
-    }
-
-    @Override
-    public void debug(String message, @Nullable Object @Nullable ... args) {
-        delegate.debug(message, args);
+    /**
+     * Checks whether the Kubernetes service host environment variable is set,
+     * which indicates a Kubernetes environment.
+     *
+     * @return {@code true} if the Kubernetes service host variable is present
+     */
+    public boolean hasKubernetesServiceHostVariable() {
+        return System.getenv(K8S_SERVICE_HOST_VARIABLE) != null;
     }
 }

@@ -23,7 +23,6 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * No-Op logger for tests.
  *
  * @author Mikhail Polivakha
- * @author Ilya Naumov
  */
 public final class NoOpLogger implements Logger {
 
@@ -35,7 +34,4 @@ public final class NoOpLogger implements Logger {
 
     @Override
     public void debug(String message, Object... args) {}
-
-    @Override
-    public void warn(String message, Object... args) {}
 }
