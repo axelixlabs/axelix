@@ -19,7 +19,6 @@ package autoconfig.generator
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.register
@@ -40,6 +39,7 @@ class AxelixAutoConfigPlugin : Plugin<Project> {
 
     companion object {
         private const val TASK_NAME = "generateAutoConfigImports"
+        private const val TARGET_TASK = "processResources"
         private const val IMPORTS_FILE_PATH =
             "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"
     }
@@ -71,8 +71,8 @@ class AxelixAutoConfigPlugin : Plugin<Project> {
     }
 
     private fun configureAutoExecution(project: Project) {
-        project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME) {
-            finalizedBy(TASK_NAME)
+        project.tasks.named(TARGET_TASK) {
+            dependsOn(TASK_NAME)
         }
     }
 }
