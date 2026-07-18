@@ -34,12 +34,6 @@ const jetBrainsMono = JetBrains_Mono({
     weight: ["400", "500"],
 });
 
-export const metadata: Metadata = {
-    title: "Axelix — AI monitoring for Spring Boot in production",
-    description:
-        "Axelix is the open-source console for debugging, observing and operating mission-critical Spring Boot microservices.",
-};
-
 export default function RootLayout({
     children,
 }: Readonly<{

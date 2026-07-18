@@ -29,17 +29,6 @@ export const Capabilities = () => {
                 <CapabilitiesFeaturedCards />
 
                 <CapabilitiesCompactCards />
-
-                <div className={styles.CloserLinkWrapper}>
-                    <a
-                        href="https://axelix.io/docs/features/details"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.CloserLink}
-                    >
-                        More verbs <span className={styles.Arrow}>→</span> capability matrix
-                    </a>
-                </div>
             </div>
         </section>
     );

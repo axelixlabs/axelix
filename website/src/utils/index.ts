@@ -25,7 +25,8 @@ import {
 import { IInstallConfigurationOptions, IInstallSpringBootOptions } from "@/models";
 
 export const NAV_LINKS: INavLink[] = [
-    { href: "#capabilities", label: "Capabilities" },
+    { href: "#reference-app", label: "Why Axelix?" },
+    { href: "#capabilities", label: "Debugging" },
     { href: "#install", label: "Install" },
     { href: "#enterprise", label: "Enterprise" },
     { href: "#faq", label: "FAQ" },
@@ -33,6 +34,7 @@ export const NAV_LINKS: INavLink[] = [
 
 export const DOCS_URL = "https://axelix.io/docs/product/introduction";
 export const GITHUB_URL = "https://github.com/axelixlabs/axelix";
+export const DEMO_APP_URL = "https://github.com/axelixlabs/order-service-demo";
 
 export const installSpringBootArtifact: TInstallSpringBootArtifact = {
     [ESpringBootVariant.SPRING_BOOT_2]: "axelix-spring-boot-2-starter",
@@ -43,7 +45,8 @@ export const installSpringBootArtifact: TInstallSpringBootArtifact = {
 export const installStepNames: TInstallStepNames = {
     1: "Run Axelix",
     2: "Add Starter",
-    3: "Configure",
+    3: "Add Plugin",
+    4: "Configure",
 };
 
 export const installSpringBootOptions: IInstallSpringBootOptions[] = [

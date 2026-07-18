@@ -80,7 +80,7 @@ ol {
 }
 
 .MainContainer {
-  max-width: 1320px;
+  max-width: 1380px;
   margin: 0 auto;
   padding-inline: clamp(20px, 4vw, 56px);
 }

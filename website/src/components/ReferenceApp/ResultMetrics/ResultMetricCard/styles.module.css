@@ -1,0 +1,101 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px 16px;
+    border-radius: 11px;
+    background-color: color-mix(in srgb, #050f01 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--axelix-green-400) 26%, transparent);
+    box-shadow: 0 20px 50px -30px rgb(0 0 0 / 75%);
+    backdrop-filter: blur(10px);
+}
+
+.Label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--axelix-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.Value {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #5079c9;
+}
+
+.Unit {
+    font-family: var(--axelix-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.Comparison {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.Cap {
+    font-family: var(--axelix-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.Track {
+    display: block;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background-color: rgb(255 255 255 / 8%);
+    overflow: hidden;
+}
+
+.FillBar {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+}
+
+.Was .FillBar {
+    background-color: rgb(210 225 190 / 45%);
+}
+
+.Now .FillBar {
+    background-color: #5079c9;
+    box-shadow: 0 0 12px -2px rgb(80 121 201 / 55%);
+}
+
+.Amount {
+    font-family: var(--axelix-mono);
+    font-size: 10px;
+    color: #c6d6b3;
+    min-width: 44px;
+    text-align: right;
+    letter-spacing: 0.02em;
+}
+
+.Now .Amount {
+    color: #f0f4e6;
+}

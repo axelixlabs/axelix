@@ -31,13 +31,14 @@ import { InstallerBoardFooter } from "./InstallerBoardFooter";
 import { InstallerBoardHeader } from "./InstallerBoardHeader";
 import { InstallerFooter } from "./InstallerFooter";
 import { InstallerMethods } from "./InstallerMethods";
+import { PluginMini } from "./PluginMini";
 import { StarterMini } from "./StarterMini";
 import styles from "./styles.module.css";
 
 export const Installer = () => {
     const [installMethod, setInstallMethod] = useState<EInstallMethod>(EInstallMethod.DOCKER);
 
-    const [installStep, setInstallStep] = useState<1 | 2 | 3>(1);
+    const [installStep, setInstallStep] = useState<1 | 2 | 3 | 4>(1);
     const [springBootVariant, setSpringBootVariant] = useState<ESpringBootVariant>(ESpringBootVariant.SPRING_BOOT_2);
     const [installConfiguration, setInstallConfiguration] = useState<EInstallConfigurationVariant>(
         EInstallConfigurationVariant.YAML,
@@ -82,7 +83,9 @@ export const Installer = () => {
                         />
 
                         <div className={styles.InstallerBoard}>
-                            {installStep !== 2 && <CopySnippet activeSnippetRef={activeSnippetRef} />}
+                            {installStep !== 2 && installStep !== 3 && (
+                                <CopySnippet activeSnippetRef={activeSnippetRef} />
+                            )}
 
                             {installStep === 1 && installMethod === EInstallMethod.DOCKER && (
                                 <DockerSnippet refEl={activeSnippetRef} />
@@ -104,7 +107,9 @@ export const Installer = () => {
                                 />
                             )}
 
-                            {installStep === 3 && (
+                            {installStep === 3 && <PluginMini activeSnippetRef={activeSnippetRef} />}
+
+                            {installStep === 4 && (
                                 <InstallThirdStep
                                     installMethod={installMethod}
                                     installConfiguration={installConfiguration}

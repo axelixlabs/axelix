@@ -19,20 +19,24 @@ import styles from "./styles.module.css";
 
 export const CapabilitiesTopSection = () => {
     return (
-        <div className={styles.MainWrapper}>
-            <div>
-                <span className={styles.Eyebrow}>Capabilities</span>
-                <h2 className={styles.Title}>
-                    Verbs for the JVM — same surface for <span className={styles.GreenText}>people</span> and{" "}
-                    <span className={styles.BlueText}>agents</span>.
-                </h2>
+        <>
+            <div className={styles.MainWrapper}>
+                <div>
+                    <span className={styles.Eyebrow}>Debugging</span>
+                    <h2 className={styles.Title}>
+                        Secure Spring Boot Runtime Debugging for both <span className={styles.GreenText}>Humans</span> &{" "}
+                        <span className={styles.BlueText}>AI Agents</span>
+                    </h2>
+                </div>
             </div>
             <p className={styles.IntroText}>
-                Every capability is exposed twice. <em className={`AccentText ${styles.AccentText}`}>Engineers</em>{" "}
-                reach it through a web console; <em className={`AccentText ${styles.AccentText}`}>AI agents</em> reach
-                the same actions through an embedded MCP server. A single role model gates both — each identity, human
-                or agent, sees only the data and actions its role permits.
+                Axelix also allows you to look inside the living Spring Boot application - see its beans, properties,
+                transactions, loggers and so on. Every capability listed below is exposed twice.{" "}
+                <em className={`AccentText ${styles.AccentText}`}>Engineers</em> reach it through a web console.{" "}
+                <em className={`AccentText ${styles.AccentText}`}>AI agents</em> get the same information through an
+                embedded MCP server. A single role model gates both - each identity, human or agent, sees only the data
+                and actions its role permits.
             </p>
-        </div>
+        </>
     );
 };

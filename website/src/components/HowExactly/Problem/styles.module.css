@@ -1,0 +1,83 @@
+.Item {
+    width: 100%;
+    border-top: 1px solid rgb(31 42 23 / 10%);
+
+    &:last-child {
+        border-bottom: 1px solid rgb(31 42 23 / 10%);
+    }
+}
+
+.Header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 12px 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: #2f382a;
+    letter-spacing: -0.006em;
+
+    &::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--axelix-green-500);
+    }
+}
+
+.Title {
+    flex: 1 1 auto;
+
+    & code {
+        font-family: var(--axelix-code);
+        font-size: 12.5px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        background-color: color-mix(in srgb, var(--axelix-green-500) 14%, transparent);
+        color: var(--axelix-green-700);
+        border: 1px solid color-mix(in srgb, var(--axelix-green-500) 30%, transparent);
+    }
+}
+
+.Chevron {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid #5c6657;
+    border-bottom: 1.5px solid #5c6657;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.Open {
+    transform: rotate(-135deg);
+}
+
+.Description {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ItemOpen .Description {
+    grid-template-rows: 1fr;
+}
+
+.DescriptionInner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.DescriptionContent {
+    padding: 0 2px 14px 19px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #6b7563;
+}

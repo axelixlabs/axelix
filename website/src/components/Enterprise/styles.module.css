@@ -1,6 +1,6 @@
 .MainWrapper {
   position: relative;
-  padding-block: 128px 136px;
+  padding-block: 88px;
   color: #e7eee0;
   background:
     radial-gradient(ellipse 65% 55% at 90% 0%, color-mix(in srgb, var(--axelix-green-500) 22%, transparent), transparent 60%),

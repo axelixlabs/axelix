@@ -22,8 +22,8 @@ import { Dispatch, SetStateAction } from "react";
 import styles from "./styles.module.css";
 
 interface IProps {
-    installStep: 1 | 2 | 3;
-    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3>>;
+    installStep: 1 | 2 | 3 | 4;
+    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3 | 4>>;
 }
 
 export const InstallerBoardFooter = ({ installStep, setInstallStep }: IProps) => {
@@ -35,22 +35,22 @@ export const InstallerBoardFooter = ({ installStep, setInstallStep }: IProps) =>
                 disabled={installStep <= 1}
                 onClick={() => {
                     if (installStep > 1) {
-                        setInstallStep((installStep - 1) as 1 | 2 | 3);
+                        setInstallStep((installStep - 1) as 1 | 2 | 3 | 4);
                     }
                 }}
             >
-                ← {installStep > 1 ? installStepNames[(installStep - 1) as 1 | 2 | 3] : "Previous"}
+                ← {installStep > 1 ? installStepNames[(installStep - 1) as 1 | 2 | 3 | 4] : "Previous"}
             </button>
-            <div className={styles.Status}>Step {installStep} of 3</div>
+            <div className={styles.Status}>Step {installStep} of 4</div>
             <button
                 className={`${styles.NavButton} ${styles.NextButton}`}
                 type="button"
-                disabled={installStep === 3}
+                disabled={installStep === 4}
                 onClick={() => {
-                    setInstallStep((installStep + 1) as 1 | 2 | 3);
+                    setInstallStep((installStep + 1) as 1 | 2 | 3 | 4);
                 }}
             >
-                {installStepNames[(installStep + 1) as 1 | 2 | 3]} →
+                {installStepNames[(installStep + 1) as 1 | 2 | 3 | 4]} →
             </button>
         </div>
     );

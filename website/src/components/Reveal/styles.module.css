@@ -1,0 +1,20 @@
+.Reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+        opacity 0.7s ease,
+        transform 0.7s ease;
+}
+
+.Visible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

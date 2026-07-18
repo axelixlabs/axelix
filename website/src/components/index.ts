@@ -17,8 +17,11 @@
  */
 export { Capabilities } from "./Capabilities";
 export { Enterprise } from "./Enterprise";
+export { HowExactly } from "./HowExactly";
 export { Install } from "./Install";
 export { Problem } from "./Problem";
+export { ReferenceApp } from "./ReferenceApp";
+export { Reveal } from "./Reveal";
 export { Footer } from "./Footer";
 export { Header } from "./Header";
 export { Hero } from "./Hero";

@@ -24,8 +24,8 @@ import { InstallerSelect } from "./InstallerSelect";
 import styles from "./styles.module.css";
 
 interface IProps {
-    installStep: 1 | 2 | 3;
-    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3>>;
+    installStep: 1 | 2 | 3 | 4;
+    setInstallStep: Dispatch<SetStateAction<1 | 2 | 3 | 4>>;
     selectRef: any;
     openSelect: EInstallOpenSelect;
     setOpenSelect: Dispatch<SetStateAction<EInstallOpenSelect>>;
@@ -49,7 +49,7 @@ export const InstallerBoardHeader = ({
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.TabsWrapper}>
-                {([1, 2, 3] as const).map((step) => (
+                {([1, 2, 3, 4] as const).map((step) => (
                     <button
                         key={step}
                         type="button"
@@ -62,6 +62,7 @@ export const InstallerBoardHeader = ({
             </div>
             <div className={styles.FileInfo} ref={selectRef}>
                 {installStep === 1 && <span className={styles.Label}>Shell</span>}
+                {installStep === 3 && <span className={styles.Label}>Build File</span>}
                 {installStep === 2 && (
                     <InstallerSelect
                         label={installSpringBootOptions.find((o) => o.key === springBootVariant)!.label}
@@ -81,7 +82,7 @@ export const InstallerBoardHeader = ({
                         }}
                     />
                 )}
-                {installStep === 3 && (
+                {installStep === 4 && (
                     <InstallerSelect
                         label={installConfiguration}
                         open={openSelect === EInstallOpenSelect.CONFIGURATION}

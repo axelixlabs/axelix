@@ -32,9 +32,49 @@ const ITEMS: IFAQItem[] = [
         question: "What is Axelix OSS?",
         answer: (
             <p>
-                The open-source console for debugging, observing and operating Spring Boot microservices in production.{" "}
-                <em>Every capability is exposed twice</em> — to engineers through a web console, and to AI agents
-                through an embedded MCP server. A single role model gates both.
+                The open-source solution for making sure your Java Spring Boot services are efficient, secure and
+                memory-wise. Axelix OSS is the core of the product, which is Open Source and can be found on GitHub.
+            </p>
+        ),
+    },
+    {
+        question: "What is Axelix Enterprise? What is the difference between OSS and Enterprise?",
+        answer: (
+            <p>
+                First of all, Axelix is an <strong>Open Core</strong> product. Our Axelix OSS core is free of charge to
+                use for anybody. It is available on{" "}
+                <a className={styles.ClickableLink} href="https://github.com/axelixlabs/axelix">
+                    GitHub
+                </a>{" "}
+                under LGPL. Axelix OSS is designed to assist the users to <strong>locate</strong> problems. <br />
+                <br /> Axelix Enterprise adds a level on top, where it allows to{" "}
+                <strong>configure policies-as-a-code</strong> to make sure your deployments stay efficient and
+                performant.
+            </p>
+        ),
+    },
+    {
+        question: "How does it work on the top-level?",
+        answer: (
+            <p>
+                On the high level, it works by starter gathering certain information about your application either at
+                boot time, or at runtime. This information is then gathered in the Axelix Master, which stores it in its
+                database.
+                <br />
+                <br />
+                <strong>We care about your deployments</strong>. Thus we specifically maintain a set of benchmarks to
+                make sure we&#39;re not introducing any runtime/performance penalties for living applications.
+            </p>
+        ),
+    },
+    {
+        question: "What about Access Control?",
+        answer: (
+            <p>
+                <strong>Axelix has built-in RBAC</strong>. For small teams, it allows to create & store users in its own
+                local database (Axelix Master - the central Axelix component - has the database). For large teams,
+                Axelix supports OIDC and OAuth2 for SSO -{" "}
+                <strong>this is all available in Axelix OSS, it is free of charge</strong>.
             </p>
         ),
     },
@@ -42,19 +82,20 @@ const ITEMS: IFAQItem[] = [
         question: "Which Spring Boot versions are supported?",
         answer: (
             <p>
-                Spring Boot 2, 3 and 4 — through dedicated starter artifacts (<code>axelix-spring-boot-2-starter</code>,{" "}
-                <code>-3-starter</code>, <code>-4-starter</code>). The master runs on JVM 11–25.{" "}
-                <em>No JVM agent, no flags, no custom boot order.</em>
+                Currently we support Spring Boot 2, 3 and 4 through dedicated starter artifacts (
+                <code>axelix-spring-boot-2-starter</code>, <code>-3-starter</code>, <code>-4-starter</code>) and a
+                specific build plugin (for Maven or Gradle, it is the same for all Spring Boot versions). The master
+                Java 25. <em>No JVM agent, no flags, no custom boot order.</em>
             </p>
         ),
     },
     {
-        question: "Is it really free?",
+        question: "Does it only work with Spring Boot?",
         answer: (
             <p>
-                Yes. Axelix OSS is licensed under <em>LGPL-3.0</em> — link it into your production apps, fork it, ship
-                your own changes. We&apos;re building <em>Axelix Enterprise</em> on top (extensions and paid support for
-                teams that want them), but the open core stays open.
+                As of now - yes. That said, we <strong>have</strong> plans to extend the support so that deployments
+                that does not use Spring Boot could benefit from Axelix as well. That may include Quarkus/Micronaut
+                services, or services that have their own home-grown framework.
             </p>
         ),
     },
@@ -62,28 +103,9 @@ const ITEMS: IFAQItem[] = [
         question: "Is it safe to run in production?",
         answer: (
             <p>
-                It&apos;s designed for production. The master speaks to your services over an authenticated channel; a
-                single role model gates both human engineers and AI agents — each identity sees only the data and
-                actions its role permits. Destructive operations are explicit and confirmable.
-            </p>
-        ),
-    },
-    {
-        question: "How is it different from Micrometer / Actuator?",
-        answer: (
-            <p>
-                Actuator exposes the data; <em>Axelix exposes the verbs.</em> We build on the actuator endpoints your
-                apps already have, then add what actuator doesn&apos;t: a unified fleet console, an MCP server, runtime
-                mutation under a role model, transactional inspection with SQL timelines, and a clear story for AI
-                agents.
-            </p>
-        ),
-    },
-    {
-        question: "What is Axelix Enterprise?",
-        answer: (
-            <p>
-                We&apos;re building something bigger. <em>Stay tuned.</em>
+                <strong>It&apos;s designed to run in production</strong>. The master speaks to your services over an
+                authenticated channel; a single role model gates both human engineers and AI agents - each identity sees
+                only the data and actions its role permits. Destructive operations are explicit and confirmable.
             </p>
         ),
     },

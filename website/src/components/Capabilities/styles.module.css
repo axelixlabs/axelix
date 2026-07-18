@@ -1,5 +1,6 @@
 .MainWrapper {
-  padding-block: 128px 136px;
+  padding-block: 88px;
+  border-top: 1px solid var(--axelix-line);
   background-color: var(--axelix-bg);
 
   @media (width <= 980px) {

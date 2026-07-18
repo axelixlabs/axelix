@@ -32,7 +32,7 @@ export const EnterpriseStack = () => {
                 <div className={styles.CardMainContent}>
                     <div className={styles.Tier}>Tier 2 · Extensions</div>
                     <div className={styles.CardTitle}>Enterprise extensions</div>
-                    <div className={styles.Meta}>SSO · RBAC · audit · multi-cluster · on-prem</div>
+                    <div className={styles.Meta}>Enforcement Policies · Advanced RBAC · Audit & Compliance</div>
                 </div>
                 <span className={styles.Badge}>licensed</span>
             </div>

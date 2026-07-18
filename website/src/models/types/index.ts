@@ -19,5 +19,5 @@ import { EInstallMethod, ESpringBootVariant } from "../enums";
 import { IInstallMethodData } from "../interfaces";
 
 export type TInstallSpringBootArtifact = Record<ESpringBootVariant, string>;
-export type TInstallStepNames = Record<1 | 2 | 3, string>;
+export type TInstallStepNames = Record<1 | 2 | 3 | 4, string>;
 export type TInstallMethodData = Record<EInstallMethod, IInstallMethodData>;

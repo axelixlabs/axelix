@@ -1,9 +1,5 @@
 .MainWrapper {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 64px;
-  align-items: end;
-  margin-bottom: 64px;
+  margin-bottom: 28px;
 
   @media (width <=980px) {
     grid-template-columns: 1fr;
@@ -43,7 +39,7 @@
   line-height: 1.04;
   letter-spacing: -0.028em;
   color: var(--axelix-ink);
-  max-width: 18ch;
+  /*max-width: 18ch;*/
   text-wrap: balance;
 }
 
@@ -59,7 +55,7 @@
   font-size: 16px;
   line-height: 1.6;
   color: var(--axelix-ink-3);
-  max-width: 420px;
+  margin-bottom: 28px;
 }
 
 .AccentText {
