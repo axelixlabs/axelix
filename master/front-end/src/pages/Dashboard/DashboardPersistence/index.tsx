@@ -15,9 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection } from "components";
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { fetchData } from "helpers";
+import { type IDashboardPersistenceResponse, StatefulRequest } from "models";
 import { getDashboardPersistence } from "services";
 
 import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
@@ -26,9 +29,23 @@ import styles from "./styles.module.css";
 
 const DashboardPersistence = () => {
     const { t } = useTranslation();
+    const [dashboardPersistenceState, setDashboardPersistenceState] = useState(
+        StatefulRequest.loading<IDashboardPersistenceResponse>(),
+    );
 
-    // TODO: revisit this
-    const dashboardPersistence = getDashboardPersistence();
+    useEffect(() => {
+        fetchData(setDashboardPersistenceState, () => getDashboardPersistence());
+    }, []);
+
+    if (dashboardPersistenceState.loading) {
+        return <Loader />;
+    }
+
+    if (dashboardPersistenceState.error) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    const { nPlusOne, inMemoryPagination } = dashboardPersistenceState.response!;
 
     return (
         <>
@@ -38,8 +55,8 @@ const DashboardPersistence = () => {
             />
 
             <div className={styles.ChartsWrapper}>
-                <NPlusOneTreemap nPlusOneEntries={dashboardPersistence.nPlusOne} />
-                <InMemoryPaginationTreemap inMemoryPaginationEntries={dashboardPersistence.inMemoryPagination} />
+                <NPlusOneTreemap nPlusOneEntries={nPlusOne} />
+                <InMemoryPaginationTreemap inMemoryPaginationEntries={inMemoryPagination} />
             </div>
         </>
     );

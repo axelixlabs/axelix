@@ -116,6 +116,29 @@ public interface HistoricalApplicationSnapshotRepository
             """)
     SpringFrameworkInsightsAggregate aggregateLatestSpringFrameworkInsights();
 
+    /**
+     * Returns the latest persistence insights of every service in the ecosystem. For every service (identified
+     * by its {@code group_id} + {@code artifact_id}) only the most recent snapshot is taken into account, so that
+     * a service is represented exactly once. The N + 1 / in-memory pagination counters are aggregated in Java
+     * (from the deserialized JSON column) rather than in SQL, since the {@code persistence_insights} payload is
+     * stored as a JSON document and cannot be summed in a vendor-agnostic way.
+     *
+     * @return one row per service, holding its {@code artifactId} and the deserialized persistence insights.
+     */
+    @Query("""
+            SELECT
+                s.artifact_id AS artifact_id,
+                s.persistence_insights AS persistence_insights
+            FROM historical_application_snapshots s
+            WHERE s.date = (
+                SELECT MAX(latest.date)
+                FROM historical_application_snapshots latest
+                WHERE latest.group_id = s.group_id
+                  AND latest.artifact_id = s.artifact_id
+            )
+            """)
+    List<ServicePersistenceInsights> findLatestPersistenceInsightsPerService();
+
     // Select * is generally a bad idea. Here, it does not cost that much, but still.
     @Query(value = """
         SELECT *
@@ -156,6 +179,14 @@ public interface HistoricalApplicationSnapshotRepository
      * @param serviceCount how many services use this garbage collector.
      */
     record GarbageCollectorDistributionAggregate(String gcInUse, long serviceCount) {}
+
+    /**
+     * The latest persistence insights of a single service.
+     *
+     * @param artifactId the artifact id of the service (used as its displayable name).
+     * @param persistenceInsights the persistence insights taken from the service's most recent snapshot.
+     */
+    record ServicePersistenceInsights(String artifactId, PersistenceInsights persistenceInsights) {}
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.

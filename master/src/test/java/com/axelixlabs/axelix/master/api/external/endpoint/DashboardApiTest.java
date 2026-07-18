@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -32,7 +33,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOverallStats;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -275,6 +283,32 @@ public class DashboardApiTest {
                 .isEqualTo(50.0);
     }
 
+    @Test
+    void shouldReturnPersistenceDashboardAggregatedAcrossServices() {
+        // given one service with an N + 1 problem (plus a single lazy load that does not qualify) and another
+        // with in-memory pagination.
+        historicalApplicationSnapshotService.reloadCurrentStateBulk(List.of(
+                persistenceMetadata(
+                        "com.example", "service-a", List.of(nPlusOne("pets", 4), nPlusOne("category", 1)), Map.of()),
+                persistenceMetadata("com.example", "service-b", List.of(), Map.of("owner", 3))));
+
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/dashboard/persistence", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody())
+                .when(IGNORING_ARRAY_ORDER)
+                .node("nPlusOne")
+                .isEqualTo("[{\"appName\":\"service-a\",\"size\":1}]");
+        assertThatJson(response.getBody())
+                .when(IGNORING_ARRAY_ORDER)
+                .node("inMemoryPagination")
+                .isEqualTo("[{\"appName\":\"service-b\",\"size\":1}]");
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/dashboard")
     void negativeAuthTests() {}
 
@@ -287,5 +321,24 @@ public class DashboardApiTest {
             String groupId, String artifactId, GarbageCollector garbageCollector) {
         return TestMetadataFactory.withFeatures(
                 groupId, artifactId, false, false, false, false, false, garbageCollector);
+    }
+
+    private static BasicRegistrationMetadata persistenceMetadata(
+            String groupId,
+            String artifactId,
+            List<CountedLazyLoadingTarget> lazyLoadingTargets,
+            Map<String, Integer> inMemoryPagination) {
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
+                TransactionOrigin.APPLICATION_DECLARATIVE,
+                new TransactionalKey("com.example.OwnerService", "loadOwners"),
+                new TransactionOverallStats(1, 10, 5),
+                lazyLoadingTargets,
+                inMemoryPagination);
+        return TestMetadataFactory.withPersistenceInsights(
+                groupId, artifactId, new PersistenceInsights(List.of(profile)));
+    }
+
+    private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
+        return new CountedLazyLoadingTarget(new LazyLoadingTarget(String.class, associationPropertyName), count);
     }
 }

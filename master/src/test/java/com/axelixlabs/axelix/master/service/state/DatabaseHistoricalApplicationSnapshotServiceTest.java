@@ -30,7 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
+import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
@@ -40,6 +42,8 @@ import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -418,6 +422,123 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                     .extracting(AggregatedFeature::featureId, AggregatedFeature::adoptionPercentage)
                     .containsExactly(tuple(FeatureId.OSIV.getId(), 0.0));
         }
+    }
+
+    @Nested
+    class GetPersistenceDashboard {
+
+        @Test
+        void shouldCountAffectedAssociationsPerServiceAndFilterOutServicesWithoutProblems() {
+            // given services with different persistence problems.
+
+            // two N + 1 associations (pets, tags); the count value is irrelevant, and two paginated queries.
+            HistoricalApplicationSnapshot both = persistenceSnapshot(
+                    "com.example",
+                    "service-both",
+                    LocalDate.now(ZoneOffset.UTC),
+                    insights(List.of(nPlusOne("pets", 2), nPlusOne("tags", 7)), Map.of("owner", 4, "customer", 9)));
+
+            // only pets is an N + 1; orders was lazily loaded once (count == 1) so it does not qualify.
+            HistoricalApplicationSnapshot mixed = persistenceSnapshot(
+                    "com.example",
+                    "service-mixed",
+                    LocalDate.now(ZoneOffset.UTC),
+                    insights(List.of(nPlusOne("pets", 5), nPlusOne("orders", 1)), Map.of()));
+
+            // a single lazy load (count == 1) is not an N + 1, so this service has no problem at all.
+            HistoricalApplicationSnapshot singleLazyLoad = persistenceSnapshot(
+                    "com.example",
+                    "service-single-lazy",
+                    LocalDate.now(ZoneOffset.UTC),
+                    insights(List.of(nPlusOne("pets", 1)), Map.of()));
+
+            HistoricalApplicationSnapshot paginationOnly = persistenceSnapshot(
+                    "com.example",
+                    "service-pagination",
+                    LocalDate.now(ZoneOffset.UTC),
+                    insights(List.of(), Map.of("owner", 3)));
+
+            HistoricalApplicationSnapshot clean = persistenceSnapshot(
+                    "com.example", "service-clean", LocalDate.now(ZoneOffset.UTC), insights(List.of(), Map.of()));
+            jdbcAggregateTemplate.insertAll(List.of(both, mixed, singleLazyLoad, paginationOnly, clean));
+
+            // when.
+            PersistenceDashboardResponse dashboard = subject.getPersistenceDashboard();
+
+            // then.
+            assertThat(dashboard.nPlusOne())
+                    .extracting(TreemapEntry::appName, TreemapEntry::size)
+                    .containsExactlyInAnyOrder(tuple("service-both", 2), tuple("service-mixed", 1));
+            assertThat(dashboard.inMemoryPagination())
+                    .extracting(TreemapEntry::appName, TreemapEntry::size)
+                    .containsExactlyInAnyOrder(tuple("service-both", 2), tuple("service-pagination", 1));
+        }
+
+        @Test
+        void shouldCountOnlyTheLatestSnapshotPerService() {
+            // given a stale snapshot with more problems and a newer one with fewer for the same service.
+            HistoricalApplicationSnapshot stale = persistenceSnapshot(
+                    "com.example",
+                    "service-a",
+                    LocalDate.now(ZoneOffset.UTC).minusDays(1),
+                    insights(List.of(nPlusOne("pets", 9), nPlusOne("tags", 9)), Map.of("owner", 9, "customer", 9)));
+            HistoricalApplicationSnapshot current = persistenceSnapshot(
+                    "com.example",
+                    "service-a",
+                    LocalDate.now(ZoneOffset.UTC),
+                    insights(List.of(nPlusOne("pets", 2)), Map.of("owner", 1)));
+            jdbcAggregateTemplate.insertAll(List.of(stale, current));
+
+            // when.
+            PersistenceDashboardResponse dashboard = subject.getPersistenceDashboard();
+
+            // then.
+            assertThat(dashboard.nPlusOne())
+                    .extracting(TreemapEntry::appName, TreemapEntry::size)
+                    .containsExactly(tuple("service-a", 1));
+            assertThat(dashboard.inMemoryPagination())
+                    .extracting(TreemapEntry::appName, TreemapEntry::size)
+                    .containsExactly(tuple("service-a", 1));
+        }
+
+        @Test
+        void shouldReturnEmptyDashboardWhenNoSnapshotsExist() {
+            // when.
+            PersistenceDashboardResponse dashboard = subject.getPersistenceDashboard();
+
+            // then.
+            assertThat(dashboard.nPlusOne()).isEmpty();
+            assertThat(dashboard.inMemoryPagination()).isEmpty();
+        }
+    }
+
+    private static PersistenceInsights insights(
+            List<CountedLazyLoadingTarget> lazyLoadingTargets, Map<String, Integer> inMemoryPagination) {
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
+                TransactionOrigin.APPLICATION_DECLARATIVE,
+                new TransactionalKey("com.example.OwnerService", "loadOwners"),
+                new TransactionOverallStats(1, 10, 5),
+                lazyLoadingTargets,
+                inMemoryPagination);
+        return new PersistenceInsights(List.of(profile));
+    }
+
+    private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
+        return new CountedLazyLoadingTarget(new LazyLoadingTarget(String.class, associationPropertyName), count);
+    }
+
+    private static HistoricalApplicationSnapshot persistenceSnapshot(
+            String groupId, String artifactId, LocalDate date, PersistenceInsights persistenceInsights) {
+        return new HistoricalApplicationSnapshot(
+                new SnapshotId(groupId, artifactId, date),
+                new com.axelixlabs.axelix.master.domain.Insights(
+                        new com.axelixlabs.axelix.master.domain.Insights.HotSpot(
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden(false, false),
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
+                                        false, GarbageCollector.G1),
+                                new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
+                        persistenceInsights));
     }
 
     private static BasicRegistrationMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {

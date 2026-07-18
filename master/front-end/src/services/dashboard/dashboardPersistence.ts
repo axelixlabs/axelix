@@ -15,33 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IDashboardPersistenceResponse } from "models";
+import { apiFetch } from "api";
 
-export const getDashboardPersistence = (): IDashboardPersistenceResponse => {
-    return {
-        nPlusOne: [
-            { appName: "payments-service", size: 10 },
-            { appName: "orders-service", size: 12 },
-            { appName: "notification-service", size: 3 },
-            { appName: "product-catalog-service", size: 7 },
-            { appName: "api-gateway-service", size: 1 },
-            { appName: "reporting-service", size: 11 },
-            { appName: "dashboard-aggregation-service", size: 18 },
-            { appName: "invoicing-service", size: 8 },
-            { appName: "delivery-service", size: 2 },
-            { appName: "audit-service", size: 2 },
-        ],
-        inMemoryPagination: [
-            { appName: "payments-service", size: 7 },
-            { appName: "orders-service", size: 8 },
-            { appName: "notification-service", size: 3 },
-            { appName: "product-catalog-service", size: 11 },
-            { appName: "api-gateway-service", size: 1 },
-            { appName: "reporting-service", size: 4 },
-            { appName: "dashboard-aggregation-service", size: 3 },
-            { appName: "invoicing-service", size: 8 },
-            { appName: "delivery-service", size: 5 },
-            { appName: "audit-service", size: 2 },
-        ],
-    };
+export const getDashboardPersistence = () => {
+    return apiFetch.get("/dashboard/persistence");
 };

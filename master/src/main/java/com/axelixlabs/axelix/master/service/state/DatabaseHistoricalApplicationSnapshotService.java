@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
@@ -42,6 +45,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.GarbageCollectorDistributionAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.ServicePersistenceInsights;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.SpringFrameworkInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
 
@@ -111,6 +115,39 @@ public class DatabaseHistoricalApplicationSnapshotService {
                 FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total))));
     }
 
+    /**
+     * Builds the aggregated, ecosystem-wide persistence problems view used to render the persistence dashboard.
+     * For every service only the most recent snapshot is considered, and its N + 1 and in-memory pagination
+     * occasions are counted into a single per-service magnitude (how many associations / queries are affected,
+     * independent of how many times each was loaded). Services without a given problem are omitted from the
+     * corresponding treemap.
+     *
+     * @return the {@link PersistenceDashboardResponse} with one treemap entry per affected service.
+     */
+    @Transactional(readOnly = true)
+    public PersistenceDashboardResponse getPersistenceDashboard() {
+        List<ServicePersistenceInsights> latestPerService = repository.findLatestPersistenceInsightsPerService();
+
+        List<TreemapEntry> nPlusOne = new ArrayList<>();
+        List<TreemapEntry> inMemoryPagination = new ArrayList<>();
+
+        for (ServicePersistenceInsights service : latestPerService) {
+            PersistenceInsights insights = service.persistenceInsights();
+
+            int nPlusOneTotal = totalNPlusOneOccasions(insights);
+            if (nPlusOneTotal > 0) {
+                nPlusOne.add(new TreemapEntry(service.artifactId(), nPlusOneTotal));
+            }
+
+            int inMemoryPaginationTotal = totalInMemoryPaginationOccasions(insights);
+            if (inMemoryPaginationTotal > 0) {
+                inMemoryPagination.add(new TreemapEntry(service.artifactId(), inMemoryPaginationTotal));
+            }
+        }
+
+        return new PersistenceDashboardResponse(nPlusOne, inMemoryPagination);
+    }
+
     @Transactional(readOnly = true)
     public HistoricalApplicationSnapshot getCurrentRecord(ApplicationId applicationId) {
         return repository.findLatestApplicationSnapshot(applicationId.groupId(), applicationId.artifactId());
@@ -144,6 +181,29 @@ public class DatabaseHistoricalApplicationSnapshotService {
                 HistoricalApplicationSnapshot.class);
 
         jdbcAggregateTemplate.insertAll(snapshots);
+    }
+
+    /**
+     * Counts the N + 1 occasions of a service: a lazy-loading target is an N + 1 only when the very same
+     * association was lazily loaded more than once ({@code count > 1}). A single lazy load is legitimate and does
+     * not qualify. Only the fact that an association is an N + 1 matters, not how many extra queries it triggered,
+     * so every qualifying association contributes exactly one.
+     */
+    private static int totalNPlusOneOccasions(PersistenceInsights insights) {
+        return (int) insights.getTransactions().stream()
+                .flatMap(transaction -> transaction.getLazyLoadingTargets().stream())
+                .filter(lazyLoadingTarget -> lazyLoadingTarget.getCount() > 1)
+                .count();
+    }
+
+    /**
+     * Counts the in-memory pagination occasions of a service. Paginating in memory is a problem the moment it
+     * happens, so every paginated query contributes exactly one, regardless of how many times it occurred.
+     */
+    private static int totalInMemoryPaginationOccasions(PersistenceInsights insights) {
+        return (int) insights.getTransactions().stream()
+                .flatMap(transaction -> transaction.getInMemoryPagination().keySet().stream())
+                .count();
     }
 
     private static double adoptionPercentage(long enabledCount, long total) {

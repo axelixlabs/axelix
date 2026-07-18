@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
@@ -90,5 +91,19 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.SPRING_FRAMEWORK)
     public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
         return databaseHistoricalApplicationSnapshotService.getSpringFrameworkDashboard();
+    }
+
+    @DefaultApiResponse(
+            summary = "Retrieve the aggregated persistence problems (N + 1, in-memory pagination) across the ecosystem")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PersistenceDashboardResponse.class)))
+    @GetMapping(path = ApiPaths.DashboardApi.PERSISTENCE)
+    public PersistenceDashboardResponse getPersistenceDashboard() {
+        return databaseHistoricalApplicationSnapshotService.getPersistenceDashboard();
     }
 }

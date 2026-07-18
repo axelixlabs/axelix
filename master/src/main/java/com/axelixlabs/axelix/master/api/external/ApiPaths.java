@@ -136,6 +136,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the aggregated Spring Framework features adoption across the ecosystem.
          */
         public static final String SPRING_FRAMEWORK = "/dashboard/spring-framework";
+
+        /**
+         * Endpoint to retrieve the aggregated persistence problems (N + 1, in-memory pagination) across the ecosystem.
+         */
+        public static final String PERSISTENCE = "/dashboard/persistence";
     }
 
     public static final class LoggersApi {
