@@ -38,12 +38,12 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTa
 @SuppressWarnings("NullAway")
 public class TransactionStats {
 
-    private final Map<LazyLoadingTarget, Integer> nPlusOneOccasions;
+    private final Map<LazyLoadingTarget, Integer> lazyLoadingOccasions;
     private final Map<String, Integer> inMemoryPaginatedEntities;
     private final PerformanceStats performanceStats;
 
     public TransactionStats() {
-        this.nPlusOneOccasions = new HashMap<>(1);
+        this.lazyLoadingOccasions = new HashMap<>(1);
         this.inMemoryPaginatedEntities = new HashMap<>(1);
         this.performanceStats = new PerformanceStats();
     }
@@ -75,7 +75,7 @@ public class TransactionStats {
         }
 
         incomingNPlusOneMap.forEach((lazyLoadingTarget, incoming) -> {
-            nPlusOneOccasions.compute(lazyLoadingTarget, (key, old) -> max(incoming, old));
+            lazyLoadingOccasions.compute(lazyLoadingTarget, (key, old) -> max(incoming, old));
         });
 
         incomingInMemoryPaginationMap.forEach((target, incoming) -> {
@@ -129,7 +129,7 @@ public class TransactionStats {
     }
 
     public Map<LazyLoadingTarget, Integer> getNPlusOneOccasions() {
-        return nPlusOneOccasions;
+        return lazyLoadingOccasions;
     }
 
     public Map<String, Integer> getInMemoryPaginatedEntities() {

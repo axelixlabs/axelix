@@ -294,16 +294,83 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         @Transactional
         Owner findByLastName(String lastName);
 
-        //        @Transactional(propagation = Propagation.SUPPORTS)
-        //        default List<Owner> findAll() {
-        //            return List.of(new Owner());
-        //        }
-
         @Transactional
         @Query(
                 value = "SELECT o FROM AbstractTransactionMonitoringSharedContextTest$Owner o JOIN FETCH o.pets",
                 countQuery = "SELECT COUNT(o) FROM AbstractTransactionMonitoringSharedContextTest$Owner o")
         Page<Owner> findAllWithPets(Pageable pageable);
+
+        /**
+         * Opens a transaction and runs several simple (non-N+1, non-in-memory-paginated) queries.
+         */
+        @Transactional
+        default void executeMultipleSimpleQueries(String lastName) {
+            save(new Owner().setLastName(lastName));
+            findByLastName(lastName);
+            count();
+        }
+
+        /**
+         * Opens a transaction that performs a classic collection N+1 (load owners, then lazy-load pets).
+         */
+        @Transactional
+        default void executeNPlusOneOnly() {
+            List<Owner> owners = findAll();
+            owners.forEach(owner -> owner.getPets().size());
+        }
+
+        /**
+         * Opens a transaction with one extra simple query plus a collection N+1 on pets.
+         */
+        @Transactional
+        default void executeNPlusOneAndSimpleQuery(String lastName) {
+            findByLastName(lastName);
+            List<Owner> owners = findAll();
+            owners.forEach(owner -> owner.getPets().size());
+        }
+
+        /**
+         * Opens a transaction with a simple query plus two different collection N+1s (pets and tags).
+         */
+        @Transactional
+        default void executeTwoNPlusOnesAndSimpleQuery(String lastName) {
+            findByLastName(lastName);
+            List<Owner> owners = findAll();
+            owners.forEach(owner -> {
+                owner.getPets().size();
+                owner.getTags().size();
+            });
+        }
+
+        /**
+         * Opens a transaction that triggers Hibernate in-memory pagination (JOIN FETCH + Pageable).
+         */
+        @Transactional
+        default void executeInMemoryPagination() {
+            findAllWithPets(PageRequest.of(0, 5));
+        }
+
+        /**
+         * Opens a transaction with one simple query plus in-memory pagination.
+         */
+        @Transactional
+        default void executeInMemoryPaginationAndSimpleQuery(String lastName) {
+            findByLastName(lastName);
+            findAllWithPets(PageRequest.of(0, 5));
+        }
+
+        /**
+         * Opens a transaction with a simple query, a collection N+1, and in-memory pagination.
+         *
+         * <p>N+1 is executed before the JOIN FETCH page query so that pets are still lazy when accessed.
+         */
+        @Transactional
+        default void executeInMemoryPaginationNPlusOneAndSimpleQuery(String lastName) {
+            findByLastName(lastName);
+            List<Owner> owners = findAll();
+            owners.forEach(owner -> owner.getPets().size());
+            findAllWithPets(PageRequest.of(0, 5));
+        }
     }
 
     interface PetRepository extends JpaRepository<Pet, Long> {}
