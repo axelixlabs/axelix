@@ -21,7 +21,6 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
  * Running min/max/avg call duration across every call aggregated into the owning record.
  *
  * @author Mikhail Polivakha
- * @author Sergey Cherkasov
  */
 public class PerformanceStats {
 
@@ -31,14 +30,14 @@ public class PerformanceStats {
     private long recorded;
 
     public void record(long durationMs) {
-        if (durationMs == 0) {
+        if (recorded == 0) {
             this.minMs = durationMs;
             this.maxMs = durationMs;
             this.avgMs = durationMs;
         } else {
             this.minMs = Math.min(durationMs, minMs);
             this.maxMs = Math.max(durationMs, maxMs);
-            this.avgMs = (avgMs * durationMs + durationMs) / (durationMs + 1);
+            this.avgMs = (avgMs * recorded + durationMs) / (recorded + 1);
         }
         this.recorded++;
     }
@@ -53,9 +52,5 @@ public class PerformanceStats {
 
     public long getAvgMs() {
         return avgMs;
-    }
-
-    public long getRecorded() {
-        return recorded;
     }
 }

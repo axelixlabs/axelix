@@ -20,7 +20,9 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
@@ -116,22 +118,17 @@ public class TransactionExecutionProfile {
      * per {@code (type, target)} endpoint, carrying the running min/max/avg duration across the calls to it.
      */
     public List<AggregatedExternalCall> getAggregatedExternalCalls() {
-        List<AggregatedExternalCall> aggregated = new ArrayList<>();
+        Map<Map.Entry<SimpleExternalCallRecord.TypeExternal, String>, AggregatedExternalCall> aggregated =
+                new LinkedHashMap<>();
 
         for (SimpleExternalCallRecord call : recordedExternalCalls) {
-            AggregatedExternalCall endpoint = aggregated.stream()
-                    .filter(a -> a.getExternalCall().getType() == call.getType()
-                            && a.getExternalCall().getTarget().equals(call.getTarget()))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        AggregatedExternalCall created = new AggregatedExternalCall(call);
-                        aggregated.add(created);
-                        return created;
-                    });
-            endpoint.record(call.getDurationMs());
+            aggregated
+                    .computeIfAbsent(
+                            Map.entry(call.getType(), call.getTarget()), key -> new AggregatedExternalCall(call))
+                    .record(call.getDurationMs());
         }
 
-        return aggregated;
+        return new ArrayList<>(aggregated.values());
     }
 
     public static class AnalyzedSqlQueryRecord {

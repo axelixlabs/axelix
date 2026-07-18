@@ -196,7 +196,6 @@ class TransactionAccessorTest {
             assertThat(stats.getMinMs()).isEqualTo(10L);
             assertThat(stats.getMaxMs()).isEqualTo(30L);
             assertThat(stats.getAvgMs()).isEqualTo(20L);
-            assertThat(stats.getRecorded()).isEqualTo(2L);
         }
     }
 
