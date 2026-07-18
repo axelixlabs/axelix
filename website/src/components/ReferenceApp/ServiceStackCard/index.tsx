@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { GITHUB_URL } from "@/utils";
+import { DEMO_APP_URL } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -32,29 +32,33 @@ export const ServiceStackCard = () => {
             <div className={styles.Stack}>
                 <div className={styles.Row}>
                     <span className={styles.Key}>Language</span>
-                    <span className={styles.Value}>Java 17</span>
+                    <span className={styles.Value}>Java 25</span>
                 </div>
                 <div className={styles.Row}>
                     <span className={styles.Key}>Framework</span>
-                    <span className={styles.Value}>Spring Boot</span>
+                    <span className={styles.Value}>Spring Boot 3.5</span>
                 </div>
                 <div className={styles.Row}>
                     <span className={styles.Key}>Persistence</span>
-                    <span className={styles.Value}>Hibernate</span>
+                    <span className={styles.Value}>Spring Data JPA · Hibernate</span>
                 </div>
                 <div className={styles.Row}>
                     <span className={styles.Key}>Database</span>
                     <span className={styles.Value}>PostgreSQL</span>
                 </div>
                 <div className={styles.Row}>
+                    <span className={styles.Key}>Messaging</span>
+                    <span className={styles.Value}>Apache Kafka</span>
+                </div>
+                <div className={styles.Row}>
                     <span className={styles.Key}>Build</span>
-                    <span className={styles.Value}>Maven/Gradle</span>
+                    <span className={styles.Value}>Gradle</span>
                 </div>
             </div>
 
             <div className={styles.Footer}>
                 <span>The most common Spring Boot stack you&apos;ll ever meet.</span>
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={styles.SourceLink}>
+                <a href={DEMO_APP_URL} target="_blank" rel="noopener noreferrer" className={styles.SourceLink}>
                     View source →
                 </a>
             </div>

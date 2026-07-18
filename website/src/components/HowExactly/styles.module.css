@@ -17,7 +17,7 @@
 .Row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 22px;
+    gap: 42px;
     align-items: start;
     opacity: 0;
     transform: translateY(32px);

@@ -30,8 +30,8 @@ export const HeroHeadline = () => {
             <p className={styles.Lede}>
                 The <span className={styles.GreenTextBold}>AI-Native</span>, Open Core solution for the AI era: its
                 open-source core <span className={styles.GreenTextBold}>pinpoints</span> what holds your Java back,
-                while while Axelix Enterprise <span className={styles.GreenTextBold}>enforces</span> optimization
-                policies whole ecosystem. <span className={styles.GreenTextBold}>At scale</span>.
+                while Axelix Enterprise <span className={styles.GreenTextBold}>enforces</span> optimization policies
+                across the whole ecosystem. <span className={styles.GreenTextBold}>At scale</span>.
             </p>
         </>
     );

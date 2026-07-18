@@ -20,25 +20,25 @@ import styles from "./styles.module.css";
 
 const metrics = [
     {
-        label: "Memory footprint · RSS",
-        value: "−25%",
+        label: "Memory footprint · RSS Under Load",
+        value: "−15%",
         unit: "reduction",
-        was: { amount: "498 MB", widthPercent: "100%" },
-        now: { amount: "374 MB", widthPercent: "75%" },
+        was: { amount: "618 MB", widthPercent: "100%" },
+        now: { amount: "533 MB", widthPercent: "86%" },
     },
     {
         label: "Throughput · under load",
-        value: "+25%",
+        value: "+183%",
         unit: "increase",
-        was: { amount: "1.4k rps", widthPercent: "80%" },
-        now: { amount: "1.75k rps", widthPercent: "100%" },
+        was: { amount: "29 rps", widthPercent: "35%" },
+        now: { amount: "82 rps", widthPercent: "100%" },
     },
     {
-        label: "Docker image size",
-        value: "−40%",
-        unit: "smaller",
-        was: { amount: "327 MB", widthPercent: "100%" },
-        now: { amount: "196 MB", widthPercent: "60%" },
+        label: "GC Stop-The-World pauses",
+        value: "−91%",
+        unit: "less",
+        was: { amount: "587", widthPercent: "100%" },
+        now: { amount: "50", widthPercent: "9%" },
     },
     {
         label: "Startup time",
