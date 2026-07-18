@@ -43,7 +43,8 @@ export const installSpringBootArtifact: TInstallSpringBootArtifact = {
 export const installStepNames: TInstallStepNames = {
     1: "Run Axelix",
     2: "Add Starter",
-    3: "Configure",
+    3: "Add Plugin",
+    4: "Configure",
 };
 
 export const installSpringBootOptions: IInstallSpringBootOptions[] = [
