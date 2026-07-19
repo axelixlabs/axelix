@@ -71,8 +71,7 @@ class AxelixAutoConfigPlugin : Plugin<Project> {
     }
 
     private fun configureAutoExecution(project: Project) {
-        project.tasks.named(TARGET_TASK) {
-            dependsOn(TASK_NAME)
-        }
+        project.tasks.named(TARGET_TASK) { dependsOn(TASK_NAME) }
+        project.tasks.findByName("sourcesJar")?.dependsOn(TARGET_TASK)
     }
 }
