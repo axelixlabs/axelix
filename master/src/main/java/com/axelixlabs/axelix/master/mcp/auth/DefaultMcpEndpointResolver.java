@@ -49,7 +49,8 @@ public class DefaultMcpEndpointResolver implements McpEndpointResolver {
             McpEndpoints.WALLBOARD_TOOL_NAME, McpEndpoints.WALLBOARD,
             McpEndpoints.CACHES_FEED_TOOL_NAME, McpEndpoints.ALL_CACHES,
             McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME, McpEndpoints.CLEAR_ALL_CACHES,
-            McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE);
+            McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE,
+            McpEndpoints.TRANSACTIONS_PROFILE_TOOL_NAME, McpEndpoints.TRANSACTIONS_PROFILE);
 
     private final JsonMapper jsonMapper;
 

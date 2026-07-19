@@ -63,6 +63,7 @@ class McpServerToolsRegistrationTest {
                         "findGroupsByName",
                         "changeLoggingLevelByLoggerName",
                         "changeLoggingLevelByGroupName",
-                        "resetLoggingLevelByLoggerName");
+                        "resetLoggingLevelByLoggerName",
+                        "getApplicationTransactionsProfile");
     }
 }

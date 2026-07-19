@@ -36,6 +36,7 @@ public final class McpEndpoints {
     public static final String CACHES_FEED_TOOL_NAME = "getAllCaches";
     public static final String CLEAR_ALL_CACHES_TOOL_NAME = "clearAllCaches";
     public static final String CLEAR_SPECIFIC_CACHE_TOOL_NAME = "clearSpecificCacheEntity";
+    public static final String TRANSACTIONS_PROFILE_TOOL_NAME = "getApplicationTransactionsProfile";
     // Mcp endpoint names end
 
     public static final McpEndpoint BEANS_FEED = new DefaultMcpEndpoint(BEANS_FEED_TOOL_NAME);
@@ -47,4 +48,5 @@ public final class McpEndpoints {
     public static final McpEndpoint ALL_CACHES = new DefaultMcpEndpoint(CACHES_FEED_TOOL_NAME);
     public static final McpEndpoint CLEAR_ALL_CACHES = new DefaultMcpEndpoint(CLEAR_ALL_CACHES_TOOL_NAME);
     public static final McpEndpoint CLEAR_SPECIFIC_CACHE = new DefaultMcpEndpoint(CLEAR_SPECIFIC_CACHE_TOOL_NAME);
+    public static final McpEndpoint TRANSACTIONS_PROFILE = new DefaultMcpEndpoint(TRANSACTIONS_PROFILE_TOOL_NAME);
 }
