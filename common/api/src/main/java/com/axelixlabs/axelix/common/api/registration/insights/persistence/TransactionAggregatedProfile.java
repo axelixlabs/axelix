@@ -35,6 +35,7 @@ public class TransactionAggregatedProfile {
     private final TransactionOverallStats transactionOverallStats;
     private final List<CountedLazyLoadingTarget> lazyLoadingTargets;
     private final Map<String, Integer> inMemoryPagination;
+    private final List<ExternalCallInsight> externalCalls;
 
     @JsonCreator
     public TransactionAggregatedProfile(
@@ -42,12 +43,14 @@ public class TransactionAggregatedProfile {
             @JsonProperty("transactionalKey") TransactionalKey transactionalKey,
             @JsonProperty("transactionOverallStats") TransactionOverallStats transactionOverallStats,
             @JsonProperty("lazyLoadingTargets") List<CountedLazyLoadingTarget> lazyLoadingTargets,
-            @JsonProperty("inMemoryPagination") Map<String, Integer> inMemoryPagination) {
+            @JsonProperty("inMemoryPagination") Map<String, Integer> inMemoryPagination,
+            @JsonProperty("externalCalls") List<ExternalCallInsight> externalCalls) {
         this.transactionOrigin = transactionOrigin;
         this.transactionalKey = transactionalKey;
         this.transactionOverallStats = transactionOverallStats;
         this.lazyLoadingTargets = lazyLoadingTargets;
         this.inMemoryPagination = inMemoryPagination;
+        this.externalCalls = externalCalls;
     }
 
     public TransactionOrigin getTransactionOrigin() {
@@ -68,5 +71,9 @@ public class TransactionAggregatedProfile {
 
     public Map<String, Integer> getInMemoryPagination() {
         return inMemoryPagination;
+    }
+
+    public List<ExternalCallInsight> getExternalCalls() {
+        return externalCalls;
     }
 }

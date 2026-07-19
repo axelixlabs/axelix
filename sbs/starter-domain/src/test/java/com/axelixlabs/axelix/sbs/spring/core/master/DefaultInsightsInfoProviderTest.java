@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,16 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
@@ -156,6 +162,35 @@ class DefaultInsightsInfoProviderTest {
         assertFeatureEnabled(insights.getSpringFramework(), OSIV, true);
     }
 
+    @Test
+    void surfacesExternalCallsInPersistenceInsights() throws Exception {
+        // given.
+        DefaultTransactionStatsCollector collector = new DefaultTransactionStatsCollector();
+        MethodClassKey key = new MethodClassKey(SampleService.class.getMethod("charge"), SampleService.class);
+        TransactionExecutionProfile profile = new TransactionExecutionProfile(Instant.now());
+        profile.recordExternalCall(
+                new SimpleExternalCallRecord(TypeExternalCall.REST_TEMPLATE, "GET https://payments/charge", 15L));
+        profile.complete();
+        collector.recordTransaction(key, profile);
+
+        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions(), collector);
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        List<TransactionAggregatedProfile> transactions =
+                insights.getPersistenceInsights().getTransactions();
+        assertThat(transactions).hasSize(1);
+        assertThat(transactions.get(0).getExternalCalls()).singleElement().satisfies(call -> {
+            assertThat(call.getType()).isEqualTo(TypeExternalCall.REST_TEMPLATE);
+            assertThat(call.getTarget()).isEqualTo("GET https://payments/charge");
+            assertThat(call.getStats().getMinMs()).isEqualTo(15L);
+            assertThat(call.getStats().getMaxMs()).isEqualTo(15L);
+            assertThat(call.getStats().getAverageMs()).isEqualTo(15L);
+        });
+    }
+
     private static void assertFeatureEnabled(List<InsightFeature> features, FeatureId featureId, boolean enabled) {
         InsightFeature feature = findByFeatureId(features, featureId);
 
@@ -196,6 +231,10 @@ class DefaultInsightsInfoProviderTest {
 
     private static OpenSessionInViewStateProvider osivEnabled() {
         return () -> true;
+    }
+
+    private static final class SampleService {
+        public void charge() {}
     }
 
     private static final class TestGcLogService implements GcLogService {

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
@@ -51,7 +52,7 @@ class TransactionAccessorTest {
     }
 
     private static SimpleExternalCallRecord externalCall(String target, long durationMs) {
-        return new SimpleExternalCallRecord(SimpleExternalCallRecord.TypeExternal.REST_TEMPLATE, target, durationMs);
+        return new SimpleExternalCallRecord(TypeExternalCall.REST_TEMPLATE, target, durationMs);
     }
 
     @Nested
@@ -131,9 +132,9 @@ class TransactionAccessorTest {
             TransactionExecutionProfile profile = subject.recordTransactionCompletion();
 
             // then.
-            assertThat(profile.getAggregatedExternalCalls())
+            assertThat(profile.getRecordedExternalCalls())
                     .hasSize(1)
-                    .extracting(agg -> agg.getExternalCall().getTarget())
+                    .extracting(SimpleExternalCallRecord::getTarget)
                     .containsExactly("GET https://payments/charge");
         }
 
@@ -149,7 +150,7 @@ class TransactionAccessorTest {
 
             // then.
             assertThat(profile.getRecordedQueries()).hasSize(1);
-            assertThat(profile.getAggregatedExternalCalls()).hasSize(1);
+            assertThat(profile.getRecordedExternalCalls()).hasSize(1);
         }
 
         @Test
@@ -173,14 +174,14 @@ class TransactionAccessorTest {
             TransactionExecutionProfile profile = subject.recordTransactionCompletion();
 
             // then.
-            assertThat(profile.getAggregatedExternalCalls())
+            assertThat(profile.getRecordedExternalCalls())
                     .hasSize(1)
-                    .extracting(agg -> agg.getExternalCall().getTarget())
+                    .extracting(SimpleExternalCallRecord::getTarget)
                     .containsExactly("GET https://payments/charge");
         }
 
         @Test
-        void shouldAggregateRepeatedCallsToTheSameTarget() {
+        void shouldRecordRepeatedCallsToTheSameTargetAsSeparateRecords() {
             // given.
             subject.recordNewTransactionStarted();
 
@@ -189,13 +190,11 @@ class TransactionAccessorTest {
             subject.recordExternalCall(externalCall("GET https://payments/charge", 30L));
             TransactionExecutionProfile profile = subject.recordTransactionCompletion();
 
-            // then. The two calls fold into one aggregated endpoint.
-            assertThat(profile.getAggregatedExternalCalls()).hasSize(1);
-
-            PerformanceStats stats = profile.getAggregatedExternalCalls().get(0).getStats();
-            assertThat(stats.getMinMs()).isEqualTo(10L);
-            assertThat(stats.getMaxMs()).isEqualTo(30L);
-            assertThat(stats.getAvgMs()).isEqualTo(20L);
+            // then. The profile keeps every raw call; aggregation happens later in TransactionStats.
+            assertThat(profile.getRecordedExternalCalls())
+                    .hasSize(2)
+                    .extracting(SimpleExternalCallRecord::getDurationMs)
+                    .containsExactly(10L, 30L);
         }
     }
 

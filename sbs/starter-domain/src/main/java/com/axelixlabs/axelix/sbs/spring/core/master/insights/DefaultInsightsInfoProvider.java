@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExternalCallInsight;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
@@ -37,6 +38,7 @@ import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.AggregatedExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.PerformanceStats;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStats;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -108,7 +110,8 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                                     performanceStats.getMaxMs(),
                                     performanceStats.getAvgMs()),
                             convertLazyLoadingTargets(transactionStats.getNPlusOneOccasions()),
-                            new HashMap<>(transactionStats.getInMemoryPaginatedEntities()));
+                            new HashMap<>(transactionStats.getInMemoryPaginatedEntities()),
+                            convertExternalCalls(transactionStats.getExternalCalls()));
                 })
                 .collect(Collectors.toList());
 
@@ -124,6 +127,18 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                                 entry.getKey().ownerEntityClass().getName(),
                                 entry.getKey().associationPropertyName()),
                         entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private static List<ExternalCallInsight> convertExternalCalls(List<AggregatedExternalCall> externalCalls) {
+        return externalCalls.stream()
+                .map(aggregatedCall -> {
+                    PerformanceStats stats = aggregatedCall.getStats();
+                    return new ExternalCallInsight(
+                            aggregatedCall.getType(),
+                            aggregatedCall.getTarget(),
+                            new TransactionOverallStats(stats.getMinMs(), stats.getMaxMs(), stats.getAvgMs()));
+                })
                 .collect(Collectors.toList());
     }
 

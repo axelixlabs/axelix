@@ -23,8 +23,9 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.web.client.RestTemplate;
 
-import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+
+import static com.axelixlabs.axelix.common.domain.insights.TypeExternalCall.REST_TEMPLATE;
 
 /**
  * {@link RestTemplateCustomizer} that registers the {@link ExternalCallHttpRequestInterceptor} on every
@@ -53,8 +54,7 @@ public class ExternalCallRestTemplateCustomizer implements RestTemplateCustomize
         if (!alreadyInstrumented) {
             restTemplate
                     .getInterceptors()
-                    .add(new ExternalCallHttpRequestInterceptor(
-                            transactionAccessor, SimpleExternalCallRecord.TypeExternal.REST_TEMPLATE));
+                    .add(new ExternalCallHttpRequestInterceptor(transactionAccessor, REST_TEMPLATE));
         }
     }
 }

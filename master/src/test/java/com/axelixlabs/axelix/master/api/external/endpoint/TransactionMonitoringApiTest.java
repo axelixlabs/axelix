@@ -81,7 +81,8 @@ class TransactionMonitoringApiTest {
                   "lazyLoadingTargets": [],
                   "inMemoryPagination": {
                     "com.example.Pet": 2
-                  }
+                  },
+                  "externalCalls": []
                 }
               ]
             }
@@ -128,7 +129,8 @@ class TransactionMonitoringApiTest {
                 new TransactionalKey("com.example.OwnerService", "saveOwner"),
                 new TransactionOverallStats(1, 10, 5),
                 List.of(),
-                Map.of("com.example.Pet", 2));
+                Map.of("com.example.Pet", 2),
+                List.of());
         BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                 groupId, artifactId, new PersistenceInsights(List.of(profile)));
         registry.reload(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));

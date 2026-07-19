@@ -20,9 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
@@ -76,6 +74,10 @@ public class TransactionExecutionProfile {
         return recordedQueries;
     }
 
+    public List<SimpleExternalCallRecord> getRecordedExternalCalls() {
+        return recordedExternalCalls;
+    }
+
     public long getStartedAtMillisFromEpoch() {
         return startedAt.toEpochMilli();
     }
@@ -111,24 +113,6 @@ public class TransactionExecutionProfile {
 
     public int getExternalCallCount() {
         return recordedExternalCalls.size();
-    }
-
-    /**
-     * Fold the raw recorded external calls into one {@link AggregatedExternalCall}
-     * per {@code (type, target)} endpoint, carrying the running min/max/avg duration across the calls to it.
-     */
-    public List<AggregatedExternalCall> getAggregatedExternalCalls() {
-        Map<Map.Entry<SimpleExternalCallRecord.TypeExternal, String>, AggregatedExternalCall> aggregated =
-                new LinkedHashMap<>();
-
-        for (SimpleExternalCallRecord call : recordedExternalCalls) {
-            aggregated
-                    .computeIfAbsent(
-                            Map.entry(call.getType(), call.getTarget()), key -> new AggregatedExternalCall(call))
-                    .record(call.getDurationMs());
-        }
-
-        return new ArrayList<>(aggregated.values());
     }
 
     public static class AnalyzedSqlQueryRecord {
@@ -172,33 +156,6 @@ public class TransactionExecutionProfile {
 
         public @Nullable LazyLoadingTarget getLazyLoadingTarget() {
             return lazyLoadingTarget;
-        }
-    }
-
-    /**
-     * Aggregate of all the calls to a single {@code (type, target)} external endpoint within the transaction,
-     * carrying the running min/max/avg duration across them.
-     */
-    public static class AggregatedExternalCall {
-
-        private final SimpleExternalCallRecord externalCall;
-        private final PerformanceStats stats;
-
-        AggregatedExternalCall(SimpleExternalCallRecord externalCall) {
-            this.externalCall = externalCall;
-            this.stats = new PerformanceStats();
-        }
-
-        void record(long durationMs) {
-            stats.record(durationMs);
-        }
-
-        public SimpleExternalCallRecord getExternalCall() {
-            return externalCall;
-        }
-
-        public PerformanceStats getStats() {
-            return stats;
         }
     }
 }

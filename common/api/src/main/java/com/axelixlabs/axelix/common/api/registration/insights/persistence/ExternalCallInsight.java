@@ -15,34 +15,45 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence;
+package com.axelixlabs.axelix.common.api.registration.insights.persistence;
+
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 
 /**
- * Record of a single blocking call to an external system made while a transaction was open.
+ * Aggregated timing of the blocking calls made to a single external endpoint from within a transactional
+ * method, folded across every invocation of that method.
  *
  * @author Sergey Cherkasov
  */
-public class SimpleExternalCallRecord {
+public class ExternalCallInsight {
+
     private final TypeExternalCall type;
     private final String target;
-    private final long durationMs;
+    private final TransactionOverallStats stats;
 
     /**
-     * Create a new SimpleExternalCallRecord.
+     * Create a new ExternalCallInsight.
      *
      * @param type       the client that performed the call, e.g. {@link TypeExternalCall#REST_TEMPLATE} or
      *                   {@link TypeExternalCall#REST_CLIENT} for an HTTP call, {@link TypeExternalCall#KAFKA} for a
      *                   messaging one.
      * @param target     where the call went: the request method and url for an HTTP call, e.g.
      *                   {@code "GET https://payments/charge"}. The topic / queue / exchange for a messaging call.
-     * @param durationMs the call duration in milliseconds.
+     * @param stats      the min/max/avg call duration aggregated across every invocation of the transactional method.
      */
-    public SimpleExternalCallRecord(TypeExternalCall type, String target, long durationMs) {
+    @JsonCreator
+    public ExternalCallInsight(
+            @JsonProperty("type") TypeExternalCall type,
+            @JsonProperty("target") String target,
+            @JsonProperty("stats") TransactionOverallStats stats) {
         this.type = type;
         this.target = target;
-        this.durationMs = durationMs;
+        this.stats = stats;
     }
 
     public TypeExternalCall getType() {
@@ -53,7 +64,31 @@ public class SimpleExternalCallRecord {
         return target;
     }
 
-    public long getDurationMs() {
-        return durationMs;
+    public TransactionOverallStats getStats() {
+        return stats;
+    }
+
+    @Override
+    public String toString() {
+        return "ExternalCallInsight{" + "type='"
+                + type + '\'' + ", target='"
+                + target + '\'' + ", stats="
+                + stats + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ExternalCallInsight that = (ExternalCallInsight) o;
+        return Objects.equals(type, that.type)
+                && Objects.equals(target, that.target)
+                && Objects.equals(stats, that.stats);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, target, stats);
     }
 }

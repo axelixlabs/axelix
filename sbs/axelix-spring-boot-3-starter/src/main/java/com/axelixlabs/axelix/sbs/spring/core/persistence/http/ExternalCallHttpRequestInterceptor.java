@@ -26,8 +26,8 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
-import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord.TypeExternal;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 
 /**
@@ -44,9 +44,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final TransactionAccessor transactionAccessor;
-    private final TypeExternal type;
+    private final TypeExternalCall type;
 
-    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor, TypeExternal type) {
+    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor, TypeExternalCall type) {
         this.transactionAccessor = transactionAccessor;
         this.type = type;
     }

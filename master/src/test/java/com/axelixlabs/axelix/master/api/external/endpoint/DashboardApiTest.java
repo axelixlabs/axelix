@@ -333,7 +333,8 @@ public class DashboardApiTest {
                 new TransactionalKey("com.example.OwnerService", "loadOwners"),
                 new TransactionOverallStats(1, 10, 5),
                 lazyLoadingTargets,
-                inMemoryPagination);
+                inMemoryPagination,
+                List.of());
         return TestMetadataFactory.withPersistenceInsights(
                 groupId, artifactId, new PersistenceInsights(List.of(profile)));
     }

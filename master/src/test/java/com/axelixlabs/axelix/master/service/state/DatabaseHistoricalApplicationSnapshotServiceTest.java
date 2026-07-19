@@ -118,7 +118,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                     new TransactionalKey("com.example.OwnerService", "saveOwner"),
                     new TransactionOverallStats(1, 10, 5),
                     List.of(),
-                    Map.of("com.example.Pet", 2));
+                    Map.of("com.example.Pet", 2),
+                    List.of());
             BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                     "org.springframework.samples", "petclinic", new PersistenceInsights(List.of(profile)));
 
@@ -327,7 +328,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                     new TransactionalKey("com.example.OwnerService", "saveOwner"),
                     new TransactionOverallStats(1, 10, 5),
                     List.of(),
-                    Map.of("com.example.Pet", 2));
+                    Map.of("com.example.Pet", 2),
+                    List.of());
             BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                     groupId, artifactId, new PersistenceInsights(List.of(profile)));
             jdbcAggregateTemplate.insert(TestInstanceFactory.create(instanceId, groupId, artifactId));
@@ -519,7 +521,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                 new TransactionalKey("com.example.OwnerService", "loadOwners"),
                 new TransactionOverallStats(1, 10, 5),
                 lazyLoadingTargets,
-                inMemoryPagination);
+                inMemoryPagination,
+                List.of());
         return new PersistenceInsights(List.of(profile));
     }
 
