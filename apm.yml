@@ -23,5 +23,11 @@ dependencies:
     - '@modelcontextprotocol/server-github'
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_PAT}"
+  - name: axelix-local
+    registry: false
+    transport: http
+    url: http://localhost:8080/api/mcp
+    headers:
+      Authorization: "Basic YWRtaW46YWRtaW4="
 includes: auto
 scripts: {}

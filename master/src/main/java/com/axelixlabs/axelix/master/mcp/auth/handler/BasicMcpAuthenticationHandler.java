@@ -62,7 +62,7 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
             String password = parts[1];
 
             return Optional.ofNullable(userAuthenticator.authenticate(login, password))
-                    .orElseThrow(AuthenticationException::new);
+                    .orElseThrow(() -> new AuthenticationException("User with provided credentials have not been found"));
 
         } catch (Exception e) {
             log.warn("Basic authentication for accessing the MCP failed: {}", e.getMessage());
