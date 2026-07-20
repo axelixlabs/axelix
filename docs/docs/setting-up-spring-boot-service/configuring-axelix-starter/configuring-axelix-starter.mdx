@@ -158,14 +158,13 @@ management:
           - axelix-metrics
           - axelix-scheduled-tasks
           - axelix-thread-dump
-          - axelix-transactions-monitoring
 ```
 
   </TabItem>
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
+management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
 ```
 
   </TabItem>
@@ -191,7 +190,9 @@ it. The starter registers these meters:
 | `axelix_cache_enabled` | `Gauge` | `cache` | Current runtime state of each enhanced cache: `1` when enabled, `0` when disabled. |
 
 These meters complement the UI-facing actuator endpoints rather than replace them. The UI still reads
-`axelix-metrics`, `axelix-caches`, and `axelix-transactions-monitoring`.
+`axelix-metrics` and `axelix-caches`. Transaction monitoring data is not served by a dedicated actuator endpoint —
+it travels to Master as part of the instance's registration metadata exposed through `axelix-metadata` (see
+[Transaction monitoring](#transaction-monitoring)).
 
 The Spring Boot 2 starter does not publish these extra Axelix meters into Micrometer yet. The `axelix-metrics`
 actuator endpoint still works for the Axelix UI.
@@ -403,6 +404,52 @@ heartbeats are rejected with `401`.
 | `axelix.sbs.endpoints.config.sanitized-properties` | *(empty list)* | Property keys whose values are masked as `******` for callers without `ENV_VALUES_READ` (for `axelix-env`) or `CONFIG_PROPS_VALUES_READ` (for `axelix-configprops`). Empty list means **all** values are masked. See [Sanitize sensitive property values](#sanitize-sensitive-property-values) for the matching rules. |
 
 </div>
+
+### Transaction monitoring
+
+Transaction monitoring is what powers the Transaction Control page and the related meters: it wraps your
+`@Transactional` methods, proxies the data source to count queries, cleans up the per-request transaction stack, and
+registers the Hibernate N+1 integrator. The collected insights travel to Master inside the instance's registration
+metadata (exposed through `axelix-metadata`), so there is no separate actuator endpoint to expose. It is **on by
+default** once the starter is on the classpath.
+
+Set `axelix.sbs.transaction.monitoring.enabled` to `false` to turn it off entirely — no bean post-processors, no data
+source proxying, no cleanup filter, and no Hibernate integrator. Use this to shave the associated overhead, to rule out
+interference while troubleshooting your data source / Hibernate setup, or simply when you don't use the feature.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    transaction:
+      monitoring:
+        enabled: false
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.transaction.monitoring.enabled=false
+```
+
+  </TabItem>
+</Tabs>
+
+<div className={styles.configTable}>
+
+| Property                                     | Default | Description                                                                                                                                                     |
+|----------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.transaction.monitoring.enabled`  | `true`  | Master switch for transaction monitoring. Set to `false` to make the whole transaction monitoring auto-configuration back off. Behaves identically on the Spring Boot 2 and Spring Boot 3 starters. |
+
+</div>
+
+:::note
+Disabling transaction monitoring also disables in-memory pagination detection described below, since that detection is
+part of the same auto-configuration.
+:::
 
 ### In-memory pagination detection
 

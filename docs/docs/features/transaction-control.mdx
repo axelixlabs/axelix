@@ -58,32 +58,17 @@ agent or APM tool is required.
 
 ## Properties
 
-The page is backed by the `axelix-transactions-monitoring` actuator endpoint contributed by the Axelix Spring Boot
-Starter. Expose it through the standard Spring Boot Actuator properties — see [Configuring Spring Boot
-Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) for the full list
-of Axelix endpoints and surrounding setup:
+The page is not backed by a dedicated actuator endpoint. The Axelix Spring Boot Starter aggregates the transaction
+insights on the JVM and ships them to Master as part of the instance's registration metadata — the same payload
+exposed through the `axelix-metadata` endpoint that Master already probes. As long as `axelix-metadata` is exposed (see
+[Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx)), this page works
+with no extra endpoint to enable.
 
-<Tabs groupId="spring-config">
-  <TabItem value="properties" label="application.properties">
-
-```properties
-management.endpoints.web.exposure.include=axelix-transactions-monitoring
-```
-
-  </TabItem>
-  <TabItem value="yaml" label="application.yaml">
-
-```yaml
-management:
-  endpoints:
-    web:
-      exposure:
-        include:
-          - axelix-transactions-monitoring
-```
-
-  </TabItem>
-</Tabs>
+Transaction monitoring is enabled by default. To turn it off entirely, set
+`axelix.sbs.transaction.monitoring.enabled=false` — see [Transaction
+monitoring](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#transaction-monitoring)
+for details.
 
 ## See also
 

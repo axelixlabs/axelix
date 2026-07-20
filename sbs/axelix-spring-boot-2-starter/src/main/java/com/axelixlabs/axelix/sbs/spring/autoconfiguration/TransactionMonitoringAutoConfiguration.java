@@ -67,6 +67,11 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Vyacheslav Yanin
  */
 @AutoConfiguration(after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
+@ConditionalOnProperty(
+        prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX,
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean

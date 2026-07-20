@@ -65,6 +65,19 @@ class TransactionMonitoringAutoConfigurationTest {
         });
     }
 
+    @Test // GH-1442
+    void shouldBackOffCompletely_whenMonitoringDisabled() {
+        contextRunner
+                .withPropertyValues("axelix.sbs.transaction.monitoring.enabled=false")
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
+                    assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
+                    assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
+                    assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                });
+    }
+
     @Test
     void shouldNotRegisterRestTemplateCustomizer_whenRestTemplateIsAbsent() {
         contextRunner

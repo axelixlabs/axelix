@@ -35,6 +35,12 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
     public static final String CONFIG_PROPS_PREFIX = "axelix.sbs.transaction.monitoring";
 
     /**
+     * Whether transaction monitoring is enabled. When {@code false}, the transaction monitoring
+     * auto-configuration backs off entirely.
+     */
+    private Boolean enabled;
+
+    /**
      * Maximum number of transaction records to keep per method.
      */
     private Integer maxTransactionsPerMethod;
@@ -43,7 +49,17 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
      * Create a new TransactionMonitoringConfigurationProperties
      */
     public TransactionMonitoringConfigurationProperties() {
+        this.enabled = true;
         this.maxTransactionsPerMethod = 30;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public TransactionMonitoringConfigurationProperties setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+        return this;
     }
 
     public Integer getMaxTransactionsPerMethod() {
@@ -62,18 +78,19 @@ public class TransactionMonitoringConfigurationProperties implements Validatable
         }
 
         TransactionMonitoringConfigurationProperties that = (TransactionMonitoringConfigurationProperties) o;
-        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod);
+        return Objects.equals(enabled, that.enabled)
+                && Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maxTransactionsPerMethod);
+        return Objects.hash(enabled, maxTransactionsPerMethod);
     }
 
     @Override
     public String toString() {
-        return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod=" + maxTransactionsPerMethod
-                + '}';
+        return "TransactionMonitoringConfigurationProperties{" + "enabled=" + enabled + ", maxTransactionsPerMethod="
+                + maxTransactionsPerMethod + '}';
     }
 
     @Override
