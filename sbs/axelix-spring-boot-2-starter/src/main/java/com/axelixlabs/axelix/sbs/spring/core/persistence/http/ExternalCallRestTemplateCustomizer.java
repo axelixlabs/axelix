@@ -50,9 +50,7 @@ public class ExternalCallRestTemplateCustomizer implements RestTemplateCustomize
                 restTemplate.getInterceptors().stream().anyMatch(ExternalCallHttpRequestInterceptor.class::isInstance);
 
         if (!alreadyInstrumented) {
-            restTemplate
-                    .getInterceptors()
-                    .add(new ExternalCallHttpRequestInterceptor(transactionAccessor, "RestTemplate"));
+            restTemplate.getInterceptors().add(new ExternalCallHttpRequestInterceptor(transactionAccessor));
         }
     }
 }

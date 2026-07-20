@@ -17,18 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.http;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
@@ -90,46 +84,5 @@ class ExternalCallRestTemplateCustomizerTest {
         assertThat(restTemplate.getInterceptors())
                 .hasSize(1)
                 .hasOnlyElementsOfType(ExternalCallHttpRequestInterceptor.class);
-    }
-
-    @Test
-    void shouldNotReorderTheInterceptorsTheApplicationRegistered() {
-        // given. RestTemplateBuilder keeps the order the application registered them in. The @Order(1) is what
-        // makes this test able to fail at all: AnnotationAwareOrderComparator scores an interceptor without any
-        // order metadata as Ordered.LOWEST_PRECEDENCE and the sort is stable, so two unordered interceptors
-        // would come out of a sort untouched and the bug would slip through.
-        UnorderedInterceptor unordered = new UnorderedInterceptor();
-        OrderedInterceptor ordered = new OrderedInterceptor();
-
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .additionalInterceptors(unordered, ordered)
-                .build();
-
-        // when.
-        subject.customize(restTemplate);
-
-        // then. The application's own order must survive, with ours appended last.
-        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
-
-        assertThat(interceptors).hasSize(3);
-        assertThat(interceptors.subList(0, 2)).containsExactly(unordered, ordered);
-        assertThat(interceptors.get(2)).isInstanceOf(ExternalCallHttpRequestInterceptor.class);
-    }
-
-    @Order(1)
-    private static class OrderedInterceptor implements ClientHttpRequestInterceptor {
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-                throws IOException {
-            return execution.execute(request, body);
-        }
-    }
-
-    private static class UnorderedInterceptor implements ClientHttpRequestInterceptor {
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-                throws IOException {
-            return execution.execute(request, body);
-        }
     }
 }

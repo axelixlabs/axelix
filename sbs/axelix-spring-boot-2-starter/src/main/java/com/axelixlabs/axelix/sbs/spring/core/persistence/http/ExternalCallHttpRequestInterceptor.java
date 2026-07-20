@@ -27,13 +27,15 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 
 /**
  * {@link ClientHttpRequestInterceptor} that records every synchronous HTTP call performed while a transaction
  * is open, so that the blocking calls holding the transaction become visible. It serves any client built on
- * {@link ClientHttpRequestInterceptor} — the concrete client name is supplied via {@code clientName}.
+ * {@link ClientHttpRequestInterceptor} — such as {@code RestTemplate} — recording every such call as a
+ * {@link TypeExternalCall#HTTP_CLIENT} one.
  * <p>
  * Whether the call actually belongs to a transaction is decided by the {@link TransactionAccessor}: calls
  * made outside of any transaction are silently dropped by it.
@@ -43,11 +45,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final TransactionAccessor transactionAccessor;
-    private final String clientName;
 
-    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor, String clientName) {
+    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor) {
         this.transactionAccessor = transactionAccessor;
-        this.clientName = clientName;
     }
 
     @Override
@@ -55,7 +55,6 @@ class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor
             @NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution)
             throws IOException {
 
-        long startTimestampMs = System.currentTimeMillis();
         long startNanos = System.nanoTime();
 
         try {
@@ -63,12 +62,10 @@ class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor
         } finally {
             long duration = System.nanoTime() - startNanos;
             HttpMethod httpMethod = request.getMethod();
-            transactionAccessor.recordExternalCall(new SimpleExternalCallRecord(
-                    clientName,
-                    httpMethod != null ? httpMethod.name() : null,
-                    request.getURI().toString(),
-                    duration / 1_000_000,
-                    startTimestampMs));
+            String method = httpMethod != null ? httpMethod.name() : "";
+            String target = method + " " + request.getURI().getPath();
+            transactionAccessor.recordExternalCall(
+                    new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, target, duration / 1_000_000));
         }
     }
 }
