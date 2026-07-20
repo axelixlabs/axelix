@@ -63,7 +63,7 @@ export interface ILoggersResponseBody {
     /**
      * All logger groups data
      */
-    groups: Record<string, Omit<ILoggerGroup, "name">>;
+    groups: ILoggerGroup[];
 
     /**
      * All possible logging levels that are supported by the logging system inside the instance
@@ -73,7 +73,7 @@ export interface ILoggersResponseBody {
     /**
      * All loggers
      */
-    loggers: Record<string, Omit<ILogger, "name">>;
+    loggers: ILogger[];
 }
 
 export interface IMappedLoggersResponse {

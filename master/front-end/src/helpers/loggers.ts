@@ -22,40 +22,12 @@ import {
     ETimepickerHourCycle,
     type ILogger,
     type ILoggerGroup,
-    type ILoggersResponseBody,
-    type IMappedLoggersResponse,
     type ITimepickerClockConfig,
     type ITimepickerData,
 } from "models";
 import { DEFAULT_TIME_LOCALE } from "utils";
 
 dayjs.extend(isSameOrBefore);
-
-export const mapLoggersResponse = (response: ILoggersResponseBody): IMappedLoggersResponse => {
-    const { levels, loggers, groups } = response;
-    const loggerEntries = Object.entries(loggers);
-    const loggerGroupEntries = Object.entries(groups);
-
-    const mappedLoggers = loggerEntries.map(([name, logger]) => {
-        return {
-            name: name,
-            ...logger,
-        };
-    });
-
-    const mappedGroups = loggerGroupEntries.map(([name, group]) => {
-        return {
-            name: name,
-            ...group,
-        };
-    });
-
-    return {
-        levels: levels,
-        loggers: mappedLoggers,
-        groups: mappedGroups,
-    };
-};
 
 export const filterLoggers = (loggers: ILogger[], search: string): ILogger[] => {
     const formattedSearch = search.toLowerCase().trim();
