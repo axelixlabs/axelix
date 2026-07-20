@@ -97,7 +97,10 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
     }, [temporaryLevelInitiatedAt, temporaryLevelRollsBackAt]);
 
     const handleChange: TChangeLoggerLevel = (level, ttlSeconds = null): void => {
-        if (configuredLevel === level) {
+        // if the ttl is specified, then this is almost 100% going to be different from the
+        // one that is already configured. The only case that is no-op, is when we're configuring
+        // the same logging level without ttl specified
+        if (configuredLevel === level && ttlSeconds == null) {
             return;
         }
 
