@@ -25,6 +25,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.utils.Assert;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 
@@ -34,19 +35,24 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTa
  * @author Mikhail Polivakha
  */
 public class TransactionExecutionProfile {
-
     private final List<AnalyzedSqlQueryRecord> recordedQueries;
+    private final List<SimpleExternalCallRecord> recordedExternalCalls;
     private final Instant startedAt;
     private @Nullable Instant finishedAt;
 
     public TransactionExecutionProfile(Instant startedAt) {
         this.recordedQueries = new ArrayList<>(4);
+        this.recordedExternalCalls = new ArrayList<>(4);
         this.startedAt = startedAt;
         this.finishedAt = null;
     }
 
     public void recordQuery(SimpleSqlQueryRecord sqlQueryRecord) {
         recordedQueries.add(new AnalyzedSqlQueryRecord(sqlQueryRecord));
+    }
+
+    public void recordExternalCall(SimpleExternalCallRecord externalCall) {
+        recordedExternalCalls.add(externalCall);
     }
 
     public void recordLazyLoading(LazyLoadingTarget lazyLoadingTarget) {
@@ -66,6 +72,10 @@ public class TransactionExecutionProfile {
 
     public List<AnalyzedSqlQueryRecord> getRecordedQueries() {
         return recordedQueries;
+    }
+
+    public List<SimpleExternalCallRecord> getRecordedExternalCalls() {
+        return recordedExternalCalls;
     }
 
     public long getStartedAtMillisFromEpoch() {
@@ -99,6 +109,10 @@ public class TransactionExecutionProfile {
 
     public int getQueriesCount() {
         return recordedQueries.size();
+    }
+
+    public int getExternalCallCount() {
+        return recordedExternalCalls.size();
     }
 
     public static class AnalyzedSqlQueryRecord {

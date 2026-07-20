@@ -17,26 +17,29 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
+/**
+ * Aggregated performance stats.
+ *
+ * @author Mikhail Polivakha
+ */
 public class PerformanceStats {
 
     private long minMs;
     private long maxMs;
     private long avgMs;
-    private long transactionsRecorded;
+    private long recorded;
 
-    public void recordTransaction(TransactionExecutionProfile transaction) {
-        long transactionDurationMs = transaction.getTransactionDuration().toMillis();
-
-        if (transactionsRecorded == 0) {
-            this.minMs = transactionDurationMs;
-            this.maxMs = transactionDurationMs;
-            this.avgMs = transactionDurationMs;
+    public void record(long durationMs) {
+        if (recorded == 0) {
+            this.minMs = durationMs;
+            this.maxMs = durationMs;
+            this.avgMs = durationMs;
         } else {
-            this.minMs = Math.min(transactionDurationMs, minMs);
-            this.maxMs = Math.max(transactionDurationMs, maxMs);
-            this.avgMs = (avgMs * transactionsRecorded + transactionDurationMs) / (transactionsRecorded + 1);
+            this.minMs = Math.min(durationMs, minMs);
+            this.maxMs = Math.max(durationMs, maxMs);
+            this.avgMs = (avgMs * recorded + durationMs) / (recorded + 1);
         }
-        this.transactionsRecorded++;
+        this.recorded++;
     }
 
     public long getMinMs() {

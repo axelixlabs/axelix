@@ -20,14 +20,14 @@ package com.axelixlabs.axelix.common.api.registration.insights.persistence;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TransactionOverallStats {
+public class ExecutionStats {
 
     private final long minMs;
     private final long maxMs;
     private final long averageMs;
 
     @JsonCreator
-    public TransactionOverallStats(
+    public ExecutionStats(
             @JsonProperty("minMs") long minMs,
             @JsonProperty("maxMs") long max,
             @JsonProperty("averageMs") long averageMs) {

@@ -25,6 +25,7 @@ import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
@@ -48,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneInteg
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -115,6 +118,17 @@ public class TransactionMonitoringAutoConfiguration {
         registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR);
 
         return registrationBean;
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(RestTemplate.class)
+    static class RestTemplateMonitoringConfiguration {
+
+        @Bean
+        public ExternalCallRestTemplateCustomizer axelixRestTemplateCustomizer(
+                TransactionAccessor transactionAccessor) {
+            return new ExternalCallRestTemplateCustomizer(transactionAccessor);
+        }
     }
 
     @Configuration

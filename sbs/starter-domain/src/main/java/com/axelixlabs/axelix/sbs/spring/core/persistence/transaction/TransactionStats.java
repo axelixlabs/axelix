@@ -17,12 +17,16 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 
 /**
@@ -40,17 +44,35 @@ public class TransactionStats {
 
     private final Map<LazyLoadingTarget, Integer> lazyLoadingOccasions;
     private final Map<String, Integer> inMemoryPaginatedEntities;
+    private final List<AggregatedExternalCall> externalCalls;
     private final PerformanceStats performanceStats;
 
     public TransactionStats() {
         this.lazyLoadingOccasions = new HashMap<>(1);
         this.inMemoryPaginatedEntities = new HashMap<>(1);
+        this.externalCalls = new ArrayList<>(1);
         this.performanceStats = new PerformanceStats();
     }
 
     public void put(TransactionExecutionProfile transaction) {
         updateProblemsProfilers(transaction);
-        performanceStats.recordTransaction(transaction);
+        performanceStats.record(transaction.getTransactionDuration().toMillis());
+
+        for (SimpleExternalCallRecord call : transaction.getRecordedExternalCalls()) {
+            getOrCreateAggregate(call.getType(), call.getTarget()).record(call.getDurationMs());
+        }
+    }
+
+    private AggregatedExternalCall getOrCreateAggregate(TypeExternalCall type, String target) {
+        for (AggregatedExternalCall aggregatedCall : externalCalls) {
+            if (aggregatedCall.getType() == type && aggregatedCall.getTarget().equals(target)) {
+                return aggregatedCall;
+            }
+        }
+
+        AggregatedExternalCall created = new AggregatedExternalCall(type, target);
+        externalCalls.add(created);
+        return created;
     }
 
     private void updateProblemsProfilers(TransactionExecutionProfile transaction) {
@@ -134,5 +156,9 @@ public class TransactionStats {
 
     public Map<String, Integer> getInMemoryPaginatedEntities() {
         return inMemoryPaginatedEntities;
+    }
+
+    public List<AggregatedExternalCall> getExternalCalls() {
+        return externalCalls;
     }
 }

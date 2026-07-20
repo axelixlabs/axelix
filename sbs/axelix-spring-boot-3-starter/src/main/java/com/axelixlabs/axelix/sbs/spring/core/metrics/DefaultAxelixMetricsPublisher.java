@@ -60,6 +60,13 @@ public class DefaultAxelixMetricsPublisher implements AxelixMetricsPublisher {
                 .tag("method", methodName)
                 .register(meterRegistry)
                 .increment(transaction.getQueriesCount());
+
+        Counter.builder(AxelixMetricNames.TRANSACTION_EXTERNAL_CALLS)
+                .description("Total number of external calls made inside transactions")
+                .tag("class", className)
+                .tag("method", methodName)
+                .register(meterRegistry)
+                .increment(transaction.getExternalCallCount());
     }
 
     @Override

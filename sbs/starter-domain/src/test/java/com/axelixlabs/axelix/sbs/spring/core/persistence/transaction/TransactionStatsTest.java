@@ -22,6 +22,8 @@ import java.time.Instant;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleSqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
 
@@ -117,6 +119,58 @@ class TransactionStatsTest {
             assertThat(subject.getNPlusOneOccasions()).containsEntry(pets, 2);
             assertThat(subject.getInMemoryPaginatedEntities()).isEmpty();
         }
+    }
+
+    @Nested
+    class ExternalCallAggregation {
+
+        @Test
+        void shouldAggregateCallsToTheSameEndpointWithinATransaction() {
+            // given.
+            TransactionStats subject = new TransactionStats();
+            TransactionExecutionProfile profile = profileWithExternalCalls(externalCall(10L), externalCall(30L));
+
+            // when.
+            subject.put(profile);
+
+            // then.
+            assertThat(subject.getExternalCalls()).singleElement().satisfies(aggregatedCall -> {
+                assertThat(aggregatedCall.getType()).isEqualTo(TypeExternalCall.HTTP_CLIENT);
+                assertThat(aggregatedCall.getTarget()).isEqualTo("GET https://payments/charge");
+                assertThat(aggregatedCall.getStats().getMinMs()).isEqualTo(10L);
+                assertThat(aggregatedCall.getStats().getMaxMs()).isEqualTo(30L);
+                assertThat(aggregatedCall.getStats().getAvgMs()).isEqualTo(20L);
+            });
+        }
+
+        @Test
+        void shouldAggregateTheSameEndpointAcrossTransactions() {
+            // given.
+            TransactionStats subject = new TransactionStats();
+
+            // when.
+            subject.put(profileWithExternalCalls(externalCall(10L), externalCall(30L)));
+            subject.put(profileWithExternalCalls(externalCall(50L)));
+
+            // then. Recording every raw call across both invocations: min/max span both, avg is the running mean.
+            assertThat(subject.getExternalCalls()).singleElement().satisfies(aggregatedCall -> {
+                assertThat(aggregatedCall.getStats().getMinMs()).isEqualTo(10L);
+                assertThat(aggregatedCall.getStats().getMaxMs()).isEqualTo(50L);
+                assertThat(aggregatedCall.getStats().getAvgMs()).isEqualTo(30L);
+            });
+        }
+    }
+
+    private static TransactionExecutionProfile profileWithExternalCalls(SimpleExternalCallRecord... calls) {
+        TransactionExecutionProfile profile = new TransactionExecutionProfile(Instant.now());
+        for (SimpleExternalCallRecord call : calls) {
+            profile.recordExternalCall(call);
+        }
+        return profile.complete();
+    }
+
+    private static SimpleExternalCallRecord externalCall(long durationMs) {
+        return new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, "GET https://payments/charge", durationMs);
     }
 
     private static TransactionExecutionProfile profileWith(SimpleSqlQueryRecord... queries) {
