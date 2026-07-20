@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.persistence.transaction;
 
 /**
- * Running min/max/avg call duration across every call aggregated into the owning record.
+ * Aggregated performance stats.
  *
  * @author Mikhail Polivakha
  */

@@ -58,8 +58,7 @@ class ExternalCallHttpRequestInterceptorTest {
     @Test
     void shouldRecordTheCallIntoTheActiveTransaction() throws IOException {
         // given.
-        ExternalCallHttpRequestInterceptor subject =
-                new ExternalCallHttpRequestInterceptor(transactionAccessor, TypeExternalCall.REST_TEMPLATE);
+        ExternalCallHttpRequestInterceptor subject = new ExternalCallHttpRequestInterceptor(transactionAccessor);
         transactionAccessor.recordNewTransactionStarted();
         MockClientHttpRequest request =
                 new MockClientHttpRequest(HttpMethod.GET, URI.create("https://payments/charge"));
@@ -70,37 +69,16 @@ class ExternalCallHttpRequestInterceptorTest {
 
         // then.
         assertThat(profile.getRecordedExternalCalls()).singleElement().satisfies(recorded -> {
-            assertThat(recorded.getType()).isEqualTo(TypeExternalCall.REST_TEMPLATE);
-            assertThat(recorded.getTarget()).isEqualTo("GET https://payments/charge");
+            assertThat(recorded.getType()).isEqualTo(TypeExternalCall.HTTP_CLIENT);
+            assertThat(recorded.getTarget()).isEqualTo("GET /charge");
             assertThat(recorded.getDurationMs()).isNotNegative();
         });
     }
 
     @Test
-    void shouldRecordTheConfiguredClientType() throws IOException {
-        // given. The same interceptor serves any ClientHttpRequestInterceptor-based client; the client is the 'type'.
-        ExternalCallHttpRequestInterceptor subject =
-                new ExternalCallHttpRequestInterceptor(transactionAccessor, TypeExternalCall.REST_CLIENT);
-        transactionAccessor.recordNewTransactionStarted();
-        MockClientHttpRequest request =
-                new MockClientHttpRequest(HttpMethod.POST, URI.create("https://payments/charge"));
-
-        // when.
-        subject.intercept(request, NO_BODY, okExecution());
-        TransactionExecutionProfile profile = transactionAccessor.recordTransactionCompletion();
-
-        // then.
-        assertThat(profile.getRecordedExternalCalls())
-                .singleElement()
-                .extracting(SimpleExternalCallRecord::getType)
-                .isEqualTo(TypeExternalCall.REST_CLIENT);
-    }
-
-    @Test
     void shouldReturnTheResponseProducedByTheExecution() throws IOException {
         // given.
-        ExternalCallHttpRequestInterceptor subject =
-                new ExternalCallHttpRequestInterceptor(transactionAccessor, TypeExternalCall.REST_TEMPLATE);
+        ExternalCallHttpRequestInterceptor subject = new ExternalCallHttpRequestInterceptor(transactionAccessor);
         transactionAccessor.recordNewTransactionStarted();
         MockClientHttpRequest request =
                 new MockClientHttpRequest(HttpMethod.GET, URI.create("https://payments/charge"));
@@ -116,8 +94,7 @@ class ExternalCallHttpRequestInterceptorTest {
     @Test
     void shouldStillRecordTheCallWhenTheExecutionFails() {
         // given. A blocking call that fails still held the transaction open, so it must be recorded.
-        ExternalCallHttpRequestInterceptor subject =
-                new ExternalCallHttpRequestInterceptor(transactionAccessor, TypeExternalCall.REST_TEMPLATE);
+        ExternalCallHttpRequestInterceptor subject = new ExternalCallHttpRequestInterceptor(transactionAccessor);
         transactionAccessor.recordNewTransactionStarted();
         MockClientHttpRequest request =
                 new MockClientHttpRequest(HttpMethod.GET, URI.create("https://payments/charge"));
@@ -135,7 +112,7 @@ class ExternalCallHttpRequestInterceptorTest {
         assertThat(profile.getRecordedExternalCalls())
                 .singleElement()
                 .extracting(SimpleExternalCallRecord::getTarget)
-                .isEqualTo("GET https://payments/charge");
+                .isEqualTo("GET /charge");
     }
 
     private static ClientHttpRequestExecution okExecution() {

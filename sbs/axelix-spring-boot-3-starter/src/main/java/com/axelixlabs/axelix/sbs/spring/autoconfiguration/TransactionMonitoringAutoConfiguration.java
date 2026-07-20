@@ -120,10 +120,15 @@ public class TransactionMonitoringAutoConfiguration {
         return registrationBean;
     }
 
-    @Bean
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(RestTemplate.class)
-    public ExternalCallRestTemplateCustomizer axelixRestTemplateCustomizer(TransactionAccessor transactionAccessor) {
-        return new ExternalCallRestTemplateCustomizer(transactionAccessor);
+    static class RestTemplateMonitoringConfiguration {
+
+        @Bean
+        public ExternalCallRestTemplateCustomizer axelixRestTemplateCustomizer(
+                TransactionAccessor transactionAccessor) {
+            return new ExternalCallRestTemplateCustomizer(transactionAccessor);
+        }
     }
 
     @Configuration

@@ -52,7 +52,7 @@ class TransactionAccessorTest {
     }
 
     private static SimpleExternalCallRecord externalCall(String target, long durationMs) {
-        return new SimpleExternalCallRecord(TypeExternalCall.REST_TEMPLATE, target, durationMs);
+        return new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, target, durationMs);
     }
 
     @Nested

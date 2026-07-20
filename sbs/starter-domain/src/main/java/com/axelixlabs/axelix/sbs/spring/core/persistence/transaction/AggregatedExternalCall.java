@@ -40,9 +40,8 @@ public class AggregatedExternalCall {
     /**
      * Create a new ggregatedExternalCall.
      *
-     * @param type       the client that performed the call, e.g. {@link TypeExternalCall#REST_TEMPLATE} or
-     *                   {@link TypeExternalCall#REST_CLIENT} for an HTTP call, {@link TypeExternalCall#KAFKA} for a
-     *                   messaging one.
+     * @param type       the client that performed the call, e.g. {@link TypeExternalCall#HTTP_CLIENT} for an HTTP
+     *                   call, {@link TypeExternalCall#KAFKA} for a messaging one.
      * @param target     where the call went: the request method and url for an HTTP call, e.g.
      *                   {@code "GET https://payments/charge"}. The topic / queue / exchange for a messaging call.
      */

@@ -169,7 +169,7 @@ class DefaultInsightsInfoProviderTest {
         MethodClassKey key = new MethodClassKey(SampleService.class.getMethod("charge"), SampleService.class);
         TransactionExecutionProfile profile = new TransactionExecutionProfile(Instant.now());
         profile.recordExternalCall(
-                new SimpleExternalCallRecord(TypeExternalCall.REST_TEMPLATE, "GET https://payments/charge", 15L));
+                new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, "GET https://payments/charge", 15L));
         profile.complete();
         collector.recordTransaction(key, profile);
 
@@ -183,7 +183,7 @@ class DefaultInsightsInfoProviderTest {
                 insights.getPersistenceInsights().getTransactions();
         assertThat(transactions).hasSize(1);
         assertThat(transactions.get(0).getExternalCalls()).singleElement().satisfies(call -> {
-            assertThat(call.getType()).isEqualTo(TypeExternalCall.REST_TEMPLATE);
+            assertThat(call.getType()).isEqualTo(TypeExternalCall.HTTP_CLIENT);
             assertThat(call.getTarget()).isEqualTo("GET https://payments/charge");
             assertThat(call.getStats().getMinMs()).isEqualTo(15L);
             assertThat(call.getStats().getMaxMs()).isEqualTo(15L);

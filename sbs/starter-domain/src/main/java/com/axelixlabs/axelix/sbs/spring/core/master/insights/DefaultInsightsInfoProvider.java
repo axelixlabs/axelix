@@ -28,11 +28,11 @@ import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExternalCallInsight;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOverallStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
@@ -105,7 +105,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                             new TransactionalKey(
                                     key.getTargetClass().getName(),
                                     key.getMethod().getName()),
-                            new TransactionOverallStats(
+                            new ExecutionStats(
                                     performanceStats.getMinMs(),
                                     performanceStats.getMaxMs(),
                                     performanceStats.getAvgMs()),
@@ -137,7 +137,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                     return new ExternalCallInsight(
                             aggregatedCall.getType(),
                             aggregatedCall.getTarget(),
-                            new TransactionOverallStats(stats.getMinMs(), stats.getMaxMs(), stats.getAvgMs()));
+                            new ExecutionStats(stats.getMinMs(), stats.getMaxMs(), stats.getAvgMs()));
                 })
                 .collect(Collectors.toList());
     }

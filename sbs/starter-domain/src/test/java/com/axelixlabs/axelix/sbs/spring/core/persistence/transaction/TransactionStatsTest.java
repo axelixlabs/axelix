@@ -135,7 +135,7 @@ class TransactionStatsTest {
 
             // then.
             assertThat(subject.getExternalCalls()).singleElement().satisfies(aggregatedCall -> {
-                assertThat(aggregatedCall.getType()).isEqualTo(TypeExternalCall.REST_TEMPLATE);
+                assertThat(aggregatedCall.getType()).isEqualTo(TypeExternalCall.HTTP_CLIENT);
                 assertThat(aggregatedCall.getTarget()).isEqualTo("GET https://payments/charge");
                 assertThat(aggregatedCall.getStats().getMinMs()).isEqualTo(10L);
                 assertThat(aggregatedCall.getStats().getMaxMs()).isEqualTo(30L);
@@ -170,7 +170,7 @@ class TransactionStatsTest {
     }
 
     private static SimpleExternalCallRecord externalCall(long durationMs) {
-        return new SimpleExternalCallRecord(TypeExternalCall.REST_TEMPLATE, "GET https://payments/charge", durationMs);
+        return new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, "GET https://payments/charge", durationMs);
     }
 
     private static TransactionExecutionProfile profileWith(SimpleSqlQueryRecord... queries) {

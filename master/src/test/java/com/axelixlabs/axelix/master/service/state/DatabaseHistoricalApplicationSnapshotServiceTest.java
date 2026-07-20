@@ -33,10 +33,10 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOverallStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
@@ -116,7 +116,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
                     TransactionOrigin.APPLICATION_DECLARATIVE,
                     new TransactionalKey("com.example.OwnerService", "saveOwner"),
-                    new TransactionOverallStats(1, 10, 5),
+                    new ExecutionStats(1, 10, 5),
                     List.of(),
                     Map.of("com.example.Pet", 2),
                     List.of());
@@ -326,7 +326,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
                     TransactionOrigin.APPLICATION_DECLARATIVE,
                     new TransactionalKey("com.example.OwnerService", "saveOwner"),
-                    new TransactionOverallStats(1, 10, 5),
+                    new ExecutionStats(1, 10, 5),
                     List.of(),
                     Map.of("com.example.Pet", 2),
                     List.of());
@@ -519,7 +519,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
                 TransactionOrigin.APPLICATION_DECLARATIVE,
                 new TransactionalKey("com.example.OwnerService", "loadOwners"),
-                new TransactionOverallStats(1, 10, 5),
+                new ExecutionStats(1, 10, 5),
                 lazyLoadingTargets,
                 inMemoryPagination,
                 List.of());

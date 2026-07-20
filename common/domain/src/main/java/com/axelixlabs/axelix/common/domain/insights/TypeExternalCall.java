@@ -23,9 +23,7 @@ package com.axelixlabs.axelix.common.domain.insights;
  * @author Sergey Cherkasov
  */
 public enum TypeExternalCall {
-    REST_TEMPLATE,
-    REST_CLIENT,
-    WEB_CLIENT,
+    HTTP_CLIENT,
     KAFKA,
     RABBIT
 }

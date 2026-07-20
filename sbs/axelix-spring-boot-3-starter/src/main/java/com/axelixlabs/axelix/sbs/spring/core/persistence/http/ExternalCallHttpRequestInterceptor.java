@@ -33,8 +33,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 /**
  * {@link ClientHttpRequestInterceptor} that records every synchronous HTTP call performed while a transaction
  * is open, so that the blocking calls holding the transaction become visible. It serves any client built on
- * {@link ClientHttpRequestInterceptor} — both {@code RestTemplate} and {@code RestClient} — the concrete client
- * is supplied via {@code type}.
+ * {@link ClientHttpRequestInterceptor} — both {@code RestTemplate} and {@code RestClient} — recording every such
+ * call as a {@link TypeExternalCall#HTTP_CLIENT} one.
  * <p>
  * Whether the call actually belongs to a transaction is decided by the {@link TransactionAccessor}: calls
  * made outside of any transaction are silently dropped by it.
@@ -44,11 +44,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final TransactionAccessor transactionAccessor;
-    private final TypeExternalCall type;
 
-    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor, TypeExternalCall type) {
+    ExternalCallHttpRequestInterceptor(TransactionAccessor transactionAccessor) {
         this.transactionAccessor = transactionAccessor;
-        this.type = type;
     }
 
     @Override
@@ -62,8 +60,9 @@ class ExternalCallHttpRequestInterceptor implements ClientHttpRequestInterceptor
             return execution.execute(request, body);
         } finally {
             long duration = System.nanoTime() - startNanos;
-            String target = request.getMethod().name() + " " + request.getURI();
-            transactionAccessor.recordExternalCall(new SimpleExternalCallRecord(type, target, duration / 1_000_000));
+            String target = request.getMethod().name() + " " + request.getURI().getPath();
+            transactionAccessor.recordExternalCall(
+                    new SimpleExternalCallRecord(TypeExternalCall.HTTP_CLIENT, target, duration / 1_000_000));
         }
     }
 }
