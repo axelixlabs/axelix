@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import styles from './_configuringMaster.module.css';
+import styles from './styles.module.css';
 
 # Настройка Master
 
@@ -50,7 +50,7 @@ import styles from './_configuringMaster.module.css';
 - **MySQL** (`jdbc:mysql://...`) — то же, что и в PostgreSQL: `url`, `username` и `password` **обязательны**, и
   пользователю нужны права на миграции схемы.
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                          | По умолчанию            | Описание                                                                                                                                                                                                                    |
 |-----------------------------------|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -62,19 +62,19 @@ import styles from './_configuringMaster.module.css';
 
 ### Аутентификация — JWT
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
-| Свойство                             | По умолчанию                                                        | Описание                                                                                                                                        |
-|--------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.jwt.algorithm`   | *(не задано)* <span className={styles.required}>обязательное</span> | Алгоритм подписи. Один из `HMAC256`, `HMAC384` или `HMAC512`. `HMAC512` — это значение, используемое во встроенном локальном профиле.           |
-| `axelix.master.auth.jwt.signing-key` | *(не задано)* <span className={styles.required}>обязательное</span> | Секрет, используемый для подписи и проверки токенов сеанса. Используйте длинное случайное значение. Меняйте его, чтобы аннулировать все сеансы. |
-| `axelix.master.auth.jwt.lifespan`    | `12h`                                                               | Срок действия токена в Spring `Duration` (например, `30m`, `12h`, `7d`).                                                                        |
+| Свойство                             | По умолчанию                                                 | Описание                                                                                                                                        |
+|--------------------------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.jwt.algorithm`   | *(не задано)* <span className="Required">обязательное</span> | Алгоритм подписи. Один из `HMAC256`, `HMAC384` или `HMAC512`. `HMAC512` — это значение, используемое во встроенном локальном профиле.           |
+| `axelix.master.auth.jwt.signing-key` | *(не задано)* <span className="Required">обязательное</span> | Секрет, используемый для подписи и проверки токенов сеанса. Используйте длинное случайное значение. Меняйте его, чтобы аннулировать все сеансы. |
+| `axelix.master.auth.jwt.lifespan`    | `12h`                                                        | Срок действия токена в Spring `Duration` (например, `30m`, `12h`, `7d`).                                                                        |
 
 </div>
 
 ### Аутентификация — суперадминистратор
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                                                      | По умолчанию | Описание                                                                                            |
 |---------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------------------------|
@@ -85,7 +85,7 @@ import styles from './_configuringMaster.module.css';
 
 ### Аутентификация — локальные пользователи
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                                   | По умолчанию | Описание                                                                                                  |
 |--------------------------------------------|--------------|-----------------------------------------------------------------------------------------------------------|
@@ -105,23 +105,23 @@ import styles from './_configuringMaster.module.css';
 - `axelix.master.auth.options.oauth2.client-secret`
 - `axelix.master.auth.options.oauth2.base-url`
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
-| Свойство                                                | По умолчанию                                                        | Описание                                                                                                                                                                                         |
-|---------------------------------------------------------|---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                             | Включить вход через OIDC.                                                                                                                                                                        |
-| `axelix.master.auth.options.oauth2.issuer-uri`          | *(не задано)* <span className={styles.required}>обязательное</span> | Базовый URL-адрес эмитента OIDC. Master считывает `/.well-known/openid-configuration` отсюда для обнаружения конечных точек. Требуется при `oauth2.enabled=true`.                                |
-| `axelix.master.auth.options.oauth2.client-id`           | *(не задано)* <span className={styles.required}>обязательное</span> | Идентификатор клиента, зарегистрированный у поставщика OIDC. Требуется при `oauth2.enabled=true`.                                                                                                |
-| `axelix.master.auth.options.oauth2.client-secret`       | *(не задано)* <span className={styles.required}>обязательное</span> | Секретный ключ клиента, зарегистрированный у провайдера OIDC. Требуется при `oauth2.enabled=true`.                                                                                               |
-| `axelix.master.auth.options.oauth2.base-url`            | *(не задано)* <span className={styles.required}>обязательное</span> | Публичный базовый URL-адрес этого сервиса Master, используется для создания URI обратного вызова OAuth2. Требуется при `oauth2.enabled=true`.                                                    |
-| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                            | Разделённые пробелами области действия, запрашиваемые при использовании кода авторизации. `openid` добавляется автоматически, если отсутствует.                                                  |
-| `axelix.master.auth.options.oauth2.role-attribute-path` | *(не задано)*                                                       | Выражение JMESPath, применяемое к утверждениям токена ID (и, при необходимости, к ответу userinfo) для определения роли в Axelix. Если не указано, каждый пользователь OIDC становится `VIEWER`. |
+| Свойство                                                | По умолчанию                                                 | Описание                                                                                                                                                                                         |
+|---------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                      | Включить вход через OIDC.                                                                                                                                                                        |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | *(не задано)* <span className="Required">обязательное</span> | Базовый URL-адрес эмитента OIDC. Master считывает `/.well-known/openid-configuration` отсюда для обнаружения конечных точек. Требуется при `oauth2.enabled=true`.                                |
+| `axelix.master.auth.options.oauth2.client-id`           | *(не задано)* <span className="Required">обязательное</span> | Идентификатор клиента, зарегистрированный у поставщика OIDC. Требуется при `oauth2.enabled=true`.                                                                                                |
+| `axelix.master.auth.options.oauth2.client-secret`       | *(не задано)* <span className="Required">обязательное</span> | Секретный ключ клиента, зарегистрированный у провайдера OIDC. Требуется при `oauth2.enabled=true`.                                                                                               |
+| `axelix.master.auth.options.oauth2.base-url`            | *(не задано)* <span className="Required">обязательное</span> | Публичный базовый URL-адрес этого сервиса Master, используется для создания URI обратного вызова OAuth2. Требуется при `oauth2.enabled=true`.                                                    |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                     | Разделённые пробелами области действия, запрашиваемые при использовании кода авторизации. `openid` добавляется автоматически, если отсутствует.                                                  |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(не задано)*                                                | Выражение JMESPath, применяемое к утверждениям токена ID (и, при необходимости, к ответу userinfo) для определения роли в Axelix. Если не указано, каждый пользователь OIDC становится `VIEWER`. |
 
 </div>
 
 ### Аутентификация — сессионный файл cookie
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                           | По умолчанию | Описание                                                                                                                                       |
 |------------------------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -148,7 +148,7 @@ import styles from './_configuringMaster.module.css';
 сертификату центра сертификации кластера. Используйте `filters.namespaces` и `filters.labels` для ограничения области
 сканирования.
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                                                     | По умолчанию                                                          | Описание                                                                                                              |
 |--------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
@@ -179,7 +179,7 @@ JWT, подписанный общим `axelix.master.auth.jwt.signing-key`. Mas
 `instance-actuator-url`, `instance-name`), описаны на странице [Настройка Spring Boot
 Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                                                               | По умолчанию  | Описание                                                                                                                                   |
 |------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------------------------------------|
@@ -191,7 +191,7 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 
 ### MCP-сервер
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Свойство                           | По умолчанию | Описание                                                               |
 |------------------------------------|--------------|------------------------------------------------------------------------|

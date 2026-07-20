@@ -222,3 +222,31 @@ main .container {
     max-width: 100%;
   }
 }
+
+@media (width <= 1000px) {
+    .markdown table th,
+    .markdown table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+.theme-edit-this-page {
+    display: none;
+}
+
+.Required {
+    display: inline-block;
+    padding: 1px 6px;
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--axelix-color-warning);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    line-height: 1.4;
+    white-space: nowrap;
+}

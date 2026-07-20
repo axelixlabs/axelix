@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import styles from './_configuringMaster.module.css';
+import styles from './styles.module.css';
 
 # Configuring Master
 
@@ -45,7 +45,7 @@ The database engine is picked from the JDBC URL prefix. Which properties you mus
 - **MySQL** (`jdbc:mysql://...`) — same as PostgreSQL: `url`, `username`, and `password` are all **required**, and the
   user needs schema-migration privileges.
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                          | Default                 | Description                                                                                                                                                                                                       |
 |-----------------------------------|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -57,19 +57,19 @@ The database engine is picked from the JDBC URL prefix. Which properties you mus
 
 ### Authentication — JWT
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
-| Property                             | Default                                                     | Description                                                                                                             |
-|--------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.jwt.algorithm`   | *(unset)* <span className={styles.required}>required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. `HMAC512` is the value used in the bundled local profile. |
-| `axelix.master.auth.jwt.signing-key` | *(unset)* <span className={styles.required}>required</span> | Secret used to sign and verify session tokens. Use a long random value. Rotate it to invalidate all sessions.           |
-| `axelix.master.auth.jwt.lifespan`    | `12h`                                                       | Token lifetime as a Spring `Duration` (e.g. `30m`, `12h`, `7d`).                                                        |
+| Property                             | Default                                              | Description                                                                                                             |
+|--------------------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.jwt.algorithm`   | *(unset)* <span className="Required">required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. `HMAC512` is the value used in the bundled local profile. |
+| `axelix.master.auth.jwt.signing-key` | *(unset)* <span className="Required">required</span> | Secret used to sign and verify session tokens. Use a long random value. Rotate it to invalidate all sessions.           |
+| `axelix.master.auth.jwt.lifespan`    | `12h`                                                | Token lifetime as a Spring `Duration` (e.g. `30m`, `12h`, `7d`).                                                        |
 
 </div>
 
 ### Authentication — super-admin
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                                                      | Default | Description                                                                      |
 |---------------------------------------------------------------|---------|----------------------------------------------------------------------------------|
@@ -80,7 +80,7 @@ The database engine is picked from the JDBC URL prefix. Which properties you mus
 
 ### Authentication — local users
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                                   | Default | Description                                                     |
 |--------------------------------------------|---------|-----------------------------------------------------------------|
@@ -100,23 +100,23 @@ When `axelix.master.auth.options.oauth2.enabled=true`, the following properties 
 - `axelix.master.auth.options.oauth2.client-secret`
 - `axelix.master.auth.options.oauth2.base-url`
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
-| Property                                                | Default                                                     | Description                                                                                                                                                                |
-|---------------------------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                     | Enable OIDC sign-in.                                                                                                                                                       |
-| `axelix.master.auth.options.oauth2.issuer-uri`          | *(unset)* <span className={styles.required}>required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`.                           |
-| `axelix.master.auth.options.oauth2.client-id`           | *(unset)* <span className={styles.required}>required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                              |
-| `axelix.master.auth.options.oauth2.client-secret`       | *(unset)* <span className={styles.required}>required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                                  |
-| `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className={styles.required}>required</span> | Public base URL of this Master instance, used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
-| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                    | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
-| `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                                   | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+| Property                                                | Default                                              | Description                                                                                                                                                                |
+|---------------------------------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                              | Enable OIDC sign-in.                                                                                                                                                       |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | *(unset)* <span className="Required">required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`.                           |
+| `axelix.master.auth.options.oauth2.client-id`           | *(unset)* <span className="Required">required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                              |
+| `axelix.master.auth.options.oauth2.client-secret`       | *(unset)* <span className="Required">required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                                  |
+| `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className="Required">required</span> | Public base URL of this Master instance, used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                             | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                            | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
 
 </div>
 
 ### Authentication — session cookie
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                           | Default | Description                                                                                           |
 |------------------------------------|---------|-------------------------------------------------------------------------------------------------------|
@@ -140,7 +140,7 @@ When Master runs **inside** the cluster as a pod, the Kubernetes connection sett
 external API URL, a token file with the required RBAC, and the cluster CA path. Use `filters.namespaces` and
 `filters.labels` to scope the scan.
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                                                     | Default                                                               | Description                                                                                |
 |--------------------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
@@ -170,7 +170,7 @@ by default** (`enabled=true`), set it to `false` only if you want Master to refu
 properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, `instance-name`) are documented in the
 [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) page.
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                                                               | Default       | Description                                                                                                        |
 |------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------------|
@@ -182,7 +182,7 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 
 ### MCP server
 
-<div className={styles.configTable}>
+<div className={styles.ConfigTable}>
 
 | Property                           | Default | Description                                                     |
 |------------------------------------|---------|-----------------------------------------------------------------|

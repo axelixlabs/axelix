@@ -1,101 +1,87 @@
 /* TODO: Make some improvs in future*/
-import styles from '../_LoggersTables.module.css'
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import styles from "../styles.module.css";
 
 export const LoggersTable = () => {
+  const levelInfoIcon = useBaseUrl("/img/feature/loggers/level-info-icon.png");
+  const levelDebugIcon = useBaseUrl(
+    "/img/feature/loggers/level-debug-icon.png",
+  );
+  const configuredLevelDebugIcon = useBaseUrl(
+    "/img/feature/loggers/configured-level-debug-icon.png",
+  );
+  const configuredLevelWarnIcon = useBaseUrl(
+    "/img/feature/loggers/configured-level-warn-icon.png",
+  );
+
   return (
     <>
-      <table>
+      <table className={styles.LoggersTable}>
         <thead>
           <tr>
             <th>Logger name</th>
-            <th>starting point</th>
-            <th>step 1</th>
-            <th>step 2</th>
+            <th>Starting point</th>
+            <th>Step 1</th>
+            <th>Step 2</th>
           </tr>
         </thead>
+
         <tbody>
           <tr>
-            <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.axelixlabs.axelix
+            <td>com.axelixlabs.axelix</td>
+
+            <td>
+              <img src={levelInfoIcon} alt="Level info icon" />
             </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
-              <img
-                src="/img/feature/loggers/level-info-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
+
+            <td>
+              <img src={levelInfoIcon} alt="Level info icon" />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
+
+            <td>
               <img
-                src="/img/feature/loggers/level-info-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
-              <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
+                src={configuredLevelDebugIcon}
                 alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
           </tr>
 
           <tr>
-            <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.axelixlabs.axelix.sbs
+            <td>com.axelixlabs.axelix.sbs</td>
+
+            <td>
+              <img src={levelInfoIcon} alt="Level info icon" />
             </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
+
+            <td>
               <img
-                src="/img/feature/loggers/level-info-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
-              <img
-                src="/img/feature/loggers/configured-level-warn-icon.png"
+                src={configuredLevelWarnIcon}
                 alt="Configured level warn icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
-              <img
-                src="/img/feature/loggers/level-debug-icon.png"
-                alt="Level debug icon"
-                className={styles.LevelIcon}
-              />
+
+            <td>
+              <img src={levelDebugIcon} alt="Level debug icon" />
             </td>
           </tr>
 
           <tr>
-            <td className={styles.CellValueWithRowChunk} title="Logger name">
-              com.axelixlabs.axelix.sbs.autoconfiguration.spring
+            <td>com.axelixlabs.axelix.sbs.autoconfiguration.spring</td>
+
+            <td>
+              <img src={levelInfoIcon} alt="Level info icon" />
             </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
-              <img
-                src="/img/feature/loggers/level-info-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
+
+            <td>
+              <img src={levelInfoIcon} alt="Level info icon" />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
-              <img
-                src="/img/feature/loggers/level-info-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
-              <img
-                src="/img/feature/loggers/level-debug-icon.png"
-                alt="Level info icon"
-                className={styles.LevelIcon}
-              />
+
+            <td>
+              <img src={levelDebugIcon} alt="Level debug icon" />
             </td>
           </tr>
         </tbody>
       </table>
     </>
   );
-}
+};

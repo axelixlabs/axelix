@@ -1,75 +1,86 @@
 /* TODO: Make some improvs in future*/
-import styles from '../_LoggersTables.module.css'
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import styles from '../styles.module.css';
 
 export const LoggersTableReset = () => {
-  return (
-    <>
-      <table>
-        <thead>
-          <tr>
-            <th>Loggers name</th>
-            <th>starting point</th>
-            <th>step 1</th>
-            <th>step 2</th>
-          </tr>
-        </thead>
-        <tbody>
+    const configuredLevelDebugIcon = useBaseUrl(
+        '/img/feature/loggers/configured-level-debug-icon.png'
+    );
+    const configuredLevelTraceIcon = useBaseUrl(
+        '/img/feature/loggers/configured-level-trace-icon.png'
+    );
+    const configuredLevelInfoIcon = useBaseUrl(
+        '/img/feature/loggers/configured-level-info-icon.png'
+    );
 
-          <tr>
-            <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.axelixlabs.axelix
-            </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
-              <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
-                alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
-              <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
-                alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
-              <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
-                alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-          </tr>
+    return (
+        <>
+            <table className={styles.LoggersTable}>
+                <thead>
+                <tr>
+                    <th>Logger name</th>
+                    <th>Starting point</th>
+                    <th>Step 1</th>
+                    <th>Step 2</th>
+                </tr>
+                </thead>
 
-          <tr>
-            <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.axelixlabs.axelix.sbs
-            </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
-              <img
-                src="/img/feature/loggers/configured-level-trace-icon.png"
-                alt="Configured level trace icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
-              <img
-                src="/img/feature/loggers/configured-level-info-icon.png"
-                alt="Configured level info icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
-              <img
-                src="/img/feature/loggers/configured-level-trace-icon.png"
-                alt="Configured level trace icon"
-                className={styles.ConfiguredLevelIcon}
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </>
-  );
-}
+                <tbody>
+                <tr>
+                    <td>
+                        com.axelixlabs.axelix
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelDebugIcon}
+                            alt="Configured level debug icon"
+                        />
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelDebugIcon}
+                            alt="Configured level debug icon"
+                        />
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelDebugIcon}
+                            alt="Configured level debug icon"
+                        />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        com.axelixlabs.axelix.sbs
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelTraceIcon}
+                            alt="Configured level trace icon"
+                        />
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelInfoIcon}
+                            alt="Configured level info icon"
+                        />
+                    </td>
+
+                    <td>
+                        <img
+                            src={configuredLevelTraceIcon}
+                            alt="Configured level trace icon"
+                        />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </>
+    );
+};

@@ -9,14 +9,11 @@ import { themeConfig } from './config/theme-config';
 const config: Config = {
   title: 'Axelix',
 
-  // TODO: Fix this in future
-  tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
-    faster: false, // Opt out of Rspack-based faster build — keeps @docusaurus/faster unneeded
   },
 
   // Set the production url of your site here
@@ -30,13 +27,6 @@ const config: Config = {
   baseUrl: '/docs/',
 
   onBrokenLinks: 'throw',
-
-  stylesheets: [
-    {
-      href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap',
-      rel: 'stylesheet',
-    },
-  ],
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -54,7 +44,7 @@ const config: Config = {
 
   plugins: [['@signalwire/docusaurus-plugin-llms-txt', llmsTxtOptions]],
 
-  themeConfig,
+  themeConfig: themeConfig,
 };
 
 export default config;

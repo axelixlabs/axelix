@@ -1,0 +1,8 @@
+.MobileEdit {
+    display: none;
+
+    @media (width <= 996px) {
+        display: block;
+        margin-bottom: 16px;
+    }
+}

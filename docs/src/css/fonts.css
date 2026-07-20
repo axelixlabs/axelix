@@ -1,6 +1,14 @@
 @font-face {
   font-family: 'Golos Text';
-  src: url("../../static/fonts/variable-golos-text.woff2") format("woff2");
+  src: url("/fonts/variable-golos-text.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url("/fonts/jet-brains-mono.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
