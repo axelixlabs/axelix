@@ -59,7 +59,7 @@ const UserProfile = () => {
 
             <UserTable user={user} reLoadUser={loadUser} />
 
-            <UserProfileActions userId={userId!} />
+            <UserProfileActions userId={userId!} userOrigin={user.userOrigin} />
         </>
     );
 };

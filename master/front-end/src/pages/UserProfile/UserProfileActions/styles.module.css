@@ -3,6 +3,27 @@
     column-gap: 8px;
 }
 
+.OidcDeleteNote {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgb(250 173 20 / 35%);
+    border-radius: 10px;
+    background-color: rgb(250 173 20 / 10%);
+    color: #ad6800;
+    line-height: 1.5;
+}
+
+.OidcDeleteNoteIcon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    color: #faad14;
+}
+
 /* TODO: Fix this in future */
 .DeleteUser {
     background-color: #ff4d54;

@@ -346,6 +346,7 @@
         "notLoggedIn": "Not logged in",
         "deleteUser": "Delete user",
         "deleteModalDescription": "Are you sure you want to delete this user?",
+        "deleteOidcModalNote": "This user is provisioned via an external OIDC provider. Deleting the user only removes their metadata record in Axelix — it does not prevent them from logging in again. If they authenticate through the OIDC provider once more, a new user record will be created.",
         "accessLog": "Access Log",
         "createUser": "Create User",
         "userCreated": "User created successfully",

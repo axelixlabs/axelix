@@ -21,21 +21,26 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { extractErrorCode } from "helpers";
-import { StatelessRequest } from "models";
+import { EUserOrigin, StatelessRequest } from "models";
 import { deleteUser } from "services";
 
 import styles from "./styles.module.css";
 
-import { TrashIcon } from "assets";
+import { TrashIcon, WarningIcon } from "assets";
 
 interface IProps {
     /**
      * Unique identifier of the user
      */
     userId: string;
+
+    /**
+     * Origin of the user, used to clarify the effect of deleting the user.
+     */
+    userOrigin: EUserOrigin;
 }
 
-export const UserProfileActions = ({ userId }: IProps) => {
+export const UserProfileActions = ({ userId, userOrigin }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
 
@@ -77,6 +82,12 @@ export const UserProfileActions = ({ userId }: IProps) => {
                 centered
             >
                 {t("Users.deleteModalDescription")}
+                {userOrigin === EUserOrigin.OIDC && (
+                    <div className={styles.OidcDeleteNote}>
+                        <WarningIcon className={styles.OidcDeleteNoteIcon} />
+                        <span>{t("Users.deleteOidcModalNote")}</span>
+                    </div>
+                )}
             </Modal>
 
             <Button
