@@ -65,44 +65,32 @@ internal class AutoConfigClassScanner {
         }
     }
 
-    private fun addClassToAutoConfigListIfHasAnnotation(classPath: Path?, classes: LinkedHashSet<String>) {
+    private fun addClassToAutoConfigListIfHasAnnotation(classPath: Path, classes: LinkedHashSet<String>) {
         try {
+            val bytes = Files.readAllBytes(classPath)
             val classFile = ClassFile.of()
-            val model = classFile.parse(classPath)
+            val model: ClassModel = classFile.parse(bytes)
 
-            if (hasAutoConfigurationAnnotation(model)) {
-                val className = extractClassName(model)
-                if (className != null) {
-                    classes.add(className)
-                }
+            if (isHasAnnotation(model)) {
+                val classDesc = model.thisClass()
+                val className = classDesc.asSymbol().descriptorString()
+                    .removePrefix("L")
+                    .removeSuffix(";")
+                    .replace('/', '.')
+                classes.add(className)
             }
         } catch (e: Exception) {
             log.debug("Failed to process class: {}", classPath, e)
         }
     }
 
-    private fun hasAutoConfigurationAnnotation(model: ClassModel): Boolean {
-        return try {
-            val annotationsAttr = model.findAttribute(Attributes.runtimeVisibleAnnotations())
-                .orElse(null)
+    private fun isHasAnnotation(model: ClassModel): Boolean {
+        val annotationsAttr = model.findAttribute(Attributes.runtimeVisibleAnnotations())
+            .orElse(null)
 
-            annotationsAttr?.annotations()?.any { annotation ->
-                annotation.classSymbol().descriptorString() == TARGET_ANNOTATION_DESCRIPTOR
-            } ?: false
-        } catch (_: Exception) {
-            false
-        }
-    }
-
-    private fun extractClassName(model: ClassModel): String? {
-        return try {
-            val sym = model.thisClass().asSymbol()
-            val pkg = sym.packageName()
-            val name = sym.displayName()
-
-            if (pkg.isEmpty()) name else "$pkg.$name"
-        } catch (_: Exception) {
-            null
-        }
+        val hasAnnotation = annotationsAttr?.annotations()?.any { annotation ->
+            annotation.className().equalsString(TARGET_ANNOTATION_DESCRIPTOR)
+        } ?: false
+        return hasAnnotation
     }
 }
