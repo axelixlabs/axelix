@@ -217,12 +217,13 @@ public class UserManagementApiTest {
                 """;
 
         // when.
-        ResponseEntity<Void> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withRole(SUPER_ADMIN)
-                .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
+                .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("USERNAME_ALREADY_EXISTS");
         assertThat(userRepository.findAll()).hasSize(1);
     }
 

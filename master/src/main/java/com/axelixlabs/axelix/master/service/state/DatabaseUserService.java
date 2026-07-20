@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 
 /**
@@ -74,6 +75,10 @@ public class DatabaseUserService implements UserService {
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
                 UserOrigin.LOCAL,
                 null);
+
+        if (userRepository.findByUsername(userEntity.username()).isPresent()) {
+            throw new UsernameAlreadyExistsException(userEntity.username());
+        }
 
         jdbcAggregateTemplate.insert(userEntity);
     }
