@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
@@ -78,6 +79,11 @@ public class DatabaseUserService implements UserService {
 
         if (userRepository.findByUsername(userEntity.username()).isPresent()) {
             throw new UsernameAlreadyExistsException(userEntity.username());
+        }
+
+        String userEmail = userEntity.email();
+        if (userEmail != null && userRepository.findByEmail(userEmail).isPresent()) {
+            throw new EmailAlreadyExistsException(userEmail);
         }
 
         jdbcAggregateTemplate.insert(userEntity);

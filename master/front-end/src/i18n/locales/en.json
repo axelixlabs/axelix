@@ -200,7 +200,8 @@
             "INTERNAL_SERVER_ERROR": "Unexpected server error. Please, re-try request later.",
             "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the instance got redeployed since the last request from your browser to the server. Visit the Wallboard",
             "INVALID_CREDENTIALS" : "Invalid username or password",
-            "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username."
+            "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username.",
+            "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email."
         }
     },
     "Metrics": {
