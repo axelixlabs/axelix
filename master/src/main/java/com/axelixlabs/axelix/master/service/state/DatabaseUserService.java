@@ -146,10 +146,27 @@ public class DatabaseUserService implements UserService {
         Set<String> validRoles =
                 roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 
+        String normalizedUsername = requireNonBlankTrimmed(username);
+        String normalizedEmail = email == null ? null : requireNonBlankTrimmed(email);
+
+        Optional<UserEntity> userWithSameUsername = userRepository.findByUsername(normalizedUsername);
+        if (userWithSameUsername.isPresent()
+                && !userWithSameUsername.get().id().equals(id)) {
+            throw new UsernameAlreadyExistsException(normalizedUsername);
+        }
+
+        if (normalizedEmail != null) {
+            Optional<UserEntity> userWithSameEmail = userRepository.findByEmail(normalizedEmail);
+            if (userWithSameEmail.isPresent()
+                    && !userWithSameEmail.get().id().equals(id)) {
+                throw new EmailAlreadyExistsException(normalizedEmail);
+            }
+        }
+
         userRepository.updateUserPatch(
                 id,
-                requireNonBlankTrimmed(username),
-                email == null ? null : requireNonBlankTrimmed(email),
+                normalizedUsername,
+                normalizedEmail,
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(validRoles),
                 lastLoginAt);

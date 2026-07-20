@@ -127,6 +127,8 @@ public interface UserService {
      * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
      * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UsernameAlreadyExistsException if another user with the given username already exists.
+     * @throws EmailAlreadyExistsException if another user with the given email already exists.
      */
     default void updateUserPatch(
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)

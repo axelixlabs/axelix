@@ -401,6 +401,56 @@ class DatabaseUserServiceTest {
     }
 
     @Test
+    void updateUserPatch_shouldThrowWhenUsernameAlreadyExists() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        userService.createLocal("bob", "bob@example.com", "p", "VIEWER");
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(
+                        () -> userService.updateUserPatch(bob.id(), "alice", "bob@example.com", null, Set.of("VIEWER")))
+                // then.
+                .isInstanceOf(UsernameAlreadyExistsException.class);
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.username()).isEqualTo("bob");
+    }
+
+    @Test
+    void updateUserPatch_shouldThrowWhenEmailAlreadyExists() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        userService.createLocal("bob", "bob@example.com", "p", "VIEWER");
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(
+                        () -> userService.updateUserPatch(bob.id(), "bob", "alice@example.com", null, Set.of("VIEWER")))
+                // then.
+                .isInstanceOf(EmailAlreadyExistsException.class);
+
+        UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
+        assertThat(untouched.email()).isEqualTo("bob@example.com");
+    }
+
+    @Test
+    void updateUserPatch_shouldAllowUserToKeepItsOwnUsernameAndEmail() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+
+        // when.
+        userService.updateUserPatch(alice.id(), "alice", "alice@example.com", null, Set.of("ADMIN"));
+
+        // then.
+        UserEntity updated = userRepository.findById(alice.id()).orElseThrow();
+        assertThat(updated.username()).isEqualTo("alice");
+        assertThat(updated.email()).isEqualTo("alice@example.com");
+        assertThat(updated.roles().values()).containsExactly("ADMIN");
+    }
+
+    @Test
     void updateUserPatch_shouldReplaceRolesCompletely() {
         userService.createLocal("alice", "a@example.com", "p", "VIEWER");
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
