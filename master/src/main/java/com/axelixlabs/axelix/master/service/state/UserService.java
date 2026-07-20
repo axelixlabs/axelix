@@ -27,8 +27,10 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 
 /**
  * Service that manages the lifecycle of users persisted by the Users Management API.
@@ -52,6 +54,8 @@ public interface UserService {
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UsernameAlreadyExistsException if a user with the given username already exists.
+     * @throws EmailAlreadyExistsException if a user with the given email already exists.
      */
     void createLocal(String username, @Nullable String email, String password, String role);
 

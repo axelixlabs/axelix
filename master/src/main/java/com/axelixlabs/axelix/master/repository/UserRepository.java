@@ -38,6 +38,8 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
     Optional<UserEntity> findByUsername(@Param("username") String username);
 
+    Optional<UserEntity> findByEmail(@Param("email") String email);
+
     @Modifying
     @Query("UPDATE users SET last_login_at = :lastLoginAt WHERE username = :username")
     void updateLastLoginAt(@Param("username") String username, @Param("lastLoginAt") Instant lastLoginAt);

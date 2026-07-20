@@ -30,8 +30,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -148,6 +150,30 @@ class DatabaseUserServiceTest {
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void createLocal_shouldThrowWhenUsernameAlreadyExists() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createLocal("alice", "other@example.com", "p", "VIEWER"))
+                // then.
+                .isInstanceOf(UsernameAlreadyExistsException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void createLocal_shouldThrowWhenEmailAlreadyExists() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+
+        // when.
+        assertThatThrownBy(() -> userService.createLocal("bob", "alice@example.com", "p", "VIEWER"))
+                // then.
+                .isInstanceOf(EmailAlreadyExistsException.class);
+        assertThat(userRepository.findAll()).hasSize(1);
     }
 
     @Test
