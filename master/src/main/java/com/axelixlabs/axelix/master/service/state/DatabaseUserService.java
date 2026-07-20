@@ -150,15 +150,13 @@ public class DatabaseUserService implements UserService {
         String normalizedEmail = email == null ? null : requireNonBlankTrimmed(email);
 
         Optional<UserEntity> userWithSameUsername = userRepository.findByUsername(normalizedUsername);
-        if (userWithSameUsername.isPresent()
-                && !userWithSameUsername.get().id().equals(id)) {
+        if (userWithSameUsername.isPresent() && !userWithSameUsername.get().id().equals(id)) {
             throw new UsernameAlreadyExistsException(normalizedUsername);
         }
 
         if (normalizedEmail != null) {
             Optional<UserEntity> userWithSameEmail = userRepository.findByEmail(normalizedEmail);
-            if (userWithSameEmail.isPresent()
-                    && !userWithSameEmail.get().id().equals(id)) {
+            if (userWithSameEmail.isPresent() && !userWithSameEmail.get().id().equals(id)) {
                 throw new EmailAlreadyExistsException(normalizedEmail);
             }
         }
