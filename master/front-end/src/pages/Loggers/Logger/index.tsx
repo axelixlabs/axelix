@@ -16,18 +16,21 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App } from "antd";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { TooltipWithCopy } from "components";
-import { type ILogger } from "models";
+import type { ILogger, TChangeLoggerLevel } from "models";
 import { resetLogger, setLoggerLevel } from "services";
 
 import { Levels } from "../Levels";
 
+import { LoggerScheduler } from "./LoggerScheduler";
 import styles from "./styles.module.css";
 
-import { Reset } from "assets";
+import { ResetIcon } from "assets";
 
 interface IProps {
     /**
@@ -49,20 +52,63 @@ interface IProps {
 export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
     // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
     const { t } = useTranslation();
-    const { effectiveLevel, configuredLevel } = logger;
+    const { effectiveLevel, configuredLevel, name, temporaryLevelInitiatedAt, temporaryLevelRollsBackAt } = logger;
     const { instanceId } = useParams();
 
     const { message } = App.useApp();
 
-    const handleChange = (level: string): void => {
-        if (configuredLevel === level) {
+    const [remainingTime, setRemainingTime] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!temporaryLevelInitiatedAt || !temporaryLevelRollsBackAt) {
+            setRemainingTime(null);
+            return;
+        }
+
+        const endTime = dayjs(temporaryLevelRollsBackAt);
+
+        if (!endTime.isValid()) {
+            setRemainingTime(null);
+            return;
+        }
+
+        const updateTimer = (): void => {
+            const remainingMilliseconds = endTime.diff(dayjs());
+
+            if (remainingMilliseconds <= 0) {
+                setRemainingTime(null);
+                return;
+            }
+
+            const remainingSeconds = Math.floor(remainingMilliseconds / 1000);
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+
+            setRemainingTime(`${hours}h ${minutes}m`);
+        };
+
+        updateTimer();
+
+        const interval = setInterval(updateTimer, 60000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [temporaryLevelInitiatedAt, temporaryLevelRollsBackAt]);
+
+    const handleChange: TChangeLoggerLevel = (level, ttlSeconds = null): void => {
+        // if the ttl is specified, then this is almost 100% going to be different from the
+        // one that is already configured. The only case that is no-op, is when we're configuring
+        // the same logging level without ttl specified
+        if (configuredLevel === level && ttlSeconds == null) {
             return;
         }
 
         setLoggerLevel({
-            instanceId: instanceId!,
+            instanceIds: [instanceId!],
             loggerName: logger.name,
-            loggingLevel: level,
+            configuredLevel: level,
+            ttlSeconds: ttlSeconds,
         }).then(() => {
             message.success(t("Loggers.loggerLevelUpdated"));
             fetchLoggersData();
@@ -80,20 +126,30 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
     };
 
     return (
-        <>
-            <div className={styles.MainWrapper}>
-                <TooltipWithCopy text={logger.name} />
+        <div className={styles.MainWrapper}>
+            <TooltipWithCopy text={name} />
 
-                <div className={styles.LevelsWrapper}>
-                    <Levels
-                        checkedLevel={effectiveLevel}
-                        configuredLevel={configuredLevel}
-                        levels={levels}
-                        handleChange={handleChange}
-                    />
-                    <Reset className={styles.Reset} onClick={() => handleLoggerReset(logger.name)} />
-                </div>
+            <div className={styles.LevelsWrapper}>
+                <LoggerScheduler
+                    checkedLevel={effectiveLevel}
+                    handleChange={handleChange}
+                    levels={levels}
+                    remainingTime={remainingTime}
+                />
+
+                <Levels
+                    checkedLevel={effectiveLevel}
+                    configuredLevel={configuredLevel}
+                    levels={levels}
+                    handleChange={handleChange}
+                    remainingTime={remainingTime}
+                />
+
+                <ResetIcon
+                    className={`${styles.ResetIcon} ${!temporaryLevelInitiatedAt ? styles.DisabledResetIcon : ""}`}
+                    onClick={temporaryLevelInitiatedAt ? () => handleLoggerReset(name) : undefined}
+                />
             </div>
-        </>
+        </div>
     );
 };

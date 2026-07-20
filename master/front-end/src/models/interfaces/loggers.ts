@@ -30,6 +30,16 @@ export interface ILogger {
      * Single logger current level
      */
     effectiveLevel: string;
+
+    /**
+     * ISO datetime when the temporary level was initiated, if any
+     */
+    temporaryLevelInitiatedAt: string | null;
+
+    /**
+     * ISO datetime when the temporary level will roll back to the previous level, if any
+     */
+    temporaryLevelRollsBackAt: string | null;
 }
 
 export interface ILoggerGroup {
@@ -66,11 +76,28 @@ export interface ILoggersResponseBody {
     loggers: ILogger[];
 }
 
+export interface IMappedLoggersResponse {
+    /**
+     * All possible logging levels that are supported by the logging system inside the instance
+     */
+    levels: string[];
+
+    /**
+     * All loggers
+     */
+    loggers: ILogger[];
+
+    /**
+     * All logger groups data
+     */
+    groups: ILoggerGroup[];
+}
+
 export interface ISetLoggerLevelRequestData {
     /**
      * Instance id
      */
-    instanceId: string;
+    instanceIds: string[];
 
     /**
      * Logger name
@@ -80,7 +107,13 @@ export interface ISetLoggerLevelRequestData {
     /**
      * Selected level
      */
-    loggingLevel: string;
+    configuredLevel: string;
+
+    /**
+     * Duration in seconds for the temporary level.
+     * If null or omitted, the level change is permanent.
+     */
+    ttlSeconds: number | null;
 }
 
 export interface IResetLoggerLevelRequestData {
@@ -110,4 +143,33 @@ export interface IChangeLoggerGroupLevelRequestData {
      * The configured level of a logger group
      */
     configuredLevel: string;
+}
+
+export interface ITimepickerData {
+    /**
+     * Selected hour
+     */
+    hour: string;
+
+    /**
+     * Selected minutes
+     */
+    minutes: string;
+
+    /**
+     * AM/PM period if 12h clock, or undefined when using 24h format
+     */
+    type?: string;
+}
+
+export interface ITimepickerClockConfig {
+    /**
+     * 12-hour or 24-hour clock type
+     */
+    type: "12h" | "24h";
+
+    /**
+     *  Locale string, e.g. 'en-US'
+     */
+    locale: string;
 }

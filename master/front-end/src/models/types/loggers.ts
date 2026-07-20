@@ -15,12 +15,4 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export enum ELoggersTabs {
-    LOGGERS = "loggers",
-    LOGGER_GROUPS = "loggerGroups",
-}
-
-export enum ETimepickerHourCycle {
-    AM = "AM",
-    PM = "PM",
-}
+export type TChangeLoggerLevel = (level: string, ttlSeconds?: number | null) => void;

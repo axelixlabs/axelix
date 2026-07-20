@@ -52,6 +52,9 @@ export { default as LinuxIcon } from "../assets/icons/linux.svg?react";
 export { default as OnOffIcon } from "../assets/icons/onOff.svg?react";
 export { default as EmailIcon } from "../assets/icons/email.svg?react";
 export { default as TrashIcon } from "../assets/icons/trash.svg?react";
+export { default as TimerIcon } from "../assets/icons/timer.svg?react";
+export { default as ResetIcon } from "../assets/icons/reset.svg?react";
+export { default as ClockIcon } from "../assets/icons/clock.svg?react";
 export { default as LogoIcon } from "../assets/icons/logo.svg?react";
 export { default as LinkIcon } from "../assets/icons/link.svg?react";
 export { default as JavaIcon } from "../assets/icons/java.svg?react";
@@ -61,7 +64,6 @@ export { default as LockIcon } from "../assets/icons/lock.svg?react";
 export { default as JVMIcon } from "../assets/icons/jvm.svg?react";
 export { default as GitIcon } from "../assets/icons/git.svg?react";
 export { default as RunIcon } from "../assets/icons/run.svg?react";
-export { default as Reset } from "../assets/icons/reset.svg?react";
 export { default as GCIcon } from "../assets/icons/gc.svg?react";
 
 export { default as LoginLeftImage } from "../assets/images/loginLeftImage.png";

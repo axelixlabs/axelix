@@ -45,3 +45,5 @@ export const loggersTabs = (t: TFunction): TabsProps["items"] => {
         },
     ];
 };
+
+export const DEFAULT_TIME_LOCALE = "en-US";

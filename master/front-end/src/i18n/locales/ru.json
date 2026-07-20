@@ -74,7 +74,9 @@
         "loggerGroups": "Группы логгеров",
         "configuredExplicitly": "Задан явно",
         "loggerLevelUpdated": "Уровень логгера изменён",
-        "reset" : "Уровень логгера изменён"
+        "reset" : "Логгер успешно сброшен",
+        "setTemporaryLevel": "Временный уровень",
+        "changedTemporary": "Изменено временно"
     },
     "Header": {
         "dashboard": "Дашборд",

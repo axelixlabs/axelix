@@ -56,9 +56,8 @@ const Loggers = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const levels = loggersData.response!.levels;
-    const loggerGroups = loggersData.response!.groups;
-    const loggers = loggersData.response!.loggers;
+    const loggersResponse = loggersData.response!;
+    const { levels, loggers, groups: loggerGroups } = loggersResponse;
 
     const isLoggersTab = activeTab === ELoggersTabs.LOGGERS;
     const isLoggerGroupsTab = activeTab === ELoggersTabs.LOGGER_GROUPS;

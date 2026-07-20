@@ -15,7 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ILogger, ILoggerGroup } from "models";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+import {
+    ETimepickerHourCycle,
+    type ILogger,
+    type ILoggerGroup,
+    type ITimepickerClockConfig,
+    type ITimepickerData,
+} from "models";
+import { DEFAULT_TIME_LOCALE } from "utils";
+
+dayjs.extend(isSameOrBefore);
 
 export const filterLoggers = (loggers: ILogger[], search: string): ILogger[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -44,4 +56,60 @@ export const filterLoggerGroups = (loggerGroups: ILoggerGroup[], search: string)
         }
         return result;
     }, []);
+};
+
+export const getTimepickerClockConfig = (): ITimepickerClockConfig => {
+    try {
+        const formatter = new Intl.DateTimeFormat(undefined, {
+            hour: "numeric",
+        });
+
+        const { hourCycle, locale } = formatter.resolvedOptions();
+
+        let type: "12h" | "24h";
+
+        if (hourCycle === "h23" || hourCycle === "h24") {
+            type = "24h";
+        } else {
+            type = "12h";
+        }
+
+        return {
+            type: type,
+            locale: locale,
+        };
+    } catch {
+        return {
+            type: "24h",
+            locale: DEFAULT_TIME_LOCALE,
+        };
+    }
+};
+
+export const timepickerDataConvertToSeconds = (data: ITimepickerData | undefined): number => {
+    if (!data) {
+        return 0;
+    }
+
+    const { hour, minutes, type } = data;
+    let parsedHour = Number(hour);
+    const parsedMinutes = Number(minutes);
+
+    const isAM = type === ETimepickerHourCycle.AM;
+    const isPM = type === ETimepickerHourCycle.PM;
+
+    if (isAM && parsedHour === 12) {
+        parsedHour = 0;
+    } else if (isPM && parsedHour !== 12) {
+        parsedHour += 12;
+    }
+
+    const now = dayjs();
+    let target = now.hour(parsedHour).minute(parsedMinutes).second(0).millisecond(0);
+
+    if (target.isSameOrBefore(now)) {
+        target = target.add(1, "day");
+    }
+
+    return target.diff(now, "second");
 };

@@ -1,0 +1,45 @@
+.TimePickerWrapper {
+    position: relative;
+}
+
+.ActionButtons {
+    display: flex;
+    column-gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--axelix-medium-grey);
+}
+
+.Timepicker {
+    --tp-primary: var(--axelix-primary-green);
+    --tp-bg: transparent;
+    --tp-surface: var(--axelix-primary-light-green);
+    --tp-surface-hover: var(--axelix-primary-green);
+    --tp-input-bg: var(--axelix-primary-light-green);
+    --tp-primary-container: var(--axelix-primary-light-green);
+    --tp-on-primary-container: var(--axelix-primary-green);
+    --tp-am-pm-active: var(--axelix-primary-green);
+    --tp-am-pm-text-selected: var(--axelix-primary-white);
+    --tp-am-pm-text-unselected: var(--axelix-primary-black);
+    --tp-border: var(--axelix-medium-grey);
+    --tp-border-radius: var(--axelix-border-radius-large);
+    --tp-outline: var(--axelix-primary-green);
+
+    &:global(.tp-ui-wrapper) {
+        margin-bottom: -165px !important;
+        box-shadow: none !important;
+    }
+
+    & :global(.tp-ui-header) {
+        padding-bottom: 20px;
+    }
+
+    & :global(:is(.tp-ui-hour, .tp-ui-minutes, .tp-ui-input-ripple-wrapper)) {
+        height: 60px;
+        font-size: 40px;
+    }
+
+    & :global(:is(.tp-ui-select-time, .tp-ui-footer)) {
+        display: none;
+    }
+}
