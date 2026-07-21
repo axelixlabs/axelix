@@ -17,29 +17,28 @@
  */
 package com.axelixlabs.gradle.plugin;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
- * Loads build-script and Java-source fixtures bundled as test resources alongside this package.
+ * The build script extension.
  *
- * @author Artemiy Degtyarev
+ * <pre>
+ * axelix {
+ *     copyProfilerReport = false
+ * }
+ * </pre>
+ *
+ * @author Nikita Kirillov
  */
-public final class GradleProjectFixtures {
+public class AxelixExtension {
 
-    private GradleProjectFixtures() {}
+    public static final String NAME = "axelix";
 
-    public static String loadContent(String fixtureName) {
-        try (InputStream in = GradleProjectFixtures.class.getResourceAsStream(fixtureName)) {
-            if (in == null) {
-                throw new IllegalStateException("Missing test fixture: " + fixtureName);
-            }
-            return new String(in.readAllBytes(), UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    private boolean copyProfilerReport = true;
+
+    public boolean isCopyProfilerReport() {
+        return copyProfilerReport;
+    }
+
+    public void setCopyProfilerReport(boolean copyProfilerReport) {
+        this.copyProfilerReport = copyProfilerReport;
     }
 }

@@ -26,14 +26,16 @@ import org.gradle.util.GradleVersion;
  * Resolves the project build directory across Gradle 4.0 through 9.x: {@code getBuildDir()} on
  * old versions, {@code layout.buildDirectory} on 5.0+ where the former triggers deprecation
  * warnings (8.3+).
+ *
+ * @author Artemiy Degtyarev
  */
-final class BuildDirAccessor {
+public final class BuildDirAccessor {
 
     private static final GradleVersion MODERN = GradleVersion.version("5.0");
 
     private BuildDirAccessor() {}
 
-    static File buildDir(Project project) {
+    public static File buildDir(Project project) {
         if (GradleVersion.current().getBaseVersion().compareTo(MODERN) >= 0) {
             return Modern.buildDir(project);
         }

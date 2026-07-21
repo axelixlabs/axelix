@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.gradle.plugin;
+package com.axelixlabs.gradle.plugin.profiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +29,16 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
+import com.axelixlabs.gradle.plugin.BuildDirAccessor;
+
 /**
  * Generates the {@code META-INF/spring.factories} registration for the Spring Test Profiler and
  * puts the generated directory on the test runtime classpath.
+ *
+ * @author Artemiy Degtyarev
+ * @author Nikita Kirillov
  */
-final class SpringFactoriesGenerator {
+public final class SpringFactoriesGenerator {
 
     public static final String GENERATE_TASK_NAME = "generateAxelixSpringFactories";
     public static final String SPRING_FACTORIES_CONTENT =
@@ -44,11 +49,11 @@ final class SpringFactoriesGenerator {
 
     private SpringFactoriesGenerator() {}
 
-    static void configure(final Project project) {
+    public static void configure(final Project project) {
         final File generatedDir = new File(BuildDirAccessor.buildDir(project), "generated/axelix");
 
         Task generateTask = project.getTasks().create(GENERATE_TASK_NAME);
-        generateTask.setGroup("axelix");
+        generateTask.setGroup("build");
         generateTask.setDescription("Generates META-INF/spring.factories registering the Spring Test Profiler.");
         // getInputs().properties(Map) keeps the same signature on Gradle 5.0 and 9.x
         generateTask.getInputs().properties(Collections.singletonMap("content", SPRING_FACTORIES_CONTENT));
