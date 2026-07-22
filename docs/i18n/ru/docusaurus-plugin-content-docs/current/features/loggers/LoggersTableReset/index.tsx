@@ -1,70 +1,77 @@
 /* TODO: Make some improvs in future*/
-import styles from '../_LoggersTables.module.css'
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import styles from "../styles.module.css";
 
 export const LoggersTableReset = () => {
+  const configuredLevelDebugIcon = useBaseUrl(
+    "/img/feature/loggers/configured-level-debug-icon.png",
+  );
+  const configuredLevelTraceIcon = useBaseUrl(
+    "/img/feature/loggers/configured-level-trace-icon.png",
+  );
+  const configuredLevelInfoIcon = useBaseUrl(
+    "/img/feature/loggers/configured-level-info-icon.png",
+  );
+
   return (
     <>
-      <table>
+      <table className={styles.LoggersTable}>
         <thead>
           <tr>
-            <th>Loggers name</th>
-            <th>starting point</th>
-            <th>step 1</th>
-            <th>step 2</th>
+            <th>Logger name</th>
+            <th>Starting point</th>
+            <th>Step 1</th>
+            <th>Step 2</th>
           </tr>
         </thead>
-        <tbody>
 
+        <tbody>
           <tr>
-            <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.axelixlabs.axelix
-            </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
+            <td>com.axelixlabs.axelix</td>
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
+                src={configuredLevelDebugIcon}
                 alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
+                src={configuredLevelDebugIcon}
                 alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-debug-icon.png"
+                src={configuredLevelDebugIcon}
                 alt="Configured level debug icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
           </tr>
 
           <tr>
-            <td className={styles.CellValueWithRowChunk} title="Loggers name">
-              com.axelixlabs.axelix.sbs
-            </td>
-            <td className={styles.CellValueFragmentWithIconCenter} title="starting point">
+            <td>com.axelixlabs.axelix.sbs</td>
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-trace-icon.png"
+                src={configuredLevelTraceIcon}
                 alt="Configured level trace icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 1">
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-info-icon.png"
+                src={configuredLevelInfoIcon}
                 alt="Configured level info icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
-            <td className={styles.CellValueFragmentWithIconLeft} title="step 2">
+
+            <td>
               <img
-                src="/img/feature/loggers/configured-level-trace-icon.png"
+                src={configuredLevelTraceIcon}
                 alt="Configured level trace icon"
-                className={styles.ConfiguredLevelIcon}
               />
             </td>
           </tr>
@@ -72,4 +79,4 @@ export const LoggersTableReset = () => {
       </table>
     </>
   );
-}
+};

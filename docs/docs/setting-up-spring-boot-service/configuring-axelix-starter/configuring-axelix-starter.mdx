@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import styles from './_configuringAxelixStarter.module.css';
+import styles from './styles.module.css';
 
 # Configuring Spring Boot Starter
 
@@ -182,12 +182,14 @@ set of Axelix-specific meters into your application's own Micrometer `MeterRegis
 This export path switches on automatically when a `MeterRegistry` bean is present. There is no extra Axelix property for
 it. The starter registers these meters:
 
+<div className={styles.MetricsTable}>
 | Meter | Type | Tags | Meaning |
 |-------|------|------|---------|
 | `axelix_transaction_duration` | `Timer` | `class`, `method`, `status` | Duration of each monitored `@Transactional` execution. The timer also publishes `0.5`, `0.95`, and `0.99` percentiles. |
 | `axelix_transaction_queries` | `Counter` | `class`, `method` | Total number of SQL queries executed inside monitored transactions. |
 | `axelix_cache_requests` | `Counter` | `cache`, `result` | Total number of cache lookups recorded by Axelix-enhanced caches. |
 | `axelix_cache_enabled` | `Gauge` | `cache` | Current runtime state of each enhanced cache: `1` when enabled, `0` when disabled. |
+</div>
 
 These meters complement the UI-facing actuator endpoints rather than replace them. The UI still reads
 `axelix-metrics` and `axelix-caches`. Transaction monitoring data is not served by a dedicated actuator endpoint —
@@ -356,14 +358,12 @@ Every starter property lives under the `axelix.sbs.*` namespace.
 
 ### Authentication — JWT
 
-<div className={styles.configTable}>
-
-| Property                          | Default                                                     | Description                                                                                                                  |
-|-----------------------------------|-------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.auth.jwt.algorithm`   | *(unset)* <span className={styles.required}>required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
-| `axelix.sbs.auth.jwt.signing-key` | *(unset)* <span className={styles.required}>required</span> | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
-| `axelix.sbs.auth.jwt.duration`    | `5m`                                                        | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.           |
-
+<div className={styles.SharedTable}>
+| Property                          | Default                                              | Description                                                                                                                  |
+|-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.auth.jwt.algorithm`   | *(unset)* <span className="Required">required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
+| `axelix.sbs.auth.jwt.signing-key` | *(unset)* <span className="Required">required</span> | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
+| `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.           |
 </div>
 
 ### Self-registration
@@ -383,21 +383,21 @@ self-registration](../../setting-up-master-ui/configuring-master/configuring-mas
 configured under `axelix.sbs.auth.jwt.signing-key` must match `axelix.master.auth.jwt.signing-key` on Master, otherwise
 heartbeats are rejected with `401`.
 
-<div className={styles.configTable}>
+<div className={styles.SharedTable}>
 
-| Property                                     | Default                                                     | Description                                                                                                                          |
-|----------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.discovery.auto`                  | `false`                                                     | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                        |
-| `axelix.sbs.discovery.master-url`            | *(unset)* <span className={styles.required}>required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
-| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className={styles.required}>required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `auto=true`.   |
-| `axelix.sbs.discovery.instance-name`         | *(unset)* <span className={styles.required}>required</span> | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                        |
-| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                       | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                           |
+| Property                                     | Default                                              | Description                                                                                                                          |
+|----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.discovery.auto`                  | `false`                                              | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                        |
+| `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `auto=true`.   |
+| `axelix.sbs.discovery.instance-name`         | *(unset)* <span className="Required">required</span> | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                        |
+| `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                           |
 
 </div>
 
 ### Endpoint value sanitization
 
-<div className={styles.configTable}>
+<div className={styles.SharedTable}>
 
 | Property                                           | Default        | Description                                                                                                                                                                                                                                                                                                            |
 |----------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

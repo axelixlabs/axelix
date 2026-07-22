@@ -1,21 +1,22 @@
+import { type ReactNode } from 'react';
 import TOC from '@theme-original/TOC';
+import type TOCType from '@theme/TOC';
+import type { WrapperProps } from '@docusaurus/types';
 import { EditPost } from '@site/src/components';
-import {ComponentProps} from "react";
-
 import styles from "./styles.module.css"
 
-const TOCWrapper = (props: ComponentProps<typeof TOC>) => {
-    const hasToc = props.toc && props.toc.length;
+type Props = WrapperProps<typeof TOCType>;
 
-    return (
-        <div className={styles.TOCWrapper}>
-            {!!hasToc && <TOC {...props} />}
+export default function TOCWrapper(props: Props): ReactNode {
+  return (
+    <>
+      <div className={styles.TOCWrapper}>
+        <TOC {...props} />
 
-            <div className={styles.TOCFooter}>
-                <EditPost />
-            </div>
+        <div className={styles.TOCFooter}>
+          <EditPost />
         </div>
-    );
+      </div>
+    </>
+  );
 }
-
-export default TOCWrapper;

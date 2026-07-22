@@ -1,26 +1,14 @@
-.rolesTable table {
-  table-layout: fixed;
+.RolesTable th:nth-child(1),
+.RolesTable td:nth-child(1) {
+    width: 20%;
 }
 
-.rolesTable table th,
-.rolesTable table td {
-  min-width: 82px;
-  word-break: break-word;
+.RolesTable th:nth-child(2),
+.RolesTable td:nth-child(2) {
+    width: 45%;
 }
 
-.rolesTable table th:nth-child(1),
-.rolesTable table td:nth-child(1) {
-  font-size: 13px;
-  width: 140px;
-}
-
-.rolesTable table th:nth-child(2),
-.rolesTable table td:nth-child(2) {
-  font-size: 13px;
-}
-
-.rolesTable table th:nth-child(3),
-.rolesTable table td:nth-child(3) {
-  font-size: 14px;
-  width: 360px;
+.RolesTable th:nth-child(3),
+.RolesTable td:nth-child(3) {
+    width: 35%;
 }

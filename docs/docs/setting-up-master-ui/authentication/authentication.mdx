@@ -14,7 +14,7 @@ Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx#con
 Master ships three independent authentication providers. Any combination can be enabled at the same time; the login
 screen at `/login` renders the controls for whichever ones are active.
 
-<div className={signInOptionsStyles.signInOptionsTable}>
+<div className={signInOptionsStyles.SignInOptionsTable}>
 
 | Option        | Default       | Toggle property                                                                          | Use it when                                                                            |
 |---------------|---------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
@@ -92,17 +92,17 @@ username already belongs to a non-OIDC account, Master rejects the sign-in rathe
 `client-secret`, `base-url`. `scopes` defaults to `openid` and only needs an override if your IdP requires extra scopes.
 `role-attribute-path` is optional — leave it unset to map every signed-in user to the `VIEWER` role.
 
-<div className={oauth2Styles.configTable}>
+<div className={oauth2Styles.ConfigTable}>
 
-| Property                                                | Default                                                           | Description                                                                                                                                                                |
-|---------------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.options.oauth2.enabled`             | `false`                                                           | Enable OIDC sign-in.                                                                                                                                                       |
-| `axelix.master.auth.options.oauth2.issuer-uri`          | *(unset)* <span className={oauth2Styles.required}>required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`.                           |
-| `axelix.master.auth.options.oauth2.client-id`           | *(unset)* <span className={oauth2Styles.required}>required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                              |
-| `axelix.master.auth.options.oauth2.client-secret`       | *(unset)* <span className={oauth2Styles.required}>required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                                  |
-| `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className={oauth2Styles.required}>required</span> | Public base URL of this Master instance. Used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
-| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                          | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
-| `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                                         | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+| Property                                                | Default                                              | Description                                                                                                                                                                |
+|---------------------------------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.auth.options.oauth2.enabled`             | `false`                                              | Enable OIDC sign-in.                                                                                                                                                       |
+| `axelix.master.auth.options.oauth2.issuer-uri`          | *(unset)* <span className="Required">required</span> | OIDC issuer base URL. Master reads `/.well-known/openid-configuration` from here to discover endpoints. Required whenever `oauth2.enabled=true`.                           |
+| `axelix.master.auth.options.oauth2.client-id`           | *(unset)* <span className="Required">required</span> | Client identifier registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                              |
+| `axelix.master.auth.options.oauth2.client-secret`       | *(unset)* <span className="Required">required</span> | Client secret registered with the OIDC provider. Required whenever `oauth2.enabled=true`.                                                                                  |
+| `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className="Required">required</span> | Public base URL of this Master instance. Used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
+| `axelix.master.auth.options.oauth2.scopes`              | `openid`                                             | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
+| `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                            | JMESPath expression evaluated against the ID token claims (and, if needed, the userinfo response) to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
 
 </div>
 
@@ -161,7 +161,7 @@ check is always against authorities, never role names. This means a custom role 
 database layer must resolve to one of the built-in names — there is no way today to define a new authority from
 configuration.
 
-<div className={rolesStyles.rolesTable}>
+<div className={rolesStyles.RolesTable}>
 
 | Role          | Authorities granted                                                                                                            | Who gets it                                                                                         |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|

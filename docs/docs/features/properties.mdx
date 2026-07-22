@@ -8,7 +8,7 @@ that contributed it. For each property, it shows the value, marks the source tha
 where Spring binds the property — links out to the `@ConfigurationProperties` bean and to the injection points that read
 it.
 
-![properties main page](../../static/img/feature/properties/properties-main-page.png) ***Properties as presented in
+![properties main page](/img/feature/properties/properties-main-page.png) ***Properties as presented in
 Axelix UI***
 
 If the instance has any active or default Spring profiles, they appear on top of the page under **Profiles:** — the
@@ -19,12 +19,12 @@ section (expanded by default), with a search input above the list that filters p
 counter in the form `<matching> / <total>`.
 
 - **Source Name**:     The name of the property source.
-- **Description**:     Hover the icon ![info icon](../../static/img/feature/icons/info-icon.svg) next to the source name
+- **Description**:     Hover the icon ![info icon](/img/feature/icons/info-icon.svg) next to the source name
   to see the custom description of this property source, when the source provides one.
 - **Properties**:      The list of property entries within the source.
 
 ## Properties Details
-![properties details page](../../static/img/feature/properties/properties-details-page.png) ***Properties dropdown as
+![properties details page](/img/feature/properties/properties-details-page.png) ***Properties dropdown as
 presented in Axelix UI***
 
 Each property row shows the property name, a copy-to-clipboard control, the resolved value, and a primary-source marker.
@@ -33,17 +33,17 @@ Expanding a row reveals the details panel:
 - **Name**:                       The property name.
 - **Value**:                      The value resolved from this property source.
 - **Primary value**:               Marked with the crown icon ![crown
-  icon](../../static/img/feature/icons/crown-icon.svg) in the value column. The crown means this value wins resolution —
+  icon](/img/feature/icons/crown-icon.svg) in the value column. The crown means this value wins resolution —
   when the same key exists in multiple property sources, only the source consulted first by the Spring environment is
   marked primary.
 - **Deprecated**:                 Deprecated properties are highlighted with a red background on the row header, and the
   details panel shows the deprecation message.
 - **Description**:                The description from `spring-configuration-metadata.json`, when available.
 - **Configuration Properties**:   The `@ConfigurationProperties` bean that binds this property, if any. The bean name is
-  a link ![redirect image](../../static/img/feature/icons/redirect-icon.png) that jumps to the Configuration Properties
+  a link ![redirect image](/img/feature/icons/redirect-icon.png) that jumps to the Configuration Properties
   page anchored at that bean.
 - **Injected in**:                Beans that consume this property through `@Value` or similar. Each entry is a link
-  ![redirect image](../../static/img/feature/icons/redirect-icon.png) that jumps to the Beans page anchored at that
+  ![redirect image](/img/feature/icons/redirect-icon.png) that jumps to the Beans page anchored at that
   bean.
 
 :::info
