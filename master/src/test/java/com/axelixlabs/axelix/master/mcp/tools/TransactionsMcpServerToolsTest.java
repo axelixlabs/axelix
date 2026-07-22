@@ -28,10 +28,10 @@ import tools.jackson.databind.json.JsonMapper;
 
 import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOverallStats;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
@@ -231,9 +231,10 @@ class TransactionsMcpServerToolsTest {
         return new TransactionAggregatedProfile(
                 TransactionOrigin.APPLICATION_DECLARATIVE,
                 new TransactionalKey(className, methodName),
-                new TransactionOverallStats(1, 10, 5),
+                new ExecutionStats(1, 10, 5),
                 lazyLoadingTargets,
-                inMemoryPagination);
+                inMemoryPagination,
+                List.of());
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
