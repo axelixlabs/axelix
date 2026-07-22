@@ -130,6 +130,7 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public void updateUserPatch(
             String id,
             String username,
