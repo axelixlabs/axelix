@@ -21,13 +21,6 @@
                 <artifactId>axelix-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <version>1.0.0-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>axelix-generate-spring-factories</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.axelixlabs</groupId>
+    <groupId>com.example</groupId>
     <artifactId>axelix-plugin-test</artifactId>
     <version>1.0.0</version>
 
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <axelix.copyProfilerReport>false</axelix.copyProfilerReport>
     </properties>
 
     <build>

@@ -46,8 +46,6 @@ class GenerateSpringFactoriesMojoTest {
 
     private static final String CURRENT_DIR = new File("").getAbsolutePath();
     private static final String SPRING_FACTORIES_PATH = "META-INF/spring.factories";
-    private static final String GENERATED_RESOURCES_PATH = "target/generated-test-resources/axelix";
-
     private static final String TEST_EXECUTION_LISTENER_KEY = "org.springframework.test.context.TestExecutionListener";
     private static final String APPLICATION_CONTEXT_INITIALIZER_KEY =
             "org.springframework.context.ApplicationContextInitializer";
@@ -64,7 +62,7 @@ class GenerateSpringFactoriesMojoTest {
     }
 
     @Test
-    void should_generate_new_spring_factories_if_not_exists() throws VerificationException, IOException {
+    void shouldGenerateNewSpringFactoriesIfNotExists() throws VerificationException, IOException {
         // given.
         baseDir = CURRENT_DIR + "/src/integrationTest/generate-new-spring-factories";
         Verifier verifier = new Verifier(baseDir);
@@ -84,7 +82,7 @@ class GenerateSpringFactoriesMojoTest {
     }
 
     @Test
-    void should_merge_spring_factories() throws VerificationException, IOException {
+    void shouldMergeSpringFactories() throws VerificationException, IOException {
         // given.
         baseDir = CURRENT_DIR + "/src/integrationTest/merge-spring-factories";
         Verifier verifier = new Verifier(baseDir);

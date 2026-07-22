@@ -32,9 +32,6 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Utilities for working with {@code spring.factories} files
  *
@@ -43,7 +40,6 @@ import org.slf4j.LoggerFactory;
 @Named("springFactoriesUtilities")
 @Singleton
 public class SpringFactoriesUtilities {
-    private static final Logger log = LoggerFactory.getLogger(SpringFactoriesUtilities.class);
 
     /**
      * Convert {@code spring.factories} content from {@link Map} to {@link Properties}
@@ -82,15 +78,10 @@ public class SpringFactoriesUtilities {
      *
      * @param path Path of {@code spring.factories} file
      * @return Map of properties
+     * @throws IOException if the file cannot be read
      */
-    public Map<String, Set<String>> load(String path) {
-        Properties properties;
-        try {
-            properties = loadProperties(path);
-        } catch (IOException e) {
-            log.error("Failed to load spring.factories file in: {}", path);
-            throw new RuntimeException(e);
-        }
+    public Map<String, Set<String>> load(String path) throws IOException {
+        Properties properties = loadProperties(path);
 
         Map<String, Set<String>> result = new HashMap<>();
         properties.forEach((name, value) -> {

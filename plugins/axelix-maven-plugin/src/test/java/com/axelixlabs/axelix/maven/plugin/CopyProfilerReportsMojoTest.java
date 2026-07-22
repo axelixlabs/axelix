@@ -32,23 +32,44 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link CopyProfilerReportsMojo}
  *
  * @author Artemiy Degtyarev
+ * @author Nikita Kirillov
  */
 class CopyProfilerReportsMojoTest {
     public static final String CURRENT_DIR = new File("").getAbsolutePath();
 
     @Test
-    void should_copy_report() throws VerificationException, IOException {
+    void shouldCopyReport() throws VerificationException, IOException {
+        // given.
         String baseDir = CURRENT_DIR + "/src/integrationTest/copy-report";
-        Path classpathReportPath = Path.of(baseDir, "target/classes/spring-test-profiler/latest.html");
+        Path classpathReportPath = Path.of(baseDir, "target/classes/META-INF/axelix/latest.html");
         Files.deleteIfExists(classpathReportPath);
 
         Verifier verifier = new Verifier(baseDir);
         verifier.setAutoclean(false);
 
+        // when.
         verifier.executeGoal("install");
-
         verifier.verify(true);
 
+        // then.
         assertThat(classpathReportPath).exists();
+    }
+
+    @Test
+    void shouldSkipCopyingReportWhenProjectTargetsJavaBelow17() throws VerificationException, IOException {
+        // given. the fixture's maven-compiler-plugin is configured for Java 11.
+        String baseDir = CURRENT_DIR + "/src/integrationTest/java-11-target";
+        Path classpathReportPath = Path.of(baseDir, "target/classes/META-INF/axelix/latest.html");
+        Files.deleteIfExists(classpathReportPath);
+
+        Verifier verifier = new Verifier(baseDir);
+        verifier.setAutoclean(false);
+
+        // when.
+        verifier.executeGoal("install");
+        verifier.verify(true);
+
+        // then.
+        assertThat(classpathReportPath).doesNotExist();
     }
 }

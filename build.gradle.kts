@@ -175,6 +175,21 @@ val starterModules = listOf(
     // project(":sbs:axelix-spring-boot-4-starter")
 )
 
+val pluginModules = listOf(
+    project(":plugins:axelix-gradle-plugin"),
+    project(":plugins:axelix-maven-plugin")
+)
+
+val commonModules = listOf(
+    project(":sbs:starter-domain"),
+    project(":common:auth"),
+    project(":common:api"),
+    project(":common:domain"),
+    project(":common:utils")
+)
+
+val publishableModules = starterModules + pluginModules
+
 if (starterTestJavaVersion != null) {
     configure(starterModules) {
         tasks.withType<Test>().configureEach {
@@ -185,20 +200,11 @@ if (starterTestJavaVersion != null) {
     }
 }
 
-val commonModules = listOf(
-    project(":sbs:starter-domain"),
-    project(":common:auth"),
-    project(":common:api"),
-    project(":common:domain"),
-    project(":common:utils")
-)
-
-// Apply publishing and signing plugins to all starter modules only
+// Apply publishing and signing plugins to all starter and plugin modules
 val mavenCentral = "ossrh-staging-api"
 val mainPublication = "main"
 
-// We only publish the starters to the maven central
-configure(starterModules) {
+configure(publishableModules) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
@@ -207,24 +213,26 @@ configure(starterModules) {
         withSourcesJar()
     }
 
-    // Pack shared submodule classes, sources, and docs into a single fat artifact
-    tasks {
-        jar {
-            duplicatesStrategy = DuplicatesStrategy.WARN
-            commonModules.forEach { from(it.sourceSets.main.get().output) }
-        }
-        named<Jar>("sourcesJar") {
-            duplicatesStrategy = DuplicatesStrategy.WARN
-            commonModules.forEach { from(it.sourceSets.main.get().allSource) }
-        }
-        withType<Javadoc> {
-            commonModules.forEach { source(it.sourceSets.main.get().allJava) }
-            classpath = project.configurations.compileClasspath.get()
-        }
-        named<Jar>("javadocJar") {
-            dependsOn(javadoc)
-            duplicatesStrategy = DuplicatesStrategy.WARN
-            from(javadoc.get().destinationDir)
+    // Pack shared submodule classes, sources, and javadocs into a single fat artifact
+    if (this@configure in starterModules) {
+        tasks {
+            jar {
+                duplicatesStrategy = DuplicatesStrategy.WARN
+                commonModules.forEach { from(it.sourceSets.main.get().output) }
+            }
+            named<Jar>("sourcesJar") {
+                duplicatesStrategy = DuplicatesStrategy.WARN
+                commonModules.forEach { from(it.sourceSets.main.get().allSource) }
+            }
+            withType<Javadoc> {
+                commonModules.forEach { source(it.sourceSets.main.get().allJava) }
+                classpath = project.configurations.compileClasspath.get()
+            }
+            named<Jar>("javadocJar") {
+                dependsOn(javadoc)
+                duplicatesStrategy = DuplicatesStrategy.WARN
+                from(javadoc.get().destinationDir)
+            }
         }
     }
 

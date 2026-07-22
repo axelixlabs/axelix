@@ -1,7 +1,6 @@
 plugins {
     id("org.gradlex.maven-plugin-development") version "1.0.3"
     id("maven-publish")
-    id("com.gradleup.shadow") version "9.5.1"
 }
 
 repositories {
@@ -12,17 +11,26 @@ tasks.compileJava {
     options.release = 11
 }
 
+// pinned to the same version the gradle plugin uses, for consistency across the two.
+val jgitVersion = "6.10.1.202505221210-r"
+val mavenPluginVersion = "3.9.16"
+val mavenPluginAnnotationsVersion = "3.15.2"
+val junitBomVersion = "5.14.4"
+val mavenVerifierVersion = "1.8.0"
+val assertjVersion = "3.27.6"
+
 dependencies {
-    implementation(project(":common:utils"))
+    implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
 
-    compileOnly("org.apache.maven:maven-plugin-api:3.9.16")
-    compileOnly("org.apache.maven:maven-core:3.9.16")
-    compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.15.2")
+    compileOnly("org.apache.maven:maven-plugin-api:${mavenPluginVersion}")
+    compileOnly("org.apache.maven:maven-core:${mavenPluginVersion}")
+    compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:${mavenPluginAnnotationsVersion}")
 
-    testImplementation(platform("org.junit:junit-bom:5.14.4"))
+    testImplementation(platform("org.junit:junit-bom:${junitBomVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.apache.maven.shared:maven-verifier:1.8.0")
-    testImplementation("org.assertj:assertj-core:3.27.6")
+    testImplementation("org.apache.maven.shared:maven-verifier:${mavenVerifierVersion}")
+    testImplementation("org.apache.maven:maven-core:${mavenPluginVersion}")
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -40,25 +48,4 @@ tasks.publishToMavenLocal {
 tasks.test {
     dependsOn(tasks.named("publishToMavenLocal"))
     useJUnitPlatform()
-}
-
-tasks.shadowJar {
-    dependsOn(tasks.named("generateMavenPluginDescriptor"))
-    from("build/mavenPlugin/descriptor/META-INF/maven") {
-        into("META-INF/maven")
-    }
-
-    archiveClassifier = ""
-}
-
-tasks.jar {
-    enabled = false
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenPlugin") {
-            from(components["shadow"])
-        }
-    }
 }

@@ -18,11 +18,9 @@
 package com.axelixlabs.axelix.maven.plugin;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,42 +37,37 @@ import org.apache.maven.project.MavenProject;
  */
 @Mojo(name = "axelix-copy-profiler-reports", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class CopyProfilerReportsMojo extends AbstractMojo {
+
+    private static final int MINIMUM_JAVA_VERSION = 17;
+
     @Parameter(readonly = true, defaultValue = "${project}")
     @SuppressWarnings("NullAway")
     private MavenProject mavenProject;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Path reportsPath = Path.of(mavenProject.getBuild().getDirectory(), "spring-test-profiler");
-        Path target = Path.of(mavenProject.getBuild().getOutputDirectory(), "spring-test-profiler");
-
-        if (Files.notExists(reportsPath)) {
+        if (!JavaCompatibility.compilesToAtLeast(mavenProject, MINIMUM_JAVA_VERSION)) {
+            getLog().info("Project targets Java below " + MINIMUM_JAVA_VERSION + ". Skipping profiler report copy.");
             return;
         }
 
-        try (Stream<Path> pathStream = Files.walk(reportsPath)) {
-            pathStream.forEach(path -> {
-                Path dest = target.resolve(reportsPath.relativize(path));
+        Path sourceFile = Path.of(mavenProject.getBuild().getDirectory(), "spring-test-profiler", "latest.html");
+        Path targetDir = Path.of(mavenProject.getBuild().getOutputDirectory(), "META-INF", "axelix");
+        Path targetFile = targetDir.resolve(sourceFile.getFileName());
 
-                if (Files.isDirectory(path)) {
-                    try {
-                        Files.createDirectories(dest);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                    return;
-                }
+        if (Files.notExists(sourceFile)) {
+            getLog().info("Profiler report 'latest.html' not found. Skipping copy.");
+            return;
+        }
 
-                try {
-                    Files.copy(path, dest, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+        try {
+            Files.createDirectories(targetDir);
+
+            Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+            getLog().info("Copied profiler report to " + targetFile);
+
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to open stream to reports folder", e);
-        } catch (UncheckedIOException e) {
-            throw new MojoExecutionException("Failed to copy profiler reports", e.getCause());
+            throw new MojoExecutionException("Failed to copy latest.html to target resources", e);
         }
     }
 }
