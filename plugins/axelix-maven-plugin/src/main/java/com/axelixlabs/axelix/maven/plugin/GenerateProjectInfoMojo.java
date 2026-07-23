@@ -42,6 +42,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
+import static com.axelixlabs.axelix.maven.plugin.AxelixLifecycleParticipant.PROFILER_DETECTED_PROPERTY;
+
 /**
  * Mojo that generates {@code META-INF/axelix-info.properties} — build coordinates plus git commit
  * metadata — directly into the output directory, so it is packaged by {@code jar} or Spring
@@ -52,7 +54,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 @Mojo(name = "axelix-generate-project-info", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class GenerateProjectInfoMojo extends AbstractMojo {
 
-    private static final String PROPERTIES_PATH = "META-INF/axelix-info.properties";
     private static final int ABBREVIATED_ID_LENGTH = 7;
 
     @Parameter(readonly = true, defaultValue = "${project}")
@@ -82,6 +83,9 @@ public class GenerateProjectInfoMojo extends AbstractMojo {
         properties.setProperty("build.name", mavenProject.getArtifactId());
         properties.setProperty("build.version", mavenProject.getVersion());
         properties.setProperty("build.time", Instant.now().toString());
+        properties.setProperty(
+                PROFILER_DETECTED_PROPERTY,
+                mavenProject.getProperties().getProperty(PROFILER_DETECTED_PROPERTY, "false"));
         return properties;
     }
 

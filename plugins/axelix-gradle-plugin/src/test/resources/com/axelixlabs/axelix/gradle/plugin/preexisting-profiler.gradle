@@ -1,0 +1,22 @@
+plugins {
+    id 'com.axelixlabs.axelix'
+}
+apply plugin: 'java'
+
+group = 'com.example'
+
+repositories { mavenCentral() }
+
+dependencies {
+    testRuntimeOnly 'digital.pragmatech.testing:spring-test-profiler:0.1.1'
+}
+
+// Prints the *declared* modules (not resolved files) of the test runtime classpath, so tests can
+// confirm the plugin never adds its own competing declaration on top of this one.
+task printDeclaredDeps {
+    doLast {
+        configurations.testRuntimeClasspath.allDependencies.each { d ->
+            println 'DEP>> ' + d.group + ':' + d.name + ':' + d.version
+        }
+    }
+}

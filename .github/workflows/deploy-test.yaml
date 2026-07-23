@@ -21,6 +21,7 @@ on:
       - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
       - 'common/**'
       - 'master/**'
+      - 'plugins/**'
       - 'sbs/**'
 
       # Playground projects

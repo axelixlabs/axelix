@@ -31,6 +31,7 @@ import org.apache.maven.it.Verifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static com.axelixlabs.axelix.maven.plugin.AxelixLifecycleParticipant.PROFILER_DETECTED_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -44,7 +45,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class GenerateProjectInfoMojoTest {
 
-    private static final String POM = """
+    private static final String POM =
+            // language=xml
+            """
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
 
@@ -140,6 +143,8 @@ class GenerateProjectInfoMojoTest {
         assertThat(properties.getProperty("build.name")).isEqualTo("axelix-plugin-test");
         assertThat(properties.getProperty("build.version")).isEqualTo("1.2.3");
         assertThat(properties.getProperty("build.time")).isNotBlank();
+
+        assertThat(properties.getProperty(PROFILER_DETECTED_PROPERTY)).isEqualTo("false");
 
         if (hasGitInfo) {
             assertThat(properties.getProperty("git.commit.id")).hasSize(40);

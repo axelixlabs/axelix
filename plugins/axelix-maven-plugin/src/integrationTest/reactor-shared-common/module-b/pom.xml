@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.axelixlabs</groupId>
+        <artifactId>axelix-plugin-test-reactor</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>module-b</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.axelixlabs</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+</project>

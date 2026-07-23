@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.axelixlabs</groupId>
+        <artifactId>axelix-plugin-test-extension-override</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>with-extensions</artifactId>
+
+    <!-- No plugin override here: inherits <extensions>true</extensions> from the parent. -->
+</project>
