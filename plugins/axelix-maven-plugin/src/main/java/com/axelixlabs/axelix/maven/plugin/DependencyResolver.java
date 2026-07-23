@@ -64,11 +64,34 @@ public class DependencyResolver {
         try {
             result = resolver.resolve(request);
         } catch (DependencyResolutionException e) {
-            log.error("Failed to resolve dependencies");
+            log.error(
+                    "Axelix maven plugin is not capable to resolve the dependency tree of project '{}'. This is "
+                            + "critical and the plugin cannot work without it. Make sure your repositories are "
+                            + "declared correctly and you have a stable internet connection",
+                    mavenProject.getArtifactId(),
+                    e);
 
             throw new RuntimeException(e);
         }
 
         return result.getDependencies().stream().map(Dependency::getArtifact).collect(Collectors.toList());
+    }
+
+    /**
+     * Probes whether the project's dependencies can be resolved from the configured repositories,
+     * without the noisy error-level logging {@link #resolveDependencies} does: a {@code false}
+     * result here is an expected, handled outcome for callers deciding whether to keep a
+     * tentatively-added dependency.
+     */
+    public boolean isResolvable(MavenProject mavenProject, RepositorySystemSession repoSession) {
+        DefaultDependencyResolutionRequest request = new DefaultDependencyResolutionRequest(mavenProject, repoSession);
+
+        try {
+            resolver.resolve(request);
+            return true;
+        } catch (DependencyResolutionException e) {
+            log.debug("Dependency resolution probe failed for project '{}'", mavenProject.getArtifactId(), e);
+            return false;
+        }
     }
 }

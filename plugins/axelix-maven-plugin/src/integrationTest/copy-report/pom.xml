@@ -5,14 +5,9 @@
     <artifactId>axelix-plugin-test</artifactId>
     <version>1.0.0</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>digital.pragmatech.testing</groupId>
-            <artifactId>spring-test-profiler</artifactId>
-            <version>0.1.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+    </properties>
 
     <build>
         <plugins>

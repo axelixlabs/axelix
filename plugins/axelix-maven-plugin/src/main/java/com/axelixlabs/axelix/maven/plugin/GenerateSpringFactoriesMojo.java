@@ -34,12 +34,11 @@ import javax.inject.Inject;
 
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Mojo that generates {@code spring.factories} file for {@code spring-test-profiler}.
@@ -60,7 +59,6 @@ public class GenerateSpringFactoriesMojo extends AbstractMojo {
             Set.of("digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer"));
     public static final String GENERATED_RESOURCES_BASE = "generated-test-resources/axelix";
     public static final String SPRING_FACTORIES_PATH = "META-INF/spring.factories";
-    private static final Logger log = LoggerFactory.getLogger(GenerateSpringFactoriesMojo.class);
 
     @Parameter(readonly = true, defaultValue = "${project}")
     @SuppressWarnings("NullAway")
@@ -70,23 +68,28 @@ public class GenerateSpringFactoriesMojo extends AbstractMojo {
     private SpringFactoriesUtilities springFactoriesUtilities;
 
     @Override
-    public void execute() {
-        List<Map<String, Set<String>>> factories = new ArrayList<>();
+    public void execute() throws MojoExecutionException {
+        try {
+            List<Map<String, Set<String>>> factories = new ArrayList<>();
 
-        for (Resource testResource : mavenProject.getTestResources()) {
-            File springFactories = new File(testResource.getDirectory(), SPRING_FACTORIES_PATH);
+            for (Resource testResource : mavenProject.getTestResources()) {
+                File springFactories = new File(testResource.getDirectory(), SPRING_FACTORIES_PATH);
 
-            if (springFactories.exists()) {
-                factories.add(springFactoriesUtilities.load(springFactories.getAbsolutePath()));
-                // Maven resources plugin does not overwrite by default; exclude the original so the
-                // merged generated file is what ends up on the test classpath.
-                testResource.addExclude(SPRING_FACTORIES_PATH);
+                if (springFactories.exists()) {
+                    factories.add(springFactoriesUtilities.load(springFactories.getAbsolutePath()));
+                    // Maven resources plugin does not overwrite by default; exclude the original so the
+                    // merged generated file is what ends up on the test classpath.
+                    testResource.addExclude(SPRING_FACTORIES_PATH);
+                }
             }
+
+            factories.add(PROFILER_SPRING_FACTORIES);
+
+            writeToFile(factories);
+        } catch (IOException e) {
+            throw new MojoExecutionException(
+                    "Failed to generate " + SPRING_FACTORIES_PATH + " for project " + mavenProject.getName(), e);
         }
-
-        factories.add(PROFILER_SPRING_FACTORIES);
-
-        writeToFile(factories);
 
         addResource();
     }
@@ -109,21 +112,16 @@ public class GenerateSpringFactoriesMojo extends AbstractMojo {
      * Writes {@code spring.factories} to file
      * @param factories List of {@code spring.factories} files content to merge
      */
-    private void writeToFile(List<Map<String, Set<String>>> factories) {
+    private void writeToFile(List<Map<String, Set<String>>> factories) throws IOException {
         Properties result = springFactoriesUtilities.convertToProperties(springFactoriesUtilities.merge(factories));
         Path outputDir =
                 Paths.get(mavenProject.getBuild().getDirectory(), GENERATED_RESOURCES_BASE, SPRING_FACTORIES_PATH);
 
-        try {
-            Files.createDirectories(outputDir.getParent());
+        Files.createDirectories(outputDir.getParent());
 
-            try (OutputStream out =
-                    Files.newOutputStream(outputDir, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-                result.store(out, null);
-            }
-        } catch (IOException e) {
-            log.error("Failed to write spring.factories file for project: {}", mavenProject.getName());
-            throw new RuntimeException(e);
+        try (OutputStream out =
+                Files.newOutputStream(outputDir, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            result.store(out, null);
         }
     }
 }

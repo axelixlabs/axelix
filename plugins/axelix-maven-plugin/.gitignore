@@ -1,2 +1,4 @@
 **/log.txt
 **/target/*
+!/src/integrationTest/copy-report/target/spring-test-profiler
+!/src/integrationTest/java-11-target/target/spring-test-profiler
