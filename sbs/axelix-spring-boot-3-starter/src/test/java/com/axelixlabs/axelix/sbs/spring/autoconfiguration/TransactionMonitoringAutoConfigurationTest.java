@@ -28,6 +28,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.kafka.KafkaTemplateMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +63,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ExternalCallRestTemplateCustomizer.class);
+            assertThat(context).hasSingleBean(KafkaTemplateMonitoringBeanPostProcessor.class);
             assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
@@ -75,6 +78,7 @@ class TransactionMonitoringAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                    assertThat(context).doesNotHaveBean(KafkaTemplateMonitoringBeanPostProcessor.class);
                 });
     }
 
@@ -85,6 +89,16 @@ class TransactionMonitoringAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                });
+    }
+
+    @Test
+    void shouldNotRegisterKafkaTemplateBeanPostProcessor_whenKafkaTemplateIsAbsent() {
+        contextRunner
+                .withClassLoader(new FilteredClassLoader(KafkaTemplate.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(KafkaTemplateMonitoringBeanPostProcessor.class);
                 });
     }
 
