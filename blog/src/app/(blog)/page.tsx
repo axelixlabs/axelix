@@ -4,9 +4,6 @@ import { getSortedCardItems } from "@/lib/source";
 import { BLOG_HOME_DESCRIPTION } from "@/lib/blog-metadata";
 import styles from "./page.module.css";
 
-// Fully static: we never read `searchParams` here (that would force dynamic
-// rendering with `Cache-Control: private`). Filtering/pagination happen on the
-// client from the URL; the whole dataset ships in the RSC payload.
 export const revalidate = false;
 
 export default async function HomePage() {
@@ -14,9 +11,9 @@ export default async function HomePage() {
 
   return (
     <>
-      <header className={styles.BlogHero}>
+      <header className={styles.Hero}>
         <div className="wrap">
-          <h1>
+          <h1 className={styles.Title}>
             Axelix <span className={styles.Accent}>Blog</span>
           </h1>
           <p className={styles.Lede}>{BLOG_HOME_DESCRIPTION}</p>

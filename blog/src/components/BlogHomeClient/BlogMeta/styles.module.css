@@ -1,0 +1,8 @@
+.MainWrapper {
+    margin-bottom: 24px;
+    font-family: var(--code);
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+}

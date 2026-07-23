@@ -2,19 +2,21 @@ import { PlainTag } from "../PlainTag";
 
 interface IProps {
   tags: string[];
-  max?: number;
 }
 
-/** Up to `max` tags, with a `+N` overflow chip. */
-export const TagRow = ({ tags, max = 3 }: IProps) => {
-  const shown = tags.slice(0, Math.max(0, max));
-  const overflow = tags.length - shown.length;
+const MAX_VISIBLE_TAGS = 3
+
+export const TagRow = ({ tags }: IProps) => {
+  const visibleTags = tags.slice(0, Math.max(0, MAX_VISIBLE_TAGS));
+  const overflowTags = tags.length - visibleTags.length;
+
   return (
     <div className="rtags">
-      {shown.map((t) => (
-        <PlainTag key={t} label={t} />
+      {visibleTags.map((tag) => (
+        <PlainTag label={tag} key={tag} />
       ))}
-      {overflow > 0 && <span className="tag tag-more">+{overflow}</span>}
+
+      {overflowTags && <span className="tag tag-more">+{overflowTags}</span>}
     </div>
   );
 };

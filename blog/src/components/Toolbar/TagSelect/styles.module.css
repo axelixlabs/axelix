@@ -1,0 +1,80 @@
+.MainWrapper {
+    display: none;
+    flex: 1;
+    min-width: 0;
+}
+
+.SelectOpenTrigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--line-2);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.Open .SelectOpenTrigger {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.Label {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.SelectOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    transition: background-color 0.12s, color 0.12s;
+}
+
+.SelectOption:hover {
+    background-color: color-mix(in srgb, var(--chip, var(--accent)) 12%, transparent);
+    color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+}
+
+.Active {
+    background-color: var(--ink);
+    color: var(--axelix-primary-white);
+}
+
+@media (max-width: 640px) {
+    .MainWrapper {
+        display: block;
+    }
+}
+
+/* 
+.CatOpt .ChipDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--chip, currentColor);
+    flex: 0 0 auto;
+} */
+
+
+/* 
+.ChipDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--chip, currentColor);
+    flex: 0 0 auto;
+} */

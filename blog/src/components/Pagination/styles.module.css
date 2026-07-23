@@ -1,75 +1,78 @@
-/* pagination */
-.Pager {
+.MainWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 40px;
+  gap: 8px;
+  margin-top: 30px;
 }
-.Pager .PgNums {
+
+.PaginationNumbers {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
-.Pager .PgNum {
-  min-width: 38px;
+
+.PaginationNumber {
   height: 38px;
-  padding: 0 6px;
-  border-radius: 10px;
+  min-width: 38px;
+  border-radius: 8px;
   font-family: var(--code);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--ink-3);
-  border: 1px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  display: grid;
+  place-items: center;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
-.Pager .PgNum:hover {
-  background: color-mix(in srgb, var(--c-green-100) 55%, transparent);
+
+.PaginationNumber:hover {
+  background-color: color-mix(in srgb, var(--c-green-100) 55%, transparent);
   color: var(--ink);
 }
-.Pager .PgNum.Active {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
+
+.ActivePaginationNumber {
+  background-color: var(--ink);
+  color: var(--axelix-primary-white);
 }
-.Pager .PgEllipsis {
-  font-family: var(--code);
-  font-size: 13px;
+
+.PaginationEllipsis {
   color: var(--ink-4);
-  padding: 0 2px;
+  padding-inline: 8px;
 }
-.Pager .PgArrow {
+
+.PaginationArrow {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 16px;
+  gap: 8px;
+  padding: 8px 16px;
   border-radius: 999px;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--ink-2);
   border: 1px solid var(--line-2);
-  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
 }
-.Pager .PgArrow svg {
-  width: 15px;
-  height: 15px;
+
+.PaginationArrowPrevIcon{
+  rotate: 180deg; 
 }
-.Pager .PgArrow:hover:not([aria-disabled="true"]) {
-  background: color-mix(in srgb, #fff 60%, transparent);
+
+.PaginationArrow:hover:not([aria-disabled="true"]) {
+  background-color: color-mix(in srgb, #fff 60%, transparent);
   border-color: var(--line-3);
   color: var(--ink);
 }
-.Pager .PgArrow[aria-disabled="true"] {
+
+.PaginationArrow[aria-disabled="true"] {
   opacity: 0.35;
   pointer-events: none;
 }
+
 @media (max-width: 520px) {
-  .Pager .PgArrow span {
+  .PaginationPrevNextText {
     display: none;
   }
-  .Pager .PgArrow {
-    padding: 9px 12px;
+
+  .PaginationArrow {
+    padding: 8px;
   }
 }
