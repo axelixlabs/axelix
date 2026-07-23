@@ -53,9 +53,7 @@ public interface GcLogService {
      * @return {@code true} if a GC log file output is specified, otherwise {@code false}
      * @throws GcLogException if the GC log file output cannot be reliably determined
      */
-    default boolean isGcLogFileSpecified() throws GcLogException {
-        return false;
-    }
+    boolean isGcLogFileSpecified() throws GcLogException;
 
     /**
      * Enables GC logging with the given log level.

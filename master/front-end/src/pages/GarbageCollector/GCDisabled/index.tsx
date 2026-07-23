@@ -69,7 +69,7 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                     <GCLogEnableSettings
                         isModalOpen={isModalOpen}
                         setIsModalOpen={setIsModalOpen}
-                        logginsStatus={loggingStatusData}
+                        loggingStatus={loggingStatusData}
                         loadGCStatus={loadGCStatus}
                     />
                 )}

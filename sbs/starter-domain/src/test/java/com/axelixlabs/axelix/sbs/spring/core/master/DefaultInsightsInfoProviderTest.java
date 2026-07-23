@@ -152,7 +152,8 @@ class DefaultInsightsInfoProviderTest {
     @Test
     void returnsGcLogFileSpecified_whenGcLogServiceReportsFileSpecified() {
         // given.
-        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogFileSpecified(), emptyVmOptions());
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(), gcLogFileSpecified(), emptyVmOptions(), emptyTransactionStatsCollector());
 
         // when.
         Insights insights = subject.getInsight();

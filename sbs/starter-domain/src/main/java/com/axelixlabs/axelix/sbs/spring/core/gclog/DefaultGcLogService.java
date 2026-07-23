@@ -307,8 +307,8 @@ public class DefaultGcLogService implements GcLogService {
      *
      * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
      */
-    private boolean isGcSelector(String selector) {
-        String[] parts = selector.split("=", 2);
+    private boolean isGcSelector(String whatSelector) {
+        String[] parts = whatSelector.split("=", 2);
         String tagSet = parts[0];
 
         if ("all".equals(tagSet)) {
