@@ -68,3 +68,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# -- Additional container env vars, appended as-is after the chart's own fixed entries
+# (JWT algorithm/signing key). Lets e2e/CI tooling inject ad-hoc config (e.g. self-registration
+# properties) via `--set-json` without needing a chart change for every new property.
+extraEnv: []

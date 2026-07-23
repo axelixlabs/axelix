@@ -38,6 +38,9 @@ spec:
               value: {{ .Values.axelix.sbs.auth.jwt.algorithm | quote }}
             - name: AXELIX_SBS_AUTH_JWT_SIGNING_KEY
               value: {{ .Values.axelix.sbs.auth.jwt.signingKey | quote }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
