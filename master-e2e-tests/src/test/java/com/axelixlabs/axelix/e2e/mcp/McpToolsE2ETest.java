@@ -80,6 +80,7 @@ class McpToolsE2ETest {
                         "findGroupsByName",
                         "changeLoggingLevelByLoggerName",
                         "changeLoggingLevelByGroupName",
-                        "resetLoggingLevelByLoggerName");
+                        "resetLoggingLevelByLoggerName",
+                        "getApplicationTransactionsProfile");
     }
 }
