@@ -38,10 +38,12 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 
+import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.NO_SIBLINGS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -59,6 +61,7 @@ import static org.mockito.Mockito.when;
             "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
             "spring.kafka.template.default-topic=default-topic"
         })
+@IgnoreTestContextArchitecture(reason = NO_SIBLINGS)
 class ExternalCallKafkaSendInterceptorTest {
 
     @Autowired
