@@ -9,6 +9,7 @@ val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
 val junitVersion = "6.1.1"
 val jsoupVersion = "1.22.2"
+val playwrightVersion = "1.61.0"
 
 dependencies {
     testImplementation("io.rest-assured:rest-assured:${restAssuredVersion}")
@@ -18,6 +19,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
     testImplementation("org.jsoup:jsoup:${jsoupVersion}")
+    testImplementation("com.microsoft.playwright:playwright:${playwrightVersion}")
+
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
