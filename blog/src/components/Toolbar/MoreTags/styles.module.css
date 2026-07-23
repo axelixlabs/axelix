@@ -1,0 +1,70 @@
+.MenuWrapper {
+    position: relative;
+}
+
+.Menu {
+    position: absolute;
+    left: 0;
+    right: auto;
+    min-width: 190px;
+    top: calc(100% + 6px);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    border-radius: 14px;
+    background: var(--axelix-primary-white);
+    border: 1px solid var(--line-2);
+    box-shadow: 0 12px 30px -12px rgba(15, 20, 16, 0.28);
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    border: 1px solid var(--line-2);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.ChipDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--chip, currentColor);
+    flex: 0 0 auto;
+}
+
+.MenuOption {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    transition: background-color 0.12s, color 0.12s;
+}
+
+.MenuOption:hover {
+    background-color: color-mix(in srgb, var(--chip, var(--accent)) 12%, transparent);
+    color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+}
+
+.ActiveOption {
+    background-color: var(--ink);
+    color: var(--axelix-primary-white);
+}
+
+.ActiveMenuTrigger {
+    background-color: var(--ink);
+    border-color: var(--ink);
+    color: var(--axelix-primary-white);
+}

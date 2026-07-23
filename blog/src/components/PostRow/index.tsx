@@ -4,29 +4,42 @@ import { DateMeta } from "../DateMeta";
 import { TagRow } from "../TagRow";
 import type { BlogCardItem } from "@/lib/source";
 import styles from "./styles.module.css";
+import Image from "next/image";
 
 interface IProps {
   item: BlogCardItem;
 }
 
 export const PostRow = ({ item }: IProps) => {
+  const { authors, coverSrc, date, description, href, readingMinutes, tags, title } = item
+
   return (
-    <Link className={styles.PostRow} href={item.href}>
-      <div className={styles.Rbody}>
-        <TagRow tags={item.tags} />
-        <DateMeta date={item.date} readingMinutes={item.readingMinutes} />
-        <h3>{item.title}</h3>
-        {item.description && <p className={styles.Exc}>{item.description}</p>}
-        <Authors authors={item.authors} />
-      </div>
-      {item.coverSrc ? (
-        <div className={styles.Rcover}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={item.coverSrc} alt="" />
+    <>
+      <Link className={styles.MainWrapper} href={href}>
+        <div className={styles.ContentWrapper}>
+          <TagRow tags={tags} />
+          <DateMeta date={date} readingMinutes={readingMinutes} />
+          <h3 className={styles.Title}>{title}</h3>
+          {description && <p className={styles.Description}>{description}</p>}
+          
+          <Authors authors={authors} />
         </div>
-      ) : (
-        <div className={`${styles.Rcover} ${styles.CoverPh}`} />
-      )}
-    </Link>
+
+        {coverSrc ? (
+          <div className={styles.CoverImageWrapper}>
+            <Image
+              src={coverSrc}
+              alt={title}
+              fill
+              sizes="(max-width: 760px) 100vw, 50vw"
+              priority
+              className={styles.CoverImage}
+            />
+          </div>
+        ) : (
+          <div className={styles.CoverImagePlaceholder} />
+        )}
+      </Link>
+    </>
   );
 };

@@ -1,0 +1,49 @@
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    border: 1px solid var(--line-2);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.Chip:hover {
+    background-color: color-mix(in srgb, var(--chip, var(--accent)) 18%, transparent);
+    border-color: color-mix(in srgb, var(--chip, var(--accent)) 40%, transparent);
+    color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+}
+
+.ChipDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    opacity: 0.85;
+    background-color: var(--chip, currentColor);
+}
+
+.ActiveChip {
+    background-color: var(--ink);
+    border-color: var(--ink);
+    color: var(--axelix-primary-white);
+}
+
+.ActiveChip .ChipDot {
+    opacity: 1;
+    animation: chipDotPulse 1s ease-in-out infinite;
+}
+
+@keyframes chipDotPulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+}

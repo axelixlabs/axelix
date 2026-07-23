@@ -70,7 +70,7 @@ a.tag-link:hover {
 }
 .authors .avatars .avatar {
   margin-left: -8px;
-  box-shadow: 0 0 0 2px var(--paper);
+  box-shadow: 0 0 0 2px var(--axelix-primary-white);
 }
 .authors .avatars .avatar:first-child {
   margin-left: 0;

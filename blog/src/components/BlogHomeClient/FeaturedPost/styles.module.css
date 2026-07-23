@@ -1,0 +1,74 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(180deg,
+            color-mix(in srgb, var(--c-green-100) 60%, transparent),
+            var(--axelix-primary-white));
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 40px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        box-shadow: 0 24px 60px -36px rgba(15, 30, 5, 0.45);
+    }
+}
+
+.CoverImageWrapper,
+.CoverImagePlaceholder {
+    position: relative;
+    aspect-ratio: 16/10;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.CoverImageWrapper {
+    background: var(--c-green-900);
+}
+
+.CoverImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.CoverImagePlaceholder {
+    background: color-mix(in srgb, var(--ink) 7%, var(--axelix-primary-white));
+}
+
+.ContentWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px;
+}
+
+.PostTitle {
+    /* margin: 0; */
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--ink);
+    text-wrap: balance;
+}
+
+.PostDescription {
+    font-size: 15px;
+    color: var(--ink-3);
+}
+
+@media (max-width: 760px) {
+    .MainWrapper {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .ContentWrapper {
+        padding: 8px;
+    }
+}
