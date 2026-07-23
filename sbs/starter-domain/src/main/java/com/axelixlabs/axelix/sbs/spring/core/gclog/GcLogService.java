@@ -48,6 +48,14 @@ public interface GcLogService {
     File getGcLogFile() throws GcLogException;
 
     /**
+     * Returns whether a GC log file output is specified for JVM logging.
+     *
+     * @return {@code true} if a GC log file output is specified, otherwise {@code false}
+     * @throws GcLogException if the GC log file output cannot be reliably determined
+     */
+    boolean isGcLogFileSpecified() throws GcLogException;
+
+    /**
      * Enables GC logging with the given log level.
      *
      * @param level GC log level to enable

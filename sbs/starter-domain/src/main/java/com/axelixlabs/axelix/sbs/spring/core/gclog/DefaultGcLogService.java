@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
@@ -32,10 +33,16 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  *
  * @since 30.12.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultGcLogService implements GcLogService {
 
+    private static final String JCMD_COMMAND = "jcmd";
+    private static final String JCMD_VM_LOG_COMMAND = "VM.log";
+    private static final String JCMD_VM_LOG_LIST_ARGUMENT = "list";
     private static final String DEFAULT_FILE_NAME = "gc.log";
+    private static final String DEFAULT_LOG_LEVEL = "info";
+    private static final String OFF_LOG_LEVEL = "off";
 
     private final JcmdExecutor jcmdExecutor;
     private final Logger logger;
@@ -51,11 +58,11 @@ public class DefaultGcLogService implements GcLogService {
         this.logger = logger;
     }
 
-    // TODO We need to enhance the GC Logging status monitoring https://github.com/axelixlabs/axelix/issues/573
     @Override
     public GcLogStatus getStatus() {
         try {
-            ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "list");
+            ProcessResult result =
+                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
 
             return parseStatus(result.getOutput());
 
@@ -64,6 +71,8 @@ public class DefaultGcLogService implements GcLogService {
         }
     }
 
+    // TODO: This assumes that the GC log file is always gc.log.
+    //       In reality, the file name and path can be customized, e.g. file=/tmp/gc.log.
     @Override
     public File getGcLogFile() throws GcLogException {
         File file = new File(DEFAULT_FILE_NAME);
@@ -73,6 +82,48 @@ public class DefaultGcLogService implements GcLogService {
         }
 
         return file;
+    }
+
+    /**
+     * Detects whether GC logging is configured to write to a file.
+     *
+     * <p>The file output is treated as GC-related by its {@code <what>} selector, not by
+     * the file name. Unified Logging allows arbitrary file names, so {@code app.log gc=info}
+     * and {@code gc.log all=info} are both valid GC-related file outputs.
+     *
+     * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
+     */
+    @Override
+    public boolean isGcLogFileSpecified() throws GcLogException {
+        try {
+            ProcessResult result =
+                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
+
+            for (String line : result.getOutput().split("\n")) {
+                String trim = line.trim();
+                if (!trim.startsWith("#")) {
+                    continue;
+                }
+
+                // VM.log list output config: "#0: <output> <what> <decorators> ...".
+                String[] configurationParts = trim.split("\\s+");
+                if (!configurationParts[1].startsWith("file=")) {
+                    continue;
+                }
+
+                String what = configurationParts[2];
+                for (String selectorText : what.split(",")) {
+                    if (isGcSelector(selectorText.trim())) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            throw new GcLogException("Failed to get GC log file output status via jcmd", e);
+        }
     }
 
     /**
@@ -96,10 +147,10 @@ public class DefaultGcLogService implements GcLogService {
 
         try {
             ProcessResult result = jcmdExecutor.execute(
-                    "jcmd",
+                    JCMD_COMMAND,
                     getPid(),
-                    "VM.log",
-                    "what=gc=" + level.toLowerCase(),
+                    JCMD_VM_LOG_COMMAND,
+                    "what=gc=" + level.toLowerCase(Locale.ROOT),
                     "output=file=" + DEFAULT_FILE_NAME,
                     "output_options=filecount=1,filesize=10M",
                     "decorators=time,level,tags");
@@ -118,7 +169,7 @@ public class DefaultGcLogService implements GcLogService {
     @Override
     public void disable() throws GcLogException {
         try {
-            ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "disable");
+            ProcessResult result = jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, "disable");
 
             if (!result.isSuccess()) {
                 throw new GcLogException(result.getOutput());
@@ -170,7 +221,8 @@ public class DefaultGcLogService implements GcLogService {
      */
     private List<String> loadAvailableLevels() {
         try {
-            ProcessResult result = jcmdExecutor.execute("jcmd", getPid(), "VM.log", "list");
+            ProcessResult result =
+                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
 
             for (String line : result.getOutput().split("\n")) {
                 String trim = line.trim();
@@ -180,7 +232,7 @@ public class DefaultGcLogService implements GcLogService {
                                     .trim()
                                     .split(","))
                             .map(String::trim)
-                            .map(String::toLowerCase)
+                            .map(level -> level.toLowerCase(Locale.ROOT))
                             .filter(level -> !level.equals("off"))
                             .collect(Collectors.toList());
                 }
@@ -193,33 +245,103 @@ public class DefaultGcLogService implements GcLogService {
         }
     }
 
-    private GcLogStatus parseStatus(String output) {
-        for (String line : output.split("\n")) {
-            String trim = line.trim();
-
-            if (trim.startsWith("#") && trim.contains("gc=")) {
-                int idx = trim.indexOf("gc=");
-                int end = trim.indexOf(" ", idx);
-                if (end == -1) {
-                    end = trim.length();
-                }
-
-                String level = trim.substring(idx + 3, end);
-                return new GcLogStatus(true, level, getAvailableLevels());
-            }
-        }
-
-        return new GcLogStatus(false, null, getAvailableLevels());
-    }
-
     private void validateLevel(String level) {
         if (level == null || level.isBlank()) {
             throw new GcLogException("GC log level must not be empty");
         }
 
-        String normalized = level.toLowerCase();
+        String normalized = level.toLowerCase(Locale.ROOT);
         if (!getAvailableLevels().contains(normalized)) {
             throw new GcLogException("Invalid GC log level '" + level + "', available: " + getAvailableLevels());
+        }
+    }
+
+    /**
+     * Detects whether GC logging is enabled and extracts its level from {@code VM.log list}.
+     *
+     * <p>Selectors with {@code off} still count as explicitly configured GC logging, but do
+     * not define the reported level. When several levels are present, the most verbose one
+     * is reported according to JEP 158 level order.
+     *
+     * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
+     */
+    private GcLogStatus parseStatus(String output) {
+        boolean gcSelectorFound = false;
+        String highestLevel = null;
+
+        for (String line : output.split("\n")) {
+            String trim = line.trim();
+            if (!trim.startsWith("#")) {
+                continue;
+            }
+
+            // VM.log list output config: "#0: <output> <what> <decorators> ...".
+            String[] configurationParts = trim.split("\\s+");
+            String what = configurationParts[2];
+            for (String selectorText : what.split(",")) {
+                String selector = selectorText.trim();
+
+                if (!isGcSelector(selector)) {
+                    continue;
+                }
+
+                gcSelectorFound = true;
+
+                String[] parts = selector.split("=", 2);
+                String level = parts.length == 2 ? parts[1] : DEFAULT_LOG_LEVEL;
+                if (!OFF_LOG_LEVEL.equals(level) && verbosity(level) > verbosity(highestLevel)) {
+                    highestLevel = level;
+                }
+            }
+        }
+
+        return new GcLogStatus(gcSelectorFound, highestLevel, getAvailableLevels());
+    }
+
+    /**
+     * Recognizes selectors that can produce GC-related log records.
+     *
+     * <p>{@code all=warning} is ignored intentionally: it is part of the default JVM logging
+     * configuration and is not useful as product-level GC logging status. Broad {@code all}
+     * selectors are treated as GC logging only from {@code info} level and above.
+     *
+     * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
+     */
+    private boolean isGcSelector(String whatSelector) {
+        String[] parts = whatSelector.split("=", 2);
+        String tagSet = parts[0];
+
+        if ("all".equals(tagSet)) {
+            String level = parts.length == 2 ? parts[1] : DEFAULT_LOG_LEVEL;
+            return verbosity(level) >= verbosity(DEFAULT_LOG_LEVEL);
+        }
+
+        return "gc".equals(tagSet) || "gc*".equals(tagSet) || tagSet.startsWith("gc+");
+    }
+
+    /**
+     * JEP 158 defines levels in increasing order of verbosity: error < warning < info < debug < trace.
+     *
+     * @see <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a>
+     */
+    private int verbosity(@Nullable String level) {
+        if (level == null) {
+            return -1;
+        }
+
+        switch (level) {
+            case "error":
+                return 0;
+            case "warning":
+                return 1;
+            case "info":
+                return 2;
+            case "debug":
+                return 3;
+            case "trace":
+                return 4;
+            default:
+                return -1;
         }
     }
 }

@@ -43,7 +43,7 @@ interface IProps {
     /**
      * State of GC logging status
      */
-    logginsStatus: IGCLoggingStatusResponseBody;
+    loggingStatus: IGCLoggingStatusResponseBody;
 
     /**
      * Loads the GC logging status
@@ -51,11 +51,11 @@ interface IProps {
     loadGCStatus: () => void;
 }
 
-export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus, loadGCStatus }: IProps) => {
+export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, loggingStatus, loadGCStatus }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const { level, availableLevels } = logginsStatus!;
+    const { level, availableLevels } = loggingStatus!;
 
     const [selectedLevel, setSelectedLevel] = useState<string>(level);
     const [enableGCLoggingData, setEnableGCLoggingData] = useState(StatelessRequest.inactive());
