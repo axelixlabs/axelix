@@ -3,16 +3,12 @@ plugins {
 }
 apply(plugin = "java")
 
-// Deliberately no repositories {} block: simulates a closed network with no access to the
-// profiler's repository, so it genuinely cannot be resolved.
+group = "com.example"
 
-tasks.register("printDeclaredDeps") {
-    // Forces the configuration's build dependencies to be computed before this task runs, which is
-    // what actually triggers the plugin's lazy dependency contribution (and, here, its probe).
-    dependsOn(configurations["testRuntimeClasspath"])
-    doLast {
-        configurations["testRuntimeClasspath"].allDependencies.forEach { d ->
-            println("DEP>> " + d.group + ":" + d.name + ":" + d.version)
-        }
-    }
+// Deliberately no repositories {} block, but a dependency IS declared: detection tries to resolve
+// testRuntimeClasspath's already-declared dependency graph, and this genuinely fails (simulating
+// e.g. a closed network with no access to the profiler's repository) - the build must not fail
+// because of it; that project is just treated as "profiler not present".
+dependencies {
+    "testRuntimeOnly"("digital.pragmatech.testing:spring-test-profiler:0.1.2")
 }

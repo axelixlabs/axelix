@@ -39,8 +39,6 @@ public class DependencyUtils {
     public static @Nullable ModuleComponentIdentifier findInTheConfigurationClasspath(
             Project project, String configurationName, final String group, final String name) {
 
-        // getAllDependencies (not getDependencies) so dependencies inherited from extended configurations
-        // are seen too, e.g. a thymeleaf declared on implementation propagates to testRuntimeClasspath.
         DependencySet declaredDependencies =
                 project.getConfigurations().getByName(configurationName).getAllDependencies();
         return findDeclaredInClasspath(getResolvedGraph(project, declaredDependencies), group, name);
@@ -93,26 +91,6 @@ public class DependencyUtils {
             return (ModuleComponentIdentifier) dependencyIdentifier;
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Probes whether {@code dependencyNotation} can be resolved from the project's configured
-     * repositories, without adding it to any of the project's own configurations. A {@code false}
-     * result is an expected, handled outcome for callers deciding whether to add a dependency.
-     */
-    public static boolean isResolvable(Project project, String dependencyNotation) {
-        Configuration detachedConfiguration = project.getConfigurations()
-                .detachedConfiguration(project.getDependencies().create(dependencyNotation));
-
-        try {
-            // Forces eager resolution to files (unlike getResolutionResult(), which tolerates
-            // unresolvable nodes), so a missing/unreachable artifact actually throws here.
-            detachedConfiguration.getFiles();
-            return true;
-        } catch (Exception e) {
-            project.getLogger().debug("Dependency resolution probe failed for '{}'", dependencyNotation, e);
-            return false;
         }
     }
 }

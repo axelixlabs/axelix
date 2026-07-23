@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-plugin-test-extension-override</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>with-extensions</module>
+        <module>without-extensions</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.axelixlabs</groupId>
+                <artifactId>axelix-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <version>1.0.0-SNAPSHOT</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

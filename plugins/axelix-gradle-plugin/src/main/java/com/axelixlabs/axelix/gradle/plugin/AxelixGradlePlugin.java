@@ -20,9 +20,6 @@ package com.axelixlabs.axelix.gradle.plugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-import com.axelixlabs.axelix.gradle.plugin.profiler.SpringTestProfilerConfigurer;
-import com.axelixlabs.axelix.gradle.plugin.projectinfo.ProjectInfoGenerator;
-
 /**
  * Axelix Gradle plugin entry point.
  *
@@ -39,17 +36,9 @@ public class AxelixGradlePlugin implements Plugin<Project> {
 
     @Override
     public void apply(final Project project) {
-        AxelixExtension extension = project.getExtensions().create(AxelixExtension.NAME, AxelixExtension.class);
-
         // Detection is deferred to afterEvaluate: the build script's dependencies {} block runs after
-        // the java plugin is applied, so inspecting the configurations any earlier would always see them
-        // empty and wrongly contribute dependencies the user already declared.
+        // the java plugin is applied, so inspecting the configurations any earlier would always see them empty.
         project.getPluginManager()
-                .withPlugin(
-                        "java",
-                        appliedPlugin -> project.afterEvaluate(p -> {
-                            SpringTestProfilerConfigurer.configure(p, extension);
-                            ProjectInfoGenerator.configure(p);
-                        }));
+                .withPlugin("java", appliedPlugin -> project.afterEvaluate(ProjectInfoGenerator::configure));
     }
 }

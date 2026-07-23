@@ -8,10 +8,5 @@ version = "1.2.3"
 
 repositories { mavenCentral() }
 
-// Build info must be collected unconditionally, even with the profiler feature disabled.
-configure<com.axelixlabs.axelix.gradle.plugin.AxelixExtension> {
-    setCopyProfilerReport(false)
-}
-
-// Stands in for Spring Boot's bootJar task, same as bootjar-ordering.gradle.kts.
+// Stands in for Spring Boot's bootJar task without pulling in the Spring Boot plugin.
 tasks.register<Jar>("bootJar")

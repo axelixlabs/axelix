@@ -56,42 +56,22 @@ public class DependencyResolver {
      * @param mavenProject maven project
      * @param repoSession maven repository session
      * @return List of project dependencies
+     * @throws RuntimeException wrapping {@link DependencyResolutionException} if the project's dependency tree
+     *      cannot be resolved; it is the caller's responsibility to decide how critical that is for their use case.
      */
-    public List<Artifact> resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession) {
+    public List<Artifact> resolveDependencies(MavenProject mavenProject, RepositorySystemSession repoSession)
+            throws RuntimeException {
         DefaultDependencyResolutionRequest request = new DefaultDependencyResolutionRequest(mavenProject, repoSession);
 
         DependencyResolutionResult result;
         try {
             result = resolver.resolve(request);
         } catch (DependencyResolutionException e) {
-            log.error(
-                    "Axelix maven plugin is not capable to resolve the dependency tree of project '{}'. This is "
-                            + "critical and the plugin cannot work without it. Make sure your repositories are "
-                            + "declared correctly and you have a stable internet connection",
-                    mavenProject.getArtifactId(),
-                    e);
+            log.error("Failed to resolve dependencies");
 
             throw new RuntimeException(e);
         }
 
         return result.getDependencies().stream().map(Dependency::getArtifact).collect(Collectors.toList());
-    }
-
-    /**
-     * Probes whether the project's dependencies can be resolved from the configured repositories,
-     * without the noisy error-level logging {@link #resolveDependencies} does: a {@code false}
-     * result here is an expected, handled outcome for callers deciding whether to keep a
-     * tentatively-added dependency.
-     */
-    public boolean isResolvable(MavenProject mavenProject, RepositorySystemSession repoSession) {
-        DefaultDependencyResolutionRequest request = new DefaultDependencyResolutionRequest(mavenProject, repoSession);
-
-        try {
-            resolver.resolve(request);
-            return true;
-        } catch (DependencyResolutionException e) {
-            log.debug("Dependency resolution probe failed for project '{}'", mavenProject.getArtifactId(), e);
-            return false;
-        }
     }
 }

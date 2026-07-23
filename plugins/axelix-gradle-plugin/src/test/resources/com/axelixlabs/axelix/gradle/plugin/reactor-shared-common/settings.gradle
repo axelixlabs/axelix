@@ -1,0 +1,2 @@
+rootProject.name = 'axelix-plugin-test-reactor'
+include 'common', 'module-a', 'module-b'

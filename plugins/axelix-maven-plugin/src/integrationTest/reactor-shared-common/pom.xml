@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-plugin-test-reactor</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common</module>
+        <module>module-a</module>
+        <module>module-b</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.axelixlabs</groupId>
+                <artifactId>axelix-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <version>1.0.0-SNAPSHOT</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

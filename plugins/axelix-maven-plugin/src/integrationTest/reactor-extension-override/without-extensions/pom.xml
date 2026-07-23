@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.axelixlabs</groupId>
+        <artifactId>axelix-plugin-test-extension-override</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>without-extensions</artifactId>
+
+    <build>
+        <plugins>
+            <!-- Overrides the parent's plugin declaration, opting back out of extensions=true. -->
+            <plugin>
+                <groupId>com.axelixlabs</groupId>
+                <artifactId>axelix-maven-plugin</artifactId>
+                <extensions>false</extensions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

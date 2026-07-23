@@ -1,0 +1,13 @@
+plugins {
+    id 'com.axelixlabs.axelix'
+}
+apply plugin: 'java'
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories { mavenCentral() }
+
+dependencies {
+    testRuntimeOnly 'digital.pragmatech.testing:spring-test-profiler:0.1.2'
+}
