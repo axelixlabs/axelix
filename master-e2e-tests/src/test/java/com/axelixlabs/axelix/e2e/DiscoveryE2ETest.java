@@ -81,7 +81,14 @@ public class DiscoveryE2ETest {
                     .untilAsserted(() -> {
                         Set<String> registeredInstanceNames = client.getRegisteredInstanceNames();
 
-                        assertThat(expectedInstanceNames).containsExactlyInAnyOrderElementsOf(registeredInstanceNames);
+                        // K8s appends random suffixes to pod names; match by prefix only.
+                        for (String expectedInstanceName : expectedInstanceNames) {
+                            Optional<String> foundInstance = registeredInstanceNames.stream()
+                                    .filter(instanceName -> instanceName.startsWith(expectedInstanceName))
+                                    .findFirst();
+
+                            assertThat(foundInstance).isPresent();
+                        }
                     });
         } catch (ConditionTimeoutException e) {
             Set<String> lastKnown = client.getRegisteredInstanceNames();
