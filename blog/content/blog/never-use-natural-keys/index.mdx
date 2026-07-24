@@ -88,9 +88,17 @@ So imagine we're designing such a relation in the database. Here's my question f
 And it's so convenient! When information about some Instance arrives in Axelix Master (whether via the push or the pull model):
 
 - We can update the data with a simple ANSI SQL `MERGE` or `INSERT ... ON CONFLICT DO ...`, because artifactId/groupId is the primary key! [Spring Data JDBC (which we use as the ORM in Axelix Master) in 4.1](https://github.com/spring-projects/spring-data-relational)
-finally learned how to do UPSERTs on the primary key, and now we can just do this:
+finally learned how to do UPSERTs on the primary key, and now we can just do this via `JdbcAggregateTemplate`:
 
-{/* SQL example: MERGE / INSERT ... ON CONFLICT keyed on (groupId, artifactId) */}
+```java
+@Transactional
+public void reloadCurrentState(BasicRegistrationMetadata metadata) {
+
+    Application application = converter.currentSnapshot(metadata);
+
+    jdbcAggregateTemplate.upsert(application);
+}
+```
 
 - And how nicely it works out for the front-end! **And here we arrive at the fact that a natural key carries business meaning by itself!** That, by the way, is one of the genuinely nice properties of natural keys. What do I mean? For example, in a situation where we just need to display the name of our "Application", and the name alone is enough, we can use the `artifactId`, i.e. a part of the composite natural key. No need to "fetch anything extra", and so on.
 
