@@ -46,6 +46,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
@@ -90,10 +91,15 @@ public class AxelixMetadataEndpointConfiguration {
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             GcLogService gcLogService,
             VmOptionsAccessor vmOptionsAccessor,
-            TransactionStatsCollector transactionStatsCollector) {
+            TransactionStatsCollector transactionStatsCollector,
+            TransactionAttributesRegistry transactionAttributesRegistry) {
 
         return new DefaultInsightsInfoProvider(
-                openSessionInViewStateProvider, gcLogService, vmOptionsAccessor, transactionStatsCollector);
+                openSessionInViewStateProvider,
+                gcLogService,
+                vmOptionsAccessor,
+                transactionStatsCollector,
+                transactionAttributesRegistry);
     }
 
     @Bean

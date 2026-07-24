@@ -65,6 +65,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneInteg
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
@@ -102,13 +103,22 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         }
 
         @Bean
+        public TransactionAttributesRegistry transactionAttributesRegistry() {
+            return new TransactionAttributesRegistry();
+        }
+
+        @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector,
                 TransactionAccessor transactionAccessor,
+                TransactionAttributesRegistry transactionAttributesRegistry,
                 ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
 
             return new TransactionMonitoringBeanPostProcessor(
-                    transactionStatsCollector, axelixMetricsPublisherObjectProvider, transactionAccessor);
+                    transactionStatsCollector,
+                    axelixMetricsPublisherObjectProvider,
+                    transactionAccessor,
+                    transactionAttributesRegistry);
         }
 
         @Bean
