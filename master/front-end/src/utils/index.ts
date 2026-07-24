@@ -17,6 +17,7 @@
  */
 export * from "./dashboard/dashboardOverview";
 export * from "./dashboard/dashboardJava";
+export * from "./transactional";
 export * from "./threadDump";
 export * from "./siderMenu";
 export * from "./wallboard";

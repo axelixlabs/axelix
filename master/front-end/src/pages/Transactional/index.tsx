@@ -57,31 +57,37 @@ const Transactional = () => {
     }
 
     if (problematic === 0) {
-        return (
-            <div className={styles.Page}>
-                <CleanState analyzed={analyzed} />
-            </div>
-        );
+        return <CleanState analyzed={analyzed} />;
     }
 
     const toggleProblemType = (type: EProblemType): void => {
-        setActiveProblemTypes((prev) =>
-            prev.includes(type) ? prev.filter((current) => current !== type) : [...prev, type],
-        );
+        setActiveProblemTypes((prev) => {
+            if (prev.includes(type)) {
+                return prev.filter((current) => current !== type);
+            }
+
+            return [...prev, type];
+        });
     };
 
     const filtered = filterTransactions(transactions, search, activeProblemTypes);
     const addonAfter = `${filtered.length} / ${analyzed}`;
 
     return (
-        <div className={styles.Page}>
-            <TransactionControlSummary analyzed={analyzed} problematic={problematic} clean={analyzed - problematic} />
-            <div className={styles.Toolbar}>
-                <PageSearch setSearch={setSearch} addonAfter={addonAfter} removeBottomGutter />
-                <ProblemTypeFilter activeProblemTypes={activeProblemTypes} onToggle={toggleProblemType} />
+        <>
+            <div className={styles.MainWrapper}>
+                <TransactionControlSummary
+                    analyzed={analyzed}
+                    problematic={problematic}
+                    clean={analyzed - problematic}
+                />
+                <div className={styles.Toolbar}>
+                    <PageSearch setSearch={setSearch} addonAfter={addonAfter} removeBottomGutter />
+                    <ProblemTypeFilter activeProblemTypes={activeProblemTypes} onToggle={toggleProblemType} />
+                </div>
+                <TransactionsTable transactions={filtered} />
             </div>
-            <TransactionsTable transactions={filtered} />
-        </div>
+        </>
     );
 };
 

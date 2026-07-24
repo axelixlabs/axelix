@@ -1,5 +1,5 @@
-.Page {
-    /* Semantic palette for the three persistence problem types, inherited by every descendant. */
+.MainWrapper {
+    /* TODO: Improve in future */
     --problem-blocking: #ea580c;
     --problem-blocking-bg: #fff7ed;
     --problem-nplusone: #7c3aed;

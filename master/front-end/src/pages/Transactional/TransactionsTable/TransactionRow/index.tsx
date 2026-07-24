@@ -21,15 +21,9 @@ import { useTranslation } from "react-i18next";
 import { Copy, InfoTooltip } from "components";
 import { deriveProblems, formatTransactionDuration, simpleClassName } from "helpers";
 import type { ITransactionAggregatedProfile } from "models";
+import { PROBLEM_TYPE_ORDER, originLabelKey, problemClassToken, problemDescriptionKey, problemLabelKey } from "utils";
 
 import { ProblemChip } from "../../ProblemChip";
-import {
-    PROBLEM_TYPE_ORDER,
-    originLabelKey,
-    problemClassToken,
-    problemDescriptionKey,
-    problemLabelKey,
-} from "../../problemTypes";
 
 import styles from "./styles.module.css";
 
@@ -60,30 +54,34 @@ export const TransactionRow = ({ transaction }: IProps) => {
     const hiddenChips = groupedChips.length - shownChips.length;
 
     return (
-        <div className={styles.Row}>
-            <div className={styles.Main} onClick={() => setOpen((prev) => !prev)}>
+        <div className={styles.MainWrapper}>
+            <div className={styles.Row} onClick={() => setOpen((prev) => !prev)}>
                 <div className={styles.Transaction}>
-                    <span className={styles.Signature}>
+                    <span className={`TextSmall ${styles.Signature}`}>
                         {simpleClassName(className)}#{methodName}()
                     </span>
-                    <span className={styles.Origin}>{t(originLabelKey[transaction.transactionOrigin])}</span>
+                    <span className={`TextUltraSmall ${styles.Origin}`}>
+                        {t(originLabelKey[transaction.transactionOrigin])}
+                    </span>
                 </div>
-                <span className={styles.Access}>{accessLabel}</span>
+                <span className={`TextUltraSmall ${styles.Access}`}>{accessLabel}</span>
                 <div className={styles.Duration}>
-                    <span className={styles.Avg}>{formatTransactionDuration(averageMs)}</span>
-                    <span className={styles.Range}>
+                    <span className={`TextSmall ${styles.Avg}`}>{formatTransactionDuration(averageMs)}</span>
+                    <span className={`TextUltraSmall ${styles.Range}`}>
                         {formatTransactionDuration(minMs)}–{formatTransactionDuration(maxMs)}
                     </span>
                 </div>
                 <div className={styles.Problems}>
                     {groupedChips.length === 0 ? (
-                        <span className={styles.NoProblemsInline}>{t("Transactional.noProblems")}</span>
+                        <span className={`TextUltraSmall ${styles.NoProblemsInline}`}>
+                            {t("Transactional.noProblems")}
+                        </span>
                     ) : (
                         <>
                             {shownChips.map((group) => (
                                 <ProblemChip key={group.type} type={group.type} multiplicity={group.count} />
                             ))}
-                            {hiddenChips > 0 && <span className={styles.More}>+{hiddenChips}</span>}
+                            {hiddenChips > 0 && <span className={`TextUltraSmall ${styles.More}`}>+{hiddenChips}</span>}
                         </>
                     )}
                 </div>
@@ -92,7 +90,7 @@ export const TransactionRow = ({ transaction }: IProps) => {
 
             {open && (
                 <div className={styles.Detail}>
-                    <div className={styles.Stats}>
+                    <div className={`TextUltraSmall ${styles.Stats}`}>
                         <div className={styles.StatCard}>
                             <span className={styles.StatLabel}>{t("Transactional.detail.min")}</span>
                             <span className={styles.StatValue}>{formatTransactionDuration(minMs)}</span>
@@ -107,7 +105,7 @@ export const TransactionRow = ({ transaction }: IProps) => {
                         </div>
                     </div>
 
-                    <div className={styles.Meta}>
+                    <div className={`TextUltraSmall ${styles.Meta}`}>
                         <div className={styles.MetaItem}>
                             <span className={styles.MetaLabel}>{t("Transactional.detail.declaredIn")}</span>
                             <span className={styles.DeclaredIn}>
@@ -133,7 +131,9 @@ export const TransactionRow = ({ transaction }: IProps) => {
                     </div>
 
                     {problems.length === 0 ? (
-                        <div className={styles.NoProblemsCard}>{t("Transactional.detail.noProblems")}</div>
+                        <div className={`TextSmall ${styles.NoProblemsCard}`}>
+                            {t("Transactional.detail.noProblems")}
+                        </div>
                     ) : (
                         problems.map((problem, index) => (
                             <div
@@ -141,10 +141,12 @@ export const TransactionRow = ({ transaction }: IProps) => {
                                 className={`${styles.ProblemCard} ${styles[problemClassToken[problem.type]]}`}
                             >
                                 <div className={styles.ProblemHeader}>
-                                    <span className={styles.ProblemLabel}>{t(problemLabelKey[problem.type])}</span>
+                                    <span className={`TextSmall ${styles.ProblemLabel}`}>
+                                        {t(problemLabelKey[problem.type])}
+                                    </span>
                                     <InfoTooltip text={t(problemDescriptionKey[problem.type])} />
                                 </div>
-                                <div className={styles.ProblemDetail}>
+                                <div className={`TextUltraSmall ${styles.ProblemDetail}`}>
                                     {problem.detail}
                                     {problem.count && problem.count > 1 ? ` (×${problem.count})` : ""}
                                 </div>

@@ -1,4 +1,4 @@
-.Filter {
+.MainWrapper {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -6,32 +6,29 @@
 }
 
 .Caption {
-    font-size: 13px;
     font-weight: 600;
     color: var(--axelix-bold-grey);
-    margin-right: 2px;
 }
 
 .Chip {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 7px 13px;
+    gap: 8px;
+    padding: 6px 12px;
     border-radius: 999px;
     border: 1px solid var(--axelix-medium-grey);
     background-color: var(--axelix-primary-white);
     color: var(--axelix-bold-grey);
-    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     user-select: none;
     transition:
-        border-color 0.15s ease,
-        color 0.15s ease,
-        background-color 0.15s ease;
+        border-color 0.15s,
+        color 0.15s,
+        background-color 0.15s;
 }
 
-.Dot {
+.ChipDot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
@@ -39,6 +36,7 @@
     background-color: var(--dot-color);
 }
 
+/* TODO: Improve in future */
 .Blocking {
     --dot-color: var(--problem-blocking);
 }
@@ -51,8 +49,10 @@
     --dot-color: var(--problem-pagination);
 }
 
-.Chip.Active {
+.ActiveChip {
     color: var(--dot-color);
     border-color: var(--dot-color);
-    background-color: color-mix(in srgb, var(--dot-color) 10%, white);
+
+    /* TODO: Improve in future */
+    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-primary-white));
 }

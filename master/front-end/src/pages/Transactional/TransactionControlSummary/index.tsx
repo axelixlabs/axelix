@@ -40,19 +40,21 @@ export const TransactionControlSummary = ({ analyzed, problematic, clean }: IPro
     const { t } = useTranslation();
 
     return (
-        <div className={styles.Summary}>
-            <div className={styles.Card}>
-                <span className={styles.Label}>{t("Transactional.summary.analyzed")}</span>
-                <span className={styles.Value}>{analyzed}</span>
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.Card}>
+                    <span className={`TextUltraSmall ${styles.Label}`}>{t("Transactional.summary.analyzed")}</span>
+                    <span className="TextLarge">{analyzed}</span>
+                </div>
+                <div className={styles.Card}>
+                    <span className={`TextUltraSmall ${styles.Label}`}>{t("Transactional.summary.withProblems")}</span>
+                    <span className="TextLarge">{problematic}</span>
+                </div>
+                <div className={styles.Card}>
+                    <span className={`TextUltraSmall ${styles.Label}`}>{t("Transactional.summary.clean")}</span>
+                    <span className="TextLarge">{clean}</span>
+                </div>
             </div>
-            <div className={`${styles.Card} ${styles.Problematic}`}>
-                <span className={styles.Label}>{t("Transactional.summary.withProblems")}</span>
-                <span className={styles.Value}>{problematic}</span>
-            </div>
-            <div className={`${styles.Card} ${styles.Clean}`}>
-                <span className={styles.Label}>{t("Transactional.summary.clean")}</span>
-                <span className={styles.Value}>{clean}</span>
-            </div>
-        </div>
+        </>
     );
 };

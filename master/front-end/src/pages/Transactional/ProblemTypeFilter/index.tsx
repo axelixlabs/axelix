@@ -18,8 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import type { EProblemType } from "models";
-
-import { PROBLEM_TYPE_ORDER, problemClassToken, problemLabelKey } from "../problemTypes";
+import { PROBLEM_TYPE_ORDER, problemClassToken, problemLabelKey } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -39,24 +38,26 @@ export const ProblemTypeFilter = ({ activeProblemTypes, onToggle }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.Filter}>
-            <span className={styles.Caption}>{t("Transactional.problemType")}</span>
-            {PROBLEM_TYPE_ORDER.map((type) => {
-                const active = activeProblemTypes.includes(type);
+        <>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <span className={styles.Caption}>{t("Transactional.problemType")}</span>
 
-                return (
-                    <button
-                        key={type}
-                        type="button"
-                        aria-pressed={active}
-                        onClick={() => onToggle(type)}
-                        className={`${styles.Chip} ${styles[problemClassToken[type]]} ${active ? styles.Active : ""}`}
-                    >
-                        <span className={styles.Dot} />
-                        {t(problemLabelKey[type])}
-                    </button>
-                );
-            })}
-        </div>
+                {PROBLEM_TYPE_ORDER.map((type) => {
+                    const active = activeProblemTypes.includes(type);
+
+                    return (
+                        <button
+                            key={type}
+                            type="button"
+                            onClick={() => onToggle(type)}
+                            className={`${styles.Chip} ${styles[problemClassToken[type]]} ${active ? styles.ActiveChip : ""}`}
+                        >
+                            <span className={styles.ChipDot} />
+                            {t(problemLabelKey[type])}
+                        </button>
+                    );
+                })}
+            </div>
+        </>
     );
 };

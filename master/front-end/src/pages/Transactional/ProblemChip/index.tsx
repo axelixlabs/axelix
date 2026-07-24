@@ -18,8 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import type { EProblemType } from "models";
-
-import { problemClassToken, problemLabelKey } from "../problemTypes";
+import { problemClassToken, problemLabelKey } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -39,10 +38,12 @@ export const ProblemChip = ({ type, multiplicity }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <span className={`${styles.Chip} ${styles[problemClassToken[type]]}`}>
-            <span className={styles.Dot} />
-            {t(problemLabelKey[type])}
-            {multiplicity && multiplicity > 1 ? ` ×${multiplicity}` : ""}
-        </span>
+        <>
+            <span className={`${styles.Chip} ${styles[problemClassToken[type]]}`}>
+                <span className={styles.Dot} />
+                {t(problemLabelKey[type])}
+                {multiplicity && multiplicity > 1 ? ` ×${multiplicity}` : ""}
+            </span>
+        </>
     );
 };

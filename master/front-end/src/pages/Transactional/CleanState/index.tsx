@@ -30,10 +30,12 @@ export const CleanState = ({ analyzed }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.CleanState}>
-            <span className={styles.Check} />
-            <h2 className={styles.Title}>{t("Transactional.clean.title")}</h2>
-            <p className={styles.Description}>{t("Transactional.clean.description", { count: analyzed })}</p>
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <span className={styles.Check} />
+                <h2 className={`TextMedium ${styles.Title}`}>{t("Transactional.clean.title")}</h2>
+                <p className={styles.Description}>{t("Transactional.clean.description", { count: analyzed })}</p>
+            </div>
+        </>
     );
 };

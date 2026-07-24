@@ -334,7 +334,6 @@
             "avgTime": "Avg time",
             "problems": "Problems detected"
         },
-        "noMatches": "No transactions match those filters.",
         "noProblems": "No problems",
         "readOnly": "read-only",
         "readWrite": "read-write",

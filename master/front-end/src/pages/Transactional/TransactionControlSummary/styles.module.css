@@ -1,53 +1,38 @@
-.Summary {
+.MainWrapper {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    gap: 20px;
 }
 
 .Card {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 16px 18px;
-    border: 1px solid var(--axelix-light-grey);
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);
     background-color: var(--axelix-primary-white);
 }
 
+.Card:nth-child(2) {
+    /* TODO: Improve in the future */
+    border-color: #fed7aa;
+    color: var(--problem-blocking);
+}
+
+.Card:nth-child(3) {
+    /* TODO: Improve in the future */
+    border-color: #bbf7d0;
+    color: var(--axelix-primary-green);
+}
+
 .Label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--axelix-bold-grey);
 }
 
-.Value {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.Problematic {
-    border-color: #fed7aa;
-}
-
-.Problematic .Label,
-.Problematic .Value {
-    color: var(--problem-blocking);
-}
-
-.Clean {
-    border-color: #bbf7d0;
-}
-
-.Clean .Label,
-.Clean .Value {
-    color: var(--axelix-primary-green);
-}
-
-@media (width <= 720px) {
-    .Summary {
+@media (width <=720px) {
+    .MainWrapper {
         grid-template-columns: 1fr;
     }
 }

@@ -17,6 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
+import { EmptyHandler } from "components";
 import type { ITransactionAggregatedProfile } from "models";
 
 import { TransactionRow } from "./TransactionRow";
@@ -33,13 +34,13 @@ export const TransactionsTable = ({ transactions }: IProps) => {
     const { t } = useTranslation();
 
     if (transactions.length === 0) {
-        return <div className={styles.Empty}>{t("Transactional.noMatches")}</div>;
+        return <EmptyHandler isEmpty />;
     }
 
     return (
-        <div className={styles.Scroll}>
+        <div className={styles.MainWrapper}>
             <div className={styles.Table}>
-                <div className={styles.HeaderRow}>
+                <div className={`TextUltraSmall ${styles.HeaderRow}`}>
                     <span>{t("Transactional.columns.transaction")}</span>
                     <span>{t("Transactional.columns.access")}</span>
                     <span>{t("Transactional.columns.avgTime")}</span>
