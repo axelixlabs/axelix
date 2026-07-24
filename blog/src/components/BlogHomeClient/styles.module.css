@@ -68,7 +68,7 @@
   box-shadow: 0 24px 60px -36px rgba(15, 30, 5, 0.45);
 }
 .VIndex .Featured .Cover {
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
   border-radius: 14px;
 }
 .VIndex .Featured .Body {
