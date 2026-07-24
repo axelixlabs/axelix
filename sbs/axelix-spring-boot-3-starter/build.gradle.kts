@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
+    id("com.axelixlabs.autoconfig")
     // What version of Kotlin are we going to use here...?
     kotlin("jvm") version "2.4.0"
 }
