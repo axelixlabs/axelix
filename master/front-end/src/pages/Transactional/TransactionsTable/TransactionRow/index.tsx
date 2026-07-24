@@ -20,9 +20,9 @@ import { useTranslation } from "react-i18next";
 
 import { deriveProblems, formatTransactionDuration, simpleClassName } from "helpers";
 import type { ITransactionAggregatedProfile } from "models";
+import { PROBLEM_TYPE_ORDER, originLabelKey } from "utils";
 
 import { ProblemChip } from "../../ProblemChip";
-import { PROBLEM_TYPE_ORDER, originLabelKey } from "../../problemTypes";
 
 import { TransactionDetail } from "./TransactionDetail";
 import styles from "./styles.module.css";

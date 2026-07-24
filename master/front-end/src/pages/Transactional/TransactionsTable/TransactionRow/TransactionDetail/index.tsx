@@ -20,8 +20,7 @@ import { useTranslation } from "react-i18next";
 import { Copy, InfoTooltip } from "components";
 import { deriveProblems, formatTransactionDuration } from "helpers";
 import type { ITransactionAggregatedProfile } from "models";
-
-import { problemClassToken, problemDescriptionKey, problemLabelKey } from "../../../problemTypes";
+import { problemClassToken, problemDescriptionKey, problemLabelKey } from "utils";
 
 import styles from "./styles.module.css";
 
