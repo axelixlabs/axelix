@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.sbs.spring.core.master;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Integration test for {@link CommitIdPluginShortBuildInfoProvider}.
+ *
+ * @author Mikhail Polivakha
+ * @author Artemiy Degtyarev
+ */
+class CommitIdPluginShortBuildInfoProviderTest extends AbstractMasterSharedContextTest {
+
+    @Autowired
+    private CommitIdPluginShortBuildInfoProvider subject;
+
+    @Test
+    void shouldAssembleShortBuildInfoFromPropertiesFile() {
+        ShortBuildInfo shortBuildInfo = subject.getShortBuildInfo();
+
+        assertThat(shortBuildInfo).isNotNull();
+        assertThat(shortBuildInfo.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+        // As of Spring Boot 4, GitProperties coerces the ISO build.time into epoch millis, consistent with how
+        // commit.time is already exposed (see CommitIdPluginGitInformationProviderTest).
+        assertThat(shortBuildInfo.buildTimestamp()).isEqualTo("1732804672000");
+    }
+}

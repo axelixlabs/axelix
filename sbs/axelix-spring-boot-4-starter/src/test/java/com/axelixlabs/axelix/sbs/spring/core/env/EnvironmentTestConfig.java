@@ -1,0 +1,123 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.sbs.spring.core.env;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+
+/**
+ * Environment test configuration.
+ *
+ * @author Mikhail Polivakha
+ * @author Nikita Kirillov
+ */
+@TestConfiguration
+public class EnvironmentTestConfig {
+
+    @Bean
+    public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+        return new DefaultConfigurationPropertiesFlattener();
+    }
+
+    @Bean
+    public ConfigurationPropertiesConverter configurationPropertiesConverter(
+            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
+    }
+
+    @Bean
+    public SecurityContextExecutor securityContextExecutor() {
+        return new ThreadLocalSecurityContextExecutor();
+    }
+
+    @Bean
+    public RequiredAuthorityCheckService requiredAuthorityCheckService(
+            SecurityContextExecutor securityContextExecutor) {
+        return new RequiredAuthorityCheckService(securityContextExecutor);
+    }
+
+    @Bean
+    public EnvironmentService environmentService(
+            Environment environment,
+            SmartSanitizingFunction smartSanitizingFunction,
+            EnvPropertyEnricher envPropertyEnricher,
+            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+        return new DefaultEnvironmentService(
+                environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
+    }
+
+    @Bean
+    public ConfigurationPropertiesService configurationPropertiesService(
+            SmartSanitizingFunction smartSanitizingFunction,
+            ApplicationContext applicationContext,
+            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+        return new DefaultConfigurationPropertiesService(
+                smartSanitizingFunction,
+                applicationContext,
+                configurationPropertiesConverter,
+                requiredAuthorityCheckService);
+    }
+
+    @Bean
+    public PropertyNameNormalizer propertyNameNormalizer() {
+        return new DefaultPropertyNameNormalizer();
+    }
+
+    @Bean
+    public PropertyMetadataExtractor propertyMetadataExtractor(
+            ConfigurableEnvironment environment, PropertyNameNormalizer propertyNameNormalizer) {
+        return new DefaultPropertyMetadataExtractor(environment, propertyNameNormalizer);
+    }
+
+    @Bean
+    public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
+    }
+
+    @Bean
+    public EnvPropertyEnricher envPropertyEnricher(
+            Environment environment,
+            PropertyNameNormalizer propertyNameNormalizer,
+            ObjectProvider<ConfigurationPropertiesService> configurationPropertiesServiceProvider,
+            PropertyMetadataExtractor propertyMetadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor) {
+        return new DefaultEnvPropertyEnricher(
+                environment,
+                propertyNameNormalizer,
+                configurationPropertiesServiceProvider,
+                propertyMetadataExtractor,
+                valueInjectionTrackerBeanPostProcessor);
+    }
+}

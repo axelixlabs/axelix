@@ -19,13 +19,73 @@ package com.axelixlabs.axelix.sbs.spring.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsPublisherAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointPropertiesSupportAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GarbageCollectionAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.HeartBeatAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryInformationProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SecurityContextExecutorAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.
  *
- * @author Sergey Cherkasov
+ * @since 24.06.2025
+ * @author Nikita Kirillov
  */
-@SpringBootApplication
+@SpringBootApplication(
+        exclude = {
+            AxelixBeansEndpointAutoConfiguration.class,
+            AxelixCachesEndpointAutoConfiguration.class,
+            AxelixConditionsEndpointAutoConfiguration.class,
+            AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
+            AxelixDetailsEndpointAutoConfiguration.class,
+            AxelixEnvironmentEndpointAutoConfiguration.class,
+            AxelixHeapDumpEndpointAutoConfiguration.class,
+            AxelixMetadataEndpointConfiguration.class,
+            AxelixMetricsAutoConfiguration.class,
+            AxelixMetricsPublisherAutoConfiguration.class,
+            AxelixGcEndpointAutoConfiguration.class,
+            AxelixCoreNamingAutoConfiguration.class,
+            GarbageCollectionAutoConfiguration.class,
+            AxelixFeignEndpointAutoConfiguration.class,
+            GitInformationProviderAutoConfiguration.class,
+            JwtAuthAutoConfiguration.class,
+            HeartBeatAutoConfiguration.class,
+            ScheduledTaskManagementAutoConfiguration.class,
+            ShortBuildInfoProviderAutoConfiguration.class,
+            ThreadDumpManagementEndpointAutoConfiguration.class,
+            TransactionMonitoringAutoConfiguration.class,
+            EndpointPropertiesSupportAutoConfiguration.class,
+            LibraryInformationProviderAutoConfiguration.class,
+            AxelixLoggersEndpointAutoConfiguration.class,
+            SecurityContextExecutorAutoConfiguration.class,
+            ValidationListenerAutoConfiguration.class,
+        })
+@EnableCaching
+@EnableFeignClients
 public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
