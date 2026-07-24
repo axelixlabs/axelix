@@ -18,13 +18,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Copy, InfoTooltip } from "components";
 import { deriveProblems, formatTransactionDuration, simpleClassName } from "helpers";
 import type { ITransactionAggregatedProfile } from "models";
-import { PROBLEM_TYPE_ORDER, originLabelKey, problemClassToken, problemDescriptionKey, problemLabelKey } from "utils";
 
 import { ProblemChip } from "../../ProblemChip";
+import { PROBLEM_TYPE_ORDER, originLabelKey } from "../../problemTypes";
 
+import { TransactionDetail } from "./TransactionDetail";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -88,73 +88,7 @@ export const TransactionRow = ({ transaction }: IProps) => {
                 <span className={styles.Caret}>{open ? "▾" : "▸"}</span>
             </div>
 
-            {open && (
-                <div className={styles.Detail}>
-                    <div className={`TextUltraSmall ${styles.Stats}`}>
-                        <div className={styles.StatCard}>
-                            <span className={styles.StatLabel}>{t("Transactional.detail.min")}</span>
-                            <span className={styles.StatValue}>{formatTransactionDuration(minMs)}</span>
-                        </div>
-                        <div className={`${styles.StatCard} ${styles.StatAvg}`}>
-                            <span className={styles.StatLabel}>{t("Transactional.detail.avgDuration")}</span>
-                            <span className={styles.StatValue}>{formatTransactionDuration(averageMs)}</span>
-                        </div>
-                        <div className={styles.StatCard}>
-                            <span className={styles.StatLabel}>{t("Transactional.detail.max")}</span>
-                            <span className={styles.StatValue}>{formatTransactionDuration(maxMs)}</span>
-                        </div>
-                    </div>
-
-                    <div className={`TextUltraSmall ${styles.Meta}`}>
-                        <div className={styles.MetaItem}>
-                            <span className={styles.MetaLabel}>{t("Transactional.detail.declaredIn")}</span>
-                            <span className={styles.DeclaredIn}>
-                                <span className={styles.DeclaredClass}>{className}</span>
-                                <span className={styles.DeclaredHash}>#</span>
-                                <span className={styles.DeclaredMethod}>{methodName}()</span>
-                            </span>
-                            <Copy text={`${className}#${methodName}`} />
-                        </div>
-                        <div className={styles.MetaDivider} />
-                        <div className={styles.MetaItem}>
-                            <span className={styles.MetaLabel}>{t("Transactional.detail.propagation")}</span>
-                            <span className={styles.MetaBadge}>{transaction.propagation ?? "—"}</span>
-                        </div>
-                        <div className={styles.MetaItem}>
-                            <span className={styles.MetaLabel}>{t("Transactional.detail.isolation")}</span>
-                            <span className={styles.MetaBadge}>{transaction.isolation ?? "—"}</span>
-                        </div>
-                        <div className={styles.MetaItem}>
-                            <span className={styles.MetaLabel}>{t("Transactional.detail.access")}</span>
-                            <span className={styles.MetaBadge}>{accessLabel}</span>
-                        </div>
-                    </div>
-
-                    {problems.length === 0 ? (
-                        <div className={`TextSmall ${styles.NoProblemsCard}`}>
-                            {t("Transactional.detail.noProblems")}
-                        </div>
-                    ) : (
-                        problems.map((problem, index) => (
-                            <div
-                                key={`${problem.type}-${index}`}
-                                className={`${styles.ProblemCard} ${styles[problemClassToken[problem.type]]}`}
-                            >
-                                <div className={styles.ProblemHeader}>
-                                    <span className={`TextSmall ${styles.ProblemLabel}`}>
-                                        {t(problemLabelKey[problem.type])}
-                                    </span>
-                                    <InfoTooltip text={t(problemDescriptionKey[problem.type])} />
-                                </div>
-                                <div className={`TextUltraSmall ${styles.ProblemDetail}`}>
-                                    {problem.detail}
-                                    {problem.count && problem.count > 1 ? ` (×${problem.count})` : ""}
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            )}
+            {open && <TransactionDetail transaction={transaction} />}
         </div>
     );
 };
