@@ -17,28 +17,23 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { toFormattedTimeWithMs } from "helpers";
-import type { IQueryData } from "models";
-
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * The query executed during a particular transaction.
+     * The total number of analyzed transactions, all of which are clean.
      */
-    query: IQueryData;
+    analyzed: number;
 }
 
-export const QueryPreview = ({ query }: IProps) => {
+export const CleanState = ({ analyzed }: IProps) => {
     const { t } = useTranslation();
 
-    const { startTimestampMs, endTimestampMs } = query;
-    const durationMs = endTimestampMs - startTimestampMs;
-
     return (
-        <div className={styles.MainWrapper}>
-            <div>{t("Transactional.previewDuration", { durationMs })}</div>
-            <div>Timestamp : {toFormattedTimeWithMs(startTimestampMs)}</div>
+        <div className={styles.CleanState}>
+            <span className={styles.Check} />
+            <h2 className={styles.Title}>{t("Transactional.clean.title")}</h2>
+            <p className={styles.Description}>{t("Transactional.clean.description", { count: analyzed })}</p>
         </div>
     );
 };

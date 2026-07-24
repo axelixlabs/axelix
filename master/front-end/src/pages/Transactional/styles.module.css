@@ -1,0 +1,19 @@
+.Page {
+    /* Semantic palette for the three persistence problem types, inherited by every descendant. */
+    --problem-blocking: #ea580c;
+    --problem-blocking-bg: #fff7ed;
+    --problem-nplusone: #7c3aed;
+    --problem-nplusone-bg: #f5f3ff;
+    --problem-pagination: #0891b2;
+    --problem-pagination-bg: #ecfeff;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.Toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}

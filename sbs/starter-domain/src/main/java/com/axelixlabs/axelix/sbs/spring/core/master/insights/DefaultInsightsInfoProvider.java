@@ -40,6 +40,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvid
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.AggregatedExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.PerformanceStats;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStats;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
@@ -60,6 +62,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     private final GcLogService gcLogService;
     private final VmOptionsAccessor vmOptionsAccessor;
     private final TransactionStatsCollector transactionStatsCollector;
+    private final TransactionAttributesRegistry transactionAttributesRegistry;
 
     /**
      * Creates a new DefaultInsightsInfoProvider.
@@ -70,11 +73,13 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             GcLogService gcLogService,
             VmOptionsAccessor vmOptionsAccessor,
-            TransactionStatsCollector transactionStatsCollector) {
+            TransactionStatsCollector transactionStatsCollector,
+            TransactionAttributesRegistry transactionAttributesRegistry) {
         this.openSessionInViewStateProvider = openSessionInViewStateProvider;
         this.gcLogService = gcLogService;
         this.vmOptionsAccessor = vmOptionsAccessor;
         this.transactionStatsCollector = transactionStatsCollector;
+        this.transactionAttributesRegistry = transactionAttributesRegistry;
     }
 
     @Override
@@ -99,6 +104,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                     MethodClassKey key = entry.getKey();
                     TransactionStats transactionStats = entry.getValue();
                     PerformanceStats performanceStats = transactionStats.getPerformanceStats();
+                    TransactionDefinitionAttributes attributes = transactionAttributesRegistry.get(key);
 
                     return new TransactionAggregatedProfile(
                             TransactionOrigin.APPLICATION_DECLARATIVE,
@@ -111,7 +117,10 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                                     performanceStats.getAvgMs()),
                             convertLazyLoadingTargets(transactionStats.getNPlusOneOccasions()),
                             new HashMap<>(transactionStats.getInMemoryPaginatedEntities()),
-                            convertExternalCalls(transactionStats.getExternalCalls()));
+                            convertExternalCalls(transactionStats.getExternalCalls()),
+                            attributes != null ? attributes.getPropagation() : null,
+                            attributes != null ? attributes.getIsolation() : null,
+                            attributes != null && attributes.isReadOnly());
                 })
                 .collect(Collectors.toList());
 

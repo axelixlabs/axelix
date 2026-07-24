@@ -1,0 +1,53 @@
+.Summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.Card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 18px;
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-primary-white);
+}
+
+.Label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.Value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.Problematic {
+    border-color: #fed7aa;
+}
+
+.Problematic .Label,
+.Problematic .Value {
+    color: var(--problem-blocking);
+}
+
+.Clean {
+    border-color: #bbf7d0;
+}
+
+.Clean .Label,
+.Clean .Value {
+    color: var(--axelix-primary-green);
+}
+
+@media (width <= 720px) {
+    .Summary {
+        grid-template-columns: 1fr;
+    }
+}

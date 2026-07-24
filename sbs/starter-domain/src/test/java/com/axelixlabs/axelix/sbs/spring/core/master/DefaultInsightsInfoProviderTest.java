@@ -35,6 +35,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.SimpleExternalCallRecord;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
@@ -58,7 +60,11 @@ class DefaultInsightsInfoProviderTest {
     void returnsDisabledInsights_whenOptionsAreEmptyAndOsivDisabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -79,7 +85,8 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(),
                 gcLogDisabled(),
                 vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"),
-                emptyTransactionStatsCollector());
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -96,7 +103,8 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(),
                 gcLogDisabled(),
                 vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"),
-                emptyTransactionStatsCollector());
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -109,7 +117,11 @@ class DefaultInsightsInfoProviderTest {
     void returnsGcLoggingEnabled_whenGcLogServiceReportsEnabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogEnabled(), emptyVmOptions(), emptyTransactionStatsCollector());
+                osivDisabled(),
+                gcLogEnabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -123,7 +135,11 @@ class DefaultInsightsInfoProviderTest {
     void returnsGcLoggingDisabled_whenGcLogServiceReportsDisabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -140,7 +156,8 @@ class DefaultInsightsInfoProviderTest {
                 osivDisabled(),
                 gcLogDisabled(),
                 vmOptions("-XX:+UseCompactObjectHeaders"),
-                emptyTransactionStatsCollector());
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -153,7 +170,11 @@ class DefaultInsightsInfoProviderTest {
     void returnsGcLogFileSpecified_whenGcLogServiceReportsFileSpecified() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivDisabled(), gcLogFileSpecified(), emptyVmOptions(), emptyTransactionStatsCollector());
+                osivDisabled(),
+                gcLogFileSpecified(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -166,7 +187,11 @@ class DefaultInsightsInfoProviderTest {
     void returnsOsivEnabled_whenOpenSessionInViewEnabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
-                osivEnabled(), gcLogDisabled(), emptyVmOptions(), emptyTransactionStatsCollector());
+                osivEnabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -186,7 +211,8 @@ class DefaultInsightsInfoProviderTest {
         profile.complete();
         collector.recordTransaction(key, profile);
 
-        var subject = new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions(), collector);
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(), gcLogDisabled(), emptyVmOptions(), collector, emptyTransactionAttributesRegistry());
 
         // when.
         Insights insights = subject.getInsight();
@@ -202,6 +228,33 @@ class DefaultInsightsInfoProviderTest {
             assertThat(call.getStats().getMaxMs()).isEqualTo(15L);
             assertThat(call.getStats().getAverageMs()).isEqualTo(15L);
         });
+    }
+
+    @Test
+    void surfacesTransactionDefinitionAttributesInPersistenceInsights() throws Exception {
+        // given.
+        DefaultTransactionStatsCollector collector = new DefaultTransactionStatsCollector();
+        TransactionAttributesRegistry registry = new TransactionAttributesRegistry();
+        MethodClassKey key = new MethodClassKey(SampleService.class.getMethod("charge"), SampleService.class);
+        registry.register(key, new TransactionDefinitionAttributes("REQUIRES_NEW", "SERIALIZABLE", true));
+        TransactionExecutionProfile profile = new TransactionExecutionProfile(Instant.now());
+        profile.complete();
+        collector.recordTransaction(key, profile);
+
+        var subject =
+                new DefaultInsightsInfoProvider(osivDisabled(), gcLogDisabled(), emptyVmOptions(), collector, registry);
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertThat(insights.getPersistenceInsights().getTransactions())
+                .singleElement()
+                .satisfies(transaction -> {
+                    assertThat(transaction.getPropagation()).isEqualTo("REQUIRES_NEW");
+                    assertThat(transaction.getIsolation()).isEqualTo("SERIALIZABLE");
+                    assertThat(transaction.isReadOnly()).isTrue();
+                });
     }
 
     private static void assertFeatureEnabled(List<InsightFeature> features, FeatureId featureId, boolean enabled) {
@@ -220,6 +273,10 @@ class DefaultInsightsInfoProviderTest {
 
     private static TransactionStatsCollector emptyTransactionStatsCollector() {
         return new DefaultTransactionStatsCollector();
+    }
+
+    private static TransactionAttributesRegistry emptyTransactionAttributesRegistry() {
+        return new TransactionAttributesRegistry();
     }
 
     private static VmOptionsAccessor emptyVmOptions() {

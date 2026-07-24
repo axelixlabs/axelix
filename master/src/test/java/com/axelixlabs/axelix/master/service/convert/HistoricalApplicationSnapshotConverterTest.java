@@ -79,7 +79,10 @@ class HistoricalApplicationSnapshotConverterTest {
                 new ExecutionStats(1, 10, 5),
                 List.of(),
                 Map.of("com.example.Pet", 2),
-                List.of());
+                List.of(),
+                "REQUIRED",
+                "DEFAULT",
+                false);
         BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                 "org.springframework.samples", "petclinic", new PersistenceInsights(List.of(profile)));
 

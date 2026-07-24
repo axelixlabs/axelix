@@ -1,0 +1,38 @@
+.Scroll {
+    overflow-x: auto;
+}
+
+.Table {
+    --tx-columns: minmax(0, 2.2fr) 120px 150px minmax(220px, 2.4fr) 40px;
+
+    min-width: 760px;
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    overflow: hidden;
+    background-color: var(--axelix-primary-white);
+}
+
+.HeaderRow {
+    display: grid;
+    grid-template-columns: var(--tx-columns);
+    gap: 16px;
+    align-items: center;
+    padding: 11px 20px;
+    background-color: var(--axelix-primary-light-green);
+    border-bottom: 1px solid var(--axelix-light-grey);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.Empty {
+    padding: 44px;
+    text-align: center;
+    color: var(--axelix-bold-grey);
+    font-size: 14px;
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-primary-white);
+}

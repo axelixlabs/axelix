@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -43,6 +42,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.RepeatableContainers;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
@@ -50,6 +50,8 @@ import org.springframework.util.ReflectionUtils.MethodFilter;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 /**
@@ -70,16 +72,19 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
     private final TransactionAccessor transactionAccessor;
+    private final TransactionAttributesRegistry transactionAttributesRegistry;
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
 
     public TransactionMonitoringBeanPostProcessor(
             TransactionStatsCollector statsCollector,
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
-            TransactionAccessor transactionAccessor) {
+            TransactionAccessor transactionAccessor,
+            TransactionAttributesRegistry transactionAttributesRegistry) {
         this.transactionAccessor = transactionAccessor;
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
         this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
+        this.transactionAttributesRegistry = transactionAttributesRegistry;
     }
 
     @Override
@@ -136,10 +141,17 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
     private boolean processMethod(Method method, Class<?> targetClass) {
         MethodClassKey key = new MethodClassKey(method, targetClass);
-        Propagation propagation = resolveTransactionPropagation(method, targetClass);
+        MergedAnnotation<Transactional> transactional = resolveTransactional(method, targetClass);
 
-        if (propagation != null) {
+        if (transactional.isPresent()) {
+            Propagation propagation = transactional.getEnum("propagation", Propagation.class);
             propagationCache.put(key, propagation);
+            transactionAttributesRegistry.register(
+                    key,
+                    new TransactionDefinitionAttributes(
+                            propagation.name(),
+                            transactional.getEnum("isolation", Isolation.class).name(),
+                            transactional.getBoolean("readOnly")));
             return canCreateTransaction(propagation);
         }
 
@@ -177,23 +189,15 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         };
     }
 
-    @Nullable
-    private Propagation resolveTransactionPropagation(Method method, Class<?> clazz) {
-        Propagation methodPropagation = findPropagation(method);
-        if (methodPropagation != null) {
-            return methodPropagation;
-        }
-
-        return findPropagation(clazz);
+    private MergedAnnotation<Transactional> resolveTransactional(Method method, Class<?> clazz) {
+        MergedAnnotation<Transactional> onMethod = findTransactional(method);
+        return onMethod.isPresent() ? onMethod : findTransactional(clazz);
     }
 
-    @Nullable
-    private Propagation findPropagation(AnnotatedElement element) {
-        MergedAnnotation<Transactional> txAnnotation = MergedAnnotations.from(
+    private MergedAnnotation<Transactional> findTransactional(AnnotatedElement element) {
+        return MergedAnnotations.from(
                         element, MergedAnnotations.SearchStrategy.TYPE_HIERARCHY, RepeatableContainers.none())
                 .get(Transactional.class);
-
-        return txAnnotation.isPresent() ? txAnnotation.getEnum("propagation", Propagation.class) : null;
     }
 
     private boolean canCreateTransaction(Propagation propagation) {
