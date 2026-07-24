@@ -11,8 +11,11 @@ export const TopNav = () => {
           <Logo />
         </a>
         <div className={styles.NavLinks}>
+          <a href="https://axelix.io/#reference-app" className={styles.NavLink}>
+            Why Axelix?
+          </a>
           <a href="https://axelix.io/#capabilities" className={styles.NavLink}>
-            Capabilities
+            Debugging
           </a>
           <a href="https://axelix.io/#install" className={styles.NavLink}>
             Install
