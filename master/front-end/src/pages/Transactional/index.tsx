@@ -19,39 +19,69 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterTransactionalData } from "helpers";
-import { type ITransactionalResponseData, StatefulRequest } from "models";
+import { fetchData, filterTransactions, isProblematic } from "helpers";
+import { type EProblemType, type IPersistenceInsights, StatefulRequest } from "models";
 import { getTransactionalData } from "services";
 
-import { TransactionalList } from "./TransactionalList";
+import { CleanState } from "./CleanState";
+import { ProblemTypeFilter } from "./ProblemTypeFilter";
+import { TransactionControlSummary } from "./TransactionControlSummary";
+import { TransactionsTable } from "./TransactionsTable";
+import styles from "./styles.module.css";
 
 const Transactional = () => {
-    const [transactionalData, setTransactionalData] = useState(StatefulRequest.loading<ITransactionalResponseData>());
+    const [insights, setInsights] = useState(StatefulRequest.loading<IPersistenceInsights>());
     const [search, setSearch] = useState<string>("");
+    const [activeProblemTypes, setActiveProblemTypes] = useState<EProblemType[]>([]);
 
     const { instanceId } = useParams();
 
     useEffect(() => {
-        fetchData(setTransactionalData, () => getTransactionalData(instanceId!));
+        fetchData(setInsights, () => getTransactionalData(instanceId!));
     }, []);
 
-    if (transactionalData.loading) {
+    if (insights.loading) {
         return <Loader />;
     }
 
-    if (transactionalData.error) {
+    if (insights.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const transactionalFeed = transactionalData.response!.entrypoints!;
-    const effectiveTransactionalData = search ? filterTransactionalData(transactionalFeed, search) : transactionalFeed;
-    const addonAfter = `${effectiveTransactionalData.length} / ${transactionalFeed.length}`;
+    const transactions = insights.response!.transactions ?? [];
+    const analyzed = transactions.length;
+    const problematic = transactions.filter(isProblematic).length;
+
+    if (analyzed === 0) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    if (problematic === 0) {
+        return (
+            <div className={styles.Page}>
+                <CleanState analyzed={analyzed} />
+            </div>
+        );
+    }
+
+    const toggleProblemType = (type: EProblemType): void => {
+        setActiveProblemTypes((prev) =>
+            prev.includes(type) ? prev.filter((current) => current !== type) : [...prev, type],
+        );
+    };
+
+    const filtered = filterTransactions(transactions, search, activeProblemTypes);
+    const addonAfter = `${filtered.length} / ${analyzed}`;
 
     return (
-        <>
-            <PageSearch setSearch={setSearch} addonAfter={addonAfter} />
-            <TransactionalList transactionEntryPoints={effectiveTransactionalData} />
-        </>
+        <div className={styles.Page}>
+            <TransactionControlSummary analyzed={analyzed} problematic={problematic} clean={analyzed - problematic} />
+            <div className={styles.Toolbar}>
+                <PageSearch setSearch={setSearch} addonAfter={addonAfter} removeBottomGutter />
+                <ProblemTypeFilter activeProblemTypes={activeProblemTypes} onToggle={toggleProblemType} />
+            </div>
+            <TransactionsTable transactions={filtered} />
+        </div>
     );
 };
 

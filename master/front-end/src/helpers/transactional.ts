@@ -15,24 +15,78 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ITransactionalEntryPoint } from "models";
+import { EProblemType, type IDetectedProblem, type ITransactionAggregatedProfile } from "models";
 
-export const filterTransactionalData = (
-    transactionalData: ITransactionalEntryPoint[],
+/**
+ * Extracts the simple (unqualified) name from a fully qualified class name.
+ */
+export const simpleClassName = (fullyQualifiedName: string): string => {
+    const parts = fullyQualifiedName.split(".");
+    return parts[parts.length - 1] || fullyQualifiedName;
+};
+
+/**
+ * Normalizes the raw insights of a transaction into a flat list of detected problems, ready for display.
+ *
+ * <p>An association counts as an N+1 problem only when it was lazily loaded more than once ({@code count > 1}),
+ * mirroring how the Axelix Master itself defines the problem.
+ */
+export const deriveProblems = (transaction: ITransactionAggregatedProfile): IDetectedProblem[] => {
+    const problems: IDetectedProblem[] = [];
+
+    for (const call of transaction.externalCalls ?? []) {
+        problems.push({ type: EProblemType.BLOCKING, detail: call.target });
+    }
+
+    for (const lazyLoading of transaction.lazyLoadingTargets ?? []) {
+        if (lazyLoading.count > 1) {
+            problems.push({
+                type: EProblemType.N_PLUS_ONE,
+                detail: `${simpleClassName(lazyLoading.target.ownerEntityClass)}.${lazyLoading.target.associationPropertyName}`,
+                count: lazyLoading.count,
+            });
+        }
+    }
+
+    for (const [entity, count] of Object.entries(transaction.inMemoryPagination ?? {})) {
+        problems.push({ type: EProblemType.IN_MEMORY_PAGINATION, detail: simpleClassName(entity), count });
+    }
+
+    return problems;
+};
+
+/**
+ * Whether the transaction has at least one detected problem.
+ */
+export const isProblematic = (transaction: ITransactionAggregatedProfile): boolean => {
+    return deriveProblems(transaction).length > 0;
+};
+
+/**
+ * Filters transactions by a free-text search over {@code class#method} and, when at least one problem type is
+ * active, keeps only the transactions that exhibit a problem of one of those types.
+ */
+export const filterTransactions = (
+    transactions: ITransactionAggregatedProfile[],
     search: string,
-): ITransactionalEntryPoint[] => {
+    activeProblemTypes: EProblemType[],
+): ITransactionAggregatedProfile[] => {
     const formattedSearch = search.toLowerCase().trim();
 
-    return transactionalData.filter(({ className, methodName }) => {
-        const lowerClassName = className.toLowerCase();
-        if (lowerClassName.includes(formattedSearch)) {
-            return true;
+    return transactions.filter((transaction) => {
+        const { className, methodName } = transaction.transactionalKey;
+        const signature = `${className}#${methodName}`.toLowerCase();
+
+        if (formattedSearch && !signature.includes(formattedSearch)) {
+            return false;
         }
 
-        const lowerMethodName = methodName.toLowerCase();
-        if (lowerMethodName.includes(formattedSearch)) {
-            return true;
+        if (activeProblemTypes.length > 0) {
+            const problemTypes = deriveProblems(transaction).map((problem) => problem.type);
+            return activeProblemTypes.some((type) => problemTypes.includes(type));
         }
+
+        return true;
     });
 };
 
@@ -45,40 +99,4 @@ const formatTransactionalDuration = (value: number): string => {
 
 export const formatTransactionDuration = (value: number) => {
     return value < 1000 ? `${value} ms` : formatTransactionalDuration(value);
-};
-
-export const getQueryLeftPosition = (
-    startTimestampMs: number,
-    executionStartTimestampMs: number,
-    pxPerMs: number,
-    timelineWidth: number,
-): string => {
-    const msFromStart = startTimestampMs - executionStartTimestampMs;
-    const left = msFromStart * pxPerMs;
-    return `${Math.min(left, timelineWidth - 3)}px`;
-};
-
-export const getQueryBarWidth = (durationMs: number, pxPerMs: number): string => {
-    return `${Math.max(durationMs * pxPerMs, 3)}px`;
-};
-
-export const toDateTimeWithMs = (timestamp: number): string => {
-    const date = new Date(timestamp);
-
-    const datePart = date.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    });
-
-    const timePart = date.toLocaleTimeString(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-    });
-
-    const msPart = date.getMilliseconds();
-
-    return `${datePart} / ${timePart}.${msPart}`;
 };

@@ -1,0 +1,45 @@
+.CleanState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+    padding: 64px 40px;
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-primary-white);
+}
+
+.Check {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background-color: #dcfce7;
+}
+
+.Check::after {
+    content: "";
+    position: absolute;
+    top: 27px;
+    left: 24px;
+    width: 28px;
+    height: 15px;
+    border-left: 5px solid var(--axelix-primary-green);
+    border-bottom: 5px solid var(--axelix-primary-green);
+    transform: rotate(-45deg);
+}
+
+.Title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.Description {
+    margin: 0;
+    max-width: 440px;
+    color: var(--axelix-bold-grey);
+    font-size: 15px;
+    line-height: 1.6;
+}

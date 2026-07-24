@@ -53,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneInteg
 import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
 import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.INTEGRATOR_PROVIDER;
@@ -93,12 +94,22 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public TransactionAttributesRegistry transactionAttributesRegistry() {
+        return new TransactionAttributesRegistry();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             TransactionAccessor transactionAccessor,
+            TransactionAttributesRegistry transactionAttributesRegistry,
             ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
         return new TransactionMonitoringBeanPostProcessor(
-                transactionStatsCollector, metricsPublisherObjectProvider, transactionAccessor);
+                transactionStatsCollector,
+                metricsPublisherObjectProvider,
+                transactionAccessor,
+                transactionAttributesRegistry);
     }
 
     @Bean

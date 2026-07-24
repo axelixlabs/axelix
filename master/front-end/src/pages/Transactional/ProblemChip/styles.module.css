@@ -1,0 +1,33 @@
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: currentcolor;
+}
+
+.Blocking {
+    color: var(--problem-blocking);
+    background-color: var(--problem-blocking-bg);
+}
+
+.NPlusOne {
+    color: var(--problem-nplusone);
+    background-color: var(--problem-nplusone-bg);
+}
+
+.Pagination {
+    color: var(--problem-pagination);
+    background-color: var(--problem-pagination-bg);
+}

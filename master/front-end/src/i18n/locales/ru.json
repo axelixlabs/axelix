@@ -321,19 +321,51 @@
         }
     },
     "Transactional": {
-        "median": "Медиана",
-        "max": "Макс",
-        "average": "Среднее",
-        "duration": "Продолжительность",
-        "durationTooltip": "Аггрегированная инфомрация по исоплнению транзакций в рамках данного метода",
-        "executionDetails": "Детали выполнения",
-        "queriesCount": "Количество запросов",
-        "startTime": "Время начала",
-        "endTime": "Время окончания",
-        "totalTime": "Общее время: {{durationMs}} мс",
-        "previewDuration": "Продолжительность: {{durationMs}} мс",
-        "ms": "мс",
-        "noQueries": "Нет запросов"
+        "summary": {
+            "analyzed": "Проанализировано транзакций",
+            "withProblems": "С проблемами",
+            "clean": "Без проблем"
+        },
+        "problemType": "Тип проблемы:",
+        "columns": {
+            "transaction": "Транзакция",
+            "access": "Доступ",
+            "avgTime": "Ср. время",
+            "problems": "Обнаруженные проблемы"
+        },
+        "noMatches": "Нет транзакций, соответствующих фильтрам.",
+        "noProblems": "Без проблем",
+        "readOnly": "только чтение",
+        "readWrite": "чтение и запись",
+        "problems": {
+            "blocking": "Блокирующий сетевой вызов",
+            "nPlusOne": "Запросы N+1",
+            "inMemoryPagination": "Пагинация в памяти"
+        },
+        "problemDescriptions": {
+            "blocking": "Блокирующий вызов ввода-вывода выполняется, пока транзакция ещё удерживает соединение с базой данных, занимая пул.",
+            "nPlusOne": "Ленивая ассоциация загружается построчно, порождая по одному дополнительному запросу на запись, пока открыта транзакция.",
+            "inMemoryPagination": "Pageable сочетается с JOIN FETCH, поэтому Hibernate загружает весь результат и разбивает его на страницы в памяти."
+        },
+        "origin": {
+            "SPRING_INFRASTRUCTURE": "Управляется Spring",
+            "APPLICATION_DECLARATIVE": "@Transactional",
+            "APPLICATION_IMPERATIVE": "Программно"
+        },
+        "detail": {
+            "min": "Мин",
+            "avgDuration": "Ср. длительность",
+            "max": "Макс",
+            "declaredIn": "Объявлено в",
+            "propagation": "Распространение",
+            "isolation": "Изоляция",
+            "access": "Доступ",
+            "noProblems": "В этой транзакции проблем не обнаружено."
+        },
+        "clean": {
+            "title": "Проблемных транзакций нет",
+            "description": "Все {{count}} проанализированных транзакций чисты — нет блокирующих вызовов, запросов N+1 и пагинации в памяти."
+        }
     },
     "Users": {
         "lastLogin": "Последний вход",

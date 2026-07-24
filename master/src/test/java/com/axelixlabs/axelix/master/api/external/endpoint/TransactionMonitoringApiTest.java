@@ -82,7 +82,10 @@ class TransactionMonitoringApiTest {
                   "inMemoryPagination": {
                     "com.example.Pet": 2
                   },
-                  "externalCalls": []
+                  "externalCalls": [],
+                  "propagation": "REQUIRED",
+                  "isolation": "DEFAULT",
+                  "readOnly": false
                 }
               ]
             }
@@ -130,7 +133,10 @@ class TransactionMonitoringApiTest {
                 new ExecutionStats(1, 10, 5),
                 List.of(),
                 Map.of("com.example.Pet", 2),
-                List.of());
+                List.of(),
+                "REQUIRED",
+                "DEFAULT",
+                false);
         BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                 groupId, artifactId, new PersistenceInsights(List.of(profile)));
         registry.reload(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));

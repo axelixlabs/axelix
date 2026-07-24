@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Aggregated information about a particular transactional method in the Instance.
@@ -37,6 +38,24 @@ public class TransactionAggregatedProfile {
     private final Map<String, Integer> inMemoryPagination;
     private final List<ExternalCallInsight> externalCalls;
 
+    /**
+     * The declared propagation behavior of the transaction (e.g. {@code REQUIRED}), or {@code null} when it could
+     * not be determined. Reflects the value declared on the {@code @Transactional} annotation.
+     */
+    private final @Nullable String propagation;
+
+    /**
+     * The declared isolation level of the transaction (e.g. {@code DEFAULT}), or {@code null} when it could not be
+     * determined. Reflects the value declared on the {@code @Transactional} annotation.
+     */
+    private final @Nullable String isolation;
+
+    /**
+     * Whether the transaction was declared read-only, or {@code null} when it could not be determined (e.g. an
+     * older agent that did not report it).
+     */
+    private final @Nullable Boolean readOnly;
+
     @JsonCreator
     public TransactionAggregatedProfile(
             @JsonProperty("transactionOrigin") TransactionOrigin transactionOrigin,
@@ -44,13 +63,19 @@ public class TransactionAggregatedProfile {
             @JsonProperty("transactionOverallStats") ExecutionStats transactionOverallStats,
             @JsonProperty("lazyLoadingTargets") List<CountedLazyLoadingTarget> lazyLoadingTargets,
             @JsonProperty("inMemoryPagination") Map<String, Integer> inMemoryPagination,
-            @JsonProperty("externalCalls") List<ExternalCallInsight> externalCalls) {
+            @JsonProperty("externalCalls") List<ExternalCallInsight> externalCalls,
+            @JsonProperty("propagation") @Nullable String propagation,
+            @JsonProperty("isolation") @Nullable String isolation,
+            @JsonProperty("readOnly") @Nullable Boolean readOnly) {
         this.transactionOrigin = transactionOrigin;
         this.transactionalKey = transactionalKey;
         this.transactionOverallStats = transactionOverallStats;
         this.lazyLoadingTargets = lazyLoadingTargets;
         this.inMemoryPagination = inMemoryPagination;
         this.externalCalls = externalCalls;
+        this.propagation = propagation;
+        this.isolation = isolation;
+        this.readOnly = readOnly;
     }
 
     public TransactionOrigin getTransactionOrigin() {
@@ -75,5 +100,17 @@ public class TransactionAggregatedProfile {
 
     public List<ExternalCallInsight> getExternalCalls() {
         return externalCalls;
+    }
+
+    public @Nullable String getPropagation() {
+        return propagation;
+    }
+
+    public @Nullable String getIsolation() {
+        return isolation;
+    }
+
+    public @Nullable Boolean isReadOnly() {
+        return readOnly;
     }
 }
