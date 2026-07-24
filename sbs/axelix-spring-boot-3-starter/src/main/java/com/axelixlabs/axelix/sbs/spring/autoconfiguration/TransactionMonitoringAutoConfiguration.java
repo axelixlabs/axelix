@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
@@ -51,6 +52,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Co
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.kafka.KafkaTemplateMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -133,6 +135,17 @@ public class TransactionMonitoringAutoConfiguration {
         public ExternalCallRestTemplateCustomizer axelixRestTemplateCustomizer(
                 TransactionAccessor transactionAccessor) {
             return new ExternalCallRestTemplateCustomizer(transactionAccessor);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(KafkaTemplate.class)
+    static class KafkaMonitoringConfiguration {
+
+        @Bean
+        public KafkaTemplateMonitoringBeanPostProcessor axelixKafkaTemplateMonitoringBeanPostProcessor(
+                TransactionAccessor transactionAccessor) {
+            return new KafkaTemplateMonitoringBeanPostProcessor(transactionAccessor);
         }
     }
 
