@@ -334,7 +334,10 @@ public class DashboardApiTest {
                 new ExecutionStats(1, 10, 5),
                 lazyLoadingTargets,
                 inMemoryPagination,
-                List.of());
+                List.of(),
+                "REQUIRED",
+                "DEFAULT",
+                false);
         return TestMetadataFactory.withPersistenceInsights(
                 groupId, artifactId, new PersistenceInsights(List.of(profile)));
     }

@@ -32,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -55,6 +58,9 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
 
     @Autowired
     private TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor;
+
+    @Autowired
+    private TransactionAttributesRegistry transactionAttributesRegistry;
 
     private Map<MethodClassKey, Propagation> propagationCache;
 
@@ -103,5 +109,18 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
         key = new MethodClassKey(testFromNonTransactional, PropagationTestHelper.class);
 
         assertThat(propagationCache).containsKey(key);
+    }
+
+    @Test
+    void testAttributesRegistryCapturesDeclaredTransactionAttributes() throws NoSuchMethodException {
+        Method testRequired = PropagationTestService.class.getDeclaredMethod("testRequired", String.class);
+        MethodClassKey key = new MethodClassKey(testRequired, PropagationTestService.class);
+
+        TransactionDefinitionAttributes attributes = transactionAttributesRegistry.get(key);
+
+        assertThat(attributes).isNotNull();
+        assertThat(attributes.getPropagation()).isEqualTo("REQUIRED");
+        assertThat(attributes.getIsolation()).isEqualTo("DEFAULT");
+        assertThat(attributes.isReadOnly()).isFalse();
     }
 }

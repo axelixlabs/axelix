@@ -322,19 +322,51 @@
         }
     },
     "Transactional": {
-        "median": "Median",
-        "max": "Max",
-        "average": "Average",
-        "duration": "Duration",
-        "durationTooltip": "Aggregated information about the duration of this transactional method execution",
-        "executionDetails": "Execution details",
-        "queriesCount": "Queries count",
-        "startTime": "Start time",
-        "endTime": "End time",
-        "totalTime": "Total time : {{durationMs}} ms",
-        "previewDuration": "Duration : {{durationMs}} ms",
-        "ms": "ms",
-        "noQueries": "No queries"
+        "summary": {
+            "analyzed": "Transactions analyzed",
+            "withProblems": "With problems",
+            "clean": "Clean"
+        },
+        "problemType": "Problem type:",
+        "columns": {
+            "transaction": "Transaction",
+            "access": "Access",
+            "avgTime": "Avg time",
+            "problems": "Problems detected"
+        },
+        "noMatches": "No transactions match those filters.",
+        "noProblems": "No problems",
+        "readOnly": "read-only",
+        "readWrite": "read-write",
+        "problems": {
+            "blocking": "Blocking network call",
+            "nPlusOne": "N+1 queries",
+            "inMemoryPagination": "In-memory pagination"
+        },
+        "problemDescriptions": {
+            "blocking": "A blocking I/O call runs while the transaction still holds its database connection, tying up the pool.",
+            "nPlusOne": "A lazy association is loaded row-by-row, firing one extra query per record while the transaction is open.",
+            "inMemoryPagination": "Pageable is combined with JOIN FETCH, so Hibernate loads the whole result set and paginates it in memory."
+        },
+        "origin": {
+            "SPRING_INFRASTRUCTURE": "Spring-managed",
+            "APPLICATION_DECLARATIVE": "@Transactional",
+            "APPLICATION_IMPERATIVE": "Programmatic"
+        },
+        "detail": {
+            "min": "Min",
+            "avgDuration": "Avg duration",
+            "max": "Max",
+            "declaredIn": "Declared in",
+            "propagation": "Propagation",
+            "isolation": "Isolation",
+            "access": "Access",
+            "noProblems": "No problems detected in this transaction."
+        },
+        "clean": {
+            "title": "No problematic transactions",
+            "description": "All {{count}} analyzed transactions are clean — no blocking calls, no N+1 queries, and no in-memory pagination."
+        }
     },
     "Users": {
         "lastLogin": "Last login",

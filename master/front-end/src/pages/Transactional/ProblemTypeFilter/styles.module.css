@@ -1,0 +1,58 @@
+.Filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.Caption {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axelix-bold-grey);
+    margin-right: 2px;
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-primary-white);
+    color: var(--axelix-bold-grey);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.Dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: var(--dot-color);
+}
+
+.Blocking {
+    --dot-color: var(--problem-blocking);
+}
+
+.NPlusOne {
+    --dot-color: var(--problem-nplusone);
+}
+
+.Pagination {
+    --dot-color: var(--problem-pagination);
+}
+
+.Chip.Active {
+    color: var(--dot-color);
+    border-color: var(--dot-color);
+    background-color: color-mix(in srgb, var(--dot-color) 10%, white);
+}

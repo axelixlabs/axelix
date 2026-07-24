@@ -234,7 +234,10 @@ class TransactionsMcpServerToolsTest {
                 new ExecutionStats(1, 10, 5),
                 lazyLoadingTargets,
                 inMemoryPagination,
-                List.of());
+                List.of(),
+                "REQUIRED",
+                "DEFAULT",
+                false);
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
