@@ -43,7 +43,7 @@ export const blog = loader({
 export type BlogPage = InferPageType<typeof blog>;
 
 /** Shape consumed by the home-page cards/rows. */
-export interface BlogCardItem {
+export interface IBlogCardItem {
     slug: string;
     /** In-app path (no basePath); pass straight to next/link. */
     href: string;
@@ -74,7 +74,7 @@ export function getSortedPosts(): BlogPage[] {
     return [...blog.getPages()].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
-export async function toCardItem(page: BlogPage): Promise<BlogCardItem> {
+export async function toCardItem(page: BlogPage): Promise<IBlogCardItem> {
     const raw = await page.data.getText("raw");
     return {
         slug: page.slugs.join("/"),
@@ -90,6 +90,6 @@ export async function toCardItem(page: BlogPage): Promise<BlogCardItem> {
 }
 
 /** All posts as card items, newest first. */
-export async function getSortedCardItems(): Promise<BlogCardItem[]> {
+export async function getSortedCardItems(): Promise<IBlogCardItem[]> {
     return Promise.all(getSortedPosts().map(toCardItem));
 }

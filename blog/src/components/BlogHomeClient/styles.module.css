@@ -1,9 +1,9 @@
 .MainContent {
-  padding-block: 40px 96px;
+  padding-block: 40px 95px;
   min-height: 40vh;
 }
 
-.Empty {
+.EmptyWrapper {
   border: 1px dashed var(--line-3);
   border-radius: 16px;
   padding: 64px 24px;
@@ -26,8 +26,8 @@
   gap: 8px;
 }
 
-@media (width <= 640px) {
+@media (width <=640px) {
   .MainContent {
-    padding-block: 28px 64px;
+    padding-block: 28px 65px;
   }
 }

@@ -21,5 +21,9 @@ interface IProps {
 }
 
 export const ReadingTime = ({ minutes, className }: IProps) => {
-    return <span className={className}>{minutes} min read</span>;
+    return (
+        <>
+            <span className={className}>{minutes} min read</span>
+        </>
+    );
 };

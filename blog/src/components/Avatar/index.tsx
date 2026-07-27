@@ -20,35 +20,41 @@
 import { authorImageCandidates, getAuthor } from "@/lib/authors";
 import { withBlogBasePathForImageSrc } from "@/lib/url";
 
+import Image from "next/image";
 import { useState } from "react";
 
 interface IProps {
-    /** Author display name. */
+    /**
+     * Author display name.
+     */
     authorRef: string;
 }
 
-/** Author avatar: tries the convention photos `public/authors/<slug>.{png,jpg,jpeg,svg}`
- *  in order, falling back to an initials circle once none load (no broken images). */
 export const Avatar = ({ authorRef }: IProps) => {
-    const a = getAuthor(authorRef);
-    const candidates = authorImageCandidates(a.slug);
-    const [idx, setIdx] = useState(0);
+    const author = getAuthor(authorRef);
+    const candidates = authorImageCandidates(author.slug);
+    const [index, setIndex] = useState<number>(0);
 
-    if (idx >= candidates.length) {
+    if (index >= candidates.length) {
         return (
-            <span className="avatar" style={{ background: a.color }}>
-                {a.initials}
-            </span>
+            <>
+                <span className="avatar" style={{ backgroundColor: author.color }}>
+                    {author.initials}
+                </span>
+            </>
         );
     }
 
     return (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-            className="avatar"
-            src={withBlogBasePathForImageSrc(candidates[idx])}
-            alt={a.name}
-            onError={() => setIdx((i) => i + 1)}
-        />
+        <>
+            <Image
+                width={25}
+                height={25}
+                className="avatar"
+                src={withBlogBasePathForImageSrc(candidates[index])}
+                alt={author.name}
+                onError={() => setIndex((idx) => idx + 1)}
+            />
+        </>
     );
 };

@@ -15,12 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LogoIcon } from "@/assets";
+import type { IBlogCardItem } from "@/lib/source";
 
-export const Logo = () => {
-    return (
-        <>
-            <LogoIcon className="logo" aria-hidden="true" />
-        </>
-    );
-};
+export interface IFeaturedAndPosts {
+    featured: IBlogCardItem | undefined;
+    posts: IBlogCardItem[];
+}

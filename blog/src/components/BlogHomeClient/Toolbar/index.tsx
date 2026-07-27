@@ -40,34 +40,36 @@ export const Toolbar = ({ currentTag, tags }: IProps) => {
     const visibleTags = tags.slice(0, VISIBLE_TAG_COUNT);
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className="wrap">
-                <div className={styles.ToolbarRow}>
-                    <div className={styles.ChipsWrapper}>
-                        <Link href="/" style={DEFAULT_CHIP_STYLE}>
-                            <Chip active={currentTag === SHOW_ALL}>All</Chip>
-                        </Link>
+        <>
+            <div className={styles.MainWrapper}>
+                <div className="wrap">
+                    <div className={styles.ToolbarRow}>
+                        <div className={styles.ChipsWrapper}>
+                            <Link href="/" style={DEFAULT_CHIP_STYLE}>
+                                <Chip active={currentTag === SHOW_ALL}>All</Chip>
+                            </Link>
 
-                        {visibleTags.map((tag) => {
-                            return (
-                                <Link
-                                    key={tag}
-                                    href={`/?tag=${encodeURIComponent(tag)}`}
-                                    style={chipColorStyle(colorForTag(tag))}
-                                >
-                                    <Chip active={currentTag === tag}>{tag}</Chip>
-                                </Link>
-                            );
-                        })}
+                            {visibleTags.map((tag) => {
+                                return (
+                                    <Link
+                                        key={tag}
+                                        href={`/?tag=${encodeURIComponent(tag)}`}
+                                        style={chipColorStyle(colorForTag(tag))}
+                                    >
+                                        <Chip active={currentTag === tag}>{tag}</Chip>
+                                    </Link>
+                                );
+                            })}
 
-                        <MoreTags tags={tags} currentTag={currentTag} />
+                            <MoreTags tags={tags} currentTag={currentTag} />
+                        </div>
+
+                        <TagSelect tags={tags} currentTag={currentTag} />
+
+                        <SearchBar onClick={() => setOpenSearch(true)} />
                     </div>
-
-                    <TagSelect tags={tags} currentTag={currentTag} />
-
-                    <SearchBar onClick={() => setOpenSearch(true)} />
                 </div>
             </div>
-        </div>
+        </>
     );
 };

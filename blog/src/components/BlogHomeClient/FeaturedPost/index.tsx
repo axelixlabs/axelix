@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Authors, DateMeta, TagRow } from "@/components";
-import { BlogCardItem } from "@/lib/source";
+import type { IBlogCardItem } from "@/lib/source";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +24,7 @@ import Link from "next/link";
 import styles from "./styles.module.css";
 
 interface IProps {
-    item: BlogCardItem;
+    item: IBlogCardItem;
 }
 
 export const FeaturedPost = ({ item }: IProps) => {

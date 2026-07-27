@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { BlogCardItem } from "@/lib/source";
+import type { IBlogCardItem } from "@/lib/source";
 import { SHOW_ALL } from "@/lib/tags";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    byTag: BlogCardItem[];
+    byTag: IBlogCardItem[];
     currentTag: string;
 }
 
@@ -31,8 +31,10 @@ export const BlogMeta = ({ byTag, currentTag }: IProps) => {
     }
 
     return (
-        <div className={styles.MainWrapper}>
-            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
+            </div>
+        </>
     );
 };

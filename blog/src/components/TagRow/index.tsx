@@ -28,12 +28,14 @@ export const TagRow = ({ tags }: IProps) => {
     const overflowTags = tags.length - visibleTags.length;
 
     return (
-        <div className="rtags">
-            {visibleTags.map((tag) => (
-                <PlainTag label={tag} key={tag} />
-            ))}
+        <>
+            <div className="rtags">
+                {visibleTags.map((tag) => (
+                    <PlainTag label={tag} key={tag} />
+                ))}
 
-            {overflowTags && <span className="tag tag-more">+{overflowTags}</span>}
-        </div>
+                {overflowTags && <span className="tag tag-more">+{overflowTags}</span>}
+            </div>
+        </>
     );
 };

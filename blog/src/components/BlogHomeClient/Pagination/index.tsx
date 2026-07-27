@@ -47,53 +47,59 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
     const nextDisabled = currentPage >= totalPages;
 
     return (
-        <nav className={styles.MainWrapper} aria-label="Pagination">
-            {prevDisabled ? (
-                <span className={styles.PaginationArrow} aria-disabled="true">
-                    <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
-                    <span className={styles.PaginationPrevNextText}>Prev</span>
-                </span>
-            ) : (
-                <Link
-                    className={styles.PaginationArrow}
-                    href={hrefFor(tag, currentPage - 1)}
-                    aria-label="Previous page"
-                >
-                    <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
-                    <span className={styles.PaginationPrevNextText}>Prev</span>
-                </Link>
-            )}
-
-            <div className={styles.PaginationNumbers}>
-                {sequence.map((entry, index) =>
-                    entry === "ellipsis" ? (
-                        <span key={index} className={styles.PaginationEllipsis}>
-                            …
-                        </span>
-                    ) : (
-                        <Link
-                            key={entry}
-                            className={`${styles.PaginationNumber}${entry === currentPage ? ` ${styles.ActivePaginationNumber}` : ""}`}
-                            href={hrefFor(tag, entry)}
-                            aria-current={entry === currentPage ? "page" : undefined}
-                        >
-                            {String(entry).padStart(2, "0")}
-                        </Link>
-                    ),
+        <>
+            <nav className={styles.MainWrapper} aria-label="Pagination">
+                {prevDisabled ? (
+                    <span className={styles.PaginationArrow} aria-disabled="true">
+                        <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
+                        <span className={styles.PaginationPrevNextText}>Prev</span>
+                    </span>
+                ) : (
+                    <Link
+                        className={styles.PaginationArrow}
+                        href={hrefFor(tag, currentPage - 1)}
+                        aria-label="Previous page"
+                    >
+                        <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
+                        <span className={styles.PaginationPrevNextText}>Prev</span>
+                    </Link>
                 )}
-            </div>
 
-            {nextDisabled ? (
-                <span className={styles.PaginationArrow} aria-disabled="true">
-                    <span className={styles.PaginationPrevNextText}>Next</span>
-                    <PaginationArrowIcon />
-                </span>
-            ) : (
-                <Link className={styles.PaginationArrow} href={hrefFor(tag, currentPage + 1)} aria-label="Next page">
-                    <span className={styles.PaginationPrevNextText}>Next</span>
-                    <PaginationArrowIcon />
-                </Link>
-            )}
-        </nav>
+                <div className={styles.PaginationNumbers}>
+                    {sequence.map((entry, index) =>
+                        entry === "ellipsis" ? (
+                            <span key={index} className={styles.PaginationEllipsis}>
+                                …
+                            </span>
+                        ) : (
+                            <Link
+                                key={entry}
+                                className={`${styles.PaginationNumber}${entry === currentPage ? ` ${styles.ActivePaginationNumber}` : ""}`}
+                                href={hrefFor(tag, entry)}
+                                aria-current={entry === currentPage ? "page" : undefined}
+                            >
+                                {String(entry).padStart(2, "0")}
+                            </Link>
+                        ),
+                    )}
+                </div>
+
+                {nextDisabled ? (
+                    <span className={styles.PaginationArrow} aria-disabled="true">
+                        <span className={styles.PaginationPrevNextText}>Next</span>
+                        <PaginationArrowIcon />
+                    </span>
+                ) : (
+                    <Link
+                        className={styles.PaginationArrow}
+                        href={hrefFor(tag, currentPage + 1)}
+                        aria-label="Next page"
+                    >
+                        <span className={styles.PaginationPrevNextText}>Next</span>
+                        <PaginationArrowIcon />
+                    </Link>
+                )}
+            </nav>
+        </>
     );
 };

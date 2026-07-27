@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export interface Author {
+export interface IAuthor {
     name: string;
     /** URL-safe id derived from the name; also the avatar filename. */
     slug: string;
@@ -67,8 +67,8 @@ function toAuthorSlug(name: string): string {
     return normalizeAuthorName(name).replace(/\s+/g, "-");
 }
 
-/** Resolve a display name to a full {@link Author} (all fields derived). */
-export function getAuthor(name: string): Author {
+/** Resolve a display name to a full {@link IAuthor} (all fields derived). */
+export function getAuthor(name: string): IAuthor {
     const slug = toAuthorSlug(name);
     return {
         name,
@@ -79,7 +79,7 @@ export function getAuthor(name: string): Author {
 }
 
 /** Resolve a list of names, de-duplicated by normalized name. */
-export function getAuthors(names: string[]): Author[] {
+export function getAuthors(names: string[]): IAuthor[] {
     const seen = new Set<string>();
     return names
         .filter(Boolean)

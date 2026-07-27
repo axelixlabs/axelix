@@ -28,10 +28,12 @@ interface IProps {
 
 export const DateMeta = ({ date, readingMinutes }: IProps) => {
     return (
-        <div className={styles.MainWrapper}>
-            <span>{formatDate(date)}</span>
-            <span className={styles.Dot} />
-            <ReadingTime minutes={readingMinutes} />
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <span>{formatDate(date)}</span>
+                <span className={styles.Dot} />
+                <ReadingTime minutes={readingMinutes} />
+            </div>
+        </>
     );
 };

@@ -31,7 +31,7 @@ const ORGANIZATION = {
     sameAs: [GITHUB_URL],
 };
 
-interface BlogPostingInput {
+interface IBlogPostingInput {
     title: string;
     description: string;
     slug: string;
@@ -41,11 +41,10 @@ interface BlogPostingInput {
     image?: string | null;
 }
 
-/** BlogPosting JSON-LD for a post (only when title + description exist). */
-export function getBlogPostingJsonLd(input: BlogPostingInput) {
-    const authors = getAuthors(input.authors).map((a) => ({
+export function getBlogPostingJsonLd(input: IBlogPostingInput) {
+    const authors = getAuthors(input.authors).map(({ name }) => ({
         "@type": "Person",
-        name: a.name,
+        name: name,
     }));
     return {
         "@context": "https://schema.org",

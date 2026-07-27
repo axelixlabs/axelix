@@ -35,5 +35,9 @@ export const ReadProgress = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    return <div className="read-progress" style={{ width: `${progress}%` }} />;
+    return (
+        <>
+            <div className="read-progress" style={{ width: `${progress}%` }} />
+        </>
+    );
 };

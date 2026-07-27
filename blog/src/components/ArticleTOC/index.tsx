@@ -48,52 +48,54 @@ export const ArticleTOC = ({ page, slug }: IProps) => {
     const canonical = new URL(withBlogBasePath(`/${slug}`), getBaseUrl()).toString();
 
     return (
-        <TOCProvider toc={pageData.toc}>
-            <div className="art-layout">
-                <article className="prose">
-                    <MDX
-                        components={getMDXComponents({
-                            a: createRelativeLink(blog, page),
-                            h2: (props) => {
-                                const providedId =
-                                    typeof (props as { id?: unknown }).id === "string"
-                                        ? ((props as { id?: string }).id ?? "")
-                                        : "";
-                                const id =
-                                    providedId ||
-                                    extractText(props.children)
-                                        .trim()
-                                        .toLowerCase()
-                                        .replace(/\s+/g, "-")
-                                        .replace(/[^a-z0-9-]/g, "")
-                                        .replace(/-+/g, "-")
-                                        .replace(/^-|-$/g, "");
-                                return (
-                                    <h2 id={id} className="group flex scroll-mt-28 items-center gap-2">
-                                        <a href={`#${id}`}>{props.children}</a>
-                                    </h2>
-                                );
-                            },
-                        })}
-                    />
-                    <div className="art-foot">
-                        <Link className="back-link" href="/">
-                            <span className="arr">←</span> All articles
-                        </Link>
-                        <BlogShare url={canonical} title={pageData.title} />
-                    </div>
-                </article>
-                <aside className="toc max-md:hidden">
-                    <span className="toc-title">On this page</span>
-                    <TOCScrollArea>
-                        <TOCItems>
-                            {pageData.toc.map((item) => (
-                                <TOCItem key={item.url} item={item} />
-                            ))}
-                        </TOCItems>
-                    </TOCScrollArea>
-                </aside>
-            </div>
-        </TOCProvider>
+        <>
+            <TOCProvider toc={pageData.toc}>
+                <div className="art-layout">
+                    <article className="prose">
+                        <MDX
+                            components={getMDXComponents({
+                                a: createRelativeLink(blog, page),
+                                h2: (props) => {
+                                    const providedId =
+                                        typeof (props as { id?: unknown }).id === "string"
+                                            ? ((props as { id?: string }).id ?? "")
+                                            : "";
+                                    const id =
+                                        providedId ||
+                                        extractText(props.children)
+                                            .trim()
+                                            .toLowerCase()
+                                            .replace(/\s+/g, "-")
+                                            .replace(/[^a-z0-9-]/g, "")
+                                            .replace(/-+/g, "-")
+                                            .replace(/^-|-$/g, "");
+                                    return (
+                                        <h2 id={id} className="group flex scroll-mt-28 items-center gap-2">
+                                            <a href={`#${id}`}>{props.children}</a>
+                                        </h2>
+                                    );
+                                },
+                            })}
+                        />
+                        <div className="art-foot">
+                            <Link className="back-link" href="/">
+                                <span className="arr">←</span> All articles
+                            </Link>
+                            <BlogShare url={canonical} title={pageData.title} />
+                        </div>
+                    </article>
+                    <aside className="toc max-md:hidden">
+                        <span className="toc-title">On this page</span>
+                        <TOCScrollArea>
+                            <TOCItems>
+                                {pageData.toc.map((item) => (
+                                    <TOCItem key={item.url} item={item} />
+                                ))}
+                            </TOCItems>
+                        </TOCScrollArea>
+                    </aside>
+                </div>
+            </TOCProvider>
+        </>
     );
 };

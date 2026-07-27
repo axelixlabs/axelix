@@ -75,37 +75,39 @@ export const TagSelect = ({ tags, currentTag }: IProps) => {
     }, [open]);
 
     return (
-        <div className={`${styles.MainWrapper}${open ? ` ${styles.Open}` : ""}`} ref={selectRef}>
-            <button
-                type="button"
-                className={styles.SelectOpenTrigger}
-                aria-haspopup="menu"
-                aria-expanded={open}
-                onClick={() => setOpen((value) => !value)}
-                style={current.id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(current.id))}
-            >
-                <span className={styles.ChipDot} />
-                <span className={styles.Label}>{current.label}</span>
-                <ChevronIcon />
-            </button>
+        <>
+            <div className={`${styles.MainWrapper}${open ? ` ${styles.Open}` : ""}`} ref={selectRef}>
+                <button
+                    type="button"
+                    className={styles.SelectOpenTrigger}
+                    aria-haspopup="menu"
+                    aria-expanded={open}
+                    onClick={() => setOpen((value) => !value)}
+                    style={current.id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(current.id))}
+                >
+                    <span className={styles.ChipDot} />
+                    <span className={styles.Label}>{current.label}</span>
+                    <ChevronIcon />
+                </button>
 
-            {open && (
-                <div role="menu">
-                    {options.map(({ id, label, href }) => (
-                        <Link
-                            key={id}
-                            href={href}
-                            role="menuitem"
-                            className={`${styles.SelectOption}${current.id === id ? styles.Active : ""}`}
-                            style={id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(id))}
-                            onClick={() => setOpen(false)}
-                        >
-                            <span className={styles.ChipDot} />
-                            <span className={styles.Lbl}>{label}</span>
-                        </Link>
-                    ))}
-                </div>
-            )}
-        </div>
+                {open && (
+                    <div role="menu">
+                        {options.map(({ id, label, href }) => (
+                            <Link
+                                key={id}
+                                href={href}
+                                role="menuitem"
+                                className={`${styles.SelectOption}${current.id === id ? styles.Active : ""}`}
+                                style={id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(id))}
+                                onClick={() => setOpen(false)}
+                            >
+                                <span className={styles.ChipDot} />
+                                <span className={styles.Lbl}>{label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </>
     );
 };

@@ -32,15 +32,19 @@ export const PlainTag = ({ label, href }: IProps) => {
 
     if (href) {
         return (
-            <Link href={href} className="tag tag-link" style={style}>
-                {label}
-            </Link>
+            <>
+                <Link href={href} className="tag tag-link" style={style}>
+                    {label}
+                </Link>
+            </>
         );
     }
 
     return (
-        <span className="tag" style={style}>
-            {label}
-        </span>
+        <>
+            <span className="tag" style={style}>
+                {label}
+            </span>
+        </>
     );
 };
