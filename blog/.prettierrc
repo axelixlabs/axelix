@@ -1,0 +1,21 @@
+{
+    "plugins": ["@trivago/prettier-plugin-sort-imports"],
+    "importOrder": [
+        "^@.+",
+        "<THIRD_PARTY_MODULES>",
+        "^(src|api|components|hooks|layout|models|pages|services|helpers|utils|store)((\/{1}[a-z]+)+(.{1}[a-z]{2,6})?)?$",
+        "^(\\.\\.\\/)+\\w+(\\.[a-z]{2,6}|\\/\\w+)*$",
+        "^\\.\\/[a-zA-Z]+(\\.[a-z]{2,6}|\\/[a-z]+)*$",
+        "^assets(\\.[a-z]{2,6}|\\/[a-z]+)*$"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "importOrderSideEffects": false,
+    "bracketSpacing": true,
+    "printWidth": 120,
+    "trailingComma": "all",
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "endOfLine": "auto"
+}

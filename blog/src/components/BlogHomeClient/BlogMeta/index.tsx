@@ -1,6 +1,24 @@
-import { SHOW_ALL } from "@/lib/tags";
-import styles from "./styles.module.css"
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 import { BlogCardItem } from "@/lib/source";
+import { SHOW_ALL } from "@/lib/tags";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     byTag: BlogCardItem[];
@@ -9,13 +27,12 @@ interface IProps {
 
 export const BlogMeta = ({ byTag, currentTag }: IProps) => {
     if (currentTag === SHOW_ALL) {
-        return null
+        return null;
     }
 
     return (
         <div className={styles.MainWrapper}>
-            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged{" "}
-            <b>{currentTag}</b>
+            <b>{byTag.length}</b> {byTag.length === 1 ? "article" : "articles"} tagged <b>{currentTag}</b>
         </div>
-    )
-} 
+    );
+};

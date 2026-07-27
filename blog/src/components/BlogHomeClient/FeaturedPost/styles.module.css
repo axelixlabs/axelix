@@ -13,7 +13,7 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 
     &:hover {
-        box-shadow: 0 24px 60px -36px rgba(15, 30, 5, 0.45);
+        box-shadow: 0 24px 60px -36px rgb(15 30 5 / 45%);
     }
 }
 
@@ -62,7 +62,7 @@
     color: var(--ink-3);
 }
 
-@media (max-width: 760px) {
+@media (width <= 760px) {
     .MainWrapper {
         grid-template-columns: 1fr;
         gap: 18px;

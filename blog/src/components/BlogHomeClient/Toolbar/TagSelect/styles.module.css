@@ -54,7 +54,7 @@
     color: var(--axelix-primary-white);
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .MainWrapper {
         display: block;
     }

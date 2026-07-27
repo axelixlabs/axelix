@@ -19,6 +19,7 @@
   isolation: isolate;
   margin-top: 40px;
 }
+
 .Footer::before {
   content: "";
   position: absolute;
@@ -32,10 +33,12 @@
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, #000 30%, transparent 88%);
 }
+
 .Footer :global(.wrap) {
   position: relative;
   z-index: 2;
 }
+
 .FooterTop {
   display: grid;
   grid-template-columns: 1.15fr 2fr;
@@ -44,38 +47,46 @@
   padding-bottom: 48px;
   border-bottom: 1px solid color-mix(in srgb, var(--c-green-400) 18%, transparent);
 }
-@media (max-width: 980px) {
+
+@media (width <= 980px) {
   .FooterTop {
     grid-template-columns: 1fr;
     gap: 48px;
   }
 }
+
 .Footer .BrandSide {
   display: flex;
   flex-direction: column;
   gap: 22px;
   max-width: 380px;
 }
+
 .Footer .FooterBrand {
   display: inline-flex;
   align-items: center;
   width: auto;
 }
+
 .Footer .FooterBrand svg {
   width: 170px;
   height: auto;
 }
+
 .Footer .FooterBrand :global(.wm) {
   fill: #f5f8ee;
 }
+
 .Footer .FooterBrand :global(.mk) {
   fill: var(--c-green-400);
 }
+
 .Footer .FooterBrand :global(.mk-line) {
   fill: none;
   stroke: var(--c-green-400);
   stroke-width: 2;
 }
+
 .Footer .Tagline {
   margin: 0;
   font-size: 15px;
@@ -83,16 +94,19 @@
   color: color-mix(in srgb, #bdd3a0 85%, transparent);
   max-width: 36ch;
 }
+
 .Footer .Tagline em {
   font-style: normal;
   color: #f5f8ee;
   font-weight: 500;
 }
+
 .Footer .Socials {
   display: inline-flex;
   gap: 8px;
   flex-wrap: wrap;
 }
+
 .Footer .Socials a {
   width: 38px;
   height: 38px;
@@ -105,27 +119,32 @@
   color: color-mix(in srgb, #bdd3a0 80%, transparent);
   transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
 }
+
 .Footer .Socials a:hover {
   color: var(--c-green-400);
   border-color: color-mix(in srgb, var(--c-green-400) 45%, transparent);
   background: color-mix(in srgb, var(--c-green-400) 8%, transparent);
   transform: translateY(-1px);
 }
+
 .Footer .Socials a svg {
   width: 18px;
   height: 18px;
 }
+
 .Footer .NavCols {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px;
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
   .Footer .NavCols {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px 24px;
   }
 }
+
 .Footer .Col h4 {
   margin: 0 0 16px;
   font-family: var(--code);
@@ -135,6 +154,7 @@
   color: color-mix(in srgb, #bdd3a0 75%, transparent);
   font-weight: 500;
 }
+
 .Footer .Col ul {
   list-style: none;
   padding: 0;
@@ -143,6 +163,7 @@
   flex-direction: column;
   gap: 11px;
 }
+
 .Footer .Col a {
   display: inline-flex;
   align-items: center;
@@ -152,10 +173,12 @@
   color: #e7eee0;
   transition: color 0.15s, transform 0.15s;
 }
+
 .Footer .Col a:hover {
   color: var(--c-green-400);
   transform: translateX(2px);
 }
+
 .FooterWatermark {
   position: relative;
   height: clamp(120px, 22vw, 240px);
@@ -163,6 +186,7 @@
   overflow: hidden;
   pointer-events: none;
 }
+
 .FooterWatermark span {
   position: absolute;
   left: 50%;
@@ -176,6 +200,7 @@
   -webkit-text-stroke: 1.5px color-mix(in srgb, var(--c-green-400) 28%, transparent);
   white-space: nowrap;
 }
+
 .FooterBottom {
   position: relative;
   z-index: 3;
@@ -191,24 +216,28 @@
   letter-spacing: 0.06em;
   color: color-mix(in srgb, #bdd3a0 70%, transparent);
 }
+
 .FooterBottom .Meta {
   display: inline-flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
 }
+
 .FooterBottom .DotSep {
   width: 3px;
   height: 3px;
   border-radius: 50%;
   background: color-mix(in srgb, #bdd3a0 35%, transparent);
 }
+
 .FooterBottom .Status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: var(--c-green-400);
 }
+
 .FooterBottom .Status::before {
   content: "";
   width: 6px;
@@ -218,11 +247,13 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-green-400) 22%, transparent);
   animation: pulse 1.8s infinite;
 }
+
 @keyframes pulse {
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.55;
   }

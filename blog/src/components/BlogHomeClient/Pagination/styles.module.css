@@ -52,7 +52,7 @@
   transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
 }
 
-.PaginationArrowPrevIcon{
+.PaginationArrowPrevIcon {
   rotate: 180deg; 
 }
 
@@ -67,7 +67,7 @@
   pointer-events: none;
 }
 
-@media (max-width: 520px) {
+@media (width <= 520px) {
   .PaginationPrevNextText {
     display: none;
   }

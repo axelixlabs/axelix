@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 /* fumadocs-ui design system (mirrors the reference blog): `neutral.css` is the
    color theme (--color-fd-* palette); `preset.css` adds base, Shiki, and the
    typography plugin that styles the MDX article body (.prose, callouts, code,

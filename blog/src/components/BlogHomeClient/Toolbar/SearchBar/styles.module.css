@@ -37,13 +37,13 @@
     outline: 1px solid var(--line-2);
 }
 
-@media (max-width: 760px) and (min-width: 641px) {
+@media (width <= 760px) and (width >= 641px) {
     .Search {
         flex: 1;
     }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .Search {
         width: auto;
         padding: 8px;

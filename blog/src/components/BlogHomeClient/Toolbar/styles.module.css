@@ -1,0 +1,111 @@
+.MainWrapper {
+    margin-top: 40px;
+    padding-block: 12px;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    border-block: 1px solid var(--line);
+}
+
+.ToolbarRow {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.ChipsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+}
+
+@media (width <= 640px) {
+    .ToolbarRow {
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+
+    .ChipsWrapper {
+        display: none;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .CatOpt.Active .Cdot { */
+
+/*    animation: tagDotPulse 1s ease-in-out infinite; */
+
+/* } */
+
+
+/* .CatMoreTrigger .Chev { */
+
+/*    width: 14px; */
+
+/*    height: 14px; */
+
+/*    margin-left: 1px; */
+
+/*    color: var(--ink-4); */
+
+/*    transition: transform 0.15s; */
+
+/* } */
+
+/* .CatMoreTrigger.Active .Chev { */
+
+/*    color: currentColor; */
+
+/* } */
+
+/* .CatMore.Open .CatMoreTrigger .Chev { */
+
+/*    transform: rotate(180deg); */
+
+/* } */
+
+/* .CatOpt.Active .Cdot { */
+
+/*    animation: tagDotPulse 1s ease-in-out infinite; */
+
+/* } */
