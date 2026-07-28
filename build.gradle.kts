@@ -170,9 +170,8 @@ val starterTestJavaVersion = providers.gradleProperty(starterTestJavaVersionProp
 
 val starterModules = listOf(
     project(":sbs:axelix-spring-boot-2-starter"),
-    project(":sbs:axelix-spring-boot-3-starter")
-    // TODO: Uncomment when axelix-spring-boot-4-starter is ready
-    // project(":sbs:axelix-spring-boot-4-starter")
+    project(":sbs:axelix-spring-boot-3-starter"),
+    project(":sbs:axelix-spring-boot-4-starter")
 )
 
 val pluginModules = listOf(

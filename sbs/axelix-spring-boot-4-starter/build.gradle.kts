@@ -10,7 +10,7 @@ val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     // Self
-    api(project(":sbs:starter-domain"))
+    compileOnly(project(":sbs:starter-domain"))
 
     // Impl
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
@@ -31,11 +31,13 @@ dependencies {
     // that are no longer pulled in transitively by the web/actuator starters.
     compileOnly("org.springframework.boot:spring-boot-restclient")
     compileOnly("org.springframework.boot:spring-boot-cache")
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
 
     // processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
     // Test
+    testImplementation(project(":sbs:starter-domain"))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
