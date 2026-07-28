@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
+import org.springframework.boot.restclient.RestTemplateCustomizer;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.web.client.RestTemplate;
@@ -84,6 +85,16 @@ class TransactionMonitoringAutoConfigurationTest {
     void shouldNotRegisterRestTemplateCustomizer_whenRestTemplateIsAbsent() {
         contextRunner
                 .withClassLoader(new FilteredClassLoader(RestTemplate.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                });
+    }
+
+    @Test
+    void shouldNotRegisterRestTemplateCustomizer_whenRestClientModuleIsAbsent() {
+        contextRunner
+                .withClassLoader(new FilteredClassLoader(RestTemplateCustomizer.class))
                 .run(context -> {
                     assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);

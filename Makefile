@@ -1,11 +1,13 @@
 .PHONY: clean clean-playgrounds clean-all build build-playground build-all spotless spotless-all \
-        publish-local build-plugins publish-starter-sb-2 publish-starter-sb-3 \
+        publish-local build-plugins publish-starter-sb-2 publish-starter-sb-3 publish-starter-sb-4 \
         build-spring-petclinic-maven-sb-2 build-notification-service-gradle-sb-2 \
-        build-feature-service-maven-sb-3 build-spring-petclinic-gradle-sb-3 publish-plugins \
+        build-feature-service-maven-sb-3 build-spring-petclinic-gradle-sb-3 \
+        build-spring-petclinic-maven-sb-4 publish-plugins \
         publish-gradle-plugin publish-maven-plugin
 
 BUILD_SB2             ?= true
 BUILD_SB3             ?= true
+BUILD_SB4             ?= true
 
 clean:
 	./gradlew clean
@@ -15,6 +17,7 @@ clean-playgrounds:
 	cd playgrounds/notification-service-gradle-sb-2 && ./gradlew clean
 	cd playgrounds/feature-service-maven-sb-3 && ./mvnw clean
 	cd playgrounds/spring-petclinic-gradle-sb-3 && ./gradlew clean
+	cd playgrounds/spring-petclinic-maven-sb-4 && ./mvnw clean
 
 clean-all: clean clean-playgrounds
 
@@ -27,6 +30,7 @@ spotless-all:
 	cd playgrounds/notification-service-gradle-sb-2 && ./gradlew spotlessApply
 	cd playgrounds/feature-service-maven-sb-3 && ./mvnw spotless:apply
 	cd playgrounds/spring-petclinic-gradle-sb-3 && ./gradlew spotlessApply
+	cd playgrounds/spring-petclinic-maven-sb-4 && ./mvnw spring-javaformat:apply
 
 publish-local:
 	./gradlew publishToMavenLocal
@@ -42,8 +46,8 @@ re-build:
 build-plugins:
 	./gradlew :plugins:axelix-gradle-plugin:build :plugins:axelix-maven-plugin:build
 
-build-all: build build-plugins
-	$(MAKE) build-playground BUILD_SB2="true" BUILD_SB3="true"
+build-all: build
+	$(MAKE) build-playground BUILD_SB2="true" BUILD_SB3="true" BUILD_SB4="true"
 
 # BUILD PLAYGROUND PROJECTS
 # Listed as plain prerequisites (not recursive $(MAKE) calls). Starter publication is modeled
@@ -56,6 +60,9 @@ PLAYGROUND_TARGETS += build-spring-petclinic-maven-sb-2 build-notification-servi
 endif
 ifeq ($(BUILD_SB3),true)
 PLAYGROUND_TARGETS += build-spring-petclinic-gradle-sb-3 build-feature-service-maven-sb-3
+endif
+ifeq ($(BUILD_SB4),true)
+PLAYGROUND_TARGETS += build-spring-petclinic-maven-sb-4
 endif
 
 build-playground: publish-plugins $(PLAYGROUND_TARGETS)
@@ -87,6 +94,10 @@ publish-starter-sb-3:
 	@echo "=== Publishing Spring Boot 3 Axelix Starter ==="
 	./gradlew :sbs:axelix-spring-boot-3-starter:publishToMavenLocal
 
+publish-starter-sb-4:
+	@echo "=== Publishing Spring Boot 4 Axelix Starter ==="
+	./gradlew :sbs:axelix-spring-boot-4-starter:publishToMavenLocal
+
 # PUBLISH PLUGINS
 publish-plugins: publish-gradle-plugin publish-maven-plugin
 
@@ -114,3 +125,7 @@ build-feature-service-maven-sb-3: publish-maven-plugin publish-starter-sb-3
 build-spring-petclinic-gradle-sb-3: publish-gradle-plugin publish-starter-sb-3
 	@echo "=== Running Gradle build for Petclinic Spring Boot 3 ==="
 	cd playgrounds/spring-petclinic-gradle-sb-3 && JAVA_HOME=$(LOCAL_JAVA_17) ./gradlew build
+
+build-spring-petclinic-maven-sb-4: publish-maven-plugin publish-starter-sb-4
+	@echo "=== Running Maven build for Petclinic Spring Boot 4 ==="
+	cd playgrounds/spring-petclinic-maven-sb-4 && JAVA_HOME=$(LOCAL_JAVA_17) ./mvnw package -B
