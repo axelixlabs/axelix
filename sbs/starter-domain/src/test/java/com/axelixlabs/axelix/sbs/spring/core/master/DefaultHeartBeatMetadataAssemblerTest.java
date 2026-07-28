@@ -142,7 +142,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
                     axelixVersionDiscoverer,
                     libraryInformationProvider,
                     insightsInfoProvider,
-                axelixInfoProperties);
+                    axelixInfoProperties);
         }
     }
 

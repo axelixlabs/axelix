@@ -39,7 +39,8 @@ export const PropertiesSnippet = ({ refEl }: IProps) => {
                     <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.At}>axelix.sbs.discovery.auto</span>=<span className={styles.St}>true</span>
+                    <span className={styles.At}>axelix.sbs.discovery.self-registration</span>=
+                    <span className={styles.St}>true</span>
                 </span>
                 <span className={styles.Line}>
                     <span className={styles.At}>axelix.sbs.discovery.instance-name</span>=

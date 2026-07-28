@@ -41,7 +41,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
  * @author Nikita Kirillov
  */
 @AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
-@ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "auto", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "self-registration", havingValue = "true")
 public class HeartBeatAutoConfiguration {
 
     @Bean

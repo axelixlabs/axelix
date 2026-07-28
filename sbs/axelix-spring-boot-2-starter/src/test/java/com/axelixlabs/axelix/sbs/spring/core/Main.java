@@ -23,7 +23,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixInfoPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
@@ -32,6 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointA
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixInfoPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;

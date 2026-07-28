@@ -41,7 +41,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     private final LibraryInformationProvider libraryInformationProvider;
 
     public DefaultServiceDetailsAssembler(
-        AxelixInfoProperties axelixInfoProperties, LibraryInformationProvider libraryInformationProvider) {
+            AxelixInfoProperties axelixInfoProperties, LibraryInformationProvider libraryInformationProvider) {
         this.axelixInfoProperties = axelixInfoProperties;
         this.libraryInformationProvider = libraryInformationProvider;
     }
@@ -58,8 +58,8 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     private GitDetails getGitDetails() {
-        CommitAuthor commitAuthor = new CommitAuthor(
-                axelixInfoProperties.getCommitUserName(), axelixInfoProperties.getCommitUserEmail());
+        CommitAuthor commitAuthor =
+                new CommitAuthor(axelixInfoProperties.getCommitUserName(), axelixInfoProperties.getCommitUserEmail());
 
         return new GitDetails(
                 axelixInfoProperties.getCommitShaShort(),

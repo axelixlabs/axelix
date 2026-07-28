@@ -46,7 +46,6 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SuppressWarnings("NullAway")
 @Order(FiltersOrder.COOKIE_BASED_JWT_AUTHORIZATION_FILTER)
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 

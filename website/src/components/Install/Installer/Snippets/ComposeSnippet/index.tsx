@@ -101,7 +101,7 @@ export const ComposeSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}
-                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_AUTO</span>:{" "}
+                    <span className={styles.At}>AXELIX_SBS_DISCOVERY_SELF_REGISTRATION</span>:{" "}
                     <span className={styles.St}>true</span>
                 </span>
                 <span className={styles.Line}>

@@ -267,7 +267,7 @@ namespace в поисках Services и опрашивал `/actuator/axelix-met
 axelix:
   sbs:
     discovery:
-      auto: true
+      self-registration: true
       master-url: http://master.internal:8080/api/internal/service/register
       instance-actuator-url: http://my-app.internal:8080/actuator
       instance-name: orders-service
@@ -278,7 +278,7 @@ axelix:
   <TabItem value="properties" label="application.properties">
 
 ```properties
-axelix.sbs.discovery.auto=true
+axelix.sbs.discovery.self-registration=true
 axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
 axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
 axelix.sbs.discovery.instance-name=orders-service
@@ -374,10 +374,10 @@ axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
 
 ### Саморегистрация
 
-Саморегистрация **выключена по умолчанию** (`axelix.sbs.discovery.auto=false`) — оставьте всё как есть, если Master
+Саморегистрация **выключена по умолчанию** (`axelix.sbs.discovery.self-registration=false`) — оставьте всё как есть, если Master
 может найти сервис через автообнаружение на стороне Master.
 
-Когда `axelix.sbs.discovery.auto=true`, следующие свойства становятся **обязательными**:
+Когда `axelix.sbs.discovery.self-registration=true`, следующие свойства становятся **обязательными**:
 
 - `axelix.sbs.discovery.master-url`
 - `axelix.sbs.discovery.instance-actuator-url`
@@ -393,10 +393,10 @@ heartbeat-сигналы будут отклоняться с `401`.
 
 | Свойство                                     | По умолчанию                                                 | Описание                                                                                                                                           |
 |----------------------------------------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.discovery.auto`                  | `false`                                                      | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
-| `axelix.sbs.discovery.master-url`            | *(не задано)* <span className="Required">обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:8080/api/internal/service/register`. Обязательно при `auto=true`.    |
-| `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className="Required">обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `auto=true`.                       |
-| `axelix.sbs.discovery.instance-name`         | *(не задано)* <span className="Required">обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `auto=true`.                                                           |
+| `axelix.sbs.discovery.self-registration`     | `false`                                                      | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
+| `axelix.sbs.discovery.master-url`            | *(не задано)* <span className="Required">обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:8080/api/internal/service/register`. Обязательно при `self-registration=true`.    |
+| `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className="Required">обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `self-registration=true`.                       |
+| `axelix.sbs.discovery.instance-name`         | *(не задано)* <span className="Required">обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `self-registration=true`.                                                           |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                        | Интервал между heartbeat-сигналами. Должен быть меньше `heartbeat-timeout` выселения на Master.                                                    |
 
 </div>

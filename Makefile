@@ -42,7 +42,7 @@ re-build:
 build-plugins:
 	./gradlew :plugins:axelix-gradle-plugin:build :plugins:axelix-maven-plugin:build
 
-build-all: build
+build-all: build build-plugins
 	$(MAKE) build-playground BUILD_SB2="true" BUILD_SB3="true"
 
 # BUILD PLAYGROUND PROJECTS

@@ -35,8 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
  * @author Nikita Kirillov, Sergey Cherkasov
  */
 @AutoConfiguration(
-        after = {AxelixInfoPropertiesAutoConfiguration.class, LibraryInformationProviderAutoConfiguration.class
-        })
+        after = {AxelixInfoPropertiesAutoConfiguration.class, LibraryInformationProviderAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = InfoEndpoint.class)
 public class AxelixDetailsEndpointAutoConfiguration {
 

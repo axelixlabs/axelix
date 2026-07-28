@@ -48,7 +48,7 @@ import static org.mockito.Mockito.mock;
 class HeartBeatAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withPropertyValues("axelix.sbs.discovery.auto=true")
+            .withPropertyValues("axelix.sbs.discovery.self-registration=true")
             .withUserConfiguration(RequiredDependenciesConfig.class)
             .withConfiguration(
                     AutoConfigurations.of(HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
@@ -79,9 +79,9 @@ class HeartBeatAutoConfigurationTest {
     }
 
     @Test
-    void shouldNotActivateAutoConfiguration_whenAutoIsFalse() {
+    void shouldNotActivateAutoConfiguration_whenSelfRegistrationIsFalse() {
         new ApplicationContextRunner()
-                .withPropertyValues("axelix.sbs.discovery.auto=false")
+                .withPropertyValues("axelix.sbs.discovery.self-registration=false")
                 .withUserConfiguration(RequiredDependenciesConfig.class)
                 .withConfiguration(AutoConfigurations.of(HeartBeatAutoConfiguration.class))
                 .run(context -> {

@@ -266,7 +266,7 @@ interval. Master accepts the post at `POST /api/internal/service/register`, whic
 axelix:
   sbs:
     discovery:
-      auto: true
+      self-registration: true
       master-url: http://master.internal:8080/api/internal/service/register
       instance-actuator-url: http://my-app.internal:8080/actuator
       instance-name: orders-service
@@ -277,7 +277,7 @@ axelix:
   <TabItem value="properties" label="application.properties">
 
 ```properties
-axelix.sbs.discovery.auto=true
+axelix.sbs.discovery.self-registration=true
 axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
 axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
 axelix.sbs.discovery.instance-name=orders-service
@@ -368,10 +368,10 @@ Every starter property lives under the `axelix.sbs.*` namespace.
 
 ### Self-registration
 
-Self-registration is **off by default** (`axelix.sbs.discovery.auto=false`) — leave it that way when Master can find the
+Self-registration is **off by default** (`axelix.sbs.discovery.self-registration=false`) — leave it that way when Master can find the
 instance through Master-side autodiscovery instead.
 
-When `axelix.sbs.discovery.auto=true`, the following properties become **required**:
+When `axelix.sbs.discovery.self-registration=true`, the following properties become **required**:
 
 - `axelix.sbs.discovery.master-url`
 - `axelix.sbs.discovery.instance-actuator-url`
@@ -387,10 +387,10 @@ heartbeats are rejected with `401`.
 
 | Property                                     | Default                                              | Description                                                                                                                          |
 |----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.discovery.auto`                  | `false`                                              | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                        |
-| `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `auto=true`. |
-| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `auto=true`.   |
-| `axelix.sbs.discovery.instance-name`         | *(unset)* <span className="Required">required</span> | Display name shown in Axelix UI and MCP responses. Required when `auto=true`.                                                        |
+| `axelix.sbs.discovery.self-registration`     | `false`                                              | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                                  |
+| `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `self-registration=true`. |
+| `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `self-registration=true`.   |
+| `axelix.sbs.discovery.instance-name`         | *(unset)* <span className="Required">required</span> | Display name shown in Axelix UI and MCP responses. Required when `self-registration=true`.                                                        |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                           |
 
 </div>

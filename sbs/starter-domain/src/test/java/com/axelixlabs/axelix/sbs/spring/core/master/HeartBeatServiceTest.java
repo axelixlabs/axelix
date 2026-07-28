@@ -187,7 +187,7 @@ class HeartBeatServiceTest {
                     axelixVersionDiscoverer,
                     libraryInformationProvider,
                     insightsInfoProvider,
-                axelixInfoProperties);
+                    axelixInfoProperties);
         }
     }
 
