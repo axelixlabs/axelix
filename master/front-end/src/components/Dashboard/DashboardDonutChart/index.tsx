@@ -76,7 +76,7 @@ const DEFAULT_COLORS = ["#2DD4BF", "#A78BFA", "#F59E0B", "#FB7185", "#4B9EFF"];
 export const DashboardDonutChart = ({ data, heading, rest, centre, onPieClick }: IProps) => {
     const chartData = data.map(({ categoryName, value }, index) => ({
         name: categoryName,
-        value,
+        value: value,
         fill: DEFAULT_COLORS[index % DEFAULT_COLORS.length],
     }));
 
@@ -120,7 +120,7 @@ export const DashboardDonutChart = ({ data, heading, rest, centre, onPieClick }:
 
                 <div className={styles.LegendWrapper}>
                     {chartData.map(({ name, fill, value }) => (
-                        <DashboardLegendItem key={name} circleColor={fill} label={name} value={`${value}%`} />
+                        <DashboardLegendItem key={name} circleColor={fill} label={name} value={value} />
                     ))}
                 </div>
             </div>

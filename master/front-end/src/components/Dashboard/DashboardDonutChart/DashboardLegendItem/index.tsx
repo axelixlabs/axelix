@@ -20,7 +20,7 @@ import styles from "./styles.module.css";
 interface IProps {
     circleColor: string;
     label: string;
-    value: string;
+    value: number;
 }
 
 export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
@@ -33,7 +33,7 @@ export const DashboardLegendItem = ({ circleColor, label, value }: IProps) => {
                 className={styles.Circle}
             />
             <span className={styles.Label}>{label}:</span>
-            <span className={styles.Value}>{value}</span>
+            <span className={styles.Value}>{Math.round(value)}%</span>
         </div>
     );
 };

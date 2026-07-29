@@ -30,13 +30,10 @@ export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses
 
 export const prepareDistributionDataPerChart = (distributions: IDistribution[]): IExtendedChartData[] => {
     return distributions.map(({ softwareComponentName, versions }) => {
-        const parsedVersions = Object.entries(versions).map(
-            ([version, value]) =>
-                ({
-                    categoryName: version,
-                    value: value,
-                }) as IChartData,
-        );
+        const parsedVersions: IChartData[] = Object.entries(versions).map(([version, value]) => ({
+            categoryName: version,
+            value: value,
+        }));
 
         return {
             softwareComponentName: softwareComponentName,

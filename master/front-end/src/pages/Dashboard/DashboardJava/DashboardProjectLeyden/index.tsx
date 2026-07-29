@@ -40,7 +40,7 @@ export const DashboardProjectLeyden = ({ projectLeydenData }: IProps) => {
                 subtitle: t("Dashboard.Java.leydenChartSubtitle"),
             }}
             centre={{
-                title: `${totalProjectLeydenAdoption}%`,
+                title: `${Math.round(totalProjectLeydenAdoption)}%`,
                 subtitle: t("Dashboard.Java.leydenChartCentreSubtitle"),
             }}
             rest={{
