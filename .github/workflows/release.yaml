@@ -61,6 +61,15 @@ jobs:
           - starter: Spring Boot 3 starter
             javaVersion: 24
             tasks: :sbs:axelix-spring-boot-3-starter:build
+          - starter: Spring Boot 4 starter
+            javaVersion: 17
+            tasks: :sbs:axelix-spring-boot-4-starter:build
+          - starter: Spring Boot 4 starter
+            javaVersion: 21
+            tasks: :sbs:axelix-spring-boot-4-starter:build
+          - starter: Spring Boot 4 starter
+            javaVersion: 25
+            tasks: :sbs:axelix-spring-boot-4-starter:build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7

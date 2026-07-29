@@ -165,7 +165,7 @@ jobs:
           JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
           JAVA_25_HOME: ${{ steps.build-backend.outputs.java-25-home }}
         run: |
-          make build-playground BUILD_SB2="true" BUILD_SB3="true"
+          make build-playground BUILD_SB2="true" BUILD_SB3="true" BUILD_SB4="true"
 
       - name: Deploy Playground Spring Petclinic Maven SB 2
         env:
@@ -205,4 +205,14 @@ jobs:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:3.5.0-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}
+
+      - name: Deploy Playground Spring Petclinic Maven SB 4
+        env:
+          APP_NAME: spring-petclinic-maven-sb-4
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:4.0.7-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}

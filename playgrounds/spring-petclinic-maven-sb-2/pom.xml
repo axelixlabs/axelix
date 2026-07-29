@@ -10,7 +10,7 @@
   </parent>
 
   <groupId>org.springframework.samples</groupId>
-  <artifactId>spring-petclinic</artifactId>
+  <artifactId>spring-petclinic-maven-sb-2</artifactId>
   <version>2.7.18-SNAPSHOT</version>
 
   <name>petclinic</name>
@@ -151,6 +151,7 @@
   </dependencies>
 
   <build>
+    <finalName>spring-petclinic-2.7.18-SNAPSHOT</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -94,7 +94,11 @@ jobs:
               - 'sbs/axelix-spring-boot-3-starter/**'
               - 'playgrounds/spring-petclinic-gradle-sb-3/**'
               - 'playgrounds/feature-service-maven-sb-3/**'
-            
+
+            sb4_specific_trigger:
+              - 'sbs/axelix-spring-boot-4-starter/**'
+              - 'playgrounds/spring-petclinic-maven-sb-4/**'
+
             sbs_global_trigger:
               - 'common/**'
               - 'sbs/starter-domain/**'
@@ -110,6 +114,7 @@ jobs:
         env:
           SB2_CHANGE_TRIGGER: ${{ steps.filter.outputs.sb2_specific_trigger }}
           SB3_CHANGE_TRIGGER: ${{ steps.filter.outputs.sb3_specific_trigger }}
+          SB4_CHANGE_TRIGGER: ${{ steps.filter.outputs.sb4_specific_trigger }}
           GLOBAL_CHANGE_TRIGGER: ${{ steps.filter.outputs.sbs_global_trigger }}
 
           JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
@@ -126,4 +131,9 @@ jobs:
             SHOULD_BUILD_SB3="true"
           fi
 
-          make build-playground BUILD_SB2="$SHOULD_BUILD_SB2" BUILD_SB3="$SHOULD_BUILD_SB3"
+          SHOULD_BUILD_SB4="false"
+          if [ "$SB4_CHANGE_TRIGGER" = "true" ] || [ "$GLOBAL_CHANGE_TRIGGER" = "true" ]; then
+            SHOULD_BUILD_SB4="true"
+          fi
+
+          make build-playground BUILD_SB2="$SHOULD_BUILD_SB2" BUILD_SB3="$SHOULD_BUILD_SB3" BUILD_SB4="$SHOULD_BUILD_SB4"
