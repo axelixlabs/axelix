@@ -34,7 +34,8 @@ Axelix analyses your app on every layer, from the JVM up through the framework a
   `spring.jpa.show-sql=true` in production, actuator endpoints exposed via a `*` wildcard.
 
 ## Look inside a running application
-[![Axelix video overview]()]()
+https://github.com/user-attachments/assets/85ab5df8-6c99-4c6d-bdd2-9067bdfcf111
+
 Beyond detection, Axelix lets you inspect the live state of a running Spring Boot application, which
 is what advanced runtime debugging really comes down to. Every capability below is available in the
 web console and as an MCP tool, so the same information is avaialble to a human and an AI agent (according 
