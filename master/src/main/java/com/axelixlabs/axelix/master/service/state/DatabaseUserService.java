@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
@@ -54,14 +55,17 @@ public class DatabaseUserService implements UserService {
     private final UserRepository userRepository;
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final SuperAdminConfigurationProperties superAdminConfiguration;
 
     public DatabaseUserService(
             UserRepository userRepository,
             JdbcAggregateTemplate jdbcAggregateTemplate,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            SuperAdminConfigurationProperties superAdminConfiguration) {
         this.userRepository = userRepository;
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
         this.passwordEncoder = passwordEncoder;
+        this.superAdminConfiguration = superAdminConfiguration;
     }
 
     @Override
@@ -77,7 +81,8 @@ public class DatabaseUserService implements UserService {
                 UserOrigin.LOCAL,
                 null);
 
-        if (userRepository.findByUsername(userEntity.username()).isPresent()) {
+        if (isUsernameReservedForSuperAdmin(userEntity.username())
+                || userRepository.findByUsername(userEntity.username()).isPresent()) {
             throw new UsernameAlreadyExistsException(userEntity.username());
         }
 
@@ -100,6 +105,10 @@ public class DatabaseUserService implements UserService {
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
                 UserOrigin.OIDC,
                 Instant.now()); // the assumption is that the user is created during the initial login
+
+        if (isUsernameReservedForSuperAdmin(userEntity.username())) {
+            throw new UsernameAlreadyExistsException(userEntity.username());
+        }
 
         jdbcAggregateTemplate.insert(userEntity);
     }
@@ -151,7 +160,9 @@ public class DatabaseUserService implements UserService {
         String normalizedEmail = email == null ? null : requireNonBlankTrimmed(email);
 
         Optional<UserEntity> userWithSameUsername = userRepository.findByUsername(normalizedUsername);
-        if (userWithSameUsername.isPresent() && !userWithSameUsername.get().id().equals(id)) {
+        if (isUsernameReservedForSuperAdmin(normalizedUsername)
+                || (userWithSameUsername.isPresent()
+                        && !userWithSameUsername.get().id().equals(id))) {
             throw new UsernameAlreadyExistsException(normalizedUsername);
         }
 
@@ -169,6 +180,10 @@ public class DatabaseUserService implements UserService {
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(validRoles),
                 lastLoginAt);
+    }
+
+    private boolean isUsernameReservedForSuperAdmin(String username) {
+        return superAdminConfiguration.getUsername().equals(username);
     }
 
     private String requireNonBlankTrimmed(String value) throws UserInvalidValueException {

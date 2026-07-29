@@ -68,6 +68,7 @@ public interface UserService {
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
+     * @throws UsernameAlreadyExistsException if the given username is reserved for the super-admin.
      */
     void createFromOidc(String username, @Nullable String email, String role);
 

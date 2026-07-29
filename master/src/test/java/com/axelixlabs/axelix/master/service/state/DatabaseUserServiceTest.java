@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
@@ -59,6 +60,9 @@ class DatabaseUserServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SuperAdminConfigurationProperties superAdminConfiguration;
 
     @BeforeEach
     @AfterEach
@@ -96,6 +100,16 @@ class DatabaseUserServiceTest {
         assertThat(saved.email()).isNull();
         assertThat(saved.password()).isNull();
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.OIDC);
+    }
+
+    @Test
+    void createFromOidc_shouldThrowWhenUsernameIsReservedForSuperAdmin() {
+        // when.
+        assertThatThrownBy(() -> userService.createFromOidc(
+                        superAdminConfiguration.getUsername(), "impostor@example.com", "VIEWER"))
+                // then.
+                .isInstanceOf(UsernameAlreadyExistsException.class);
+        assertThat(userRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -162,6 +176,16 @@ class DatabaseUserServiceTest {
                 // then.
                 .isInstanceOf(UsernameAlreadyExistsException.class);
         assertThat(userRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void createLocal_shouldThrowWhenUsernameIsReservedForSuperAdmin() {
+        // when.
+        assertThatThrownBy(() -> userService.createLocal(
+                        superAdminConfiguration.getUsername(), "impostor@example.com", "p", "VIEWER"))
+                // then.
+                .isInstanceOf(UsernameAlreadyExistsException.class);
+        assertThat(userRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -415,6 +439,22 @@ class DatabaseUserServiceTest {
 
         UserEntity untouched = userRepository.findById(bob.id()).orElseThrow();
         assertThat(untouched.username()).isEqualTo("bob");
+    }
+
+    @Test
+    void updateUserPatch_shouldThrowWhenUsernameIsReservedForSuperAdmin() {
+        // given.
+        userService.createLocal("alice", "alice@example.com", "p", "VIEWER");
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.updateUserPatch(
+                        alice.id(), superAdminConfiguration.getUsername(), "alice@example.com", null, Set.of("VIEWER")))
+                // then.
+                .isInstanceOf(UsernameAlreadyExistsException.class);
+
+        UserEntity untouched = userRepository.findById(alice.id()).orElseThrow();
+        assertThat(untouched.username()).isEqualTo("alice");
     }
 
     @Test
