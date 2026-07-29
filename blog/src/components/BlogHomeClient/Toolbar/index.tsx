@@ -17,7 +17,7 @@
  */
 "use client";
 import { chipColorStyle } from "@/helpers";
-import { SHOW_ALL, colorForTag } from "@/lib/tags";
+import { SHOW_ALL, getColorForTag } from "@/lib/tags";
 import { DEFAULT_CHIP_STYLE, VISIBLE_TAG_COUNT } from "@/utils";
 
 import { useSearchContext } from "fumadocs-ui/contexts/search";
@@ -54,7 +54,7 @@ export const Toolbar = ({ currentTag, tags }: IProps) => {
                                     <Link
                                         key={tag}
                                         href={`/?tag=${encodeURIComponent(tag)}`}
-                                        style={chipColorStyle(colorForTag(tag))}
+                                        style={chipColorStyle(getColorForTag(tag))}
                                     >
                                         <Chip active={currentTag === tag}>{tag}</Chip>
                                     </Link>

@@ -15,9 +15,41 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IBlogCardItem } from "@/lib/source";
+export interface IBlogCardItem {
+    slug: string;
+    href: string;
+    title: string;
+    description: string;
+    tags: string[];
+    authors: string[];
+    date: string;
+    coverSrc: string | null;
+    readingMinutes: number;
+}
 
 export interface IFeaturedAndPosts {
     featured: IBlogCardItem | undefined;
     posts: IBlogCardItem[];
+}
+
+export interface IAuthor {
+    name: string;
+    slug: string;
+    initials: string;
+    color: string;
+}
+
+export interface IBlogPostingInput {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    modified?: string;
+    authors: string[];
+    image?: string | null;
+}
+
+export interface INavLink {
+    href: string;
+    label: string;
 }

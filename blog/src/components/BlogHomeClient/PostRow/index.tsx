@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IBlogCardItem } from "@/lib/source";
+import type { IBlogCardItem } from "@/models";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +41,6 @@ export const PostRow = ({ item }: IProps) => {
                     <DateMeta date={date} readingMinutes={readingMinutes} />
                     <h3 className={styles.Title}>{title}</h3>
                     {description && <p className={styles.Description}>{description}</p>}
-
                     <Authors authors={authors} />
                 </div>
 

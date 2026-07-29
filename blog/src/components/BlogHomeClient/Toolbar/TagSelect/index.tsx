@@ -18,7 +18,7 @@
 "use client";
 import { ChevronIcon } from "@/assets";
 import { chipColorStyle } from "@/helpers";
-import { SHOW_ALL, colorForTag } from "@/lib/tags";
+import { SHOW_ALL, getColorForTag } from "@/lib/tags";
 import { DEFAULT_CHIP_STYLE } from "@/utils";
 
 import Link from "next/link";
@@ -80,10 +80,8 @@ export const TagSelect = ({ tags, currentTag }: IProps) => {
                 <button
                     type="button"
                     className={styles.SelectOpenTrigger}
-                    aria-haspopup="menu"
-                    aria-expanded={open}
                     onClick={() => setOpen((value) => !value)}
-                    style={current.id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(current.id))}
+                    style={current.id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(getColorForTag(current.id))}
                 >
                     <span className={styles.ChipDot} />
                     <span className={styles.Label}>{current.label}</span>
@@ -98,7 +96,7 @@ export const TagSelect = ({ tags, currentTag }: IProps) => {
                                 href={href}
                                 role="menuitem"
                                 className={`${styles.SelectOption}${current.id === id ? styles.Active : ""}`}
-                                style={id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(colorForTag(id))}
+                                style={id === SHOW_ALL ? DEFAULT_CHIP_STYLE : chipColorStyle(getColorForTag(id))}
                                 onClick={() => setOpen(false)}
                             >
                                 <span className={styles.ChipDot} />

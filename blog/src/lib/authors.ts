@@ -15,21 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { IAuthor } from "@/models";
 
-export interface IAuthor {
-    name: string;
-    /** URL-safe id derived from the name; also the avatar filename. */
-    slug: string;
-    /** Fallback circle text when the photo is missing. */
-    initials: string;
-    /** Fallback circle color (deterministic from the name). */
-    color: string;
-}
+const AUTHOR_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg"] as const;
 
-/** Avatar image formats tried, in order, for `public/authors/<slug>.<ext>`. */
-export const AUTHOR_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg"] as const;
-
-/** Convention avatar paths to try in order; the first that loads wins (see `Avatar`). */
 export function authorImageCandidates(slug: string): string[] {
     return AUTHOR_IMAGE_EXTENSIONS.map((ext) => `/authors/${slug}.${ext}`);
 }
@@ -49,14 +38,13 @@ function initialsFromName(name: string): string {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-/** Normalize a display name to a comparable, ascii-ish key (mirrors Prisma). */
 function normalizeAuthorName(name: string): string {
     const latinized = name.replace(/[øØ]/g, "o").replace(/[æÆ]/g, "ae").replace(/[œŒ]/g, "oe").replace(/[ß]/g, "ss");
 
     return latinized
         .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "") // strip combining diacritics
-        .replace(/['‘’]/g, "") // drop apostrophes
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/['‘’]/g, "")
         .replace(/[^a-zA-Z0-9\s-]/g, " ")
         .trim()
         .toLowerCase()
@@ -67,7 +55,6 @@ function toAuthorSlug(name: string): string {
     return normalizeAuthorName(name).replace(/\s+/g, "-");
 }
 
-/** Resolve a display name to a full {@link IAuthor} (all fields derived). */
 export function getAuthor(name: string): IAuthor {
     const slug = toAuthorSlug(name);
     return {
@@ -78,7 +65,6 @@ export function getAuthor(name: string): IAuthor {
     };
 }
 
-/** Resolve a list of names, de-duplicated by normalized name. */
 export function getAuthors(names: string[]): IAuthor[] {
     const seen = new Set<string>();
     return names

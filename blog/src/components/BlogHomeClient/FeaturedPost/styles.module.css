@@ -4,7 +4,7 @@
     align-items: center;
     gap: 20px;
     background: linear-gradient(180deg,
-            color-mix(in srgb, var(--c-green-100) 60%, transparent),
+            color-mix(in srgb, var(--axelix-green-100) 60%, transparent),
             var(--axelix-primary-white));
     border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
     border-radius: 20px;

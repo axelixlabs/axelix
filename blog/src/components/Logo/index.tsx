@@ -20,7 +20,7 @@ import { LogoIcon } from "@/assets";
 export const Logo = () => {
     return (
         <>
-            <LogoIcon className="logo" aria-hidden="true" />
+            <LogoIcon className="logo" />
         </>
     );
 };

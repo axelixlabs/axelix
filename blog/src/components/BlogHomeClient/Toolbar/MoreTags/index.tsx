@@ -18,7 +18,7 @@
 "use client";
 import { ChevronIcon } from "@/assets";
 import { chipColorStyle } from "@/helpers";
-import { colorForTag } from "@/lib/tags";
+import { getColorForTag } from "@/lib/tags";
 import { VISIBLE_TAG_COUNT } from "@/utils";
 
 import Link from "next/link";
@@ -72,10 +72,8 @@ export const MoreTags = ({ tags, currentTag }: IProps) => {
                 <div className={`${styles.MenuWrapper}${moreOpen ? ` ${styles.MenuOpen}` : ""}`} ref={moreRef}>
                     <button
                         className={`${styles.Chip} ${activeOverflow ? ` ${styles.Active}` : ""}`}
-                        aria-haspopup="menu"
-                        aria-expanded={moreOpen}
                         onClick={() => setMoreOpen((value) => !value)}
-                        style={activeOverflow ? chipColorStyle(colorForTag(activeOverflow)) : undefined}
+                        style={activeOverflow ? chipColorStyle(getColorForTag(activeOverflow)) : undefined}
                     >
                         {activeOverflow && <span className={styles.ChipDot} />}
                         {activeOverflow ?? "More"}
@@ -90,7 +88,7 @@ export const MoreTags = ({ tags, currentTag }: IProps) => {
                                     href={`/?tag=${encodeURIComponent(tag)}`}
                                     role="menuitem"
                                     className={`${styles.MenuOption} ${currentTag === tag ? ` ${styles.Active}` : ""}`}
-                                    style={chipColorStyle(colorForTag(tag))}
+                                    style={chipColorStyle(getColorForTag(tag))}
                                     onClick={() => setMoreOpen(false)}
                                 >
                                     <span className={styles.ChipDot} />

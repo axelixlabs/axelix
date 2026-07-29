@@ -42,7 +42,7 @@ button {
 
 ::selection {
   background: var(--accent);
-  color: #fff;
+  color: var(--axelix-primary-white);
 }
 
 .wrap {

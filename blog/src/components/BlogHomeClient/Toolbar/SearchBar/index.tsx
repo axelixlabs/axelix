@@ -27,7 +27,7 @@ interface IProps {
 export const SearchBar = ({ onClick }: IProps) => {
     return (
         <>
-            <button onClick={onClick} className={styles.Search} aria-label="Search the blog">
+            <button onClick={onClick} className={styles.Search}>
                 <MagnifyingGlassIcon />
 
                 <span className={styles.Placeholder}>Search the blog…</span>

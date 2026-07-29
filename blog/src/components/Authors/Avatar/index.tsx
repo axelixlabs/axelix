@@ -23,6 +23,8 @@ import { withBlogBasePathForImageSrc } from "@/lib/url";
 import Image from "next/image";
 import { useState } from "react";
 
+import styles from "./styles.module.css";
+
 interface IProps {
     /**
      * Author display name.
@@ -31,15 +33,15 @@ interface IProps {
 }
 
 export const Avatar = ({ authorRef }: IProps) => {
-    const author = getAuthor(authorRef);
-    const candidates = authorImageCandidates(author.slug);
+    const { color, initials, name, slug } = getAuthor(authorRef);
+    const candidates = authorImageCandidates(slug);
     const [index, setIndex] = useState<number>(0);
 
     if (index >= candidates.length) {
         return (
             <>
-                <span className="avatar" style={{ backgroundColor: author.color }}>
-                    {author.initials}
+                <span className={styles.Avatar} style={{ backgroundColor: color }}>
+                    {initials}
                 </span>
             </>
         );
@@ -48,11 +50,11 @@ export const Avatar = ({ authorRef }: IProps) => {
     return (
         <>
             <Image
-                width={25}
-                height={25}
-                className="avatar"
+                width={35}
+                height={35}
+                className={styles.Avatar}
                 src={withBlogBasePathForImageSrc(candidates[index])}
-                alt={author.name}
+                alt={name}
                 onError={() => setIndex((idx) => idx + 1)}
             />
         </>

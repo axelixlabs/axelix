@@ -1,0 +1,33 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-2);
+}
+
+.ShareWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ShareEntity {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--line-2);
+    color: var(--ink-3);
+    transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+
+    &:hover {
+        color: var(--accent-deep);
+        border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        background: color-mix(in srgb, var(--axelix-green-100) 50%, transparent);
+    }
+}

@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ArticleHeader, ArticleTOC, JsonLd, ReadProgress } from "@/components";
+import { Article, ArticleHeader, BackLink, JsonLd, ReadProgress } from "@/components";
 import { blog } from "@/lib/source";
 import { withBlogBasePath } from "@/lib/url";
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
@@ -62,15 +61,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <JsonLd data={page.data} slug={slug} />
 
             <div className="wrap">
-                <div className="art-top">
-                    <Link className="back-link" href="/">
-                        <span className="arr">←</span> Back to blog
-                    </Link>
-                </div>
+                <BackLink text="Back to blog" />
 
                 <ArticleHeader data={page.data} />
 
-                <ArticleTOC page={page} slug={slug} />
+                <Article page={page} slug={slug} />
             </div>
         </>
     );

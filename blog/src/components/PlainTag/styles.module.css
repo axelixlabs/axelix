@@ -1,0 +1,30 @@
+.Tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    border: 1px solid var(--line-2);
+
+    &::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--chip, var(--accent));
+    }
+}
+
+.TagLink {
+    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+
+    &:hover {
+        color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+        border-color: color-mix(in srgb, var(--chip, var(--accent)) 45%, transparent);
+        background: color-mix(in srgb, var(--chip, var(--accent)) 18%, transparent);
+    }
+}

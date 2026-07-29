@@ -25,7 +25,7 @@
 }
 
 .PaginationNumber:hover {
-  background-color: color-mix(in srgb, var(--c-green-100) 55%, transparent);
+  background-color: color-mix(in srgb, var(--axelix-green-100) 55%, transparent);
   color: var(--ink);
 }
 
@@ -39,7 +39,8 @@
   padding-inline: 8px;
 }
 
-.PaginationArrow {
+.PaginationArrow,
+.DisabledPaginationArrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -53,26 +54,27 @@
 }
 
 .PaginationArrowPrevIcon {
-  rotate: 180deg; 
+  rotate: 180deg;
 }
 
-.PaginationArrow:hover:not([aria-disabled="true"]) {
-  background-color: color-mix(in srgb, #fff 60%, transparent);
+.DisabledPaginationArrow {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.PaginationArrow:hover {
+  background-color: color-mix(in srgb, var(--axelix-primary-white) 60%, transparent);
   border-color: var(--line-3);
   color: var(--ink);
 }
 
-.PaginationArrow[aria-disabled="true"] {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-@media (width <= 520px) {
+@media (width <=520px) {
   .PaginationPrevNextText {
     display: none;
   }
 
-  .PaginationArrow {
+  .PaginationArrow,
+  .DisabledPaginationArrow {
     padding: 8px;
   }
 }

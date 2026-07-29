@@ -15,33 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { getAuthorName } from "@/helpers";
 import { getAuthors } from "@/lib/authors";
 
-import { Avatar } from "../Avatar";
+import { Avatar } from "./Avatar";
+import styles from "./styles.module.css";
 
 interface IProps {
     authors: string[];
 }
 
 export const Authors = ({ authors }: IProps) => {
-    const list = getAuthors(authors);
-    const names = list.map(({ name }) => name);
-    const label =
-        names.length === 1
-            ? names[0]
-            : names.length === 2
-              ? `${names[0]}, ${names[1]}`
-              : `${names[0]} +${names.length - 1}`;
+    const authorsList = getAuthors(authors);
+    const names = authorsList.map(({ name }) => name);
+    const authorName = getAuthorName(names);
+    const visibleAuthors = authorsList.slice(0, 3)
 
     return (
         <>
-            <div className="authors">
-                <span className="avatars">
-                    {list.slice(0, 3).map(({ name, slug }) => (
+            <div className={styles.MainWrapper}>
+                <span className={styles.AvatarsWrapper}>
+                    {visibleAuthors.map(({ name, slug }) => (
                         <Avatar key={slug} authorRef={name} />
                     ))}
                 </span>
-                <span className="who">{label}</span>
+                <span className={styles.AuthorName}>{authorName}</span>
             </div>
         </>
     );

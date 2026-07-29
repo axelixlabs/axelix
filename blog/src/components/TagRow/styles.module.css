@@ -1,0 +1,27 @@
+.OverflowTagsWrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+
+    &::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--accent);
+    }
+}
+
+.MainWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}

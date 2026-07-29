@@ -48,18 +48,14 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
 
     return (
         <>
-            <nav className={styles.MainWrapper} aria-label="Pagination">
+            <nav className={styles.MainWrapper}>
                 {prevDisabled ? (
-                    <span className={styles.PaginationArrow} aria-disabled="true">
+                    <span className={styles.DisabledPaginationArrow}>
                         <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
                         <span className={styles.PaginationPrevNextText}>Prev</span>
                     </span>
                 ) : (
-                    <Link
-                        className={styles.PaginationArrow}
-                        href={hrefFor(tag, currentPage - 1)}
-                        aria-label="Previous page"
-                    >
+                    <Link className={styles.PaginationArrow} href={hrefFor(tag, currentPage - 1)}>
                         <PaginationArrowIcon className={styles.PaginationArrowPrevIcon} />
                         <span className={styles.PaginationPrevNextText}>Prev</span>
                     </Link>
@@ -74,9 +70,8 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
                         ) : (
                             <Link
                                 key={entry}
-                                className={`${styles.PaginationNumber}${entry === currentPage ? ` ${styles.ActivePaginationNumber}` : ""}`}
+                                className={`${styles.PaginationNumber} ${entry === currentPage ? ` ${styles.ActivePaginationNumber}` : ""}`}
                                 href={hrefFor(tag, entry)}
-                                aria-current={entry === currentPage ? "page" : undefined}
                             >
                                 {String(entry).padStart(2, "0")}
                             </Link>
@@ -85,16 +80,12 @@ export const Pagination = ({ tag, currentPage, totalPages }: IProps) => {
                 </div>
 
                 {nextDisabled ? (
-                    <span className={styles.PaginationArrow} aria-disabled="true">
+                    <span className={styles.DisabledPaginationArrow}>
                         <span className={styles.PaginationPrevNextText}>Next</span>
                         <PaginationArrowIcon />
                     </span>
                 ) : (
-                    <Link
-                        className={styles.PaginationArrow}
-                        href={hrefFor(tag, currentPage + 1)}
-                        aria-label="Next page"
-                    >
+                    <Link className={styles.PaginationArrow} href={hrefFor(tag, currentPage + 1)}>
                         <span className={styles.PaginationPrevNextText}>Next</span>
                         <PaginationArrowIcon />
                     </Link>

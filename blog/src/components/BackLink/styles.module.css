@@ -1,0 +1,21 @@
+.BackToBlogLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-3);
+    transition: color 0.15s;
+}
+
+.BackArrow {
+    transition: transform 0.15s;
+}
+
+.BackToBlogLink:hover {
+    color: var(--accent-deep);
+}
+
+.BackToBlogLink:hover .BackArrow {
+    transform: translateX(-3px);
+}

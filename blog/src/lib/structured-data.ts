@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { IBlogPostingInput } from "@/models";
+
 import { GITHUB_URL, SITE_NAME } from "./blog-metadata";
 
 import { getAuthors } from "./authors";
@@ -30,16 +32,6 @@ const ORGANIZATION = {
     url: getBaseUrl(),
     sameAs: [GITHUB_URL],
 };
-
-interface IBlogPostingInput {
-    title: string;
-    description: string;
-    slug: string;
-    date: string;
-    modified?: string;
-    authors: string[];
-    image?: string | null;
-}
 
 export function getBlogPostingJsonLd(input: IBlogPostingInput) {
     const authors = getAuthors(input.authors).map(({ name }) => ({

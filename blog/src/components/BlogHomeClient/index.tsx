@@ -18,8 +18,8 @@
 "use client";
 import { filterByTag, getAllTags, getCurrentPage, getCurrentTag, getFeaturedAndPosts } from "@/helpers";
 import { PAGE_SIZE } from "@/lib/pagination";
-import type { IBlogCardItem } from "@/lib/source";
 import { SHOW_ALL } from "@/lib/tags";
+import type { IBlogCardItem } from "@/models";
 
 import { useSearchParams } from "next/navigation";
 
@@ -60,7 +60,7 @@ export const BlogHomeClient = ({ items }: IProps) => {
                             Nothing here yet. Try another topic.
                         </div>
                     ) : (
-                        <div>
+                        <>
                             {featured && <FeaturedPost item={featured} />}
 
                             <div className={styles.PostsWrapper}>
@@ -70,7 +70,7 @@ export const BlogHomeClient = ({ items }: IProps) => {
                             </div>
 
                             <Pagination tag={currentTag} currentPage={currentPage} totalPages={totalPages} />
-                        </div>
+                        </>
                     )}
                 </div>
             </main>

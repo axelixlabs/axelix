@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { SiteFooter, TopNav } from "@/components";
+import { Header, SiteFooter } from "@/components";
 
 import type { ReactNode } from "react";
 
@@ -24,7 +24,7 @@ import styles from "./layout.module.css";
 export default function BlogLayout({ children }: { children: ReactNode }) {
     return (
         <>
-            <TopNav />
+            <Header />
             <div className={styles.Page}>{children}</div>
             <SiteFooter />
         </>

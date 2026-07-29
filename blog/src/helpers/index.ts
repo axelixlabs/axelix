@@ -16,9 +16,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { PAGE_SIZE } from "@/lib/pagination";
-import type { IBlogCardItem } from "@/lib/source";
 import { SHOW_ALL } from "@/lib/tags";
-import { IFeaturedAndPosts } from "@/models";
+import type { IBlogCardItem, IFeaturedAndPosts } from "@/models";
 
 import type { CSSProperties } from "react";
 
@@ -93,3 +92,15 @@ export const getFeaturedAndPosts = (
         posts: byTag.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
     };
 };
+
+export const getAuthorName = (names: string[]): string => {
+    if (names.length === 1) {
+        return names[0]
+    }
+
+    if (names.length === 2) {
+        return `${names[0]}, ${names[1]}`
+    }
+
+    return `${names[0]} +${names.length - 1}`;
+}

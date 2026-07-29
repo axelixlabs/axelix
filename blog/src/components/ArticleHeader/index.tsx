@@ -17,14 +17,16 @@
  */
 import { formatDate } from "@/lib/format";
 import { computeReadingTime } from "@/lib/reading-time";
-import { BlogPage } from "@/lib/source";
+import { TBlogPage } from "@/models";
 
 import { Authors } from "../Authors";
 import { PlainTag } from "../PlainTag";
 import { ReadingTime } from "../ReadingTime";
 
+import styles from "./styles.module.css";
+
 interface IProps {
-    data: BlogPage["data"];
+    data: TBlogPage["data"];
 }
 
 export const ArticleHeader = async ({ data }: IProps) => {
@@ -35,17 +37,19 @@ export const ArticleHeader = async ({ data }: IProps) => {
 
     return (
         <>
-            <header className="art-hero">
-                <h1>{title}</h1>
-                {description && <p className="standfirst">{description}</p>}
-                <div className="art-meta">
+            <header className={styles.MainWrapper}>
+                <h1 className={styles.Title}>{title}</h1>
+                {description && <p className={styles.Description}>{description}</p>}
+
+                <div className={styles.Meta}>
                     <Authors authors={authors} />
-                    <span className="sep" />
-                    <span className="m">{formatDate(date)}</span>
-                    <span className="sep" />
-                    <ReadingTime minutes={readingMinutes} className="m" />
+                    <span className={styles.Dot} />
+                    <span className={styles.Date}>{formatDate(date)}</span>
+                    <span className={styles.Dot} />
+                    <ReadingTime minutes={readingMinutes} className={styles.Date} />
                 </div>
-                <div className="rtags">
+
+                <div className={styles.TagsWrapper}>
                     {(tags ?? []).map((tag) => (
                         <PlainTag label={tag} href={`/?tag=${encodeURIComponent(tag)}`} key={tag} />
                     ))}

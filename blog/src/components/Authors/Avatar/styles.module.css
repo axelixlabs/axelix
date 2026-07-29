@@ -1,0 +1,16 @@
+.Avatar {
+    margin-left: -16px;
+    box-shadow: 0 0 0 2px var(--axelix-primary-white);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    color: var(--axelix-primary-white);
+    object-fit: cover;
+
+    &:first-child {
+        margin-left: 0;
+    }
+}

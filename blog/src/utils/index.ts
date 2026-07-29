@@ -16,6 +16,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { chipColorStyle } from "@/helpers";
+import type { INavLink } from "@/models"
 
 export const VISIBLE_TAG_COUNT = 6;
 export const DEFAULT_CHIP_STYLE = chipColorStyle("var(--ink-4)");
+
+export const NAV_LINKS: INavLink[] = [
+    { href: "https://axelix.io/#reference-app", label: "Why Axelix?" },
+    { href: "https://axelix.io/#capabilities", label: "Debugging" },
+    { href: "https://axelix.io/#install", label: "Install" },
+    { href: "https://axelix.io/#enterprise", label: "Enterprise" },
+    { href: "https://axelix.io/#faq", label: "FAQ" },
+];

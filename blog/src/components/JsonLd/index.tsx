@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { BlogPage } from "@/lib/source";
 import { getBlogPostingJsonLd } from "@/lib/structured-data";
+import { TBlogPage } from "@/models";
 
 interface IProps {
-    data: BlogPage["data"];
+    data: TBlogPage["data"];
     slug: string;
 }
 

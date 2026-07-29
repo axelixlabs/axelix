@@ -15,25 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { colorForTag } from "@/lib/tags";
+import { chipColorStyle } from "@/helpers";
+import { getColorForTag } from "@/lib/tags";
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     label: string;
     href?: string;
 }
 
-/** A tag chip. With `href` it renders as a link (e.g. to the filtered home);
- *  without one it stays a plain span (safe inside card-level links). */
 export const PlainTag = ({ label, href }: IProps) => {
-    const style: CSSProperties = { ["--cat" as string]: colorForTag(label) };
+    const style: CSSProperties = chipColorStyle(getColorForTag(label));
 
     if (href) {
         return (
             <>
-                <Link href={href} className="tag tag-link" style={style}>
+                <Link href={href} className={`${styles.Tag} ${styles.TagLink}`} style={style}>
                     {label}
                 </Link>
             </>
@@ -42,7 +43,7 @@ export const PlainTag = ({ label, href }: IProps) => {
 
     return (
         <>
-            <span className="tag" style={style}>
+            <span className={styles.Tag} style={style}>
                 {label}
             </span>
         </>

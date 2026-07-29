@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Authors, DateMeta, TagRow } from "@/components";
-import type { IBlogCardItem } from "@/lib/source";
+import type { IBlogCardItem } from "@/models";
 
 import Image from "next/image";
 import Link from "next/link";

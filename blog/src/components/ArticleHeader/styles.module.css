@@ -1,0 +1,48 @@
+.MainWrapper {
+    margin-block: 30px;
+    border-bottom: 1px solid var(--line-2);
+    max-width: 700px;
+}
+
+.Title {
+    font-weight: 500;
+    font-size: clamp(34px, 4.6vw, 60px);
+    line-height: 1;
+    text-wrap: balance;
+}
+
+.Description {
+    font-size: clamp(17px, 1.5vw, 21px);
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-wrap: pretty;
+    margin-block: 25px 30px;
+}
+
+.TagsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.Meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.Dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink-4);
+}
+
+.Date {
+    font-family: var(--code);
+    font-size: 12.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+}
