@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.domain;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -49,4 +50,22 @@ public record HistoricalApplicationSnapshot(
     //  We should use the ApplicationId here, but we cannot now do that since we need Spring Data JDBC 4.1
     //  that supports embedded fields in the composite keys
     public record SnapshotId(String groupId, String artifactId, LocalDate date) {}
+
+    // Intentionally based on snapshotId only: in k8s the same application can run as several
+    // instances with differing insights, but they must still collapse to one snapshotId.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof HistoricalApplicationSnapshot other)) {
+            return false;
+        }
+        return Objects.equals(snapshotId, other.snapshotId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(snapshotId);
+    }
 }
