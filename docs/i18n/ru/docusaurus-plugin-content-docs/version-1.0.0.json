@@ -1,0 +1,18 @@
+{
+  "version.label": {
+    "message": "Текущая",
+    "description": "The label for version current"
+  },
+  "sidebar.featuresSidebar.category.Insights": {
+    "message": "Аналитика",
+    "description": "The label for category 'Insights' in sidebar 'featuresSidebar'"
+  },
+  "sidebar.featuresSidebar.category.Spring Framework": {
+    "message": "Spring Framework",
+    "description": "The label for category 'Spring Framework' in sidebar 'featuresSidebar'"
+  },
+  "sidebar.featuresSidebar.category.JVM": {
+    "message": "JVM",
+    "description": "The label for category 'JVM' in sidebar 'featuresSidebar'"
+  }
+}

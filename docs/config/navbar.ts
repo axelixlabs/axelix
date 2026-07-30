@@ -67,6 +67,11 @@ export const navbar: Navbar = {
       className: 'navbar__pill',
     },
     {
+      type: 'docsVersionDropdown',
+      position: 'right',
+      className: 'navbar__pill',
+    },
+    {
       type: 'localeDropdown',
       position: 'right',
       className: 'navbar__pill',

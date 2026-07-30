@@ -1,0 +1,19 @@
+.SignInOptionsTable th:nth-child(1),
+.SignInOptionsTable td:nth-child(1) {
+    width: 15%;
+}
+
+.SignInOptionsTable th:nth-child(2),
+.SignInOptionsTable td:nth-child(2) {
+    width: 15%;
+}
+
+.SignInOptionsTable th:nth-child(3),
+.SignInOptionsTable td:nth-child(3) {
+    width: 35%;
+}
+
+.SignInOptionsTable th:nth-child(4),
+.SignInOptionsTable td:nth-child(4) {
+    width: 35%;
+}

@@ -1,0 +1,123 @@
+# Why not just Spring Boot Admin?
+
+Spring Boot Admin (SBA) is often the first tool teams reach for when they want a solution over Spring Boot
+deployments. This page explains where Axelix fits relative to SBA: what problems Axelix was built to solve, and how the
+two products compare on capabilities and operations.
+
+If you are evaluating both tools, read this alongside the [Features](../features/details) reference and
+[Motivation](../product/motivation) for the day-to-day problems Axelix targets.
+
+## Built by engineers who have used SBA for years
+
+First of all, [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin) is a mature, widely adopted project. It aggregates
+health, metrics, loggers, environment data, and other Actuator surfaces behind a single UI, and it has been maintained
+for many years by Codecentric.
+
+The people who design and implement Axelix core have operated Spring Boot Admin in real environments for a long time.
+That experience shapes the product: the pain points below are not theoretical comparisons from a feature checklist, but
+recurring needs that standard Actuator exposure (and therefore SBA) did not satisfy in traditional enterprise setups.
+
+## Reason 1: SBA is bounded by Actuator; Axelix goes further
+
+Spring Boot Admin works **on top of** built-in Spring Boot/Cloud Actuator endpoints. Whatever the Actuator exposes,
+SBA can surface; whatever Actuator cannot do, SBA cannot do either without custom extensions in every managed
+application.
+
+That boundary matters in testing, debugging and finally production operations. Enterprise Spring Boot fleets routinely need to:
+
+- Turn caches off or on **at runtime**, not only evict entries.
+- **Run, reschedule, enable, or disable** `@Scheduled` jobs without a redeploy.
+- See **which SQL ran inside which `@Transactional` method**, with per-execution timings, without standing up a full APM
+  stack.
+- Inspect **why** a bean exists (dependencies, origin, qualifiers) and **why** auto-configuration took a given path.
+
+Those workflows require code in the monitored application (custom endpoints, interceptors, enriched reports).
+
+Axelix ships that logic in the [Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter) as dedicated
+`axelix-*` Actuator endpoints that Master and the UI call. That is the **primary** reason the Axelix project exists:
+Spring Boot Admin did not cover the operational depth teams needed when debugging live services in complex deployments.
+
+For concrete examples of that debugging story, see [Motivation](../product/motivation).
+
+## Reason 2: Axelix is ready to install; SBA takes more assembly
+
+The second major difference is **how you run the console**, not what you see on a single instance.
+
+Spring Boot Admin is typically embedded in an application **you have to build yourself**, or deployed as a separate service you
+package and operate. The upstream project does **not** publish an official Docker image or Helm chart maintained by the
+SBA authors. Wiring **OIDC/OAuth2**, corporate **LDAP**, or fine-grained authorization usually means custom Spring
+Security configuration on top of your deployment.
+
+Axelix Master is distributed as a **ready-to-run** product:
+
+- **Standalone JAR** with the UI bundled — see [Configuring Master](../setting-up-master-ui/configuring-master/).
+- **Official Docker image** and **Docker Compose** examples in the same guide.
+- **Official Helm chart** on [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) (source:
+  [github.com/axelixlabs/helm-charts](https://github.com/axelixlabs/helm-charts)).
+
+Authentication is built in: either in local database for simple setups, or via **OAuth2/OIDC** (Keycloak, Auth0, Okta, Google, and
+other providers) with role mapping — documented in
+[Authentication](../setting-up-master-ui/authentication/). Managed applications are protected by
+JWT between Master and the starter; operation-level authorities (for example `CACHES_TOGGLE`, `SCHEDULED_TASKS_MODIFY`)
+gate destructive actions in the UI and via MCP.
+
+Another important note: **the solid, tested and maintained authentication channel between Axelix Master and starters is already built-in**. With
+Spring Boot Admin - you have to build it all up yourself.
+
+You still add the Axelix starter to each Spring Boot service, but you do not have to build and secure the management
+console from scratch.
+
+## Feature comparison (battle card)
+
+The table below compares **typical** Spring Boot Admin 3.x behaviour (Actuator-backed UI) with **Axelix OSS**. It is important
+to recognize that **SBA deployments vary**: some teams add custom security, notifications, or extensions. So keep in mind that theoretically
+SBA _can_ be extended (by writing some code, packing it, deploying it etc) **but Axelix ships the capability out of the box**.
+
+| Area | Spring Boot Admin | Axelix |
+|------|-------------------|--------|
+| **Distribution** | | |
+| Official Docker image from project maintainers | ❌ (you build your own image) | ✅ |
+| Official Helm chart | ❌ (community charts only) | ✅ |
+| UI bundled with server JAR | Depends on deployment | ✅ |
+| **Security & access** | | |
+| OAuth2 / OIDC sign-in | ❌ (Have to build by your own) | ✅ built-in |
+| Local user store on the console | ❌ | ✅ |
+| Per-operation RBAC on instance actions | ❌ | ✅ roles and authorities |
+| JWT protection of instance Actuator endpoints | ❌ | ✅ starter + Master |
+| **Actuator-standard surfaces** | | |
+| Health, info, metrics | ✅ | ✅ |
+| Loggers (change levels) | ✅ | ✅ ([Loggers](../features/loggers/)) |
+| Environment / config properties (read) | ✅ | ✅ ([Properties](../features/properties), [Configuration Properties](../features/configuration-properties)) |
+| Thread dump, heap dump | ✅ | ✅ ([Thread Dump](../features/thread-dump)) |
+| **Beyond standard Actuator** | | |
+| Enable / disable caches at runtime | ❌ (evict/clear only via `/actuator/caches`) | ✅ ([Caches](../features/caches)) |
+| Clear caches | ✅ | ✅ |
+| Cache hit/miss charts and entry estimates | ❌ | ✅ |
+| List `@Scheduled` tasks | ✅ (read-only via Actuator) | ✅ |
+| Run scheduled task on demand | ❌ | ✅ ([Scheduled Tasks](../features/scheduled-tasks)) |
+| Change cron / fixed delay / fixed rate at runtime | ❌ | ✅ |
+| Enable / disable scheduled tasks at runtime | ❌ | ✅ |
+| Transaction monitoring (`@Transactional` + SQL timeline) | ❌ | ✅ ([Transaction Control](../features/transaction-control)) |
+| Enhanced beans (dependencies, origin, qualifiers, proxying) | Partial (Actuator `/beans`) | ✅ ([Beans](../features/beans)) |
+| Property source + “injected in” / `@ConfigurationProperties` links | Partial | ✅ ([Properties](../features/properties)) |
+| Auto-configuration conditions report | ✅ | ✅ ([Conditions](../features/conditions)) |
+| Grouped metrics with live charts and tag drill-down | ✅ | ✅ ([Metrics](../features/metrics)) |
+| GC log enable/disable, trigger GC, download GC log | ❌ | ✅ ([Garbage Collector](../features/garbage-collector)) |
+| Live thread dump polling + contention monitoring toggle | ✅ | ✅ ([Thread Dump](../features/thread-dump)) |
+| Feign client integration discovery | ❌ | ✅ (`axelix-feign` endpoint) |
+| One-click application state export (ZIP) | Partial | ✅ ([Details](../features/details) — Download state) |
+| **AI & automation** | | |
+| Model Context Protocol (MCP) server for AI agents | ❌ | ✅ ([MCP](../ui-guide/mcp), [MCP Tools](../setting-up-master-ui/mcp/mcp-tools)) |
+| Same operations available to UI and MCP clients | ❌ | ✅ |
+| **Fleet view** | | |
+| Wallboard of all instances with health | ✅ | ✅ ([Wallboard](../ui-guide/wallboard)) |
+| Version filters (Spring Boot, Java, Framework, Kotlin) | Partial | ✅ |
+| Kubernetes / Docker Compose discovery | ✅ (via Spring Cloud / custom) | ✅ ([What is Master](../setting-up-master-ui/what-is-master)) |
+
+## Related
+
+- [Introduction](../product/introduction) — what Axelix is.
+- [Motivation](../product/motivation) — problems Axelix was created to solve.
+- [What is Master](../setting-up-master-ui/what-is-master) — discovery and the management console.
+- [Configuring Master](../setting-up-master-ui/configuring-master/) — JAR, Docker, Helm, Compose.
+- [Features](../features/details) — per-screen reference for managed instances.
