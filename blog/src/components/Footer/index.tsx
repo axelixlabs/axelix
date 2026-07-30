@@ -15,79 +15,52 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { GITHUB_URL } from "@/lib/blog-metadata";
-
-import { Logo } from "../Logo";
+import { EmailIcon, ExternalLinkIcon, GitHubIcon, LinkedinIcon, LogoIcon, XTwitterIcon } from "@/assets";
+import { BLOG_URL, DOCS_URL, GITHUB_URL, LINKEDIN_URL, MAIL_URL, OSS_LICENSE_URL, X_URL } from "@/lib/blog-metadata";
 
 import styles from "./styles.module.css";
 
-export const SiteFooter = () => {
+export const Footer = () => {
     return (
         <>
             <footer className={styles.Footer}>
-                <div className="wrap">
-                    <div className={styles.FooterTop}>
+                <div className={`wrap ${styles.Wrap}`}>
+                    <div className={styles.Top}>
                         <div className={styles.BrandSide}>
-                            <a className={styles.FooterBrand} href="https://axelix.io">
-                                <Logo />
-                            </a>
-                            <p className={styles.Tagline}>
+                            <LogoIcon color="#fff" />
+                            <p className={styles.Tag}>
                                 AI monitoring for Spring Boot in production.{" "}
                                 <em>Open-source, MCP-native, never your bottleneck.</em>
                             </p>
                             <div className={styles.Socials}>
                                 <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.7"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
-                                    </svg>
+                                    <GitHubIcon />
                                 </a>
-                                <a href="https://x.com/axelixlabs" target="_blank" rel="noopener noreferrer">
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.7"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
-                                        <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
-                                    </svg>
+                                <a href={X_URL} target="_blank" rel="noopener noreferrer">
+                                    <XTwitterIcon />
                                 </a>
-                                <a href="mailto:hello@axelix.io">
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.7"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
-                                        <path d="M3 7l9 6l9 -6" />
-                                    </svg>
+                                <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
+                                    <LinkedinIcon />
+                                </a>
+                                <a href={`mailto:${MAIL_URL}`}>
+                                    <EmailIcon />
                                 </a>
                             </div>
                         </div>
+
+                        {/* Nav columns */}
                         <div className={styles.NavCols}>
                             <div className={styles.Col}>
                                 <h4>Product</h4>
                                 <ul>
                                     <li>
-                                        <a href="https://axelix.io/#capabilities">Capabilities</a>
+                                        <a href="#capabilities">Capabilities</a>
                                     </li>
                                     <li>
-                                        <a href="https://axelix.io/#install">Install</a>
+                                        <a href="#install">Install</a>
                                     </li>
                                     <li>
-                                        <a href="https://axelix.io/#faq">FAQ</a>
+                                        <a href="#faq">FAQ</a>
                                     </li>
                                 </ul>
                             </div>
@@ -95,13 +68,20 @@ export const SiteFooter = () => {
                                 <h4>Resources</h4>
                                 <ul>
                                     <li>
-                                        <a href="https://axelix.io/docs">Documentation</a>
+                                        <a href={DOCS_URL} target="_blank" rel="noopener noreferrer">
+                                            Documentation <ExternalLinkIcon className={styles.ExtArr} />
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                                            GitHub <ExternalLinkIcon className={styles.ExtArr} />
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href={GITHUB_URL}>GitHub</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://axelix.io/docs">Changelog</a>
+                                        <a href={`${GITHUB_URL}/releases`} target="_blank" rel="noopener noreferrer">
+                                            Changelog <ExternalLinkIcon className={styles.ExtArr} />
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -109,13 +89,17 @@ export const SiteFooter = () => {
                                 <h4>Company</h4>
                                 <ul>
                                     <li>
-                                        <a href="https://axelix.io">About</a>
+                                        <a href="#" target="_blank" rel="noopener noreferrer">
+                                            About
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="/">Blog</a>
+                                        <a href={BLOG_URL} target="_blank" rel="noopener noreferrer">
+                                            Blog <ExternalLinkIcon className={styles.ExtArr} />
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="mailto:hello@axelix.io">Contact</a>
+                                        <a href={`mailto:${MAIL_URL}`}>Contact</a>
                                     </li>
                                 </ul>
                             </div>
@@ -123,23 +107,33 @@ export const SiteFooter = () => {
                                 <h4>Legal</h4>
                                 <ul>
                                     <li>
-                                        <a href={`${GITHUB_URL}/blob/master/LICENSE`}>License</a>
+                                        <a href={OSS_LICENSE_URL} target="_blank" rel="noopener noreferrer">
+                                            OSS License
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://axelix.io">Privacy</a>
+                                        <a href="#" target="_blank" rel="noopener noreferrer">
+                                            Privacy
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://axelix.io">Terms</a>
+                                        <a href="#" target="_blank" rel="noopener noreferrer">
+                                            Terms
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    <div className={styles.FooterWatermark}>
+
+                    {/* Watermark */}
+                    <div className={styles.Watermark}>
                         <span>AXELIX</span>
                     </div>
-                    <div className={styles.FooterBottom}>
-                        <span className="copy">© 2026 Axelix Labs</span>
+
+                    {/* Bottom strip */}
+                    <div className={styles.Bottom}>
+                        <span>© 2026 Axelix Labs</span>
                         <div className={styles.Meta}>
                             <span>LGPL-3.0</span>
                             <span className={styles.DotSep} />
