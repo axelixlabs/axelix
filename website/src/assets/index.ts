@@ -44,6 +44,7 @@ export { default as TasksIcon } from "./icons/tasks.svg";
 export { default as LogoIcon } from "./icons/logo.svg";
 export { default as CopyIcon } from "./icons/copy.svg";
 export { default as PlusIcon } from "./icons/plus.svg";
+export { default as PlayIcon } from "./icons/play.svg";
 export { default as RbacIcon } from "./icons/rbac.svg";
 export { default as K8sIcon } from "./icons/k8s.svg";
 export { default as SsoIcon } from "./icons/sso.svg";

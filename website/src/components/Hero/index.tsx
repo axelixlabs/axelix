@@ -19,6 +19,7 @@ import { HeroActions } from "./HeroActions";
 import { HeroBackground } from "./HeroBackground";
 import { HeroBenefits } from "./HeroBenefits";
 import { HeroHeadline } from "./HeroHeadline";
+import { HeroVideo } from "./HeroVideo";
 import styles from "./styles.module.css";
 
 export const Hero = () => {
@@ -34,6 +35,8 @@ export const Hero = () => {
 
                     <HeroBenefits />
                 </div>
+
+                <HeroVideo />
             </div>
         </header>
     );

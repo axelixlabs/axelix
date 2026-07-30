@@ -1,10 +1,13 @@
+/* Viewport-tall, not section-tall: stretching the 1400x800 viewBox past that makes "slice" scale the mesh by height. */
 .HeroBackground {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    left: 0;
     z-index: -1;
     pointer-events: none;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, rgb(0 0 0 / 18%) 0%, rgb(0 0 0 / 32%) 22%, rgb(0 0 0 / 70%) 55%, #000 85%);
 }
 
