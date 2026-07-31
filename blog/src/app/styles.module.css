@@ -1,0 +1,14 @@
+.NotFoundMainWrapper {
+    padding-block: 120px;
+    text-align: center;
+}
+
+.NotFoundTitle {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 500;
+}
+
+.NotFoundDescription {
+    color: var(--ink-3);
+    margin-block: 20px 10px;
+}

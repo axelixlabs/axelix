@@ -1,7 +1,3 @@
-/* =========================================================================
-   AXELIX BLOG — design tokens + presentation, ported from the design
-   prototype (blog.css + article.css). Light-only.
-   ========================================================================= */
 :root {
     --axelix-primary-white: #fff;
     --c-green-50: #f6faef;
@@ -26,8 +22,4 @@
     --line-3: #0f141033;
     --font: var(--font-golos), ui-sans-serif, system-ui, -apple-system, sans-serif;
     --code: var(--font-jetbrains), ui-monospace, "SFMono-Regular", menlo, monospace;
-    --maxw: 1320px;
-    --pad: clamp(20px, 4vw, 56px);
-    --accent: var(--c-green-500);
-    --accent-deep: var(--c-green-700);
 }

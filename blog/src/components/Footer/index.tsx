@@ -16,7 +16,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { EmailIcon, ExternalLinkIcon, GitHubIcon, LinkedinIcon, LogoIcon, XTwitterIcon } from "@/assets";
-import { BLOG_URL, DOCS_URL, GITHUB_URL, LINKEDIN_URL, MAIL_URL, OSS_LICENSE_URL, X_URL } from "@/lib/blog-metadata";
+import {
+    BLOG_URL,
+    DOCS_URL,
+    GITHUB_URL,
+    LINKEDIN_URL,
+    MAIL_URL,
+    OSS_LICENSE_URL,
+    WEBSITE_URL,
+    X_URL,
+} from "@/lib/blog-metadata";
 
 import styles from "./styles.module.css";
 
@@ -24,7 +33,7 @@ export const Footer = () => {
     return (
         <>
             <footer className={styles.Footer}>
-                <div className={`wrap ${styles.Wrap}`}>
+                <div className={`MainContainer ${styles.Wrap}`}>
                     <div className={styles.Top}>
                         <div className={styles.BrandSide}>
                             <LogoIcon color="#fff" />
@@ -137,7 +146,7 @@ export const Footer = () => {
                         <div className={styles.Meta}>
                             <span>LGPL-3.0</span>
                             <span className={styles.DotSep} />
-                            <a href="https://axelix.io" className={styles.Status}>
+                            <a href={WEBSITE_URL} className={styles.Status}>
                                 All systems operational
                             </a>
                         </div>

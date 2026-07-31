@@ -24,7 +24,7 @@ import styles from "./styles.module.css";
 
 export const Header = () => {
     return (
-        <nav className={`wrap ${styles.MainWrapper}`}>
+        <nav className={`MainContainer ${styles.MainWrapper}`}>
             <div className={styles.InnerWrapper}>
                 <LogoIcon className={styles.LogoIcon} />
                 <NavLinks />

@@ -5,10 +5,3 @@
   font-size: 12px;
   color: var(--ink-3);
 }
-
-.Dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--ink-4);
-}

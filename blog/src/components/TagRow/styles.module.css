@@ -7,15 +7,15 @@
     font-weight: 500;
     padding: 4px 12px;
     border-radius: 999px;
-    color: var(--accent);
-    border: 1px solid var(--accent);
+    color: var(--c-green-500);
+    border: 1px solid var(--c-green-500);
 
     &::before {
         content: "";
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background-color: var(--accent);
+        background-color: var(--c-green-500);
     }
 }
 

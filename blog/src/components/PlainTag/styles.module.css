@@ -7,7 +7,7 @@
     font-weight: 500;
     padding: 4px 12px;
     border-radius: 999px;
-    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 60%, var(--ink));
     border: 1px solid var(--line-2);
 
     &::before {
@@ -15,7 +15,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: var(--chip, var(--accent));
+        background: var(--chip, var(--c-green-500));
     }
 }
 
@@ -23,8 +23,8 @@
     transition: border-color 0.15s, background-color 0.15s, color 0.15s;
 
     &:hover {
-        color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
-        border-color: color-mix(in srgb, var(--chip, var(--accent)) 45%, transparent);
-        background: color-mix(in srgb, var(--chip, var(--accent)) 18%, transparent);
+        color: color-mix(in srgb, var(--chip, var(--c-green-500)) 75%, var(--ink));
+        border-color: color-mix(in srgb, var(--chip, var(--c-green-500)) 45%, transparent);
+        background: color-mix(in srgb, var(--chip, var(--c-green-500)) 18%, transparent);
     }
 }

@@ -6,5 +6,3 @@
 @import "./styles/base.css";
 @import "./styles/code-tabs.css";
 @import "./styles/motion.css";
-
-@source "../../node_modules/fumadocs-ui/dist/**/*.js";

@@ -18,7 +18,7 @@
 }
 
 .Accent {
-  color: var(--accent);
+  color: var(--c-green-500);
 }
 
 @media (width <= 640px) {

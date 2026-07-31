@@ -31,7 +31,7 @@ export default async function HomePage() {
     return (
         <>
             <header className={styles.MainWrapper}>
-                <div className="wrap">
+                <div className="MainContainer">
                     <h1 className={styles.Title}>
                         Axelix <span className={styles.Accent}>Blog</span>
                     </h1>

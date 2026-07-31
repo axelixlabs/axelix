@@ -27,7 +27,7 @@
     border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
-    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 60%, var(--ink));
     border: 1px solid var(--line-2);
     transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     white-space: nowrap;
@@ -49,13 +49,13 @@
     border-radius: 9px;
     font-size: 13px;
     font-weight: 500;
-    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 60%, var(--ink));
     transition: background-color 0.12s, color 0.12s;
 }
 
 .MenuOption:hover {
-    background-color: color-mix(in srgb, var(--chip, var(--accent)) 12%, transparent);
-    color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+    background-color: color-mix(in srgb, var(--chip, var(--c-green-500)) 12%, transparent);
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 75%, var(--ink));
 }
 
 .ActiveOption {

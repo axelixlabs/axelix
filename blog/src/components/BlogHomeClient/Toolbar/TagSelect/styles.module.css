@@ -20,8 +20,8 @@
 }
 
 .Open .SelectOpenTrigger {
-    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--c-green-500) 45%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-green-500) 12%, transparent);
 }
 
 .Label {
@@ -40,13 +40,13 @@
     border-radius: 8px;
     font-size: 12px;
     font-weight: 500;
-    color: color-mix(in srgb, var(--chip, var(--accent)) 60%, var(--ink));
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 60%, var(--ink));
     transition: background-color 0.12s, color 0.12s;
 }
 
 .SelectOption:hover {
-    background-color: color-mix(in srgb, var(--chip, var(--accent)) 12%, transparent);
-    color: color-mix(in srgb, var(--chip, var(--accent)) 75%, var(--ink));
+    background-color: color-mix(in srgb, var(--chip, var(--c-green-500)) 12%, transparent);
+    color: color-mix(in srgb, var(--chip, var(--c-green-500)) 75%, var(--ink));
 }
 
 .Active {

@@ -42,7 +42,7 @@ export const Toolbar = ({ currentTag, tags }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className="wrap">
+                <div className="MainContainer">
                     <div className={styles.ToolbarRow}>
                         <div className={styles.ChipsWrapper}>
                             <Link href="/" style={DEFAULT_CHIP_STYLE}>

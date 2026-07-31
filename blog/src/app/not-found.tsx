@@ -15,28 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import Link from "next/link";
+import { BackLink } from "@/components";
+
+import styles from "./styles.module.css";
 
 export default function NotFound() {
     return (
-        <div className="page">
-            <div className="wrap" style={{ padding: "120px 0", textAlign: "center" }}>
-                <h1
-                    style={{
-                        fontSize: "clamp(40px, 6vw, 80px)",
-                        fontWeight: 500,
-                        margin: 0,
-                    }}
-                >
-                    404
-                </h1>
-                <p style={{ color: "var(--ink-3)", marginTop: 12 }}>That page wandered off. Let&apos;s get you back.</p>
-                <p style={{ marginTop: 24 }}>
-                    <Link className="ext-link" href="/">
-                        ← Back to the blog
-                    </Link>
-                </p>
+        <>
+            <div className={`MainContainer ${styles.NotFoundMainWrapper}`}>
+                <h1 className={styles.NotFoundTitle}>404</h1>
+                <p className={styles.NotFoundDescription}>That page wandered off. Let&apos;s get you back.</p>
+                <BackLink text="Back to the blog" />
             </div>
-        </div>
+        </>
     );
 }

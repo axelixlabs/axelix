@@ -53,7 +53,7 @@
 }
 
 .MainWrapper:hover .Title {
-  color: var(--accent-deep);
+  color: var(--c-green-700);
 }
 
 .MainWrapper:hover .CoverImage {

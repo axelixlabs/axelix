@@ -13,7 +13,7 @@
 }
 
 .BackToBlogLink:hover {
-    color: var(--accent-deep);
+    color: var(--c-green-700);
 }
 
 .BackToBlogLink:hover .BackArrow {

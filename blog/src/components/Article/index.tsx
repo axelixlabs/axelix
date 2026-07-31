@@ -27,6 +27,7 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 
 import { ArticleFooter } from "./ArticleFooter";
 import styles from "./styles.module.css";
+import { ArticleHeader } from "./ArticleHeader";
 
 interface IProps {
     page: TBlogPage;
@@ -40,6 +41,8 @@ export const Article = ({ page, slug }: IProps) => {
 
     return (
         <>
+            <ArticleHeader data={page.data} />
+
             <TOCProvider toc={pageData.toc}>
                 <div className={styles.ArticleContainer}>
                     <article className={styles.ArticleContentWrapper}>

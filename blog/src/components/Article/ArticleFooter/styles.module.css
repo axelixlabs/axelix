@@ -26,8 +26,8 @@
     transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 
     &:hover {
-        color: var(--accent-deep);
-        border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        color: var(--c-green-700);
+        border-color: color-mix(in srgb, var(--c-green-500) 40%, transparent);
         background: color-mix(in srgb, var(--axelix-green-100) 50%, transparent);
     }
 }

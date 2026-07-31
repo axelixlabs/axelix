@@ -15,13 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Authors, PlainTag, ReadingTime } from "@/components";
 import { formatDate } from "@/lib/format";
 import { computeReadingTime } from "@/lib/reading-time";
 import { TBlogPage } from "@/models";
-
-import { Authors } from "../Authors";
-import { PlainTag } from "../PlainTag";
-import { ReadingTime } from "../ReadingTime";
 
 import styles from "./styles.module.css";
 
@@ -43,9 +40,9 @@ export const ArticleHeader = async ({ data }: IProps) => {
 
                 <div className={styles.Meta}>
                     <Authors authors={authors} />
-                    <span className={styles.Dot} />
+                    <span className="DotSeparator" />
                     <span className={styles.Date}>{formatDate(date)}</span>
-                    <span className={styles.Dot} />
+                    <span className="DotSeparator" />
                     <ReadingTime minutes={readingMinutes} className={styles.Date} />
                 </div>
 

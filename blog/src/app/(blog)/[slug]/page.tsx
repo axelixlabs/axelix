@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Article, ArticleHeader, BackLink, JsonLd, ReadProgress } from "@/components";
+import { Article, BackLink, JsonLd, ReadProgress } from "@/components";
 import { blog } from "@/lib/source";
 import { withBlogBasePath } from "@/lib/url";
 
@@ -60,10 +60,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
             <JsonLd data={page.data} slug={slug} />
 
-            <div className="wrap">
+            <div className="MainContainer">
                 <BackLink text="Back to blog" />
-
-                <ArticleHeader data={page.data} />
 
                 <Article page={page} slug={slug} />
             </div>

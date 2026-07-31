@@ -51,7 +51,7 @@ export const BlogHomeClient = ({ items }: IProps) => {
         <>
             <Toolbar currentTag={currentTag} tags={allTags} />
             <main className={styles.PostsWrapper}>
-                <div className="wrap">
+                <div className="MainContainer">
                     <BlogMeta byTag={byTag} currentTag={currentTag} />
 
                     {byTag.length === 0 ? (

@@ -14,13 +14,13 @@
 
 .Search:focus-within,
 .Search:focus-visible {
-    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--c-green-500) 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-green-500) 14%, transparent);
     outline: none;
 }
 
 .Search:hover {
-    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    border-color: color-mix(in srgb, var(--c-green-500) 40%, transparent);
 }
 
 .Placeholder {

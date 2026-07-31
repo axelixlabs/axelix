@@ -31,7 +31,7 @@ export const DateMeta = ({ date, readingMinutes }: IProps) => {
         <>
             <div className={styles.MainWrapper}>
                 <span>{formatDate(date)}</span>
-                <span className={styles.Dot} />
+                <span className="DotSeparator" />
                 <ReadingTime minutes={readingMinutes} />
             </div>
         </>
