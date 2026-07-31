@@ -99,7 +99,7 @@ export const Installer = () => {
             } catch {
                 setAxelixVersionData((prev) => ({
                     ...prev,
-                    version: "<VERSION>",
+                    version: "1.0.0",
                 }));
             } finally {
                 setAxelixVersionData((prev) => ({
