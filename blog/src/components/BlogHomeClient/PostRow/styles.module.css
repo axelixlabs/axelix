@@ -34,7 +34,7 @@
 .CoverImageWrapper,
 .CoverImagePlaceholder {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
   border-radius: 16px;
   overflow: hidden;
 }

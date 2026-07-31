@@ -20,6 +20,6 @@
     --line: #0f141014;
     --line-2: #0f14101f;
     --line-3: #0f141033;
-    --font: var(--font-golos), ui-sans-serif, system-ui, -apple-system, sans-serif;
-    --code: var(--font-jetbrains), ui-monospace, "SFMono-Regular", menlo, monospace;
+    --font-golos: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, "SFMono-Regular", menlo, monospace;
 }

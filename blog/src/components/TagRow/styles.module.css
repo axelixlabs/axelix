@@ -2,7 +2,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--font);
+    font-family: var(--font-golos);
     font-size: 12px;
     font-weight: 500;
     padding: 4px 12px;

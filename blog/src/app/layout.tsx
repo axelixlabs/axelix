@@ -16,13 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import "./global.css";
-import { getBaseUrl, withBlogBasePath } from "@/lib/url";
 
 import { BLOG_HOME_DESCRIPTION, BLOG_HOME_TITLE, SITE_NAME } from "@/lib/blog-metadata";
+import { getBaseUrl, withBlogBasePath } from "@/lib/url";
 
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
     metadataBase: new URL(getBaseUrl()),
@@ -33,14 +33,9 @@ export const metadata: Metadata = {
     description: BLOG_HOME_DESCRIPTION,
 };
 
-const fontVars: CSSProperties = {
-    ["--font-golos" as string]: "'Golos Text'",
-    ["--font-jetbrains" as string]: "'JetBrains Mono'",
-};
-
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="en" style={fontVars} data-scroll-behavior="smooth">
+        <html lang="en" data-scroll-behavior="smooth">
             <body suppressHydrationWarning>
                 <RootProvider theme={{ enabled: false }} search={{ options: { api: withBlogBasePath("/api/search") } }}>
                     {children}
