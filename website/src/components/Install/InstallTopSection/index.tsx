@@ -23,7 +23,8 @@ export const InstallTopSection = () => {
             <div>
                 <span className={styles.Eyebrow}>Install</span>
                 <h2 className={styles.Title}>
-                    Install Axelix Master. Add library & plugin - <span className="UnderlinedText">that&#39;s all you need</span>
+                    Install Axelix Master. Add library & plugin -{" "}
+                    <span className="UnderlinedText">that&#39;s all you need</span>
                 </h2>
             </div>
             <p className={styles.IntroText}>
