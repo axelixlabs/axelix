@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { CopyIcon } from "@/assets";
+import { useAxelixVersion } from "@/hooks/useAxelixVersion";
 
 import { useRef, useState } from "react";
 
@@ -29,7 +30,8 @@ export const PluginMini = ({ activeSnippetRef }: IProps) => {
     const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
     const timers = useRef<Array<ReturnType<typeof setTimeout> | null>>([null, null, null]);
 
-    const axelixActualVersion = `1.0.0`;
+    const { version } = useAxelixVersion();
+    const axelixActualVersion = version ?? "1.0.0";
 
     const blocks: { label: string; code: string }[] = [
         {

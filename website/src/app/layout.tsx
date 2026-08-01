@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Footer, Header, Metric } from "@/components";
+import { AxelixVersionProvider } from "@/hooks/useAxelixVersion";
 
 import type { Metadata } from "next";
 import { Golos_Text, JetBrains_Mono } from "next/font/google";
@@ -42,10 +43,12 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${golosText.variable} ${jetBrainsMono.variable}`}>
             <body>
-                <Metric />
-                <Header />
-                <main>{children}</main>
-                <Footer />
+                <AxelixVersionProvider>
+                    <Metric />
+                    <Header />
+                    <main>{children}</main>
+                    <Footer />
+                </AxelixVersionProvider>
             </body>
         </html>
     );

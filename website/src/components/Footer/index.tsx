@@ -17,6 +17,7 @@
  */
 import { DiscordIcon, EmailIcon, ExternalLinkIcon, GithubIcon, LinkedinIcon, LogoIcon, XTwitterIcon } from "@/assets";
 
+import { FooterVersion } from "./FooterVersion";
 import styles from "./styles.module.css";
 
 const Footer = () => {
@@ -153,7 +154,7 @@ const Footer = () => {
                 <div className={styles.Bottom}>
                     <span>© 2026 Axelix Labs</span>
                     <div className={styles.Meta}>
-                        <span>v1.0.0</span>
+                        <FooterVersion />
                         <span className={styles.DotSep}></span>
                         <span>Open Core</span>
                         <span className={styles.DotSep}></span>

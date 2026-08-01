@@ -15,6 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useAxelixVersion } from "@/hooks/useAxelixVersion";
+
+import { AxelixVersion } from "../AxelixVersion";
 import styles from "../shared.module.css";
 
 interface IProps {
@@ -22,6 +25,8 @@ interface IProps {
 }
 
 export const K8sSnippet = ({ refEl }: IProps) => {
+    const axelixVersionData = useAxelixVersion();
+
     return (
         <pre
             className={styles.Snippet}
@@ -51,7 +56,10 @@ export const K8sSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.Ar}>--version</span> <span className={styles.St}>1.0.0</span>{" "}
+                    <span className={styles.Ar}>--version</span>{" "}
+                    <span className={styles.St}>
+                        <AxelixVersion axelixVersionData={axelixVersionData} />
+                    </span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
