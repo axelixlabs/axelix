@@ -7,7 +7,7 @@ plugins {
 val restAssuredVersion = "5.5.7"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
-val junitVersion = "6.1.1"
+val junitVersion = "6.1.2"
 val jsoupVersion = "1.22.2"
 val playwrightVersion = "1.61.0"
 

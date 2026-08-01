@@ -17,7 +17,7 @@ val mavenPluginVersion = "3.9.16"
 val mavenPluginAnnotationsVersion = "3.15.2"
 val junitBomVersion = "5.14.4"
 val mavenVerifierVersion = "1.8.0"
-val assertjVersion = "3.27.6"
+val assertjVersion = "3.27.7"
 
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")

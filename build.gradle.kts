@@ -14,7 +14,7 @@ import kotlin.io.path.readText
 plugins {
     id("java")
     id("maven-publish")
-    id("com.diffplug.spotless") version "8.8.0"
+    id("com.diffplug.spotless") version "8.9.0"
     id("pmd")
     id("signing")
     id("net.ltgt.errorprone") version "4.4.0"
@@ -67,7 +67,7 @@ subprojects {
 
     dependencies {
         errorprone("com.google.errorprone:error_prone_core:2.50.0")
-        errorprone("com.uber.nullaway:nullaway:0.13.7")
+        errorprone("com.uber.nullaway:nullaway:0.13.8")
     }
 
     spotless {

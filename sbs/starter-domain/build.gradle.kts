@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("shared")
-    kotlin("jvm") version "2.4.0"
+    kotlin("jvm") version "2.4.10"
 }
 
 val springBootTestPlatformVersion = "2.7.18"
@@ -23,7 +23,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework:spring-web")
     testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.2")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
@@ -51,7 +51,7 @@ testing {
             }
 
             dependencies {
-                implementation("org.jetbrains.lincheck:lincheck:3.6")
+                implementation("org.jetbrains.lincheck:lincheck:3.7")
                 implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
                 // Additional Test Suites do not inherit production dependencies automatically.

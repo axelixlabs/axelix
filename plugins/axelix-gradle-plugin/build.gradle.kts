@@ -27,8 +27,8 @@ gradlePlugin {
 
 // pinned to the 6.x line since 7.x requires Java 17+, above this plugin's Java 11 floor.
 val jgitVersion = "6.10.1.202505221210-r"
-val junitBomVersion = "5.14.0"
-val assertjVersion = "3.27.6"
+val junitBomVersion = "5.14.4"
+val assertjVersion = "3.27.7"
 
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")

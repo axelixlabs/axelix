@@ -14,7 +14,7 @@ val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
 val springDocSwaggerVersion = "3.0.3"
-val sqliteVersion = "3.53.2.0"
+val sqliteVersion = "3.53.2.1"
 val nimbusJoseJwt ="10.9.1"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.6.0"
@@ -24,7 +24,7 @@ val jsonUnitAssertJVersion = "2.40.1"
 val postgresqlVersion = "42.7.13"
 val nettyVersion = "4.2.16.Final"
 val tomcatVersion = "11.0.24"
-val vertxVersion = "4.5.29"
+val vertxVersion = "4.5.31"
 
 dependencies {
     // Self
@@ -93,7 +93,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.1.2")
+    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
     testImplementation("org.instancio:instancio-core:${instancioVersion}")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
