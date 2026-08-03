@@ -16,10 +16,11 @@ inputs:
 runs:
   using: composite
   steps:
+     # TODO remove --provenance=false
     - name: Build Docker Image
       working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run: docker build --tag $CR_URL/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} --file docker/Dockerfile .
+      run: docker build --provenance=false --tag $CR_URL/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} --file docker/Dockerfile .
 
     - name: Docker login to Yandex Cloud CR
       shell: bash

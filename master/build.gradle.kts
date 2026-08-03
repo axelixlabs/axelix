@@ -3,9 +3,9 @@ import org.gradle.kotlin.dsl.axelix
 
 plugins {
     id("shared")
-    id("org.springframework.boot") version "4.1.0"
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
+    id("java-test-fixtures")
 }
 
 val springBootVersion = "4.1.0"
@@ -28,15 +28,15 @@ val vertxVersion = "4.5.31"
 
 dependencies {
     // Self
-    implementation(project(":common:domain"))
-    implementation(project(":common:api"))
-    implementation(project(":common:auth"))
-    implementation(project(":common:utils"))
+    api(project(":common:domain"))
+    api(project(":common:api"))
+    api(project(":common:auth"))
+    api(project(":common:utils"))
 
     // Impl
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
-    implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    api(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
+    api(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Security Patches
     implementation(platform("io.netty:netty-bom:${nettyVersion}"))
@@ -56,11 +56,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
 
-    implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
+    api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.springframework.security:spring-security-crypto")
 
-    implementation("org.slf4j:slf4j-api")
+    api("org.slf4j:slf4j-api")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
@@ -78,23 +78,30 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
 
+    // Test Self
+    testImplementation(testFixtures(project))
+    testFixturesImplementation(project(":common:domain"))
+    testFixturesImplementation(project(":common:api"))
+    testFixturesImplementation(project(":common:auth"))
+    testFixturesImplementation(project(":common:utils"))
+
     // Test
-    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
-    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
+    testFixturesApi(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testFixturesApi(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-jdbc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-restclient-test")
+    testFixturesApi("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testFixturesApi("org.springframework.boot:spring-boot-testcontainers")
 
-    testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("org.testcontainers:testcontainers-mysql")
-    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("com.squareup.okhttp3:mockwebserver")
-    testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
-    testImplementation("org.instancio:instancio-core:${instancioVersion}")
+    testFixturesApi("org.testcontainers:testcontainers-postgresql")
+    testFixturesApi("org.testcontainers:testcontainers-mysql")
+    testFixturesApi("org.testcontainers:testcontainers-junit-jupiter")
+    testFixturesApi("com.squareup.okhttp3:mockwebserver")
+    testFixturesApi("com.squareup.okhttp3:okhttp")
+    testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.2")
+    testFixturesApi("org.instancio:instancio-core:${instancioVersion}")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // annotation processor
@@ -112,15 +119,6 @@ java {
     }
 }
 
-// We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need
-tasks.jar {
-    enabled = false
-}
-
-tasks.bootJar {
-    archiveFileName = "master.jar"
-}
-
 tasks.processResources {
 
     val projectVersion = version.toString()
@@ -134,6 +132,11 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-parameters")
+    options.release = 25
 }
 
 axelix {

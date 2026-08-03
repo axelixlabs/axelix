@@ -3,7 +3,7 @@ FROM eclipse-temurin:25-jre-alpine AS training
 
 WORKDIR /application
 
-COPY master/build/libs/master.jar master.jar
+COPY axelix-enterprise/master-enterprise/build/libs/master-unified.jar master.jar
 
 # Step 1: Record class loading profile (training run — app may crash without infra, that's expected)
 RUN java \

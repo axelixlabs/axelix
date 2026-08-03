@@ -63,6 +63,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
+          submodules: 'true'
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
@@ -93,9 +96,10 @@ jobs:
           file: gradle.properties
           property: axelixVersion
 
+      # TODO remove --provenance=false
       - name: Build Docker Image
         run: |
-          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
+          docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL

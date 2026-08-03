@@ -45,6 +45,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
+          submodules: 'true'
 
       - name: Checkout helm-charts
         uses: actions/checkout@v7
@@ -65,7 +68,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Master jar
-        run: ./gradlew :master:bootJar --no-configuration-cache --no-build-cache
+        run: ./gradlew :master-enterprise:bootJar --no-configuration-cache --no-build-cache
 
       - name: Build Master Docker image
         run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file Dockerfile .

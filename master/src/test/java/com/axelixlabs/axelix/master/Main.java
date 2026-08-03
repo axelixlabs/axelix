@@ -15,14 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.response.settings;
+package com.axelixlabs.axelix.master;
 
-import java.util.List;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
+import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 
 /**
- * Response containing the list of available authentication providers and their settings.
+ * Minimal Spring Boot application used exclusively for testing this application.
  *
- * @since 06.03.2026
  * @author Nikita Kirillov
  */
-public record AxelixSettings(List<AuthenticationOption> authenticationOptions, boolean isMcpServerEnabled) {}
+@SpringBootApplication(
+        exclude = {CompositeDiscoveryClientAutoConfiguration.class, SimpleDiscoveryClientAutoConfiguration.class})
+public class Main {
+
+    static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
+    }
+}
