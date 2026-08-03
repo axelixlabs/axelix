@@ -1,6 +1,6 @@
 {
   "version.label": {
-    "message": "Текущая",
+    "message": "1.x",
     "description": "The label for version current"
   },
   "sidebar.featuresSidebar.category.Insights": {
