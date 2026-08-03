@@ -61,16 +61,21 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET: ${{ secrets.OIDC_GOOGLE_CLIENT_SECRET }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
     steps:
+      # Initial checkout without submodules so that the local bitwarden action is available.
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
-          submodules: 'true'
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
+      # Re-checkout with submodules using the token loaded from Bitwarden.
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v7
+        with:
+          token: ${{ env.GITHUB_MASTER_ACCESS_TOKEN }}
+          submodules: 'true'
 
       # Java 25 will be installed at this step.
       - name: Build Backend

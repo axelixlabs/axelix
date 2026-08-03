@@ -35,7 +35,7 @@ public interface HeapDumpCustomizer {
      *
      * @param originalHeapDump the raw heap dump
      * @return the processed heap dump resource
-     * @throws StateExportException if processing of the heap dump customize fails
+     * @throws StateExportException if heap dump customization failed
      */
     @NonNull
     Resource customize(Resource originalHeapDump) throws StateExportException;

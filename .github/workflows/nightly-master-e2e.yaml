@@ -43,10 +43,20 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     steps:
+      # Initial checkout without submodules so that the local bitwarden action is available.
       - name: Checkout repository
         uses: actions/checkout@v7
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
         with:
-          token: ${{ secrets.ENTERPRISE_GITHUB_TOKEN }}
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
+      # Re-checkout with submodules using the token loaded from Bitwarden.
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v7
+        with:
+          token: ${{ env.GITHUB_MASTER_ACCESS_TOKEN }}
           submodules: 'true'
 
       - name: Checkout helm-charts
