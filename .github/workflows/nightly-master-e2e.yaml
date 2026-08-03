@@ -58,6 +58,7 @@ jobs:
         with:
           token: ${{ env.GITHUB_MASTER_ACCESS_TOKEN }}
           submodules: 'true'
+          persist-credentials: false
 
       - name: Checkout helm-charts
         uses: actions/checkout@v7

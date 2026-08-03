@@ -79,7 +79,6 @@ dependencies {
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
 
     // Test Self
-    testImplementation(testFixtures(project))
     testFixturesImplementation(project(":common:domain"))
     testFixturesImplementation(project(":common:api"))
     testFixturesImplementation(project(":common:auth"))
