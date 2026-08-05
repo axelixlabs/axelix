@@ -153,6 +153,21 @@ export interface IAutocompletionOption {
     value: string;
 }
 
+export interface ILicenseFunction {
+    name: string;
+    enabled: boolean;
+}
+
+export interface ILicensing {
+    license: string;
+    issuedAt: string | null;
+    validUntil: string | null;
+    licenseId: string | null;
+    issuedTo: string | null;
+    source: string | null;
+    functions: ILicenseFunction[];
+}
+
 export interface IAxelixSettings {
     /**
      * Boolean flag that represents if the MCP server is enabled.
@@ -163,6 +178,8 @@ export interface IAxelixSettings {
      * Authentication options configured on the backend
      */
     authenticationOptions: LoginOption[];
+
+    licensing: ILicensing;
 }
 
 export interface ISiderMenuItem {

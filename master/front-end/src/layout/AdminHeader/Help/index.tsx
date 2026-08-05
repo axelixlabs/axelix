@@ -21,8 +21,8 @@ import { Dropdown, type MenuProps } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AboutModal } from "components";
-
+import { HelpAboutItem } from "./HelpAboutItem";
+import { HelpLicenseItem } from "./HelpLicenseItem";
 import styles from "./styles.module.css";
 
 import { ArrowIcon, InfoIcon } from "assets";
@@ -30,8 +30,7 @@ import { ArrowIcon, InfoIcon } from "assets";
 export const Help = () => {
     const { t } = useTranslation();
 
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [open, setOpen] = useState<boolean>(false);
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
     const version = import.meta.env.VITE_APP_VERSION;
 
@@ -55,11 +54,16 @@ export const Help = () => {
         },
         {
             key: "3",
-            icon: <InfoIcon />,
-            label: <a onClick={() => setOpen(true)}>{t("Header.Help.about")}</a>,
+            icon: <BookOutlined className={styles.CommonIcon} />,
+            label: <HelpLicenseItem />,
         },
         {
             key: "4",
+            icon: <InfoIcon />,
+            label: <HelpAboutItem />,
+        },
+        {
+            key: "5",
             icon: <CommentOutlined className={styles.CommonIcon} />,
             label: (
                 <a target="_blank" rel="noopener noreferrer" href="https://github.com/axelixlabs/axelix/issues">
@@ -72,14 +76,13 @@ export const Help = () => {
     return (
         <>
             <Dropdown menu={{ items }} onOpenChange={(open) => setDropdownOpen(open)}>
-                <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
+                <div onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
                     <div className={styles.HelpLabel}>
                         {t("Header.Help.title")}
                         <ArrowIcon className={`${styles.ArrowIcon} ${dropdownOpen && styles.OpenArrowIcon}`} />
                     </div>
-                </a>
+                </div>
             </Dropdown>
-            <AboutModal open={open} setOpen={setOpen} />
         </>
     );
 };

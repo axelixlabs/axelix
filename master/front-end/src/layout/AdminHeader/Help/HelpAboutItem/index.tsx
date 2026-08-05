@@ -15,32 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createSlice } from "@reduxjs/toolkit";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import type { IAxelixSettings } from "models";
+import { AboutModal } from "./AboutModal";
 
-const initialState: IAxelixSettings = {
-    authenticationOptions: [],
-    isMcpServerEnabled: false,
-    licensing: {
-        validUntil: null,
-        source: null,
-        licenseId: null,
-        license: "",
-        issuedTo: null,
-        issuedAt: null,
-        functions: [],
-    },
+export const HelpAboutItem = () => {
+    const { t } = useTranslation();
+    const [aboutModalOpen, setAboutModalOpen] = useState<boolean>(false);
+
+    return (
+        <>
+            <div onClick={() => setAboutModalOpen(true)}>{t("Header.Help.about")}</div>
+            <AboutModal open={aboutModalOpen} setOpen={setAboutModalOpen} />
+        </>
+    );
 };
-
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: initialState,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
-export const { setAxelixSettings } = SettingsSlice.actions;

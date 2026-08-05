@@ -1,0 +1,58 @@
+.EnterKeyFormTitle {
+    color: var(--axelix-bold-grey);
+}
+
+.FormActionsWrapper {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 8px;
+}
+
+.EnterKeyDescription {
+    color: var(--axelix-bold-grey);
+}
+
+.EnterKeyFormWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.AlertTitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.AlertWrapper {
+    border: 1px solid var(--axelix-primary-red);
+    background-color: var(--axelix-primary-light-red);
+    padding: 8px;
+    border-radius: var(--axelix-border-radius-large);
+    color: var(--axelix-primary-red);
+}
+
+.ActiveLicenseKeyInfoWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    align-items: baseline;
+    background-color: var(--axelix-extra-light-grey);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 12px 16px;
+    color: var(--axelix-bold-grey);
+}
+
+.ActiveLicenseKeyInfoLabel {
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.ActiveLicenseKeyInfoOrg {
+    font-weight: 500;
+    color: var(--axelix-primary-black);
+}
+
+.ActiveLicenseKeyInfoValue {
+    text-align: right;
+}

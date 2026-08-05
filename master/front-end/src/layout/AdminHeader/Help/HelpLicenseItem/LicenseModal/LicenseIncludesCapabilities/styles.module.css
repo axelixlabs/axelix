@@ -1,0 +1,20 @@
+.CapabilitiesTitle {
+    color: var(--axelix-bold-grey);
+    margin-bottom: 4px;
+}
+
+.CapabilityChipsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.CapabilityChip {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 4px 8px;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+}

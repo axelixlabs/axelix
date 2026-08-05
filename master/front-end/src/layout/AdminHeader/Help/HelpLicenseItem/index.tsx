@@ -15,32 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createSlice } from "@reduxjs/toolkit";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import type { IAxelixSettings } from "models";
+import { LicenseBadge } from "../LicenseBadge";
 
-const initialState: IAxelixSettings = {
-    authenticationOptions: [],
-    isMcpServerEnabled: false,
-    licensing: {
-        validUntil: null,
-        source: null,
-        licenseId: null,
-        license: "",
-        issuedTo: null,
-        issuedAt: null,
-        functions: [],
-    },
+import { LicenseModal } from "./LicenseModal";
+import styles from "./styles.module.css";
+
+const isEnterprise = true;
+
+export const HelpLicenseItem = () => {
+    const { t } = useTranslation();
+
+    const [open, setOpen] = useState<boolean>(false);
+
+    return (
+        <>
+            <div className={styles.LicenseItemWrapper} onClick={() => setOpen(true)}>
+                {t("license")}
+                <LicenseBadge isEnterprise={isEnterprise} enterpriseText="ENT" ossText="OSS" />
+            </div>
+
+            <LicenseModal open={open} setOpen={setOpen} isEnterprise={isEnterprise} />
+        </>
+    );
 };
-
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: initialState,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
-export const { setAxelixSettings } = SettingsSlice.actions;

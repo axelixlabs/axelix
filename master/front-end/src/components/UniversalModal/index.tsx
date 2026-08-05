@@ -64,7 +64,7 @@ export const UniversalModal = ({
     loading,
     displayCancel = true,
     displayOkay = true,
-    maskCloseable = false,
+    maskCloseable,
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
@@ -83,19 +83,19 @@ export const UniversalModal = ({
                 cancelButtonProps={
                     !displayCancel
                         ? {
-                              style: {
-                                  display: "none",
-                              },
-                          }
+                            style: {
+                                display: "none",
+                            },
+                        }
                         : {}
                 }
                 okButtonProps={
                     !displayOkay
                         ? {
-                              style: {
-                                  display: "none",
-                              },
-                          }
+                            style: {
+                                display: "none",
+                            },
+                        }
                         : {}
                 }
                 mask={{

@@ -17,6 +17,7 @@
     "username": "Username",
     "password": "Password",
     "notEnoughAuthorities": "You don't have enough authorities",
+    "license": "License",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
@@ -269,6 +270,28 @@
         "contact": "In case of any questions please consult the <0>Reference Guide</0>",
         "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
         "githubSource": "GitHub Source"
+    },
+    "LicenseModal": {
+        "enterpriseStatus": "Active",
+        "noExpiry": "no expiry",
+        "expiresIn": "expires in {{days}} days",
+        "thirdPartyNotices": "Third-party notices",
+        "updateKey": "Update license key",
+        "enterKey": "Enter license key",
+        "ossDescription": "You are running Axelix Core, licensed under {{license}}. Enterprise capabilities are not enabled on this instance.",
+        "licensedTo": "LICENSED TO",
+        "licensedId": "LICENSE ID",
+        "validFrom": "VALID FROM",
+        "validTo": "VALID TO",
+        "included": "INCLUDED",
+        "Form": {
+            "enterKeyTitle": "Enter license key",
+            "updateKeyTitle": "Update license key",
+            "enterKeyDescription": "Paste the key issued to your organization. Keys are verified locally - no outbound connection is made.",
+            "keyExpiredTitle": "This key expired on {{date}}",
+            "keyExpiredDescription": "Issued to {{organization}}. Ask your Axelix contact for a renewed key, or contact support.",
+            "activate": "Activate"
+        }
     },
     "ThreadDump": {
         "id": "Thread id",

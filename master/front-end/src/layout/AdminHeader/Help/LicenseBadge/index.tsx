@@ -15,32 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createSlice } from "@reduxjs/toolkit";
+import styles from "./styles.module.css";
 
-import type { IAxelixSettings } from "models";
+interface IProps {
+    isEnterprise: boolean;
+    enterpriseText: string;
+    ossText: string;
+}
 
-const initialState: IAxelixSettings = {
-    authenticationOptions: [],
-    isMcpServerEnabled: false,
-    licensing: {
-        validUntil: null,
-        source: null,
-        licenseId: null,
-        license: "",
-        issuedTo: null,
-        issuedAt: null,
-        functions: [],
-    },
+export const LicenseBadge = ({ isEnterprise, enterpriseText, ossText }: IProps) => {
+    return (
+        <>
+            <span className={`TextUltraSmall ${isEnterprise ? styles.EnterpriseBadge : styles.OSSBadge}`}>
+                {isEnterprise ? enterpriseText : ossText}
+            </span>
+        </>
+    );
 };
-
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: initialState,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
-export const { setAxelixSettings } = SettingsSlice.actions;
