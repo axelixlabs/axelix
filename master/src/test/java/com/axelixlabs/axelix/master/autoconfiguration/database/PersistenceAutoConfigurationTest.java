@@ -27,7 +27,6 @@ import org.mockito.Mockito;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -48,10 +47,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 class PersistenceAutoConfigurationTest {
-
-    private static final String SQLITE_CHANGELOG = "db/changelog/sqlite/db.changelog.master.sqlite.xml";
-    private static final String POSTGRES_CHANGELOG = "db/changelog/postgres/db.changelog.master.postgresql.xml";
-    private static final String MYSQL_CHANGELOG = "db/changelog/mysql/db.changelog.master.mysql.xml";
 
     private static ApplicationContextRunner baselineContextRunner() {
         return new ApplicationContextRunner(PersistenceAutoConfigurationTest::isolatedContext)
@@ -76,10 +71,6 @@ class PersistenceAutoConfigurationTest {
             assertThat(context).doesNotHaveBean(PersistenceAutoConfiguration.PostgreSqlAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(PersistenceAutoConfiguration.MySqlAutoConfiguration.class);
 
-            assertThat(context).hasSingleBean(LiquibaseProperties.class);
-            assertThat(context.getBean(LiquibaseProperties.class).getChangeLog())
-                    .isEqualTo(SQLITE_CHANGELOG);
-
             assertThat(context).hasSingleBean(JdbcDialect.class);
             assertThat(context.getBean(JdbcDialect.class)).isInstanceOf(SQLiteDialect.class);
         });
@@ -97,10 +88,6 @@ class PersistenceAutoConfigurationTest {
             assertThat(context).hasSingleBean(PersistenceAutoConfiguration.PostgreSqlAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(PersistenceAutoConfiguration.SQLiteAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(PersistenceAutoConfiguration.MySqlAutoConfiguration.class);
-
-            assertThat(context).hasSingleBean(LiquibaseProperties.class);
-            assertThat(context.getBean(LiquibaseProperties.class).getChangeLog())
-                    .isEqualTo(POSTGRES_CHANGELOG);
 
             assertThat(context).hasSingleBean(JdbcDialect.class);
             assertThat(context.getBean(JdbcDialect.class)).isInstanceOf(JdbcPostgresDialect.class);

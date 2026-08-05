@@ -50,18 +50,18 @@ dependencies {
     }
 
     // Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    api("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    api("org.springframework.boot:spring-boot-starter-liquibase")
 
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.springframework.security:spring-security-crypto")
 
     api("org.slf4j:slf4j-api")
-    implementation("com.github.ben-manes.caffeine:caffeine")
+    api("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
@@ -101,7 +101,7 @@ dependencies {
     testFixturesApi("com.squareup.okhttp3:okhttp")
     testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.2")
     testFixturesApi("org.instancio:instancio-core:${instancioVersion}")
-    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+    testFixturesApi("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")

@@ -34,7 +34,6 @@ import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
@@ -77,14 +76,6 @@ public class PersistenceAutoConfiguration {
         @Override
         public @NonNull JdbcDialect jdbcDialect(@NonNull NamedParameterJdbcOperations operations) {
             return new SQLiteDialect();
-        }
-
-        @Bean
-        @Primary
-        public LiquibaseProperties sqliteLiquibaseProperties() {
-            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
-            liquibaseProperties.setChangeLog("db/changelog/sqlite/db.changelog.master.sqlite.xml");
-            return liquibaseProperties;
         }
 
         @Bean
@@ -188,14 +179,6 @@ public class PersistenceAutoConfiguration {
     @ConditionalOnCommunityRdbms(CommunityRDBMS.POSTGRES)
     public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
-        @Bean
-        @Primary
-        public LiquibaseProperties postgresLiquibaseProperties() {
-            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
-            liquibaseProperties.setChangeLog("db/changelog/postgres/db.changelog.master.postgresql.xml");
-            return liquibaseProperties;
-        }
-
         @Override
         @NonNull
         public JdbcDialect jdbcDialect(@NonNull NamedParameterJdbcOperations operations) {
@@ -205,16 +188,7 @@ public class PersistenceAutoConfiguration {
 
     @AutoConfiguration
     @ConditionalOnCommunityRdbms(CommunityRDBMS.MYSQL)
-    public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
-
-        @Bean
-        @Primary
-        public LiquibaseProperties mysqlLiquibaseProperties() {
-            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
-            liquibaseProperties.setChangeLog("db/changelog/mysql/db.changelog.master.mysql.xml");
-            return liquibaseProperties;
-        }
-    }
+    public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
 
     public static class BaseJdbcConvertersAutoConfiguration extends AbstractJdbcConfiguration {
 

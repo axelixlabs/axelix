@@ -92,6 +92,10 @@ public class TestRestTemplateBuilder {
         return withRole(DefaultRole.EDITOR);
     }
 
+    public TestRestTemplate asAdmin() {
+        return withRole(DefaultRole.ADMIN);
+    }
+
     public TestRestTemplate withRole(Role role) {
         String token = generateToken(new Role[] {role});
 

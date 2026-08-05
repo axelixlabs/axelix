@@ -70,6 +70,13 @@ subprojects {
         errorprone("com.uber.nullaway:nullaway:0.13.8")
     }
 
+    val licenseHeaderFile = if (projectDir.toPath().startsWith(rootDir.resolve("axelix-enterprise").toPath())) {
+        "${rootDir.path}/axelix-enterprise/LICENSE_HEADER_ENTERPRISE"
+    } else {
+        "${rootDir.path}/LICENSE_HEADER"
+    }
+    val licenseHeaderText = Paths.get(licenseHeaderFile).readText(charset = StandardCharsets.UTF_8)
+
     spotless {
         java {
             palantirJavaFormat("2.90.0")
@@ -92,11 +99,7 @@ subprojects {
             // TODO: removeUnusedImports may not always work https://github.com/diffplug/spotless/issues/2850
             removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
 
-            licenseHeader(
-                Paths
-                    .get("${rootDir.path}/LICENSE_HEADER")
-                    .readText(charset = StandardCharsets.UTF_8)
-            )
+            licenseHeader(licenseHeaderText)
         }
 
         kotlin {
@@ -106,11 +109,7 @@ subprojects {
             //  I would like to integrate detekt into spotless
             //  but spotless does not support it as of now https://github.com/diffplug/spotless/issues/143
 
-            licenseHeader(
-                Paths
-                    .get("${rootDir.path}/LICENSE_HEADER")
-                    .readText(charset = StandardCharsets.UTF_8)
-            )
+            licenseHeader(licenseHeaderText)
         }
     }
 
