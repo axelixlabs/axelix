@@ -290,7 +290,8 @@
             "enterKeyDescription": "Вставьте ключ, выданный вашей организации. Ключи проверяются локально - исходящих соединений не выполняется.",
             "keyExpiredTitle": "Действие ключа истекло {{date}}",
             "keyExpiredDescription": "Выдан организации {{organization}}. Обратитесь к представителю Axelix для получения нового ключа или в службу поддержки.",
-            "activate": "Активировать"
+            "activate": "Активировать",
+            "availableInEnterprise": "Доступно в Enterprise"
         }
     },
     "ThreadDump": {

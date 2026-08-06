@@ -27,6 +27,7 @@ export * from "./threadDump";
 export * from "./conditions";
 export * from "./wallboard";
 export * from "./settings";
+export * from "./license";
 export * from "./loggers";
 export * from "./details";
 export * from "./metrics";

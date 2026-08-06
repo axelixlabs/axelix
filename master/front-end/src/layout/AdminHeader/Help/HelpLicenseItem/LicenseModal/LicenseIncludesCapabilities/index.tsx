@@ -21,6 +21,7 @@ import type { ILicenseFunction } from "models";
 
 import styles from "./styles.module.css";
 import { GoldCrownIcon } from "assets";
+import { HintTooltip } from "components";
 
 export interface IProps {
     capabilities: ILicenseFunction[];
@@ -42,16 +43,24 @@ export const LicenseCapabilities = ({ capabilities }: IProps) => {
                     {sortedCapabilities.map(({ name, enabled }) => {
                         const isDisabled = !enabled;
 
+                        if (isDisabled) {
+                            return (
+                                <HintTooltip content={t("LicenseModal.Form.availableInEnterprise")}>
+                                    <span className={styles.CapabilityChip}>
+                                        {name} <GoldCrownIcon />
+                                    </span>
+                                </HintTooltip>
+                            )
+                        }
+
                         return (
-                            <span
-                                className={styles.CapabilityChip}
-                            >
-                                {name} {isDisabled && <GoldCrownIcon />}
+                            <span className={styles.CapabilityChip}>
+                                {name}
                             </span>
-                        );
+                        )
                     })}
                 </div>
-            </div>
+            </div >
         </>
     );
 };

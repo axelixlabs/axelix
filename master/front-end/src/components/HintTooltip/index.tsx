@@ -43,7 +43,6 @@ export const HintTooltip = ({ children, content, placement = "top" }: PropsWithC
             title={<div className={styles.Content}>{content}</div>}
             placement={placement}
             color="#0f172a"
-            arrow={false}
             styles={{ container: { padding: 0 } }}
         >
             {children}

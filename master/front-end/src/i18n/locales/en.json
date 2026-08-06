@@ -290,7 +290,8 @@
             "enterKeyDescription": "Paste the key issued to your organization. Keys are verified locally - no outbound connection is made.",
             "keyExpiredTitle": "This key expired on {{date}}",
             "keyExpiredDescription": "Issued to {{organization}}. Ask your Axelix contact for a renewed key, or contact support.",
-            "activate": "Activate"
+            "activate": "Activate",
+            "availableInEnterprise": "Available in Enterprise"
         }
     },
     "ThreadDump": {

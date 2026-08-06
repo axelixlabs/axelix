@@ -8,6 +8,12 @@
     column-gap: 8px;
 }
 
+.FormFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .EnterKeyDescription {
     color: var(--axelix-bold-grey);
 }
@@ -29,30 +35,4 @@
     padding: 8px;
     border-radius: var(--axelix-border-radius-large);
     color: var(--axelix-primary-red);
-}
-
-.ActiveLicenseKeyInfoWrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    align-items: baseline;
-    background-color: var(--axelix-extra-light-grey);
-    border: 1px solid var(--axelix-medium-grey);
-    border-radius: var(--axelix-border-radius-large);
-    padding: 12px 16px;
-    color: var(--axelix-bold-grey);
-}
-
-.ActiveLicenseKeyInfoLabel {
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.ActiveLicenseKeyInfoOrg {
-    font-weight: 500;
-    color: var(--axelix-primary-black);
-}
-
-.ActiveLicenseKeyInfoValue {
-    text-align: right;
 }

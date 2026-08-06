@@ -17,4 +17,6 @@
     padding: 4px 8px;
     border-radius: var(--axelix-border-radius-large);
     border: 1px solid var(--axelix-medium-grey);
+    user-select: none;
+    cursor: default;
 }

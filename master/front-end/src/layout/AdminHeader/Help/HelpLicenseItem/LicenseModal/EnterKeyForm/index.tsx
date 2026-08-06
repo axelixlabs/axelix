@@ -16,12 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Button, Input } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 import type { ILicensing } from "models";
-import dayjs from "dayjs";
+import { checkLicense, sendLicense } from "services";
+import { LicenseKeyInfo } from "./LicenseKeyInfo";
+import { UploadLicenseKeyFile } from "./UploadLicenseKeyFile";
 
 const { TextArea } = Input;
 
@@ -33,10 +35,21 @@ interface IProps {
 export const EnterKeyForm = ({ setIsFormOpen, licensing }: IProps) => {
     const { t } = useTranslation();
     const [licenseKey, setLicenseKey] = useState<string>("");
+    const [isValidLicenseKey, setIsValidLicenseKey] = useState<boolean>(false);
 
-    const { licenseId, issuedTo, validUntil } = licensing
+    const { issuedTo } = licensing
 
-    const validTo = validUntil && dayjs(validUntil).format("YYYY-MM-DD")
+    useEffect(() => {
+        if (!licenseKey) {
+            return;
+        }
+
+        checkLicense(licenseKey).then(() => {
+            setIsValidLicenseKey(true);
+        }).catch(() => {
+            setIsValidLicenseKey(false);
+        });
+    }, [licenseKey])
 
     return (
         <>
@@ -51,12 +64,7 @@ export const EnterKeyForm = ({ setIsFormOpen, licensing }: IProps) => {
                     {t("LicenseModal.Form.enterKeyDescription")}
                 </p>
 
-                <div className={styles.ActiveLicenseKeyInfoWrapper}>
-                    <div className={styles.ActiveLicenseKeyInfoLabel}>Currently active</div>
-                    <div className={styles.ActiveLicenseKeyInfoValue}>{licenseId || "-"}</div>
-                    <div className={styles.ActiveLicenseKeyInfoOrg}>{issuedTo || "-"}</div>
-                    <div className={styles.ActiveLicenseKeyInfoValue}>{validTo ? `until ${validTo}` : "-"}</div>
-                </div>
+                <LicenseKeyInfo licensing={licensing} />
 
                 <TextArea
                     rows={6}
@@ -70,16 +78,20 @@ export const EnterKeyForm = ({ setIsFormOpen, licensing }: IProps) => {
                         {t("LicenseModal.Form.keyExpiredTitle", { date: "2026-03-01" })}
                     </div>
                     <div className="TextSmall">
-                        {t("LicenseModal.Form.keyExpiredDescription", { organization: "Contoso Financial AG" })}
+                        {t("LicenseModal.Form.keyExpiredDescription", { organization: issuedTo || "-" })}
                     </div>
                 </div>
 
-                <div className={styles.FormActionsWrapper}>
-                    <Button onClick={() => setIsFormOpen(false)}>{t("cancel")}</Button>
+                <div className={styles.FormFooter}>
+                    <UploadLicenseKeyFile setLicenseKey={setLicenseKey} />
 
-                    <Button type="primary" onClick={() => setIsFormOpen(true)}>
-                        {t("LicenseModal.Form.activate")}
-                    </Button>
+                    <div className={styles.FormActionsWrapper}>
+                        <Button onClick={() => setIsFormOpen(false)}>{t("cancel")}</Button>
+
+                        <Button type="primary" onClick={() => sendLicense(licenseKey)}>
+                            {t("LicenseModal.Form.activate")}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </>
