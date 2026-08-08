@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Dmitry Kiselev
  * @since 14.10.2025
  */
 @AutoConfiguration
@@ -56,13 +57,8 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     public ScheduledTaskService scheduledTaskService(
-            ScheduledTasksRegistry scheduledTasksRegistry,
-            List<TaskRescheduler> taskReschedulers,
-            ObjectProvider<ThreadPoolTaskExecutor> taskExecutor) {
-        return new ScheduledTaskService(
-                scheduledTasksRegistry,
-                taskReschedulers,
-                taskExecutor.getIfAvailable() != null ? taskExecutor.getIfAvailable() : createThreadPoolExecutor());
+            ScheduledTasksRegistry scheduledTasksRegistry, List<TaskRescheduler> taskReschedulers) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, createThreadPoolExecutor());
     }
 
     @Bean

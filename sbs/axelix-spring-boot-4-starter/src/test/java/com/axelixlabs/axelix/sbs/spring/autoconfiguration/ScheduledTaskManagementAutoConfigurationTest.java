@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 10.02.2026
  * @author Nikita Kirillov
+ * @author Dmitry Kiselev
  */
 class ScheduledTaskManagementAutoConfigurationTest {
 
@@ -94,6 +96,20 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
+    @Test // GH-1485
+    void shouldCreateThreadPoolTaskExecutorAndNotUseAnyFromContext() {
+        new ApplicationContextRunner()
+                .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
+                .withUserConfiguration(ThreadPoolTaskExecutorsConfig.class)
+                .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context)
+                            .getBean(ScheduledTaskService.class)
+                            .extracting("taskExecutor")
+                            .isNotIn(context.getBeansOfType(ThreadPoolTaskExecutor.class));
+                });
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -101,6 +117,21 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Bean
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();
+        }
+    }
+
+    @TestConfiguration
+    @EnableScheduling
+    static class ThreadPoolTaskExecutorsConfig {
+
+        @Bean
+        public ThreadPoolTaskExecutor threadPoolTaskExecutor1() {
+            return new ThreadPoolTaskExecutor();
+        }
+
+        @Bean
+        public ThreadPoolTaskExecutor threadPoolTaskExecutor2() {
+            return new ThreadPoolTaskExecutor();
         }
     }
 }
