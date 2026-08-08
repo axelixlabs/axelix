@@ -30,12 +30,14 @@ interface IProps {
 
 export const UserRoleTags = ({ roles }: IProps) => {
     return (
-        <div>
-            {roles.map((role) => (
-                <Tag variant="outlined" color="blue" key={role} className={styles.Tag}>
-                    {role}
-                </Tag>
-            ))}
-        </div>
+        <>
+            <div>
+                {roles.map((role) => (
+                    <Tag variant="outlined" key={role} className={styles.Tag}>
+                        {role}
+                    </Tag>
+                ))}
+            </div>
+        </>
     );
 };

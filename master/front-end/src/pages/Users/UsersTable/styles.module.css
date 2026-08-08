@@ -4,9 +4,54 @@
 
 .TableHeader,
 .TableRow {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
 }
 
 .TableHeader:hover {
     background-color: var(--axelix-primary-light-green);
+}
+
+.Avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 8px;
+    background-color: var(--axelix-light-grey);
+    border-radius: 50%;
+    margin-right: 20px;
+    font-weight: 500;
+}
+
+.Username {
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.Email {
+    color: var(--axelix-bold-grey);
+}
+
+.DepartmentTitle {
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: var(--axelix-border-radius-large);
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: var(--axelix-light-grey);
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: currentcolor;
 }

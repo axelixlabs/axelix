@@ -128,3 +128,9 @@ export interface IEditableUser extends Omit<IUser, "email"> {
      */
     password: string;
 }
+
+export interface IUsersStats {
+    label: string;
+    value: string;
+    detail: string;
+}

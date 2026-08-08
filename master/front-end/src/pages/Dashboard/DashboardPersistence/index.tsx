@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { EmptyHandler, Loader, PagesFirstSection } from "components";
 import { fetchData } from "helpers";
 import { type IDashboardPersistenceResponse, StatefulRequest } from "models";
 import { getDashboardPersistence } from "services";
@@ -49,7 +49,7 @@ const DashboardPersistence = () => {
 
     return (
         <>
-            <DashboardPagesFirstSection
+            <PagesFirstSection
                 title={t("Dashboard.Persistence.title")}
                 subtitle={t("Dashboard.Persistence.subtitle")}
             />

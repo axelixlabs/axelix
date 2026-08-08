@@ -15,19 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { CreateUser } from "./UsersFirstSection/CreateUser";
+import { UsersStats } from "./UsersTable/UsersStats";
+import { Pagination } from "antd";
 import { useEffect, useState } from "react";
 
-import { EmptyHandler, Loader } from "components";
+import { EmptyHandler, Loader, PagesFirstSection } from "components";
 import { fetchData, filterUsers } from "helpers";
+import { useAppSelector } from "hooks";
 import { type IUser, type IUsersFilters, StatefulRequest } from "models";
 import { getUsers } from "services";
+import { LOCAL_AUTH_OPTION_TYPE_NAME, PAGINATION_SIZE } from "utils";
 
 import { UsersFirstSection } from "./UsersFirstSection";
 import { UsersTable } from "./UsersTable";
+import styles from "./styles.module.css";
 
 const Users = () => {
+    const settings = useAppSelector((state) => state.settings);
+
     const [usersData, setUsersData] = useState(StatefulRequest.loading<IUser[]>());
     const [search, setSearch] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
     const [filters, setFilters] = useState<IUsersFilters>({
         roles: [],
@@ -43,6 +52,10 @@ const Users = () => {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, filters]);
+
     if (usersData.loading) {
         return <Loader />;
     }
@@ -55,16 +68,42 @@ const Users = () => {
     const effectiveUsers = filterUsers(usersFeed, search, filters);
     const addonAfter = `${effectiveUsers.length} / ${usersFeed.length}`;
 
+    const pageStartIndex = (currentPage - 1) * PAGINATION_SIZE;
+    const pageEndIndex = currentPage * PAGINATION_SIZE;
+
+    const pageUsers = effectiveUsers.slice(pageStartIndex, pageEndIndex);
+
+    const isLocalAuthEnabled = settings.authenticationOptions.some(({ type }) => type === LOCAL_AUTH_OPTION_TYPE_NAME);
+
     return (
         <>
+            <div className={styles.PageFirstSectionWrapper}>
+                <PagesFirstSection
+                    title="Users"
+                    subtitle="412 users in Northwind Industrial · sign-in via OIDC Provider and local password"
+                />
+
+                {isLocalAuthEnabled && <CreateUser fetchUsers={fetchUsers} />}
+            </div>
+
+            <UsersStats />
+
             <UsersFirstSection
                 addonAfter={addonAfter}
                 filters={filters}
                 setFilters={setFilters}
                 setSearch={setSearch}
-                fetchUsers={fetchUsers}
             />
-            <UsersTable users={effectiveUsers} />
+
+            <UsersTable users={pageUsers} />
+
+            <Pagination
+                current={currentPage}
+                pageSize={PAGINATION_SIZE}
+                total={effectiveUsers.length}
+                onChange={setCurrentPage}
+                className={styles.Pagination}
+            />
         </>
     );
 };

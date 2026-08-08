@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { EmptyHandler, UserRoleTags } from "components";
-import type { IUser } from "models";
+import { type IUser } from "models";
 
 import styles from "./styles.module.css";
 
@@ -38,11 +38,12 @@ export const UsersTable = ({ users }: IProps) => {
         <>
             <div className={`CustomizedTable ${styles.Table}`}>
                 <div className={`TableHeader TableRow ${styles.TableHeader}`}>
-                    <div className="RowChunk">{t("username")}</div>
-                    <div className="RowChunk">Email</div>
-                    <div className="RowChunk">{t("Users.lastLogin")}</div>
-                    <div className="RowChunk">{t("Users.origin")}</div>
-                    <div className="RowChunk">{t("Users.roles")}</div>
+                    <div className="RowChunk">USER</div>
+                    <div className="RowChunk">DEPARTMENT</div>
+                    <div className="RowChunk">STATUS</div>
+                    <div className="RowChunk">ROLES</div>
+                    <div className="RowChunk">ORIGIN</div>
+                    <div className="RowChunk">LAST ACTIVITY</div>
                 </div>
 
                 <EmptyHandler isEmpty={users.length === 0}>
@@ -54,18 +55,35 @@ export const UsersTable = ({ users }: IProps) => {
 
                         return (
                             <Link
-                                to={`/users/${user.id}`}
+                                to={`/users/${id}`}
                                 state={{ user }}
                                 className={`TableRow ${styles.TableRow}`}
                                 key={id}
                             >
-                                <div className="RowChunk">{username}</div>
-                                <div className="RowChunk">{email}</div>
-                                <div className="RowChunk">{formattedLastLogin}</div>
-                                <div className="RowChunk">{userOrigin}</div>
+                                <div className="RowChunk">
+                                    <div className={`TextSmall ${styles.Avatar}`}>{id} DR</div>
+                                    <div>
+                                        <div className={styles.Username}>{username}</div>
+                                        <div className={`TextSmall ${styles.Email}`}>{email}</div>
+                                    </div>
+                                </div>
+                                <div className="RowChunk">
+                                    <div>
+                                        <div className={styles.DepartmentTitle}>Operations</div>
+                                        <div className={`TextSmall ${styles.Email}`}>Realibility Engineer</div>
+                                    </div>
+                                </div>
+                                <div className={`RowChunk ${styles.Status}`}>
+                                    <span className={`TextSmall ${styles.Chip}`}>
+                                        <span className={styles.Dot} />
+                                        <span>Status</span>
+                                    </span>
+                                </div>
                                 <div className="RowChunk">
                                     <UserRoleTags roles={roles} />
                                 </div>
+                                <div className="RowChunk">{userOrigin}</div>
+                                <div className="RowChunk">{formattedLastLogin}</div>
                             </Link>
                         );
                     })}
@@ -74,3 +92,13 @@ export const UsersTable = ({ users }: IProps) => {
         </>
     );
 };
+
+{
+    /* <div className={`TableHeader TableRow ${styles.TableHeader}`}>
+                    <div className="RowChunk">{t("username")}</div>
+                    <div className="RowChunk">Email</div>
+                    <div className="RowChunk">{t("Users.lastLogin")}</div>
+                    <div className="RowChunk">{t("Users.origin")}</div>
+                    <div className="RowChunk">{t("Users.roles")}</div>
+                </div> */
+}

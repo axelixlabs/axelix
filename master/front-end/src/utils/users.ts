@@ -19,6 +19,8 @@ import type { InputProps } from "antd";
 
 import { ERoles, type UserProfileEditableValueField } from "models";
 
+export const PAGINATION_SIZE = 10;
+
 export const userProfileInputTypeMap: Record<UserProfileEditableValueField, InputProps["type"]> = {
     username: "text",
     email: "email",

@@ -1,0 +1,9 @@
+.PageFirstSectionWrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.Pagination {
+    display: flex;
+    justify-content: flex-end;
+}

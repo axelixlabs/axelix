@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
+import { DashboardGauge, EmptyHandler, Loader, PagesFirstSection } from "components";
 import { fetchData } from "helpers";
 import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "models";
 import { getDashboardSpringFramework } from "services";
@@ -50,7 +50,7 @@ const DashboardSpringFramework = () => {
 
     return (
         <>
-            <DashboardPagesFirstSection title="Spring Framework" subtitle={t("Dashboard.SpringFramework.subtitle")} />
+            <PagesFirstSection title="Spring Framework" subtitle={t("Dashboard.SpringFramework.subtitle")} />
 
             <div className={styles.ChartsWrapper}>
                 <DashboardGauge

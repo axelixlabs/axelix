@@ -20,11 +20,9 @@ import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "components";
-import { useAppSelector } from "hooks";
 import { ERoles, EUserOrigin, type IUsersFilters } from "models";
-import { LOCAL_AUTH_OPTION_TYPE_NAME, roleOptions } from "utils";
+import { roleOptions } from "utils";
 
-import { CreateUser } from "./CreateUser";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -47,16 +45,10 @@ interface IProps {
      * Filters setter
      */
     setFilters: Dispatch<SetStateAction<IUsersFilters>>;
-
-    /**
-     * Function to fetch all users
-     */
-    fetchUsers: () => void;
 }
 
-export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, fetchUsers }: IProps) => {
+export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters }: IProps) => {
     const { t } = useTranslation();
-    const settings = useAppSelector((state) => state.settings);
 
     const userOriginOptions = Object.values(EUserOrigin).map((origin) => ({
         value: origin,
@@ -77,15 +69,14 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.FiltersSection}>
+        <>
+            <div className={styles.MainWrapper}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
                 <div className={styles.FiltersWrapper}>
                     <Select
                         mode="multiple"
                         showSearch={false}
-                        placeholder={t("Users.roles")}
-                        size="small"
+                        placeholder={t("Users.role")}
                         maxTagCount={1}
                         value={filters.roles}
                         onChange={rolesHandleChange}
@@ -96,7 +87,6 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                         mode="multiple"
                         showSearch={false}
                         placeholder={t("Users.origin")}
-                        size="small"
                         maxTagCount={1}
                         value={filters.userOrigins}
                         onChange={userOriginsHandleChange}
@@ -105,10 +95,6 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                     />
                 </div>
             </div>
-
-            {settings.authenticationOptions.find((value) => {
-                return value.type === LOCAL_AUTH_OPTION_TYPE_NAME;
-            }) && <CreateUser fetchUsers={fetchUsers} />}
-        </div>
+        </>
     );
 };

@@ -22,7 +22,7 @@ interface IProps {
     subtitle: string;
 }
 
-export const DashboardPagesFirstSection = ({ title, subtitle }: IProps) => {
+export const PagesFirstSection = ({ title, subtitle }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
