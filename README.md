@@ -110,7 +110,7 @@ interface. Pick whichever shape matches how you ship the rest of your services.
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 **With Docker.** The release image is published to GitHub Container Registry:
@@ -121,7 +121,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for

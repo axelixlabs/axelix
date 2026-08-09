@@ -15,7 +15,7 @@ A few facts to fix in your head before you copy any of the snippets below — th
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
-- **Front-end assets**: the `axelix-1.0.0-M1.jar` and the published Docker image both bundle the UI — there is nothing
+- **Front-end assets**: the `axelix-1.0.0.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
 - **Authentication**: Master ships with a built-in super-admin account `admin / admin` and an unset JWT signing key. In
   any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
@@ -197,7 +197,7 @@ runtime involved.
 
 ### 1. Download the JAR
 
-Grab the `axelix-1.0.0-M1.jar` attached to the release you want from the [Releases
+Grab the `axelix-1.0.0.jar` attached to the release you want from the [Releases
 page](https://github.com/axelixlabs/axelix/releases). The published artifact already bundles the UI, so there is nothing
 else to build.
 
@@ -209,7 +209,7 @@ Provide a JWT signing key and an algorithm. Everything else can stay on defaults
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 Master is then reachable at `http://localhost:8080`. Sign in with the super-admin credentials you configured.
@@ -356,11 +356,11 @@ Use this when you want a single, immutable artifact that already bundles both Ma
 The release pipeline publishes the image to GitHub Container Registry:
 
 ```
-ghcr.io/axelixlabs/axelix:1.0.0-M1
+ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 :::note
-The snippets below pin `1.0.0-M1` for illustration. Check the [Releases
+The snippets below pin `1.0.0` for illustration. Check the [Releases
 page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
 commands.
 :::
@@ -375,7 +375,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 A few notes about this command:
@@ -394,7 +394,7 @@ Use this when you want Master plus an external database in one declarative file 
 self-hosted deployment.
 
 The example below is a complete stack you can drop into a new `docker-compose.yaml`, edit, and start with `docker
-compose up -d`. The `master` service is pinned to `1.0.0-M1` here — swap in the latest tag from the [Releases
+compose up -d`. The `master` service is pinned to `1.0.0` here — swap in the latest tag from the [Releases
 page](https://github.com/axelixlabs/axelix/releases) before shipping.
 
 ```yaml title="docker-compose.yaml"
@@ -414,7 +414,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+    image: ghcr.io/axelixlabs/axelix:1.0.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -563,7 +563,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+          image: ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 In K8S, a Role is a namespaced object, so repeat the Role and RoleBinding once per namespace in `filters.namespaces`, all referencing

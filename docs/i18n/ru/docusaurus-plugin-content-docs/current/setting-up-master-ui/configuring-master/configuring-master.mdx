@@ -17,7 +17,7 @@ import styles from './styles.module.css';
 - **База данных**: Master поддерживает три движка, которые выбираются автоматически по префиксу URL-адреса JDBC —
   **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), **MySQL** (`jdbc:mysql:`). По умолчанию используется
   SQLite с файлом `axelix.db` в рабочем каталоге. Liquibase выполняет миграцию схемы при каждом запуске.
-- **Веб-интерфейс**: `axelix-1.0.0-M1.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
+- **Веб-интерфейс**: `axelix-1.0.0.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
   подключения веб-интерфейса ничего дополнительно настраивать не нужно.
 - **Аутентификация**: в Master встроена учётная запись суперадминистратора `admin / admin` и не заданный ключ для
   подписи JWT. В любой среде, кроме тестовой, необходимо изменить оба параметра — см. [Справочник по
@@ -206,7 +206,7 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 
 ### 1. Скачайте JAR
 
-Возьмите `axelix-1.0.0-M1.jar`, прикреплённый к нужному вам релизу, со [страницы
+Возьмите `axelix-1.0.0.jar`, прикреплённый к нужному вам релизу, со [страницы
 релизов](https://github.com/axelixlabs/axelix/releases). Опубликованный артефакт уже включает пользовательский
 интерфейс, поэтому ничего больше собирать не нужно.
 
@@ -218,7 +218,7 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 После этого Master доступен по адресу `http://localhost:8080`. Войдите с учётными данными суперадминистратора, которые
@@ -367,11 +367,11 @@ axelix.master.auth.cookie.secure=true
 Конвейер выпуска публикует образ в GitHub Container Registry:
 
 ```
-ghcr.io/axelixlabs/axelix:1.0.0-M1
+ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 :::note
-Приведённые ниже фрагменты кода содержат `1.0.0-M1` для наглядности. Проверьте [страницу
+Приведённые ниже фрагменты кода содержат `1.0.0` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases) на актуальную опубликованную метку и подставьте её в свои
 команды.
 :::
@@ -386,7 +386,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 Несколько примечаний об этой команде:
@@ -405,7 +405,7 @@ docker run --rm -p 8080:8080 \
 для небольшого self-hosted развёртывания.
 
 Приведённый ниже пример представляет собой готовый стек, который можно положить в новый `docker-compose.yaml`,
-отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.0.0-M1` —
+отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.0.0` —
 подставьте актуальную метку со [страницы релизов](https://github.com/axelixlabs/axelix/releases) перед отправкой в
 продакшен.
 
@@ -426,7 +426,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+    image: ghcr.io/axelixlabs/axelix:1.0.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -578,7 +578,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+          image: ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 В Kubernetes Role — это объект, привязанный к пространству имён, поэтому повторите Role и RoleBinding по одному разу на

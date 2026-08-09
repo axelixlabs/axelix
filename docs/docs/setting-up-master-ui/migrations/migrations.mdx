@@ -97,7 +97,7 @@ java \
   -Daxelix.master.database.password=... \
   -Daxelix.master.migrations.username=axelix_migrator \
   -Daxelix.master.migrations.password=... \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 ### Run with Docker
@@ -113,7 +113,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.database.password=... \
     -Daxelix.master.migrations.username=axelix_migrator \
     -Daxelix.master.migrations.password=..." \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 ### Run with Docker Compose
@@ -123,7 +123,7 @@ Add the migration properties to the `master` service's `JAVA_TOOL_OPTIONS`, alon
 ```yaml title="docker-compose.yaml"
 services:
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+    image: ghcr.io/axelixlabs/axelix:1.0.0
     ports:
       - "8080:8080"
     environment:
