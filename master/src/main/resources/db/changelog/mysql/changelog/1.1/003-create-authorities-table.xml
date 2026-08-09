@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-003-mysql-create-authorities-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="authorities"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="authorities">
+      <column name="id" type="VARCHAR(36)">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_authorities"/>
+      </column>
+      <column name="name" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="uq_authorities_name"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

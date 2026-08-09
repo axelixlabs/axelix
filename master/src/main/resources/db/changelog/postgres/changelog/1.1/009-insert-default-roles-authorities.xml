@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-009-postgres-insert-default-roles-authorities" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <rowCount tableName="roles_authorities" expectedRows="0"/>
+    </preConditions>
+
+    <!-- VIEWER has no authorities. -->
+
+    <!-- EDITOR. -->
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a3"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a4"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a5"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a6"/>
+    </insert>
+
+    <!-- ADMIN. -->
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a3"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a4"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a5"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a6"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a1"/>
+    </insert>
+    <insert tableName="roles_authorities">
+      <column name="role_id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="authority_id" value="00000000-0000-0000-0000-0000000000a2"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

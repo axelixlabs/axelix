@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-010-sqlite-migrate-user-roles-to-users-roles" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <rowCount tableName="users_roles" expectedRows="0"/>
+    </preConditions>
+
+    <comment>
+      Fills users_roles from the legacy users.roles JSON column. The column itself is intentionally left in place:
+      it is kept up to date so that a rollback to a previous Axelix version does not lose the role assignments.
+    </comment>
+
+    <sql>
+      INSERT INTO users_roles (user_id, role_id)
+      SELECT DISTINCT u.id, r.id
+      FROM users u
+      JOIN json_each(u.roles) AS role_name
+      JOIN roles r ON r.name = UPPER(TRIM(role_name.value))
+      WHERE u.roles IS NOT NULL AND u.roles &lt;&gt; '';
+    </sql>
+  </changeSet>
+</databaseChangeLog>

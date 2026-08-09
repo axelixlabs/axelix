@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-008-sqlite-insert-default-roles" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <rowCount tableName="roles" expectedRows="0"/>
+    </preConditions>
+
+    <insert tableName="roles">
+      <column name="id" value="00000000-0000-0000-0000-0000000000b1"/>
+      <column name="name" value="VIEWER"/>
+      <column name="description" value="Read-only access to the monitored applications."/>
+      <column name="role_origin" value="BUILT_IN"/>
+    </insert>
+    <insert tableName="roles">
+      <column name="id" value="00000000-0000-0000-0000-0000000000b2"/>
+      <column name="name" value="EDITOR"/>
+      <column name="description" value="Performs runtime operations on the monitored applications, including destructive ones such as clearing caches."/>
+      <column name="role_origin" value="BUILT_IN"/>
+    </insert>
+    <insert tableName="roles">
+      <column name="id" value="00000000-0000-0000-0000-0000000000b3"/>
+      <column name="name" value="ADMIN"/>
+      <column name="description" value="Everything an editor can do, plus reading sensitive configuration values."/>
+      <column name="role_origin" value="BUILT_IN"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
