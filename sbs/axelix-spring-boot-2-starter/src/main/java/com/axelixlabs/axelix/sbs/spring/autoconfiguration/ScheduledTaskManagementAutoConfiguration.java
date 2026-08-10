@@ -24,11 +24,10 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
@@ -53,6 +52,9 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
+    public static final String THREAD_POOL_TASK_EXECUTOR_QUALIFIER = "schedulingThreadPoolTaskExecutor";
+    public static final String TASK_SCHEDULER_QUALIFIER = "schedulingTaskScheduler";
+
     @Bean
     public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
         return new ScheduledTasksRegistry(taskHolders.orderedStream().collect(Collectors.toList()));
@@ -62,19 +64,17 @@ public class ScheduledTaskManagementAutoConfiguration {
     public ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            @Qualifier("axelixThreadPoolTaskExecutor") ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+            @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER) ThreadPoolTaskExecutor threadPoolTaskExecutor) {
         return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, threadPoolTaskExecutor);
     }
 
     @Bean
-    @ConditionalOnBean(TaskScheduler.class)
-    public TaskRescheduler intervalBasedTaskRescheduler(TaskScheduler scheduler) {
+    public TaskRescheduler intervalBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
         return new IntervalBasedTaskRescheduler(scheduler);
     }
 
     @Bean
-    @ConditionalOnBean(TaskScheduler.class)
-    public TaskRescheduler triggerBasedTaskRescheduler(TaskScheduler scheduler) {
+    public TaskRescheduler triggerBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
         return new TriggerBasedTaskRescheduler(scheduler);
     }
 
@@ -90,8 +90,16 @@ public class ScheduledTaskManagementAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = "axelixThreadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor axelixThreadPoolTaskExecutor() {
+    @Qualifier(TASK_SCHEDULER_QUALIFIER)
+    public ThreadPoolTaskScheduler schedulingTaskScheduler() {
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(1);
+        return taskScheduler;
+    }
+
+    @Bean
+    @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER)
+    public ThreadPoolTaskExecutor schedulingThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(1);
         threadPoolTaskExecutor.setMaxPoolSize(3);

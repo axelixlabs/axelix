@@ -89,7 +89,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     @Test
-    void shouldActivateWithoutReschedulers_whenSchedulingNotEnabled() {
+    void shouldActivateReschedulers_backedByLocalScheduler_whenSchedulingNotEnabled() {
         // given
         new ApplicationContextRunner()
                 .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
@@ -104,8 +104,11 @@ class ScheduledTaskManagementAutoConfigurationTest {
                     assertThat(context).hasSingleBean(AxelixScheduledTasksEndpoint.class);
                     assertThat(context).hasSingleBean(ThreadPoolTaskExecutor.class);
 
-                    // no scheduling -> reschedulers are not created
-                    assertThat(context).getBeans(TaskRescheduler.class).isEmpty();
+                    // reschedulers are backed by the locally-declared TaskScheduler, so they are
+                    // created even without @EnableScheduling
+                    assertThat(context).getBeans(TaskRescheduler.class).hasSize(2);
+                    assertThat(context).hasSingleBean(IntervalBasedTaskRescheduler.class);
+                    assertThat(context).hasSingleBean(TriggerBasedTaskRescheduler.class);
                 });
     }
 
@@ -129,7 +132,10 @@ class ScheduledTaskManagementAutoConfigurationTest {
                     assertThat(context).getBeans(TaskRescheduler.class).hasSize(2);
                     assertThat(context).hasSingleBean(IntervalBasedTaskRescheduler.class);
                     assertThat(context).hasSingleBean(TriggerBasedTaskRescheduler.class);
-                    assertThat(context).hasBean("axelixThreadPoolTaskExecutor");
+
+                    // our executor is registered alongside the user-declared ones, and the
+                    // ScheduledTaskService is wired via @Qualifier despite the ambiguity
+                    assertThat(context).getBeans(ThreadPoolTaskExecutor.class).hasSize(3);
                 });
     }
 
