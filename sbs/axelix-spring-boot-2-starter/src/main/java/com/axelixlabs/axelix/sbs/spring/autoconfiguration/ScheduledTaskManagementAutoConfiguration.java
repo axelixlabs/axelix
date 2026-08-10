@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -58,8 +59,10 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     public ScheduledTaskService scheduledTaskService(
-            ScheduledTasksRegistry scheduledTasksRegistry, List<TaskRescheduler> taskReschedulers) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, createThreadPoolExecutor());
+            ScheduledTasksRegistry scheduledTasksRegistry,
+            List<TaskRescheduler> taskReschedulers,
+            @Qualifier("axelixThreadPoolTaskExecutor") ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, threadPoolTaskExecutor);
     }
 
     @Bean
@@ -85,13 +88,15 @@ public class ScheduledTaskManagementAutoConfiguration {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
 
-    private static ThreadPoolTaskExecutor createThreadPoolExecutor() {
+    @Bean
+    public ThreadPoolTaskExecutor axelixThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(1);
         threadPoolTaskExecutor.setMaxPoolSize(3);
         threadPoolTaskExecutor.setAllowCoreThreadTimeOut(false);
         threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
-        threadPoolTaskExecutor.initialize();
+        threadPoolTaskExecutor.setAwaitTerminationSeconds(30);
+        threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         return threadPoolTaskExecutor;
     }
 }

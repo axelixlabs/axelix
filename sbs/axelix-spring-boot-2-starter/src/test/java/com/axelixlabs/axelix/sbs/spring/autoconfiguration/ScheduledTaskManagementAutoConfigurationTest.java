@@ -54,7 +54,11 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
+        // given: ApplicationContextRunner configured with required properties and scheduling enabled
+
+        // when
         contextRunner.run(context -> {
+            // then
             assertThat(context).hasSingleBean(ScheduledTasksRegistry.class);
             assertThat(context).hasSingleBean(ScheduledTaskService.class);
             assertThat(context).hasSingleBean(ScheduledTasksAssembler.class);
@@ -63,15 +67,19 @@ class ScheduledTaskManagementAutoConfigurationTest {
             assertThat(context).getBeans(TaskRescheduler.class).hasSize(2);
             assertThat(context).hasSingleBean(IntervalBasedTaskRescheduler.class);
             assertThat(context).hasSingleBean(TriggerBasedTaskRescheduler.class);
+            assertThat(context).hasSingleBean(ThreadPoolTaskExecutor.class);
         });
     }
 
     @Test
     void shouldNotActivateAutoConfiguration_withoutRequiredProperty() {
+        // given
         new ApplicationContextRunner()
                 .withUserConfiguration(EnableSchedulingConfig.class)
                 .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
+                // when
                 .run(context -> {
+                    // then
                     assertThat(context).doesNotHaveBean(ScheduledTaskManagementAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ScheduledTasksRegistry.class);
                     assertThat(context).doesNotHaveBean(ScheduledTaskService.class);
@@ -81,32 +89,22 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
     @Test
     void shouldActivateWithoutReschedulers_whenSchedulingNotEnabled() {
+        // given
         new ApplicationContextRunner()
                 .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
                 .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
+                // when
                 .run(context -> {
+                    // then
                     // read path is available even without @EnableScheduling
                     assertThat(context).hasSingleBean(ScheduledTasksRegistry.class);
                     assertThat(context).hasSingleBean(ScheduledTaskService.class);
                     assertThat(context).hasSingleBean(ScheduledTasksAssembler.class);
                     assertThat(context).hasSingleBean(AxelixScheduledTasksEndpoint.class);
+                    assertThat(context).hasSingleBean(ThreadPoolTaskExecutor.class);
 
                     // no scheduling -> reschedulers are not created
                     assertThat(context).getBeans(TaskRescheduler.class).isEmpty();
-                });
-    }
-
-    @Test // GH-1485
-    void shouldCreateThreadPoolTaskExecutorAndNotUseAnyFromContext() {
-        new ApplicationContextRunner()
-                .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
-                .withUserConfiguration(ThreadPoolTaskExecutorsConfig.class)
-                .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context)
-                            .getBean(ScheduledTaskService.class)
-                            .extracting("taskExecutor")
-                            .isNotIn(context.getBeansOfType(ThreadPoolTaskExecutor.class));
                 });
     }
 
@@ -117,21 +115,6 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Bean
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();
-        }
-    }
-
-    @TestConfiguration
-    @EnableScheduling
-    static class ThreadPoolTaskExecutorsConfig {
-
-        @Bean
-        public ThreadPoolTaskExecutor threadPoolTaskExecutor1() {
-            return new ThreadPoolTaskExecutor();
-        }
-
-        @Bean
-        public ThreadPoolTaskExecutor threadPoolTaskExecutor2() {
-            return new ThreadPoolTaskExecutor();
         }
     }
 }
