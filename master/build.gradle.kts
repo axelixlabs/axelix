@@ -55,6 +55,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     api("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
 
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")

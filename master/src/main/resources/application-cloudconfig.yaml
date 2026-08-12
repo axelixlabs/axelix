@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    config:
+      enabled: ${axelix.master.config-server.enabled}
+      uri: ${axelix.master.config-server.uri}
+      label: ${axelix.master.config-server.label}
+      name: ${axelix.master.config-server.name:${spring.application.name}}
+      username: ${axelix.master.config-server.username:}
+      password: ${axelix.master.config-server.password:}
+      fail-fast: ${axelix.master.config-server.fail-fast}
+  config:
+    import: 'optional:configserver:'
+  application:
+    name: axelix
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+axelix:
+  master:
+    config-server:
+      enabled: true
+      uri:
+      label: master
+      name:
+      username:
+      password:
+      fail-fast: true
