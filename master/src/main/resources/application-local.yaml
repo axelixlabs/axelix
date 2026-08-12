@@ -1,4 +1,5 @@
 # These are the settings for the local launch of Axelix Master
+
 axelix:
   master:
     discovery:
@@ -49,3 +50,6 @@ management:
 spring:
   datasource:
     url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
+  cloud:
+    config:
+      enabled: false

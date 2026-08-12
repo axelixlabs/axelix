@@ -12,11 +12,9 @@ spring:
       password: ${axelix.master.config-server.password:}
       fail-fast: ${axelix.master.config-server.fail-fast}
   config:
-    import: 'optional:configserver:'
+    import: 'configserver:'
   application:
     name: axelix
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}
 
 axelix:
   master:

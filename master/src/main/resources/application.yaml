@@ -7,6 +7,8 @@ spring:
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
+    config:
+      enabled: false
   application:
     name: axelix
   ai:
