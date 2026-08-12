@@ -8,8 +8,8 @@ spring:
       uri: ${axelix.master.config-server.uri}
       label: ${axelix.master.config-server.label}
       name: ${axelix.master.config-server.name:${spring.application.name}}
-      username: ${axelix.master.config-server.username:}
-      password: ${axelix.master.config-server.password:}
+      username: ${axelix.master.config-server.username}
+      password: ${axelix.master.config-server.password}
       fail-fast: ${axelix.master.config-server.fail-fast}
   config:
     import: 'configserver:'
