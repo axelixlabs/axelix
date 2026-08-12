@@ -33,8 +33,9 @@ import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
-public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
+public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, AutoCloseable {
 
     private final ScheduledTasksRegistry registry;
 
@@ -121,5 +122,12 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
                 null,
                 null,
                 managedScheduledTask.isEnabled());
+    }
+
+    @Override
+    public void close() {
+        if (this.registry != null) {
+            this.registry.close();
+        }
     }
 }

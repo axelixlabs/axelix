@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
@@ -42,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 10.02.2026
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 class ScheduledTaskManagementAutoConfigurationTest {
 
@@ -94,6 +97,24 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
+    @Test // GH-1497
+    void shouldCancelAllManagedTasksWhenContextCloses() {
+        contextRunner.run(context -> {
+            ScheduledTasksRegistry registry = context.getBean(ScheduledTasksRegistry.class);
+
+            assertThat(registry.getAll()).isNotEmpty();
+            for (ManagedScheduledTask task : registry.getAll()) {
+                assertThat(task.isEnabled()).isTrue();
+            }
+
+            context.close();
+
+            for (ManagedScheduledTask task : registry.getAll()) {
+                assertThat(task.isEnabled()).isFalse();
+            }
+        });
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -101,6 +122,11 @@ class ScheduledTaskManagementAutoConfigurationTest {
         @Bean
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();
+        }
+
+        // simulation of schedule tasks
+        @Scheduled(fixedDelay = 10000)
+        public void someMockTask() {
         }
     }
 }

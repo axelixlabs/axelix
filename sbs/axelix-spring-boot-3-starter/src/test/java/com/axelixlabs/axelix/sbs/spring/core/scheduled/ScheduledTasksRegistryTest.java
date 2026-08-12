@@ -44,6 +44,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;
 
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest
 @Import(ScheduledTasksRegistryTest.ScheduledTaskRegistryTestConfiguration.class)
@@ -109,6 +111,26 @@ class ScheduledTasksRegistryTest {
                         task -> assertThat(task).isInstanceOf(FixedDelayTask.class),
                         task -> assertThat(task).isInstanceOf(FixedRateTask.class),
                         task -> assertThat(task).isInstanceOf(TriggerTask.class).isNotInstanceOf(CronTask.class));
+    }
+
+    @Test // GH-1497
+    @DirtiesContext
+    void shouldCancelAllManagedTasksWhenRegistryCloses() {
+        Collection<ManagedScheduledTask> managedTasks = taskRegistry.getAll();
+        assertThat(managedTasks).isNotEmpty();
+
+        for (ManagedScheduledTask task : managedTasks) {
+            assertThat(task.isEnabled())
+                .withFailMessage("Task with ID %s should be enabled initially", task.getId())
+                .isTrue();
+        }
+
+        taskRegistry.close();
+
+        for (ManagedScheduledTask task : managedTasks) {
+            assertThat(task.isEnabled()).isFalse();
+        }
+        assertThat(taskRegistry.getAll()).isEmpty();
     }
 
     @TestConfiguration

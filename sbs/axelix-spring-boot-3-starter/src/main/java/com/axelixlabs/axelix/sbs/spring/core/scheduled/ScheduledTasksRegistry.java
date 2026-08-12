@@ -40,8 +40,9 @@ import org.springframework.scheduling.config.Task;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
-public class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent> {
+public class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent>, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksRegistry.class);
 
@@ -81,5 +82,20 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
         Task t = task.getTask();
         Runnable r = t.getRunnable();
         return r.toString();
+    }
+
+    @Override
+    public void close() {
+        log.info("Closing ScheduledTasksRegistry, cancelling {} managed tasks", tasks.size());
+        for (ManagedScheduledTask task : tasks.values()) {
+            if (task != null) {
+                try {
+                    task.close();
+                } catch (Exception e) {
+                    log.error("Failed to close managed scheduled task with id: {}", task.getId(), e);
+                }
+            }
+        }
+        tasks.clear();
     }
 }
