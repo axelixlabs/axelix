@@ -15,24 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createSlice } from "@reduxjs/toolkit";
+package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import type { IAxelixSettings } from "models";
+import java.util.Map;
 
-const initialState: IAxelixSettings = {
-    authenticationOptions: [],
-    isMcpServerEnabled: false,
-    additionalOidcAuthorizationParameters: {},
-};
+import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
 
-export const SettingsSlice = createSlice({
-    name: "settings",
-    initialState: initialState,
-    reducers: {
-        setAxelixSettings: (_, action) => {
-            return action.payload;
-        },
-    },
-});
+/**
+ * Extension point validating the OIDC ID token claims after the standard issuer/audience/signature
+ * validation. Every registered validator is invoked before the login is allowed to proceed.
+ *
+ * @author Nikita Kirillov
+ */
+public interface OidcIdTokenClaimsValidator {
 
-export const { setAxelixSettings } = SettingsSlice.actions;
+    /**
+     * Validates the given ID token claims.
+     *
+     * @param idTokenClaims validated ID token claims
+     * @throws OAuth2AuthenticationException if the claims fail validation
+     */
+    void validate(Map<String, Object> idTokenClaims);
+}

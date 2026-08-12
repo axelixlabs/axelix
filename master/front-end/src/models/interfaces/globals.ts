@@ -163,6 +163,11 @@ export interface IAxelixSettings {
      * Authentication options configured on the backend
      */
     authenticationOptions: LoginOption[];
+
+    /**
+     * Additional query parameters to append to the OIDC provider's /authorize redirect, contributed by the backend.
+     */
+    additionalOidcAuthorizationParameters?: Record<string, string>;
 }
 
 export interface ISiderMenuItem {

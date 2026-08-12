@@ -27,9 +27,10 @@ import { LockIcon } from "assets";
 
 interface IProps {
     option: OIDCLoginOption;
+    additionalParameters?: Record<string, string>;
 }
 
-export const LoginOidcForm = ({ option }: IProps) => {
+export const LoginOidcForm = ({ option, additionalParameters }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -38,7 +39,7 @@ export const LoginOidcForm = ({ option }: IProps) => {
                 htmlType="submit"
                 icon={<LockIcon />}
                 className={styles.SubmitButton}
-                onClick={() => authorize(option)}
+                onClick={() => authorize(option, additionalParameters)}
             >
                 {t("Authentication.oidcForm.loginButtonText")}
             </Button>

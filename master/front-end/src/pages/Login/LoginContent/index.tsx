@@ -64,7 +64,10 @@ export const LoginContent = () => {
                 {displayUsernamePasswordLoginForm && oidcOptionPresent && <SeparatorLine />}
 
                 {ifFound(oidcOptionPresent, (value) => (
-                    <LoginOidcForm option={value as OIDCLoginOption} />
+                    <LoginOidcForm
+                        option={value as OIDCLoginOption}
+                        additionalParameters={settings?.additionalOidcAuthorizationParameters}
+                    />
                 ))}
             </div>
         </>

@@ -48,10 +48,12 @@ import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
@@ -59,6 +61,7 @@ import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -98,6 +101,9 @@ class OAuth2CallbackControllerTest {
 
     @MockitoBean
     private UserInfoJsonAccessor userInfoJsonAccessor;
+
+    @MockitoBean
+    private OidcIdTokenClaimsValidator claimsValidator;
 
     @Autowired
     private JwtDecoderService jwtDecoderService;
@@ -334,6 +340,26 @@ class OAuth2CallbackControllerTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldReturn401AndSkipUserProvisioningWhenClaimsValidatorRejects() {
+        // given.
+        String username = "test-user";
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+        doThrow(new OAuth2AuthenticationException("claims validation failed"))
+                .when(claimsValidator)
+                .validate(Map.of());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
+        assertThat(userRepository.findByUsername(username)).isEmpty();
     }
 
     @Test
