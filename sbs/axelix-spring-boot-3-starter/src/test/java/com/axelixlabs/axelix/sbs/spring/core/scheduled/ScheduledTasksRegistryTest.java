@@ -42,9 +42,9 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
-import org.springframework.test.annotation.DirtiesContext;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -121,8 +121,8 @@ class ScheduledTasksRegistryTest {
 
         for (ManagedScheduledTask task : managedTasks) {
             assertThat(task.isEnabled())
-                .withFailMessage("Task with ID %s should be enabled initially", task.getId())
-                .isTrue();
+                    .withFailMessage("Task with ID %s should be enabled initially", task.getId())
+                    .isTrue();
         }
 
         taskRegistry.close();

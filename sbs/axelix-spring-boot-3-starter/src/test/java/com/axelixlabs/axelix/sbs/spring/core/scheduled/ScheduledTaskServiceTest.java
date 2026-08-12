@@ -43,6 +43,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import org.springframework.test.annotation.DirtiesContext;
