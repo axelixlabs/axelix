@@ -1,0 +1,11 @@
+.FormFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.FormActionsWrapper {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 8px;
+}

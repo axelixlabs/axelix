@@ -1,0 +1,23 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--axelix-medium-grey);
+}
+
+.RecordChunk {
+    padding-block: 16px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+
+    &:nth-child(odd) {
+        border-right: 1px solid var(--axelix-medium-grey);
+    }
+
+    &:nth-child(even) {
+        padding-left: 16px;
+    }
+}
+
+.RecordLabel {
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+}

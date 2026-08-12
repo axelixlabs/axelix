@@ -37,7 +37,7 @@ interface IProps {
     setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export function AboutModal({ open, setOpen }: IProps) {
+export const AboutModal = ({ open, setOpen }: IProps) => {
     const { t } = useTranslation();
 
     const version = import.meta.env.VITE_APP_VERSION;
@@ -121,4 +121,4 @@ export function AboutModal({ open, setOpen }: IProps) {
             </UniversalModal>
         </>
     );
-}
+};

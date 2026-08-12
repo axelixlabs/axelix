@@ -15,19 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./transactional";
-export * from "./entitiesMap";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./wallboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./license";
-export * from "./caches";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import { apiFetch } from "api";
+
+export const checkLicenseKey = (licenseKey: string) => {
+    return apiFetch.post("license/check", {
+        licenseKey: licenseKey,
+    });
+};
+
+export const sendLicenseKey = (licenseKey: string) => {
+    return apiFetch.post("license", {
+        licenseKey: licenseKey,
+    });
+};

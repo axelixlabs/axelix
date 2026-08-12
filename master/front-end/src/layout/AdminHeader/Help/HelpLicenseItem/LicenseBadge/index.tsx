@@ -15,37 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tooltip } from "antd";
-import type { TooltipPlacement } from "antd/es/tooltip";
-import type { PropsWithChildren, ReactNode } from "react";
-
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * The rich content shown inside the tooltip.
-     */
-    content: ReactNode;
-
-    /**
-     * Tooltip position relative to the trigger.
-     */
-    placement?: TooltipPlacement;
+    isEnterprise: boolean;
+    enterpriseText: string;
+    ossText: string;
 }
 
-/**
- * A light, design-aligned tooltip: a plain white surface with dark text, distinct from the accented
- * {@link InfoTooltip}. The trigger is provided as children.
- */
-export const HintTooltip = ({ children, content, placement = "top" }: PropsWithChildren<IProps>) => {
+export const LicenseBadge = ({ isEnterprise, enterpriseText, ossText }: IProps) => {
     return (
-        <Tooltip
-            title={<div className={styles.Content}>{content}</div>}
-            placement={placement}
-            color="#0f172a"
-            styles={{ container: { padding: 0 } }}
-        >
-            {children}
-        </Tooltip>
+        <>
+            <span className={`TextUltraSmall ${isEnterprise ? styles.EnterpriseBadge : styles.OSSBadge}`}>
+                {isEnterprise ? enterpriseText : ossText}
+            </span>
+        </>
     );
 };

@@ -17,6 +17,7 @@
     "username": "Username",
     "password": "Password",
     "notEnoughAuthorities": "You don't have enough authorities",
+    "license": "License",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
@@ -269,6 +270,61 @@
         "contact": "In case of any questions please consult the <0>Reference Guide</0>",
         "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
         "githubSource": "GitHub Source"
+    },
+    "LicenseModal": {
+        "active": "Active",
+        "noExpiry": "no expiry",
+        "thirdPartyNotices": "Third-party notices",
+        "updateKey": "Update key",
+        "enterKey": "Enter key",
+        "ossDescription": "You are running <b>Axelix Core</b>, licensed under <a>{{license}}</a>. Enterprise capabilities are not enabled on this instance.",
+        "licensedTo": "LICENSED TO",
+        "licensedId": "LICENSE ID",
+        "validFrom": "VALID FROM",
+        "validTo": "VALID TO",
+        "included": "INCLUDED",
+        "timeLeft": {
+            "days_one": "expires in {{count}} day",
+            "days_other": "expires in {{count}} days",
+            "detailed": "expires in {{days}}d {{hours}}h {{minutes}}m",
+            "expired": "expired",
+            "unknown": "expiry date unknown"
+        },
+        "Form": {
+            "enterKeyTitle": "Enter license key",
+            "updateKeyTitle": "Update license key",
+            "enterKeyDescription": "Paste the key issued to your organization. Keys are verified locally - no outbound connection is made.",
+            "activate": "Activate",
+            "replaceLicense": "Replace license",
+            "availableInEnterprise": "Available in Enterprise",
+            "or": "or",
+            "uploadFile": "upload a .lic file",
+            "keyActivated": "License key activated",
+            "keyUpdated": "License key updated",
+            "fileReadError": "Failed to read the file. Please try again.",
+            "KeyInfo": {
+                "currentlyActive": "Currently active",
+                "validUntil": "until {{date}}"
+            },
+            "Alert": {
+                "Valid": {
+                    "title": "New key validated",
+                    "description": "{{issuedTo}} · valid to <0>{{validUntil}}</0>. The current license stays active until you confirm."
+                },
+                "AlreadyActive": {
+                    "title": "Already active",
+                    "description": "This license key is already in use."
+                },
+                "Expired": {
+                    "title": "This key expired on {{date}}",
+                    "description": "Issued to {{issuedTo}}. Ask your Axelix contact for a renewed key, or <0>contact support</0>."
+                },
+                "SignatureInvalid": {
+                    "title": "Signature could not be verified",
+                    "description": "The key was altered after it was issued, or it was not issued by Axelix. Request a fresh copy from your Axelix contact."
+                }
+            }
+        }
     },
     "ThreadDump": {
         "id": "Thread id",

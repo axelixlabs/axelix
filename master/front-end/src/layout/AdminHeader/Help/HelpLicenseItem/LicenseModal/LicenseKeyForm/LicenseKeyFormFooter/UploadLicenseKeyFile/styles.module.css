@@ -1,0 +1,17 @@
+.Or {
+    margin-right: 8px;
+}
+
+.FileUploadLabel {
+    cursor: pointer;
+    transition: text-decoration 0.3s;
+    color: var(--axelix-primary-green);
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.UploadInput {
+    display: none;
+}
