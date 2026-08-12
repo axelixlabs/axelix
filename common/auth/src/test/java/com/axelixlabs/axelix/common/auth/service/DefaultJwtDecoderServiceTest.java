@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -84,7 +85,9 @@ class DefaultJwtDecoderServiceTest {
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrderElementsOf(role.getAuthorities());
+                .extracting(Authority::getName)
+                .containsExactlyInAnyOrderElementsOf(
+                        role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()));
     }
 
     static Stream<Arguments> roles() {
@@ -111,7 +114,10 @@ class DefaultJwtDecoderServiceTest {
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrderElementsOf(DefaultRole.ADMIN.getAuthorities());
+                .extracting(Authority::getName)
+                .containsExactlyInAnyOrderElementsOf(DefaultRole.ADMIN.getAuthorities().stream()
+                        .map(Authority::getName)
+                        .collect(Collectors.toList()));
 
         // Editor
         assertThat(decodedUser.getRoles().stream()
@@ -119,7 +125,10 @@ class DefaultJwtDecoderServiceTest {
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrderElementsOf(DefaultRole.EDITOR.getAuthorities());
+                .extracting(Authority::getName)
+                .containsExactlyInAnyOrderElementsOf(DefaultRole.EDITOR.getAuthorities().stream()
+                        .map(Authority::getName)
+                        .collect(Collectors.toList()));
 
         // Viewer
         assertThat(decodedUser.getRoles().stream()
@@ -141,8 +150,15 @@ class DefaultJwtDecoderServiceTest {
         PasswordlessUser decodedUser = decoder256.decodeTokenToUser(token);
 
         // then.
-        PasswordlessUser expectedUser = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.EDITOR));
-        assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
+        assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
+        assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
+            assertThat(role.getName()).isEqualTo(DefaultRole.EDITOR.getName());
+            assertThat(role.getAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactlyInAnyOrderElementsOf(DefaultRole.EDITOR.getAuthorities().stream()
+                            .map(Authority::getName)
+                            .collect(Collectors.toList()));
+        });
     }
 
     @Test
@@ -157,12 +173,19 @@ class DefaultJwtDecoderServiceTest {
         PasswordlessUser decodedUser = decoder384.decodeTokenToUser(token);
 
         // then.
-        PasswordlessUser expectedUser = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.ADMIN));
-        assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
+        assertThat(decodedUser.getUsername()).isEqualTo(USER_NAME);
+        assertThat(decodedUser.getRoles()).singleElement().satisfies(role -> {
+            assertThat(role.getName()).isEqualTo(DefaultRole.ADMIN.getName());
+            assertThat(role.getAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactlyInAnyOrderElementsOf(DefaultRole.ADMIN.getAuthorities().stream()
+                            .map(Authority::getName)
+                            .collect(Collectors.toList()));
+        });
     }
 
     @Test
-    void shouldOmitUnrecognizedAuthority() {
+    void shouldPreserveCustomAuthority() {
         Role role = new DefaultRole("VIEWER", Set.of(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
@@ -171,7 +194,9 @@ class DefaultJwtDecoderServiceTest {
 
         assertThat(decodedUser.getRoles())
                 .first()
-                .satisfies(r -> assertThat(r.getAuthorities()).hasSize(0));
+                .satisfies(r -> assertThat(r.getAuthorities())
+                        .extracting(Authority::getName)
+                        .containsExactly(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY.getName()));
     }
 
     @Test

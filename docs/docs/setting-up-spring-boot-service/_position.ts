@@ -1,10 +1,23 @@
-// Order of docs in the Spring Boot Starter sidebar. Leading underscore makes
+// Order of docs in the Spring Boot Service sidebar. Leading underscore makes
 // Docusaurus ignore this file when scanning the docs content tree.
-const prefix = 'setting-up-spring-boot-service';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
-const pages: string[] = [
-  'what-is-axelix-starter',
-  'configuring-axelix-starter/configuring-axelix-starter',
-].map((id) => `${prefix}/${id}`);
+const prefix = 'setting-up-spring-boot-service';
+const withPrefix = (ids: string[]): string[] => ids.map((id) => `${prefix}/${id}`);
+
+const pages: SidebarsConfig[string] = [
+  {
+    type: 'category',
+    label: 'Spring Boot Starter',
+    collapsed: false,
+    items: withPrefix(['spring-boot-starter/what-is-spring-boot-starter', 'spring-boot-starter/configuration']),
+  },
+  {
+    type: 'category',
+    label: 'Build Plugin',
+    collapsed: false,
+    items: withPrefix(['build-plugin/what-is-build-plugin', 'build-plugin/configuration']),
+  },
+];
 
 export default pages;

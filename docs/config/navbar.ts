@@ -47,8 +47,8 @@ export const navbar: Navbar = {
       className: 'navbar__tab',
     },
     {
-      to: '/setting-up-spring-boot-service/what-is-axelix-starter',
-      label: 'Spring Boot Starter',
+      to: '/setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter',
+      label: 'Your Services',
       position: 'left',
       activeBaseRegex: '^/setting-up-spring-boot-service',
       className: 'navbar__tab',

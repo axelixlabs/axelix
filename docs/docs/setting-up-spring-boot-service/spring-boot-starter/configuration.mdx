@@ -25,6 +25,11 @@ A few facts worth pinning down before you copy any of the snippets below.
 - **What the starter contributes**: a set of Axelix-specific actuator endpoints (`axelix-metadata`, `axelix-beans`,
   `axelix-loggers`, …), a JWT-based authorization filter that gates them, and an optional self-registration component
   that announces this instance to Master.
+- **The Axelix build plugin is required too**: alongside the starter dependency, apply the Axelix Gradle or Maven build
+  plugin. It stamps your build coordinates (`groupId`/`artifactId`/`version`) into the artifact, and Master identifies
+  every application by those coordinates — an instance built without the plugin **cannot register**. See [What is the
+  Axelix build plugin?](../build-plugin/what-is-build-plugin.mdx) and [Configuring the build
+  plugin](../build-plugin/configuration.mdx).
 - **Two consumers of the same data**: Master serves the Axelix UI at `/` and an MCP server at `/api/mcp` (controlled by
   `axelix.master.mcp-server.enabled`, on by default). Both read from the actuator endpoints the starter exposes, so
   wiring the starter up makes the instance visible to UI users *and* to MCP clients with no extra configuration on the
@@ -44,7 +49,7 @@ A few facts worth pinning down before you copy any of the snippets below.
 Declare the starter coordinate matching your Boot major version.
 
 :::note
-The snippets below pin `1.0.0-M1` for illustration. Check the [Maven
+The snippets below pin `1.0.0` for illustration. Check the [Maven
 Central](https://github.com/axelixlabs/axelix/releases) for the latest published tag and use that version in your own
 build.
 :::
@@ -57,7 +62,7 @@ build.
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
 }
 ```
 
@@ -66,7 +71,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:1.0.0'
 }
 ```
 
@@ -78,7 +83,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -94,7 +99,7 @@ dependencies {
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0")
 }
 ```
 
@@ -103,7 +108,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0'
 }
 ```
 
@@ -115,7 +120,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-3-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -131,7 +136,7 @@ dependencies {
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0")
 }
 ```
 
@@ -140,7 +145,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0'
 }
 ```
 
@@ -152,7 +157,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-2-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -166,6 +171,12 @@ dependencies {
 The starter also depends on [Spring Boot
 Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator) if your application doesn't
 already include `spring-boot-starter-actuator`, add it alongside.
+
+:::tip[The build plugin is a separate step]
+Applying the Axelix build plugin is required for every managed service, but it lives in its own section — see [What is
+the Axelix build plugin?](../build-plugin/what-is-build-plugin.mdx) and [Configuring the build
+plugin](../build-plugin/configuration.mdx).
+:::
 
 ## Expose the Axelix actuator endpoints
 
@@ -534,6 +545,8 @@ axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false
 
 ## Related
 
+- [Configuring the build plugin](../build-plugin/configuration.mdx) — the second half of wiring a service up; required
+  for the instance to register.
 - [Configuring Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — where the signing key, eviction timeout, and
   Kubernetes scan are set.
 - [What is Master?](../../setting-up-master-ui/what-is-master.mdx) — background on how Master uses the data the starter

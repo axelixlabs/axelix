@@ -26,6 +26,11 @@ Context Protocol), который предоставляет те же данн�
 - **Что добавляет стартер**: набор Axelix-специфичных actuator-эндпоинтов (`axelix-metadata`, `axelix-beans`,
   `axelix-loggers`, …), JWT-фильтр авторизации, который ограничивает доступ к ним, и опциональный компонент
   саморегистрации, который объявляет сервис в Master.
+- **Плагин сборки Axelix также обязателен**: помимо зависимости стартера, подключите Gradle- или Maven-плагин сборки
+  Axelix. Он записывает координаты сборки (`groupId`/`artifactId`/`version`) в артефакт, а Master идентифицирует каждое
+  приложение именно по этим координатам — сервис, собранный без плагина, **не сможет зарегистрироваться**. См.
+  [Что такое плагин сборки Axelix?](../build-plugin/what-is-build-plugin.mdx) и [Настройка плагина
+  сборки](../build-plugin/configuration.mdx).
 - **Два потребителя одних и тех же данных**: Master отдаёт пользовательский интерфейс Axelix по адресу `/` и сервер MCP
   по адресу `/api/mcp` (управляется `axelix.master.mcp-server.enabled`, по умолчанию включён). Оба считывают данные с
   тех же actuator-эндпоинтов, которые публикует стартер, — поэтому подключение стартера делает сервис видимым и для
@@ -47,7 +52,7 @@ Context Protocol), который предоставляет те же данн�
 Укажите координату стартера, соответствующую мажорной версии Boot.
 
 :::note
-В сниппетах ниже для иллюстрации зафиксирована версия `1.0.0-M1`. Проверьте [Maven
+В сниппетах ниже для иллюстрации зафиксирована версия `1.0.0`. Проверьте [Maven
 Central](https://central.sonatype.com/namespace/com.axelixlabs) на актуальный опубликованный тег и используйте эту
 версию в своей сборке.
 :::
@@ -60,7 +65,7 @@ Central](https://central.sonatype.com/namespace/com.axelixlabs) на актуа�
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
 }
 ```
 
@@ -69,7 +74,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-4-starter:1.0.0'
 }
 ```
 
@@ -81,7 +86,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -97,7 +102,7 @@ dependencies {
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0")
 }
 ```
 
@@ -106,7 +111,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-3-starter:1.0.0'
 }
 ```
 
@@ -118,7 +123,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-3-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -134,7 +139,7 @@ dependencies {
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1")
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0")
 }
 ```
 
@@ -143,7 +148,7 @@ dependencies {
 
 ```groovy title="build.gradle"
 dependencies {
-    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0-M1'
+    implementation 'com.axelixlabs:axelix-spring-boot-2-starter:1.0.0'
 }
 ```
 
@@ -155,7 +160,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-2-starter</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -169,6 +174,12 @@ dependencies {
 Стартер также зависит от [Spring Boot
 Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator). Если в вашем сервисе ещё
 нет `spring-boot-starter-actuator`, добавьте его рядом.
+
+:::tip[Плагин сборки — отдельный шаг]
+Подключение плагина сборки Axelix обязательно для каждого управляемого сервиса, но оно вынесено в отдельный раздел —
+см. [Что такое плагин сборки Axelix?](../build-plugin/what-is-build-plugin.mdx) и [Настройка плагина
+сборки](../build-plugin/configuration.mdx).
+:::
 
 ## Откройте доступ к Axelix actuator-эндпоинтам
 
@@ -544,6 +555,8 @@ axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false
 
 ## См. также
 
+- [Настройка плагина сборки](../build-plugin/configuration.mdx) — вторая половина подключения сервиса; обязательна для
+  регистрации сервиса.
 - [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — где задаются ключ подписи, таймаут выселения и
   сканирование Kubernetes.
 - [Что такое Master?](../../setting-up-master-ui/what-is-master.mdx) — фон того, как Master использует данные, которые

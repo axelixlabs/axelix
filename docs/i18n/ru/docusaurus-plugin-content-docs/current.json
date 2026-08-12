@@ -14,5 +14,13 @@
   "sidebar.featuresSidebar.category.JVM": {
     "message": "JVM",
     "description": "The label for category 'JVM' in sidebar 'featuresSidebar'"
+  },
+  "sidebar.springBootStarterSidebar.category.Spring Boot Starter": {
+    "message": "Spring Boot Starter",
+    "description": "The label for category 'Spring Boot Starter' in sidebar 'springBootStarterSidebar'"
+  },
+  "sidebar.springBootStarterSidebar.category.Build Plugin": {
+    "message": "Плагин сборки",
+    "description": "The label for category 'Build Plugin' in sidebar 'springBootStarterSidebar'"
   }
 }

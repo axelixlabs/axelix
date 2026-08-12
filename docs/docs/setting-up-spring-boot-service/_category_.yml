@@ -1,7 +1,7 @@
 # label    : display name of the category as shown in the sidebar header
 #            and the breadcrumb trail. Overrides the default that would be
 #            inferred from the folder name.
-label: Spring Boot Starter
+label: Your Services
 
 # position : sort order of this category among its siblings inside the
 #            parent sidebar. Lower numbers appear first. Equivalent to
@@ -19,4 +19,4 @@ link:
   type: doc
   # id     : the doc identifier (folder-relative path without `.md`).
   #          Required when `type: doc`.
-  id: setting-up-spring-boot-service/what-is-axelix-starter
+  id: setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter

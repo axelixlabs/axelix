@@ -1,0 +1,48 @@
+# What is the Axelix Build Plugin?
+
+The Axelix build plugin is a small Gradle or Maven plugin you apply to every service you want Axelix to manage. It runs
+at build time and writes a single `META-INF/axelix-info.properties` file into your application's artifact. That file
+carries the identity Master uses to tell one application apart from another.
+
+It is the companion to the [Axelix Spring Boot Starter](../spring-boot-starter/what-is-spring-boot-starter.mdx): the
+starter is the runtime component that talks to Master, and the build plugin is the build-time component that gives the
+starter something to report. Both are required — a service with the starter but without the plugin **cannot register**.
+
+## What it produces
+
+At build time the plugin generates `META-INF/axelix-info.properties` and records:
+
+- **Build coordinates** — `groupId`, `artifactId`, and `version`. These are the identity Master keys everything on.
+- **A build timestamp** — when the artifact was assembled.
+- **Git metadata** — when the build runs inside a Git repository, the current commit, branch, and author.
+
+At runtime the [starter](../spring-boot-starter/what-is-spring-boot-starter.mdx) reads this file and sends the
+coordinates to Master as part of the instance's registration metadata.
+
+## Why it is required
+
+Master identifies every application by its `groupId` + `artifactId`. Those coordinates are how it groups instances,
+attributes state, and keys the [persistence insights](../../setting-up-master-ui/mcp/mcp-tools.mdx) (N+1 and
+entity-mapping analysis).
+
+Without the plugin the properties file is absent, the coordinates are blank, and **Master rejects the registration** —
+the instance never appears in the UI, no matter how the starter is configured. Applying the plugin is therefore a hard
+prerequisite for every managed service, not an optional enhancement.
+
+## Gradle and Maven
+
+The plugin ships in two flavours, one per build tool:
+
+- **Gradle** — the `com.axelixlabs.axelix` plugin. It only needs the standard project `group` and `version` to be set;
+  it fails the build if `group` is blank, since Axelix needs it to tell applications apart.
+- **Maven** — the `axelix-maven-plugin`, whose `axelix-generate-project-info` goal binds to the `prepare-package` phase.
+  Maven always has its GAV coordinates, so nothing extra is required.
+
+Neither flavour exposes any configuration options — you apply it and it does its one job. See [Configuring the build
+plugin](./configuration.mdx) for the exact snippets.
+
+## Related
+
+- [Configuring the build plugin](./configuration.mdx) — how to apply it with Gradle or Maven.
+- [What is the Axelix Spring Boot Starter?](../spring-boot-starter/what-is-spring-boot-starter.mdx) — the runtime half
+  that reads and reports the generated coordinates.

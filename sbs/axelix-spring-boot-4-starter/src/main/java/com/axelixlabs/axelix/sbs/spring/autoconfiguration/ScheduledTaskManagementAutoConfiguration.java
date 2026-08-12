@@ -20,12 +20,13 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import java.util.List;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
@@ -43,11 +44,15 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Dmitry Kiselev
  * @since 14.10.2025
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
+
+    public static final String THREAD_POOL_TASK_EXECUTOR_QUALIFIER = "schedulingThreadPoolTaskExecutor";
+    public static final String TASK_SCHEDULER_QUALIFIER = "schedulingTaskScheduler";
 
     @Bean
     public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
@@ -58,22 +63,17 @@ public class ScheduledTaskManagementAutoConfiguration {
     public ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            ObjectProvider<ThreadPoolTaskExecutor> taskExecutor) {
-        return new ScheduledTaskService(
-                scheduledTasksRegistry,
-                taskReschedulers,
-                taskExecutor.getIfAvailable() != null ? taskExecutor.getIfAvailable() : createThreadPoolExecutor());
+            @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER) ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, threadPoolTaskExecutor);
     }
 
     @Bean
-    @ConditionalOnBean(TaskScheduler.class)
-    public TaskRescheduler intervalBasedTaskRescheduler(TaskScheduler scheduler) {
+    public TaskRescheduler intervalBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
         return new IntervalBasedTaskRescheduler(scheduler);
     }
 
     @Bean
-    @ConditionalOnBean(TaskScheduler.class)
-    public TaskRescheduler triggerBasedTaskRescheduler(TaskScheduler scheduler) {
+    public TaskRescheduler triggerBasedTaskRescheduler(@Qualifier(TASK_SCHEDULER_QUALIFIER) TaskScheduler scheduler) {
         return new TriggerBasedTaskRescheduler(scheduler);
     }
 
@@ -88,12 +88,24 @@ public class ScheduledTaskManagementAutoConfiguration {
         return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
 
-    private static ThreadPoolTaskExecutor createThreadPoolExecutor() {
+    @Bean
+    @Qualifier(TASK_SCHEDULER_QUALIFIER)
+    public ThreadPoolTaskScheduler schedulingTaskScheduler() {
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(1);
+        return taskScheduler;
+    }
+
+    @Bean
+    @Qualifier(THREAD_POOL_TASK_EXECUTOR_QUALIFIER)
+    public ThreadPoolTaskExecutor schedulingThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(1);
         threadPoolTaskExecutor.setMaxPoolSize(3);
         threadPoolTaskExecutor.setAllowCoreThreadTimeOut(false);
         threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
+        threadPoolTaskExecutor.setAwaitTerminationSeconds(30);
+        threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         return threadPoolTaskExecutor;
     }
 }

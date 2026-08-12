@@ -23,9 +23,9 @@
     "message": "Master",
     "description": "Navbar item with label Master"
   },
-  "item.label.Spring Boot Starter": {
-    "message": "Spring Boot Starter",
-    "description": "Navbar item with label Spring Boot Starter"
+  "item.label.Your Services": {
+    "message": "Ваши сервисы",
+    "description": "Navbar item with label Your Services"
   },
   "item.label.More": {
     "message": "Ещё",

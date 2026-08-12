@@ -29,10 +29,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.lang.Assert;
-import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
@@ -47,6 +45,7 @@ import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
  *
  * @since 22.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class DefaultJwtDecoderService implements JwtDecoderService {
 
@@ -104,10 +103,8 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         List<String> authoritiesList =
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
 
-        Set<Authority> authorities = authoritiesList.stream()
-                .map(this::safeAuthoritiesFromString)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<Authority> authorities =
+                authoritiesList.stream().map(s -> (Authority) () -> s).collect(Collectors.toSet());
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> components =
@@ -116,14 +113,5 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         Set<Role> componentRoles = components.stream().map(this::mapToRole).collect(Collectors.toSet());
 
         return new DefaultRole(roleName, authorities, componentRoles);
-    }
-
-    @Nullable
-    private DefaultAuthority safeAuthoritiesFromString(String name) {
-        try {
-            return DefaultAuthority.valueOf(name);
-        } catch (IllegalArgumentException ignored) {
-            return null;
-        }
     }
 }

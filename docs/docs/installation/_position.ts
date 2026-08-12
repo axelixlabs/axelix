@@ -4,7 +4,8 @@ const prefix = 'installation';
 
 const pages: string[] = [
   'configuring-master',
-  'configuring-spring-boot-starter'
+  'configuring-spring-boot-starter',
+  'configuring-build-plugin'
 ].map((id) => `${prefix}/${id}`);
 
 export default pages;

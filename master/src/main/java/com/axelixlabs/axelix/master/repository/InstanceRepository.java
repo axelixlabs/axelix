@@ -49,7 +49,6 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Query("DELETE FROM instances WHERE latest_heart_beat IS NOT NULL AND latest_heart_beat < :threshold")
     int deleteWhereHeartbeatOlderThan(@Param("threshold") Instant threshold);
 
-    // TODO: Clean up the features as well!
     @Modifying
     @Query("DELETE FROM instances WHERE latest_heart_beat IS NULL")
     void deleteAllWithoutHeartbeat();
