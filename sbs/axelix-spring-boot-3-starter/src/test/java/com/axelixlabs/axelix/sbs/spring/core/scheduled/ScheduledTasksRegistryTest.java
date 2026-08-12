@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -119,15 +120,15 @@ class ScheduledTasksRegistryTest {
         Collection<ManagedScheduledTask> managedTasks = taskRegistry.getAll();
         assertThat(managedTasks).isNotEmpty();
 
+        List<ManagedScheduledTask> tasksSnapshot = new ArrayList<>(taskRegistry.getAll());
+
         for (ManagedScheduledTask task : managedTasks) {
-            assertThat(task.isEnabled())
-                    .withFailMessage("Task with ID %s should be enabled initially", task.getId())
-                    .isTrue();
+            assertThat(task.isEnabled()).isTrue();
         }
 
         taskRegistry.close();
 
-        for (ManagedScheduledTask task : managedTasks) {
+        for (ManagedScheduledTask task : tasksSnapshot) {
             assertThat(task.isEnabled()).isFalse();
         }
         assertThat(taskRegistry.getAll()).isEmpty();
