@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Unit tests for {@link JwtProperties}.
  *
- * @author Mikhail Polivkha
+ * @author Mikhail Polivakha
  */
 class JwtPropertiesTest {
 

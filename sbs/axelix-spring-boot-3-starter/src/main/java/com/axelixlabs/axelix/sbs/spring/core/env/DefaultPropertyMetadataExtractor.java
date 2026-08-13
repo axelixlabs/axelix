@@ -37,7 +37,6 @@ import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
@@ -52,7 +51,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
  *
  * @since 04.12.2025
  * @author Nikita Kirillov
- * @author Mikhail Polivkha
+ * @author Mikhail Polivakha
  */
 public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtractor {
 
@@ -83,7 +82,6 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         return metadataMap.get(normalizedName);
     }
 
-    @Async
     @EventListener(ApplicationReadyEvent.class)
     void loadAndFilterPropertyMetadata() {
         loadPropertyMetadata();
