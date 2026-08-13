@@ -19,17 +19,16 @@ import { Alert } from "antd";
 import dayjs from "dayjs";
 import { Trans, useTranslation } from "react-i18next";
 
-import type { IAlertConfigItem, ILicensing, TLicenseValidationResponseBody } from "models";
+import type { IAlertConfigItem, TLicenseCheckResponseBody } from "models";
 import { ISO_DATE_FORMAT, LICENSE_KEY_VALID_FLAG } from "utils";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    validationData: TLicenseValidationResponseBody | null;
-    licensing: ILicensing;
+    validationData: TLicenseCheckResponseBody | null;
 }
 
-export const LicenseKeyFormAlert = ({ validationData, licensing }: IProps) => {
+export const LicenseKeyFormAlert = ({ validationData }: IProps) => {
     const { t } = useTranslation();
 
     const getAlertKey = () => {
@@ -50,7 +49,13 @@ export const LicenseKeyFormAlert = ({ validationData, licensing }: IProps) => {
         return null;
     }
 
-    const { issuedTo } = licensing;
+    const getIssuedTo = (): string => {
+        if (validationData && "issuedTo" in validationData) {
+            return validationData.issuedTo;
+        }
+
+        return validationData.attributes?.issuedTo;
+    };
 
     const getExpiredDate = (): string => {
         if (!validationData || !("errorCode" in validationData)) {
@@ -60,7 +65,7 @@ export const LicenseKeyFormAlert = ({ validationData, licensing }: IProps) => {
         return dayjs(validationData.attributes.expiredAt).format(ISO_DATE_FORMAT);
     };
 
-    const getSuccessDate = (): string => {
+    const getValidUntilDate = (): string => {
         if (!validationData || !("status" in validationData)) {
             return "-";
         }
@@ -76,7 +81,7 @@ export const LicenseKeyFormAlert = ({ validationData, licensing }: IProps) => {
                 <Trans
                     t={t}
                     i18nKey="LicenseModal.Form.Alert.Valid.description"
-                    values={{ issuedTo: issuedTo ?? "-", validUntil: getSuccessDate() }}
+                    values={{ issuedTo: getIssuedTo() ?? "-", validUntil: getValidUntilDate() }}
                     components={[<b key="0" />]}
                 />
             ),
@@ -93,7 +98,7 @@ export const LicenseKeyFormAlert = ({ validationData, licensing }: IProps) => {
                 <Trans
                     t={t}
                     i18nKey="LicenseModal.Form.Alert.Expired.description"
-                    values={{ issuedTo: issuedTo ?? "-" }}
+                    values={{ issuedTo: getIssuedTo() ?? "-" }}
 
                     // TODO: Add href from .env
                     components={[

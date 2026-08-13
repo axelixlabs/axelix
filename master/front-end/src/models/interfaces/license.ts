@@ -25,12 +25,11 @@ export interface IAlertConfigItem {
 
 export interface ILicenseValidationResponseBody {
     status: string;
+    issuedTo: string;
     validUntil: string;
 }
 
 export interface ILicenseValidationErrorResponseBody {
     errorCode: string;
-    attributes: {
-        expiredAt: string;
-    };
+    attributes: Record<string, string>;
 }

@@ -17,4 +17,4 @@
  */
 import type { ILicenseValidationErrorResponseBody, ILicenseValidationResponseBody } from "models";
 
-export type TLicenseValidationResponseBody = ILicenseValidationResponseBody | ILicenseValidationErrorResponseBody;
+export type TLicenseCheckResponseBody = ILicenseValidationResponseBody | ILicenseValidationErrorResponseBody;

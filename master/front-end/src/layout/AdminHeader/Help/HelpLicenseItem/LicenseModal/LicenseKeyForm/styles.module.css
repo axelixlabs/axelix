@@ -1,5 +1,6 @@
 .EnterKeyFormTitle {
     color: var(--axelix-bold-grey);
+    margin-bottom: 2px;
 }
 
 .EnterKeyDescription {

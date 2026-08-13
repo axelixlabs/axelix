@@ -20,7 +20,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { isEnterpriseLicense } from "helpers/license";
-import { ELicenseFormType, type ILicensing, type TLicenseValidationResponseBody } from "models";
+import { ELicenseFormType, type ILicensing, type TLicenseCheckResponseBody } from "models";
 import { checkLicenseKey } from "services";
 import { LICENSE_KEY_VALID_FLAG } from "utils";
 
@@ -43,22 +43,22 @@ export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing 
     const isEnterprise = isEnterpriseLicense(licensing);
 
     const [licenseKey, setLicenseKey] = useState<string>("");
-    const [validationData, setValidationData] = useState<TLicenseValidationResponseBody | null>(null);
+    const [checkResponse, setCheckResponse] = useState<TLicenseCheckResponseBody | null>(null);
     const [isChecking, setIsChecking] = useState<boolean>(false);
 
     const isValidLicenseKey =
-        validationData && "status" in validationData ? validationData.status === LICENSE_KEY_VALID_FLAG : null;
+        checkResponse && "status" in checkResponse ? checkResponse.status === LICENSE_KEY_VALID_FLAG : null;
 
     const validateLicenseKey = (cancelled: boolean): void => {
         checkLicenseKey(licenseKey)
             .then(({ data }) => {
                 if (!cancelled) {
-                    setValidationData(data);
+                    setCheckResponse(data);
                 }
             })
             .catch((e) => {
                 if (!cancelled) {
-                    setValidationData(e.response?.data ?? null);
+                    setCheckResponse(e.response?.data ?? null);
                 }
             })
             .finally(() => {
@@ -70,12 +70,12 @@ export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing 
 
     useEffect(() => {
         if (!licenseKey) {
-            setValidationData(null);
+            setCheckResponse(null);
             setIsChecking(false);
             return;
         }
 
-        setValidationData(null);
+        setCheckResponse(null);
         setIsChecking(true);
 
         let cancelled = false;
@@ -121,7 +121,7 @@ export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing 
                     {isChecking && <Spin size="small" className={styles.CheckingSpinner} />}
                 </div>
 
-                <LicenseKeyFormAlert licensing={licensing} validationData={validationData} />
+                <LicenseKeyFormAlert validationData={checkResponse} />
 
                 <LicenseKeyFormFooter
                     licenseKey={licenseKey}
