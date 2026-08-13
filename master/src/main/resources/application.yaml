@@ -36,6 +36,9 @@ management:
 
 axelix:
   master:
+    environment:
+    logging:
+      json: false
     web:
       static-resources:
         location: classpath:/spa/

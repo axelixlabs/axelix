@@ -32,6 +32,16 @@ the JWT signing key has no default at all. Override both — together with `axel
 over HTTPS — before exposing Master to anyone other than yourself.
 :::
 
+### General
+
+<div className={styles.ConfigTable}>
+
+| Property                    | Default | Description                                                                             |
+|-------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. |
+
+</div>
+
 ### Database
 
 The database engine is picked from the JDBC URL prefix. Which properties you must supply depends on the engine:
@@ -187,6 +197,21 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 | Property                           | Default | Description                                                     |
 |------------------------------------|---------|-----------------------------------------------------------------|
 | `axelix.master.mcp-server.enabled` | `true`  | Expose the bundled Model Context Protocol server at `/api/mcp`. |
+
+</div>
+
+### Structured logging
+
+By default, Master logs plain text to the console. Set `axelix.master.logging.json=true` to switch to
+[Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON logging
+instead — the only structured format Master supports today. ECS is a JSON-based logging format; reach for it when logs
+are shipped to an aggregator such as Elasticsearch or a similar ECS-aware pipeline.
+
+<div className={styles.ConfigTable}>
+
+| Property                     | Default | Description                                                               |
+|-------------------------------|---------|------------------------------------------------------------------------------|
+| `axelix.master.logging.json` | `false` | Switch console logging from plain text to ECS-formatted structured JSON.     |
 
 </div>
 
