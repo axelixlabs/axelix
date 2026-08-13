@@ -29,14 +29,14 @@ export const logout = () => {
 /**
  * Invoke OIDC '/authorize' endpoint
  */
-export const authorize = (option: OIDCLoginOption, additionalParameters?: Record<string, string>) => {
+export const authorize = (option: OIDCLoginOption) => {
     const params = new URLSearchParams();
     params.append("client_id", option.clientId);
     params.append("scope", option.scope);
     params.append("response_type", "code");
     params.append("redirect_uri", option.redirectUri);
 
-    Object.entries(additionalParameters ?? {}).forEach(([key, value]) => params.append(key, value));
+    Object.entries(option.additionalParameters ?? {}).forEach(([key, value]) => params.append(key, value));
 
     window.location.href = `${option.authorizationEndpoint}?${params.toString()}`;
 };

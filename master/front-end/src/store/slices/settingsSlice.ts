@@ -22,7 +22,6 @@ import type { IAxelixSettings } from "models";
 const initialState: IAxelixSettings = {
     authenticationOptions: [],
     isMcpServerEnabled: false,
-    additionalOidcAuthorizationParameters: {},
 };
 
 export const SettingsSlice = createSlice({

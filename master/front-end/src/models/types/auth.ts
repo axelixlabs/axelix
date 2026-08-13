@@ -44,6 +44,11 @@ export type OIDCLoginOption = {
     redirectUri: string;
 
     /**
+     * Additional parameters to be sent to the /authorize endpoint
+     */
+    additionalParameters?: Record<string, string>;
+
+    /**
      * The URL of the /authorize on the OIDC provider side.
      */
     authorizationEndpoint: string;
