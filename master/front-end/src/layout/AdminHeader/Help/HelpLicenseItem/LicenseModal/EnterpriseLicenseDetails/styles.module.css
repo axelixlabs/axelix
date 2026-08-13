@@ -21,15 +21,7 @@
     color: var(--axelix-primary-green);
 }
 
-.MetaStatusOSS {
-    color: var(--axelix-bold-grey);
-}
-
-.LicenseLink {
-    color: var(--axelix-primary-blue);
-    transition: color 0.3s;
-
-    &:hover {
-        color: var(--axelix-primary-light-blue);
-    }
+.ActionsWrapper {
+    display: flex;
+    column-gap: 8px;
 }

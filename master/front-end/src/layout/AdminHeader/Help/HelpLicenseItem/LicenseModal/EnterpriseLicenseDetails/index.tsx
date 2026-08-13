@@ -19,32 +19,51 @@ import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { ELicenseFormType } from "models";
+import { getTimeLeftText } from "helpers/license";
+import { ELicenseFormType, type ILicensing } from "models";
+
+import { LicenseBadge } from "../../LicenseBadge";
+import { LicenseFunctions } from "../LicenseFunctions";
+import { LicenseRecord } from "../LicenseRecord";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    isEnterprise: boolean;
+    licensing: ILicensing;
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const LicenseDetailsFooter = ({ isEnterprise, setLicenseFormType }: IProps) => {
+export const EnterpriseLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => {
     const { t } = useTranslation();
+
+    const { functions, validUntil } = licensing;
+
+    const timeLeft = getTimeLeftText(validUntil, t);
 
     return (
         <>
-            <div className={styles.ActionsWrapper}>
-                {isEnterprise ? (
+            <div className="TextLarge">{t("license")}</div>
+
+            <div className={styles.ContentWrapper}>
+                <div className={`TextSmall ${styles.Meta}`}>
+                    <LicenseBadge isEnterprise enterpriseText="Enterprise" ossText="Open Source" />
+
+                    <div className={`${styles.MetaStatus} ${styles.MetaStatusEnterprise}`}>
+                        <span>{t("LicenseModal.active")}</span>
+                        <span>•</span>
+                        <span>{timeLeft}</span>
+                    </div>
+                </div>
+
+                <LicenseRecord licensing={licensing} />
+
+                <LicenseFunctions functions={functions} />
+
+                <div className={styles.ActionsWrapper}>
                     <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.UPDATE)}>
                         {t("LicenseModal.updateKey")}
                     </Button>
-                ) : (
-                    <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.CREATE)}>
-                        {t("LicenseModal.enterKey")}
-                    </Button>
-                )}
-
-                {/* <Button>{t("LicenseModal.thirdPartyNotices")}</Button> */}
+                </div>
             </div>
         </>
     );

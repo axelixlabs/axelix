@@ -18,10 +18,12 @@
 import { type Dispatch, type SetStateAction, useState } from "react";
 
 import { UniversalModal } from "components";
+import { isEnterpriseLicense } from "helpers/license";
 import { ELicenseFormType, type ILicensing } from "models";
 
-import { LicenseDetails } from "./LicenseDetails";
+import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
 import { LicenseKeyForm } from "./LicenseKeyForm";
+import { OSSLicenseDetails } from "./OSSLicenseDetails";
 
 interface IProps {
     /**
@@ -45,6 +47,12 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps)
         setLicenseFormType(null);
     };
 
+    const licenseDetails = isEnterpriseLicense(licensing) ? (
+        <EnterpriseLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
+    ) : (
+        <OSSLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
+    );
+
     return (
         <>
             <UniversalModal
@@ -61,7 +69,7 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps)
                         licensing={licensing}
                     />
                 ) : (
-                    <LicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
+                    licenseDetails
                 )}
             </UniversalModal>
         </>
