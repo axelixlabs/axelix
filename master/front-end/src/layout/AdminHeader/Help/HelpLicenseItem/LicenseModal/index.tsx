@@ -22,7 +22,7 @@ import { isEnterpriseLicense } from "helpers/license";
 import { ELicenseFormType, type ILicensing } from "models";
 
 import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
-import { LicenseKeyForm } from "./LicenseKeyForm";
+import { EnterLicenseKeyForm } from "./LicenseKeyForm";
 import { OSSLicenseDetails } from "./OSSLicenseDetails";
 
 interface IProps {
@@ -47,7 +47,7 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps)
         setLicenseFormType(null);
     };
 
-    const licenseDetails = isEnterpriseLicense(licensing) ? (
+    const existingLicenseDetails = isEnterpriseLicense(licensing) ? (
         <EnterpriseLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
     ) : (
         <OSSLicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
@@ -63,13 +63,13 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps)
                 displayOkay={false}
             >
                 {licenseFormType ? (
-                    <LicenseKeyForm
+                    <EnterLicenseKeyForm
                         licenseFormType={licenseFormType}
                         setLicenseFormType={setLicenseFormType}
                         licensing={licensing}
                     />
                 ) : (
-                    licenseDetails
+                    existingLicenseDetails
                 )}
             </UniversalModal>
         </>

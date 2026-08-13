@@ -23,7 +23,7 @@ export const checkLicenseKey = (licenseKey: string) => {
     });
 };
 
-export const sendLicenseKey = (licenseKey: string) => {
+export const enterLicenseKey = (licenseKey: string) => {
     return apiFetch.post("license", {
         licenseKey: licenseKey,
     });

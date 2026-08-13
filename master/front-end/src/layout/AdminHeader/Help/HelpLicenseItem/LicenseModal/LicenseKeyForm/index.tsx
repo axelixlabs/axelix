@@ -37,7 +37,7 @@ interface IProps {
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing }: IProps) => {
+export const EnterLicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing }: IProps) => {
     const { t } = useTranslation();
 
     const isEnterprise = isEnterpriseLicense(licensing);

@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAppDispatch } from "hooks";
 import type { ELicenseFormType } from "models";
-import { getAxelixSettings, sendLicenseKey } from "services";
+import { enterLicenseKey, getAxelixSettings } from "services";
 import { setAxelixSettings } from "store/slices";
 
 import { UploadLicenseKeyFile } from "./UploadLicenseKeyFile";
@@ -51,7 +51,7 @@ export const LicenseKeyFormFooter = ({
     const clickHandler = () => {
         setLoading(true);
 
-        sendLicenseKey(licenseKey)
+        enterLicenseKey(licenseKey)
             .then(() => {
                 getAxelixSettings()
                     .then((response) => {
