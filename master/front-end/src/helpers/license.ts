@@ -18,6 +18,11 @@
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 
+import type { ILicensing } from "models";
+import { IS_ENTERPRISE_FLAG } from "utils";
+
+export const isEnterpriseLicense = (licensing: ILicensing): boolean => licensing.license === IS_ENTERPRISE_FLAG;
+
 export const getTimeLeftText = (validUntil: string | null, t: TFunction) => {
     if (!validUntil) {
         return t("LicenseModal.timeLeft.unknown");

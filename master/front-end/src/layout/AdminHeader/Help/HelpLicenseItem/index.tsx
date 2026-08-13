@@ -18,8 +18,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { isEnterpriseLicense } from "helpers/license";
 import { useAppSelector } from "hooks";
-import { IS_ENTERPRISE_FLAG } from "utils";
 
 import { LicenseBadge } from "./LicenseBadge";
 import { LicenseModal } from "./LicenseModal";
@@ -31,19 +31,16 @@ export const HelpLicenseItem = () => {
     const { licensing } = useAppSelector((state) => state.settings);
     const [isLicenseModalOpen, setIsLicenseModalOpen] = useState<boolean>(false);
 
-    const isEnterprise = licensing.license === IS_ENTERPRISE_FLAG;
-
     return (
         <>
             <div className={styles.LicenseItemWrapper} onClick={() => setIsLicenseModalOpen(true)}>
                 {t("license")}
-                <LicenseBadge isEnterprise={isEnterprise} enterpriseText="ENT" ossText="OSS" />
+                <LicenseBadge isEnterprise={isEnterpriseLicense(licensing)} enterpriseText="ENT" ossText="OSS" />
             </div>
 
             <LicenseModal
                 isModalOpen={isLicenseModalOpen}
                 setIsModalOpen={setIsLicenseModalOpen}
-                isEnterprise={isEnterprise}
                 licensing={licensing}
             />
         </>

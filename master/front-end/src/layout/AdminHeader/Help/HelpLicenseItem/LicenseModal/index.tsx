@@ -34,11 +34,10 @@ interface IProps {
      */
     setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 
-    isEnterprise: boolean;
     licensing: ILicensing;
 }
 
-export const LicenseModal = ({ isModalOpen, setIsModalOpen, isEnterprise, licensing }: IProps) => {
+export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps) => {
     const [licenseFormType, setLicenseFormType] = useState<ELicenseFormType | null>(null);
 
     const onClose = (): void => {
@@ -58,16 +57,11 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, isEnterprise, licens
                 {licenseFormType ? (
                     <LicenseKeyForm
                         licenseFormType={licenseFormType}
-                        isEnterprise={isEnterprise}
                         setLicenseFormType={setLicenseFormType}
                         licensing={licensing}
                     />
                 ) : (
-                    <LicenseDetails
-                        isEnterprise={isEnterprise}
-                        setLicenseFormType={setLicenseFormType}
-                        licensing={licensing}
-                    />
+                    <LicenseDetails setLicenseFormType={setLicenseFormType} licensing={licensing} />
                 )}
             </UniversalModal>
         </>

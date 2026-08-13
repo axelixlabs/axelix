@@ -1,6 +1,6 @@
 .EnterpriseBadge,
 .OSSBadge {
-    padding: 2px 6px;
+    padding: 0 3px;
     border-radius: var(--axelix-border-radius-small);
     font-weight: 500;
 }

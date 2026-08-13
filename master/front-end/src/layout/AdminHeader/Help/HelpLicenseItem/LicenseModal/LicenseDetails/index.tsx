@@ -18,7 +18,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { getTimeLeftText } from "helpers/license";
+import { getTimeLeftText, isEnterpriseLicense } from "helpers/license";
 import { ELicenseFormType, type ILicensing } from "models";
 import { LGPL_LINK } from "utils";
 
@@ -31,15 +31,15 @@ import styles from "./styles.module.css";
 
 interface IProps {
     licensing: ILicensing;
-    isEnterprise: boolean;
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const LicenseDetails = ({ isEnterprise, setLicenseFormType, licensing }: IProps) => {
+export const LicenseDetails = ({ setLicenseFormType, licensing }: IProps) => {
     const { t } = useTranslation();
 
     const { license, functions, validUntil } = licensing;
 
+    const isEnterprise = isEnterpriseLicense(licensing);
     const timeLeft = getTimeLeftText(validUntil, t);
 
     return (

@@ -19,6 +19,7 @@ import { Input, Spin } from "antd";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { isEnterpriseLicense } from "helpers/license";
 import { ELicenseFormType, type ILicensing, type TLicenseValidationResponseBody } from "models";
 import { checkLicenseKey } from "services";
 import { LICENSE_KEY_VALID_FLAG } from "utils";
@@ -34,11 +35,12 @@ interface IProps {
     licensing: ILicensing;
     licenseFormType: ELicenseFormType;
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
-    isEnterprise: boolean;
 }
 
-export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing, isEnterprise }: IProps) => {
+export const LicenseKeyForm = ({ licenseFormType, setLicenseFormType, licensing }: IProps) => {
     const { t } = useTranslation();
+
+    const isEnterprise = isEnterpriseLicense(licensing);
 
     const [licenseKey, setLicenseKey] = useState<string>("");
     const [validationData, setValidationData] = useState<TLicenseValidationResponseBody | null>(null);
