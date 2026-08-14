@@ -1,0 +1,32 @@
+.LogRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-block: 20px;
+}
+
+.LogRow:not(:last-child) {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.LogTitle {
+    font-weight: 500;
+}
+
+.LogMeta {
+    margin-top: 4px;
+    color: var(--axelix-bold-grey);
+}
+
+.LogStatus {
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+.Danger {
+    color: var(--axelix-primary-red);
+}
+
+.Success {
+    color: var(--axelix-bold-grey);
+}

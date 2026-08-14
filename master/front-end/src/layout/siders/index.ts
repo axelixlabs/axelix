@@ -17,3 +17,4 @@
  */
 export { DashboardSiderMenu } from "./DashboardSiderMenu";
 export { InstanceSiderMenu } from "./InstanceSiderMenu";
+export { UsersSiderMenu } from "./UsersSiderMenu";

@@ -1,0 +1,39 @@
+.MainWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-block: 20px;
+}
+
+.HeaderInfo {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.Avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background-color: var(--axelix-light-grey);
+    border-radius: 50%;
+    margin-right: 20px;
+    font-weight: 500;
+}
+
+.Username {
+    font-weight: 600;
+}
+
+.Subtitle {
+    margin-top: 4px;
+    color: var(--axelix-bold-grey);
+}
+
+.ActionButtonsWrapper {
+    display: flex;
+    column-gap: 8px;
+}

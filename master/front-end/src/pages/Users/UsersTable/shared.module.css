@@ -1,0 +1,16 @@
+.TableHeader,
+.TableRow {
+    grid-template-columns: 48px repeat(6, 1fr);
+}
+
+.TableHeader {
+    text-transform: uppercase;
+}
+
+.TableHeader:hover {
+    background-color: var(--axelix-primary-light-green);
+}
+
+.TableRow:hover {
+    color: inherit;
+}

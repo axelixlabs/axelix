@@ -1,0 +1,54 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background-color: var(--axelix-primary-black);
+    border-radius: var(--axelix-border-radius-large);
+    color: var(--axelix-primary-white);
+    margin-bottom: 20px;
+}
+
+.InfoWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.SelectedUsers {
+    font-weight: 500;
+}
+
+.OidcLocal {
+    color: var(--axelix-bold-grey);
+}
+
+.ActionsButtons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.SuspendButton {
+    background-color: var(--axelix-primary-white);
+    color: #1a1a1a;
+    border: none;
+}
+
+.SuspendButton:hover {
+    background-color: #f0f0f0 !important;
+    color: #1a1a1a !important;
+}
+
+.DeleteButton {
+    background-color: transparent;
+}
+
+.ClearButton {
+    color: var(--axelix-primary-white);
+}
+
+.ClearButton:hover {
+    color: var(--axelix-primary-white) !important;
+    text-decoration: underline;
+}

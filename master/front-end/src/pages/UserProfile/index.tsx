@@ -15,22 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Tabs } from "antd";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 
-import { Loader } from "components";
-import { type IUser, StatefulRequest } from "models";
+import { ERoles, EUserOrigin, type IUser, StatefulRequest } from "models";
 import { getUserById } from "services";
 
+import { UserAccess } from "./UserAccess";
 import { UserProfileActions } from "./UserProfileActions";
-import { UserTable } from "./UserTable";
+import { UserProfileFirstSection } from "./UserProfileFirstSection";
 import styles from "./styles.module.css";
 
-import { BackwardArrowIcon } from "assets";
-
 const UserProfile = () => {
-    const { t } = useTranslation();
     const { userId } = useParams();
 
     const [userResponse, setUserResponse] = useState(StatefulRequest.loading<IUser>());
@@ -43,21 +40,48 @@ const UserProfile = () => {
 
     useEffect(() => loadUser(), [userId]);
 
-    if (userResponse.loading) {
-        return <Loader />;
-    }
+    // if (userResponse.loading) {
+    //     return <Loader />;
+    // }
 
-    const user = userResponse.response!;
+    // const user = userResponse.response!;
+    const user = {
+        id: "1",
+        email: "string",
+        lastLoginAt: "string",
+        userOrigin: EUserOrigin.LOCAL,
+        roles: [ERoles.ADMIN, ERoles.EDITOR, ERoles.VIEWER],
+        username: "string",
+    };
+
+    const tabItems = [
+        {
+            key: "profile",
+            label: "Profile",
+            children: null,
+        },
+        {
+            key: "access",
+            label: "Access",
+            children: <UserAccess />,
+        },
+        {
+            key: "activity",
+            label: "Activity",
+            children: null,
+        },
+        {
+            key: "sessions",
+            label: "Sessions & tokens",
+            children: null,
+        },
+    ];
 
     return (
         <>
-            <Link to="/users" className={styles.BackwardWrapper}>
-                <BackwardArrowIcon /> {t("Users.back")}
-            </Link>
+            <UserProfileFirstSection username={user.username} />
 
-            <div className={`TextMedium ${styles.FirstSectionUsername}`}>{user.username}</div>
-
-            <UserTable user={user} reLoadUser={loadUser} />
+            <Tabs defaultActiveKey="access" items={tabItems} className={styles.Tabs} />
 
             <UserProfileActions userId={userId!} userOrigin={user.userOrigin} />
         </>
@@ -65,3 +89,5 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+
+// <UserTable user={user} reLoadUser={loadUser} />

@@ -15,29 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
-
-import { ERoles } from "models";
+import { UserAccessCard } from "../UserAccessCard";
 
 import styles from "./styles.module.css";
 
-interface IProps {
-    /**
-     * The roles granted to this user
-     */
-    roles: ERoles[];
-}
+const securityRows = [
+    { label: "Password", value: "Managed by Okta" },
+    { label: "Active sessions", value: "2 devices" },
+    { label: "API tokens", value: "1 active" },
+    { label: "Failed sign-ins (30d)", value: "1", valueClass: "Danger" },
+];
 
-export const UserRoleTags = ({ roles }: IProps) => {
+export const SecurityCard = () => {
     return (
         <>
-            <div className={styles.TagsWrapper}>
-                {roles.map((role) => (
-                    <Tag variant="outlined" key={role} className={styles.Tag}>
-                        {role}
-                    </Tag>
+            <UserAccessCard title="Security">
+                {securityRows.map(({ label, valueClass, value }, index) => (
+                    <div className={styles.SecurityRow} key={index}>
+                        <span>{label}</span>
+                        <span className={`${valueClass ? styles[valueClass] : ""}`}>{value}</span>
+                    </div>
                 ))}
-            </div>
+            </UserAccessCard>
         </>
     );
 };

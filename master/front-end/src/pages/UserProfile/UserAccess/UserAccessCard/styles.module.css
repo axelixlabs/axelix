@@ -1,0 +1,21 @@
+.Card {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.CardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.CardTitle {
+    font-weight: 600;
+}
+
+.CardBody {
+    padding: 4px 20px;
+}

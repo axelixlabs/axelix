@@ -37,7 +37,7 @@ export const NavigationBar = () => {
                         to="/users"
                         className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
                     >
-                        {t("Header.users")}
+                        {t("Header.administration")}
                     </NavLink>
                 )}
                 {settings.isMcpServerEnabled && (

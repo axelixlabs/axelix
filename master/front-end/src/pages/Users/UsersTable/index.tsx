@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import dayjs from "dayjs";
+import { Checkbox, type CheckboxProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
 
-import { EmptyHandler, UserRoleTags } from "components";
-import type { IUser } from "models";
+import { EmptyHandler } from "components";
+import { ERoles, EUserOrigin, type IUser } from "models";
 
+import { UsersTableRow } from "./UsersTableRow";
+import sharedStyles from "./shared.module.css";
 import styles from "./styles.module.css";
 
 export interface IProps {
@@ -34,40 +35,45 @@ export interface IProps {
 export const UsersTable = ({ users }: IProps) => {
     const { t } = useTranslation();
 
+    users = [
+        {
+            id: "1",
+            email: "string",
+            lastLoginAt: "string",
+            userOrigin: EUserOrigin.LOCAL,
+            roles: [ERoles.ADMIN, ERoles.EDITOR, ERoles.VIEWER],
+            username: "string",
+        },
+        {
+            id: "2",
+            email: "string",
+            lastLoginAt: "string",
+            userOrigin: EUserOrigin.LOCAL,
+            roles: [ERoles.ADMIN],
+            username: "string",
+        },
+    ];
+
+    const onChange: CheckboxProps["onChange"] = () => {};
+
     return (
         <>
             <div className={`CustomizedTable ${styles.Table}`}>
-                <div className={`TableHeader TableRow ${styles.TableHeader}`}>
-                    <div className="RowChunk">{t("username")}</div>
-                    <div className="RowChunk">Email</div>
-                    <div className="RowChunk">{t("Users.lastLogin")}</div>
+                <div className={`TableHeader TableRow ${sharedStyles.TableHeader}`}>
+                    <div className="RowChunk">
+                        <Checkbox onChange={onChange} />
+                    </div>
+                    <div className="RowChunk">{t("Users.Table.user")}</div>
+                    <div className="RowChunk">{t("Users.Table.department")}</div>
+                    <div className="RowChunk">{t("status")}</div>
+                    <div className="RowChunk">{t("Users.Table.roles")}</div>
                     <div className="RowChunk">{t("Users.origin")}</div>
-                    <div className="RowChunk">{t("Users.roles")}</div>
+                    <div className="RowChunk">{t("Users.Table.lastActivity")}</div>
                 </div>
 
                 <EmptyHandler isEmpty={users.length === 0}>
                     {users.map((user) => {
-                        const { id, username, email, roles, lastLoginAt, userOrigin } = user;
-                        const formattedLastLogin = lastLoginAt
-                            ? dayjs(lastLoginAt).format("DD.MM.YYYY HH:mm")
-                            : t("Users.notLoggedIn");
-
-                        return (
-                            <Link
-                                to={`/users/${user.id}`}
-                                state={{ user }}
-                                className={`TableRow ${styles.TableRow}`}
-                                key={id}
-                            >
-                                <div className="RowChunk">{username}</div>
-                                <div className="RowChunk">{email}</div>
-                                <div className="RowChunk">{formattedLastLogin}</div>
-                                <div className="RowChunk">{userOrigin}</div>
-                                <div className="RowChunk">
-                                    <UserRoleTags roles={roles} />
-                                </div>
-                            </Link>
-                        );
+                        return <UsersTableRow user={user} key={user.id} />;
                     })}
                 </EmptyHandler>
             </div>

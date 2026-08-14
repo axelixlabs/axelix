@@ -1,0 +1,44 @@
+.PermissionRow {
+    display: flex;
+    align-items: center;
+    padding-block: 20px;
+}
+
+.PermissionRow:not(:last-child) {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.PermissionName {
+    flex-grow: 1;
+}
+
+.PermissionLevel {
+    flex-shrink: 0;
+    min-width: 100px;
+    font-weight: 500;
+}
+
+.PermissionRole {
+    flex-shrink: 0;
+    width: 90px;
+    text-align: right;
+    color: var(--axelix-bold-grey);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+.Full {
+    color: var(--axelix-primary-green);
+}
+
+.Edit {
+    color: inherit;
+}
+
+.ReadOnly {
+    color: var(--axelix-bold-grey);
+}
+
+.NoAccess {
+    color: var(--axelix-bold-grey);
+}

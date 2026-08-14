@@ -1,0 +1,34 @@
+.ManageLink {
+    color: var(--axelix-primary-green);
+}
+
+.RoleRow {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+    padding-block: 20px;
+}
+
+.RoleRow:not(:last-child) {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.RoleTag {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.RoleDescription {
+    flex-grow: 1;
+    color: var(--axelix-bold-grey);
+}
+
+.RoleDate {
+    flex-shrink: 0;
+    color: var(--axelix-bold-grey);
+}

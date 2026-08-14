@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button, Form, Input, Select } from "antd";
+import { App, Button, Checkbox, Col, Form, Input, Row, Select } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,9 @@ import { UniversalModal } from "components";
 import { extractErrorCode } from "helpers";
 import { type ICreateUserFormFields, type ICreateUserRequestData, type IErrorResponse, StatelessRequest } from "models";
 import { createUser } from "services";
-import { roleOptions } from "utils";
+import { getRoleCheckboxOptions } from "utils";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -77,6 +79,17 @@ export const CreateUser = ({ fetchUsers }: IProps) => {
         form.resetFields();
     };
 
+    // const handleGeneratePassword = (): void => {
+    //     const generated = Math.random().toString(36).slice(-10);
+
+    //     form.setFieldsValue({
+    //         password: generated,
+    //         confirmPassword: generated,
+    //     });
+    // };
+
+    const roleCheckboxOptions = getRoleCheckboxOptions(t);
+
     return (
         <>
             <Button type="primary" onClick={() => setModalOpen(true)}>
@@ -88,27 +101,55 @@ export const CreateUser = ({ fetchUsers }: IProps) => {
                 open={modalOpen}
                 onOk={handleSubmit}
                 onClose={onClose}
+                okText={t("Users.createUser")}
                 loading={requestData.loading}
             >
-                <Form form={form} layout="vertical" requiredMark={false}>
-                    <Form.Item
-                        name="username"
-                        label={t("username")}
-                        rules={[
-                            {
-                                required: true,
-                                message: t("Users.ValidationErrors.username"),
-                            },
-                        ]}
-                    >
-                        <Input />
-                    </Form.Item>
+                <div className={`TextUltSmall ${styles.Subtitle}`}>Northwind Industrial · seat 413 of 500</div>
+
+                <Form
+                    form={form}
+                    layout="vertical"
+                    requiredMark={false}
+                    // initialValues={{ requirePasswordChange: true }}
+                >
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="firstname"
+                                label="First name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: t("Users.ValidationErrors.firstname"),
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="lastname"
+                                label="Last name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: t("Users.ValidationErrors.lastname"),
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
                     <Form.Item
                         name="email"
-                        label="Email"
+                        label="Work email"
+                        extra={<span className={`TextUltraSmall ${styles.EmailHint}`}>Username defaults to dana.rowe - change</span>}
                         rules={[
                             {
+                                required: true,
                                 type: "email",
                                 message: t("Users.ValidationErrors.emailFormat"),
                             },
@@ -117,22 +158,39 @@ export const CreateUser = ({ fetchUsers }: IProps) => {
                         <Input />
                     </Form.Item>
 
-                    <Form.Item
-                        name="password"
-                        label={t("password")}
-                        rules={[
-                            {
-                                required: true,
-                                message: t("Users.ValidationErrors.password"),
-                            },
-                        ]}
-                    >
-                        <Input.Password />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="department"
+                                label="Department"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: t("Users.ValidationErrors.department"),
+                                    },
+                                ]}
+                            >
+                                <Select />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="jobTitle"
+                                label={
+                                    <>
+                                        {t("Users.CreateUser.jobTitle")}
+                                        <span className={`TextSmall ${styles.OptionalLabel}`}>optional</span>
+                                    </>
+                                }
+                            >
+                                <Input placeholder="e.g. Reliability Engineer" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
                     <Form.Item
-                        name="role"
-                        label={t("Users.role")}
+                        name="roles"
+                        label={t("Users.CreateUser.roles")}
                         rules={[
                             {
                                 required: true,
@@ -140,7 +198,68 @@ export const CreateUser = ({ fetchUsers }: IProps) => {
                             },
                         ]}
                     >
-                        <Select allowClear={false} options={roleOptions} />
+                        <Checkbox.Group className={styles.RoleGroup}>
+                            {roleCheckboxOptions.map(({ value, label, description }) => (
+                                <label key={value} className={styles.RoleOption}>
+                                    <Checkbox value={value} />
+                                    <div className="TextSmall">
+                                        <div className={styles.RoleLabel}>{label}</div>
+                                        <div className={styles.RoleDescription}>{description}</div>
+                                    </div>
+                                </label>
+                            ))}
+                        </Checkbox.Group>
+                    </Form.Item>
+
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="password"
+                                label={t("password")}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: t("Users.ValidationErrors.password"),
+                                    },
+                                ]}
+                            // extra={
+                            //     <a className={styles.GeneratePassword} onClick={handleGeneratePassword}>
+                            //         {t("Users.generate")}
+                            //     </a>
+                            // }
+                            >
+                                <Input.Password />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="confirmPassword"
+                                label={t("Users.CreateUser.confirmPassword")}
+                                dependencies={["password"]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: t("Users.ValidationErrors.confirmPassword"),
+                                    },
+                                    ({ getFieldValue }) => ({
+                                        validator(_, value) {
+                                            if (!value || getFieldValue("password") === value) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(
+                                                new Error(t("Users.ValidationErrors.passwordMismatch")),
+                                            );
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <Input.Password />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Form.Item name="requirePasswordChange" valuePropName="checked">
+                        <Checkbox>Require a password change at first sign-in</Checkbox>
                     </Form.Item>
                 </Form>
             </UniversalModal>

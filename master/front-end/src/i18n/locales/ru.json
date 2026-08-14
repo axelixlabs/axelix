@@ -74,14 +74,14 @@
         "loggerGroups": "Группы логгеров",
         "configuredExplicitly": "Задан явно",
         "loggerLevelUpdated": "Уровень логгера изменён",
-        "reset" : "Логгер успешно сброшен",
+        "reset": "Логгер успешно сброшен",
         "setTemporaryLevel": "Временный уровень",
         "changedTemporary": "Изменено временно"
     },
     "Header": {
         "dashboard": "Дашборд",
         "wallboard": "Панель",
-        "users": "Пользователи",
+        "administration": "Администрация",
         "Help": {
             "title": "Помощь",
             "about": "О программе",
@@ -101,7 +101,7 @@
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
-        "transactionControl" : "Мониторинг транзакций",
+        "transactionControl": "Мониторинг транзакций",
         "entitiesMap": "Карта сущностей",
         "garbageCollector": "Сборщик Мусора"
     },
@@ -128,12 +128,12 @@
     "Authentication": {
         "welcome": "Добро пожаловать",
         "logout": "Выйти",
-        "loginPasswordForm" : {
+        "loginPasswordForm": {
             "enterUsername": "Введите имя пользователя",
             "enterPassword": "Введите пароль",
             "loginButtonText": "Войти"
         },
-        "oidcForm" : {
+        "oidcForm": {
             "loginButtonText": "Войти с помощью OAuth2/OIDC"
         },
         "docs": "Доки"
@@ -159,12 +159,12 @@
                 "beanMethod": "@Bean метод",
                 "enclosingClass": "Декларирущий класс",
                 "factoryBeanClassName": "Factory Bean",
-                "autoConfigurationEnclosingClass" : "Класс Авто-Конфигурации",
-                "conditionsPageRef" : "Происхождение бина",
+                "autoConfigurationEnclosingClass": "Класс Авто-Конфигурации",
+                "conditionsPageRef": "Происхождение бина",
                 "configPropsBean": "@ConfigurationProperties bean"
             },
-            "AUTO_CONFIGURATION_BEAN_METHOD" : "@Bean метод в классе авто-конфигурации",
-            "AUTO_CONFIGURATION_CLASS" : "Класс Авто-Конфигурации",
+            "AUTO_CONFIGURATION_BEAN_METHOD": "@Bean метод в классе авто-конфигурации",
+            "AUTO_CONFIGURATION_CLASS": "Класс Авто-Конфигурации",
             "COMPONENT_ANNOTATION": "@Component или аналоги",
             "SYNTHETIC_BEAN": "Синтетический bean",
             "UNKNOWN": "Неизвестно",
@@ -202,7 +202,7 @@
             "UNKNOWN_ERROR": "Неизвестная ошибка. Попробуйте обновить страницу или повторить действие позже.",
             "INTERNAL_SERVER_ERROR": "Непредвиденная ошибка сервера. Повторите запрос позднее.",
             "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что экземпляр сервиса был передеплоен. Посетите панель сервисов чтобы убедиться.",
-            "INVALID_CREDENTIALS" : "Неверное имя пользователя или пароль",
+            "INVALID_CREDENTIALS": "Неверное имя пользователя или пароль",
             "USERNAME_ALREADY_EXISTS": "Пользователь с таким именем уже существует. Пожалуйста, выберите другое имя пользователя.",
             "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email."
         }
@@ -216,11 +216,11 @@
     "Dashboard": {
         "distributions": "Карта Системы",
         "distributionsSubtitle": "Состояние актуальных версий в рамках экосистемы",
-        "components" : {
+        "components": {
             "subtitle": "Версия Компонента",
-            "SpringBoot" : "Spring Boot",
-            "SpringFramework" : "Spring Framework",
-            "Java" : "Java",
+            "SpringBoot": "Spring Boot",
+            "SpringFramework": "Spring Framework",
+            "Java": "Java",
             "Kotlin": "Kotlin",
             "JdkVendor": "JDK Vendor"
         },
@@ -287,7 +287,7 @@
         "lockInfo": "Заблокирован на",
         "lock": "Блокировка",
         "stacktrace": "Стек вызовов",
-        "notAvailable" : "Не Доступно",
+        "notAvailable": "Не Доступно",
         "Settings": {
             "title": "Настройки Дампа Потоков",
             "contentionMonitoring": "Мониторинг Контешена",
@@ -299,10 +299,10 @@
         "disableTitle": "Лог Сборщика Мусора Отключён",
         "disableSubtitle": "Нажмите на кнопку ниже, чтобы включить логгировние",
         "enableButtonText": "Включить Лог Сборщика Мусора",
-        "modalWindow" : {
-            "title" : "Включить Лог Сборщика Мусора",
+        "modalWindow": {
+            "title": "Включить Лог Сборщика Мусора",
             "selectLoggingLevel": "Выберите уровень логирования",
-            "submit" : "Ок"
+            "submit": "Ок"
         },
         "download": "Скачать Лог GC",
         "disable": "Отключить Лог GC",
@@ -408,7 +408,6 @@
         "provider": "Провайдер",
         "origin": "Происхождение",
         "role": "Роль",
-        "roles": "Роли",
         "back": "Назад",
         "userInformation": "Информация о Пользователе",
         "selectRoles": "Выберите роли",
@@ -422,11 +421,49 @@
         "userEdited": "Данные пользователя успешно обновлены",
         "userDeleted": "Пользователь успешно удалён",
         "userNotFound": "Пользователь не найден",
+        "SiderMenu": {
+            "users": "Пользователи",
+            "rolesPermissions": "Роли и права",
+            "authentication": "Аутентификация",
+            "auditLog": "Журнал аудита"
+        },
         "ValidationErrors": {
-            "username": "Пожалуйста, введите имя пользователя!",
+            "firstname": "Пожалуйста, введите имя!",
+            "lastname": "Пожалуйста, введите фамилию!",
+            "department": "Пожалуйста, выберите отдел!",
             "emailFormat": "Неверный формат email!",
             "password": "Пожалуйста, введите пароль!",
             "roles": "Пожалуйста, выберите роли!"
+        },
+        "SelectionActionBar": {
+            "selectedUsers_one": "Выбран {{count}} пользователь",
+            "selectedUsers_few": "Выбрано {{count}} пользователя",
+            "selectedUsers_many": "Выбрано {{count}} пользователей",
+            "selectedUsers_other": "Выбрано {{count}} пользователей",
+            "oidcLocal": "{{oidcCount}} OIDC · {{localCount}} локальных",
+            "suspend": "Заблокировать",
+            "delete": "Удалить",
+            "clear": "Очистить"
+        },
+        "CreateUser": {
+            "confirmPassword": "Подтверждение пароля",
+            "roles": "Роли",
+            "Roles": {
+                "Viewer": {
+                    "label": "ПРОСМОТР",
+                    "description": "Просмотр дашбордов, видеостен и отчётов"
+                },
+                "Editor": {
+                    "label": "РЕДАКТОР",
+                    "description": "Создание и редактирование контента, запуск действий MCP"
+                },
+                "Admin": {
+                    "label": "АДМИНИСТРАТОР",
+                    "description": "Полное администрирование, включая пользователей и авторизацию"
+                }
+            },
+            "jobTitle": "Должность",
+            "optional": "Опционально"
         }
     }
 }

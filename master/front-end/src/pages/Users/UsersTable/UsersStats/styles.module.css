@@ -1,0 +1,39 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--axelix-medium-grey);
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    margin-bottom: 30px;
+}
+
+.Cell {
+    padding: 20px;
+    border-left: 1px solid var(--axelix-medium-grey);
+
+    &:first-child {
+        border-left: none;
+    }
+}
+
+.Label {
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+    margin-bottom: 8px;
+}
+
+.Row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    white-space: nowrap;
+        white-space: nowrap;
+
+}
+
+.Detail {
+    color: var(--axelix-bold-grey);
+    white-space: nowrap;
+}

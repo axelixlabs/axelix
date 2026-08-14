@@ -1,0 +1,15 @@
+.SecurityRow {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 20px;
+    color: var(--axelix-bold-grey);
+
+}
+
+.SecurityRow:not(:last-child) {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.Danger {
+    color: var(--axelix-primary-red);
+}

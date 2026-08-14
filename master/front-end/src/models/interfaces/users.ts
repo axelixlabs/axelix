@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ERoles, EUserOrigin } from "../enums/users";
+import { ERoles, type EUserOrigin } from "../enums/users";
 
 export interface IUser {
     /**
@@ -127,4 +127,16 @@ export interface IEditableUser extends Omit<IUser, "email"> {
      * Password of the user
      */
     password: string;
+}
+
+export interface IUsersStats {
+    label: string;
+    value: string;
+    detail: string;
+}
+
+export interface IRoleCheckboxOption {
+    label: string;
+    value: ERoles;
+    description: string;
 }

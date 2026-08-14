@@ -22,8 +22,6 @@ import { useLocation, useParams } from "react-router";
 import { findOpenInstanceKeys } from "helpers";
 import { getInstanceItems } from "utils";
 
-import styles from "./styles.module.css";
-
 export const InstanceSiderMenu = () => {
     const { t } = useTranslation();
 
@@ -36,7 +34,6 @@ export const InstanceSiderMenu = () => {
             items={getInstanceItems(instanceId!, t)}
             selectedKeys={[pathname]}
             defaultOpenKeys={findOpenInstanceKeys(getInstanceItems(instanceId!, t), pathname)}
-            className={styles.Menu}
         />
     );
 };

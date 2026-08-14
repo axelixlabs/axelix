@@ -74,14 +74,14 @@
         "loggerGroups": "Logger groups",
         "configuredExplicitly": "Configured explicitly",
         "loggerLevelUpdated": "Level has been changed",
-        "reset" : "The logger was successfully reset",
+        "reset": "The logger was successfully reset",
         "setTemporaryLevel": "Temporary level",
         "changedTemporary": "Changed Temporarily"
     },
     "Header": {
         "dashboard": "Dashboard",
         "wallboard": "Wallboard",
-        "users": "Users",
+        "administration": "Administration",
         "Help": {
             "title": "Help",
             "about": "About",
@@ -93,14 +93,14 @@
         "details": "Details",
         "metrics": "Metrics",
         "environment": "Properties",
-        "beans" : "Beans",
+        "beans": "Beans",
         "configurationProperties": "Configuration Properties",
         "scheduledTasks": "Scheduled Tasks",
         "conditions": "Conditions",
         "loggers": "Loggers",
         "mappings": "Mappings",
         "caches": "Caches",
-        "transactionControl" : "Transaction Control",
+        "transactionControl": "Transaction Control",
         "entitiesMap": "Entities Map",
         "threadDump": "Thread Dump",
         "garbageCollector": "Garbage Collector"
@@ -111,7 +111,7 @@
         "name": "Name",
         "cleared": "Cleared",
         "clear": "Clear",
-        "ratio" : "Hits/Total Ratio",
+        "ratio": "Hits/Total Ratio",
         "enabled": "Cache is enabled at runtime",
         "disabled": "Cache is disabled at runtime",
         "estimatedEntrySize": "Entries count",
@@ -129,12 +129,12 @@
         "welcome": "Welcome",
         "logout": "Logout",
         "docs": "Docs",
-        "loginPasswordForm" : {
+        "loginPasswordForm": {
             "enterUsername": "Enter username",
             "enterPassword": "Enter password",
             "loginButtonText": "Sign In"
         },
-        "oidcForm" : {
+        "oidcForm": {
             "loginButtonText": "Sign in with OAuth2/OIDC Provider"
         }
     },
@@ -159,12 +159,12 @@
                 "beanMethod": "@Bean method",
                 "enclosingClass": "Declaring class",
                 "factoryBeanClassName": "Factory Bean",
-                "autoConfigurationEnclosingClass" : "Declaring AutoConfiguration class",
-                "conditionsPageRef" : "Who defines this bean?",
+                "autoConfigurationEnclosingClass": "Declaring AutoConfiguration class",
+                "conditionsPageRef": "Who defines this bean?",
                 "configPropsBean": "@ConfigurationProperties bean"
             },
-            "AUTO_CONFIGURATION_BEAN_METHOD" : "AutoConfiguration @Bean method",
-            "AUTO_CONFIGURATION_CLASS" : "@AutoConfiguration class",
+            "AUTO_CONFIGURATION_BEAN_METHOD": "AutoConfiguration @Bean method",
+            "AUTO_CONFIGURATION_CLASS": "@AutoConfiguration class",
             "COMPONENT_ANNOTATION": "@Component or variants",
             "SYNTHETIC_BEAN": "Synthetic bean",
             "UNKNOWN": "Unknown",
@@ -202,7 +202,7 @@
             "UNKNOWN_ERROR": "Unknown error. Please refresh the page or try again later.",
             "INTERNAL_SERVER_ERROR": "Unexpected server error. Please, re-try request later.",
             "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the instance got redeployed since the last request from your browser to the server. Visit the Wallboard",
-            "INVALID_CREDENTIALS" : "Invalid username or password",
+            "INVALID_CREDENTIALS": "Invalid username or password",
             "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username.",
             "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email."
         }
@@ -216,11 +216,11 @@
     "Dashboard": {
         "distributions": "System's Map",
         "distributionsSubtitle": "View the used versions of most important software components",
-        "components" : {
+        "components": {
             "subtitle": "Software Component Version",
-            "SpringBoot" : "Spring Boot",
-            "SpringFramework" : "Spring Framework",
-            "Java" : "Java",
+            "SpringBoot": "Spring Boot",
+            "SpringFramework": "Spring Framework",
+            "Java": "Java",
             "Kotlin": "Kotlin",
             "JdkVendor": "JDK Vendor"
         },
@@ -288,7 +288,7 @@
         "lockInfo": "Locked by",
         "lock": "Lock",
         "stacktrace": "Stacktrace",
-        "notAvailable" : "Not Available",
+        "notAvailable": "Not Available",
         "Settings": {
             "title": "Thread Dump Settings",
             "contentionMonitoring": "Thread Contention Monitoring",
@@ -300,10 +300,10 @@
         "disableTitle": "Garbage Collector Logging is Disabled",
         "disableSubtitle": "Click below to see GC logs feed",
         "enableButtonText": "Enable GC Logging",
-        "modalWindow" : {
-            "title" : "Enable Garbage Collector Logs",
+        "modalWindow": {
+            "title": "Enable Garbage Collector Logs",
             "selectLoggingLevel": "Select Logging Level",
-            "submit" : "Enable"
+            "submit": "Enable"
         },
         "download": "Download GC Log",
         "disable": "Disable GC Logging",
@@ -408,7 +408,6 @@
         "lastLogin": "Last login",
         "provider": "Provider",
         "role": "Role",
-        "roles": "Roles",
         "origin": "Origin",
         "back": "Back",
         "userInformation": "User Profile",
@@ -423,11 +422,54 @@
         "userEdited": "User data updated successfully",
         "userDeleted": "User deleted successfully",
         "userNotFound": "User not found",
+        "Table": {
+            "user": "USER",
+            "department": "DEPARTMENT",
+            "status": "STATUS",
+            "roles": "ROLES",
+            "lastActivity": "LAST ACTIVITY"
+        },
+        "SiderMenu": {
+            "users": "Users",
+            "rolesPermissions": "Roles & permissions",
+            "authentication": "Authentication",
+            "auditLog": "Audit log"
+        },
         "ValidationErrors": {
-            "username": "Please input username!",
+            "firstname": "Please input first name!",
+            "lastname": "Please input last name!",
+            "department": "Please select department!",
             "emailFormat": "Invalid email format!",
             "password": "Please input password!",
             "roles": "Please select roles!"
+        },
+        "SelectionActionBar": {
+            "selectedUsers_one": "{{count}} user selected",
+            "selectedUsers_other": "{{count}} users selected",
+            "oidcLocal": "{{oidcCount}} OIDC · {{localCount}} local",
+            "suspend": "Suspend",
+            "delete": "Delete",
+            "clear": "Clear"
+        },
+        "CreateUser": {
+            "confirmPassword": "Confirm password",
+            "roles": "Roles",
+            "Roles": {
+                "Viewer": {
+                    "label": "VIEWER",
+                    "description": "Read dashboards, wallboards and reports"
+                },
+                "Editor": {
+                    "label": "EDITOR",
+                    "description": "Create and edit content, run MCP actions"
+                },
+                "Admin": {
+                    "label": "ADMIN",
+                    "description": "Full administration, including users and auth"
+                }
+            },
+            "jobTitle": "Job title",
+            "optional": "optional"
         }
     }
 }

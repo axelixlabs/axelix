@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Menu } from "antd";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
 import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "models";
@@ -27,50 +28,33 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
     }));
 };
 
-// TODO: Add icons in future
-const getDashboardItems = (): AntdMenuItem[] => {
-    const overviewItems: ISiderMenuItem[] = [
-        {
-            path: "/dashboard/overview",
-            label: "Overview",
-        },
-    ];
-
-    const technologiesItems: ISiderMenuItem[] = [
-        {
-            path: "/dashboard/java",
-            label: "Java",
-        },
-        {
-            path: "/dashboard/persistence",
-            label: "Persistence",
-        },
-        {
-            path: "/dashboard/spring-framework",
-            label: "Spring Framework",
-        },
-    ];
-
-    return [
-        ...createMenuItems(overviewItems),
-        {
-            key: "technologies",
-            label: "Technologies",
-            children: createMenuItems(technologiesItems),
-        },
-    ];
-};
-
-export const DashboardSiderMenu = () => {
+export const UsersSiderMenu = () => {
+    const { t } = useTranslation();
     const { pathname } = useLocation();
 
-    return (
-        <Menu
-            defaultSelectedKeys={["/dashboard/overview"]}
-            defaultOpenKeys={["technologies"]}
-            selectedKeys={[pathname]}
-            mode="inline"
-            items={getDashboardItems()}
-        />
-    );
+    // TODO: Add icons in future
+    const getUsersItems = (): AntdMenuItem[] => {
+        const administrationItems: ISiderMenuItem[] = [
+            {
+                path: "/users",
+                label: t("Users.SiderMenu.users"),
+            },
+            {
+                path: "/users/roles-permissions",
+                label: t("Users.SiderMenu.rolesPermissions"),
+            },
+            {
+                path: "/users/authentication",
+                label: t("Users.SiderMenu.authentication"),
+            },
+            {
+                path: "/users/audit-log",
+                label: t("Users.SiderMenu.auditLog"),
+            },
+        ];
+
+        return createMenuItems(administrationItems);
+    };
+
+    return <Menu defaultSelectedKeys={["/users"]} selectedKeys={[pathname]} mode="inline" items={getUsersItems()} />;
 };
