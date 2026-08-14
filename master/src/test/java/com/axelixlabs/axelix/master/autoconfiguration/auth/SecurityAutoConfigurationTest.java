@@ -60,6 +60,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
+import com.axelixlabs.axelix.master.service.state.RoleService;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
@@ -530,6 +531,11 @@ class SecurityAutoConfigurationTest {
         @Bean
         public UserService userService() {
             return Mockito.mock(UserService.class);
+        }
+
+        @Bean
+        public RoleService roleService() {
+            return Mockito.mock(RoleService.class);
         }
     }
 

@@ -80,6 +80,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -147,7 +148,7 @@ class JwtAuthorizationFilterTest {
     @MethodSource("adminEndpoints")
     void shouldAllowAccess_ForUserWithRoleAdmin(String path, HttpMethod httpMethod) {
         buildCache();
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
@@ -159,8 +160,7 @@ class JwtAuthorizationFilterTest {
     @MethodSource("adminEndpoints")
     void shouldAllowAccess_MultipleRoles(String path, HttpMethod httpMethod) {
         buildCache();
-        User user =
-                new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN, DefaultRole.EDITOR, DefaultRole.VIEWER));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
@@ -186,7 +186,7 @@ class JwtAuthorizationFilterTest {
     @MethodSource("editorEndpoints")
     void shouldAllowAccess_ForUserWithRoleEditor(String path, HttpMethod httpMethod) {
         buildCache();
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.EDITOR));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
@@ -211,7 +211,7 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("viewerEndpoints")
     void shouldAllowAccess_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
@@ -242,7 +242,7 @@ class JwtAuthorizationFilterTest {
     @MethodSource("notAuthorityForRole")
     void shouldReturnForbidden_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
         buildCache();
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
@@ -275,7 +275,7 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnUnauthorized_AuthorizationHeaderIsMalformed() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "BearerToken" + jwtEncoderService.generateToken(user));
 
@@ -302,7 +302,7 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnUnauthorized_TokenIsTampered() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
         String token = jwtEncoderService.generateToken(user);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -328,7 +328,7 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnUnauthorized_TokenIsExpired() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
         String token = jwtEncoderService.generateToken(user, Duration.ofDays(0));
 
         ResponseEntity<String> response =

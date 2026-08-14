@@ -25,7 +25,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -33,6 +32,7 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
+import com.axelixlabs.axelix.master.service.state.RoleService;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
@@ -44,10 +44,13 @@ import com.axelixlabs.axelix.master.service.state.UserService;
 public class DatabaseUserAuthenticator implements UserAuthenticator {
 
     private final UserService userService;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
-    public DatabaseUserAuthenticator(UserService userService, PasswordEncoder passwordEncoder) {
+    public DatabaseUserAuthenticator(
+            UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -62,20 +65,18 @@ public class DatabaseUserAuthenticator implements UserAuthenticator {
             }
 
             userService.updateLastLoginAt(user.username());
-            return new DefaultUser(user.username(), user.password(), extractRoles(user.roles()));
+            return new DefaultUser(
+                    user.username(), user.password(), extractRoles(userService.findRoleNamesByUserId(user.id())));
         }
 
         return null;
     }
 
-    private Set<Role> extractRoles(UserEntity.Roles roles) {
-        return roles.values().stream()
-                .map(role -> switch (role.toLowerCase()) {
-                    case "admin" -> DefaultRole.ADMIN;
-                    case "editor" -> DefaultRole.EDITOR;
-                    case "viewer" -> DefaultRole.VIEWER;
-                    default -> throw new UserRoleNotFoundException(role);
-                })
+    private Set<Role> extractRoles(Set<String> roleNames) {
+        return roleNames.stream()
+                .map(role -> roleService
+                        .findByName(role.trim().toUpperCase())
+                        .orElseThrow(() -> new UserRoleNotFoundException(role)))
                 .collect(Collectors.toSet());
     }
 }

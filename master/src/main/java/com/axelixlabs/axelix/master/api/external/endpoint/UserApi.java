@@ -18,6 +18,8 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -92,8 +94,11 @@ public class UserApi {
                             array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     @GetMapping(path = ApiPaths.UsersApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
-        List<UserResponse> users =
-                userService.findAll().stream().map(UserResponse::from).toList();
+        Map<String, Set<String>> roleNamesByUserId = userService.findAllRoleNamesByUserId();
+
+        List<UserResponse> users = userService.findAll().stream()
+                .map(user -> UserResponse.from(user, roleNamesByUserId.getOrDefault(user.id(), Set.of())))
+                .toList();
 
         return ResponseEntity.ok(users);
     }
@@ -110,7 +115,7 @@ public class UserApi {
     public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
         return userService
                 .findUserById(userId)
-                .map(UserResponse::from)
+                .map(user -> UserResponse.from(user, userService.findRoleNamesByUserId(user.id())))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
                     log.warn("User with ID was not found {}", userId);

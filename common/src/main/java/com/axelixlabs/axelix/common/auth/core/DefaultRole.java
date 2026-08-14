@@ -34,41 +34,14 @@ import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.HEART_B
  */
 public final class DefaultRole implements Role {
 
-    // TODO A task was created to remove ALL_ROLE_NAMES https://github.com/axelixlabs/axelix/issues/971
-    public static final Set<String> ALL_ROLE_NAMES;
     public static final Role SUPER_ADMIN;
-    public static final Role ADMIN;
-    public static final Role EDITOR;
-    public static final Role VIEWER;
     public static final Role MANAGED_SERVICE;
 
     static {
-        VIEWER = new DefaultRole("VIEWER", Set.of());
-
-        EDITOR = new DefaultRole(
-                "EDITOR",
-                Set.of(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR));
-
-        ADMIN = new DefaultRole(
-                "ADMIN",
-                Set.of(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR,
-                        DefaultAuthority.ENV_VALUES_READ,
-                        DefaultAuthority.CONFIG_PROPS_VALUES_READ));
-
         SUPER_ADMIN = new DefaultRole(
                 "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toUnmodifiableSet()));
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(HEART_BEATING_AUTHORITY));
-
-        ALL_ROLE_NAMES = Set.of(VIEWER.getName(), ADMIN.getName(), EDITOR.getName());
     }
 
     private final String name;

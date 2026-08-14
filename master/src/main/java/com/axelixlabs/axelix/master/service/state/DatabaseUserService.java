@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
@@ -56,16 +56,19 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
 public class DatabaseUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleService roleService;
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
     private final PasswordEncoder passwordEncoder;
     private final SuperAdminConfigurationProperties superAdminConfiguration;
 
     public DatabaseUserService(
             UserRepository userRepository,
+            RoleService roleService,
             JdbcAggregateTemplate jdbcAggregateTemplate,
             PasswordEncoder passwordEncoder,
             SuperAdminConfigurationProperties superAdminConfiguration) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
         this.passwordEncoder = passwordEncoder;
         this.superAdminConfiguration = superAdminConfiguration;
@@ -108,6 +111,7 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
+        grantRoles(userEntity.id(), userEntity.roles().values());
     }
 
     @Override
@@ -139,10 +143,12 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
+        grantRoles(userEntity.id(), userEntity.roles().values());
     }
 
     @Override
     public void deleteById(String id) {
+        userRepository.deleteUserRoles(id);
         userRepository.deleteById(id);
     }
 
@@ -159,6 +165,18 @@ public class DatabaseUserService implements UserService {
     @Override
     public Optional<UserEntity> findUserById(String id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public Set<String> findRoleNamesByUserId(String userId) {
+        return Set.copyOf(userRepository.findRoleNamesByUserId(userId));
+    }
+
+    @Override
+    public Map<String, Set<String>> findAllRoleNamesByUserId() {
+        return userRepository.findAllUserRoleNames().stream()
+                .collect(Collectors.groupingBy(
+                        UserRoleName::userId, Collectors.mapping(UserRoleName::roleName, Collectors.toSet())));
     }
 
     @Override
@@ -226,6 +244,13 @@ public class DatabaseUserService implements UserService {
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(validRoles),
                 lastLoginAt);
+
+        userRepository.deleteUserRoles(id);
+        grantRoles(id, validRoles);
+    }
+
+    private void grantRoles(String userId, Set<String> roleNames) {
+        roleNames.forEach(roleName -> userRepository.insertUserRole(userId, roleName));
     }
 
     private boolean userWithSuchEmailAlreadyExists(String id, String normalizedEmail) {
@@ -266,7 +291,7 @@ public class DatabaseUserService implements UserService {
         }
 
         String normalized = role.trim().toUpperCase();
-        if (!DefaultRole.ALL_ROLE_NAMES.contains(normalized)) {
+        if (roleService.findByName(normalized).isEmpty()) {
             throw new UserRoleNotFoundException(role);
         }
         return normalized;

@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ class DatabaseUserServiceTest {
     @BeforeEach
     @AfterEach
     void setup() {
-        userRepository.deleteAll();
+        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
     }
 
     @Test
@@ -649,5 +650,79 @@ class DatabaseUserServiceTest {
         UserEntity updated = userRepository.findById(existing.id()).orElseThrow();
         assertThat(updated.roles().values()).containsExactly("ADMIN");
         assertThat(passwordEncoder.matches("newPass", updated.password())).isTrue();
+    }
+
+    @Test
+    void createLocal_shouldGrantRolesThroughUsersRolesTable() {
+        // when.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "plainPass", "ADMIN");
+
+        // then.
+        UserEntity saved = userRepository.findByUsername("alice").orElseThrow();
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactly("ADMIN");
+    }
+
+    @Test
+    void createFromOidc_shouldGrantRolesThroughUsersRolesTable() {
+        // when.
+        userService.createFromOidc("bob", null, null, "bob@example.com", null, null, "VIEWER");
+
+        // then.
+        UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactly("VIEWER");
+    }
+
+    @Test
+    void updateUserPatch_shouldReplaceRolesInUsersRolesTableRatherThanAddToThem() {
+        // given.
+        userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+
+        // when.
+        userService.updateUserPatch(
+                existing.id(),
+                existing.username(),
+                null,
+                null,
+                existing.email(),
+                null,
+                null,
+                null,
+                Set.of("ADMIN", "EDITOR"),
+                null);
+
+        // then.
+        assertThat(userService.findRoleNamesByUserId(existing.id())).containsExactlyInAnyOrder("ADMIN", "EDITOR");
+    }
+
+    @Test
+    void deleteById_shouldRevokeRoles() {
+        // given.
+        userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "ADMIN");
+        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+
+        // when.
+        userService.deleteById(existing.id());
+
+        // then.
+        assertThat(userService.findRoleNamesByUserId(existing.id())).isEmpty();
+    }
+
+    @Test
+    void findAllRoleNamesByUserId_shouldReturnAssignmentsOfEveryUser() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "ADMIN");
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "VIEWER");
+
+        String aliceId = userRepository.findByUsername("alice").orElseThrow().id();
+        String bobId = userRepository.findByUsername("bob").orElseThrow().id();
+
+        // when.
+        Map<String, Set<String>> roleNamesByUserId = userService.findAllRoleNamesByUserId();
+
+        // then.
+        assertThat(roleNamesByUserId).containsOnlyKeys(aliceId, bobId);
+        assertThat(roleNamesByUserId.get(aliceId)).containsExactly("ADMIN");
+        assertThat(roleNamesByUserId.get(bobId)).containsExactly("VIEWER");
     }
 }

@@ -71,6 +71,7 @@ import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthentic
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
+import com.axelixlabs.axelix.master.service.state.RoleService;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
@@ -179,8 +180,8 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public DatabaseUserAuthenticator databaseUserAuthenticator(
-                UserService userService, PasswordEncoder passwordEncoder) {
-            return new DatabaseUserAuthenticator(userService, passwordEncoder);
+                UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+            return new DatabaseUserAuthenticator(userService, roleService, passwordEncoder);
         }
     }
 
@@ -260,8 +261,10 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public UserInfoJsonAccessor userInfoJsonAccessor(
-                JmesPathJsonInspector jmesPathJsonInspector, OAuth2Properties oAuth2Properties) {
-            return new UserInfoJsonAccessor(jmesPathJsonInspector, oAuth2Properties);
+                JmesPathJsonInspector jmesPathJsonInspector,
+                OAuth2Properties oAuth2Properties,
+                RoleService roleService) {
+            return new UserInfoJsonAccessor(jmesPathJsonInspector, oAuth2Properties, roleService);
         }
     }
 }

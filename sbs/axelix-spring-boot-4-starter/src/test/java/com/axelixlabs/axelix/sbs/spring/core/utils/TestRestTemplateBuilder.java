@@ -32,7 +32,6 @@ import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -76,15 +75,15 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate asViewer() {
-        return withRole(DefaultRole.VIEWER);
+        return withRole(TestRoles.VIEWER);
     }
 
     public TestRestTemplate asEditor() {
-        return withRole(DefaultRole.EDITOR);
+        return withRole(TestRoles.EDITOR);
     }
 
     public TestRestTemplate asAdmin() {
-        return withRole(DefaultRole.ADMIN);
+        return withRole(TestRoles.ADMIN);
     }
 
     public TestRestTemplate withRole(Role role) {

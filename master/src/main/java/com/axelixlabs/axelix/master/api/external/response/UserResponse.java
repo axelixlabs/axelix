@@ -54,7 +54,12 @@ public record UserResponse(
         String status,
         @Nullable Instant lastLoginAt) {
 
-    public static UserResponse from(UserEntity user) {
+    /**
+     * @param user      The user to expose.
+     * @param roleNames Names of the roles granted to the user, read from {@code users_roles} rather than from the
+     *                  legacy {@code users.roles} column.
+     */
+    public static UserResponse from(UserEntity user, Set<String> roleNames) {
         return new UserResponse(
                 user.id(),
                 user.username(),
@@ -63,7 +68,7 @@ public record UserResponse(
                 user.email(),
                 user.jobTitle(),
                 user.organizationalUnit(),
-                user.roles().values(),
+                roleNames,
                 user.userOrigin().getDisplayName(),
                 user.status().name(),
                 user.lastLoginAt());

@@ -38,7 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
@@ -50,6 +49,7 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.TestRoles;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.common.auth.core.DefaultAuthority.USERS_VIEW;
@@ -112,7 +112,9 @@ class UserApiTest {
 
     @BeforeEach
     void cleanUsersTable() {
-        userRepository.deleteAll();
+        // Goes through the service rather than userRepository.deleteAll(), so that the users_roles assignments are
+        // cleaned up too: SQLite does not enforce the ON DELETE CASCADE.
+        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
     }
 
     @Test
@@ -175,7 +177,7 @@ class UserApiTest {
     @Test
     void shouldNotAuthenticateUserFromDatabaseWithInvalidCredentials() {
         userService.createLocal(
-                "db-user", null, null, "db-user@example.com", null, null, "db-password", DefaultRole.VIEWER.getName());
+                "db-user", null, null, "db-user@example.com", null, null, "db-password", TestRoles.VIEWER.getName());
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 
@@ -442,6 +444,13 @@ class UserApiTest {
                 provider,
                 status,
                 null);
-        return jdbcAggregateTemplate.insert(entity);
+
+        UserEntity inserted = jdbcAggregateTemplate.insert(entity);
+
+        // The API reads the roles from users_roles, so the assignments have to be written as well; this helper
+        // bypasses UserService on purpose, to control the id, origin and status precisely.
+        roles.forEach(role -> userRepository.insertUserRole(inserted.id(), role));
+
+        return inserted;
     }
 }
