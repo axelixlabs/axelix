@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +37,6 @@ class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest 
 
     @Autowired
     private PropertyNameNormalizer normalizer;
-
-    @BeforeEach
-    void setUp() throws InterruptedException {
-        Thread.sleep(1000);
-    }
 
     @Test
     void shouldExtractAllPropertyMetadataCorrectly() {
