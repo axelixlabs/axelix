@@ -17,23 +17,21 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.master.domain.RoleEntity;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
+import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
 
 /**
  * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities}
@@ -54,26 +52,14 @@ public class DatabaseRoleService implements RoleService {
 
     @Override
     public Optional<Role> findByName(String name) {
-        return roleRepository.findByName(name).map(this::toRole);
-    }
-
-    private Role toRole(RoleEntity roleEntity) {
-        return new DefaultRole(roleEntity.name(), resolveAuthorities(roleEntity.name()));
-    }
-
-    private Set<Authority> resolveAuthorities(String roleName) {
-        return roleRepository.findAuthorityNamesByRoleName(roleName).stream()
-                .map(this::safeAuthorityFromString)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-    }
-
-    @Nullable
-    private Authority safeAuthorityFromString(String name) {
-        try {
-            return DefaultAuthority.valueOf(name);
-        } catch (IllegalArgumentException ignored) {
-            return null;
+        List<RoleWithAuthorityName> rows = roleRepository.findWithAuthoritiesByName(name);
+        if (rows.isEmpty()) {
+            return Optional.empty();
         }
+        Set<Authority> authorities = rows.stream()
+                .flatMap(row -> Optional.ofNullable(row.authorityName()).stream())
+                .map(authorityName -> (Authority) () -> authorityName)
+                .collect(Collectors.toSet());
+        return Optional.of(new DefaultRole(name, authorities));
     }
 }

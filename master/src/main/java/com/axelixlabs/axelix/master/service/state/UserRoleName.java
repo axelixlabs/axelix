@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.domain;
+package com.axelixlabs.axelix.master.service.state;
 
 /**
  * Single role assignment, used to read the assignments of many users at once without a query per user.

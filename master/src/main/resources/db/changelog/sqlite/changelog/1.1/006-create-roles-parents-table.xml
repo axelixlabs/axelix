@@ -16,11 +16,11 @@
     <createTable tableName="roles_parents">
       <column name="role_id" type="TEXT">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_roles_parents"
-                     foreignKeyName="fk_roles_parents_role" references="roles(id)" deleteCascade="true"/>
+                     foreignKeyName="fk_roles_parents_role" references="roles(id)"/>
       </column>
       <column name="parent_role_id" type="TEXT">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_roles_parents"
-                     foreignKeyName="fk_roles_parents_parent" references="roles(id)" deleteCascade="true"/>
+                     foreignKeyName="fk_roles_parents_parent" references="roles(id)"/>
       </column>
     </createTable>
   </changeSet>

@@ -15,13 +15,18 @@
 
     <createTable tableName="users_roles">
       <column name="user_id" type="TEXT">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users_roles"
-                     foreignKeyName="fk_users_roles_user" references="users(id)" deleteCascade="true"/>
+        <constraints nullable="false"
+                     foreignKeyName="fk_users_roles_user" references="users(id)"/>
       </column>
       <column name="role_id" type="TEXT">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users_roles"
-                     foreignKeyName="fk_users_roles_role" references="roles(id)" deleteCascade="true"/>
+        <constraints nullable="false"
+                     foreignKeyName="fk_users_roles_role" references="roles(id)"/>
       </column>
     </createTable>
+
+    <addPrimaryKey
+            tableName="users_roles"
+            columnNames="user_id, role_id"
+            constraintName="pk_users_roles"/>
   </changeSet>
 </databaseChangeLog>
