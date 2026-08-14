@@ -29,22 +29,22 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.util.StringUtils;
 
 /**
- * Enables Spring Boot's own structured logging properties based on {@code axelix.master.logging.json},
+ * Enables Spring Boot's own structured logging properties based on {@code axelix.master.logging.json.enabled},
  * before the logging system initializes. Property names follow the same {@code axelix.master.*} prefix
  * as the rest of Master's configuration.
  * <p>
- * {@code axelix.master.logging.json=true} enables ECS structured console logging - the only format
+ * {@code axelix.master.logging.json.enabled=true} enables ECS structured console logging - the only format
  * Master supports for now.
  * <p>
  * {@code axelix.master.environment}, when set, is forwarded to
- * {@code logging.structured.ecs.service.environment} - but only when {@code axelix.master.logging.json}
+ * {@code logging.structured.ecs.service.environment} - but only when {@code axelix.master.logging.json.enabled}
  * is also {@code true}.
  *
  * @author Dmitry Mazurov
  */
 public class AxelixStructuredLoggingEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    public static final String AXELIX_MASTER_LOGGING_JSON = "axelix.master.logging.json";
+    public static final String AXELIX_MASTER_LOGGING_JSON = "axelix.master.logging.json.enabled";
 
     public static final String AXELIX_MASTER_ENVIRONMENT = "axelix.master.environment";
 
@@ -60,7 +60,7 @@ public class AxelixStructuredLoggingEnvironmentPostProcessor implements Environm
     /**
      * Runs after every explicitly-ordered {@link EnvironmentPostProcessor}, in particular
      * {@link ConfigDataEnvironmentPostProcessor} (order {@code HIGHEST_PRECEDENCE + 10}, where
-     * {@code application.yaml} gets loaded): without that, an {@code axelix.master.logging.json} set there
+     * {@code application.yaml} gets loaded): without that, an {@code axelix.master.logging.json.enabled} set there
      * wouldn't be visible yet when this class reads it below.
      */
     @Override

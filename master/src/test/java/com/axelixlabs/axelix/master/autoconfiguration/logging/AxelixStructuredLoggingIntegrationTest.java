@@ -48,7 +48,7 @@ class AxelixStructuredLoggingIntegrationTest {
                 .web(WebApplicationType.NONE)
                 .properties(
                         "spring.main.banner-mode=off",
-                        "axelix.master.logging.json=true",
+                        "axelix.master.logging.json.enabled=true",
                         "axelix.master.environment=integration-test")
                 .run()) {
 

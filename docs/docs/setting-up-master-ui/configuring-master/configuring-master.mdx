@@ -38,7 +38,7 @@ over HTTPS — before exposing Master to anyone other than yourself.
 
 | Property                    | Default | Description                                                                             |
 |-------------------------------|---------|--------------------------------------------------------------------------------------------|
-| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. |
+| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. Currently only used to populate the ECS `service.environment` field when [structured logging](#structured-logging) is enabled. |
 
 </div>
 
@@ -202,16 +202,16 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 
 ### Structured logging
 
-By default, Master logs plain text to the console. Set `axelix.master.logging.json=true` to switch to
-[Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON logging
-instead — the only structured format Master supports today. ECS is a JSON-based logging format; reach for it when logs
-are shipped to an aggregator such as Elasticsearch or a similar ECS-aware pipeline.
+By default, Master logs plain text to the console (i.e. the process stdout). Set `axelix.master.logging.json.enabled=true`
+to switch to [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON
+logging instead — the only structured format Master supports today. ECS is a JSON-based logging format; reach for it
+when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aware pipeline.
 
 <div className={styles.ConfigTable}>
 
-| Property                     | Default | Description                                                               |
-|-------------------------------|---------|------------------------------------------------------------------------------|
-| `axelix.master.logging.json` | `false` | Switch console logging from plain text to ECS-formatted structured JSON.     |
+| Property                             | Default | Description                                                               |
+|----------------------------------------|---------|------------------------------------------------------------------------------|
+| `axelix.master.logging.json.enabled` | `false` | Switch console logging from plain text to ECS-formatted structured JSON.     |
 
 </div>
 
