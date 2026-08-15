@@ -20,9 +20,8 @@ package com.axelixlabs.axelix.master.api.external.response;
 import java.time.Instant;
 import java.util.Set;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Public view of a managed user.
@@ -34,12 +33,13 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
  * @param email       Email address of the user, which may be {@code null}.
  * @param jobTitle    Job title of the user, which may be {@code null}.
  * @param organizationalUnit Organizational unit of the user, which may be {@code null}.
- * @param roles       The roles granted to this user.
+ * @param roles       The names of roles granted to this user.
  * @param userOrigin  Origin of the user account.
  * @param status      Status that controls whether the user can log in.
  * @param lastLoginAt Timestamp of the most recent successful login. {@code null} if the user has never logged in.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public record UserResponse(
         String id,

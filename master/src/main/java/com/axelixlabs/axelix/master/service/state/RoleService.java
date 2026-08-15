@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -43,4 +44,12 @@ public interface RoleService {
      * @return The role, or {@link Optional#empty()} if no role with such a name exists.
      */
     Optional<Role> findByName(String name);
+
+    /**
+     * Looks up roles that belong to the given user.
+     *
+     * @param userId the ID of the user whose roles we want to fetch.
+     * @return Roles of the user.
+     */
+    Set<Role> findRolesOfUser(String userId);
 }

@@ -51,11 +51,11 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
     @Modifying
     @Query("INSERT INTO users_roles (user_id, role_id) SELECT :userId, r.id FROM roles r WHERE r.name = :roleName")
-    void insertUserRole(@Param("userId") String userId, @Param("roleName") String roleName);
+    void attachRole(@Param("userId") String userId, @Param("roleName") String roleName);
 
     @Modifying
     @Query("DELETE FROM users_roles WHERE user_id = :userId")
-    void deleteUserRoles(@Param("userId") String userId);
+    void deleteUserRolesMappings(@Param("userId") String userId);
 
     @Modifying
     @Query("UPDATE users SET last_login_at = :lastLoginAt WHERE username = :username")

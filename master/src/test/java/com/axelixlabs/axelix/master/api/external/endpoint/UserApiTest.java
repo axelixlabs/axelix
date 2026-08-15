@@ -449,7 +449,7 @@ class UserApiTest {
 
         // The API reads the roles from users_roles, so the assignments have to be written as well; this helper
         // bypasses UserService on purpose, to control the id, origin and status precisely.
-        roles.forEach(role -> userRepository.insertUserRole(inserted.id(), role));
+        roles.forEach(role -> userRepository.attachRole(inserted.id(), role));
 
         return inserted;
     }

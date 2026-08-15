@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,13 +56,33 @@ public class DatabaseRoleService implements RoleService {
     @Override
     public Optional<Role> findByName(String name) {
         List<RoleWithAuthorityName> rows = roleRepository.findWithAuthoritiesByName(name);
+
         if (rows.isEmpty()) {
             return Optional.empty();
         }
+
         Set<Authority> authorities = rows.stream()
                 .flatMap(row -> Optional.ofNullable(row.authorityName()).stream())
                 .map(authorityName -> (Authority) () -> authorityName)
                 .collect(Collectors.toSet());
+
         return Optional.of(new DefaultRole(name, authorities));
+    }
+
+    @Override
+    public Set<Role> findRolesOfUser(String userId) {
+        List<RoleWithAuthorityName> rows = roleRepository.findWithAuthoritiesByUserId(userId);
+        Map<String, Set<Authority>> authoritiesByRole = new LinkedHashMap<>();
+
+        for (RoleWithAuthorityName row : rows) {
+            Set<Authority> authorities = authoritiesByRole.computeIfAbsent(row.roleName(), _ -> new HashSet<>());
+            if (row.authorityName() != null) {
+                String authorityName = row.authorityName();
+                authorities.add(() -> authorityName);
+            }
+        }
+        return authoritiesByRole.entrySet().stream()
+                .map(entry -> (Role) new DefaultRole(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
     }
 }

@@ -54,6 +54,21 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
     List<RoleWithAuthorityName> findWithAuthoritiesByName(@Param("name") String name);
 
     /**
+     * @param userId ID of the user.
+     * @return One row per (role, granted-authority) pair, a single {@code null}-authority row for a role that grants
+     *         none, or an empty list if the user has no roles assigned.
+     */
+    @Query("""
+            SELECT r.name AS role_name, a.name AS authority_name
+            FROM users_roles ur
+            JOIN roles r ON r.id = ur.role_id
+            LEFT JOIN roles_authorities ra ON ra.role_id = r.id
+            LEFT JOIN authorities a ON a.id = ra.authority_id
+            WHERE ur.user_id = :userId
+            """)
+    List<RoleWithAuthorityName> findWithAuthoritiesByUserId(@Param("userId") String userId);
+
+    /**
      * A single (role, granted-authority-name) row of {@link #findWithAuthoritiesByName(String)}.
      *
      * @param roleName      Name of the role.

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
+import java.util.Locale;
+
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -66,7 +68,7 @@ public class UserInfoJsonAccessor {
 
     private Role resolveRole(String roleName, @Nullable String roleAttributePath) {
         return roleService
-                .findByName(roleName.trim().toUpperCase())
+                .findByName(roleName.trim().toUpperCase(Locale.ROOT))
                 .orElseThrow(() -> new OidcRoleExtractionException(String.format(
                         "Failed to extract role from UserInfo JSON payload using JMESPath expression: '%s'",
                         roleAttributePath)));

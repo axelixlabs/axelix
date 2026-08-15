@@ -17,23 +17,17 @@
  */
 package com.axelixlabs.axelix.master.service.auth.provider;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.axelixlabs.axelix.common.auth.core.DefaultUser;
+import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
+import com.axelixlabs.axelix.master.service.state.RoleService;
+import com.axelixlabs.axelix.master.service.state.UserService;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserStatus;
-import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
-import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
-import com.axelixlabs.axelix.master.service.state.RoleService;
-import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
  * {@link UserAuthenticator} that authenticates a given user against the users stored in the database.
@@ -57,6 +51,10 @@ public class DatabaseUserAuthenticator implements UserAuthenticator {
     @Override
     public @Nullable User authenticate(String username, String password) {
 
+        // TODO:
+        //  Maybe we can load user with his roles already here with one query?
+        //  It is going to be a bit inconvenient, since we would have to write
+        //  the mapping of a non-flat result set by ourselves (we're using SDJ).
         UserEntity user = userService.findUserByUsername(username).orElse(null);
 
         if (user != null && user.password() != null && passwordEncoder.matches(password, user.password())) {
@@ -65,18 +63,9 @@ public class DatabaseUserAuthenticator implements UserAuthenticator {
             }
 
             userService.updateLastLoginAt(user.username());
-            return new DefaultUser(
-                    user.username(), user.password(), extractRoles(userService.findRoleNamesByUserId(user.id())));
+            return new DefaultUser(user.username(), user.password(), roleService.findRolesOfUser(user.id()));
         }
 
         return null;
-    }
-
-    private Set<Role> extractRoles(Set<String> roleNames) {
-        return roleNames.stream()
-                .map(role -> roleService
-                        .findByName(role.trim().toUpperCase())
-                        .orElseThrow(() -> new UserRoleNotFoundException(role)))
-                .collect(Collectors.toSet());
     }
 }

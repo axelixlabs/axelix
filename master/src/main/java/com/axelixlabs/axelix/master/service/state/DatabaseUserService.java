@@ -95,7 +95,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
+                null,
                 UserOrigin.LOCAL,
                 UserStatus.ACTIVE,
                 null);
@@ -111,7 +111,7 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
-        grantRoles(userEntity.id(), userEntity.roles().values());
+        grantRoles(userEntity.id(), Set.of(role));
     }
 
     @Override
@@ -133,7 +133,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 null,
-                new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
+                null,
                 UserOrigin.OIDC,
                 UserStatus.ACTIVE,
                 Instant.now()); // the assumption is that the user is created during the initial login
@@ -143,12 +143,12 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
-        grantRoles(userEntity.id(), userEntity.roles().values());
+        grantRoles(userEntity.id(), Set.of(role));
     }
 
     @Override
     public void deleteById(String id) {
-        userRepository.deleteUserRoles(id);
+        userRepository.deleteUserRolesMappings(id);
         userRepository.deleteById(id);
     }
 
@@ -245,12 +245,12 @@ public class DatabaseUserService implements UserService {
                 new UserEntity.Roles(validRoles),
                 lastLoginAt);
 
-        userRepository.deleteUserRoles(id);
+        userRepository.deleteUserRolesMappings(id);
         grantRoles(id, validRoles);
     }
 
     private void grantRoles(String userId, Set<String> roleNames) {
-        roleNames.forEach(roleName -> userRepository.insertUserRole(userId, roleName));
+        roleNames.forEach(roleName -> userRepository.attachRole(userId, roleName));
     }
 
     private boolean userWithSuchEmailAlreadyExists(String id, String normalizedEmail) {

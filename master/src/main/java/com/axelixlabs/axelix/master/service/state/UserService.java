@@ -131,9 +131,6 @@ public interface UserService {
     /**
      * Returns the names of the roles granted to the given user.
      *
-     * <p>The roles are read from the {@code users_roles} table. The legacy {@code users.roles} column is still
-     * written, so that a rollback to a previous Axelix version keeps working, but it is no longer read.</p>
-     *
      * @param userId Unique identifier of the user.
      * @return Names of the granted roles, empty if the user has none or does not exist.
      */
