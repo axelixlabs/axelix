@@ -237,7 +237,6 @@ public class DatabaseUserService implements UserService {
                 normalizedJobTitle,
                 normalizedOrganizationalUnit,
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                null,
                 lastLoginAt);
 
         userRepository.deleteUserRolesMappings(id);

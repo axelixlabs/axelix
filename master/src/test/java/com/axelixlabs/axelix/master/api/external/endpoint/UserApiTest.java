@@ -438,7 +438,7 @@ class UserApiTest {
                 jobTitle,
                 organizationalUnit,
                 password == null ? null : passwordEncoder.encode(password),
-                new UserEntity.Roles(roles),
+                null,
                 provider,
                 status,
                 null);

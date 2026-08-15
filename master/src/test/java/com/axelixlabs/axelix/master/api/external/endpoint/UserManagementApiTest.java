@@ -674,10 +674,11 @@ public class UserManagementApiTest {
                 null,
                 null,
                 password == null ? null : passwordEncoder.encode(password),
-                new UserEntity.Roles(roles),
+                null,
                 provider,
                 UserStatus.ACTIVE,
                 null);
+
         return jdbcAggregateTemplate.insert(entity);
     }
 }

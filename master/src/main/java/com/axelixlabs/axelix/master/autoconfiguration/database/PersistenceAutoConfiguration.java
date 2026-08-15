@@ -204,6 +204,7 @@ public class PersistenceAutoConfiguration {
                     new PersistenceInsightsReadingConverter(jsonMapper));
         }
 
+        @Deprecated(forRemoval = true, since = "1.1") // GH-1515
         @WritingConverter
         public static class RolesWritingConverter implements Converter<UserEntity.Roles, String> {
 
@@ -219,6 +220,7 @@ public class PersistenceAutoConfiguration {
             }
         }
 
+        @Deprecated(forRemoval = true, since = "1.1") // GH-1515
         @ReadingConverter
         public static class RolesReadingConverter implements Converter<String, UserEntity.Roles> {
 

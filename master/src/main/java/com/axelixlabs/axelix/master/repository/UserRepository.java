@@ -91,7 +91,6 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
             @Param("jobTitle") @Nullable String jobTitle,
             @Param("organizationalUnit") @Nullable String organizationalUnit,
             @Param("password") @Nullable String password,
-            @Param("roles") UserEntity.Roles roles,
             @Param("lastLoginAt") @Nullable Instant lastLoginAt);
 
     /**
