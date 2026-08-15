@@ -56,19 +56,16 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
 public class DatabaseUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleService roleService;
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
     private final PasswordEncoder passwordEncoder;
     private final SuperAdminConfigurationProperties superAdminConfiguration;
 
     public DatabaseUserService(
             UserRepository userRepository,
-            RoleService roleService,
             JdbcAggregateTemplate jdbcAggregateTemplate,
             PasswordEncoder passwordEncoder,
             SuperAdminConfigurationProperties superAdminConfiguration) {
         this.userRepository = userRepository;
-        this.roleService = roleService;
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
         this.passwordEncoder = passwordEncoder;
         this.superAdminConfiguration = superAdminConfiguration;
@@ -213,9 +210,6 @@ public class DatabaseUserService implements UserService {
             throw new UserInvalidValueException(null);
         }
 
-        Set<String> validRoles =
-                roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
-
         String normalizedUsername = requireNonBlankTrimmed(username);
         String normalizedFirstName = normalizeOptional(firstName);
         String normalizedLastName = normalizeOptional(lastName);
@@ -243,16 +237,22 @@ public class DatabaseUserService implements UserService {
                 normalizedJobTitle,
                 normalizedOrganizationalUnit,
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(validRoles),
+                null,
                 lastLoginAt);
 
         userRepository.deleteUserRolesMappings(id);
-        grantRoles(id, validRoles);
+        grantRoles(id, roles);
     }
 
     // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization
     private void grantRoles(String userId, Set<String> roleNames) {
-        roleNames.forEach(roleName -> userRepository.attachRole(userId, roleName));
+        roleNames.forEach(roleName -> {
+            int rowsAffected = userRepository.attachRole(userId, roleName);
+
+            if (rowsAffected != 1) {
+                throw new UserRoleNotFoundException(roleName);
+            }
+        });
     }
 
     private boolean userWithSuchEmailAlreadyExists(String id, String normalizedEmail) {
@@ -284,18 +284,5 @@ public class DatabaseUserService implements UserService {
     @Nullable
     private String normalizeOptional(@Nullable String value) throws UserInvalidValueException {
         return value == null ? null : requireNonBlankTrimmed(value);
-    }
-
-    private String validateAndNormalizeRole(@Nullable String role)
-            throws UserInvalidValueException, UserRoleNotFoundException {
-        if (role == null || role.isBlank()) {
-            throw new UserInvalidValueException(role);
-        }
-
-        String normalized = role.trim().toUpperCase();
-        if (roleService.findByName(normalized).isEmpty()) {
-            throw new UserRoleNotFoundException(role);
-        }
-        return normalized;
     }
 }

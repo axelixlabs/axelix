@@ -112,8 +112,6 @@ class UserApiTest {
 
     @BeforeEach
     void cleanUsersTable() {
-        // Goes through the service rather than userRepository.deleteAll(), so that the users_roles assignments are
-        // cleaned up too: SQLite does not enforce the ON DELETE CASCADE.
         userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
     }
 
