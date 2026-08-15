@@ -28,14 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
@@ -45,7 +43,6 @@ import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.UserService;
@@ -103,12 +100,6 @@ class UserApiTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     @BeforeEach
     void cleanUsersTable() {
@@ -273,17 +264,12 @@ class UserApiTest {
     @Test
     void shouldReturnAllManagedUsers() {
         // given.
-        UserEntity alice = insertUser(
-                "alice",
-                "Alice",
-                "Smith",
-                "alice@example.com",
-                "aliceSecret",
-                Set.of("ADMIN"),
-                UserOrigin.LOCAL,
-                UserStatus.ACTIVE);
-        UserEntity bob = insertUser(
-                "bob", "Bob", null, "bob@example.com", null, Set.of("VIEWER"), UserOrigin.OIDC, UserStatus.SUSPENDED);
+        userService.createLocal("alice", "Alice", "Smith", "alice@example.com", null, null, "aliceSecret", "ADMIN");
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+
+        userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "VIEWER");
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+        userService.updateStatus(bob.id(), UserStatus.SUSPENDED);
 
         // language=json
         String expectedFeed = """
@@ -331,7 +317,7 @@ class UserApiTest {
     @Test
     void shouldReturnUserByHisId() {
         // given.
-        UserEntity alice = insertUser(
+        userService.createLocal(
                 "alice",
                 "Alice",
                 "Smith",
@@ -339,9 +325,9 @@ class UserApiTest {
                 "Engineering Manager",
                 "Engineering",
                 "aliceSecret",
-                Set.of("ADMIN"),
-                UserOrigin.LOCAL,
-                UserStatus.SUSPENDED);
+                "ADMIN");
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        userService.updateStatus(alice.id(), UserStatus.SUSPENDED);
 
         // language=json
         String expectedUser = """
@@ -404,51 +390,5 @@ class UserApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(requestBody, headers);
-    }
-
-    private UserEntity insertUser(
-            String username,
-            String firstName,
-            String lastName,
-            String email,
-            String password,
-            Set<String> roles,
-            UserOrigin provider,
-            UserStatus status) {
-        return insertUser(username, firstName, lastName, email, null, null, password, roles, provider, status);
-    }
-
-    private UserEntity insertUser(
-            String username,
-            String firstName,
-            String lastName,
-            String email,
-            String jobTitle,
-            String organizationalUnit,
-            String password,
-            Set<String> roles,
-            UserOrigin provider,
-            UserStatus status) {
-        UserEntity entity = new UserEntity(
-                UUID.randomUUID().toString(),
-                username,
-                firstName,
-                lastName,
-                email,
-                jobTitle,
-                organizationalUnit,
-                password == null ? null : passwordEncoder.encode(password),
-                null,
-                provider,
-                status,
-                null);
-
-        UserEntity inserted = jdbcAggregateTemplate.insert(entity);
-
-        // The API reads the roles from users_roles, so the assignments have to be written as well; this helper
-        // bypasses UserService on purpose, to control the id, origin and status precisely.
-        roles.forEach(role -> userRepository.attachRole(inserted.id(), role));
-
-        return inserted;
     }
 }
