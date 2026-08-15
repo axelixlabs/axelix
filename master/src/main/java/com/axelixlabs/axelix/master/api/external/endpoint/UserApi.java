@@ -95,7 +95,8 @@ public class UserApi {
     @GetMapping(path = ApiPaths.UsersApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
         // TODO:
-        //  Okay, I know what you're thinking. But the assumption is that the amount of users will not be that high, and it is
+        //  Okay, I know what you're thinking. But the assumption is that the amount of users will not be that high, and
+        // it is
         //  okay to load them in this way.
         Map<String, Set<String>> roleNamesByUserId = userService.findAllRoleNamesByUserId();
 

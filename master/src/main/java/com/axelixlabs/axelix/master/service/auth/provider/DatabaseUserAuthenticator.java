@@ -17,6 +17,11 @@
  */
 package com.axelixlabs.axelix.master.service.auth.provider;
 
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.domain.UserEntity;
@@ -24,10 +29,6 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.state.RoleService;
 import com.axelixlabs.axelix.master.service.state.UserService;
-import org.jspecify.annotations.Nullable;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link UserAuthenticator} that authenticates a given user against the users stored in the database.

@@ -56,7 +56,10 @@ public record UserEntity(
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
         @Nullable String password,
-        @Nullable @Deprecated(forRemoval = true, since = "1.1") Roles roles,
+
+        @Nullable @Deprecated(forRemoval = true, since = "1.1")
+        Roles roles,
+
         UserOrigin userOrigin,
         UserStatus status,
         @Nullable Instant lastLoginAt) {

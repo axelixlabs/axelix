@@ -20,8 +20,9 @@ package com.axelixlabs.axelix.master.api.external.response;
 import java.time.Instant;
 import java.util.Set;
 
-import com.axelixlabs.axelix.master.domain.UserEntity;
 import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.master.domain.UserEntity;
 
 /**
  * Public view of a managed user.

@@ -176,7 +176,8 @@ public class DatabaseUserService implements UserService {
     public Map<String, Set<String>> findAllRoleNamesByUserId() {
         return userRepository.findAllUserRoleNames().stream()
                 .collect(Collectors.groupingBy(
-                        UserRepository.UserRoleName::userId, Collectors.mapping(UserRepository.UserRoleName::roleName, Collectors.toSet())));
+                        UserRepository.UserRoleName::userId,
+                        Collectors.mapping(UserRepository.UserRoleName::roleName, Collectors.toSet())));
     }
 
     @Override
