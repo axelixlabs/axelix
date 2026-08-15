@@ -176,7 +176,7 @@ public class DatabaseUserService implements UserService {
     public Map<String, Set<String>> findAllRoleNamesByUserId() {
         return userRepository.findAllUserRoleNames().stream()
                 .collect(Collectors.groupingBy(
-                        UserRoleName::userId, Collectors.mapping(UserRoleName::roleName, Collectors.toSet())));
+                        UserRepository.UserRoleName::userId, Collectors.mapping(UserRepository.UserRoleName::roleName, Collectors.toSet())));
     }
 
     @Override
@@ -249,6 +249,7 @@ public class DatabaseUserService implements UserService {
         grantRoles(id, validRoles);
     }
 
+    // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization
     private void grantRoles(String userId, Set<String> roleNames) {
         roleNames.forEach(roleName -> userRepository.attachRole(userId, roleName));
     }

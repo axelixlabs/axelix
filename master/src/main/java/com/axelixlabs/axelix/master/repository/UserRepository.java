@@ -30,7 +30,6 @@ import org.springframework.data.repository.query.Param;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserStatus;
-import com.axelixlabs.axelix.master.service.state.UserRoleName;
 
 /**
  * Repository for {@link UserEntity} aggregate.
@@ -91,4 +90,14 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
             @Param("password") @Nullable String password,
             @Param("roles") UserEntity.Roles roles,
             @Param("lastLoginAt") @Nullable Instant lastLoginAt);
+
+    /**
+     * Single role assignment, used to read the assignments of many users at once without a query per user.
+     *
+     * @param userId   Identifier of the user the role is granted to.
+     * @param roleName Name of the granted role.
+     *
+     * @author Sergey Cherkasov
+     */
+    record UserRoleName(String userId, String roleName) {}
 }
