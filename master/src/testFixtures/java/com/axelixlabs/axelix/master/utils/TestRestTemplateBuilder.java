@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 

@@ -31,8 +31,8 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TestRoles;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.BeanSourceTestJsonSupport.beanSourceAwareJsonConverter;
 

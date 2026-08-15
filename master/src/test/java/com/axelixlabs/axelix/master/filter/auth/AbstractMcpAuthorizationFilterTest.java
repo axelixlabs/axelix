@@ -51,6 +51,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
@@ -60,7 +61,6 @@ import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
-import com.axelixlabs.axelix.master.utils.TestRoles;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;

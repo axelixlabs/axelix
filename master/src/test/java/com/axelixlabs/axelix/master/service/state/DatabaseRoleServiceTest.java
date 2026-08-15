@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.master.utils.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -40,6 +40,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
@@ -49,7 +50,6 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.master.utils.TestRoles;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.common.auth.core.DefaultAuthority.USERS_VIEW;

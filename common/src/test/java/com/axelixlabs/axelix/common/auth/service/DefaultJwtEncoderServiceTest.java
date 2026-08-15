@@ -40,9 +40,9 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TestRoles;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;

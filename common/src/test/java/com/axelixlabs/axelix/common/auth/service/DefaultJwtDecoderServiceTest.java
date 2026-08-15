@@ -39,10 +39,10 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.TestRoles;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

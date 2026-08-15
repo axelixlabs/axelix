@@ -38,8 +38,8 @@ import org.springframework.http.ResponseEntity;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;

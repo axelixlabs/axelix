@@ -59,6 +59,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
@@ -82,7 +83,6 @@ import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRoles;
 
 import static com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture.POTENTIAL_CONTEXT_MUTATION;
 import static org.assertj.core.api.Assertions.assertThat;

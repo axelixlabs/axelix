@@ -32,8 +32,8 @@ import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;

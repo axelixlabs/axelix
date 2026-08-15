@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 
 /**
  * Configuration for the tests that cover the HTTP API side.

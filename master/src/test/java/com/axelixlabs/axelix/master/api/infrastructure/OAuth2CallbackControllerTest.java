@@ -44,6 +44,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
@@ -57,7 +58,6 @@ import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.UserService;
-import com.axelixlabs.axelix.master.utils.TestRoles;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;

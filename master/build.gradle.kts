@@ -77,6 +77,8 @@ dependencies {
 
     // Test Self
     testFixturesImplementation(project(":common"))
+    testFixturesImplementation(testFixtures(project(":common")))
+    testImplementation(testFixtures(project(":common")))
 
     // Test
     testFixturesApi(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
