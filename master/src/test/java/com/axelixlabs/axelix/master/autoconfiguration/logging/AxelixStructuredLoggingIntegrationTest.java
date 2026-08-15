@@ -110,6 +110,7 @@ class AxelixStructuredLoggingIntegrationTest {
         // given.
         try (ConfigurableApplicationContext _ = new SpringApplicationBuilder(EmptyApplication.class)
                 .web(WebApplicationType.NONE)
+                .properties("axelix.master.logging.json.enabled=false")
                 .run()) {
 
             // when.
