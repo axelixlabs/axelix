@@ -50,9 +50,9 @@ public class AxelixStructuredLoggingEnvironmentPostProcessor implements Environm
 
     private static final String ECS_FORMAT_ID = "ecs";
 
-    private static final String SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY = "logging.structured.format.console";
+    public static final String SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY = "logging.structured.format.console";
 
-    private static final String SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY =
+    public static final String SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY =
             "logging.structured.ecs.service.environment";
 
     private static final String PROPERTY_SOURCE_NAME = "axelixStructuredLogging";

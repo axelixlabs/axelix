@@ -26,6 +26,8 @@ import org.springframework.mock.env.MockEnvironment;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor.AXELIX_MASTER_ENVIRONMENT;
 import static com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor.AXELIX_MASTER_LOGGING_JSON;
+import static com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor.SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor.SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -34,10 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Dmitry Mazurov
  */
 class AxelixStructuredLoggingEnvironmentPostProcessorTest {
-
-    private static final String STRUCTURED_FORMAT_CONSOLE_PROPERTY = "logging.structured.format.console";
-
-    private static final String ECS_SERVICE_ENVIRONMENT_PROPERTY = "logging.structured.ecs.service.environment";
 
     private final AxelixStructuredLoggingEnvironmentPostProcessor postProcessor =
             new AxelixStructuredLoggingEnvironmentPostProcessor();
@@ -61,8 +59,10 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(STRUCTURED_FORMAT_CONSOLE_PROPERTY)).isNull();
-        assertThat(environment.getProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY)).isNull();
+        assertThat(environment.getProperty(SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY))
+                .isNull();
+        assertThat(environment.getProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY))
+                .isNull();
     }
 
     @Test
@@ -76,8 +76,10 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(STRUCTURED_FORMAT_CONSOLE_PROPERTY)).isNull();
-        assertThat(environment.getProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY)).isNull();
+        assertThat(environment.getProperty(SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY))
+                .isNull();
+        assertThat(environment.getProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY))
+                .isNull();
     }
 
     @Test
@@ -90,7 +92,8 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(STRUCTURED_FORMAT_CONSOLE_PROPERTY)).isEqualTo("ecs");
+        assertThat(environment.getProperty(SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY))
+                .isEqualTo("ecs");
     }
 
     @Test
@@ -98,13 +101,14 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         // given.
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty(AXELIX_MASTER_LOGGING_JSON, "true");
-        environment.setProperty(STRUCTURED_FORMAT_CONSOLE_PROPERTY, "logstash");
+        environment.setProperty(SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY, "logstash");
 
         // when.
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(STRUCTURED_FORMAT_CONSOLE_PROPERTY)).isEqualTo("logstash");
+        assertThat(environment.getProperty(SPRING_STRUCTURED_FORMAT_CONSOLE_PROPERTY))
+                .isEqualTo("logstash");
     }
 
     @Test
@@ -118,7 +122,8 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY)).isEqualTo("production");
+        assertThat(environment.getProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY))
+                .isEqualTo("production");
     }
 
     @Test
@@ -131,7 +136,8 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY)).isNull();
+        assertThat(environment.getProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY))
+                .isNull();
     }
 
     @Test
@@ -140,12 +146,13 @@ class AxelixStructuredLoggingEnvironmentPostProcessorTest {
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty(AXELIX_MASTER_LOGGING_JSON, "true");
         environment.setProperty(AXELIX_MASTER_ENVIRONMENT, "production");
-        environment.setProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY, "staging");
+        environment.setProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY, "staging");
 
         // when.
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(ECS_SERVICE_ENVIRONMENT_PROPERTY)).isEqualTo("staging");
+        assertThat(environment.getProperty(SPRING_STRUCTURED_ECS_SERVICE_ENVIRONMENT_PROPERTY))
+                .isEqualTo("staging");
     }
 }

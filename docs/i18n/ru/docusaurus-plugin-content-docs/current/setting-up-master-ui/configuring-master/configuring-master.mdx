@@ -1,6 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
+import { UpcomingReleaseNotice } from '@site/src/components';
 
 # Настройка Master
 
@@ -37,6 +38,8 @@ import styles from './styles.module.css';
 :::
 
 ### Общие настройки
+
+<UpcomingReleaseNotice />
 
 <div className={styles.ConfigTable}>
 
@@ -210,6 +213,8 @@ Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.
 </div>
 
 ### Структурированное логирование
+
+<UpcomingReleaseNotice />
 
 По умолчанию Master выводит в консоль (то есть в stdout процесса) обычный текст. Установите
 `axelix.master.logging.json.enabled=true`, чтобы переключиться на структурированное JSON-логирование в формате

@@ -1,6 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
+import { UpcomingReleaseNotice } from '@site/src/components';
 
 # Configuring Master
 
@@ -33,6 +34,8 @@ over HTTPS — before exposing Master to anyone other than yourself.
 :::
 
 ### General
+
+<UpcomingReleaseNotice />
 
 <div className={styles.ConfigTable}>
 
@@ -201,6 +204,8 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 </div>
 
 ### Structured logging
+
+<UpcomingReleaseNotice />
 
 By default, Master logs plain text to the console (i.e. the process stdout). Set `axelix.master.logging.json.enabled=true`
 to switch to [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON
