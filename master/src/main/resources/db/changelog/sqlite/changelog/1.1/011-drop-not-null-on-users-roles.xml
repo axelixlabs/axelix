@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    SQLite cannot drop a NOT NULL constraint in place, so the users table is recreated without it, following the
+    procedure from https://www.sqlite.org/lang_altertable.html#otheralter. Foreign keys are enforced on the
+    application connections (PRAGMA foreign_keys=ON), and users_roles references users(id); PRAGMA foreign_keys=OFF
+    is a no-op inside a transaction, so this changeSet runs with runInTransaction="false" to toggle it around the
+    drop/recreate. The row copy preserves every user id, so the users_roles references stay valid.
+  -->
+  <changeSet id="1.1-011-1-sqlite-drop-not-null-on-users-roles" author="Axelix Team" runInTransaction="false">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <columnExists tableName="users" columnName="roles"/>
+    </preConditions>
+
+    <sql>PRAGMA foreign_keys=OFF;</sql>
+
+    <sql>
+      CREATE TABLE users_new (
+        id TEXT NOT NULL,
+        username TEXT NOT NULL,
+        email TEXT,
+        password TEXT,
+        roles TEXT,
+        user_origin TEXT NOT NULL,
+        last_login_at TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        status TEXT,
+        job_title TEXT,
+        organizational_unit TEXT,
+        CONSTRAINT pk_users PRIMARY KEY (id)
+      );
+    </sql>
+
+    <sql>
+      INSERT INTO users_new (id, username, email, password, roles, user_origin, last_login_at,
+                             first_name, last_name, status, job_title, organizational_unit)
+      SELECT id, username, email, password, roles, user_origin, last_login_at,
+             first_name, last_name, status, job_title, organizational_unit
+      FROM users;
+    </sql>
+
+    <sql>DROP TABLE users;</sql>
+
+    <sql>ALTER TABLE users_new RENAME TO users;</sql>
+
+    <sql>PRAGMA foreign_keys=ON;</sql>
+  </changeSet>
+</databaseChangeLog>
