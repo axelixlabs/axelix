@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.config.TriggerTask;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest
 @Import(ScheduledTasksRegistryTest.ScheduledTaskRegistryTestConfiguration.class)
@@ -106,6 +109,26 @@ class ScheduledTasksRegistryTest {
                         task -> assertThat(task).isInstanceOf(FixedDelayTask.class),
                         task -> assertThat(task).isInstanceOf(FixedRateTask.class),
                         task -> assertThat(task).isInstanceOf(TriggerTask.class).isNotInstanceOf(CronTask.class));
+    }
+
+    @Test // GH-1497
+    @DirtiesContext
+    void shouldCancelAllManagedTasksWhenRegistryCloses() {
+        Collection<ManagedScheduledTask> managedTasks = taskRegistry.getAll();
+        assertThat(managedTasks).isNotEmpty();
+
+        List<ManagedScheduledTask> tasksSnapshot = new ArrayList<>(taskRegistry.getAll());
+
+        for (ManagedScheduledTask task : managedTasks) {
+            assertThat(task.isEnabled()).isTrue();
+        }
+
+        taskRegistry.close();
+
+        for (ManagedScheduledTask task : tasksSnapshot) {
+            assertThat(task.isEnabled()).isFalse();
+        }
+        assertThat(taskRegistry.getAll()).isEmpty();
     }
 
     @TestConfiguration

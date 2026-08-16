@@ -38,8 +38,9 @@ import org.springframework.util.ReflectionUtils;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
+ * @author Vyacheslav Yanin
  */
-public class ManagedScheduledTask {
+public class ManagedScheduledTask implements AutoCloseable {
 
     /**
      * Reflection field access to the package-private 'future' field in {@link ScheduledTask}.
@@ -132,6 +133,13 @@ public class ManagedScheduledTask {
             throw new IllegalStateException("Failed to set 'future' in ScheduledTask", e);
         } catch (InvocationTargetException | InstantiationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (this.scheduledTask != null) {
+            this.scheduledTask.cancel();
         }
     }
 }

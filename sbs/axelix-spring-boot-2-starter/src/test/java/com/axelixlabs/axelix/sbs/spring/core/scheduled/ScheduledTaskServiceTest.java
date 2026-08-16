@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
@@ -259,6 +262,23 @@ class ScheduledTaskServiceTest {
         // then task exists and was executed
         taskRegistry.find(FIXED_RATE_TASK_ID_FOR_EXECUTE).orElseThrow();
         assertThat(fixedRateFlagForExecute).isTrue();
+    }
+
+    @Test // GH-1497
+    @DirtiesContext
+    void shouldCancelAllTasksAndClearRegistryWhenServiceCloses() {
+        Optional<ManagedScheduledTask> taskBefore = taskService.find(CRON_TASK_ID);
+        assertThat(taskBefore).isPresent();
+        assertThat(taskBefore.get().isEnabled()).isTrue();
+
+        ManagedScheduledTask managedTask = taskBefore.get();
+
+        taskService.close();
+
+        assertThat(managedTask.isEnabled()).isFalse();
+
+        Optional<ManagedScheduledTask> taskAfter = taskService.find(CRON_TASK_ID);
+        assertThat(taskAfter).isEmpty();
     }
 
     @TestConfiguration

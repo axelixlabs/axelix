@@ -25,11 +25,13 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ManagedScheduledTask;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
@@ -44,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 10.02.2026
  * @author Nikita Kirillov
  * @author Dmitry Kiselev
+ * @author Vyacheslav Yanin
  */
 class ScheduledTaskManagementAutoConfigurationTest {
 
@@ -138,6 +141,24 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
+    @Test // GH-1497
+    void shouldCancelAllManagedTasksWhenContextCloses() {
+        contextRunner.run(context -> {
+            ScheduledTasksRegistry registry = context.getBean(ScheduledTasksRegistry.class);
+
+            assertThat(registry.getAll()).isNotEmpty();
+            for (ManagedScheduledTask task : registry.getAll()) {
+                assertThat(task.isEnabled()).isTrue();
+            }
+
+            context.close();
+
+            for (ManagedScheduledTask task : registry.getAll()) {
+                assertThat(task.isEnabled()).isFalse();
+            }
+        });
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
@@ -146,6 +167,10 @@ class ScheduledTaskManagementAutoConfigurationTest {
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();
         }
+
+        // simulation of schedule tasks
+        @Scheduled(fixedDelay = 10000)
+        public void someMockTask() {}
     }
 
     @TestConfiguration
