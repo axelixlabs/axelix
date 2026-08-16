@@ -232,6 +232,12 @@ It responds at `/api/actuator/prometheus` and does not require authentication.
 Attach common tags to every exported metric with `axelix.master.monitoring.prometheus.tags.<name>=<value>`, for example
 a deployment region or environment.
 
+:::warning
+Because the endpoint is unauthenticated, anyone who can reach Master over the network can read metric values and any
+configured common tags. Restrict `/api/actuator/prometheus` to trusted Prometheus infrastructure with a network
+policy, ingress rule, or an equivalent perimeter control.
+:::
+
 <div className={styles.ConfigTable}>
 
 | Property                                      | Default | Description                                                           |

@@ -87,4 +87,20 @@ class ActuatorPrometheusEndpointTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
+
+    @Nested
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @AutoConfigureTestRestTemplate
+    class WhenNotConfigured {
+
+        @Autowired
+        private TestRestTemplate restTemplate;
+
+        @Test
+        void actuatorPrometheusIsNotAvailableByDefault() {
+            ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/prometheus", String.class);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+    }
 }
