@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.monitoring;
+package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -29,27 +29,27 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.StandardEnvironment;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.monitoring.MonitoringAutoConfiguration.PROMETHEUS_MONITORING_PROPERTIES_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.MetricsAutoConfiguration.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link MonitoringAutoConfiguration}.
+ * Integration tests for {@link MetricsAutoConfiguration}.
  *
  * @author Dmitry Mazurov
  */
-class MonitoringAutoConfigurationTest {
+class MetricsAutoConfigurationTest {
 
     private static ApplicationContextRunner baselineContextRunner() {
-        return new ApplicationContextRunner(MonitoringAutoConfigurationTest::isolatedContext)
+        return new ApplicationContextRunner(MetricsAutoConfigurationTest::isolatedContext)
                 .withConfiguration(AutoConfigurations.of(
-                        ConfigurationPropertiesAutoConfiguration.class, MonitoringAutoConfiguration.class));
+                        ConfigurationPropertiesAutoConfiguration.class, MetricsAutoConfiguration.class));
     }
 
     @Test
     void shouldNotCreateCommonTagsCustomizerWhenPrometheusDisabled() {
         // given.
         ApplicationContextRunner contextRunner =
-                baselineContextRunner().withPropertyValues(PROMETHEUS_MONITORING_PROPERTIES_PREFIX + ".enabled=false");
+                baselineContextRunner().withPropertyValues(PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=false");
 
         // when.
         contextRunner.run(context -> {
@@ -63,8 +63,8 @@ class MonitoringAutoConfigurationTest {
         // given.
         ApplicationContextRunner contextRunner = baselineContextRunner()
                 .withPropertyValues(
-                        PROMETHEUS_MONITORING_PROPERTIES_PREFIX + ".enabled=true",
-                        PROMETHEUS_MONITORING_PROPERTIES_PREFIX + ".tags.region=eu-west-1");
+                        PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                        PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".tags.region=eu-west-1");
 
         // when.
         contextRunner.run(context -> {
@@ -87,7 +87,7 @@ class MonitoringAutoConfigurationTest {
     void shouldNotAddAnyTagsWhenNoTagsConfigured() {
         // given.
         ApplicationContextRunner contextRunner =
-                baselineContextRunner().withPropertyValues(PROMETHEUS_MONITORING_PROPERTIES_PREFIX + ".enabled=true");
+                baselineContextRunner().withPropertyValues(PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true");
 
         // when.
         contextRunner.run(context -> {

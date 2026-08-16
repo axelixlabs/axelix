@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.monitoring;
+package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
 import java.util.Map;
 
@@ -30,18 +30,18 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.MeterRegistryCu
 import org.springframework.context.annotation.Bean;
 
 /**
- * Monitoring/metrics related auto-configuration.
+ * Metrics related auto-configuration.
  *
  * @author Dmitry Mazurov
  */
 @AutoConfiguration
 @EnableConfigurationProperties(PrometheusProperties.class)
-public class MonitoringAutoConfiguration {
+public class MetricsAutoConfiguration {
 
-    public static final String PROMETHEUS_MONITORING_PROPERTIES_PREFIX = "axelix.master.monitoring.prometheus";
+    public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 
     @Bean
-    @ConditionalOnProperty(prefix = PROMETHEUS_MONITORING_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = PROMETHEUS_METRICS_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     public MeterRegistryCustomizer<MeterRegistry> prometheusCommonTagsCustomizer(
             PrometheusProperties prometheusProperties) {
         Map<String, String> tags = prometheusProperties.getTags();

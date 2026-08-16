@@ -7,4 +7,4 @@ com.axelixlabs.axelix.master.autoconfiguration.MemoryTransformerAutoConfiguratio
 com.axelixlabs.axelix.master.autoconfiguration.AxelixAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.database.PersistenceAutoConfiguration
-com.axelixlabs.axelix.master.autoconfiguration.monitoring.MonitoringAutoConfiguration
+com.axelixlabs.axelix.master.autoconfiguration.metrics.MetricsAutoConfiguration

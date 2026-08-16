@@ -230,17 +230,17 @@ Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.
 
 </div>
 
-### Мониторинг
+### Метрики
 
 #### Prometheus
 
 <UpcomingReleaseNotice />
 
 Master открывает эндпоинт для сбора метрик Prometheus, если включить его через
-`axelix.master.monitoring.prometheus.enabled=true`. Он отвечает по адресу `/api/actuator/prometheus` и не требует
+`axelix.master.metrics.prometheus.enabled=true`. Он отвечает по адресу `/api/actuator/prometheus` и не требует
 аутентификации.
 
-Добавляйте общие теги к каждой экспортируемой метрике через `axelix.master.monitoring.prometheus.tags.<name>=<value>`,
+Добавляйте общие теги к каждой экспортируемой метрике через `axelix.master.metrics.prometheus.tags.<name>=<value>`,
 например регион развёртывания или окружение.
 
 :::warning
@@ -253,15 +253,15 @@ Prometheus с помощью network policy, правил ingress или дру�
 
 | Свойство                                      | По умолчанию | Описание                                                                        |
 |------------------------------------------------|--------------|--------------------------------------------------------------------------------------|
-| `axelix.master.monitoring.prometheus.enabled` | `false`      | Открыть эндпоинт сбора метрик Prometheus по адресу `/api/actuator/prometheus`.  |
-| `axelix.master.monitoring.prometheus.tags`    | empty        | Общие теги, применяемые к каждой экспортируемой метрике.                       |
+| `axelix.master.metrics.prometheus.enabled` | `false`      | Открыть эндпоинт сбора метрик Prometheus по адресу `/api/actuator/prometheus`.  |
+| `axelix.master.metrics.prometheus.tags`    | empty        | Общие теги, применяемые к каждой экспортируемой метрике.                       |
 
 </div>
 
 ```yaml
 axelix:
   master:
-    monitoring:
+    metrics:
       prometheus:
         enabled: true
         tags:

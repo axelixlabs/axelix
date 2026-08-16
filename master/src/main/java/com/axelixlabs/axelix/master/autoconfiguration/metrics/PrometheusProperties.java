@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.monitoring;
+package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.monitoring.MonitoringAutoConfiguration.PROMETHEUS_MONITORING_PROPERTIES_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.MetricsAutoConfiguration.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 
 /**
  * The Prometheus related properties that are specific to Axelix Master.
  *
  * @author Dmitry Mazurov
  */
-@ConfigurationProperties(prefix = PROMETHEUS_MONITORING_PROPERTIES_PREFIX)
+@ConfigurationProperties(prefix = PROMETHEUS_METRICS_PROPERTIES_PREFIX)
 public class PrometheusProperties {
 
     /**

@@ -36,7 +36,7 @@ management:
   prometheus:
     metrics:
       export:
-        enabled: ${axelix.master.monitoring.prometheus.enabled:false}
+        enabled: ${axelix.master.metrics.prometheus.enabled:false}
 
 axelix:
   master:
@@ -44,7 +44,7 @@ axelix:
     logging:
       json:
         enabled: false
-    monitoring:
+    metrics:
       prometheus:
         enabled: false
         # tags:

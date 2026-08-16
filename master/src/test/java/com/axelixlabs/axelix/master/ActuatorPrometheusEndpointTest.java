@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies that the actuator prometheus endpoint on the master is available or absent depending on
- * {@code axelix.master.monitoring.prometheus.enabled}, without requiring authentication.
+ * {@code axelix.master.metrics.prometheus.enabled}, without requiring authentication.
  *
  * @author Dmitry Mazurov
  */
@@ -43,8 +43,8 @@ class ActuatorPrometheusEndpointTest {
     @SpringBootTest(
             webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
             properties = {
-                "axelix.master.monitoring.prometheus.enabled=true",
-                "axelix.master.monitoring.prometheus.tags.region=eu-west-1"
+                "axelix.master.metrics.prometheus.enabled=true",
+                "axelix.master.metrics.prometheus.tags.region=eu-west-1"
             })
     @AutoConfigureTestRestTemplate
     class WhenEnabled {
@@ -73,7 +73,7 @@ class ActuatorPrometheusEndpointTest {
     @Nested
     @SpringBootTest(
             webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-            properties = {"axelix.master.monitoring.prometheus.enabled=false"})
+            properties = {"axelix.master.metrics.prometheus.enabled=false"})
     @AutoConfigureTestRestTemplate
     class WhenDisabled {
 
