@@ -220,6 +220,37 @@ when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aw
 
 </div>
 
+### Monitoring
+
+#### Prometheus
+
+<UpcomingReleaseNotice />
+
+Master exposes a Prometheus scrape endpoint once you turn it on with `axelix.master.monitoring.prometheus.enabled=true`.
+It responds at `/api/actuator/prometheus` and does not require authentication.
+
+Attach common tags to every exported metric with `axelix.master.monitoring.prometheus.tags.<name>=<value>`, for example
+a deployment region or environment.
+
+<div className={styles.ConfigTable}>
+
+| Property                                      | Default | Description                                                           |
+|------------------------------------------------|---------|---------------------------------------------------------------------------|
+| `axelix.master.monitoring.prometheus.enabled` | `false` | Expose the Prometheus scrape endpoint at `/api/actuator/prometheus`.  |
+| `axelix.master.monitoring.prometheus.tags`    | empty   | Common tags applied to every exported metric.                         |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    monitoring:
+      prometheus:
+        enabled: true
+        tags:
+          region: eu-west-1
+```
+
 ## Run as a JAR
 
 Use this when you want the lightest possible runtime — a single process on a machine you already manage, no container

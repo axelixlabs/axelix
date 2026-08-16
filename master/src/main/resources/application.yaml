@@ -32,7 +32,11 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health" ]
+        include: [ "health", "prometheus"]
+  prometheus:
+    metrics:
+      export:
+        enabled: ${axelix.master.monitoring.prometheus.enabled:false}
 
 axelix:
   master:
@@ -40,6 +44,10 @@ axelix:
     logging:
       json:
         enabled: false
+    monitoring:
+      prometheus:
+        enabled: false
+        # tags:
     web:
       static-resources:
         location: classpath:/spa/
