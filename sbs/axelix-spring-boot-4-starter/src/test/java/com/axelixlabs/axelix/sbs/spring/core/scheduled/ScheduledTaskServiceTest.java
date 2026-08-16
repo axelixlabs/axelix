@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -55,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
@@ -266,6 +268,23 @@ class ScheduledTaskServiceTest {
         // then task exists and was executed
         taskRegistry.find(FIXED_RATE_TASK_ID_FOR_EXECUTE).orElseThrow();
         assertThat(fixedRateFlagForExecute).isTrue();
+    }
+
+    @Test // GH-1497
+    @DirtiesContext
+    void shouldCancelAllTasksAndClearRegistryWhenServiceCloses() {
+        Optional<ManagedScheduledTask> taskBefore = taskService.find(CRON_TASK_ID);
+        assertThat(taskBefore).isPresent();
+        assertThat(taskBefore.get().isEnabled()).isTrue();
+
+        ManagedScheduledTask managedTask = taskBefore.get();
+
+        taskService.close();
+
+        assertThat(managedTask.isEnabled()).isFalse();
+
+        Optional<ManagedScheduledTask> taskAfter = taskService.find(CRON_TASK_ID);
+        assertThat(taskAfter).isEmpty();
     }
 
     @TestConfiguration
