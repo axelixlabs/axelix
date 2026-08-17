@@ -21,11 +21,17 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "components";
-import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
-import { useAuthority, useConfirmableAction } from "hooks";
-import { EAuthorities, type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
-import { clearAllCachesData, getCachesData } from "services";
+import { EmptyHandler, Loader, NoRequiredAuthorityTooltip, PageSearch } from "@/components";
+import { extractErrorCode, fetchData, filterCacheManagers } from "@/helpers";
+import { useAuthority, useConfirmableAction } from "@/hooks";
+import {
+    EAuthorities,
+    type ICachesResponseBody,
+    type IErrorResponse,
+    StatefulRequest,
+    StatelessRequest,
+} from "@/models";
+import { clearAllCachesData, getCachesData } from "@/services";
 
 import { CacheManagerSection } from "./CacheManagerSection";
 import styles from "./styles.module.css";

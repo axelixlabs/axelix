@@ -17,8 +17,8 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { filterPropertySources } from "helpers";
-import type { IEnvironmentPropertySource } from "models";
+import { filterPropertySources } from "@/helpers";
+import type { IEnvironmentPropertySource } from "@/models";
 
 describe("Filter propertySources", () => {
     const propertySources: IEnvironmentPropertySource[] = [

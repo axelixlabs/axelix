@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IColorPallete } from "models";
+import type { IColorPallete } from "@/models";
 
 export const SEARCH_PARAMS_FILTER = "f";
 export const UNKNOWN_ERROR = "UNKNOWN_ERROR";

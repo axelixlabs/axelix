@@ -17,9 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { Accordion } from "components";
-import { splitCaches } from "helpers";
-import type { ICachesManager } from "models";
+import { Accordion } from "@/components";
+import { splitCaches } from "@/helpers";
+import type { ICachesManager } from "@/models";
 
 import { CacheAccordionBody } from "../CacheAccordionBody";
 import { SingleCacheHeader } from "../SingleCacheHeader";

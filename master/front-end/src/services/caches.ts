@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { apiFetch } from "api";
-import type { IClearCacheRequestData, IGetSingleCacheData, IUpdateCacheStatusRequestData } from "models";
+import { apiFetch } from "@/api";
+import type { IClearCacheRequestData, IGetSingleCacheData, IUpdateCacheStatusRequestData } from "@/models";
 
 export const getCachesData = (instanceId: string) => {
     return apiFetch.get(`caches/${instanceId}`);

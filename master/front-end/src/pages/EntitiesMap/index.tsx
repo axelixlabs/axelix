@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterEntities, isEntityProblematic } from "helpers";
-import { type EAssociationProblem, type IPersistenceInsights, StatefulRequest } from "models";
-import { getTransactionalData } from "services";
+import { EmptyHandler, Loader, PageSearch } from "@/components";
+import { fetchData, filterEntities, isEntityProblematic } from "@/helpers";
+import { type EAssociationProblem, type IPersistenceInsights, StatefulRequest } from "@/models";
+import { getTransactionalData } from "@/services";
 
 import { AssociationProblemFilter } from "./AssociationProblemFilter";
 import { CleanState } from "./CleanState";

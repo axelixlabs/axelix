@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import accordionStyles from "components/Accordion/styles.module.css";
 import type { MouseEvent } from "react";
 
-import { EThreadState, type IColorPallete, type IThread, type IThreadGroup } from "models";
-import { THREAD_DUMP_SLIDING_WINDOW_MS, TIMELINE_SEGMENT_INTERVAL_MS, colorPalette } from "utils";
+import accordionStyles from "@/components/Accordion/styles.module.css";
+import { EThreadState, type IColorPallete, type IThread, type IThreadGroup } from "@/models";
+import { THREAD_DUMP_SLIDING_WINDOW_MS, TIMELINE_SEGMENT_INTERVAL_MS, colorPalette } from "@/utils";
 
 export const getThreadStateColor = (threadDump: IThread): IColorPallete => {
     const { threadState, inNative, suspended } = threadDump;

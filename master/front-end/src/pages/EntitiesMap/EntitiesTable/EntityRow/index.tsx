@@ -17,9 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { Accordion } from "components";
-import { groupEntityProblems } from "helpers";
-import type { IMappedEntity } from "models";
+import { Accordion } from "@/components";
+import { groupEntityProblems } from "@/helpers";
+import type { IMappedEntity } from "@/models";
 
 import { AssociationProblemChip } from "../../AssociationProblemChip";
 

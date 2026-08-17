@@ -17,10 +17,10 @@
  */
 import { useEffect, useState } from "react";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData, filterUsers } from "helpers";
-import { type IUser, type IUsersFilters, StatefulRequest } from "models";
-import { getUsers } from "services";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, filterUsers } from "@/helpers";
+import { type IUser, type IUsersFilters, StatefulRequest } from "@/models";
+import { getUsers } from "@/services";
 
 import { UsersFirstSection } from "./UsersFirstSection";
 import { UsersTable } from "./UsersTable";

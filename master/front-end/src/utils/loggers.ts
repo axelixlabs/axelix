@@ -18,7 +18,7 @@
 import type { TabsProps } from "antd";
 import type { TFunction } from "i18next";
 
-import { ELoggersTabs, type IColorPallete } from "models";
+import { ELoggersTabs, type IColorPallete } from "@/models";
 
 import { colorPalette } from "./globals";
 

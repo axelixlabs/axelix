@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import accordionStyles from "components/Accordion/styles.module.css";
 import { type PropsWithChildren, useEffect } from "react";
 import { useLocation } from "react-router";
+
+import accordionStyles from "@/components/Accordion/styles.module.css";
 
 interface IProps {
     /**

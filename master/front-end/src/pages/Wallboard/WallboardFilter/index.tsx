@@ -20,9 +20,9 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { SetURLSearchParams } from "react-router";
 
-import { createWallboardFilterId, createWallboardFilterSearchParam } from "helpers";
-import type { IInstanceCard, IWallboardLocalFilterBuilder, IWallboardSingleOperandFilter } from "models";
-import { SEARCH_PARAMS_FILTER, filteringKeys, getWallboardFilterDefinitions } from "utils";
+import { createWallboardFilterId, createWallboardFilterSearchParam } from "@/helpers";
+import type { IInstanceCard, IWallboardLocalFilterBuilder, IWallboardSingleOperandFilter } from "@/models";
+import { SEARCH_PARAMS_FILTER, filteringKeys, getWallboardFilterDefinitions } from "@/utils";
 
 import styles from "./styles.module.css";
 

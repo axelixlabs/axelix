@@ -17,8 +17,8 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { timepickerDataConvertToSeconds } from "helpers";
-import { ETimepickerHourCycle } from "models";
+import { timepickerDataConvertToSeconds } from "@/helpers";
+import { ETimepickerHourCycle } from "@/models";
 
 const HOUR_IN_SECONDS = 60 * 60;
 const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;

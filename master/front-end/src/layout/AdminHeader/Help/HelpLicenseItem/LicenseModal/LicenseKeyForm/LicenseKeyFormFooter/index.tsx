@@ -19,10 +19,10 @@ import { App, Button } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useAppDispatch } from "hooks";
-import type { ELicenseFormType } from "models";
-import { enterLicenseKey, getAxelixSettings } from "services";
-import { setAxelixSettings } from "store/slices";
+import { useAppDispatch } from "@/hooks";
+import type { ELicenseFormType } from "@/models";
+import { enterLicenseKey, getAxelixSettings } from "@/services";
+import { setAxelixSettings } from "@/store/slices";
 
 import { UploadLicenseKeyFile } from "./UploadLicenseKeyFile";
 import styles from "./styles.module.css";

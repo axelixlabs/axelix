@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData, getEffectiveBeans } from "helpers";
-import { type IBeansResponseBody, StatefulRequest } from "models";
-import { getBeansData } from "services";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, getEffectiveBeans } from "@/helpers";
+import { type IBeansResponseBody, StatefulRequest } from "@/models";
+import { getBeansData } from "@/services";
 
 import { BeansAccordionsList } from "./BeansAccordionsList";
 import { BeansFirstSection } from "./BeansFirstSection";

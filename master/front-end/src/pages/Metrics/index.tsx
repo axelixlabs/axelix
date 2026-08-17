@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { Accordion, EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterMetrics, findMetricsCount, metricsAutocompleteOptions } from "helpers";
-import { type IMetricsResponseBody, StatefulRequest } from "models";
-import { getMetricsData } from "services";
+import { Accordion, EmptyHandler, Loader, PageSearch } from "@/components";
+import { fetchData, filterMetrics, findMetricsCount, metricsAutocompleteOptions } from "@/helpers";
+import { type IMetricsResponseBody, StatefulRequest } from "@/models";
+import { getMetricsData } from "@/services";
 
 import { MetricBody } from "./MetricBody";
 import { MetricHeader } from "./MetricHeader";

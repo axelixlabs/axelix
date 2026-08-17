@@ -19,15 +19,14 @@ import { Button } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { useAuthority } from "hooks";
-import { EAuthorities, type IGCLoggingStatusResponseBody } from "models";
+import { InfoIcon, OnOffIcon } from "@/assets";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, type IGCLoggingStatusResponseBody } from "@/models";
 
 import { GCLogEnableSettings } from "../GCLogEnableSettings";
 
 import styles from "./styles.module.css";
-
-import { InfoIcon, OnOffIcon } from "assets";
 
 interface IProps {
     /**

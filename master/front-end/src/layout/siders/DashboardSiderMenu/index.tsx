@@ -18,7 +18,7 @@
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router";
 
-import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "models";
+import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "@/models";
 
 import styles from "./styles.module.css";
 

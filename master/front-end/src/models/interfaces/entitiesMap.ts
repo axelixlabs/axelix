@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EAssociationProblem } from "models";
+import type { EAssociationProblem } from "@/models";
 
 /**
  * A single JPA association, identified by the entity that declares it and the field that maps it.

@@ -18,8 +18,8 @@
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 
-import type { ILicensing } from "models";
-import { IS_ENTERPRISE_FLAG } from "utils";
+import type { ILicensing } from "@/models";
+import { IS_ENTERPRISE_FLAG } from "@/utils";
 
 export const isEnterpriseLicense = (licensing: ILicensing): boolean => licensing.license === IS_ENTERPRISE_FLAG;
 

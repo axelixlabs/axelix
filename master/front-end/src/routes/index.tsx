@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router";
 
-import { getCookie } from "helpers";
-import { useAppDispatch } from "hooks";
-import { getAxelixSettings } from "services";
-import { setAxelixSettings } from "store/slices";
+import { getCookie } from "@/helpers";
+import { useAppDispatch } from "@/hooks";
+import { getAxelixSettings } from "@/services";
+import { setAxelixSettings } from "@/store/slices";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";

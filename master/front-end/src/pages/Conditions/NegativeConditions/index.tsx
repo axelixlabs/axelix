@@ -17,8 +17,8 @@
  */
 import { Fragment } from "react/jsx-runtime";
 
-import { Copy } from "components";
-import { EConditionStatus, type IConditionBeanNegative } from "models";
+import { Copy } from "@/components";
+import { EConditionStatus, type IConditionBeanNegative } from "@/models";
 
 import { ConditionsAccordionEntry } from "../ConditionAccordionEntry";
 import styles from "../styles.module.css";

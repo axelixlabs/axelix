@@ -17,9 +17,9 @@
  */
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { createWallboardFilterId, parseWallboardFilters, removeFilterById, semVerMatch } from "helpers";
-import { EWallboardFilterKey, EWallboardFilterOperator, type IWallboardSingleOperandFilter } from "models";
-import { SEARCH_PARAMS_FILTER } from "utils";
+import { createWallboardFilterId, parseWallboardFilters, removeFilterById, semVerMatch } from "@/helpers";
+import { EWallboardFilterKey, EWallboardFilterOperator, type IWallboardSingleOperandFilter } from "@/models";
+import { SEARCH_PARAMS_FILTER } from "@/utils";
 
 const createFilter = (operator: EWallboardFilterOperator, operand: string): IWallboardSingleOperandFilter => ({
     id: "test-filter",

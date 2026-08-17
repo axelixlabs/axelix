@@ -18,11 +18,10 @@
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
-import type { IEnvProperty } from "models";
+import { CrownIcon } from "@/assets";
+import type { IEnvProperty } from "@/models";
 
 import styles from "./styles.module.css";
-
-import { CrownIcon } from "assets";
 
 interface IProps {
     /**

@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 import { Cell, Label, Legend, Pie, PieChart, Tooltip } from "recharts";
 
-import { prepareHealthStatusesChartData } from "helpers";
+import { prepareHealthStatusesChartData } from "@/helpers";
 
 import styles from "./styles.module.css";
 

@@ -18,8 +18,8 @@
 import { useTranslation } from "react-i18next";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { buildChartData, cacheHitsMissesChartToFormattedTime, getTimelineInterval } from "helpers";
-import type { IGetSingleCacheResponseBody } from "models";
+import { buildChartData, cacheHitsMissesChartToFormattedTime, getTimelineInterval } from "@/helpers";
+import type { IGetSingleCacheResponseBody } from "@/models";
 
 import { CacheChartStats } from "../../CacheChartStats";
 

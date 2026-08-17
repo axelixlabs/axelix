@@ -19,12 +19,11 @@ import { Tag } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router";
 
-import { PageSearch } from "components";
-import { getBeanShortName } from "helpers";
+import { CloseIcon } from "@/assets";
+import { PageSearch } from "@/components";
+import { getBeanShortName } from "@/helpers";
 
 import styles from "./styles.module.css";
-
-import { CloseIcon } from "assets";
 
 interface IProps {
     /**

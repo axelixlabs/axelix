@@ -21,16 +21,15 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { TooltipWithCopy } from "components";
-import type { ILogger, TChangeLoggerLevel } from "models";
-import { resetLogger, setLoggerLevel } from "services";
+import { ResetIcon } from "@/assets";
+import { TooltipWithCopy } from "@/components";
+import type { ILogger, TChangeLoggerLevel } from "@/models";
+import { resetLogger, setLoggerLevel } from "@/services";
 
 import { Levels } from "../Levels";
 
 import { LoggerScheduler } from "./LoggerScheduler";
 import styles from "./styles.module.css";
-
-import { ResetIcon } from "assets";
 
 interface IProps {
     /**

@@ -17,12 +17,11 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { HintTooltip } from "components";
-import type { ILicenseFunction } from "models";
+import { GoldCrownIcon } from "@/assets";
+import { HintTooltip } from "@/components";
+import type { ILicenseFunction } from "@/models";
 
 import styles from "./styles.module.css";
-
-import { GoldCrownIcon } from "assets";
 
 interface IProps {
     functions: ILicenseFunction[];

@@ -18,11 +18,10 @@
 import { Popover, Tag } from "antd";
 import { Fragment } from "react";
 
-import type { IMCPAnnotation } from "models";
+import { BurgerIcon } from "@/assets";
+import type { IMCPAnnotation } from "@/models";
 
 import styles from "./styles.module.css";
-
-import { BurgerIcon } from "assets";
 
 interface IProps {
     /**

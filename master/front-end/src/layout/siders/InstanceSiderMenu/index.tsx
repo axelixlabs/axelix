@@ -19,8 +19,8 @@ import { Menu } from "antd";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
-import { findOpenInstanceKeys } from "helpers";
-import { getInstanceItems } from "utils";
+import { findOpenInstanceKeys } from "@/helpers";
+import { getInstanceItems } from "@/utils";
 
 import styles from "./styles.module.css";
 

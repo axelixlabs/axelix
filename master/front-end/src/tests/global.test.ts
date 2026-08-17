@@ -17,8 +17,8 @@
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { canonicalize, getCookie, parseAuthorities } from "helpers";
-import { EAuthorities } from "models";
+import { canonicalize, getCookie, parseAuthorities } from "@/helpers";
+import { EAuthorities } from "@/models";
 
 describe("Canonicalize", () => {
     it("Converts a string to lowercase", () => {

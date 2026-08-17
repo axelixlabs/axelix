@@ -21,11 +21,11 @@ import { App, Button, Form, Select } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { UserRoleTags } from "components";
-import { emptyStringToNull, extractErrorCode } from "helpers";
-import { ERoles, type IEditUserRequestData, type IEditableUser, StatelessRequest } from "models";
-import { editUser } from "services";
-import { roleOptions } from "utils";
+import { UserRoleTags } from "@/components";
+import { emptyStringToNull, extractErrorCode } from "@/helpers";
+import { ERoles, type IEditUserRequestData, type IEditableUser, StatelessRequest } from "@/models";
+import { editUser } from "@/services";
+import { roleOptions } from "@/utils";
 
 import styles from "./styles.module.css";
 

@@ -17,14 +17,13 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IEditableUser, IUser } from "models";
+import { EmailIcon, LockOutlinedIcon, ProfileIcon, ShieldIcon } from "@/assets";
+import type { IEditableUser, IUser } from "@/models";
 
 import { EditableValue } from "../EditableValue";
 import { RolesSelect } from "../RolesSelect";
 
 import styles from "./styles.module.css";
-
-import { EmailIcon, LockOutlinedIcon, ProfileIcon, ShieldIcon } from "assets";
 
 interface IProps {
     /**

@@ -15,6 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IDetailsBuild, IDetailsGit, IDetailsOS, IDetailsRuntime, IDetailsSpring } from "models";
+import type { IDetailsBuild, IDetailsGit, IDetailsOS, IDetailsRuntime, IDetailsSpring } from "@/models";
 
 export type DetailsBuildValuesData = IDetailsGit | IDetailsBuild | IDetailsSpring | IDetailsRuntime | IDetailsOS;

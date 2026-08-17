@@ -18,8 +18,6 @@
 import type { TFunction } from "i18next";
 import { Link } from "react-router";
 
-import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "models";
-
 import {
     BeansIcon,
     CachesIcon,
@@ -37,7 +35,8 @@ import {
     SpringIcon,
     ThreadDumpIcon,
     TransactionIcon,
-} from "assets";
+} from "@/assets";
+import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "@/models";
 
 const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
     return items.map(({ path, icon, label }) => ({

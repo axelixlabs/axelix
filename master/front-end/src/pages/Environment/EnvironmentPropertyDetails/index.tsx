@@ -18,13 +18,12 @@
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 
-import { StyledLink } from "components";
-import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "helpers";
-import type { IEnvProperty } from "models";
+import { LinkIcon } from "@/assets";
+import { StyledLink } from "@/components";
+import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "@/helpers";
+import type { IEnvProperty } from "@/models";
 
 import styles from "./styles.module.css";
-
-import { LinkIcon } from "assets";
 
 interface IProps {
     /**

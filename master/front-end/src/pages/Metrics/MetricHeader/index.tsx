@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { InfoTooltip } from "components";
-import type { IMetric } from "models";
+import { InfoTooltip } from "@/components";
+import type { IMetric } from "@/models";
 
 import styles from "./styles.module.css";
 

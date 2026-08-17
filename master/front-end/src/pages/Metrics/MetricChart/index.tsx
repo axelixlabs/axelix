@@ -27,9 +27,9 @@ import {
     YAxis,
 } from "recharts";
 
-import { getMetricsChartTicks, reduceDisplayedNumber, toFormattedTime } from "helpers";
-import type { IMeasurementsWithTimestamp } from "models";
-import { METRIC_SLIDING_WINDOW_MS } from "utils";
+import { getMetricsChartTicks, reduceDisplayedNumber, toFormattedTime } from "@/helpers";
+import type { IMeasurementsWithTimestamp } from "@/models";
+import { METRIC_SLIDING_WINDOW_MS } from "@/utils";
 
 import styles from "./styles.module.css";
 

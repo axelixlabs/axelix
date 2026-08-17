@@ -19,9 +19,9 @@ import { Tooltip } from "antd";
 import type { TooltipPlacement } from "antd/es/tooltip";
 import type { PropsWithChildren } from "react";
 
-import styles from "./styles.module.css";
+import { InfoIcon, QuestionIcon } from "@/assets";
 
-import { InfoIcon, QuestionIcon } from "assets";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**

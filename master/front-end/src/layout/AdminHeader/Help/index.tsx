@@ -21,11 +21,11 @@ import { Dropdown, type MenuProps } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { ArrowIcon, InfoIcon, LicenseIcon } from "@/assets";
+
 import { HelpAboutItem } from "./HelpAboutItem";
 import { HelpLicenseItem } from "./HelpLicenseItem";
 import styles from "./styles.module.css";
-
-import { ArrowIcon, InfoIcon, LicenseIcon } from "assets";
 
 export const Help = () => {
     const { t } = useTranslation();

@@ -18,32 +18,32 @@
 import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
-import Loadable from "components";
-import { useAppSelector } from "hooks";
-import { MainLayout } from "layout";
-import { DashboardSiderMenu } from "layout/siders";
+import Loadable from "@/components";
+import { useAppSelector } from "@/hooks";
+import { MainLayout } from "@/layout";
+import { DashboardSiderMenu } from "@/layout/siders";
 
-const DashboardSpringFramework = Loadable(lazy(() => import("pages/Dashboard/DashboardSpringFramework")));
-const DashboardPersistence = Loadable(lazy(() => import("pages/Dashboard/DashboardPersistence")));
-const DashboardOverview = Loadable(lazy(() => import("pages/Dashboard/DashboardOverview")));
-const DashboardJava = Loadable(lazy(() => import("pages/Dashboard/DashboardJava")));
-const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
-const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
-const Transactional = Loadable(lazy(() => import("pages/Transactional")));
-const EntitiesMap = Loadable(lazy(() => import("pages/EntitiesMap")));
-const Environment = Loadable(lazy(() => import("pages/Environment")));
-const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
-const UserProfile = Loadable(lazy(() => import("pages/UserProfile")));
-const Conditions = Loadable(lazy(() => import("pages/Conditions")));
-const ThreadDump = Loadable(lazy(() => import("pages/ThreadDump")));
-const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
-const Loggers = Loadable(lazy(() => import("pages/Loggers")));
-const Details = Loadable(lazy(() => import("pages/Details")));
-const Metrics = Loadable(lazy(() => import("pages/Metrics")));
-const Caches = Loadable(lazy(() => import("pages/Caches")));
-const Beans = Loadable(lazy(() => import("pages/Beans")));
-const Users = Loadable(lazy(() => import("pages/Users")));
-const MCP = Loadable(lazy(() => import("pages/MCP")));
+const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
+const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
+const DashboardOverview = Loadable(lazy(() => import("@/pages/Dashboard/DashboardOverview")));
+const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
+const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
+const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
+const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
+const EntitiesMap = Loadable(lazy(() => import("@/pages/EntitiesMap")));
+const Environment = Loadable(lazy(() => import("@/pages/Environment")));
+const ConfigProps = Loadable(lazy(() => import("@/pages/ConfigProps")));
+const UserProfile = Loadable(lazy(() => import("@/pages/UserProfile")));
+const Conditions = Loadable(lazy(() => import("@/pages/Conditions")));
+const ThreadDump = Loadable(lazy(() => import("@/pages/ThreadDump")));
+const Wallboard = Loadable(lazy(() => import("@/pages/Wallboard")));
+const Loggers = Loadable(lazy(() => import("@/pages/Loggers")));
+const Details = Loadable(lazy(() => import("@/pages/Details")));
+const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
+const Caches = Loadable(lazy(() => import("@/pages/Caches")));
+const Beans = Loadable(lazy(() => import("@/pages/Beans")));
+const Users = Loadable(lazy(() => import("@/pages/Users")));
+const MCP = Loadable(lazy(() => import("@/pages/MCP")));
 
 export const MainRoutes = () => {
     const settings = useAppSelector((state) => state.settings);

@@ -22,9 +22,9 @@ import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { extractErrorCode } from "helpers";
-import { type IErrorResponse, StatelessRequest } from "models";
-import { logout } from "services";
+import { extractErrorCode } from "@/helpers";
+import { type IErrorResponse, StatelessRequest } from "@/models";
+import { logout } from "@/services";
 
 import styles from "./styles.module.css";
 

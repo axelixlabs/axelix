@@ -19,11 +19,10 @@ import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
-import { EInstanceStatus, type IInstanceCard } from "models";
+import { QuestionIcon } from "@/assets";
+import { EInstanceStatus, type IInstanceCard } from "@/models";
 
 import styles from "./styles.module.css";
-
-import { QuestionIcon } from "assets";
 
 interface IProps {
     /**

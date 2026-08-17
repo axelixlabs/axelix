@@ -19,9 +19,9 @@ import { Tooltip } from "antd";
 import type { HTMLAttributes, PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
+import { InfoIcon } from "@/assets";
 
-import { InfoIcon } from "assets";
+import styles from "./styles.module.css";
 
 interface IProps extends HTMLAttributes<HTMLSpanElement> {
     /**

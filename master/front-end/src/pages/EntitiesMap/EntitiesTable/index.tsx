@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler } from "components";
-import type { IMappedEntity } from "models";
+import { EmptyHandler } from "@/components";
+import type { IMappedEntity } from "@/models";
 
 import { EntityRow } from "./EntityRow";
 import styles from "./styles.module.css";

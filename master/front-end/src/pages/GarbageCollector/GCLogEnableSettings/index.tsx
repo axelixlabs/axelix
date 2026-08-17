@@ -21,11 +21,11 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { UniversalModal } from "components";
-import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type IGCLoggingStatusResponseBody, StatelessRequest } from "models";
-import { enableGCLogging } from "services";
-import { getLevelsSelectData } from "utils";
+import { UniversalModal } from "@/components";
+import { extractErrorCode } from "@/helpers";
+import { type IErrorResponse, type IGCLoggingStatusResponseBody, StatelessRequest } from "@/models";
+import { enableGCLogging } from "@/services";
+import { getLevelsSelectData } from "@/utils";
 
 import styles from "./styles.module.css";
 

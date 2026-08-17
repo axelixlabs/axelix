@@ -18,7 +18,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { UniversalModal } from "components";
+import { UniversalModal } from "@/components";
 
 import { ContentionMonitoringStatusSwitch } from "./ContentionMonitoringStatusSwitch";
 import styles from "./styles.module.css";

@@ -21,10 +21,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterScheduledTasks, isEmpty } from "helpers";
-import { type IScheduledTasksResponseBody, StatefulRequest } from "models";
-import { getScheduledTasksData } from "services";
+import { EmptyHandler, Loader, PageSearch } from "@/components";
+import { fetchData, filterScheduledTasks, isEmpty } from "@/helpers";
+import { type IScheduledTasksResponseBody, StatefulRequest } from "@/models";
+import { getScheduledTasksData } from "@/services";
 
 const ScheduledTasks = () => {
     const { instanceId } = useParams();

@@ -17,9 +17,9 @@
  */
 import { useState } from "react";
 
-import { EmptyHandler, PageSearch } from "components";
-import { buildAutoCompleteOptions, filterPropertySources, getPropertiesCount } from "helpers";
-import type { IEnvironmentPropertySource } from "models";
+import { EmptyHandler, PageSearch } from "@/components";
+import { buildAutoCompleteOptions, filterPropertySources, getPropertiesCount } from "@/helpers";
+import type { IEnvironmentPropertySource } from "@/models";
 
 import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
 

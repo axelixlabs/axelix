@@ -18,12 +18,11 @@
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
-import type { TChangeLoggerLevel } from "models";
-import { loggersColors } from "utils";
+import { ClockIcon, TargetIcon } from "@/assets";
+import type { TChangeLoggerLevel } from "@/models";
+import { loggersColors } from "@/utils";
 
 import styles from "./styles.module.css";
-
-import { ClockIcon, TargetIcon } from "assets";
 
 interface IProps {
     /**

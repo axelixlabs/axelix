@@ -19,7 +19,7 @@ import { Layout } from "antd";
 import type { JSX } from "react";
 import { Outlet } from "react-router";
 
-import { AccessProvider } from "components";
+import { AccessProvider } from "@/components";
 
 import { AdminHeader } from "./AdminHeader";
 import { InstanceSiderMenu } from "./siders";

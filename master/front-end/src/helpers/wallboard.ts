@@ -23,8 +23,8 @@ import {
     type IInstanceCard,
     type IWallboardSingleOperandFilter,
     type WallboardParsedFilter,
-} from "models";
-import { SEARCH_PARAMS_FILTER, getWallboardFilterDefinitions } from "utils";
+} from "@/models";
+import { SEARCH_PARAMS_FILTER, getWallboardFilterDefinitions } from "@/utils";
 
 export const getAllJavaVersions = (instances: IInstanceCard[]): string[] => {
     const allVersions = new Set<string>();

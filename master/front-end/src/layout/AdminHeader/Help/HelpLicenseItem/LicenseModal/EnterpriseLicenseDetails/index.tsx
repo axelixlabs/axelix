@@ -19,8 +19,8 @@ import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getTimeLeftText } from "helpers/license";
-import { ELicenseFormType, type ILicensing } from "models";
+import { getTimeLeftText } from "@/helpers";
+import { ELicenseFormType, type ILicensing } from "@/models";
 
 import { LicenseBadge } from "../../LicenseBadge";
 import { LicenseFunctions } from "../LicenseFunctions";

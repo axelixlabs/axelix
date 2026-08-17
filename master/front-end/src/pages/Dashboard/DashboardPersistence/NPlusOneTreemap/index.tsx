@@ -19,8 +19,8 @@ import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 
-import { DashboardCard } from "components";
-import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity } from "models";
+import { DashboardCard } from "@/components";
+import type { IDashboardPersistenceStatsData, IDashboardTreemapEntity } from "@/models";
 
 import { DashboardPersistenceLegend } from "../DashboardPersistenceLegend";
 import { DashboardPersistenceStats } from "../DashboardPersistenceStats";

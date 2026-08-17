@@ -21,13 +21,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { extractErrorCode } from "helpers";
-import { useAuthority, useConfirmableAction } from "hooks";
-import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
-import { forceRunTask } from "services";
-
-import { RunIcon } from "assets";
+import { RunIcon } from "@/assets";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { extractErrorCode } from "@/helpers";
+import { useAuthority, useConfirmableAction } from "@/hooks";
+import { EAuthorities, type IErrorResponse, StatelessRequest } from "@/models";
+import { forceRunTask } from "@/services";
 
 interface IProps {
     /**

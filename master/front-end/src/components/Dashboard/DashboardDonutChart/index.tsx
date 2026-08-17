@@ -17,8 +17,8 @@
  */
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-import { DashboardCard } from "components";
-import type { IChartData } from "models";
+import { DashboardCard } from "@/components";
+import type { IChartData } from "@/models";
 
 import { DashboardChartTooltip } from "./DashboardChartTooltip";
 import { DashboardDonutCentre } from "./DashboardDonutCentre";

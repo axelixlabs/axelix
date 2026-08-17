@@ -19,8 +19,8 @@ import { Alert } from "antd";
 import dayjs from "dayjs";
 import { Trans, useTranslation } from "react-i18next";
 
-import type { IAlertConfigItem, TLicenseCheckResponseBody } from "models";
-import { ISO_DATE_FORMAT, LICENSE_KEY_VALID_FLAG } from "utils";
+import type { IAlertConfigItem, TLicenseCheckResponseBody } from "@/models";
+import { ISO_DATE_FORMAT, LICENSE_KEY_VALID_FLAG } from "@/utils";
 
 import styles from "./styles.module.css";
 

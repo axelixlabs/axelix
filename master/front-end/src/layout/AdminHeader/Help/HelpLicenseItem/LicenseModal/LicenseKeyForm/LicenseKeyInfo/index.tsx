@@ -18,8 +18,8 @@
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
-import type { ILicensing } from "models";
-import { ISO_DATE_FORMAT } from "utils";
+import type { ILicensing } from "@/models";
+import { ISO_DATE_FORMAT } from "@/utils";
 
 import styles from "./styles.module.css";
 

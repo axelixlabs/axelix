@@ -19,9 +19,9 @@ import { App } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getCookie, parseAuthorities } from "helpers";
-import { useAppDispatch } from "hooks";
-import { setAuthorities } from "store/slices";
+import { getCookie, parseAuthorities } from "@/helpers";
+import { useAppDispatch } from "@/hooks";
+import { setAuthorities } from "@/store/slices";
 
 export const AccessProvider = () => {
     const { t } = useTranslation();

@@ -19,8 +19,8 @@ import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { ELicenseFormType, type ILicensing } from "models";
-import { LGPL_LINK } from "utils";
+import { ELicenseFormType, type ILicensing } from "@/models";
+import { LGPL_LINK } from "@/utils";
 
 import { LicenseBadge } from "../../LicenseBadge";
 import { LicenseFunctions } from "../LicenseFunctions";

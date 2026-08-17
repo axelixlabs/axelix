@@ -21,7 +21,7 @@ import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { UniversalModal } from "components";
+import { UniversalModal } from "@/components";
 
 import styles from "./styles.module.css";
 

@@ -17,9 +17,9 @@
  */
 import type { Dispatch, SetStateAction } from "react";
 
-import { getThreadStateColor } from "helpers";
-import type { IThread, IThreadGroup } from "models";
-import { threadDumpStateLetters } from "utils";
+import { getThreadStateColor } from "@/helpers";
+import type { IThread, IThreadGroup } from "@/models";
+import { threadDumpStateLetters } from "@/utils";
 
 import { ThreadTimeLine } from "../ThreadTimeLine";
 

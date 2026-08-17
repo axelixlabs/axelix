@@ -18,9 +18,9 @@
 import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
-import Loadable from "components";
+import Loadable from "@/components";
 
-const Login = Loadable(lazy(() => import("pages/Login")));
+const Login = Loadable(lazy(() => import("@/pages/Login")));
 
 export const AuthRoutes = () => {
     return (

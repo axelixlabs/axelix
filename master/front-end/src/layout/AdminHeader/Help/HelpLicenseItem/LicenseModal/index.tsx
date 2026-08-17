@@ -17,9 +17,9 @@
  */
 import { type Dispatch, type SetStateAction, useState } from "react";
 
-import { UniversalModal } from "components";
-import { isEnterpriseLicense } from "helpers/license";
-import { ELicenseFormType, type ILicensing } from "models";
+import { UniversalModal } from "@/components";
+import { isEnterpriseLicense } from "@/helpers/license";
+import { ELicenseFormType, type ILicensing } from "@/models";
 
 import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
 import { EnterLicenseKeyForm } from "./LicenseKeyForm";

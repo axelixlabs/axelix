@@ -30,6 +30,8 @@ export * from "./metrics";
 export * from "./globals";
 export * from "./details";
 export * from "./loggers";
+export * from "./license";
 export * from "./caches";
 export * from "./beans";
 export * from "./users";
+export * from "./mcp";

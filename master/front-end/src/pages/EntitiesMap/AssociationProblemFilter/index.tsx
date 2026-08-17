@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { EAssociationProblem } from "models";
-import { ASSOCIATION_PROBLEM_ORDER, associationProblemClassToken, associationProblemLabelKey } from "utils";
+import type { EAssociationProblem } from "@/models";
+import { ASSOCIATION_PROBLEM_ORDER, associationProblemClassToken, associationProblemLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 

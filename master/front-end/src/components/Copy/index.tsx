@@ -19,9 +19,9 @@ import { App } from "antd";
 import { type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
+import { CopyIcon } from "@/assets";
 
-import { CopyIcon } from "assets";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**

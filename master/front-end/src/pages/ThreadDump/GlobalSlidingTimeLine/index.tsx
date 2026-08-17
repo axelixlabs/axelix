@@ -17,8 +17,8 @@
  */
 import { useEffect, useState } from "react";
 
-import { generateTimeSlots } from "helpers";
-import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
+import { generateTimeSlots } from "@/helpers";
+import { THREAD_DUMP_SLIDING_WINDOW_MS } from "@/utils";
 
 import styles from "./styles.module.css";
 

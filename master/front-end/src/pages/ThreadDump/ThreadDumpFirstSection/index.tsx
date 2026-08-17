@@ -18,14 +18,13 @@
 import { Button } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 
-import { PageSearch } from "components";
+import { SettingsIcon } from "@/assets";
+import { PageSearch } from "@/components";
 
 import { GlobalSlidingTimeLine } from "../GlobalSlidingTimeLine";
 import { ThreadDumpSettingsModal } from "../ThreadDumpSettingsModal";
 
 import styles from "./styles.module.css";
-
-import { SettingsIcon } from "assets";
 
 interface IProps {
     /**

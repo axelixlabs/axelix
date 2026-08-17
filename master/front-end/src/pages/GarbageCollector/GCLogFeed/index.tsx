@@ -18,9 +18,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { fetchData } from "helpers";
-import { StatefulRequest } from "models";
-import { getGCLogFile } from "services";
+import { fetchData } from "@/helpers";
+import { StatefulRequest } from "@/models";
+import { getGCLogFile } from "@/services";
 
 export const GCLogFeed = () => {
     const { instanceId } = useParams();

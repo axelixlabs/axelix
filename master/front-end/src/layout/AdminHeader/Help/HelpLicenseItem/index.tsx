@@ -18,8 +18,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { isEnterpriseLicense } from "helpers/license";
-import { useAppSelector } from "hooks";
+import { isEnterpriseLicense } from "@/helpers";
+import { useAppSelector } from "@/hooks";
 
 import { LicenseBadge } from "./LicenseBadge";
 import { LicenseModal } from "./LicenseModal";

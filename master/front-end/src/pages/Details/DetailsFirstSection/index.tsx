@@ -20,14 +20,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { Loader, UniversalModal } from "components";
-import { downloadFile } from "helpers";
-import { EExportableComponent } from "models";
-import { exportStateData } from "services";
+import { DownloadIcon } from "@/assets";
+import { Loader, UniversalModal } from "@/components";
+import { downloadFile } from "@/helpers";
+import { EExportableComponent } from "@/models";
+import { exportStateData } from "@/services";
 
 import styles from "./styles.module.css";
-
-import { DownloadIcon } from "assets";
 
 interface IProps {
     /**

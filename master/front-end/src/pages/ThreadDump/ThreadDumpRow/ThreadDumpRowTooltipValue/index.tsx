@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { InfoTooltip } from "components";
+import { InfoTooltip } from "@/components";
 
 import styles from "./styles.module.css";
 

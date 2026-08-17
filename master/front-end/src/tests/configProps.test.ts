@@ -17,8 +17,8 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { filterConfigPropsBeans } from "helpers";
-import type { IConfigPropsBean } from "models";
+import { filterConfigPropsBeans } from "@/helpers";
+import type { IConfigPropsBean } from "@/models";
 
 describe("Filter configProps", () => {
     const beans: IConfigPropsBean[] = [

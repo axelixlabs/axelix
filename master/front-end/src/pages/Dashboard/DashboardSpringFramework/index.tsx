@@ -18,11 +18,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "models";
-import { getDashboardSpringFramework } from "services";
-import { OSIV_FEATURE_ID } from "utils";
+import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { fetchData } from "@/helpers";
+import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "@/models";
+import { getDashboardSpringFramework } from "@/services";
+import { OSIV_FEATURE_ID } from "@/utils";
 
 import styles from "./styles.module.css";
 

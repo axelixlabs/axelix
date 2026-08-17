@@ -19,7 +19,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useRef } from "react";
 
-import type { ILogger } from "models";
+import type { ILogger } from "@/models";
 
 import { Logger } from "../Logger";
 

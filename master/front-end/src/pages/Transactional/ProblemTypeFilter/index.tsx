@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { EProblemType } from "models";
-import { PROBLEM_TYPE_ORDER, problemClassToken, problemLabelKey } from "utils";
+import type { EProblemType } from "@/models";
+import { PROBLEM_TYPE_ORDER, problemClassToken, problemLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 

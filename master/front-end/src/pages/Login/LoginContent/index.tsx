@@ -17,9 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { useAppSelector } from "hooks";
-import type { LoginOption, OIDCLoginOption } from "models";
-import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "utils";
+import { useAppSelector } from "@/hooks";
+import type { LoginOption, OIDCLoginOption } from "@/models";
+import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "@/utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
 import { LoginPasswordForm } from "../LoginPasswordForm";

@@ -18,7 +18,7 @@
 import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 
-import { EMCPToolStatus, type IMCPTool } from "models";
+import { EMCPToolStatus, type IMCPTool } from "@/models";
 
 import { MCPCardDescription } from "../MCPCardDescription";
 import { MCPCardFooter } from "../MCPCardFooter";

@@ -20,8 +20,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
-import { fetchData, filterMatches } from "helpers";
+import { EmptyHandler, HashNavigable, Loader, PageSearch } from "@/components";
+import { fetchData, filterMatches } from "@/helpers";
 import {
     type ConditionBeanCollection,
     EConditionsTabs,
@@ -29,8 +29,8 @@ import {
     type IConditionBeanPositive,
     type IConditionsResponseBody,
     StatefulRequest,
-} from "models";
-import { getConditionsData } from "services";
+} from "@/models";
+import { getConditionsData } from "@/services";
 
 import { Matches } from "./Matches";
 import { NegativeConditions } from "./NegativeConditions";

@@ -17,8 +17,8 @@
  */
 import { useSelector } from "react-redux";
 
-import type { EAuthorities } from "models";
-import type { RootState } from "store";
+import type { EAuthorities } from "@/models";
+import type { RootState } from "@/store";
 
 export const useAuthority = (authority: EAuthorities): boolean => {
     const authorities = useSelector((state: RootState) => state.authorities);

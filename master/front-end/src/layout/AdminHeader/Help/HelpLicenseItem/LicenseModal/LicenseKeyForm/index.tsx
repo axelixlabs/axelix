@@ -19,10 +19,10 @@ import { Input, Spin } from "antd";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { isEnterpriseLicense } from "helpers/license";
-import { ELicenseFormType, type ILicensing, type TLicenseCheckResponseBody } from "models";
-import { checkLicenseKey } from "services";
-import { LICENSE_KEY_VALID_FLAG } from "utils";
+import { isEnterpriseLicense } from "@/helpers";
+import { ELicenseFormType, type ILicensing, type TLicenseCheckResponseBody } from "@/models";
+import { checkLicenseKey } from "@/services";
+import { LICENSE_KEY_VALID_FLAG } from "@/utils";
 
 import { LicenseKeyFormAlert } from "./LicenseKeyFormAlert";
 import { LicenseKeyFormFooter } from "./LicenseKeyFormFooter";

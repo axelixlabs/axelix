@@ -17,7 +17,7 @@
  */
 import type { TFunction } from "i18next";
 
-import { EProxyType, ESearchSubject, type IBean } from "models";
+import { EProxyType, ESearchSubject, type IBean } from "@/models";
 
 import { normalizeHtmlElementId } from "./globals";
 

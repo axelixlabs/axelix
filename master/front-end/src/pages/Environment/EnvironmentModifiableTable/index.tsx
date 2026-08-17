@@ -15,17 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Accordion, EmptyHandler, InfoTooltip } from "components";
-import { splitProperties } from "helpers";
-import type { IEnvironmentPropertySource } from "models";
+import { InfoIcon } from "@/assets";
+import { Accordion, EmptyHandler, InfoTooltip } from "@/components";
+import { splitProperties } from "@/helpers";
+import type { IEnvironmentPropertySource } from "@/models";
 
 import { EnvironmentPropertyDetails } from "../EnvironmentPropertyDetails";
 
 import { EnvironmentProperty } from "./EnvironmentProperty";
 import sharedStyles from "./shared.module.css";
 import styles from "./styles.module.css";
-
-import { InfoIcon } from "assets";
 
 interface IProps {
     /**

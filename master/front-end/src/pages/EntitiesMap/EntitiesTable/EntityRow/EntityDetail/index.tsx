@@ -17,15 +17,15 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { HintTooltip } from "components";
-import { orderAssociationProblems } from "helpers";
-import type { IMappedEntity } from "models";
+import { HintTooltip } from "@/components";
+import { orderAssociationProblems } from "@/helpers";
+import type { IMappedEntity } from "@/models";
 import {
     associationProblemClassToken,
     associationProblemColor,
     associationProblemFixKey,
     associationProblemLabelKey,
-} from "utils";
+} from "@/utils";
 
 import { AssociationProblemChip } from "../../../AssociationProblemChip";
 

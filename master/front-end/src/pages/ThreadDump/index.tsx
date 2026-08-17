@@ -18,11 +18,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData, filterThreadDump, sortThreadDumpByPriority } from "helpers";
-import { type IThreadDumpResponseBody, StatefulRequest } from "models";
-import { getThreadDumpData } from "services";
-import { THREAD_DUMP_SHORT_POLLING_INTERVAL_MS } from "utils";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, filterThreadDump, sortThreadDumpByPriority } from "@/helpers";
+import { type IThreadDumpResponseBody, StatefulRequest } from "@/models";
+import { getThreadDumpData } from "@/services";
+import { THREAD_DUMP_SHORT_POLLING_INTERVAL_MS } from "@/utils";
 
 import { ThreadDumpFirstSection } from "./ThreadDumpFirstSection";
 import { ThreadDumpMainContent } from "./ThreadDumpMainContent";

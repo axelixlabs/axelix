@@ -19,12 +19,11 @@ import { Popover, Select } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { TChangeLoggerLevel } from "models";
+import { TimerIcon } from "@/assets";
+import type { TChangeLoggerLevel } from "@/models";
 
 import { LoggerTimePicker } from "./LoggerTimePicker";
 import styles from "./styles.module.css";
-
-import { TimerIcon } from "assets";
 
 export interface IProps {
     /**

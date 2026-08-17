@@ -18,9 +18,9 @@
 import type { PropsWithChildren } from "react";
 import { Link } from "react-router";
 
-import styles from "./styles.module.css";
+import { LinkIcon } from "@/assets";
 
-import { LinkIcon } from "assets";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**

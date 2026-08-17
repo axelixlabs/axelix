@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { MenuItem } from "models";
+import type { MenuItem } from "@/models";
 
 export const findOpenInstanceKeys = (items: MenuItem[], pathname: string): string[] => {
     const openKeys: string[] = [];

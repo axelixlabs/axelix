@@ -20,11 +20,16 @@ import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { UniversalModal } from "components";
-import { extractErrorCode } from "helpers";
-import { type ICreateUserFormFields, type ICreateUserRequestData, type IErrorResponse, StatelessRequest } from "models";
-import { createUser } from "services";
-import { roleOptions } from "utils";
+import { UniversalModal } from "@/components";
+import { extractErrorCode } from "@/helpers";
+import {
+    type ICreateUserFormFields,
+    type ICreateUserRequestData,
+    type IErrorResponse,
+    StatelessRequest,
+} from "@/models";
+import { createUser } from "@/services";
+import { roleOptions } from "@/utils";
 
 interface IProps {
     /**

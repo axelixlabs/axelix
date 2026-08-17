@@ -17,9 +17,9 @@
  */
 import { Tag } from "antd";
 
-import { TooltipWithCopy } from "components";
-import { defineBeanScopeColor } from "helpers";
-import type { IBean } from "models";
+import { TooltipWithCopy } from "@/components";
+import { defineBeanScopeColor } from "@/helpers";
+import type { IBean } from "@/models";
 
 import styles from "./styles.module.css";
 

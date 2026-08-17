@@ -21,11 +21,11 @@ import { type KeyboardEvent, type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { extractErrorCode } from "helpers";
-import { useAuthority, useConfirmableAction } from "hooks";
-import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
-import { disableCache, enableCache } from "services";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { extractErrorCode } from "@/helpers";
+import { useAuthority, useConfirmableAction } from "@/hooks";
+import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "@/models";
+import { disableCache, enableCache } from "@/services";
 
 interface IProps {
     /**

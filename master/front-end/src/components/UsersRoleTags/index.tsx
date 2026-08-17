@@ -17,7 +17,7 @@
  */
 import { Tag } from "antd";
 
-import { ERoles } from "models";
+import { ERoles } from "@/models";
 
 import styles from "./styles.module.css";
 
