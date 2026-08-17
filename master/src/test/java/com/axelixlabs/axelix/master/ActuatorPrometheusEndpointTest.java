@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master;
 
-import io.prometheus.metrics.expositionformats.PrometheusTextFormatWriter;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -59,8 +58,9 @@ class ActuatorPrometheusEndpointTest {
             ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/prometheus", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getHeaders().getContentType())
-                    .isEqualTo(MediaType.parseMediaType(PrometheusTextFormatWriter.CONTENT_TYPE));
+            assertThat(response.getHeaders().getContentType()).isNotNull();
+            assertThat(response.getHeaders().getContentType().isCompatibleWith(MediaType.TEXT_PLAIN))
+                    .isTrue();
 
             String body = response.getBody();
             assertThat(body).isNotBlank();

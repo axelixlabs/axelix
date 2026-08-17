@@ -42,7 +42,7 @@ management:
   prometheus:
     metrics:
       export:
-        enabled: ${axelix.master.metrics.prometheus.enabled:false}
+        enabled: ${axelix.master.metrics.prometheus.enabled}
 
 axelix:
   master:
