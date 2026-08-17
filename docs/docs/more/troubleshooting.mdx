@@ -1,0 +1,82 @@
+# Common Troubleshooting
+
+This page describes the most common issues that occur during Axelix installation and configuration.
+
+## Authentication Error (401) When Accessing Axelix Endpoints
+
+**Symptom:** On the Master side, a 401 error is returned when communicating with the managed service, even though access to Axelix endpoints is enabled in `application.yaml` on the managed service side and Spring Security is configured correctly.
+
+**Cause:** If the managed service has authentication/authorization enabled using an IAM solution (most commonly Keycloak) and Spring Security is configured accordingly, all incoming client requests are processed by the `BearerTokenAuthenticationFilter`. This applies to all endpoints, including those exposed via `management.endpoints.web.exposure.include`. The filter's logic works as follows:
+
+```
+[ Client App ]
+      │
+      │ 1. HTTP Request + Authorization Header ("Bearer <token>")
+      ▼
+┌────────────────────────────────────────────────────────┐
+│               Application Filter Chain                 │
+│                                                        │
+│   ┌──────────────────────────────────────────────┐     │
+│   │  [1] Bearer Token Authentication Filter      │     │
+│   │      (e.g., Spring OncePerRequestFilter)     │     │
+│   └──────────────────────┬───────────────────────┘     │
+│                          │                             │
+│                          │ 2. Read Authorization Header│
+│                          ▼                             │
+│               { Has "Bearer " prefix? }                │
+│                 /                  \                   │
+│         [No]   /                    \  [Yes]           │
+│               ▼                      ▼                 │
+│     ┌──────────────────┐   ┌───────────────────┐       │
+│     │ Reject or Pass   │   │ 3. Extract Token  │       │
+│     │ to Next Filter   │   └─────────┬─────────┘       │
+│     │ (for public EP)  │             │                 │
+│     └──────────────────┘             │                 │
+│                                      ▼                 │
+│                            [2] Token Validator         │
+│                            ┌─────────┬─────────┐       │
+│                            │ Check Expiration  │       │
+│                            │ Verify Signature  │       │
+│                            └─────────┬─────────┘       │
+│                                      │                 │
+│                        4. Validate   │ 5. Retrieve     │
+│                        & Cache Keys  │    Public Keys  │
+│                                      ▼                 │
+│                        ┌──────────────────────────┐    │
+│                        │ [3] Identity Provider    │    │
+│                        │     (Auth0, Keycloak)    │    │
+│                        └──────────────────────────┘    │
+│                                      │                 │
+│                                      │ 6. Token Valid  │
+│                                      ▼                 │
+│                            [4] Security Context        │
+│                            ┌───────────────────┐       │
+│                            │ Populate Principal│       │
+│                            │ & Authorities     │       │
+│                            └─────────┬─────────┘       │
+│                                      │                 │
+│                                      │ 7. Proceed      │
+│                                      ▼                 │
+│                        ┌──────────────────────────┐    │
+│                        │    Other Web Filters     │    │
+│                        └─────────┬────────────────┘    │
+└──────────────────────────────────┼─────────────────────┘
+                                   │
+                                   │ 8. Forward Authorized Request
+                                   ▼
+                        ┌──────────────────────────┐
+                        │   Protected API Resource │
+                        │      (Controller)        │
+                        └──────────────────────────┘
+```
+
+As can be seen from the diagram, the filter always performs token authentication validation if a token is present in the client request, even if the request is directed to a public resource. In the described scenario, the Master's request to the managed service's endpoint (```/actuator/axelix..```) will contain the Master's authentication token, which will fail validation against the configured IAM product, and the filter will return a 401 error.
+
+**Solution:** Currently, you can use a workaround by excluding Axelix endpoints from the corresponding filter chain:
+
+```
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix**");
+}
+```
