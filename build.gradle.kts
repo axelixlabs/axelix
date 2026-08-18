@@ -253,56 +253,62 @@ configure(publishableModules) {
             // The 'main' publication. Created for each subproject that is supposed to be published.
             register<MavenPublication>(mainPublication) {
                 from(components["java"])
+            }
+        }
 
-                // Configure the POM file details
-                pom {
-                    name.set(project.name)
-                    description = "An AI-native monitoring solution for Java Spring Boot deployments"
-                    url = "https://github.com/axelixlabs/axelix"
-                    packaging = "jar"
+        // POM metadata is applied to every Maven publication - not only 'main' - because the
+        // java-gradle-plugin auto-creates a plugin marker publication ('axelixPluginMarkerMaven')
+        // that Maven Central validates as well; without name/description/url/license/scm/developers
+        // its upload is rejected. Using configureEach (instead of configuring 'main' inline) also
+        // avoids appending duplicate license/developer entries to the same POM.
+        publications.withType<MavenPublication>().configureEach {
+            pom {
+                name.set(project.name)
+                description = "An AI-native monitoring solution for Java Spring Boot deployments"
+                url = "https://github.com/axelixlabs/axelix"
+                packaging = "jar"
 
-                    organization {
-                        name.set("Axelix Labs")
-                        url.set("https://github.com/axelixlabs")
+                organization {
+                    name.set("Axelix Labs")
+                    url.set("https://github.com/axelixlabs")
+                }
+
+                licenses {
+                    license {
+                        name.set("GNU Lesser General Public License, Version 3.0")
+                        url.set("https://www.gnu.org/licenses/lgpl-3.0.en.html")
+                        distribution.set("repo")
                     }
+                }
 
-                    licenses {
-                        license {
-                            name.set("GNU Lesser General Public License, Version 3.0")
-                            url.set("https://www.gnu.org/licenses/lgpl-3.0.en.html")
-                            distribution.set("repo")
-                        }
+                scm {
+                    url.set("https://github.com/axelixlabs/axelix")
+                }
+
+                developers {
+                    developer {
+                        name.set("Mikhail Polivakha")
+                        email.set("mikhailpolivakha@gmail.com")
+                        organization.set("Axelix Labs")
+                        organizationUrl.set("https://github.com/axelixlabs")
                     }
-
-                    scm {
-                        url.set("https://github.com/axelixlabs/axelix")
+                    developer {
+                        name.set("Nikita Kirillov")
+                        email.set("kirilloffnikita1@gmail.com")
+                        organization.set("Axelix Labs")
+                        organizationUrl.set("https://github.com/axelixlabs")
                     }
-
-                    developers {
-                        developer {
-                            name.set("Mikhail Polivakha")
-                            email.set("mikhailpolivakha@gmail.com")
-                            organization.set("Axelix Labs")
-                            organizationUrl.set("https://github.com/axelixlabs")
-                        }
-                        developer {
-                            name.set("Nikita Kirillov")
-                            email.set("kirilloffnikita1@gmail.com")
-                            organization.set("Axelix Labs")
-                            organizationUrl.set("https://github.com/axelixlabs")
-                        }
-                        developer {
-                            name.set("Ashot Sargsyan")
-                            email.set("ashotsargsyan527@gmail.com")
-                            organization.set("Axelix Labs")
-                            organizationUrl.set("https://github.com/axelixlabs")
-                        }
-                        developer {
-                            name.set("Sergey Cherkasov")
-                            email.set("iamcherkasov.job@gmail.com")
-                            organization.set("Axelix Labs")
-                            organizationUrl.set("https://github.com/axelixlabs")
-                        }
+                    developer {
+                        name.set("Ashot Sargsyan")
+                        email.set("ashotsargsyan527@gmail.com")
+                        organization.set("Axelix Labs")
+                        organizationUrl.set("https://github.com/axelixlabs")
+                    }
+                    developer {
+                        name.set("Sergey Cherkasov")
+                        email.set("iamcherkasov.job@gmail.com")
+                        organization.set("Axelix Labs")
+                        organizationUrl.set("https://github.com/axelixlabs")
                     }
                 }
             }
@@ -319,7 +325,9 @@ configure(publishableModules) {
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
-        sign(publishing.publications.getByName(mainPublication))
+        // Sign every publication (current and future), so the java-gradle-plugin marker
+        // publication is signed too - Maven Central rejects unsigned POM/artifacts.
+        sign(publishing.publications)
     }
 
     gradle.taskGraph.whenReady {
@@ -343,8 +351,12 @@ configure(publishableModules) {
     // to make the standard mavne-publish plugin work, we need to add one more HTTP query to the Maven OSSRH registry. That is what is
     // actually happening here
     tasks.withType<PublishToMavenRepository>().configureEach {
-        if (repository.name == mavenCentral && publication.name == mainPublication) {
-            doLast {
+        // The guard is evaluated inside doLast (execution time) rather than eagerly here: the
+        // java-gradle-plugin marker publication ('axelixPluginMarkerMaven') produces a
+        // PublishToMavenRepository task whose 'repository' is still null while configureEach runs,
+        // so reading repository.name at configuration time throws an NPE and fails task creation.
+        doLast {
+            if (repository.name == mavenCentral && publication.name == mainPublication) {
                 val endpoint =
                     "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/$projectNamespace"
                 val username = System.getenv("PRODUCTION_MAVEN_CENTRAL_USERNAME")
@@ -373,5 +385,23 @@ configure(publishableModules) {
                 }
             }
         }
+    }
+
+    // java-gradle-plugin auto-creates a 'pluginMaven' publication that duplicates our explicit
+    // 'main' publication (identical group:artifact:version and jar). Publishing both would upload
+    // the same coordinates twice; disable pluginMaven's upload tasks and keep 'main'. The plugin
+    // marker publication depends on the project coordinates, which 'main' still provides. No-op for
+    // modules without java-gradle-plugin.
+    tasks.matching { it.name.matches(Regex("publishPluginMavenPublicationTo.*")) }
+        .configureEach { enabled = false }
+
+    // The 'main' publish task carries the manual OSSRH finalize trigger above, which packages every
+    // artifact staged under the namespace so far. It must therefore run after every other publish
+    // task for this module (e.g. the java-gradle-plugin marker publication), so all artifacts land
+    // in the same staging deployment before it is finalized. No-op for modules with only 'main'.
+    val mainRepoPublishTask = "publish${mainPublication.replaceFirstChar { it.uppercase() }}PublicationTo" +
+        "${mavenCentral.replaceFirstChar { it.uppercase() }}Repository"
+    tasks.matching { it.name == mainRepoPublishTask }.configureEach {
+        mustRunAfter(tasks.withType<PublishToMavenRepository>().matching { it.name != mainRepoPublishTask })
     }
 }
