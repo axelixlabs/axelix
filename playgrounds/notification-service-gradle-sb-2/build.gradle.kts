@@ -10,7 +10,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.0.0"
     id("org.cyclonedx.bom") version "2.3.1"
-    id("com.axelixlabs.axelix") version "1.0.0"
+    id("com.axelixlabs.axelix") version "1.0.1"
 }
 
 group = "com.sivalabs.ft"
@@ -49,7 +49,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0") {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.1") {
         isChanging = true
     }
     implementation("org.springframework.boot:spring-boot-starter-actuator")

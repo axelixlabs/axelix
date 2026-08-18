@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.axelixlabs</groupId>
             <artifactId>axelix-spring-boot-3-starter</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
@@ -207,7 +207,7 @@
             <plugin>
                 <groupId>com.axelixlabs</groupId>
                 <artifactId>axelix-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <executions>
                     <execution>
                         <goals>
