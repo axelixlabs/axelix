@@ -1,0 +1,4 @@
+.MainWrapper {
+    height: calc(100vh - 225px);
+    overflow: auto;
+}
