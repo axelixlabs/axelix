@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -147,14 +150,16 @@ class ScheduledTaskManagementAutoConfigurationTest {
         contextRunner.run(context -> {
             ScheduledTasksRegistry registry = context.getBean(ScheduledTasksRegistry.class);
 
-            assertThat(registry.getAll()).isNotEmpty();
-            for (ManagedScheduledTask task : registry.getAll()) {
+            Collection<ManagedScheduledTask> snapshot = new ArrayList<>(registry.getAll());
+
+            assertThat(snapshot).isNotEmpty();
+            for (ManagedScheduledTask task : snapshot) {
                 assertThat(task.isEnabled()).isTrue();
             }
 
             context.close();
 
-            for (ManagedScheduledTask task : registry.getAll()) {
+            for (ManagedScheduledTask task : snapshot) {
                 assertThat(task.isEnabled()).isFalse();
             }
         });
