@@ -28,7 +28,7 @@
         "react-dom": "^19.2.7",
         "react-i18next": "^16.6.0",
         "react-redux": "^9.3.0",
-        "react-router": "^7.18.1",
+        "react-router": "^7.18.2",
         "react-syntax-highlighter": "^16.1.1",
         "recharts": "^3.9.1",
         "sql-formatter": "^15.8.2",
@@ -70,10 +70,12 @@
     "overrides": {
         "@babel/core": "^7.29.6",
         "form-data": "^4.0.6",
-        "js-yaml": "^4.3.0",
-        "fast-uri": "^3.1.4",
+        "js-yaml": "^4.3.1",
+        "fast-uri": "^3.1.5",
         "postcss": "^8.5.18",
-        "brace-expansion@1": "1.1.16",
-        "brace-expansion@2": "2.1.2"
+        "nanoid": "^3.3.18",
+        "brace-expansion@1": "1.1.18",
+        "brace-expansion@2": "2.1.4",
+        "brace-expansion@5": "5.0.9"
     }
 }
