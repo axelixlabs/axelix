@@ -117,12 +117,10 @@ class ScheduledTasksRegistryTest {
     @Test // GH-1497
     @DirtiesContext
     void shouldCancelAllManagedTasksWhenRegistryCloses() {
-        Collection<ManagedScheduledTask> managedTasks = taskRegistry.getAll();
-        assertThat(managedTasks).isNotEmpty();
-
         List<ManagedScheduledTask> tasksSnapshot = new ArrayList<>(taskRegistry.getAll());
+        assertThat(tasksSnapshot).isNotEmpty();
 
-        for (ManagedScheduledTask task : managedTasks) {
+        for (ManagedScheduledTask task : tasksSnapshot) {
             assertThat(task.isEnabled()).isTrue();
         }
 

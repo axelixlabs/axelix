@@ -271,7 +271,6 @@ class ScheduledTaskServiceTest {
     }
 
     @Test // GH-1497
-    @DirtiesContext
     void shouldCancelAllTasksAndClearRegistryWhenServiceCloses() {
         Optional<ManagedScheduledTask> taskBefore = taskService.find(CRON_TASK_ID);
         assertThat(taskBefore).isPresent();
