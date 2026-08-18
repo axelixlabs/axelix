@@ -47,6 +47,8 @@ management:
 axelix:
   master:
     metrics:
+      otlp:
+        enabled: false
       prometheus:
         enabled: false
     mcp-server:

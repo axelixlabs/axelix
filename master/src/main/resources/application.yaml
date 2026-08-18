@@ -45,6 +45,8 @@ axelix:
       json:
         enabled: false
     metrics:
+      otlp:
+        enabled: false
       prometheus:
         enabled: false
         # tags:
