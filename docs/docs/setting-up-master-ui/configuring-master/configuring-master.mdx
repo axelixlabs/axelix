@@ -265,6 +265,10 @@ when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aw
 Master exposes a Prometheus scrape endpoint once you turn it on with `axelix.master.metrics.prometheus.enabled=true`.
 It responds at `/api/actuator/prometheus` and does not require authentication.
 
+By default it uses the same port as the rest of Master (`server.port`). Set `axelix.master.metrics.prometheus.port` to
+use a different port instead, useful when you want to restrict access to scraping separately from the main UI and
+API.
+
 Attach common tags to every exported metric with `axelix.master.metrics.prometheus.tags.<name>=<value>`, for example
 a deployment region or environment.
 
@@ -279,6 +283,7 @@ policy, ingress rule, or an equivalent perimeter control.
 | Property                                      | Default | Description                                                           |
 |------------------------------------------------|---------|---------------------------------------------------------------------------|
 | `axelix.master.metrics.prometheus.enabled` | `false` | Expose the Prometheus scrape endpoint at `/api/actuator/prometheus`.  |
+| `axelix.master.metrics.prometheus.port`    | *(unset)* | Port for the Prometheus endpoint. Defaults to `server.port`. |
 | `axelix.master.metrics.prometheus.tags`    | empty   | Common tags applied to every exported metric.                         |
 
 </div>
@@ -291,6 +296,17 @@ axelix:
         enabled: true
         tags:
           region: eu-west-1
+```
+
+Using a separate port instead:
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        port: 9404
 ```
 
 #### OTLP

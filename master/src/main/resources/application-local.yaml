@@ -44,7 +44,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: [ "health", "prometheus" ]
+        include: [ "health" ]
 
 spring:
   datasource:

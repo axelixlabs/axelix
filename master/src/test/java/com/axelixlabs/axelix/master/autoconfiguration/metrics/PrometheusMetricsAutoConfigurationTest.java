@@ -20,14 +20,17 @@ package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import io.prometheus.metrics.model.snapshots.MetricSnapshots;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -47,7 +50,9 @@ class PrometheusMetricsAutoConfigurationTest {
     private static ApplicationContextRunner baselineContextRunner() {
         return new ApplicationContextRunner(PrometheusMetricsAutoConfigurationTest::isolatedContext)
                 .withConfiguration(AutoConfigurations.of(
-                        ConfigurationPropertiesAutoConfiguration.class, PrometheusMetricsAutoConfiguration.class));
+                        ConfigurationPropertiesAutoConfiguration.class,
+                        MetricsAutoConfiguration.class,
+                        PrometheusMetricsAutoConfiguration.class));
     }
 
     @Nested
@@ -65,6 +70,7 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).doesNotHaveBean(PrometheusMeterRegistry.class);
                 assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
                 assertThat(context).doesNotHaveBean(PrometheusRegistry.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
             });
         }
 
@@ -79,6 +85,7 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).doesNotHaveBean(PrometheusMeterRegistry.class);
                 assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
                 assertThat(context).doesNotHaveBean(PrometheusRegistry.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
             });
         }
     }
@@ -100,6 +107,26 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).hasSingleBean(Clock.class);
                 assertThat(context).hasSingleBean(PrometheusMeterRegistry.class);
                 assertThat(context).hasSingleBean(PrometheusScrapeEndpoint.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldNotCreateEndpointWhenPortDiffersFromServerPort() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withBean(WebEndpointProperties.class)
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=9999",
+                            "server.port=8080");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasSingleBean(PrometheusMeterRegistry.class);
+                assertThat(context).hasSingleBean(HTTPServer.class);
+                assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
             });
         }
 
