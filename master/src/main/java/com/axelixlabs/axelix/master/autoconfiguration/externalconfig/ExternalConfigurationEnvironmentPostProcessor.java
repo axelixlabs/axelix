@@ -38,7 +38,7 @@ import org.springframework.core.env.MapPropertySource;
  * configuration sources specified in {@code axelix.master.external-config.options}.
  *
  * <p>The processor runs before {@link ConfigDataEnvironmentPostProcessor}, which means
- * the options must be provided via environment variables or system properties — not
+ * the options must be provided via environment variables or system properties - not
  * from {@code application.yaml}, since YAML files are not yet loaded at this stage.
  *
  * @author Ilya Naumov
@@ -52,8 +52,7 @@ public class ExternalConfigurationEnvironmentPostProcessor implements Environmen
     /**
      * Runs before {@link ConfigDataEnvironmentPostProcessor}.
      *
-     * @return one less than {@link ConfigDataEnvironmentPostProcessor#ORDER}, ensuring
-     * this processor runs before YAML-based config data is loaded
+     * @return one less than {@link ConfigDataEnvironmentPostProcessor#ORDER}
      */
     @Override
     public int getOrder() {
@@ -94,14 +93,16 @@ public class ExternalConfigurationEnvironmentPostProcessor implements Environmen
             return;
         }
 
-        List<String> imports =
-                options.stream().map(ExternalConfigOption::getImportLocation).toList();
+        String newImports =
+                options.stream().map(ExternalConfigOption::getImportLocation).collect(Collectors.joining(","));
 
         Map<String, Object> properties = options.stream()
                 .flatMap(option -> option.getProperties().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        properties.put(SPRING_CONFIG_IMPORT_PROPERTY, String.join(",", imports));
+        String existingImports = environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY, "");
+        String allImports = existingImports.isEmpty() ? newImports : existingImports + "," + newImports;
+        properties.put(SPRING_CONFIG_IMPORT_PROPERTY, allImports);
         environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, properties));
     }
 }

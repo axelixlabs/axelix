@@ -17,10 +17,13 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.externalconfig;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -45,119 +48,130 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ExternalConfigurationEnvironmentPostProcessorTest {
     private final ExternalConfigurationEnvironmentPostProcessor postProcessor =
             new ExternalConfigurationEnvironmentPostProcessor();
-
     private final SpringApplication application = new SpringApplication();
+    private MockEnvironment environment;
 
-    @Test // GH-1489
-    void shouldRunBeforeConfigDataEnvironmentPostProcessor() {
-        // when.
-        assertThat(postProcessor.getOrder())
-                // then.
-                .isLessThan(ConfigDataEnvironmentPostProcessor.ORDER);
+    @BeforeEach
+    void setUp() {
+        environment = new MockEnvironment();
     }
 
-    @Test // GH-1489
-    void shouldDoNothingWhenPropertyIsAbsent() {
-        // given.
-        MockEnvironment environment = new MockEnvironment();
+    @Nested
+    class LifecycleAndOrder {
+        @Test // GH-1489
+        void shouldRunBeforeConfigDataEnvironmentPostProcessor() {
+            // when.
+            assertThat(postProcessor.getOrder())
+                    // then.
+                    .isLessThan(ConfigDataEnvironmentPostProcessor.ORDER);
+        }
 
-        // when.
-        postProcessor.postProcessEnvironment(environment, application);
+        @Test // GH-1489
+        void shouldDoNothingWhenPropertyIsAbsent() {
+            // when.
+            postProcessor.postProcessEnvironment(environment, application);
 
-        // then.
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isNull();
-
-        for (ExternalConfigOption configType : ExternalConfigOption.values()) {
-            for (String key : configType.getProperties().keySet()) {
-                assertThat(environment.getProperty(key)).isNull();
-            }
+            // then.
+            assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isNull();
+            Arrays.stream(ExternalConfigOption.values())
+                    .flatMap(option -> option.getProperties().keySet().stream())
+                    .forEach(key -> assertThat(environment.getProperty(key)).isNull());
         }
     }
 
-    @ParameterizedTest // GH-1489
-    @ValueSource(strings = {"INVALID_OPTION", "VAULT VAULT"})
-    void shouldThrowWhenInvalidOptionsAreProvided(String invalidOption) {
-        // given.
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, invalidOption);
+    @Nested
+    class ValidationAndErrorHandling {
+        @ParameterizedTest // GH-1489
+        @ValueSource(strings = {"INVALID_OPTION", "VAULT VAULT"})
+        void shouldThrowWhenInvalidOptionsAreProvided(String invalidOption) {
+            // given.
+            environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, invalidOption);
 
-        // when.
-        assertThatThrownBy(() -> postProcessor.postProcessEnvironment(environment, application))
-                // then.
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(invalidOption);
-    }
-
-    @Test // GH-1489
-    void shouldProperlyHandleDuplicateOptions() {
-        // given.
-        MockEnvironment environment = new MockEnvironment();
-        ExternalConfigOption duplicateOption = ExternalConfigOption.VAULT;
-        environment.setProperty(
-                AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS,
-                String.join(",", List.of(duplicateOption.toString(), duplicateOption.toString())));
-
-        // when.
-        postProcessor.postProcessEnvironment(environment, application);
-
-        // then.
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY))
-                .isEqualTo(duplicateOption.getImportLocation());
-
-        for (String key : duplicateOption.getProperties().keySet()) {
-            assertThat(environment.getProperty(key)).isNotNull();
+            // when.
+            assertThatThrownBy(() -> postProcessor.postProcessEnvironment(environment, application))
+                    // then.
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining(invalidOption);
         }
-    }
 
-    @ParameterizedTest // GH-1489
-    @EnumSource(ExternalConfigOption.class)
-    void shouldHandleSingleOption(ExternalConfigOption option) {
-        // given.
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, option.toString());
+        @Test // GH-1489
+        void shouldProperlyHandleDuplicateOptions() {
+            // given.
+            ExternalConfigOption duplicateOption = ExternalConfigOption.VAULT;
+            environment.setProperty(
+                    AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS,
+                    String.join(",", List.of(duplicateOption.toString(), duplicateOption.toString())));
 
-        // when.
-        postProcessor.postProcessEnvironment(environment, application);
+            // when.
+            postProcessor.postProcessEnvironment(environment, application);
 
-        // then.
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isEqualTo(option.getImportLocation());
-
-        for (String key : option.getProperties().keySet()) {
-            assertThat(environment.getProperty(key)).isNotNull();
-        }
-    }
-
-    @Test // GH-1489
-    void shouldProperlyHandleAllOptionsInOrder() {
-        // given.
-        MockEnvironment environment = new MockEnvironment();
-
-        List<String> reversedOptions = Stream.of(ExternalConfigOption.values())
-                .sorted(Comparator.comparing(ExternalConfigOption::getOrder).reversed())
-                .map(ExternalConfigOption::toString)
-                .toList();
-
-        environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, String.join(",", reversedOptions));
-
-        // when.
-        postProcessor.postProcessEnvironment(environment, application);
-
-        // then.
-        List<String> orderedImportLocations = Stream.of(ExternalConfigOption.values())
-                .sorted(Comparator.comparing(ExternalConfigOption::getOrder))
-                .map(ExternalConfigOption::getImportLocation)
-                .toList();
-
-        List<String> environmentImportLocations = Binder.get(environment)
-                .bind(SPRING_CONFIG_IMPORT_PROPERTY, Bindable.listOf(String.class))
-                .orElseGet(List::of);
-
-        assertThat(environmentImportLocations).containsExactlyElementsOf(orderedImportLocations);
-
-        for (ExternalConfigOption configType : ExternalConfigOption.values()) {
-            for (String key : configType.getProperties().keySet()) {
+            // then.
+            assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY))
+                    .isEqualTo(duplicateOption.getImportLocation());
+            for (String key : duplicateOption.getProperties().keySet()) {
                 assertThat(environment.getProperty(key)).isNotNull();
             }
+        }
+    }
+
+    @Nested
+    class OptionResolution {
+        @ParameterizedTest // GH-1489
+        @EnumSource(ExternalConfigOption.class)
+        void shouldHandleSingleOption(ExternalConfigOption option) {
+            // given.
+            environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, option.toString());
+
+            // when.
+            postProcessor.postProcessEnvironment(environment, application);
+
+            // then.
+            assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isEqualTo(option.getImportLocation());
+            for (String key : option.getProperties().keySet()) {
+                assertThat(environment.getProperty(key)).isNotNull();
+            }
+        }
+
+        @Test // GH-1489
+        void shouldProperlyHandleAllOptionsInOrder() {
+            // given.
+            List<String> reversedOptions = Stream.of(ExternalConfigOption.values())
+                    .sorted(Comparator.comparing(ExternalConfigOption::getOrder).reversed())
+                    .map(ExternalConfigOption::toString)
+                    .toList();
+            environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, String.join(",", reversedOptions));
+
+            // when.
+            postProcessor.postProcessEnvironment(environment, application);
+
+            // then.
+            List<String> orderedImportLocations = Stream.of(ExternalConfigOption.values())
+                    .sorted(Comparator.comparing(ExternalConfigOption::getOrder))
+                    .map(ExternalConfigOption::getImportLocation)
+                    .toList();
+            List<String> environmentImportLocations = Binder.get(environment)
+                    .bind(SPRING_CONFIG_IMPORT_PROPERTY, Bindable.listOf(String.class))
+                    .orElseGet(List::of);
+            assertThat(environmentImportLocations).containsExactlyElementsOf(orderedImportLocations);
+            Arrays.stream(ExternalConfigOption.values())
+                    .flatMap(option -> option.getProperties().keySet().stream())
+                    .forEach(key -> assertThat(environment.getProperty(key)).isNotNull());
+        }
+
+        @Test // GH-1489
+        void shouldPreserveExistingSpringConfigImport() {
+            // given.
+            String existingImport = "file:./custom.properties";
+            environment.setProperty(SPRING_CONFIG_IMPORT_PROPERTY, existingImport);
+            environment.setProperty(AXELIX_MASTER_EXTERNAL_CONFIG_OPTIONS, ExternalConfigOption.VAULT.toString());
+
+            // when.
+            postProcessor.postProcessEnvironment(environment, application);
+
+            // then.
+            String result = environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY);
+            assertThat(result).startsWith(existingImport);
+            assertThat(result).contains(ExternalConfigOption.VAULT.getImportLocation());
         }
     }
 }

@@ -24,7 +24,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for external configuration sources.
  *
- * @see ExternalConfigurationEnvironmentPostProcessor
  * @author Ilya Naumov
  */
 @ConfigurationProperties(prefix = "axelix.master.external-config")
