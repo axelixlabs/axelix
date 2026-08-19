@@ -17,21 +17,30 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -40,13 +49,19 @@ import org.springframework.context.annotation.Bean;
  * @author Dmitry Mazurov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration
+@AutoConfiguration(
+        before = {CompositeMeterRegistryAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class},
+        after = MetricsAutoConfiguration.class)
 @EnableConfigurationProperties(PrometheusProperties.class)
 @ConditionalOnProperty(
         prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX,
         name = "enabled",
         havingValue = "true")
 public class PrometheusMetricsAutoConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(PrometheusMetricsAutoConfiguration.class);
+
+    public static final String PROMETHEUS_METRICS_ENDPOINT_PATH = "/prometheus";
 
     @Bean
     @ConditionalOnMissingBean
@@ -67,11 +82,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    Clock mainClock() {
-        return Clock.SYSTEM;
-    }
-
-    @Bean
+    @ConditionalOnMatchingPrometheusPort
     PrometheusScrapeEndpoint prometheusEndpoint(
             PrometheusRegistry prometheusRegistry, PrometheusConfig prometheusConfig) {
         return new PrometheusScrapeEndpoint(prometheusRegistry, prometheusConfig.prometheusProperties());
@@ -88,6 +99,31 @@ public class PrometheusMetricsAutoConfiguration {
                 new PrometheusMeterRegistry(prometheusConfig, prometheusRegistry, clock, null);
         addTagsIfNeeded(prometheusProperties, prometheusMeterRegistry);
         return prometheusMeterRegistry;
+    }
+
+    @Bean
+    @ConditionalOnMatchingPrometheusPort(matches = false)
+    HTTPServer prometheusHttpServer(
+            PrometheusMeterRegistry prometheusMeterRegistry,
+            PrometheusProperties prometheusProperties,
+            WebEndpointProperties webEndpointProperties)
+            throws IOException {
+        int port = Objects.requireNonNull(prometheusProperties.getPort());
+        String metricsHandlerPath = webEndpointProperties.getBasePath() + PROMETHEUS_METRICS_ENDPOINT_PATH;
+        HTTPServer server = HTTPServer.builder()
+                .port(port)
+                .registry(prometheusMeterRegistry.getPrometheusRegistry())
+                .metricsHandlerPath(metricsHandlerPath)
+                .registerHealthHandler(false)
+                .defaultHandler(new WhitelabelNotFoundHandler())
+                .buildAndStart();
+
+        log.info(
+                "Prometheus HTTP server started on port {} with context path '{}'",
+                server.getPort(),
+                metricsHandlerPath);
+
+        return server;
     }
 
     private static void addTagsIfNeeded(
