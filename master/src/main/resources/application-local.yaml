@@ -49,3 +49,6 @@ management:
 spring:
   datasource:
     url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
+  cloud:
+    vault:
+      enabled: false

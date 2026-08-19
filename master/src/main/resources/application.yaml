@@ -4,6 +4,35 @@ server:
 
 spring:
   cloud:
+    vault:
+      enabled: false
+      uri: ${axelix.master.external-config.vault.uri}
+      host: ${axelix.master.external-config.vault.host}
+      port: ${axelix.master.external-config.vault.port}
+      scheme: ${axelix.master.external-config.vault.scheme}
+      authentication: ${axelix.master.external-config.vault.authentication}
+      token: ${axelix.master.external-config.vault.token}
+      namespace: ${axelix.master.external-config.vault.namespace}
+      connection-timeout: ${axelix.master.external-config.vault.connection-timeout}
+      read-timeout: ${axelix.master.external-config.vault.read-timeout}
+      fail-fast: true
+      kv:
+        backend: ${axelix.master.external-config.vault.kv.backend}
+        default-context: ${axelix.master.external-config.vault.kv.default-context}
+        profile-separator: ${axelix.master.external-config.vault.kv.profile-separator}
+      ssl:
+        trust-store: ${axelix.master.external-config.vault.ssl.trust-store}
+        trust-store-password: ${axelix.master.external-config.vault.ssl.trust-store-password}
+        trust-store-type: ${axelix.master.external-config.vault.ssl.trust-store-type}
+      app-role:
+        role-id: ${axelix.master.external-config.vault.app-role.role-id}
+        secret-id: ${axelix.master.external-config.vault.app-role.secret-id}
+        role: ${axelix.master.external-config.vault.app-role.role}
+        app-role-path: ${axelix.master.external-config.vault.app-role.app-role-path}
+      kubernetes:
+        role: ${axelix.master.external-config.vault.kubernetes.role}
+        kubernetes-path: ${axelix.master.external-config.vault.kubernetes.kubernetes-path}
+        service-account-token-file: ${axelix.master.external-config.vault.kubernetes.service-account-token-file}
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
@@ -99,3 +128,33 @@ axelix:
           scopes: openid
       cookie:
         secure: false
+
+    external-config:
+      options: []
+      vault:
+        uri:
+        host: localhost
+        port: 8200
+        scheme: https
+        authentication: TOKEN
+        token:
+        namespace:
+        connection-timeout: 5000
+        read-timeout: 15000
+        kv:
+          backend: secret
+          default-context: application
+          profile-separator: /
+        ssl:
+          trust-store:
+          trust-store-password:
+          trust-store-type:
+        app-role:
+          role-id:
+          secret-id:
+          role:
+          app-role-path: approle
+        kubernetes:
+          role:
+          kubernetes-path: kubernetes
+          service-account-token-file: /var/run/secrets/kubernetes.io/serviceaccount/token
