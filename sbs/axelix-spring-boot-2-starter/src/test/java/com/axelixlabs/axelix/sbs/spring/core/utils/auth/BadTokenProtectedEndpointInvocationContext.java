@@ -17,9 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.utils.auth;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -37,35 +36,42 @@ import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * {@link TestTemplateInvocationContext} for scenarios with bad token.
+ * {@link TestTemplateInvocationContext} for a specific scenario with bad token.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class BadTokenProtectedEndpointInvocationContext implements TestTemplateInvocationContext {
 
+    private final InvalidAuthScenario scenario;
+
+    public BadTokenProtectedEndpointInvocationContext(InvalidAuthScenario scenario) {
+        this.scenario = scenario;
+    }
+
+    @Override
+    public String getDisplayName(int invocationIndex) {
+        return "Bad Auth [" + invocationIndex + "]: " + scenario.name();
+    }
+
     @Override
     public List<Extension> getAdditionalExtensions() {
-        return Arrays.stream(InvalidAuthScenario.values())
-                .map(invalidAuthScenario -> (Extension) (BeforeTestExecutionCallback) context -> {
-                    ProtectedEndpointTests meta =
-                            context.getRequiredTestMethod().getAnnotation(ProtectedEndpointTests.class);
+        return Collections.singletonList((BeforeTestExecutionCallback) context -> {
+            ProtectedEndpointTests meta = context.getRequiredTestMethod().getAnnotation(ProtectedEndpointTests.class);
 
-                    ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);
+            ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);
 
-                    TestRestTemplateBuilder testRestTemplateBuilder =
-                            applicationContext.getBean(TestRestTemplateBuilder.class);
+            TestRestTemplateBuilder testRestTemplateBuilder = applicationContext.getBean(TestRestTemplateBuilder.class);
 
-                    ResponseEntity<Void> result = invalidAuthScenario
-                            .getModifier()
-                            .apply(testRestTemplateBuilder)
-                            .exchange(
-                                    meta.path(),
-                                    HttpMethod.valueOf(meta.method().name()),
-                                    ProtectedEndpointRequestSupport.httpEntity(meta),
-                                    Void.class);
+            ResponseEntity<Void> result = scenario.getModifier()
+                    .apply(testRestTemplateBuilder)
+                    .exchange(
+                            meta.path(),
+                            HttpMethod.valueOf(meta.method().name()),
+                            ProtectedEndpointRequestSupport.httpEntity(meta),
+                            Void.class);
 
-                    assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-                })
-                .collect(Collectors.toList());
+            assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        });
     }
 }

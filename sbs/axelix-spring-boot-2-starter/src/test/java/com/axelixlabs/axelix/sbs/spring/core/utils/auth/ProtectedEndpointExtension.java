@@ -18,17 +18,21 @@
 package com.axelixlabs.axelix.sbs.spring.core.utils.auth;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 
+import com.axelixlabs.axelix.sbs.spring.core.utils.InvalidAuthScenario;
+
 /**
  * A specific extension for Junit 6 to provide {@link TestTemplateInvocationContext} instances for the given
  * {@link ProtectedEndpointTests} methods.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class ProtectedEndpointExtension implements TestTemplateInvocationContextProvider {
 
@@ -45,20 +49,17 @@ public class ProtectedEndpointExtension implements TestTemplateInvocationContext
 
         ProtectedEndpointTests annotation = requiredTestMethod.getAnnotation(ProtectedEndpointTests.class);
 
-        Stream<BadAuthorityEndpointInvocationContext> first;
-
+        Stream<TestTemplateInvocationContext> badAuthorityScenarios;
         if (annotation.requiredAuthority().length > 0) {
-            first = Stream.of(
-                    new BadAuthorityEndpointInvocationContext(annotation.requiredAuthority()[0]));
+            badAuthorityScenarios = BadAuthorityEndpointInvocationContext.allBadAuthorityScenarios(
+                    annotation.requiredAuthority()[0]);
         } else {
-            first = Stream.of();
+            badAuthorityScenarios = Stream.of();
         }
 
-        return Stream.concat(
-                // authorization negative cases
-                first,
+        Stream<TestTemplateInvocationContext> badTokenScenarios =
+                Arrays.stream(InvalidAuthScenario.values()).map(BadTokenProtectedEndpointInvocationContext::new);
 
-                // authentication negative cases
-                Stream.of(new BadTokenProtectedEndpointInvocationContext()));
+        return Stream.concat(badAuthorityScenarios, badTokenScenarios);
     }
 }
