@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
@@ -65,11 +66,11 @@ public class ExternalConfigurationEnvironmentPostProcessor implements Environmen
     }
 
     /**
-     * @return {@link Ordered#HIGHEST_PRECEDENCE} to ensure this processor executes before
-     *         native Spring Boot configuration importers inspect the environment.
+     * @return {@code ConfigDataEnvironmentPostProcessor.Order + 1} to ensure this processor executes after
+     *         {@code ConfigDataEnvironmentPostProcessor}.
      */
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
     }
 }
