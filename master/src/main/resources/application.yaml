@@ -7,18 +7,8 @@ spring:
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
-    config:
-      enabled: ${axelix.master.config-server.enabled}
-      uri: ${axelix.master.config-server.uri}
-      label: ${axelix.master.config-server.label}
-      name: ${axelix.master.config-server.name:${spring.application.name}}
-      username: ${axelix.master.config-server.username}
-      password: ${axelix.master.config-server.password}
-      fail-fast: ${axelix.master.config-server.fail-fast}
   application:
     name: axelix
-  config:
-    import: 'configserver:'
   ai:
     mcp:
       server:
@@ -46,14 +36,14 @@ management:
 
 axelix:
   master:
-    config-server:
-      enabled: false
-      uri:
-      label: master
-      name:
-      username:
-      password:
-      fail-fast: false
+    external-config:
+      option:
+      spring-cloud-config:
+        uri:
+        label: master
+        name:
+        username:
+        password:
     web:
       static-resources:
         location: classpath:/spa/
