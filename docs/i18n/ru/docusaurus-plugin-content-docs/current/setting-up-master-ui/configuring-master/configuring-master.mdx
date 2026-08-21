@@ -37,6 +37,43 @@ import { UpcomingReleaseNotice } from '@site/src/components';
 себя.
 :::
 
+### Способы задания свойств
+
+Master — это приложение на Spring Boot, поэтому любое свойство с этой страницы можно задать через любой источник,
+который читает Spring Boot, — не только через файл конфигурации:
+
+- файл конфигурации **YAML** или **properties** (`application.yaml` / `application.properties`);
+- **системное свойство JVM**, переданное через `-D` в командной строке `java`;
+- **переменная окружения**.
+
+Master никогда не ограничивает свойство единственным источником. Везде, где на этой странице описано свойство вроде
+`axelix.master.auth.jwt.signing-key`, вы можете задать его тем из трёх способов, который подходит для вашего
+развёртывания, — одно и то же имя доходит до Master одинаково через любой из них.
+
+Это работает благодаря [нестрогому связыванию (relaxed binding)](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding)
+в Spring Boot: у одного логического свойства есть несколько эквивалентных написаний, и Master читает их все как одно и то
+же значение. Каноническая форма, используемая на этой странице, — строчными буквами, через точку, в стиле kebab-case
+(`axelix.master.auth.jwt.signing-key`). В таблице ниже показано, как записывается это свойство для каждого источника:
+
+| Источник                      | Как записать `axelix.master.auth.jwt.signing-key`                          |
+|-------------------------------|----------------------------------------------------------------------------|
+| `application.yaml`            | вложенные ключи `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:`   |
+| `application.properties`      | `axelix.master.auth.jwt.signing-key=...`                                    |
+| Системное свойство JVM (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                  |
+| Переменная окружения          | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                     |
+
+Форма для переменной окружения подчиняется строгому правилу: **переведите имя в верхний регистр, замените каждую точку
+на подчёркивание и уберите все дефисы**. Именно поэтому `signing-key` превращается в `SIGNINGKEY` — дефис удаляется, а не
+заменяется на подчёркивание. Свойство без дефисов отображается более прямолинейно:
+`axelix.master.metrics.prometheus.enabled` превращается в `AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+В примерах для Docker и Docker Compose ниже свойства передаются как флаги `-D` внутри `JAVA_TOOL_OPTIONS`, но это лишь
+один из вариантов: флаг `-Daxelix.master.auth.jwt.signing-key=...` и переменная окружения
+`AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` взаимозаменяемы, поэтому используйте тот способ, который проще на вашей
+платформе.
+:::
+
 ### Общие настройки
 
 <UpcomingReleaseNotice />

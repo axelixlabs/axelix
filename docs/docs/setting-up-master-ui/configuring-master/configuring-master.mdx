@@ -33,6 +33,42 @@ the JWT signing key has no default at all. Override both — together with `axel
 over HTTPS — before exposing Master to anyone other than yourself.
 :::
 
+### Supplying properties
+
+Master is a Spring Boot application, so every property on this page can be supplied through any source Spring Boot
+reads — not only a config file:
+
+- a **YAML** or **properties** config file (`application.yaml` / `application.properties`);
+- a **JVM system property** passed with `-D` on the `java` command line;
+- an **environment variable**.
+
+Master never restricts a property to a single source. Wherever this page documents a property such as
+`axelix.master.auth.jwt.signing-key`, you may set it in whichever of the three fits your deployment — the same name
+reaches Master identically through all of them.
+
+This works because of Spring Boot's [relaxed binding](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding):
+one logical property has several equivalent spellings, and Master reads them all as the same value. The canonical form
+used throughout this page is lowercase, dot-separated, kebab-case (`axelix.master.auth.jwt.signing-key`). The table
+below shows how that one property is written for each source:
+
+| Source                     | How you write `axelix.master.auth.jwt.signing-key`                          |
+|----------------------------|----------------------------------------------------------------------------|
+| `application.yaml`         | nested keys `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:`       |
+| `application.properties`   | `axelix.master.auth.jwt.signing-key=...`                                    |
+| JVM system property (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                  |
+| Environment variable       | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                     |
+
+The environment-variable form follows a strict rule: **upper-case the name, replace every dot with an underscore, and
+drop any dashes**. That is why `signing-key` becomes `SIGNINGKEY` — the dash is removed, not turned into an underscore.
+A property with no dashes maps more directly: `axelix.master.metrics.prometheus.enabled` becomes
+`AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+The Docker and Docker Compose examples further down pass properties as `-D` flags inside `JAVA_TOOL_OPTIONS`, but that is
+just one option: a `-Daxelix.master.auth.jwt.signing-key=...` flag and an `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`
+environment variable are interchangeable, so use whichever your platform makes easier.
+:::
+
 ### General
 
 <UpcomingReleaseNotice />
