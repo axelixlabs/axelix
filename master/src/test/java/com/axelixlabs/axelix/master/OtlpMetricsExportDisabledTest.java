@@ -33,7 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.AxelixOtlpMetricsEnvironmentPostProcessor.AXELIX_MASTER_METRICS_OTLP_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.OtlpProperties.AXELIX_MASTER_METRICS_OTLP_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

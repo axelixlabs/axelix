@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    # OTLP metrics export is owned by OtlpTransportMetricsAutoConfiguration, not Spring Boot.
+    exclude: org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
   cloud:
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1

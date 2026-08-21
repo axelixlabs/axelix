@@ -20,29 +20,37 @@ package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 import java.time.Duration;
 import java.util.Map;
 
+import io.micrometer.core.instrument.Clock;
 import io.micrometer.registry.otlp.CompressionMode;
 import io.micrometer.registry.otlp.OtlpConfig;
+import io.micrometer.registry.otlp.OtlpMeterRegistry;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.AxelixOtlpMetricsEnvironmentPostProcessor.AXELIX_MASTER_METRICS_OTLP_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.OtlpProperties.AXELIX_MASTER_METRICS_OTLP_PREFIX;
 
 /**
- * Metrics related auto-configuration.
+ * OTLP transport metrics export auto-configuration.
+ *
+ * <p>Configures a {@link OtlpMeterRegistry} that pushes metrics to an OTLP HTTP/protobuf endpoint
+ * from the stable {@code axelix.master.metrics.otlp.*} contract, instead of relying on Spring Boot's
+ * own OTLP metrics export auto-configuration.
  *
  * @author Aleksei Ermakov
+ * @author Mikhail Polivakha
  */
-@AutoConfiguration(before = OtlpMetricsExportAutoConfiguration.class)
-@EnableConfigurationProperties({OtlpProperties.class})
+@AutoConfiguration
+@EnableConfigurationProperties(OtlpProperties.class)
+@ConditionalOnProperty(prefix = AXELIX_MASTER_METRICS_OTLP_PREFIX, name = "enabled", havingValue = "true")
 public class OtlpTransportMetricsAutoConfiguration {
 
     @Bean
-    @ConditionalOnProperty(prefix = AXELIX_MASTER_METRICS_OTLP_PREFIX, name = "enabled", havingValue = "true")
-    public OtlpConfig otlpConfig(OtlpProperties properties) {
+    @ConditionalOnMissingBean
+    OtlpConfig otlpConfig(OtlpProperties properties) {
         return new OtlpConfig() {
             @SuppressWarnings("NullAway") // Micrometer uses null to fall back to its default values.
             @Override
@@ -70,5 +78,10 @@ public class OtlpTransportMetricsAutoConfiguration {
                 return properties.compressionMode();
             }
         };
+    }
+
+    @Bean
+    OtlpMeterRegistry otlpMeterRegistry(OtlpConfig otlpConfig, Clock clock) {
+        return OtlpMeterRegistry.builder(otlpConfig).clock(clock).build();
     }
 }

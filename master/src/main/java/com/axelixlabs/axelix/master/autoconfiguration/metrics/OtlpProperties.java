@@ -25,14 +25,12 @@ import io.micrometer.registry.otlp.CompressionMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.AxelixOtlpMetricsEnvironmentPostProcessor.AXELIX_MASTER_METRICS_OTLP_PREFIX;
-
 /**
  * The OTLP metrics export properties that are specific to Axelix Master.
  *
  * @author Aleksei Ermakov
  */
-@ConfigurationProperties(prefix = AXELIX_MASTER_METRICS_OTLP_PREFIX)
+@ConfigurationProperties(prefix = OtlpProperties.AXELIX_MASTER_METRICS_OTLP_PREFIX)
 public record OtlpProperties(
         /** Whether OTLP metrics export is enabled. */
         @DefaultValue("false") boolean enabled,
@@ -43,4 +41,7 @@ public record OtlpProperties(
         /** Headers to add to every export request. */
         @DefaultValue Map<String, String> headers,
         /** Compression mode to use for export requests. */
-        @DefaultValue("none") CompressionMode compressionMode) {}
+        @DefaultValue("none") CompressionMode compressionMode) {
+
+    public static final String AXELIX_MASTER_METRICS_OTLP_PREFIX = "axelix.master.metrics.otlp";
+}
