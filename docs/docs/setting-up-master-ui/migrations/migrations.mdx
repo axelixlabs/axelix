@@ -1,0 +1,150 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { UpcomingReleaseNotice } from '@site/src/components';
+
+# Database Migrations
+
+Master owns its database schema and keeps it in step with the running version. On every startup it runs
+[Liquibase](https://www.liquibase.com/) to apply any schema changes the current version needs. You never run
+migrations by hand.
+
+## How migrations run
+
+Migrations are part of startup, not a separate step you trigger.
+
+- **On every startup.** Before Master starts serving the UI and API, Liquibase inspects the database and applies any
+  changesets that are missing.
+- **Against the configured database.** Migrations run on the same engine Master uses at runtime — SQLite, PostgreSQL,
+  or MySQL, picked from the JDBC URL prefix. See the [Database](../configuring-master/configuring-master.mdx#database)
+  section for how the engine is selected.
+- **Only once per change.** Liquibase records every applied changeset in its own bookkeeping table
+  (`DATABASECHANGELOG`). A changeset that already ran is skipped, so restarting Master is safe and cheap.
+- **Fail-fast.** If a migration cannot be applied, startup aborts with an error instead of running against a
+  half-migrated schema.
+
+## Which credentials run the migrations
+
+By default, migrations use the **same credentials Master connects with** — `axelix.master.database.username` and
+`axelix.master.database.password`. Because migrations create and alter tables, that database user needs schema-change
+(DDL) privileges on top of the read and write access Master uses at runtime.
+
+### Using a dedicated migration user
+
+<UpcomingReleaseNotice />
+
+Some teams run the application day-to-day under a least-privilege user that can only read and write rows, and apply
+schema changes under a separate, more privileged user. Master supports this with two properties:
+
+| Property                            | Default                             | Description                                                                                     |
+|-------------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------|
+| `axelix.master.migrations.username` | `axelix.master.database.username`   | User Liquibase authenticates as when applying migrations. Needs schema-change (DDL) privileges. |
+| `axelix.master.migrations.password` | `axelix.master.database.password`   | Password for the migration user.                                                                |
+
+Both default to the matching `axelix.master.database.*` value. If you leave them unset, migrations run under the same
+user as the rest of the application — the behavior described above. When you do set them, Master connects to the **same
+database** — the JDBC URL and driver from `axelix.master.database.url` are reused — but authenticates the migration run
+as the migration user. Everything after startup still runs under `axelix.master.database.*`.
+
+:::note[SQLite has no users]
+SQLite stores data in a local file and has no concept of a database user, so `axelix.master.migrations.*` is ignored
+when `axelix.master.database.url` starts with `jdbc:sqlite:`. These properties apply to PostgreSQL and MySQL only.
+:::
+
+## Setting the migration credentials
+
+The migration properties are ordinary Master settings, so you supply them the same way as everything else. The examples
+below use PostgreSQL; MySQL works identically with a `jdbc:mysql://` URL.
+
+### Run as a JAR
+
+Pass them as `-D` system properties, or put them in a config file next to the JAR.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://db.internal:5432/axelix
+      username: axelix_app        # runtime user (DML only)
+      password: ${AXELIX_DB_PASSWORD}
+    migrations:
+      username: axelix_migrator    # migration user (DDL)
+      password: ${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
+axelix.master.database.username=axelix_app
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.migrations.username=axelix_migrator
+axelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </TabItem>
+</Tabs>
+
+Or entirely on the command line:
+
+```bash
+java \
+  -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+  -Daxelix.master.database.username=axelix_app \
+  -Daxelix.master.database.password=... \
+  -Daxelix.master.migrations.username=axelix_migrator \
+  -Daxelix.master.migrations.password=... \
+  -jar axelix-1.0.0.jar
+```
+
+### Run with Docker
+
+The image applies `JAVA_TOOL_OPTIONS` to the JVM automatically, so it is the hook for passing `-D` properties into the
+container.
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.database.password=... \
+    -Daxelix.master.migrations.username=axelix_migrator \
+    -Daxelix.master.migrations.password=..." \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+### Run with Docker Compose
+
+Add the migration properties to the `master` service's `JAVA_TOOL_OPTIONS`, alongside the database settings.
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: ghcr.io/axelixlabs/axelix:1.0.0
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+Provide the values through an `.env` file next to the Compose file:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix_app
+AXELIX_DB_PASSWORD=...
+AXELIX_MIGRATIONS_USERNAME=axelix_migrator
+AXELIX_MIGRATIONS_PASSWORD=...
+```
+
+## Related
+
+- [Configuring Master](../configuring-master/configuring-master.mdx) — the full property reference, including the
+  `axelix.master.database.*` connection settings.

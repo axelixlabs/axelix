@@ -20,9 +20,9 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { SetURLSearchParams } from "react-router";
 
-import { PageSearch } from "components";
-import { removeFilterById } from "helpers";
-import type { IInstanceCard, IWallboardSingleOperandFilter } from "models";
+import { PageSearch } from "@/components";
+import { removeFilterById } from "@/helpers";
+import type { IInstanceCard, IWallboardSingleOperandFilter } from "@/models";
 
 import { WallboardFilter } from "../WallboardFilter";
 

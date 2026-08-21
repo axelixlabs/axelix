@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler } from "components";
-import type { ITransactionAggregatedProfile } from "models";
+import { EmptyHandler } from "@/components";
+import type { ITransactionAggregatedProfile } from "@/models";
 
 import { TransactionRow } from "./TransactionRow";
 import styles from "./styles.module.css";

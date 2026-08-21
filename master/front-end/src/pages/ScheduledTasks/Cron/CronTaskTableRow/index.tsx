@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { TooltipWithCopy } from "components";
-import { type ICron } from "models";
+import { TooltipWithCopy } from "@/components";
+import { type ICron } from "@/models";
 
 import { CronExpressionEditableValue } from "../../CronExpressionEditableValue";
 import { ForceRunTask } from "../../ForceRunTask";

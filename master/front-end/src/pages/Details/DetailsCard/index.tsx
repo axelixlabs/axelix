@@ -18,7 +18,7 @@
 import type { PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { IDetailsCardRecord } from "models";
+import type { IDetailsCardRecord } from "@/models";
 
 import styles from "./styles.module.css";
 

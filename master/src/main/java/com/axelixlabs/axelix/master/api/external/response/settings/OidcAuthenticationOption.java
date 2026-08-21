@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -35,13 +38,19 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
     private final String scope;
     private final String clientId;
     private final String redirectUri;
+    private final Map<String, String> additionalParameters;
     private final Lazy<String> authorizationEndpointResolver;
 
     public OidcAuthenticationOption(
-            String scope, String clientId, String redirectUri, Lazy<String> authorizationEndpointResolver) {
+            String scope,
+            String clientId,
+            String redirectUri,
+            Map<String, String> additionalParameters,
+            Lazy<String> authorizationEndpointResolver) {
         this.scope = scope;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
+        this.additionalParameters = additionalParameters;
         this.authorizationEndpointResolver = authorizationEndpointResolver;
     }
 
@@ -77,6 +86,11 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
 
     public String getRedirectUri() {
         return redirectUri;
+    }
+
+    @JsonGetter("additionalParameters")
+    public Map<String, String> getAdditionalParameters() {
+        return additionalParameters;
     }
 
     public String getScope() {

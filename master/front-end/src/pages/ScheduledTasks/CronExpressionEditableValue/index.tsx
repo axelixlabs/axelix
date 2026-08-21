@@ -22,11 +22,11 @@ import { type ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { getCronDescription } from "helpers";
-import { useAuthority } from "hooks";
-import { EAuthorities, type ICron } from "models";
-import { changeCronExpression, checkCronExpressionValid } from "services";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { getCronDescription } from "@/helpers";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, type ICron } from "@/models";
+import { changeCronExpression, checkCronExpressionValid } from "@/services";
 
 import styles from "./styles.module.css";
 

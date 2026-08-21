@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
-import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "helpers";
-import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "models";
-import { getConfigPropsData } from "services";
+import { EmptyHandler, HashNavigable, Loader, PageSearch } from "@/components";
+import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "@/helpers";
+import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "@/models";
+import { getConfigPropsData } from "@/services";
 
 import { ConfigPropsTables } from "./ConfigPropsTables";
 

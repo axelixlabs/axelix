@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EProblemType, ETransactionOrigin, ETypeExternalCall, IJpaEntities } from "models";
+import type { EProblemType, ETransactionOrigin, ETypeExternalCall, IJpaEntities } from "@/models";
 
 /**
  * Min / max / average timing aggregated across every invocation.

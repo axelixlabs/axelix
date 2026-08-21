@@ -18,7 +18,7 @@
 import { App as AntdApp, ConfigProvider, type ThemeConfig } from "antd";
 import { Provider } from "react-redux";
 
-import { store } from "store";
+import { store } from "@/store";
 
 import { AppRoutes } from "./routes";
 

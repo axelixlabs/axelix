@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-004-postgres-create-roles-authorities-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="roles_authorities"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="roles_authorities">
+      <column name="role_id" type="TEXT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_roles_authorities_role" references="roles(id)"/>
+      </column>
+      <column name="authority_id" type="TEXT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_roles_authorities_authority" references="authorities(id)"/>
+      </column>
+    </createTable>
+
+    <addPrimaryKey
+            tableName="roles_authorities"
+            columnNames="role_id, authority_id"
+            constraintName="pk_roles_authorities"/>
+  </changeSet>
+</databaseChangeLog>

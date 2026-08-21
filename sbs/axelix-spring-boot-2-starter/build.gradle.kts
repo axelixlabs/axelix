@@ -33,6 +33,8 @@ dependencies {
 
     // Test
     testImplementation(project(":sbs:starter-domain"))
+    testImplementation(testFixtures(project(":common")))
+    testImplementation(testFixtures(project(":sbs:starter-domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

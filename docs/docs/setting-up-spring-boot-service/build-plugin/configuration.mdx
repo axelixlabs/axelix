@@ -1,0 +1,111 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Configuring the Axelix Build Plugin
+
+Applying the Axelix build plugin is the second half of making a service visible to
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — the first half is
+[wiring up the starter](../spring-boot-starter/configuration.mdx). The plugin has nothing to configure: you apply it,
+and it stamps your build coordinates into the artifact so Master can identify the instance. See [What is the Axelix
+build plugin?](./what-is-build-plugin.mdx) for what it produces and why it is required.
+
+:::warning[Required for registration]
+Master identifies every application by its `groupId` + `artifactId`. Without the plugin the
+`META-INF/axelix-info.properties` file is absent, the coordinates are blank, and **Master rejects the registration** —
+the instance never appears in the UI. The same coordinates also key the [persistence
+insights](../../setting-up-master-ui/mcp/mcp-tools.mdx) (N+1 and entity-mapping analysis). Apply the plugin to every
+service you want Axelix to manage.
+:::
+
+:::note
+The plugins are currently published to **Maven Central only**. Publishing to the Gradle Plugin Portal is on the roadmap;
+until then, Gradle builds must resolve the plugin from Maven Central (see the `pluginManagement` block below). Keep the
+plugin version in sync with the starter version.
+:::
+
+## Apply the plugin
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` to `pluginManagement` in your
+`settings.gradle.kts`:
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Then apply the plugin in `build.gradle.kts`:
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "1.0.0"
+}
+```
+
+  </TabItem>
+  <TabItem value="gradle-groovy" label="Gradle (Groovy)">
+
+Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` to `pluginManagement` in your
+`settings.gradle`:
+
+```groovy title="settings.gradle"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Then apply the plugin in `build.gradle`:
+
+```groovy title="build.gradle"
+plugins {
+    id 'com.axelixlabs.axelix' version '1.0.0'
+}
+```
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>1.0.0</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+The `axelix-generate-project-info` goal binds to the `prepare-package` phase by default, so it runs automatically during
+a normal `package`/`install` build — no extra phase configuration is needed.
+
+  </TabItem>
+</Tabs>
+
+Neither plugin exposes any configuration options. The Gradle plugin only needs the standard project `group` and
+`version` to be set (it fails the build if `group` is blank, since Axelix needs it to tell applications apart); Maven
+always has its GAV coordinates, so nothing else is required.
+
+## Related
+
+- [What is the Axelix build plugin?](./what-is-build-plugin.mdx) — what the plugin generates and why registration
+  depends on it.
+- [Configuring the Spring Boot Starter](../spring-boot-starter/configuration.mdx) — the runtime side that reads the
+  generated coordinates and reports them to Master.

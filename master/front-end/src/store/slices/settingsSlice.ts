@@ -17,11 +17,20 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { IAxelixSettings } from "models";
+import type { IAxelixSettings } from "@/models";
 
 const initialState: IAxelixSettings = {
     authenticationOptions: [],
     isMcpServerEnabled: false,
+    licensing: {
+        validUntil: null,
+        source: null,
+        licenseId: null,
+        license: "",
+        issuedTo: null,
+        issuedAt: null,
+        functions: [],
+    },
 };
 
 export const SettingsSlice = createSlice({

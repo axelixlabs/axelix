@@ -1,5 +1,6 @@
 .HelpLabelWrapper {
     margin-left: 20px;
+    cursor: pointer;
 }
 
 .HelpLabelWrapper:hover {

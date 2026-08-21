@@ -20,9 +20,9 @@ import type { DefaultOptionType } from "antd/es/select";
 import { type Dispatch, Fragment, type SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { InfoTooltip } from "components";
-import { getMetricTagValuesWithStatus } from "helpers";
-import type { ITagValueOptionValue, IValidTagCombination } from "models";
+import { InfoTooltip } from "@/components";
+import { getMetricTagValuesWithStatus } from "@/helpers";
+import type { ITagValueOptionValue, IValidTagCombination } from "@/models";
 
 import styles from "./styles.module.css";
 

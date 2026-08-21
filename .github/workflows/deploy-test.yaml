@@ -70,13 +70,8 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      # Re-checkout with submodules using the token loaded from Bitwarden.
-      - name: Checkout repository with submodules
-        uses: actions/checkout@v7
-        with:
-          token: ${{ env.GITHUB_MASTER_ACCESS_TOKEN }}
-          submodules: 'true'
-          persist-credentials: false
+      - name: Initialize enterprise submodule
+        uses: ./.github/actions/enterprise-submodule
 
       # Java 25 will be installed at this step.
       - name: Build Backend

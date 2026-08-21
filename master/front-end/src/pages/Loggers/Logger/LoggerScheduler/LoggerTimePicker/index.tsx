@@ -23,8 +23,8 @@ import "timepicker-ui/main.css";
 
 import { useTranslation } from "react-i18next";
 
-import { getTimepickerClockConfig, timepickerDataConvertToSeconds } from "helpers";
-import type { ITimepickerData, TChangeLoggerLevel } from "models";
+import { getTimepickerClockConfig, timepickerDataConvertToSeconds } from "@/helpers";
+import type { ITimepickerData, TChangeLoggerLevel } from "@/models";
 
 import styles from "./styles.module.css";
 

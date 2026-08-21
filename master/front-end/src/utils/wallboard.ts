@@ -23,13 +23,13 @@ import {
     getAllSpringBootVersions,
     getAllSpringFrameworkVersions,
     semVerMatch,
-} from "helpers";
+} from "@/helpers";
 import {
     EWallboardFilterKey,
     EWallboardFilterOperator,
     type ISelectOptionData,
     type IWallboardFilterDefinition,
-} from "models";
+} from "@/models";
 
 export const filteringKeys = Object.values(EWallboardFilterKey).map((source) => {
     return {

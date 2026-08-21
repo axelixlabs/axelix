@@ -47,6 +47,7 @@ public class SuperAdminPasswordEncoder {
     private final Set<String> supportedEncoderIds;
     private final DelegatingPasswordEncoder passwordEncoder;
 
+    @SuppressWarnings("deprecation")
     public SuperAdminPasswordEncoder(PasswordEncoder passwordEncoder) {
         Map<String, PasswordEncoder> encoders = new HashMap<>();
         encoders.put("noop", NoOpPasswordEncoder.getInstance());

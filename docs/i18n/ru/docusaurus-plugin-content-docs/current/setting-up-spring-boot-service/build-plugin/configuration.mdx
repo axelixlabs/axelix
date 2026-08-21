@@ -1,0 +1,111 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Настройка плагина сборки Axelix
+
+Подключение плагина сборки Axelix — это вторая половина того, что делает сервис видимым для
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx); первая половина —
+[подключение стартера](../spring-boot-starter/configuration.mdx). У плагина нечего настраивать: вы его подключаете, и он
+записывает координаты сборки в артефакт, чтобы Master мог идентифицировать сервис. См. [Что такое плагин сборки
+Axelix?](./what-is-build-plugin.mdx), чтобы узнать, что он создаёт и почему он обязателен.
+
+:::warning[Обязателен для регистрации]
+Master идентифицирует каждое приложение по его `groupId` + `artifactId`. Без плагина файл
+`META-INF/axelix-info.properties` отсутствует, координаты пусты, и **Master отклоняет регистрацию** — сервис так и не
+появится в UI. Эти же координаты используются как ключ для [инсайтов по
+персистентности](../../setting-up-master-ui/mcp/mcp-tools.mdx) (анализ N+1 и маппинга сущностей). Подключайте плагин к
+каждому сервису, которым вы хотите управлять через Axelix.
+:::
+
+:::note
+На данный момент плагины публикуются **только в Maven Central**. Публикация в Gradle Plugin Portal запланирована; до тех
+пор сборки на Gradle должны получать плагин из Maven Central (см. блок `pluginManagement` ниже). Держите версию плагина в
+соответствии с версией стартера.
+:::
+
+## Подключите плагин
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+Поскольку плагина пока нет в Gradle Plugin Portal, добавьте `mavenCentral()` в `pluginManagement` в вашем
+`settings.gradle.kts`:
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Затем подключите плагин в `build.gradle.kts`:
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "1.0.0"
+}
+```
+
+  </TabItem>
+  <TabItem value="gradle-groovy" label="Gradle (Groovy)">
+
+Поскольку плагина пока нет в Gradle Plugin Portal, добавьте `mavenCentral()` в `pluginManagement` в вашем
+`settings.gradle`:
+
+```groovy title="settings.gradle"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+Затем подключите плагин в `build.gradle`:
+
+```groovy title="build.gradle"
+plugins {
+    id 'com.axelixlabs.axelix' version '1.0.0'
+}
+```
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>1.0.0</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+Цель `axelix-generate-project-info` по умолчанию привязана к фазе `prepare-package`, поэтому она выполняется
+автоматически при обычной сборке `package`/`install` — дополнительная настройка фазы не нужна.
+
+  </TabItem>
+</Tabs>
+
+Ни один из плагинов не имеет параметров конфигурации. Gradle-плагину нужно лишь, чтобы были заданы стандартные `group`
+и `version` проекта (он завершает сборку с ошибкой, если `group` пуст, поскольку Axelix использует его, чтобы различать
+приложения); в Maven координаты GAV есть всегда, поэтому ничего дополнительно настраивать не нужно.
+
+## См. также
+
+- [Что такое плагин сборки Axelix?](./what-is-build-plugin.mdx) — что генерирует плагин и почему от него зависит
+  регистрация.
+- [Настройка Spring Boot Starter](../spring-boot-starter/configuration.mdx) — runtime-сторона, которая читает
+  сгенерированные координаты и передаёт их в Master.

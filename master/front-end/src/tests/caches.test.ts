@@ -17,8 +17,8 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { buildChartData } from "helpers";
-import { ELookupOutcome, type ICacheLookup } from "models";
+import { buildChartData } from "@/helpers";
+import { ELookupOutcome, type ICacheLookup } from "@/models";
 
 const hit = (timestamp = 0): ICacheLookup => ({ timestamp, outcome: ELookupOutcome.HIT });
 const miss = (timestamp = 0): ICacheLookup => ({ timestamp, outcome: ELookupOutcome.MISS });

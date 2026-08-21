@@ -47,6 +47,6 @@ public class RequiredAuthorityCheckService {
     private boolean userHasAuthority(User user, DefaultAuthority requiredAuthority) {
         return user.getRoles().stream()
                 .flatMap(role -> role.getAuthorities().stream())
-                .anyMatch(authority -> authority == requiredAuthority);
+                .anyMatch(authority -> authority.getName().equals(requiredAuthority.getName()));
     }
 }

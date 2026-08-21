@@ -38,10 +38,17 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health" ]
+        include: [ "health", "prometheus" ]
+  prometheus:
+    metrics:
+      export:
+        enabled: ${axelix.master.metrics.prometheus.enabled}
 
 axelix:
   master:
+    metrics:
+      prometheus:
+        enabled: false
     mcp-server:
       enabled: false
     discovery:

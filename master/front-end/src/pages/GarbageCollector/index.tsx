@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IGCLoggingStatusResponseBody, StatefulRequest } from "models";
-import { getGCLoggingStatus } from "services";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData } from "@/helpers";
+import { type IGCLoggingStatusResponseBody, StatefulRequest } from "@/models";
+import { getGCLoggingStatus } from "@/services";
 
 import { GCDisabledMessage } from "./GCDisabled";
 import { GCFirstSection } from "./GCFirstSection";

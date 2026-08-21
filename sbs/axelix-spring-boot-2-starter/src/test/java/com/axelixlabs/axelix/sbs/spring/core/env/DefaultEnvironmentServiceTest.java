@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExec
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
-import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

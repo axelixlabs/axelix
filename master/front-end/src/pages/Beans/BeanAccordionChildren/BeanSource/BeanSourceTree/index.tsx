@@ -19,9 +19,9 @@ import { Tree, type TreeDataNode } from "antd";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { StyledLink } from "components";
-import { findBeanBySearchSubject, normalizeHtmlElementId } from "helpers";
-import { EBeanOrigin, ESearchSubject, type IBean } from "models";
+import { StyledLink } from "@/components";
+import { findBeanBySearchSubject, normalizeHtmlElementId } from "@/helpers";
+import { EBeanOrigin, ESearchSubject, type IBean } from "@/models";
 
 import styles from "./styles.module.css";
 

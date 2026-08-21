@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("shared")
+    id("java-test-fixtures")
     kotlin("jvm") version "2.4.10"
 }
 
@@ -12,10 +13,7 @@ val jsonUnitAssertJVersion = "2.40.1"
 
 dependencies {
     // Self
-    api(project(":common:auth"))
-    api(project(":common:api"))
-    api(project(":common:domain"))
-    api(project(":common:utils"))
+    api(project(":common"))
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))

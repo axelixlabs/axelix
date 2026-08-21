@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IDashboardResponseBody, StatefulRequest } from "models";
-import { getDashboardOverviewData } from "services";
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { fetchData } from "@/helpers";
+import { type IDashboardResponseBody, StatefulRequest } from "@/models";
+import { getDashboardOverviewData } from "@/services";
 
 import Distributions from "./Distributions";
 

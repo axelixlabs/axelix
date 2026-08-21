@@ -23,8 +23,8 @@ import type {
     ITagValueOption,
     ITagValueOptionValue,
     IValidTagCombination,
-} from "models";
-import { SHOW_RAW_THRESHOLD } from "utils";
+} from "@/models";
+import { SHOW_RAW_THRESHOLD } from "@/utils";
 
 import { commonNormalize } from "./globals";
 

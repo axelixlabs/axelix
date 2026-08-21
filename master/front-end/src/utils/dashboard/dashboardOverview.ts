@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EInstanceStatus } from "models";
+import { EInstanceStatus } from "@/models";
 
 export const HEALTH_STATUSES_COLORS: Record<EInstanceStatus, string> = {
     [EInstanceStatus.UP]: "#00ab55",

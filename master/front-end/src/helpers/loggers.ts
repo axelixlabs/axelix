@@ -24,8 +24,8 @@ import {
     type ILoggerGroup,
     type ITimepickerClockConfig,
     type ITimepickerData,
-} from "models";
-import { DEFAULT_TIME_LOCALE } from "utils";
+} from "@/models";
+import { DEFAULT_TIME_LOCALE } from "@/utils";
 
 dayjs.extend(isSameOrBefore);
 

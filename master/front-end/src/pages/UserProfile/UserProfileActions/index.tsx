@@ -20,13 +20,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-import { extractErrorCode } from "helpers";
-import { EUserOrigin, StatelessRequest } from "models";
-import { deleteUser } from "services";
+import { TrashIcon, WarningIcon } from "@/assets";
+import { extractErrorCode } from "@/helpers";
+import { EUserOrigin, StatelessRequest } from "@/models";
+import { deleteUser } from "@/services";
 
 import styles from "./styles.module.css";
-
-import { TrashIcon, WarningIcon } from "assets";
 
 interface IProps {
     /**

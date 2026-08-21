@@ -1,6 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
+import { UpcomingReleaseNotice } from '@site/src/components';
 
 # Настройка Master
 
@@ -17,7 +18,7 @@ import styles from './styles.module.css';
 - **База данных**: Master поддерживает три движка, которые выбираются автоматически по префиксу URL-адреса JDBC —
   **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), **MySQL** (`jdbc:mysql:`). По умолчанию используется
   SQLite с файлом `axelix.db` в рабочем каталоге. Liquibase выполняет миграцию схемы при каждом запуске.
-- **Веб-интерфейс**: `axelix-1.0.0-M1.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
+- **Веб-интерфейс**: `axelix-1.0.0.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
   подключения веб-интерфейса ничего дополнительно настраивать не нужно.
 - **Аутентификация**: в Master встроена учётная запись суперадминистратора `admin / admin` и не заданный ключ для
   подписи JWT. В любой среде, кроме тестовой, необходимо изменить оба параметра — см. [Справочник по
@@ -35,6 +36,55 @@ import styles from './styles.module.css';
 `axelix.master.auth.cookie.secure` при работе через HTTPS — прежде чем предоставлять доступ к Master кому-либо, кроме
 себя.
 :::
+
+### Способы задания свойств
+
+Master — это приложение на Spring Boot, поэтому любое свойство с этой страницы можно задать через любой источник,
+который читает Spring Boot, — не только через файл конфигурации:
+
+- файл конфигурации **YAML** или **properties** (`application.yaml` / `application.properties`);
+- **системное свойство JVM**, переданное через `-D` в командной строке `java`;
+- **переменная окружения**.
+
+Master никогда не ограничивает свойство единственным источником. Везде, где на этой странице описано свойство вроде
+`axelix.master.auth.jwt.signing-key`, вы можете задать его тем из трёх способов, который подходит для вашего
+развёртывания, — одно и то же имя доходит до Master одинаково через любой из них.
+
+Это работает благодаря [нестрогому связыванию (relaxed binding)](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding)
+в Spring Boot: у одного логического свойства есть несколько эквивалентных написаний, и Master читает их все как одно и то
+же значение. Каноническая форма, используемая на этой странице, — строчными буквами, через точку, в стиле kebab-case
+(`axelix.master.auth.jwt.signing-key`). В таблице ниже показано, как записывается это свойство для каждого источника:
+
+| Источник                      | Как записать `axelix.master.auth.jwt.signing-key`                          |
+|-------------------------------|----------------------------------------------------------------------------|
+| `application.yaml`            | вложенные ключи `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:`   |
+| `application.properties`      | `axelix.master.auth.jwt.signing-key=...`                                    |
+| Системное свойство JVM (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                  |
+| Переменная окружения          | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                     |
+
+Форма для переменной окружения подчиняется строгому правилу: **переведите имя в верхний регистр, замените каждую точку
+на подчёркивание и уберите все дефисы**. Именно поэтому `signing-key` превращается в `SIGNINGKEY` — дефис удаляется, а не
+заменяется на подчёркивание. Свойство без дефисов отображается более прямолинейно:
+`axelix.master.metrics.prometheus.enabled` превращается в `AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+В примерах для Docker и Docker Compose ниже свойства передаются как флаги `-D` внутри `JAVA_TOOL_OPTIONS`, но это лишь
+один из вариантов: флаг `-Daxelix.master.auth.jwt.signing-key=...` и переменная окружения
+`AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` взаимозаменяемы, поэтому используйте тот способ, который проще на вашей
+платформе.
+:::
+
+### Общие настройки
+
+<UpcomingReleaseNotice />
+
+<div className={styles.ConfigTable}>
+
+| Свойство                    | По умолчанию | Описание                                                                                       |
+|------------------------------|--------------|----------------------------------------------------------------------------------------------------|
+| `axelix.master.environment` | пусто        | Имя среды, в которой работает этот экземпляр Master, например `production` или `staging`. На данный момент используется только для заполнения поля ECS `service.environment`, когда включено [структурированное логирование](#структурированное-логирование). |
+
+</div>
 
 ### База данных
 
@@ -177,7 +227,7 @@ JWT, подписанный общим `axelix.master.auth.jwt.signing-key`. Mas
 Функция **включена по умолчанию** (`enabled=true`), установите в `false`, только если хотите, чтобы Master отказывался
 от всех heartbeat-сигналов. Свойства со стороны стартера, которые попадают *в* heartbeat-сигнал (`master-url`,
 `instance-actuator-url`, `instance-name`), описаны на странице [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
 
 <div className={styles.ConfigTable}>
 
@@ -199,6 +249,62 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 
 </div>
 
+### Структурированное логирование
+
+<UpcomingReleaseNotice />
+
+По умолчанию Master выводит в консоль (то есть в stdout процесса) обычный текст. Установите
+`axelix.master.logging.json.enabled=true`, чтобы переключиться на структурированное JSON-логирование в формате
+[Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html)
+(ECS) — на сегодня это единственный поддерживаемый Master структурированный формат. ECS — это JSON-формат логирования;
+используйте его, когда логи отправляются в агрегатор вроде Elasticsearch или аналогичный ECS-совместимый конвейер.
+
+<div className={styles.ConfigTable}>
+
+| Свойство                             | По умолчанию | Описание                                                                       |
+|----------------------------------------|--------------|-------------------------------------------------------------------------------------|
+| `axelix.master.logging.json.enabled` | `false`      | Переключить логирование в консоль с обычного текста на структурированный JSON ECS. |
+
+</div>
+
+### Метрики
+
+#### Prometheus
+
+<UpcomingReleaseNotice />
+
+Master открывает эндпоинт для сбора метрик Prometheus, если включить его через
+`axelix.master.metrics.prometheus.enabled=true`. Он отвечает по адресу `/api/actuator/prometheus` и не требует
+аутентификации.
+
+Добавляйте общие теги к каждой экспортируемой метрике через `axelix.master.metrics.prometheus.tags.<name>=<value>`,
+например регион развёртывания или окружение.
+
+:::warning
+Поскольку эндпоинт не требует аутентификации, любой, кто имеет сетевой доступ к Master, сможет прочитать значения
+метрик и настроенные общие теги. Ограничьте доступ к `/api/actuator/prometheus` доверенной инфраструктуре
+Prometheus с помощью network policy, правил ingress или другого аналогичного контроля периметра.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Свойство                                      | По умолчанию | Описание                                                                        |
+|------------------------------------------------|--------------|--------------------------------------------------------------------------------------|
+| `axelix.master.metrics.prometheus.enabled` | `false`      | Открыть эндпоинт сбора метрик Prometheus по адресу `/api/actuator/prometheus`.  |
+| `axelix.master.metrics.prometheus.tags`    | empty        | Общие теги, применяемые к каждой экспортируемой метрике.                       |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        tags:
+          region: eu-west-1
+```
+
 ## Запуск как JAR
 
 Используйте этот вариант, когда вам нужна максимально лёгкая среда выполнения — один процесс на машине, которой вы уже
@@ -206,7 +312,7 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 
 ### 1. Скачайте JAR
 
-Возьмите `axelix-1.0.0-M1.jar`, прикреплённый к нужному вам релизу, со [страницы
+Возьмите `axelix-1.0.0.jar`, прикреплённый к нужному вам релизу, со [страницы
 релизов](https://github.com/axelixlabs/axelix/releases). Опубликованный артефакт уже включает пользовательский
 интерфейс, поэтому ничего больше собирать не нужно.
 
@@ -218,7 +324,7 @@ Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configu
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 После этого Master доступен по адресу `http://localhost:8080`. Войдите с учётными данными суперадминистратора, которые
@@ -367,11 +473,11 @@ axelix.master.auth.cookie.secure=true
 Конвейер выпуска публикует образ в GitHub Container Registry:
 
 ```
-ghcr.io/axelixlabs/axelix:1.0.0-M1
+ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 :::note
-Приведённые ниже фрагменты кода содержат `1.0.0-M1` для наглядности. Проверьте [страницу
+Приведённые ниже фрагменты кода содержат `1.0.0` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases) на актуальную опубликованную метку и подставьте её в свои
 команды.
 :::
@@ -386,7 +492,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 Несколько примечаний об этой команде:
@@ -405,7 +511,7 @@ docker run --rm -p 8080:8080 \
 для небольшого self-hosted развёртывания.
 
 Приведённый ниже пример представляет собой готовый стек, который можно положить в новый `docker-compose.yaml`,
-отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.0.0-M1` —
+отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.0.0` —
 подставьте актуальную метку со [страницы релизов](https://github.com/axelixlabs/axelix/releases) перед отправкой в
 продакшен.
 
@@ -426,7 +532,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+    image: ghcr.io/axelixlabs/axelix:1.0.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -578,7 +684,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+          image: ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 В Kubernetes Role — это объект, привязанный к пространству имён, поэтому повторите Role и RoleBinding по одному разу на
@@ -594,7 +700,7 @@ spec:
 ## См. также
 
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) — подключите
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — подключите
   ваши мониторируемые сервисы, чтобы Master их увидел.
 - [Что такое Master?](../what-is-master.mdx) — фон того, что делает Master, когда он запущен.
 - [Аутентификация](../authentication/authentication.mdx) — углублённый взгляд на JWT, суперадминистратора и OAuth2/OIDC.

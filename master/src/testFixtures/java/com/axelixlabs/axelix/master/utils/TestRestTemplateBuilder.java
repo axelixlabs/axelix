@@ -30,11 +30,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
@@ -85,15 +85,15 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate asViewer() {
-        return withRole(DefaultRole.VIEWER);
+        return withRole(TestRoles.VIEWER);
     }
 
     public TestRestTemplate asEditor() {
-        return withRole(DefaultRole.EDITOR);
+        return withRole(TestRoles.EDITOR);
     }
 
     public TestRestTemplate asAdmin() {
-        return withRole(DefaultRole.ADMIN);
+        return withRole(TestRoles.ADMIN);
     }
 
     public TestRestTemplate withRole(Role role) {

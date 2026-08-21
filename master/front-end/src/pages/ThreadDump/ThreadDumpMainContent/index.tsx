@@ -17,10 +17,10 @@
  */
 import { useEffect, useState } from "react";
 
-import { Accordion } from "components";
-import { appendToThreadDumpHistory, getDisplayedThreadDump } from "helpers";
-import type { IThread, IThreadGroup } from "models";
-import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
+import { Accordion } from "@/components";
+import { appendToThreadDumpHistory, getDisplayedThreadDump } from "@/helpers";
+import type { IThread, IThreadGroup } from "@/models";
+import { THREAD_DUMP_SLIDING_WINDOW_MS } from "@/utils";
 
 import { SingleThreadAccordionHeader } from "../SingleThreadAccordionHeader";
 import { ThreadDumpAccordionBody } from "../ThreadDumpAccordionBody";

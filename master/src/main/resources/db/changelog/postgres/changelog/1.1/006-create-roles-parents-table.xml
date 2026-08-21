@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-006-postgres-create-roles-parents-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="roles_parents"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="roles_parents">
+      <column name="role_id" type="TEXT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_roles_parents_role" references="roles(id)"/>
+      </column>
+      <column name="parent_role_id" type="TEXT">
+        <constraints nullable="false"
+                     foreignKeyName="fk_roles_parents_parent" references="roles(id)"/>
+      </column>
+    </createTable>
+
+    <addPrimaryKey
+            tableName="roles_parents"
+            columnNames="role_id, parent_role_id"
+            constraintName="pk_roles_parents"/>
+  </changeSet>
+</databaseChangeLog>

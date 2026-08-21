@@ -17,12 +17,11 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { EAssociationProblem } from "models";
-import { associationProblemClassToken, associationProblemLabelKey } from "utils";
+import { QuestionIcon } from "@/assets";
+import type { EAssociationProblem } from "@/models";
+import { associationProblemClassToken, associationProblemLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
-
-import { QuestionIcon } from "assets";
 
 interface IProps {
     /**

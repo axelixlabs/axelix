@@ -19,8 +19,8 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { EmptyHandler, UserRoleTags } from "components";
-import type { IUser } from "models";
+import { EmptyHandler, UserRoleTags } from "@/components";
+import type { IUser } from "@/models";
 
 import styles from "./styles.module.css";
 

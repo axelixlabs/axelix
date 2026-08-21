@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -41,6 +42,23 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
     Optional<UserEntity> findByEmail(@Param("email") String email);
 
+    @Query("SELECT r.name FROM users_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = :userId")
+    List<String> findRoleNamesByUserId(@Param("userId") String userId);
+
+    @Query("SELECT ur.user_id AS user_id, r.name AS role_name FROM users_roles ur JOIN roles r ON r.id = ur.role_id")
+    List<UserRoleName> findAllUserRoleNames();
+
+    /**
+     * @return the amount of rows affected
+     */
+    @Modifying
+    @Query("INSERT INTO users_roles (user_id, role_id) SELECT :userId, r.id FROM roles r WHERE r.name = :roleName")
+    int attachRole(@Param("userId") String userId, @Param("roleName") String roleName);
+
+    @Modifying
+    @Query("DELETE FROM users_roles WHERE user_id = :userId")
+    void deleteUserRolesMappings(@Param("userId") String userId);
+
     @Modifying
     @Query("UPDATE users SET last_login_at = :lastLoginAt WHERE username = :username")
     void updateLastLoginAt(@Param("username") String username, @Param("lastLoginAt") Instant lastLoginAt);
@@ -60,7 +78,6 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
                 job_title = :jobTitle,
                 organizational_unit = :organizationalUnit,
                 password = COALESCE(:password, password),
-                roles = :roles,
                 last_login_at = COALESCE(:lastLoginAt, last_login_at)
         WHERE id = :id
         """)
@@ -73,6 +90,15 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
             @Param("jobTitle") @Nullable String jobTitle,
             @Param("organizationalUnit") @Nullable String organizationalUnit,
             @Param("password") @Nullable String password,
-            @Param("roles") UserEntity.Roles roles,
             @Param("lastLoginAt") @Nullable Instant lastLoginAt);
+
+    /**
+     * Single role assignment, used to read the assignments of many users at once without a query per user.
+     *
+     * @param userId   Identifier of the user the role is granted to.
+     * @param roleName Name of the granted role.
+     *
+     * @author Sergey Cherkasov
+     */
+    record UserRoleName(String userId, String roleName) {}
 }

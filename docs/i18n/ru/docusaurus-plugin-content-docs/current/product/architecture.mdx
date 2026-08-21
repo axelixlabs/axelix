@@ -27,10 +27,10 @@ Master, поэтому одни и те же данные отдаются и б
 
 - **[Axelix Master](../setting-up-master-ui/what-is-master)**: отдаёт UI, предоставляет REST API, который потребляет UI,
   запускает встроенный MCP-сервер, общается с каждым управляемым сервисом по HTTP и хранит реестр сервисов.
-- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter)**: отдельные модули стартера
-  существуют для [Spring Boot 2](../setting-up-spring-boot-service/configuring-axelix-starter#add-the-dependency),
-  [Spring Boot 3](../setting-up-spring-boot-service/configuring-axelix-starter#add-the-dependency) и
-  [Spring Boot 4](../setting-up-spring-boot-service/configuring-axelix-starter#add-the-dependency) — выберите тот, что соответствует вашему приложению. Стартер
+- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter)**: отдельные модули стартера
+  существуют для [Spring Boot 2](../setting-up-spring-boot-service/spring-boot-starter/configuration#add-the-dependency),
+  [Spring Boot 3](../setting-up-spring-boot-service/spring-boot-starter/configuration#add-the-dependency) и
+  [Spring Boot 4](../setting-up-spring-boot-service/spring-boot-starter/configuration#add-the-dependency) — выберите тот, что соответствует вашему приложению. Стартер
   предоставляет эндпоинты, нужные Master (бины, окружение, кеши, запланированные задачи и прочее), и опционально может
   сам зарегистрироваться в Master при старте.
 
@@ -56,7 +56,7 @@ Master, поэтому одни и те же данные отдаются и б
   только в [Kubernetes](../setting-up-master-ui/configuring-master#discovery--auto-discovery) и включён по умолчанию в
   [официальном helm-чарте Axelix](https://artifacthub.io/packages/helm/axelix/axelix).
 - [Самостоятельная регистрация со стороны
-  стартера](../setting-up-spring-boot-service/configuring-axelix-starter#option-b--self-registration): Axelix Starter
+  стартера](../setting-up-spring-boot-service/spring-boot-starter/configuration#option-b--self-registration): Axelix Starter
   отправляет запрос на регистрацию в Master при старте и шлёт heartbeats с определённым интервалом.
 
 ## Развёртывание и масштабирование

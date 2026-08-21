@@ -30,9 +30,9 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -73,36 +73,35 @@ public class AxelixConfigurationPropertiesEndpointTest extends AbstractConfigPro
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                Arguments.of("tags.environment", "******", DefaultRole.VIEWER),
-                Arguments.of("tags.version", "******", DefaultRole.VIEWER),
-                Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
-                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
-                Arguments.of("tags.environment", "******", DefaultRole.EDITOR),
-                Arguments.of("tags.version", "******", DefaultRole.EDITOR),
-                Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
-                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
-                Arguments.of("tags.environment", "test", DefaultRole.ADMIN),
-                Arguments.of("tags.version", "1.0.0", DefaultRole.ADMIN),
-                Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
-                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN),
-                Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
-                Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
+                Arguments.of("tags.environment", "******", TestRoles.VIEWER),
+                Arguments.of("tags.version", "******", TestRoles.VIEWER),
+                Arguments.of("tags.forSanitization", "******", TestRoles.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.VIEWER),
+                Arguments.of("tags.environment", "******", TestRoles.EDITOR),
+                Arguments.of("tags.version", "******", TestRoles.EDITOR),
+                Arguments.of("tags.forSanitization", "******", TestRoles.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "******", TestRoles.EDITOR),
+                Arguments.of("tags.environment", "test", TestRoles.ADMIN),
+                Arguments.of("tags.version", "1.0.0", TestRoles.ADMIN),
+                Arguments.of("tags.forSanitization", "toBeSanitized", TestRoles.ADMIN),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", TestRoles.ADMIN),
+                Arguments.of("enabledContexts[0]", "user-service", TestRoles.VIEWER),
+                Arguments.of("enabledContexts[1]", "payment-service", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[0].name", "user-api", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].type", "GET", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", TestRoles.VIEWER),
                 Arguments.of(
-                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
-                Arguments.of(
-                        "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
+                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[1].type", "POST", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[1].name", "payment-api", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", TestRoles.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", TestRoles.VIEWER),
                 Arguments.of(
                         "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
                         "DEBUG",
-                        DefaultRole.VIEWER));
+                        TestRoles.VIEWER));
     }
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-configprops")

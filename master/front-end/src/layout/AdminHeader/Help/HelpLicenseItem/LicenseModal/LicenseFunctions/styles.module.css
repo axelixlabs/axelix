@@ -1,0 +1,23 @@
+.FunctionsTitle {
+    color: var(--axelix-bold-grey);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.FunctionChipsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.FunctionChip {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 4px 8px;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+    user-select: none;
+    cursor: default;
+}

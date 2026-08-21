@@ -17,10 +17,10 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { Accordion } from "components";
-import { deriveProblems, formatTransactionDuration, simpleClassName } from "helpers";
-import type { ITransactionAggregatedProfile } from "models";
-import { PROBLEM_TYPE_ORDER, originLabelKey } from "utils";
+import { Accordion } from "@/components";
+import { deriveProblems, formatTransactionDuration, simpleClassName } from "@/helpers";
+import type { ITransactionAggregatedProfile } from "@/models";
+import { PROBLEM_TYPE_ORDER, originLabelKey } from "@/utils";
 
 import { ProblemChip } from "../../ProblemChip";
 

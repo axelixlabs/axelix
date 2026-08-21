@@ -41,7 +41,10 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param status       Status that controls whether the user can log in.
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
  *
+ * @deprecated roles - since 1.1, we're using {@link RoleEntity}.
+ *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Table("users")
 public record UserEntity(
@@ -53,7 +56,10 @@ public record UserEntity(
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
         @Nullable String password,
+
+        @Nullable @Deprecated(forRemoval = true, since = "1.1")
         Roles roles,
+
         UserOrigin userOrigin,
         UserStatus status,
         @Nullable Instant lastLoginAt) {
@@ -69,7 +75,7 @@ public record UserEntity(
         return "User[id=" + id + ", username=[REDACTED], firstName=[REDACTED]"
                 + ", lastName=[REDACTED], email=[REDACTED]"
                 + ", jobTitle=[REDACTED], organizationalUnit=[REDACTED]"
-                + ", password=[REDACTED], roles=" + roles + ", userOrigin=" + userOrigin
+                + ", password=[REDACTED]" + ", userOrigin=" + userOrigin
                 + ", status=" + status + ", lastLoginAt=" + lastLoginAt + ']';
     }
 }

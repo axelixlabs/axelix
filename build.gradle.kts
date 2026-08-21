@@ -9,6 +9,7 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.Base64
+import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 plugins {
@@ -38,7 +39,7 @@ dependencies {
     }
 }
 
-val aggregateTestProfilerReports by tasks.registering(Copy::class) {
+val aggregateTestProfilerReports by tasks.register<Copy>("aggregateTestProfilerReports") {
     group = "reporting"
     description = "Aggregates spring-test-profiler HTML reports from all subprojects."
 
@@ -70,12 +71,9 @@ subprojects {
         errorprone("com.uber.nullaway:nullaway:0.13.8")
     }
 
-    val licenseHeaderFile = if (projectDir.toPath().startsWith(rootDir.resolve("axelix-enterprise").toPath())) {
-        "${rootDir.path}/axelix-enterprise/LICENSE_HEADER_ENTERPRISE"
-    } else {
-        "${rootDir.path}/LICENSE_HEADER"
-    }
-    val licenseHeaderText = Paths.get(licenseHeaderFile).readText(charset = StandardCharsets.UTF_8)
+    val customLicenseHeader = projectDir.resolve("../LICENSE_HEADER").toPath()
+    val licenseHeaderFile = if (customLicenseHeader.exists()) customLicenseHeader else Paths.get("${rootDir.path}/LICENSE_HEADER")
+    val licenseHeaderText = licenseHeaderFile.readText(charset = StandardCharsets.UTF_8)
 
     spotless {
         java {
@@ -179,12 +177,9 @@ val pluginModules = listOf(
     project(":plugins:axelix-maven-plugin")
 )
 
-val commonModules = listOf(
+val shadedModules = listOf(
     project(":sbs:starter-domain"),
-    project(":common:auth"),
-    project(":common:api"),
-    project(":common:domain"),
-    project(":common:utils")
+    project(":common")
 )
 
 val publishableModules = starterModules + pluginModules
@@ -222,14 +217,14 @@ configure(publishableModules) {
         tasks {
             jar {
                 duplicatesStrategy = DuplicatesStrategy.WARN
-                commonModules.forEach { from(it.sourceSets.main.get().output) }
+                shadedModules.forEach { from(it.sourceSets.main.get().output) }
             }
             named<Jar>("sourcesJar") {
                 duplicatesStrategy = DuplicatesStrategy.WARN
-                commonModules.forEach { from(it.sourceSets.main.get().allSource) }
+                shadedModules.forEach { from(it.sourceSets.main.get().allSource) }
             }
             withType<Javadoc> {
-                commonModules.forEach { source(it.sourceSets.main.get().allJava) }
+                shadedModules.forEach { source(it.sourceSets.main.get().allJava) }
                 classpath = project.configurations.compileClasspath.get()
             }
             named<Jar>("javadocJar") {

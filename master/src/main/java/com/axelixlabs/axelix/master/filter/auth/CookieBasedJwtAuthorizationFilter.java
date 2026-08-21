@@ -71,6 +71,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // TODO: We must refactor it
         return !path.startsWith("/api/")
                 || path.startsWith("/api/actuator/health")
+                || path.startsWith("/api/actuator/prometheus")
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
                 || path.startsWith("/api/external/settings")

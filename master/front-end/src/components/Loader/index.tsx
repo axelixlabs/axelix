@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
+import { LoaderIcon } from "@/assets";
 
-import { LoaderIcon } from "assets";
+import styles from "./styles.module.css";
 
 export const Loader = () => {
     return (

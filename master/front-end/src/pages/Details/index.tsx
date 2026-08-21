@@ -18,22 +18,21 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { Copy, EmptyHandler, Loader } from "components";
-import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "helpers";
+import { BuildIcon, GitIcon, SpringIcon } from "@/assets";
+import { Copy, EmptyHandler, Loader } from "@/components";
+import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "@/helpers";
 import {
     type DetailsBuildValuesData,
     type IDetailsCardRecord,
     type IDetailsResponseBody,
     StatefulRequest,
-} from "models";
-import { getDetailsData } from "services";
-import { VALUE_TRANSFORMERS } from "utils";
+} from "@/models";
+import { getDetailsData } from "@/services";
+import { VALUE_TRANSFORMERS } from "@/utils";
 
 import { DetailsCard } from "./DetailsCard";
 import { DetailsHeader } from "./DetailsFirstSection";
 import styles from "./styles.module.css";
-
-import { BuildIcon, GitIcon, SpringIcon } from "assets";
 
 const Details = () => {
     const { instanceId } = useParams();

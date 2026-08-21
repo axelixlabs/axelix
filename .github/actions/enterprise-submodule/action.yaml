@@ -1,0 +1,19 @@
+name: "Initialize Axelix Enterprise submodule"
+description: >-
+  Checks out the axelix-enterprise git submodule so that the unified (OSS + Enterprise)
+  distribution can be built. Requires GITHUB_ENTERPRISE_PRIVATE_KEY and
+  GITHUB_ENTERPRISE_REPO_LOCATION to be present in the environment.
+
+runs:
+  using: composite
+  steps:
+    - name: Initialize enterprise submodule
+      shell: bash
+      run: |
+        mkdir -p "$HOME/.ssh"
+        printf '%s\n' "$GITHUB_ENTERPRISE_PRIVATE_KEY" > "$HOME/.ssh/enterprise.key"
+        chmod 600 "$HOME/.ssh/enterprise.key"
+        git config submodule.axelix-enterprise.url "$GITHUB_ENTERPRISE_REPO_LOCATION"
+        GIT_SSH_COMMAND="ssh -i $HOME/.ssh/enterprise.key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
+          git submodule update --init --recursive axelix-enterprise
+        rm "$HOME/.ssh/enterprise.key"

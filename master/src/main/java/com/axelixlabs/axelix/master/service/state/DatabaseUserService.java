@@ -18,7 +18,10 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +36,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
@@ -92,7 +94,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
+                null,
                 UserOrigin.LOCAL,
                 UserStatus.ACTIVE,
                 null);
@@ -108,6 +110,7 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
+        grantRoles(userEntity.id(), Collections.singleton(role));
     }
 
     @Override
@@ -129,7 +132,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 null,
-                new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
+                null,
                 UserOrigin.OIDC,
                 UserStatus.ACTIVE,
                 Instant.now()); // the assumption is that the user is created during the initial login
@@ -139,10 +142,12 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
+        grantRoles(userEntity.id(), Set.of(role));
     }
 
     @Override
     public void deleteById(String id) {
+        userRepository.deleteUserRolesMappings(id);
         userRepository.deleteById(id);
     }
 
@@ -159,6 +164,19 @@ public class DatabaseUserService implements UserService {
     @Override
     public Optional<UserEntity> findUserById(String id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public Set<String> findRoleNamesByUserId(String userId) {
+        return Set.copyOf(userRepository.findRoleNamesByUserId(userId));
+    }
+
+    @Override
+    public Map<String, Set<String>> findAllRoleNamesByUserId() {
+        return userRepository.findAllUserRoleNames().stream()
+                .collect(Collectors.groupingBy(
+                        UserRepository.UserRoleName::userId,
+                        Collectors.mapping(UserRepository.UserRoleName::roleName, Collectors.toSet())));
     }
 
     @Override
@@ -194,9 +212,6 @@ public class DatabaseUserService implements UserService {
             throw new UserInvalidValueException(null);
         }
 
-        Set<String> validRoles =
-                roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
-
         String normalizedUsername = requireNonBlankTrimmed(username);
         String normalizedFirstName = normalizeOptional(firstName);
         String normalizedLastName = normalizeOptional(lastName);
@@ -224,8 +239,30 @@ public class DatabaseUserService implements UserService {
                 normalizedJobTitle,
                 normalizedOrganizationalUnit,
                 password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                new UserEntity.Roles(validRoles),
                 lastLoginAt);
+
+        userRepository.deleteUserRolesMappings(id);
+        grantRoles(id, roles);
+    }
+
+    // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization
+    private void grantRoles(String userId, Set<String> roleNames) {
+        roleNames.forEach(roleName -> {
+            String normalizedRole = validateAndNormalizeRole(roleName);
+            int rowsAffected = userRepository.attachRole(userId, normalizedRole);
+
+            if (rowsAffected != 1) {
+                throw new UserRoleNotFoundException(normalizedRole);
+            }
+        });
+    }
+
+    private String validateAndNormalizeRole(@Nullable String role) throws UserInvalidValueException {
+        if (role == null || role.isBlank()) {
+            throw new UserInvalidValueException(role);
+        }
+
+        return role.trim().toUpperCase(Locale.ROOT);
     }
 
     private boolean userWithSuchEmailAlreadyExists(String id, String normalizedEmail) {
@@ -257,18 +294,5 @@ public class DatabaseUserService implements UserService {
     @Nullable
     private String normalizeOptional(@Nullable String value) throws UserInvalidValueException {
         return value == null ? null : requireNonBlankTrimmed(value);
-    }
-
-    private String validateAndNormalizeRole(@Nullable String role)
-            throws UserInvalidValueException, UserRoleNotFoundException {
-        if (role == null || role.isBlank()) {
-            throw new UserInvalidValueException(role);
-        }
-
-        String normalized = role.trim().toUpperCase();
-        if (!DefaultRole.ALL_ROLE_NAMES.contains(normalized)) {
-            throw new UserRoleNotFoundException(role);
-        }
-        return normalized;
     }
 }

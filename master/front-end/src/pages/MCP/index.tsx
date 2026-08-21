@@ -16,12 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { getMCPTools } from "services/MCP";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData } from "helpers";
-import { filterMCPTools } from "helpers/mcp";
-import { type IMCPToolsResponseBody, StatefulRequest } from "models";
+import { EmptyHandler, Loader, PageSearch } from "@/components";
+import { fetchData } from "@/helpers";
+import { filterMCPTools } from "@/helpers";
+import { type IMCPToolsResponseBody, StatefulRequest } from "@/models";
+import { getMCPTools } from "@/services";
 
 import { MCPCard } from "./MCPCard";
 import styles from "./styles.module.css";

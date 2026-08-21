@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -126,6 +127,22 @@ public interface UserService {
      * @return The matching user, or {@link Optional#empty()} if no user with that id exists.
      */
     Optional<UserEntity> findUserById(String id);
+
+    /**
+     * Returns the names of the roles granted to the given user.
+     *
+     * @param userId Unique identifier of the user.
+     * @return Names of the granted roles, empty if the user has none or does not exist.
+     */
+    Set<String> findRoleNamesByUserId(String userId);
+
+    /**
+     * Returns the role names of every user, keyed by user id. Intended for listing users without issuing a query
+     * per user.
+     *
+     * @return Role names per user id. Users without roles are absent from the map.
+     */
+    Map<String, Set<String>> findAllRoleNamesByUserId();
 
     /**
      * Sets the user's {@code lastLoginAt} timestamp to {@link Instant#now()}.

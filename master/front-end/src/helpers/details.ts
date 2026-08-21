@@ -17,9 +17,8 @@
  */
 import type { FC, SVGProps } from "react";
 
-import { ECopyableField, type IDetailsRuntime } from "models";
-
-import { FreeBSDIcon, JavaIcon, KotlinIcon, LinuxIcon, WindowsIcon } from "assets";
+import { FreeBSDIcon, JavaIcon, KotlinIcon, LinuxIcon, WindowsIcon } from "@/assets";
+import { ECopyableField, type IDetailsRuntime } from "@/models";
 
 /**
  * Resolve the Icon to be used on the details card for the given Operating System.

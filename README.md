@@ -110,7 +110,7 @@ interface. Pick whichever shape matches how you ship the rest of your services.
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 **With Docker.** The release image is published to GitHub Container Registry:
@@ -121,7 +121,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for
@@ -212,5 +212,11 @@ enforce optimization policies across the whole ecosystem, at scale.
 
 ## Contributing
 
-If you are interested in contributing to the Axelix project, please read our
-[contribution guidelines](CONTRIBUTING.adoc).
+Contributors are very welcome — Axelix is an open project and we would love your help. Whether it is
+a bug fix, a docs improvement, or a new feature, there is a good place for you to start.
+
+We maintain a [contribution guide](CONTRIBUTING.adoc) that answers most of the questions you may have
+before jumping in: how to tell whether a ticket is worth taking, how to find out if someone is
+already working on it, what the overall contribution process looks like, whether you can open a PR
+without a ticket, and the branch naming convention we follow. If you are interested in contributing,
+please give it a read.

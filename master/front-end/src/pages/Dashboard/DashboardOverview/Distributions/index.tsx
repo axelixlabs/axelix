@@ -18,10 +18,10 @@
 import { useTranslation } from "react-i18next";
 import { type NavigateFunction, useNavigate } from "react-router";
 
-import { DashboardDonutChart } from "components";
-import { createWallboardFilterSearchParam, findMostUsed, prepareDistributionDataPerChart } from "helpers";
-import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
-import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "utils";
+import { DashboardDonutChart } from "@/components";
+import { createWallboardFilterSearchParam, findMostUsed, prepareDistributionDataPerChart } from "@/helpers";
+import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "@/models";
+import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "@/utils";
 
 import styles from "./styles.module.css";
 

@@ -18,9 +18,9 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { StyledLink } from "components";
-import { normalizeHtmlElementId } from "helpers";
-import { EBeanOrigin, type IBean } from "models";
+import { StyledLink } from "@/components";
+import { normalizeHtmlElementId } from "@/helpers";
+import { EBeanOrigin, type IBean } from "@/models";
 
 import sharedStyles from "../styles.module.css";
 

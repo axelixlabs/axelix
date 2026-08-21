@@ -27,13 +27,13 @@ the same data is served to a browser and to an AI agent from a single process.
 
 - **[Axelix Master](../setting-up-master-ui/what-is-master.mdx)**: Serves the UI, exposes the REST API the UI consumes,
   runs the bundled MCP server, talks to every managed service over HTTP, and holds the instance registry.
-- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/what-is-axelix-starter.mdx)**: Separate starter
+- **[Axelix Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx)**: Separate starter
   modules exist for [Spring Boot
-  2](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#add-the-dependency),
+  2](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency),
   [Spring Boot
-  3](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#add-the-dependency),
+  3](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency),
   and [Spring Boot
-  4](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#add-the-dependency) —
+  4](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency) —
   pick the one that matches your application. The starter exposes the endpoints Master needs (beans, environment,
   caches, scheduled tasks, and the rest) and can optionally self-register with Master on startup.
 
@@ -59,7 +59,7 @@ A service shows up in Master's instance registry through one of two paths:
   [Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#discovery--auto-discovery) as of now,
   and it is enabled by default in the [official Axelix helm-chart](https://artifacthub.io/packages/helm/axelix/axelix).
 - [Starter-side
-  self-registration](../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx#option-b--self-registration):
+  self-registration](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#option-b--self-registration):
   the Axelix Starter sends a registration request to Master on startup and heartbeats its over certain interval.
 
 ## Deployment & scaling

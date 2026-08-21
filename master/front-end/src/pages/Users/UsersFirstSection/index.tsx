@@ -19,10 +19,10 @@ import { Select } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import { PageSearch } from "components";
-import { useAppSelector } from "hooks";
-import { ERoles, EUserOrigin, type IUsersFilters } from "models";
-import { LOCAL_AUTH_OPTION_TYPE_NAME, roleOptions } from "utils";
+import { PageSearch } from "@/components";
+import { useAppSelector } from "@/hooks";
+import { ERoles, EUserOrigin, type IUsersFilters } from "@/models";
+import { LOCAL_AUTH_OPTION_TYPE_NAME, roleOptions } from "@/utils";
 
 import { CreateUser } from "./CreateUser";
 import styles from "./styles.module.css";

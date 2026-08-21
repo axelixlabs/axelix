@@ -21,15 +21,15 @@ import { App, Button, Form, Input } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { emptyStringToNull, extractErrorCode } from "helpers";
+import { emptyStringToNull, extractErrorCode } from "@/helpers";
 import {
     type IEditUserRequestData,
     type IEditableUser,
     StatelessRequest,
     type UserProfileEditableValueField,
-} from "models";
-import { editUser } from "services";
-import { userProfileInputTypeMap } from "utils";
+} from "@/models";
+import { editUser } from "@/services";
+import { userProfileInputTypeMap } from "@/utils";
 
 import styles from "./styles.module.css";
 

@@ -29,8 +29,8 @@ import {
     type IEnvironmentPropertySource,
     type SetRequestState,
     StatefulRequest,
-} from "models";
-import { UNKNOWN_ERROR } from "utils";
+} from "@/models";
+import { UNKNOWN_ERROR } from "@/utils";
 
 /**
  * A universal function that retrieves data from the backend.

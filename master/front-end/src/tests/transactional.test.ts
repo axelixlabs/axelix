@@ -17,7 +17,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { formatTransactionDuration } from "helpers";
+import { formatTransactionDuration } from "@/helpers";
 
 describe("Check formatTransactionDuration function", () => {
     it("Returns milliseconds for values below 1000", () => {

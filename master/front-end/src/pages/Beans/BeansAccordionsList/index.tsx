@@ -19,8 +19,8 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useRef } from "react";
 
-import { Accordion } from "components";
-import { type IBean } from "models";
+import { Accordion } from "@/components";
+import { type IBean } from "@/models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
 import { BeanAccordionLabels } from "../BeanAccordionLabels";

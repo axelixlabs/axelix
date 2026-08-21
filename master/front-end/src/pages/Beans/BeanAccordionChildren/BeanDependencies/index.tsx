@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { TooltipWithCopy } from "components";
-import { type IDependency } from "models";
+import { TooltipWithCopy } from "@/components";
+import { type IDependency } from "@/models";
 
 import styles from "./styles.module.css";
 

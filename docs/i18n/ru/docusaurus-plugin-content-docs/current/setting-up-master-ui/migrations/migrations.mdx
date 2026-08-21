@@ -1,0 +1,154 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { UpcomingReleaseNotice } from '@site/src/components';
+
+# Миграции базы данных
+
+Master владеет схемой своей базы данных и поддерживает её в соответствии с запущенной версией. При каждом запуске он
+выполняет [Liquibase](https://www.liquibase.com/), чтобы применить изменения схемы, которые нужны текущей версии.
+Запускать миграции вручную не требуется.
+
+## Как выполняются миграции
+
+Миграции — это часть запуска, а не отдельный шаг, который вы инициируете.
+
+- **При каждом запуске.** Прежде чем Master начнёт обслуживать UI и API, Liquibase проверяет базу данных и применяет
+  недостающие changeset'ы.
+- **В настроенной базе данных.** Миграции выполняются на том же движке, который Master использует во время работы —
+  SQLite, PostgreSQL или MySQL, выбираемом по префиксу JDBC URL. О том, как выбирается движок, см. раздел
+  [База данных](../configuring-master/configuring-master.mdx#база-данных).
+- **Только один раз на изменение.** Liquibase фиксирует каждый применённый changeset в своей служебной таблице
+  (`DATABASECHANGELOG`). Уже применённый changeset пропускается, поэтому перезапуск Master безопасен и не затратен.
+- **Быстрый отказ (fail-fast).** Если миграцию применить невозможно, запуск прерывается с ошибкой, а не продолжается на
+  наполовину мигрированной схеме.
+
+## Под какими учётными данными выполняются миграции
+
+По умолчанию миграции используют **те же учётные данные, с которыми подключается Master** —
+`axelix.master.database.username` и `axelix.master.database.password`. Так как миграции создают и изменяют таблицы,
+этому пользователю базы данных нужны права на изменение схемы (DDL) в дополнение к правам на чтение и запись, которые
+Master использует во время работы.
+
+### Отдельный пользователь для миграций
+
+<UpcomingReleaseNotice />
+
+Некоторые команды в повседневной работе запускают приложение под пользователем с минимальными правами, который может
+только читать и писать строки, а изменения схемы применяют под отдельным, более привилегированным пользователем. Master
+поддерживает такой сценарий двумя свойствами:
+
+| Свойство                            | Значение по умолчанию               | Описание                                                                                                       |
+|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| `axelix.master.migrations.username` | `axelix.master.database.username`   | Пользователь, под которым Liquibase выполняет миграции. Нужны права на изменение схемы (DDL).                   |
+| `axelix.master.migrations.password` | `axelix.master.database.password`   | Пароль пользователя миграций.                                                                                   |
+
+Оба свойства по умолчанию принимают значение соответствующего свойства `axelix.master.database.*`. Если оставить их
+незаданными, миграции выполняются под тем же пользователем, что и остальное приложение — это описанное выше поведение.
+Когда вы их задаёте, Master подключается к **той же базе данных** — JDBC URL и драйвер из `axelix.master.database.url`
+используются повторно, — но аутентифицирует выполнение миграций под пользователем миграций. Всё после запуска
+по-прежнему работает под `axelix.master.database.*`.
+
+:::note[В SQLite нет пользователей]
+SQLite хранит данные в локальном файле и не имеет понятия пользователя базы данных, поэтому `axelix.master.migrations.*`
+игнорируется, когда используется SQLite. Эти свойства применимы только к
+PostgreSQL и MySQL.
+:::
+
+## Как задать учётные данные миграций
+
+Свойства миграций — это обычные настройки Master, поэтому они задаются так же, как и всё остальное. В примерах ниже
+используется PostgreSQL. С MySQL всё работает аналогично.
+
+### Запуск в виде JAR
+
+Передайте их как системные свойства `-D` или укажите в файле конфигурации рядом с JAR.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://db.internal:5432/axelix
+      username: axelix_app        # пользователь времени выполнения (только DML)
+      password: ${AXELIX_DB_PASSWORD}
+    migrations:
+      username: axelix_migrator    # пользователь миграций (DDL)
+      password: ${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
+axelix.master.database.username=axelix_app
+axelix.master.database.password=${AXELIX_DB_PASSWORD}
+axelix.master.migrations.username=axelix_migrator
+axelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+  </TabItem>
+</Tabs>
+
+Или полностью в командной строке:
+
+```bash
+java \
+  -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+  -Daxelix.master.database.username=axelix_app \
+  -Daxelix.master.database.password=... \
+  -Daxelix.master.migrations.username=axelix_migrator \
+  -Daxelix.master.migrations.password=... \
+  -jar axelix-1.0.0.jar
+```
+
+### Запуск в Docker
+
+Образ автоматически применяет `JAVA_TOOL_OPTIONS` к JVM, поэтому это и есть способ передать свойства `-D` внутрь
+контейнера.
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e JAVA_TOOL_OPTIONS="\
+    -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
+    -Daxelix.master.database.username=axelix_app \
+    -Daxelix.master.database.password=... \
+    -Daxelix.master.migrations.username=axelix_migrator \
+    -Daxelix.master.migrations.password=..." \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+### Запуск с Docker Compose
+
+Добавьте свойства миграций в `JAVA_TOOL_OPTIONS` сервиса `master`, рядом с настройками базы данных.
+
+```yaml title="docker-compose.yaml"
+services:
+  master:
+    image: ghcr.io/axelixlabs/axelix:1.0.0
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_TOOL_OPTIONS: >-
+        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
+        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
+        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
+        -Daxelix.master.migrations.username=${AXELIX_MIGRATIONS_USERNAME}
+        -Daxelix.master.migrations.password=${AXELIX_MIGRATIONS_PASSWORD}
+```
+
+Значения передайте через файл `.env` рядом с файлом Compose:
+
+```bash title=".env"
+AXELIX_DB_USERNAME=axelix_app
+AXELIX_DB_PASSWORD=...
+AXELIX_MIGRATIONS_USERNAME=axelix_migrator
+AXELIX_MIGRATIONS_PASSWORD=...
+```
+
+## Связанные материалы
+
+- [Настройка Master](../configuring-master/configuring-master.mdx) — полный справочник свойств, включая настройки
+  подключения `axelix.master.database.*`.

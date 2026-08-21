@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

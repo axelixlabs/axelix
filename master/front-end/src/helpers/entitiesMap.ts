@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EAssociationProblem, IMappedEntity } from "models";
-import { ASSOCIATION_PROBLEM_ORDER } from "utils";
+import type { EAssociationProblem, IMappedEntity } from "@/models";
+import { ASSOCIATION_PROBLEM_ORDER } from "@/utils";
 
 /**
  * A problem type together with how many of the entity's associations exhibit it.

@@ -17,8 +17,8 @@
  */
 import type { Dispatch, SetStateAction } from "react";
 
-import { getThreadStateColor, partitionToThreadGroups, stopPropagationOnAccordionExpand } from "helpers";
-import type { IThread, IThreadGroup } from "models";
+import { getThreadStateColor, partitionToThreadGroups, stopPropagationOnAccordionExpand } from "@/helpers";
+import type { IThread, IThreadGroup } from "@/models";
 
 import styles from "./styles.module.css";
 

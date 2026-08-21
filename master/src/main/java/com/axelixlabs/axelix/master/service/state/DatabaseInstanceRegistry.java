@@ -79,7 +79,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public List<Instance> getAll() {
-        // No need to coping collections or anything - the domain instances are not proxied
         return instanceRepository.findAll();
     }
 

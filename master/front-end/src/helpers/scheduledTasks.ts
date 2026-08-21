@@ -17,7 +17,7 @@
  */
 import cronstrue from "cronstrue";
 
-import type { IScheduledTasksResponseBody } from "models";
+import type { IScheduledTasksResponseBody } from "@/models";
 
 export const filterScheduledTasks = (
     scheduledTasksResponse: IScheduledTasksResponseBody,

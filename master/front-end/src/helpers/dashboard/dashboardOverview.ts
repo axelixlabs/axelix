@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus, IChartData, IDistribution, IExtendedChartData, IHealthStatus } from "models";
-import { HEALTH_STATUSES_COLORS } from "utils";
+import type { EInstanceStatus, IChartData, IDistribution, IExtendedChartData, IHealthStatus } from "@/models";
+import { HEALTH_STATUSES_COLORS } from "@/utils";
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
     const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];

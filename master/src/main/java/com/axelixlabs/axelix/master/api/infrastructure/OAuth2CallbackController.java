@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.infrastructure;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -43,6 +44,7 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
@@ -75,6 +77,7 @@ public class OAuth2CallbackController {
     private final OAuth2Properties oAuth2Properties;
     private final UserService userService;
     private final UserInfoJsonAccessor userInfoJsonAccessor;
+    private final List<OidcIdTokenClaimsValidator> claimsValidators;
 
     public OAuth2CallbackController(
             OidcClient oidcClient,
@@ -82,13 +85,15 @@ public class OAuth2CallbackController {
             JwtEncoderService jwtEncoderService,
             OAuth2Properties oAuth2Properties,
             UserService userService,
-            UserInfoJsonAccessor userInfoJsonAccessor) {
+            UserInfoJsonAccessor userInfoJsonAccessor,
+            List<OidcIdTokenClaimsValidator> claimsValidators) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
         this.jwtEncoderService = jwtEncoderService;
         this.oAuth2Properties = oAuth2Properties;
         this.userService = userService;
         this.userInfoJsonAccessor = userInfoJsonAccessor;
+        this.claimsValidators = claimsValidators;
     }
 
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
@@ -104,6 +109,10 @@ public class OAuth2CallbackController {
         Tokens tokens = oidcClient.exchangeCodeForTokens(code);
 
         ValidatedOidcIdentity identity = oidcClient.validateIdToken(tokens.idToken());
+
+        for (OidcIdTokenClaimsValidator validator : claimsValidators) {
+            validator.validate(identity.claims());
+        }
 
         String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(tokens.accessToken());
 

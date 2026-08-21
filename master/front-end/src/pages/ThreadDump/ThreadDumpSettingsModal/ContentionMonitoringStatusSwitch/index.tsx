@@ -21,9 +21,9 @@ import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { extractErrorCode } from "helpers";
-import { type IErrorResponse, StatelessRequest } from "models";
-import { disableContentionMonitoring, enableContentionMonitoring } from "services";
+import { extractErrorCode } from "@/helpers";
+import { type IErrorResponse, StatelessRequest } from "@/models";
+import { disableContentionMonitoring, enableContentionMonitoring } from "@/services";
 
 interface IProps {
     /**

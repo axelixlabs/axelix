@@ -19,9 +19,9 @@ import { App } from "antd";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { Accordion, TooltipWithCopy } from "components";
-import type { ILoggerGroup } from "models";
-import { changeLoggerGroupLevel } from "services";
+import { Accordion, TooltipWithCopy } from "@/components";
+import type { ILoggerGroup } from "@/models";
+import { changeLoggerGroupLevel } from "@/services";
 
 import { Levels } from "../Levels";
 

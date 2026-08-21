@@ -34,12 +34,13 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
  * @param email       Email address of the user, which may be {@code null}.
  * @param jobTitle    Job title of the user, which may be {@code null}.
  * @param organizationalUnit Organizational unit of the user, which may be {@code null}.
- * @param roles       The roles granted to this user.
+ * @param roles       The names of roles granted to this user.
  * @param userOrigin  Origin of the user account.
  * @param status      Status that controls whether the user can log in.
  * @param lastLoginAt Timestamp of the most recent successful login. {@code null} if the user has never logged in.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public record UserResponse(
         String id,
@@ -54,7 +55,12 @@ public record UserResponse(
         String status,
         @Nullable Instant lastLoginAt) {
 
-    public static UserResponse from(UserEntity user) {
+    /**
+     * @param user      The user to expose.
+     * @param roleNames Names of the roles granted to the user, read from {@code users_roles} rather than from the
+     *                  legacy {@code users.roles} column.
+     */
+    public static UserResponse from(UserEntity user, Set<String> roleNames) {
         return new UserResponse(
                 user.id(),
                 user.username(),
@@ -63,7 +69,7 @@ public record UserResponse(
                 user.email(),
                 user.jobTitle(),
                 user.organizationalUnit(),
-                user.roles().values(),
+                roleNames,
                 user.userOrigin().getDisplayName(),
                 user.status().name(),
                 user.lastLoginAt());

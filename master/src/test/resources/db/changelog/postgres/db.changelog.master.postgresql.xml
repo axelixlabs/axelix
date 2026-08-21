@@ -13,4 +13,14 @@
   <include file="db/changelog/postgres/changelog/1.0.0-create-historical-application-snapshots-table.xml"/>
   <include file="db/changelog/postgres/changelog/1.0.0-add-persistence-insights-to-historical-application-snapshots.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.1/001-add-firstname-lastname-status-to-users.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/002-create-roles-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/003-create-authorities-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/004-create-roles-authorities-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/005-create-users-roles-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/006-create-roles-parents-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/007-insert-default-authorities.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/008-insert-default-roles.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/009-insert-default-roles-authorities.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/010-migrate-user-roles-to-users-roles.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
 </databaseChangeLog>

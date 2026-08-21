@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { ELookupOutcome, type IGetSingleCacheResponseBody } from "models";
+import { ELookupOutcome, type IGetSingleCacheResponseBody } from "@/models";
 
 import styles from "./styles.module.css";
 

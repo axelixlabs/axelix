@@ -17,8 +17,9 @@ If you are reporting a bug, please help to speed up problem diagnosis by providi
 Ideally, that would include a small sample project that reproduces the problem (Minimal Reproducible Example).
 
 == Reporting Security Vulnerabilities
-If you think you have found a security vulnerability in Axelix please *DO NOT* disclose it publicly until we've had a chance to fix it.
-Please don't report security vulnerabilities using GitHub issues, instead head over to *#TODO* and learn how to disclose them responsibly.
+
+If you think you have found a security vulnerability, please **DO NOT** disclose it publicly until we’ve had a chance to fix it.
+Please don’t report security vulnerabilities using GitHub issues, instead mail the team at maintainers@axelix.io and we'll together develop the solution.
 
 [[how-to-contribute]]
 == How to Contribute
@@ -28,8 +29,72 @@ Please don't report security vulnerabilities using GitHub issues, instead head o
 
 If you have a question, check existing GitHub issues with the `question` label. You can express your thoughts within an existing discussion, or start a new one if necessary.
 
-If you believe there is an issue, search through existing issues trying a few different ways to find discussions, past or current, that are related to the issue.
-Reading those discussions helps you to learn about the issue, and helps us to make a decision.
+By participating in the discussion you help us to make the decition - *we care about your experiance*.
+
+[[picking-an-issue]]
+=== Finding an issue to work on
+
+Contributors are very welcome here, and we try hard to make it easy to get started.
+
+[[worth-taking]]
+==== How do I know a ticket is worth taking?
+
+If a ticket is labelled `ideal-for-contribution` and it is not assigned to anyone, you can safely assume it is a good place to start.
+Tickets labelled `bug` are generally a good starting point too, since they usually do not require deep design decisions before you can begin.
+
+The more you contribute, the more the core team gets to trust you, and the more sophisticated problems you may be handed later on. There is a good chance this grows into something more down the line.
+
+Not every good contribution has to come from an `ideal-for-contribution` ticket. We also have tickets that are not marked that way but would still be a great thing to pick up. If you think you can take one of those on, just ping a core team member right in the issue (for example `@mipo256`, our technical leader), and we'll guide you.
+
+In any case — even when you have found an unassigned `ideal-for-contribution` ticket — please *ALWAYS* leave a comment on the issue before you start. The core team will respond shortly and, if everything is fine, assign the ticket to you. Do NOT start working on issue before the feedback from the core team.
+
+[[nobody-working]]
+==== How do I find out that nobody is already working on a ticket?
+
+If the ticket is unassigned, you can assume that nobody is working on it.
+This is exactly why the step above matters: we do not want two people to end up with conflicting pull requests that solve the very same problem.
+
+[[contribution-procedure]]
+==== The overall contribution procedure
+
+The process, from start to finish, usually looks like this:
+
+1. You find a ticket you want to pick up.
+2. You leave a comment on the issue pinging a core team member.
+3. Assuming the core team agrees (he/she usually will), the ticket gets assigned to you.
+4. You start working on it on your own. Feel free to ask questions along the way. Some tickets require certain design decisions, and it is completely okay to brainstorm them in the issue comments — see, for example, the design discussion in https://github.com/axelixlabs/axelix/issues/957[#957] or https://github.com/axelixlabs/axelix/issues/1491[#1491].
+5. You open the pull request. We then review it and merge it under your authorship.
+
+Please keep the conversation going while you work. If we do not hear from you for a sensible period of time, the core team may unassign the ticket and either work on it directly or hand it to somebody else.
+
+[[prs-without-tickets]]
+==== Can I submit a PR without a ticket?
+
+Yes, you can. The most common cases are:
+
+* Documentation polishing, when there are minor inaccuracies in the docs, or you feel something is worth outlining more clearly.
+* Small refactorings of the existing code.
+* Adding a small feature.
+
+This is generally fine, but please be aware that in this case the core team may decline the PR.
+When there is an issue for a change, it means the core team already agrees that the problem is real and worth solving. When a feature arrives that is not aligned with the overall shape of the product, it is unclear whether it should be merged.
+
+So, if you are unsure whether a feature is needed, please file an issue first. For small documentation polishings and refactorings this is not required, but for features, filing a ticket first is a good idea.
+
+[[branch-naming]]
+==== Branch naming convention
+
+The convention depends on how you started working on the change.
+
+If you are just refactoring or polishing the docs, or adding a small feature with no ticket behind it, feel free to name the branch however you like.
+
+When there is a ticket and you are working on it (which, in most cases, is the way to go), please follow the branch naming convention `feature/GH-<ticket number>`, for example:
+
+[source]
+----
+feature/GH-1514
+feature/GH-957
+----
 
 [[quickstart]]
 === Quickstart

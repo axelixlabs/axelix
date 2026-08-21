@@ -21,16 +21,15 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { downloadFile, extractErrorCode } from "helpers";
-import { useAuthority } from "hooks";
-import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
-import { disableGCLogging, getGCLogFile, triggerGC } from "services";
+import { DownloadIcon, OnOffIcon, RunIcon } from "@/assets";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { downloadFile, extractErrorCode } from "@/helpers";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, type IErrorResponse, StatelessRequest } from "@/models";
+import { disableGCLogging, getGCLogFile, triggerGC } from "@/services";
 
 import { GCActionButton } from "./GCActionButton";
 import styles from "./styles.module.css";
-
-import { DownloadIcon, OnOffIcon, RunIcon } from "assets";
 
 export interface IProps {
     /**

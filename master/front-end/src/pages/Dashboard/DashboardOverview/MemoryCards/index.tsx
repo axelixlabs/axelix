@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IMemoryUsage } from "models";
+import type { IMemoryUsage } from "@/models";
 
 import styles from "./styles.module.css";
 

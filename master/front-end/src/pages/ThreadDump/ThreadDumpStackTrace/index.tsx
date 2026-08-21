@@ -18,7 +18,7 @@
 import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
-import type { IThread } from "models";
+import type { IThread } from "@/models";
 
 import styles from "./styles.module.css";
 

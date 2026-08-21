@@ -19,10 +19,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
-import { EmptyHandler, Loader } from "components";
-import { fetchData, filterWallboardInstances, parseWallboardFilters } from "helpers";
-import { type IServiceCardsResponseBody, StatefulRequest } from "models";
-import { getWallboardData } from "services";
+import { EmptyHandler, Loader } from "@/components";
+import { fetchData, filterWallboardInstances, parseWallboardFilters } from "@/helpers";
+import { type IServiceCardsResponseBody, StatefulRequest } from "@/models";
+import { getWallboardData } from "@/services";
 
 import { WallboardCard } from "./WallboardCard";
 import { WallboardFirstSection } from "./WallboardFirstSection";

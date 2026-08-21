@@ -1,6 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
+import { UpcomingReleaseNotice } from '@site/src/components';
 
 # Configuring Master
 
@@ -15,7 +16,7 @@ A few facts to fix in your head before you copy any of the snippets below — th
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
-- **Front-end assets**: the `axelix-1.0.0-M1.jar` and the published Docker image both bundle the UI — there is nothing
+- **Front-end assets**: the `axelix-1.0.0.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
 - **Authentication**: Master ships with a built-in super-admin account `admin / admin` and an unset JWT signing key. In
   any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
@@ -31,6 +32,54 @@ The default super-admin credentials (`admin / admin`) grant full control over ev
 the JWT signing key has no default at all. Override both — together with `axelix.master.auth.cookie.secure` when serving
 over HTTPS — before exposing Master to anyone other than yourself.
 :::
+
+### Supplying properties
+
+Master is a Spring Boot application, so every property on this page can be supplied through any source Spring Boot
+reads — not only a config file:
+
+- a **YAML** or **properties** config file (`application.yaml` / `application.properties`);
+- a **JVM system property** passed with `-D` on the `java` command line;
+- an **environment variable**.
+
+Master never restricts a property to a single source. Wherever this page documents a property such as
+`axelix.master.auth.jwt.signing-key`, you may set it in whichever of the three fits your deployment — the same name
+reaches Master identically through all of them.
+
+This works because of Spring Boot's [relaxed binding](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding):
+one logical property has several equivalent spellings, and Master reads them all as the same value. The canonical form
+used throughout this page is lowercase, dot-separated, kebab-case (`axelix.master.auth.jwt.signing-key`). The table
+below shows how that one property is written for each source:
+
+| Source                     | How you write `axelix.master.auth.jwt.signing-key`                          |
+|----------------------------|----------------------------------------------------------------------------|
+| `application.yaml`         | nested keys `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:`       |
+| `application.properties`   | `axelix.master.auth.jwt.signing-key=...`                                    |
+| JVM system property (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                  |
+| Environment variable       | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                     |
+
+The environment-variable form follows a strict rule: **upper-case the name, replace every dot with an underscore, and
+drop any dashes**. That is why `signing-key` becomes `SIGNINGKEY` — the dash is removed, not turned into an underscore.
+A property with no dashes maps more directly: `axelix.master.metrics.prometheus.enabled` becomes
+`AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+The Docker and Docker Compose examples further down pass properties as `-D` flags inside `JAVA_TOOL_OPTIONS`, but that is
+just one option: a `-Daxelix.master.auth.jwt.signing-key=...` flag and an `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`
+environment variable are interchangeable, so use whichever your platform makes easier.
+:::
+
+### General
+
+<UpcomingReleaseNotice />
+
+<div className={styles.ConfigTable}>
+
+| Property                    | Default | Description                                                                             |
+|-------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. Currently only used to populate the ECS `service.environment` field when [structured logging](#structured-logging) is enabled. |
+
+</div>
 
 ### Database
 
@@ -168,7 +217,7 @@ The endpoint is `POST /api/internal/service/register`. It is gated by the same J
 On the Master side there are **no required overrides** — every property here has a working default. The feature is **on
 by default** (`enabled=true`), set it to `false` only if you want Master to refuse all heartbeats. The starter-side
 properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, `instance-name`) are documented in the
-[Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) page.
+[Configuring Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) page.
 
 <div className={styles.ConfigTable}>
 
@@ -190,6 +239,60 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 
 </div>
 
+### Structured logging
+
+<UpcomingReleaseNotice />
+
+By default, Master logs plain text to the console (i.e. the process stdout). Set `axelix.master.logging.json.enabled=true`
+to switch to [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON
+logging instead — the only structured format Master supports today. ECS is a JSON-based logging format; reach for it
+when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aware pipeline.
+
+<div className={styles.ConfigTable}>
+
+| Property                             | Default | Description                                                               |
+|----------------------------------------|---------|------------------------------------------------------------------------------|
+| `axelix.master.logging.json.enabled` | `false` | Switch console logging from plain text to ECS-formatted structured JSON.     |
+
+</div>
+
+### Metrics
+
+#### Prometheus
+
+<UpcomingReleaseNotice />
+
+Master exposes a Prometheus scrape endpoint once you turn it on with `axelix.master.metrics.prometheus.enabled=true`.
+It responds at `/api/actuator/prometheus` and does not require authentication.
+
+Attach common tags to every exported metric with `axelix.master.metrics.prometheus.tags.<name>=<value>`, for example
+a deployment region or environment.
+
+:::warning
+Because the endpoint is unauthenticated, anyone who can reach Master over the network can read metric values and any
+configured common tags. Restrict `/api/actuator/prometheus` to trusted Prometheus infrastructure with a network
+policy, ingress rule, or an equivalent perimeter control.
+:::
+
+<div className={styles.ConfigTable}>
+
+| Property                                      | Default | Description                                                           |
+|------------------------------------------------|---------|---------------------------------------------------------------------------|
+| `axelix.master.metrics.prometheus.enabled` | `false` | Expose the Prometheus scrape endpoint at `/api/actuator/prometheus`.  |
+| `axelix.master.metrics.prometheus.tags`    | empty   | Common tags applied to every exported metric.                         |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        tags:
+          region: eu-west-1
+```
+
 ## Run as a JAR
 
 Use this when you want the lightest possible runtime — a single process on a machine you already manage, no container
@@ -197,7 +300,7 @@ runtime involved.
 
 ### 1. Download the JAR
 
-Grab the `axelix-1.0.0-M1.jar` attached to the release you want from the [Releases
+Grab the `axelix-1.0.0.jar` attached to the release you want from the [Releases
 page](https://github.com/axelixlabs/axelix/releases). The published artifact already bundles the UI, so there is nothing
 else to build.
 
@@ -209,7 +312,7 @@ Provide a JWT signing key and an algorithm. Everything else can stay on defaults
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0-M1.jar
+  -jar axelix-1.0.0.jar
 ```
 
 Master is then reachable at `http://localhost:8080`. Sign in with the super-admin credentials you configured.
@@ -356,11 +459,11 @@ Use this when you want a single, immutable artifact that already bundles both Ma
 The release pipeline publishes the image to GitHub Container Registry:
 
 ```
-ghcr.io/axelixlabs/axelix:1.0.0-M1
+ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 :::note
-The snippets below pin `1.0.0-M1` for illustration. Check the [Releases
+The snippets below pin `1.0.0` for illustration. Check the [Releases
 page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
 commands.
 :::
@@ -375,7 +478,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0-M1
+  ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 A few notes about this command:
@@ -394,7 +497,7 @@ Use this when you want Master plus an external database in one declarative file 
 self-hosted deployment.
 
 The example below is a complete stack you can drop into a new `docker-compose.yaml`, edit, and start with `docker
-compose up -d`. The `master` service is pinned to `1.0.0-M1` here — swap in the latest tag from the [Releases
+compose up -d`. The `master` service is pinned to `1.0.0` here — swap in the latest tag from the [Releases
 page](https://github.com/axelixlabs/axelix/releases) before shipping.
 
 ```yaml title="docker-compose.yaml"
@@ -414,7 +517,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+    image: ghcr.io/axelixlabs/axelix:1.0.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -563,7 +666,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.0.0-M1
+          image: ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 In K8S, a Role is a namespaced object, so repeat the Role and RoleBinding once per namespace in `filters.namespaces`, all referencing
@@ -579,7 +682,7 @@ and RoleBinding into your own manifests if you want a starting point.
 
 ## Related
 
-- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx) — wire your monitored
+- [Configuring Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — wire your monitored
   applications so Master can see them.
 - [What is Master?](../what-is-master.mdx) — background on what Master does once it is running.
 - [Authentication](../authentication/authentication.mdx) — deeper look at JWT, super-admin, and OAuth2/OIDC.

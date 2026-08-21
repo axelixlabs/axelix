@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { DashboardDonutChart } from "components";
-import type { IChartData } from "models";
+import { DashboardDonutChart } from "@/components";
+import type { IChartData } from "@/models";
 
 interface IProps {
     gcDistributionData: IChartData[];

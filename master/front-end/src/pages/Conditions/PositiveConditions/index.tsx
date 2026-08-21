@@ -17,9 +17,9 @@
  */
 import { Fragment } from "react";
 
-import { Copy } from "components";
-import { normalizeHtmlElementId } from "helpers";
-import { EConditionStatus, type IConditionBeanPositive } from "models";
+import { Copy } from "@/components";
+import { normalizeHtmlElementId } from "@/helpers";
+import { EConditionStatus, type IConditionBeanPositive } from "@/models";
 
 import { ConditionsAccordionEntry } from "../ConditionAccordionEntry";
 import styles from "../styles.module.css";

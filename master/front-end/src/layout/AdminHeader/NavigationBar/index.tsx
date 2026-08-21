@@ -18,8 +18,8 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
-import { useAppSelector, useAuthority } from "hooks";
-import { EAuthorities } from "models";
+import { useAppSelector, useAuthority } from "@/hooks";
+import { EAuthorities } from "@/models";
 
 import styles from "./styles.module.css";
 

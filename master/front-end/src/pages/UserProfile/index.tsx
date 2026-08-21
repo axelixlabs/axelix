@@ -19,15 +19,14 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 
-import { Loader } from "components";
-import { type IUser, StatefulRequest } from "models";
-import { getUserById } from "services";
+import { BackwardArrowIcon } from "@/assets";
+import { Loader } from "@/components";
+import { type IUser, StatefulRequest } from "@/models";
+import { getUserById } from "@/services";
 
 import { UserProfileActions } from "./UserProfileActions";
 import { UserTable } from "./UserTable";
 import styles from "./styles.module.css";
-
-import { BackwardArrowIcon } from "assets";
 
 const UserProfile = () => {
     const { t } = useTranslation();

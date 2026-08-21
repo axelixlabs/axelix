@@ -18,12 +18,11 @@
 import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { type OIDCLoginOption } from "models";
-import { authorize } from "services";
+import { LockIcon } from "@/assets";
+import { type OIDCLoginOption } from "@/models";
+import { authorize } from "@/services";
 
 import styles from "./styles.module.css";
-
-import { LockIcon } from "assets";
 
 interface IProps {
     option: OIDCLoginOption;

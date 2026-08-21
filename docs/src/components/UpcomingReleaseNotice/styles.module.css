@@ -1,0 +1,37 @@
+.Notice {
+    /* Accent for the "upcoming" marker. Purple reads as "future" without colliding
+       with the info / success / warning / danger admonition colors. */
+    --upcoming-accent: #7a5cc4;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -4px 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--axelix-border);
+    font-size: 0.85rem;
+    color: var(--axelix-fg-subtle);
+}
+
+:global(html[data-theme='dark']) .Notice {
+    --upcoming-accent: #b9a9ee;
+}
+
+.Label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--upcoming-accent);
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--upcoming-accent);
+}
+
+.Separator {
+    color: var(--axelix-border-strong);
+}

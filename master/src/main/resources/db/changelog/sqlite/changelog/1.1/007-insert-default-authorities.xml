@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-007-sqlite-insert-default-authorities" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <rowCount tableName="authorities" expectedRows="0"/>
+    </preConditions>
+
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a1"/>
+      <column name="name" value="ENV_VALUES_READ"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a2"/>
+      <column name="name" value="CONFIG_PROPS_VALUES_READ"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a3"/>
+      <column name="name" value="SCHEDULED_TASKS_MODIFY"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a4"/>
+      <column name="name" value="CACHES_CLEAR"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a5"/>
+      <column name="name" value="CACHES_TOGGLE"/>
+    </insert>
+    <insert tableName="authorities">
+      <column name="id" value="00000000-0000-0000-0000-0000000000a6"/>
+      <column name="name" value="GARBAGE_COLLECTOR"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LanguageSwitcher } from "components";
+import { LoginLeftImage, LogoIcon } from "@/assets";
+import { LanguageSwitcher } from "@/components";
 
 import { LoginContent } from "./LoginContent";
 import { LoginFooter } from "./LoginFooter";
 import styles from "./styles.module.css";
-
-import { LoginLeftImage, LogoIcon } from "assets";
 
 const Login = () => {
     return (

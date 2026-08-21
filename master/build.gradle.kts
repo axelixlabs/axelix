@@ -28,10 +28,7 @@ val vertxVersion = "4.5.31"
 
 dependencies {
     // Self
-    api(project(":common:domain"))
-    api(project(":common:api"))
-    api(project(":common:auth"))
-    api(project(":common:utils"))
+    api(project(":common"))
 
     // Impl
     api(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
@@ -78,12 +75,12 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     // Test Self
-    testFixturesImplementation(project(":common:domain"))
-    testFixturesImplementation(project(":common:api"))
-    testFixturesImplementation(project(":common:auth"))
-    testFixturesImplementation(project(":common:utils"))
+    testFixturesImplementation(project(":common"))
+    testFixturesImplementation(testFixtures(project(":common")))
+    testImplementation(testFixtures(project(":common")))
 
     // Test
     testFixturesApi(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))

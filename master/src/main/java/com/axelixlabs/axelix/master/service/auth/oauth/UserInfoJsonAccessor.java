@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
+import java.util.Locale;
+
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
+import com.axelixlabs.axelix.master.service.state.RoleService;
 
 /**
  * Accessor for the JSON response of the {@code /userinfo} OIDC endpoint.
@@ -31,12 +33,17 @@ import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
  */
 public class UserInfoJsonAccessor {
 
+    private static final String DEFAULT_ROLE_NAME = "VIEWER";
+
     private final JmesPathJsonInspector jsonInspector;
     private final OAuth2Properties oAuth2Properties;
+    private final RoleService roleService;
 
-    public UserInfoJsonAccessor(JmesPathJsonInspector jsonInspector, OAuth2Properties oAuth2Properties) {
+    public UserInfoJsonAccessor(
+            JmesPathJsonInspector jsonInspector, OAuth2Properties oAuth2Properties, RoleService roleService) {
         this.jsonInspector = jsonInspector;
         this.oAuth2Properties = oAuth2Properties;
+        this.roleService = roleService;
     }
 
     @Nullable
@@ -47,23 +54,23 @@ public class UserInfoJsonAccessor {
     public Role extractRole(String userInfoJson) {
         String roleAttributePath = oAuth2Properties.roleAttributePath();
         if (roleAttributePath == null || roleAttributePath.isBlank()) {
-            return DefaultRole.VIEWER;
+            return resolveRole(DEFAULT_ROLE_NAME, roleAttributePath);
         }
 
         String roleName = jsonInspector.extract(userInfoJson, roleAttributePath);
-        Role role = roleName == null
-                ? null
-                : switch (roleName.toLowerCase()) {
-                    case "admin" -> DefaultRole.ADMIN;
-                    case "editor" -> DefaultRole.EDITOR;
-                    case "viewer" -> DefaultRole.VIEWER;
-                    default -> null;
-                };
-        if (role == null) {
+        if (roleName == null) {
             throw new OidcRoleExtractionException(String.format(
                     "Failed to extract role from UserInfo JSON payload using JMESPath expression: '%s'",
                     roleAttributePath));
         }
-        return role;
+        return resolveRole(roleName, roleAttributePath);
+    }
+
+    private Role resolveRole(String roleName, @Nullable String roleAttributePath) {
+        return roleService
+                .findByName(roleName.trim().toUpperCase(Locale.ROOT))
+                .orElseThrow(() -> new OidcRoleExtractionException(String.format(
+                        "Failed to extract role from UserInfo JSON payload using JMESPath expression: '%s'",
+                        roleAttributePath)));
     }
 }

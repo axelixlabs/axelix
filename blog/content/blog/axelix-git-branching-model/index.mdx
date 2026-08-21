@@ -1,0 +1,189 @@
+---
+title: "One Branch to Rule Them All"
+date: 2026-08-19
+authors: ["Mikhail Polivakha"]
+tags: ["Software Design"]
+heroImagePath: /posts/axelix-git-branching-model/preview.png
+description: "How Axelix adapted trunk-based development for a lockstep-versioned monorepo: short-lived feature branches, long-lived patch branches, release mechanics, and the trade-offs behind the model."
+metaDescription: "Explore Axelix's Git branching model: trunk-based development with short-lived feature branches, long-lived patch branches, and lockstep versioning."
+---
+
+Hey everybody. This is Mikhail, the technical lead of the [Axelix project](https://github.com/axelixlabs/axelix).
+
+For quite a long time I wanted to write a small article outlining our git branching model, in hope it may be useful to other people.
+
+There are quite a lot of git branching strategies in the world, e.g.
+
+- [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+- [GitHub-flow](https://docs.github.com/en/get-started/using-github/github-flow)
+- [Trunk-Based-Development (TBD)](https://trunkbaseddevelopment.com/) and so on.
+
+Throughout my experience I can tell, that teams usually do not adopt the given strategy in the exact form/shape, rather, they either invent something completely
+new themselves, or they just take, for instance, aforementioned GitFlow and modify it for their needs.
+
+So, throughout already a year of development of [Axelix](https://github.com/axelixlabs/axelix), we have adopted a slightly modified Trunk Based Development model, and I think it served us well.
+I hope you will find it also useful. This model admittedly has certain downsides, but in general, we're happy with it.
+
+Before we start, you should be mindful of the requirements we tried to address. At the end of the day everybody must judge for themselves.
+
+## Small Prerequisite. Axelix Versioning.
+
+> The two most difficult problems in software are naming and versioning.
+
+This is not the exact quote, but it is a rough sense of the joke that [Thomas Wuerthinger](https://thomaswue.dev/) (GraalVM Project Lead) said on BoF on Devoxx Belgium 2025 (explaining the [_"Detaching GraalVM from the Java Ecosystem Train"_](https://blogs.oracle.com/java/detaching-graalvm-from-the-java-ecosystem-train) article).
+
+To later understand on why we're doing certain things we're doing, it's going to be useful to realize the versioning scheme we're using.
+
+At Axelix, we use [semantic versioning](https://semver.org/) of our components. I'd even say that SemVer is a de-facto standard for versioning the modern world. There are, of course, simple versioning schemes, like for Windows OS, when you
+have Windows 7, 8, 10 or 11. There also is software that is released under the different variations [CalVer](https://calver.org/). The JetBrains IDEs will be a good example of that,
+e.g. 2026.1 or 2026.2.
+
+Still, the majority of projects do SemVer, and Axelix does it as well. But when we're talking about the modern software - it is often composed of multiple components.
+For example, Axelix has:
+
+- Build plugins for Maven/Gradle
+- Spring Boot starters
+- Master as the separate bootable JAR
+- Docker image of Master
+- Helm Chart of Master
+
+So, the thing is that each of the points above represent an independent artifact that is generally distributed independently of others, and thus, it has its own coordinates.
+
+And in our case, we have selected to follow the Lockstep Versioning of the Axelix project. In short, this is not the versioning schema, but a versioning strategy where all
+ components of the system share the same version X.Y.Z. It means, that if we release Axelix 1.4.2, all the components above receive the same version - 1.4.2.
+
+Yes, we know that Lockstep versioning is generally *a highly debatable subject for a couple of reasons*. And I would say, that team should generally think twice before adopting it.
+I should probably write another article outlining why we choose semver with lockstep, and why it _may be_ a good idea for _some_ of you as well. But this is an off-top for this article.
+
+## The Problem
+
+So, you're starting a new project, or you're about to revisit the git branching model in your team for various reasons. When you try to implement any technical solution (let's say, you want to choose a git branching model for the project), it is generally a good idea to take a step back and answer the question:
+
+> What exactly is the problem that we're solving?
+
+Indeed, before explaining anything, we should first realize what are the specific requirements that we want to address with any git branching model. And these requirements
+will be different for different kinds of software that has different release cadence. In the case of Axelix, we wanted a branching model that would:
+
+### 1. Give us the ability to do patches
+
+We want to be able to deliver patches quickly.
+
+Moreover, the important thing is that *we do not know the amount of patch releases in the given minor in advance*. The general
+requirement is to be able to go to the *arbitrary minor release*, and apply *an arbitrary number of patches* for it (for example, to fix the CVE).
+
+### 2. Avoid the merge hell.
+
+A lot of git branching strategies easily end-up in the merge hell, e.g. GitFlow is infamous for ending up in such conundrums.
+
+So, with that in mind, let's finally discuss what branching model we actually adopt.
+
+## Axelix Git Branching Model
+
+At Axelix, we have the monorepo. And in this monorepo we have the main trunk, called 'master' trunk (the thing we borrowed from TBD). Some commits that do
+polishing or basic housekeeping happen directly in the master trunk. For features, we create short-lived branches (directly from master) that gets merged
+back into the master trunk:
+
+![Short-lived feature branches created from and merged back into the master trunk](/posts/axelix-git-branching-model/first.png)
+
+In some extreme cases, adepts of TBD advocate for no feature branches at all with the risk of them being long-lived, and I understand the rationale behind it.
+However, for OSS projects such as Axelix, we cannot allow for that because of external contributors and for various other reasons.
+
+Nevertheless, *feature branches ideally need to die fast*. To facilitate "the death" of feature branches, we impose a couple of rules on the feature
+branches, and famously, we introduce a cap of 500-lines PR. In other words, feature branch cannot contribute more than 500 lines of code into the main trunk (there are some
+exceptions to that rule, but it does not matter right now). This cap ensures that:
+
+1. The PR is small enough to be carefully reviewed.
+2. The feature branch will indeed be short-lived, since the smaller PR the faster it will be ready for review.
+
+It is generally well-known that [for small PRs the overall TTM (time-to-merge) is smaller](https://www.cubic.dev/blog/does-pr-size-actually-matter),
+and the cap ensures feature branches die fast and they do not evolve into the long-lived branches. So here, we're perfectly aligned with the TBD.
+
+When we want to perform a minor/major release, we create a tag on the master trunk of our monorepo and execute the release pipeline (very simplified):
+
+![Tagging a commit on the master trunk to trigger a minor/major release](/posts/axelix-git-branching-model/second.png)
+
+Since we have the monorepo with the lockstep versioning, this tagged commit is the one from which all the release artifacts are built. And the value of the
+tag is the version that Axelix release gets.
+
+If we want to do the patch release, we create the branch from the git tag, e.g. a branch named 1.0.x. That is the long lived branch that is going to live by itself.
+Once we have created necessary patches in the 1.0.x branch, we create a tag in that long-lived patch branch, call this tag v1.0.1 e.g, and release it then:
+
+![A long-lived 1.0.x patch branch created from a tag, with its own patch release tag](/posts/axelix-git-branching-model/third.png)
+
+And here the pivot point where we significantly and deliberately depart from TBD. In TBD, it is forbidden to have long-lived branches apart from the main trunk.
+But I want to take a step back and explain not what is forbidden, but why TBD advocates against it, and why it is okay in our use case.
+
+## TBD: Why patch-branches are okay.
+
+TBD is a well-known and proven git branching strategy. It [is adopted by Google, Facebook and other companies](https://trunkbaseddevelopment.com/game-changers/#google-revealing-their-monorepo-trunk-2016).
+And it does not allow long-lived (apart from the main trunk) branches for a variety of reasons. One of them, and, probably, the most notorious is the merging problem. Merging the long-lived branches is quite challenging and time-consuming,
+error-prone, bug-welcome and so on.
+
+This problem becomes real in scenarios, when we develop certain functionality, *that is intended to be later merged with something else, like a main trunk*. But in case
+of such patch branches, we do not intend to merge them ever. *They are not supposed to be merged*.
+
+According to SemVer, the changes that go into the patch releases are (very broadly):
+
+- Backwards compatible bugfixes
+- Backwards compatible perf. improvements
+- Backports of CVE patches
+
+Of course, we can discuss all day what exactly backward compatibility means, whether it accounts for "behavioral" backwards compatibility or source-level backwards compatibility and so on.
+Let's put that aside.
+
+The core idea is that *patch branches will never have any kind of features developed in them*, that are going to be merged back into master trunk. That just won't happen.
+
+In our case, for example, the changes that end up in the patch branches are the very specific commits that just got cherry-picked from the main master trunk.
+
+## Challenges & Problems
+
+Of course, such a model as above has challenges. There are a couple of them. Let me enumerate them.
+
+### 1. Minor/Major Dilemma
+
+One of the most important challenges of such architecture is its Minor/Major inflexibility.
+
+So, what do I mean by that?
+
+Well, for example, let's say, that you're developing version 1.7 of your software. And now, you're thinking about releasing a new major version, 2.0. If you're
+making that decision, you're effectively starting to merge all the changes that you wanted to end up in the new major (e.g. non-backward-compatible ones, more on them
+later) into the master trunk. Well, once you've started doing that, pivoting back and saying stuff like:
+
+> Oh, no, we changed our mind, we just want to release 1.8
+
+It becomes really hard, in some cases infeasible. That is the inflexibility I'm talking about.
+
+Still, that problem (in its various levels of severity) of having no simple return follows _a lot_ of similar git models, TBD included.
+So, in the industry, this problem is generally a consequence of the trade-off of not having merge hells.
+
+### 2. Long-Lived Breaking Changes Branches
+
+Well, when I said to you, that we have master trunk and patch branches as the only long-lived branches, I have omitted one thing. One _very important thing_.
+
+And that is: our git branching model allows for long-lived *feature* branches that contain breaking changes. And since such branches are *intended* to be
+merged, we have to postpone them until the next major (at very least). And if we combine that with the problem above, then we realize - we're in trouble.
+
+Well, although we are in trouble, _the degree_ towards which we're actually in trouble is debatable.
+
+First of all, it significantly depends on the fact of *what changes we consider breaking*. And for every
+mature system such changes may be different. In our case, we have a whole documentation page that explains our release cadence and overall breaking changes
+impression.
+
+Another thing is that we can _try_ to mitigate such problem by constraining the amount of breaking changes subject for the next release. It is not always
+feasible/predictable, but tackling that problem not from a technical, but from an administrative PoV may also help here.
+
+So, admittedly, this is also a challenge that we have to live with. We may try to mitigate that, but to some degree we're going to have it.
+
+## Conclusions. Axelix, Lessons Learned.
+
+So, again, I did not want to say that we have invented some astonishing or mind-blowing git model. Internally, we just felt that it may be worth sharing with
+the world the git branching model we adopted and the reasons why.
+
+The goal of the article was more to outline the way we approached the problem with the hope that you'll learn from it. Axelix has the [Open Source core](https://github.com/axelixlabs/axelix),
+so if you want to learn more - you're welcome.
+
+Remember that there're always trade-offs, and sometimes it is okay to diverge from certain well-established practices. Still, you always have to
+clearly justify such divergences and, what is also important, realize the weaknesses of your solution as well.
+
+Take care!
+Mikhail

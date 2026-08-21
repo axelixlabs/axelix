@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData, toChartData, toGcDistributionData } from "helpers";
-import { type IDashboardJavaResponseBody, StatefulRequest } from "models";
-import { getDashboardJavaData } from "services";
+import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { fetchData, toChartData, toGcDistributionData } from "@/helpers";
+import { type IDashboardJavaResponseBody, StatefulRequest } from "@/models";
+import { getDashboardJavaData } from "@/services";
 
 import { DashboardGCDistribution } from "./DashboardGCDistribution";
 import { DashboardProjectLeyden } from "./DashboardProjectLeyden";

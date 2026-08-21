@@ -18,15 +18,12 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +37,7 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.state.UserService;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
@@ -72,14 +70,14 @@ public class UserManagementApiTest {
     private UserRepository userRepository;
 
     @Autowired
-    private JdbcAggregateTemplate jdbcAggregateTemplate;
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void cleanUsersTable() {
-        userRepository.deleteAll();
+        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
     }
 
     @Test
@@ -118,7 +116,7 @@ public class UserManagementApiTest {
         assertThat(saved.email()).isEqualTo("newUser@example.com");
         assertThat(saved.jobTitle()).isEqualTo("Software Engineer");
         assertThat(saved.organizationalUnit()).isEqualTo("Engineering");
-        assertThat(saved.roles().values()).containsExactly("EDITOR");
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactly("EDITOR");
         assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(saved.lastLoginAt()).isNull();
@@ -245,7 +243,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenCreateRequestUsernameIsDuplicate() {
-        insertUser("existingUser", "existing@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        createUser("existingUser", "existing@example.com", "p");
 
         // language=json
         String request = """
@@ -270,7 +268,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenCreateRequestEmailIsDuplicate() {
-        insertUser("user_test", "user_test@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        createUser("user_test", "user_test@example.com", "p");
 
         // language=json
         String request = """
@@ -295,7 +293,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldDeleteUser() {
-        UserEntity user = insertUser("toDelete", "d@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("toDelete", "d@example.com", "p");
 
         // language=json
         String request = """
@@ -317,7 +315,7 @@ public class UserManagementApiTest {
     @Test
     void shouldUpdateAllUserFields() {
         // given.
-        UserEntity user = insertUser("oldName", "old@example.com", "oldPass", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("oldName", "old@example.com", "oldPass");
 
         // language=json
         String request = """
@@ -349,15 +347,14 @@ public class UserManagementApiTest {
         assertThat(updated.email()).isEqualTo("new@example.com");
         assertThat(updated.jobTitle()).isEqualTo("Engineering Manager");
         assertThat(updated.organizationalUnit()).isEqualTo("Engineering");
-        assertThat(updated.roles().values()).containsExactlyInAnyOrder("ADMIN", "EDITOR");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactlyInAnyOrder("ADMIN", "EDITOR");
         assertThat(passwordEncoder.matches("newPass", updated.password())).isTrue();
     }
 
     @Test
     void shouldUpdateRetainingThePassword_WhenUpdateRequestContainsNullPassword() {
         String oldPassword = "oldPass";
-        UserEntity user =
-                insertUser("oldUsername", "old-email@example.com", oldPassword, Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("oldUsername", "old-email@example.com", oldPassword);
 
         String newUsername = "newUsername";
 
@@ -383,15 +380,15 @@ public class UserManagementApiTest {
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
         assertThat(updated.username()).isEqualTo(newUsername);
         assertThat(updated.email()).isEqualTo(null);
-        assertThat(updated.roles().values()).isEqualTo(user.roles().values());
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
         assertThat(passwordEncoder.matches(oldPassword, updated.password())).isTrue();
     }
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRequestUsernameIsDuplicate() {
         // given.
-        insertUser("alice", "alice@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
-        UserEntity bob = insertUser("bob", "bob@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        createUser("alice", "alice@example.com", "p");
+        UserEntity bob = createUser("bob", "bob@example.com", "p");
 
         // language=json
         String request = """
@@ -420,8 +417,8 @@ public class UserManagementApiTest {
     @Test
     void shouldReturnBadRequest_WhenUpdateRequestEmailIsDuplicate() {
         // given.
-        insertUser("alice", "alice@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
-        UserEntity bob = insertUser("bob", "bob@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        createUser("alice", "alice@example.com", "p");
+        UserEntity bob = createUser("bob", "bob@example.com", "p");
 
         // language=json
         String request = """
@@ -449,7 +446,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainSuperAdmin() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
         String request = """
@@ -467,8 +464,7 @@ public class UserManagementApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        UserEntity untouched = userRepository.findById(user.id()).orElseThrow();
-        assertThat(untouched.roles().values()).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
     }
 
     @Test
@@ -494,7 +490,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesAreEmpty() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
         String request = """
@@ -512,13 +508,12 @@ public class UserManagementApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        UserEntity untouched = userRepository.findById(user.id()).orElseThrow();
-        assertThat(untouched.roles().values()).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("VIEWER");
     }
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainBlank() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
         String request = """
@@ -540,7 +535,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainUnknownRole() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
         String request = """
@@ -563,7 +558,7 @@ public class UserManagementApiTest {
     @Test
     void shouldChangeOnlyUserStatus() {
         // given.
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
         String request = """
                 {
                   "id": "%s",
@@ -586,7 +581,7 @@ public class UserManagementApiTest {
     @Test
     void shouldAllowIdempotentStatusChange() {
         // given.
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
         String request = """
                 {
                   "id": "%s",
@@ -607,7 +602,7 @@ public class UserManagementApiTest {
     @Test
     void shouldReturnBadRequest_WhenStatusIsUnknown() {
         // given.
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
+        UserEntity user = createUser("u", "u@example.com", "p");
         String request = """
                 {
                   "id": "%s",
@@ -663,21 +658,8 @@ public class UserManagementApiTest {
         return new HttpEntity<>(body, headers);
     }
 
-    private UserEntity insertUser(
-            String username, String email, String password, Set<String> roles, UserOrigin provider) {
-        UserEntity entity = new UserEntity(
-                UUID.randomUUID().toString(),
-                username,
-                null,
-                null,
-                email,
-                null,
-                null,
-                password == null ? null : passwordEncoder.encode(password),
-                new UserEntity.Roles(roles),
-                provider,
-                UserStatus.ACTIVE,
-                null);
-        return jdbcAggregateTemplate.insert(entity);
+    private UserEntity createUser(String username, String email, String password) {
+        userService.createLocal(username, null, null, email, null, null, password, "VIEWER");
+        return userRepository.findByUsername(username).orElseThrow();
     }
 }

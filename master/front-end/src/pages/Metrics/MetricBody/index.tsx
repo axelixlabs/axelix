@@ -19,11 +19,16 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader } from "components";
-import { buildSelectedTagParams, createMeasurementsWithTimestamp, fetchData } from "helpers";
-import { type IMeasurementsWithTimestamp, type IMetric, type ISingleMetricResponseBody, StatefulRequest } from "models";
-import { getSingleMetricData } from "services";
-import { METRIC_SHORT_POLLING_INTERVAL_MS, METRIC_SLIDING_WINDOW_MS } from "utils";
+import { EmptyHandler, Loader } from "@/components";
+import { buildSelectedTagParams, createMeasurementsWithTimestamp, fetchData } from "@/helpers";
+import {
+    type IMeasurementsWithTimestamp,
+    type IMetric,
+    type ISingleMetricResponseBody,
+    StatefulRequest,
+} from "@/models";
+import { getSingleMetricData } from "@/services";
+import { METRIC_SHORT_POLLING_INTERVAL_MS, METRIC_SLIDING_WINDOW_MS } from "@/utils";
 
 import { MetricChart } from "../MetricChart";
 

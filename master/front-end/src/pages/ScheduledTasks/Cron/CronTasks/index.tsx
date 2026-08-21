@@ -17,8 +17,8 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler } from "components";
-import type { ICron } from "models";
+import { EmptyHandler } from "@/components";
+import type { ICron } from "@/models";
 
 import styles from "../../styles.module.css";
 import { CronTableHeader } from "../CronTableHeader";

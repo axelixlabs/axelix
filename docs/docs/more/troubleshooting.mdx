@@ -1,0 +1,32 @@
+# Troubleshooting
+
+This page describes the most common issues that occur during Axelix installation and configuration.
+
+## 1. Authentication Error (401) When Accessing Axelix Endpoints
+
+### Symptom
+
+On the Master side, a 401 error is returned when communicating with the managed service, even though access to Axelix endpoints is enabled in `application.yaml` on the managed service side and Spring Security is configured correctly.
+
+### Most Likely Cause
+
+In practice, the actuator endpoints exposed by the managed service (the microservice that includes the Axelix Spring Boot Starter and plugin) are almost never left open. It is very common — and generally recommended — to protect them with some authentication mechanism: HTTP Basic, an OIDC/OAuth2 resource server, or any other scheme wired into the application's Spring Security configuration.
+
+At the same time, Axelix ships with its own Identity & Access Management (IAM). When the Master communicates with the managed service, it calls the custom Axelix actuator endpoints (those that start with `/actuator/axelix-**`, but note that the actuator prefix may be different - it is configurable) and attaches its **own** Axelix-issued bearer token in the `Authorization` header. This token is meant to be understood by the Axelix components on the managed service, **not** by the managed service's own security stack.
+
+:::note[Custom actuator prefix]
+The `/actuator` part is the actuator base path, which is configurable via `management.endpoints.web.base-path` (it defaults to `/actuator`). If your managed service overrides this property, the Axelix endpoints live under the configured base path instead — for example, a base path of `/manage` means the endpoints are reachable at `/manage/axelix-**`. Keep this in mind for the request matcher in the solution below.
+:::
+
+The 401 arises from the collision between these two independent authentication systems: the managed service's security filter intercepts the request before it ever reaches the Axelix components, sees a bearer token, and tries to validate it against the managed service's own IAM — where the Axelix token is unknown and therefore rejected.
+
+### The Solution:
+
+The solution is to exclude Axelix custom actuator endpoints (i.e. those that are prefixed with `/actuator/axelix-**`, again, considering the ability to configure the custom prefix for actuator endpoints) from the application IAM and trust Axelix's own IAM:
+
+```
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+  return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
+}
+```

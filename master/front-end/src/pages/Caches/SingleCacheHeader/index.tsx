@@ -23,11 +23,11 @@ import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip, TooltipWithCopy } from "components";
-import { extractErrorCode } from "helpers";
-import { useAuthority, useConfirmableAction } from "hooks";
-import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
-import { clearCacheData } from "services";
+import { NoRequiredAuthorityTooltip, TooltipWithCopy } from "@/components";
+import { extractErrorCode } from "@/helpers";
+import { useAuthority, useConfirmableAction } from "@/hooks";
+import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "@/models";
+import { clearCacheData } from "@/services";
 
 import { CacheStatusSwitch } from "../CacheStatusSwitch";
 

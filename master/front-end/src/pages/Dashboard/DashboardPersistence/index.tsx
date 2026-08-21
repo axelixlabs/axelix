@@ -18,10 +18,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IDashboardPersistenceResponse, StatefulRequest } from "models";
-import { getDashboardPersistence } from "services";
+import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { fetchData } from "@/helpers";
+import { type IDashboardPersistenceResponse, StatefulRequest } from "@/models";
+import { getDashboardPersistence } from "@/services";
 
 import { InMemoryPaginationTreemap } from "./InMemoryPaginationTreemap";
 import { NPlusOneTreemap } from "./NPlusOneTreemap";

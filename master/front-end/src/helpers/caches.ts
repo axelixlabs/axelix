@@ -22,7 +22,7 @@ import {
     type ICacheLookup,
     type ICachesManager,
     type ITimelineData,
-} from "models";
+} from "@/models";
 
 import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_5M,

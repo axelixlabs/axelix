@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IChartData, IGCDistributionData, IJavaFeatureAdoption } from "models";
+import type { IChartData, IGCDistributionData, IJavaFeatureAdoption } from "@/models";
 
 export const toChartData = (javaFeatureAdoption: IJavaFeatureAdoption[]): IChartData[] => {
     return javaFeatureAdoption.map(({ featureId, adoptionPercentage }) => ({

@@ -36,9 +36,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -192,12 +192,12 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
 
     public static Stream<Arguments> sanitizationArgsSource() {
         return Stream.of(
-                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
-                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
-                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
-                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN));
+                Arguments.of("axelix.env.test.toBeSanitized", "******", TestRoles.EDITOR),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", TestRoles.EDITOR),
+                Arguments.of("axelix.env.test.toBeSanitized", "******", TestRoles.VIEWER),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", TestRoles.VIEWER),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", TestRoles.ADMIN),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", TestRoles.ADMIN));
     }
 
     private static Stream<Arguments> propertyName() {

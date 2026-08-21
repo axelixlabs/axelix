@@ -17,14 +17,13 @@
  */
 import { useNavigate } from "react-router";
 
-import { LanguageSwitcher } from "components";
+import { LogoIcon } from "@/assets";
+import { LanguageSwitcher } from "@/components";
 
 import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
 import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
-
-import { LogoIcon } from "assets";
 
 export const AdminHeader = () => {
     const navigate = useNavigate();

@@ -22,10 +22,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "components";
-import { useAuthority } from "hooks";
-import { EAuthorities, type IFixedTasks } from "models";
-import { changeScheduledTaskInterval } from "services";
+import { NoRequiredAuthorityTooltip } from "@/components";
+import { useAuthority } from "@/hooks";
+import { EAuthorities, type IFixedTasks } from "@/models";
+import { changeScheduledTaskInterval } from "@/services";
 
 import styles from "./styles.module.css";
 

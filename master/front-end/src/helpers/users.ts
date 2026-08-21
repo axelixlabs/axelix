@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IUser, IUsersFilters } from "models";
+import type { IUser, IUsersFilters } from "@/models";
 
 export const filterUsers = (users: IUser[], search: string, filters: IUsersFilters): IUser[] => {
     const formattedSearch = search.toLowerCase().trim();

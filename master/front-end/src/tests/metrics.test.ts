@@ -17,9 +17,9 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { getMetricTagValuesWithStatus, reduceDisplayedNumber } from "helpers";
-import type { IValidTagCombination } from "models";
-import { SHOW_RAW_THRESHOLD } from "utils";
+import { getMetricTagValuesWithStatus, reduceDisplayedNumber } from "@/helpers";
+import type { IValidTagCombination } from "@/models";
+import { SHOW_RAW_THRESHOLD } from "@/utils";
 
 describe("Check reduceDisplayedNumber function", () => {
     it("Returns an empty string if the value is null or undefined", () => {

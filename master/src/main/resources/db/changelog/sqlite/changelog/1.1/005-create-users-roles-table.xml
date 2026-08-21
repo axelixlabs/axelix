@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-005-sqlite-create-users-roles-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="users_roles"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="users_roles">
+      <column name="user_id" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users_roles"
+                     foreignKeyName="fk_users_roles_user" references="users(id)"/>
+      </column>
+      <column name="role_id" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users_roles"
+                     foreignKeyName="fk_users_roles_role" references="roles(id)"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

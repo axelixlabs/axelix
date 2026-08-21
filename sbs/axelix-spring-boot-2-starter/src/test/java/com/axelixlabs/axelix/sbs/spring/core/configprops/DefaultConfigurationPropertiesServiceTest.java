@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
-import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

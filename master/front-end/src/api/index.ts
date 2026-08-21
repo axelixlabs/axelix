@@ -17,8 +17,8 @@
  */
 import axios, { AxiosError } from "axios";
 
-import { extractErrorCode, showErrorNotification } from "helpers";
-import { EIgnoredErrors, type IErrorResponse } from "models";
+import { extractErrorCode, showErrorNotification } from "@/helpers";
+import { EIgnoredErrors, type IErrorResponse } from "@/models";
 
 /**
  * Browser will route such requests (with no host:port) to the same origin as the current

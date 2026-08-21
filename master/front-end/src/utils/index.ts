@@ -26,6 +26,7 @@ export * from "./loggers";
 export * from "./details";
 export * from "./metrics";
 export * from "./globals";
+export * from "./license";
 export * from "./caches";
 export * from "./users";
 export * from "./auth";

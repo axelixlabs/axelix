@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { apiFetch } from "api";
-import type { ILoginSubmitRequestData, OIDCLoginOption } from "models";
+import { apiFetch } from "@/api";
+import type { ILoginSubmitRequestData, OIDCLoginOption } from "@/models";
 
 export const login = (data: ILoginSubmitRequestData) => {
     return apiFetch.post("users/login", data);
@@ -35,6 +35,8 @@ export const authorize = (option: OIDCLoginOption) => {
     params.append("scope", option.scope);
     params.append("response_type", "code");
     params.append("redirect_uri", option.redirectUri);
+
+    Object.entries(option.additionalParameters ?? {}).forEach(([key, value]) => params.append(key, value));
 
     window.location.href = `${option.authorizationEndpoint}?${params.toString()}`;
 };

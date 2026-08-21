@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IThread } from "models";
+import type { IThread } from "@/models";
 
 import { ThreadDumpLockInfo } from "../ThreadDumpLockInfo";
 import { ThreadDumpRow } from "../ThreadDumpRow";

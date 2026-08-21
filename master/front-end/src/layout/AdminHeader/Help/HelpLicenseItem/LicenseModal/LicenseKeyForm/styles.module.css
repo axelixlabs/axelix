@@ -1,0 +1,24 @@
+.EnterKeyFormTitle {
+    color: var(--axelix-bold-grey);
+    margin-bottom: 2px;
+}
+
+.EnterKeyDescription {
+    color: var(--axelix-bold-grey);
+}
+
+.EnterKeyFormWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.TextAreaWrapper {
+    position: relative;
+}
+
+.CheckingSpinner {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}

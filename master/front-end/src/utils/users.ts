@@ -17,7 +17,7 @@
  */
 import type { InputProps } from "antd";
 
-import { ERoles, type UserProfileEditableValueField } from "models";
+import { ERoles, type UserProfileEditableValueField } from "@/models";
 
 export const userProfileInputTypeMap: Record<UserProfileEditableValueField, InputProps["type"]> = {
     username: "text",

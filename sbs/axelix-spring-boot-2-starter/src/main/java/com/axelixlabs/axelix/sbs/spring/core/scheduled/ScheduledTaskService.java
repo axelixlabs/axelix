@@ -40,8 +40,9 @@ import org.springframework.scheduling.support.CronTrigger;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Chaerkasov
+ * @author Vyacheslav Yanin
  */
-public final class ScheduledTaskService {
+public final class ScheduledTaskService implements AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTaskService.class);
 
@@ -197,6 +198,13 @@ public final class ScheduledTaskService {
                     "Cancelled task future: {} (mayInterrupt: {}, success: {})", managedTask.getId(), force, cancelled);
         } else {
             log.debug("No future to cancel for task: {}", managedTask.getId());
+        }
+    }
+
+    @Override
+    public void close() {
+        if (this.registry != null) {
+            this.registry.close();
         }
     }
 }
