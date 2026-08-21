@@ -20,14 +20,14 @@ import { Activity, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "@/components";
+import { EmptyHandler, Loader, PageSearch, VirtualList } from "@/components";
 import { fetchData, filterLoggerGroups, filterLoggers } from "@/helpers";
 import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest } from "@/models";
 import { getLoggersData } from "@/services";
 import { loggersTabs } from "@/utils";
 
+import { Logger } from "./Logger";
 import { LoggerGroups } from "./LoggerGroups";
-import { LoggersList } from "./LoggersList";
 import styles from "./styles.module.css";
 
 const Loggers = () => {
@@ -83,10 +83,14 @@ const Loggers = () => {
 
             <Activity mode={isLoggersTab ? "visible" : "hidden"}>
                 <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
-                    <LoggersList
-                        effectiveLoggers={effectiveLoggers}
-                        levels={levels}
-                        fetchLoggersData={fetchLoggersData}
+                    <VirtualList
+                        items={effectiveLoggers}
+                        rowKey="name"
+                        // TODO: Fix in the future
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        itemRender={(logger) => (
+                            <Logger logger={logger} levels={levels} fetchLoggersData={fetchLoggersData} />
+                        )}
                     />
                 </EmptyHandler>
             </Activity>
