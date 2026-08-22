@@ -81,7 +81,7 @@ public class JwtAuthTestConfiguration {
     @Bean
     public WebIdentityAccessManager securityManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+        return new ManagedServiceWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }
 
     @Bean

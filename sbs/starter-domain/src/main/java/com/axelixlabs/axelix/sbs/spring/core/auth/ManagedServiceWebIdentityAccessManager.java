@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth;
+package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -36,23 +36,21 @@ import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * The master-side {@link WebIdentityAccessManager}. It handles the entire IAM for the browser-facing HTTP requests,
- * resolving the required {@link Authority} directly from the {@link MasterWebEndpoint} that the request addresses
- * (via {@link MasterWebEndpointResolver}) rather than from a generic authority resolver.
+ * Default {@link WebIdentityAccessManager}. Handles the entire IAM for HTTP requests.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class MasterWebIdentityAccessManager implements WebIdentityAccessManager {
+public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccessManager {
 
     private final JwtDecoderService jwtDecoderService;
-    private final MasterWebEndpointResolver endpointResolver;
+    private final AuthorityResolver authorityResolver;
     private final Authorizer authorizer;
 
-    public MasterWebIdentityAccessManager(
-            JwtDecoderService jwtDecoderService, MasterWebEndpointResolver endpointResolver, Authorizer authorizer) {
+    public ManagedServiceWebIdentityAccessManager(
+            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         this.jwtDecoderService = jwtDecoderService;
-        this.endpointResolver = endpointResolver;
+        this.authorityResolver = authorityResolver;
         this.authorizer = authorizer;
     }
 
@@ -64,11 +62,9 @@ public class MasterWebIdentityAccessManager implements WebIdentityAccessManager 
             throw new InvalidJwtTokenException("Authorization token is missing");
         }
 
-        Optional<Authority> requiredAuthority = endpointResolver
-            .resolveEndpoint(relativeRequestPath, requestHttpMethod)
-            .map(MasterWebEndpoint::authority);
-
         PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
+
+        Optional<Authority> requiredAuthority = authorityResolver.resolve(relativeRequestPath, requestHttpMethod);
 
         AuthorizationRequest authorizationRequest =
                 new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));

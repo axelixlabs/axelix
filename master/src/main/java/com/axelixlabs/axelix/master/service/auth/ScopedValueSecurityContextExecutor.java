@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 @Component
 public class ScopedValueSecurityContextExecutor implements SecurityContextExecutor {
 
-    public static final ScopedValue<SecurityContext> SECURITY_CONTEXT = ScopedValue.newInstance();
+    private static final ScopedValue<SecurityContext> SECURITY_CONTEXT = ScopedValue.newInstance();
 
     @Override
     public <T extends Exception> void runWithinSecurityContext(

@@ -38,7 +38,12 @@ import com.axelixlabs.axelix.master.filter.SpaStaticResourcesServingFilter;
 @AutoConfiguration
 public class WebAutoConfiguration {
 
+    /**
+     * The path, that serves as the prefix for all <strong>external</strong> web (web!) requests that are coming to the
+     * Axelix Master. By "external" we mean from the front-end UI or from OIDC provider and so on.
+     */
     public static final String EXTERNAL_API_PATH = "/api/external";
+
     public static final String INTERNAL_API_PATH = "/api/internal";
 
     @Bean

@@ -15,23 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.filter;
-
-import org.springframework.core.Ordered;
+package com.axelixlabs.axelix.master.service.auth.intercept;
 
 /**
- * Class that holds ordering of the HTTP servlet filters.
+ * A marker interface that represents a callback to be called in the
+ * IAM-related filters in the {@link jakarta.servlet.FilterChain} of Axelix Master
  *
  * @author Mikhail Polivakha
  */
-public final class FiltersOrder {
-
-    private FiltersOrder() {}
-
-    public static final int EXCEPTION_HANDLING_FILTER = Ordered.HIGHEST_PRECEDENCE + 5;
-    public static final int SPA_STATIC_RESOURCES_SERVING_FILTER = Ordered.HIGHEST_PRECEDENCE + 6;
-    public static final int REQUEST_PROFILE_FILTER = Ordered.HIGHEST_PRECEDENCE + 7;
-    public static final int COOKIE_BASED_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 8;
-    public static final int HEART_BEAT_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 9;
-    public static final int MCP_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 10;
-}
+public interface IamEvaluationInterceptor {}

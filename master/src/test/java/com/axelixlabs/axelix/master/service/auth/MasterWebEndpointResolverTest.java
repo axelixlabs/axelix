@@ -67,7 +67,8 @@ class MasterWebEndpointResolverTest {
     void shouldResolveEndpointWithOperationCode(String path, HttpMethod httpMethod, String operationCode) {
         // when/then.
         assertThat(resolver.resolveEndpoint(path, httpMethod))
-                .hasValueSatisfying(endpoint -> assertThat(endpoint.operationCode()).isEqualTo(operationCode));
+                .hasValueSatisfying(
+                        endpoint -> assertThat(endpoint.operationCode()).isEqualTo(operationCode));
     }
 
     private static Stream<Arguments> authorityProtectedEndpoints() {

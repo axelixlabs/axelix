@@ -41,7 +41,6 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
@@ -53,6 +52,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Prop
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.filter.auth.WebRequestContextInitFilter;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
@@ -61,8 +61,8 @@ import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
-import com.axelixlabs.axelix.master.service.auth.MasterWebIdentityAccessManager;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
+import com.axelixlabs.axelix.master.service.auth.intercept.IamEvaluationInterceptor;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathJsonInspector;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
@@ -99,14 +99,6 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public WebIdentityAccessManager webIdentityAccessManager(
-            JwtDecoderService jwtDecoderService,
-            MasterWebEndpointResolver masterWebEndpointResolver,
-            Authorizer authorizer) {
-        return new MasterWebIdentityAccessManager(jwtDecoderService, masterWebEndpointResolver, authorizer);
-    }
-
-    @Bean
     public Authorizer authorizer() {
         return new DefaultAuthorizer();
     }
@@ -129,6 +121,13 @@ public class SecurityAutoConfiguration {
     @ConditionalOnMcpServerEnabled
     public McpAuthenticationHandler basicAuthMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
         return new BasicMcpAuthenticationHandler(userAuthenticator);
+    }
+
+    @Bean
+    public WebRequestContextInitFilter webRequestContextInitFilter(
+            MasterWebEndpointResolver masterWebEndpointResolver) {
+
+        return new WebRequestContextInitFilter(masterWebEndpointResolver);
     }
 
     /**
@@ -164,11 +163,17 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
-                WebIdentityAccessManager webIdentityAccessManager,
                 CookieProperties cookieProperties,
-                SecurityContextExecutor securityContextExecutor) {
+                JwtDecoderService jwtDecoderService,
+                Authorizer authorizer,
+                SecurityContextExecutor securityContextExecutor,
+                List<IamEvaluationInterceptor> iamEvaluationInterceptors) {
             return new CookieBasedJwtAuthorizationFilter(
-                    cookieProperties.getAuthCookieName(), webIdentityAccessManager, securityContextExecutor);
+                    cookieProperties.getAuthCookieName(),
+                    securityContextExecutor,
+                    jwtDecoderService,
+                    authorizer,
+                    iamEvaluationInterceptors);
         }
     }
 

@@ -98,16 +98,20 @@ public final class MasterWebEndpoints {
             register("cache:read-one", HttpMethod.GET, ApiPaths.CachesApi.CACHE_NAME, null);
     public static final MasterWebEndpoint CACHE_ENABLE =
             register("caches:enable", HttpMethod.POST, ApiPaths.CachesApi.ENABLE_CACHE, DefaultAuthority.CACHES_TOGGLE);
-    public static final MasterWebEndpoint CACHE_DISABLE =
-            register("caches:disable", HttpMethod.POST, ApiPaths.CachesApi.DISABLE_CACHE, DefaultAuthority.CACHES_TOGGLE);
+    public static final MasterWebEndpoint CACHE_DISABLE = register(
+            "caches:disable", HttpMethod.POST, ApiPaths.CachesApi.DISABLE_CACHE, DefaultAuthority.CACHES_TOGGLE);
     public static final MasterWebEndpoint CACHE_MANAGER_ENABLE = register(
-            "cache-manager:enable", HttpMethod.POST, ApiPaths.CachesApi.ENABLE_CACHE_MANAGER,
+            "cache-manager:enable",
+            HttpMethod.POST,
+            ApiPaths.CachesApi.ENABLE_CACHE_MANAGER,
             DefaultAuthority.CACHES_TOGGLE);
     public static final MasterWebEndpoint CACHE_MANAGER_DISABLE = register(
-            "cache-manager:disable", HttpMethod.POST, ApiPaths.CachesApi.DISABLE_CACHE_MANAGER,
+            "cache-manager:disable",
+            HttpMethod.POST,
+            ApiPaths.CachesApi.DISABLE_CACHE_MANAGER,
             DefaultAuthority.CACHES_TOGGLE);
-    public static final MasterWebEndpoint CACHE_CLEAR_ONE =
-            register("caches:clear-one", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_NAME, DefaultAuthority.CACHES_CLEAR);
+    public static final MasterWebEndpoint CACHE_CLEAR_ONE = register(
+            "caches:clear-one", HttpMethod.DELETE, ApiPaths.CachesApi.CACHE_NAME, DefaultAuthority.CACHES_CLEAR);
     public static final MasterWebEndpoint CACHES_CLEAR_ALL = register(
             "caches:clear-all", HttpMethod.DELETE, ApiPaths.CachesApi.INSTANCE_ID, DefaultAuthority.CACHES_CLEAR);
 
@@ -115,23 +119,35 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint SCHEDULED_TASKS_READ =
             register("scheduled-tasks:read", HttpMethod.GET, ApiPaths.ScheduledTasksApi.INSTANCE_ID, null);
     public static final MasterWebEndpoint SCHEDULED_TASK_ENABLE = register(
-            "scheduled-task:enable", HttpMethod.POST, ApiPaths.ScheduledTasksApi.ENABLE_TASK,
+            "scheduled-task:enable",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.ENABLE_TASK,
             DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_DISABLE = register(
-            "scheduled-task:disable", HttpMethod.POST, ApiPaths.ScheduledTasksApi.DISABLE_TASK,
+            "scheduled-task:disable",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.DISABLE_TASK,
             DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_EXECUTE = register(
-            "scheduled-task:execute", HttpMethod.POST, ApiPaths.ScheduledTasksApi.EXECUTE,
+            "scheduled-task:execute",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.EXECUTE,
             DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_CRON = register(
-            "scheduled-task:modify-cron-expression", HttpMethod.POST, ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
+            "scheduled-task:modify-cron-expression",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
             DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_MODIFY_INTERVAL = register(
-            "scheduled-task:modify-interval", HttpMethod.POST, ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL,
+            "scheduled-task:modify-interval",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL,
             DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     public static final MasterWebEndpoint SCHEDULED_TASK_VALIDATE_CRON = register(
-            "scheduled-task:validate-cron-expression", HttpMethod.POST,
-            ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION, null);
+            "scheduled-task:validate-cron-expression",
+            HttpMethod.POST,
+            ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION,
+            null);
 
     // Garbage collector
     public static final MasterWebEndpoint GC_LOG_READ_FILE =
@@ -141,21 +157,29 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint GC_TRIGGER = register(
             "gc:trigger", HttpMethod.POST, ApiPaths.GcLogFileApi.TRIGGER_GC, DefaultAuthority.GARBAGE_COLLECTOR);
     public static final MasterWebEndpoint GC_LOG_ENABLE = register(
-            "gc-log:enable", HttpMethod.POST, ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING,
+            "gc-log:enable",
+            HttpMethod.POST,
+            ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING,
             DefaultAuthority.GARBAGE_COLLECTOR);
     public static final MasterWebEndpoint GC_LOG_DISABLE = register(
-            "gc-log:disable", HttpMethod.POST, ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING,
+            "gc-log:disable",
+            HttpMethod.POST,
+            ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING,
             DefaultAuthority.GARBAGE_COLLECTOR);
 
     // Thread dump
     public static final MasterWebEndpoint THREAD_DUMP_READ =
             register("thread-dump:read", HttpMethod.GET, ApiPaths.ThreadDumpApi.INSTANCE_ID, null);
     public static final MasterWebEndpoint THREAD_DUMP_ENABLE_CONTENTION = register(
-            "thread-dump:enable-contention-monitoring", HttpMethod.POST,
-            ApiPaths.ThreadDumpApi.ENABLE_CONTENTION_MONITORING, null);
+            "thread-dump:enable-contention-monitoring",
+            HttpMethod.POST,
+            ApiPaths.ThreadDumpApi.ENABLE_CONTENTION_MONITORING,
+            null);
     public static final MasterWebEndpoint THREAD_DUMP_DISABLE_CONTENTION = register(
-            "thread-dump:disable-contention-monitoring", HttpMethod.POST,
-            ApiPaths.ThreadDumpApi.DISABLE_CONTENTION_MONITORING, null);
+            "thread-dump:disable-contention-monitoring",
+            HttpMethod.POST,
+            ApiPaths.ThreadDumpApi.DISABLE_CONTENTION_MONITORING,
+            null);
 
     // Heap dump
     public static final MasterWebEndpoint HEAP_DUMP_READ =
@@ -199,14 +223,24 @@ public final class MasterWebEndpoints {
 
     // User management
     public static final MasterWebEndpoint USER_CREATE = register(
-            "users:create", HttpMethod.POST, ApiPaths.UsersManagementApi.USERS_CREATE, DefaultAuthority.USERS_MANAGEMENT);
+            "users:create",
+            HttpMethod.POST,
+            ApiPaths.UsersManagementApi.USERS_CREATE,
+            DefaultAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_DELETE = register(
-            "users:delete", HttpMethod.DELETE, ApiPaths.UsersManagementApi.USERS_DELETE,
+            "users:delete",
+            HttpMethod.DELETE,
+            ApiPaths.UsersManagementApi.USERS_DELETE,
             DefaultAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_UPDATE = register(
-            "users:update", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_UPDATE, DefaultAuthority.USERS_MANAGEMENT);
+            "users:update",
+            HttpMethod.PUT,
+            ApiPaths.UsersManagementApi.USERS_UPDATE,
+            DefaultAuthority.USERS_MANAGEMENT);
     public static final MasterWebEndpoint USER_CHANGE_STATUS = register(
-            "users:change-status", HttpMethod.PUT, ApiPaths.UsersManagementApi.USERS_STATUS,
+            "users:change-status",
+            HttpMethod.PUT,
+            ApiPaths.UsersManagementApi.USERS_STATUS,
             DefaultAuthority.USERS_MANAGEMENT);
 
     // spotless:on

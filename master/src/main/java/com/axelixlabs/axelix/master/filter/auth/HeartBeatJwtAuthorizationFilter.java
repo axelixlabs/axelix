@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
+import java.util.Set;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,12 +34,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
+import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 
@@ -52,20 +56,27 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
 @Order(FiltersOrder.HEART_BEAT_JWT_AUTHORIZATION_FILTER)
 public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final WebIdentityAccessManager webIdentityAccessManager;
+    private static final String HEART_BEAT_REQUEST_PATH =
+            WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.HeartBeatApi.SERVICE_REGISTER;
+
     private final SecurityContextExecutor securityContextExecutor;
+    private final JwtDecoderService jwtDecoderService;
+    private final Authorizer authorizer;
 
     public HeartBeatJwtAuthorizationFilter(
-            WebIdentityAccessManager webIdentityAccessManager, SecurityContextExecutor securityContextExecutor) {
-        this.webIdentityAccessManager = webIdentityAccessManager;
+            SecurityContextExecutor securityContextExecutor,
+            JwtDecoderService jwtDecoderService,
+            Authorizer authorizer) {
         this.securityContextExecutor = securityContextExecutor;
+        this.jwtDecoderService = jwtDecoderService;
+        this.authorizer = authorizer;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        return !path.equalsIgnoreCase(WebAutoConfiguration.INTERNAL_API_PATH + "/service/register");
+        return !path.equalsIgnoreCase(HEART_BEAT_REQUEST_PATH);
     }
 
     @Override
@@ -81,9 +92,12 @@ public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        String servletPath = request.getServletPath().substring(WebAutoConfiguration.INTERNAL_API_PATH.length());
+        PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
 
-        User user = webIdentityAccessManager.verifyAccess(servletPath, HttpMethod.valueOf(request.getMethod()), token);
+        AuthorizationRequest authorizationRequest =
+                new AuthorizationRequest(Set.of(InternalAuthorities.HEART_BEATING_AUTHORITY));
+
+        authorizer.authorize(user, authorizationRequest);
 
         try {
             securityContextExecutor.runWithinSecurityContext(

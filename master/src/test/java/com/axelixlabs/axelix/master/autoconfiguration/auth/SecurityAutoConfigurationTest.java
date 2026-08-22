@@ -41,7 +41,6 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
 import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
@@ -49,6 +48,7 @@ import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenti
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.SuperAdminAuthenticationOption;
 import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.filter.auth.WebRequestContextInitFilter;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
@@ -124,8 +124,9 @@ class SecurityAutoConfigurationTest {
             // when.
             contextRunner.run(context -> {
                 // then.
-                assertThat(context).hasSingleBean(MasterWebEndpointResolver.class);                assertThat(context).hasSingleBean(Authorizer.class);
-                assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
+                assertThat(context).hasSingleBean(MasterWebEndpointResolver.class);
+                assertThat(context).hasSingleBean(Authorizer.class);
+                assertThat(context).hasSingleBean(WebRequestContextInitFilter.class);
                 assertThat(context).hasSingleBean(JwtEncoderService.class);
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
                 assertThat(context).hasSingleBean(CookieService.class);
@@ -149,7 +150,8 @@ class SecurityAutoConfigurationTest {
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
             // when.
             contextRunner.run(context -> {
@@ -169,7 +171,8 @@ class SecurityAutoConfigurationTest {
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
             // when.
             contextRunner.run(context -> {
@@ -191,7 +194,8 @@ class SecurityAutoConfigurationTest {
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
             // when.
             contextRunner.run(context -> {
@@ -199,7 +203,7 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasNotFailed();
                 assertThat(context).hasSingleBean(JwtEncoderService.class);
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
-                assertThat(context).hasSingleBean(WebIdentityAccessManager.class);                assertThat(context).hasSingleBean(Authorizer.class);
+                assertThat(context).hasSingleBean(Authorizer.class);
             });
         }
 
@@ -215,7 +219,8 @@ class SecurityAutoConfigurationTest {
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
             // when.
             contextRunner.run(context -> {
@@ -236,7 +241,8 @@ class SecurityAutoConfigurationTest {
                     .withPropertyValues(superAdminCredentialPropertyValues())
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class));
 
             // when.
             contextRunner.run(context -> {
@@ -286,7 +292,8 @@ class SecurityAutoConfigurationTest {
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
                             ConfigurationPropertiesAutoConfiguration.class,
-                            SecurityAutoConfiguration.class,                            SecurityAutoConfiguration.JwtAutoConfiguration.class,
+                            SecurityAutoConfiguration.class,
+                            SecurityAutoConfiguration.JwtAutoConfiguration.class,
                             SecurityAutoConfiguration.CookieAutoConfiguration.class));
 
             // when.

@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.auth;
 
 import org.jspecify.annotations.Nullable;
+
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
@@ -36,7 +37,10 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @author Mikhail Polivakha
  */
 public record MasterWebEndpoint(
-        String operationCode, HttpMethod method, PathPattern path, @Nullable Authority authority) {
+        String operationCode,
+        HttpMethod method,
+        PathPattern path,
+        @Nullable Authority authority) {
 
     private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
 
