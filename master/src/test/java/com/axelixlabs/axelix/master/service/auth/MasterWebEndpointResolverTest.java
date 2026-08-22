@@ -23,47 +23,54 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
-import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.AuthorityBindingsAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link MasterAuthorityResolver}.
+ * Unit tests for {@link MasterWebEndpointResolver}.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-class MasterAuthorityResolverTest {
+class MasterWebEndpointResolverTest {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(AuthorityBindingsAutoConfiguration.class))
-            .withBean(MasterAuthorityResolver.class);
+    private final MasterWebEndpointResolver resolver = new MasterWebEndpointResolver(MasterWebEndpoints.oss());
 
     @ParameterizedTest
-    @MethodSource("mappedEndpoints")
-    void shouldResolveMappedAuthority(String path, HttpMethod httpMethod, DefaultAuthority authority) {
+    @MethodSource("authorityProtectedEndpoints")
+    void shouldResolveEndpointCarryingItsRequiredAuthority(
+            String path, HttpMethod httpMethod, DefaultAuthority authority) {
         // when/then.
-        contextRunner.run(
-                context -> assertThat(context.getBean(AuthorityResolver.class).resolve(path, httpMethod))
-                        .contains(authority));
+        assertThat(resolver.resolveEndpoint(path, httpMethod))
+                .hasValueSatisfying(endpoint -> assertThat(endpoint.authority()).isEqualTo(authority));
     }
 
     @ParameterizedTest
-    @MethodSource("unmappedEndpoints")
-    void shouldReturnEmptyWhenEndpointIsNotMapped(String path, HttpMethod httpMethod) {
+    @MethodSource("unprotectedEndpoints")
+    void shouldResolveUnprotectedEndpointWithoutAuthority(String path, HttpMethod httpMethod) {
         // when/then.
-        contextRunner.run(
-                context -> assertThat(context.getBean(AuthorityResolver.class).resolve(path, httpMethod))
-                        .isEmpty());
+        assertThat(resolver.resolveEndpoint(path, httpMethod))
+                .hasValueSatisfying(endpoint -> assertThat(endpoint.authority()).isNull());
     }
 
-    private static Stream<Arguments> mappedEndpoints() {
+    @ParameterizedTest
+    @MethodSource("unresolvableEndpoints")
+    void shouldNotResolveUnknownOrWrongMethodEndpoints(String path, HttpMethod httpMethod) {
+        // when/then.
+        assertThat(resolver.resolveEndpoint(path, httpMethod)).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("operationCodes")
+    void shouldResolveEndpointWithOperationCode(String path, HttpMethod httpMethod, String operationCode) {
+        // when/then.
+        assertThat(resolver.resolveEndpoint(path, httpMethod))
+                .hasValueSatisfying(endpoint -> assertThat(endpoint.operationCode()).isEqualTo(operationCode));
+    }
+
+    private static Stream<Arguments> authorityProtectedEndpoints() {
         return Stream.of(
                 // USERS_MANAGEMENT
                 Arguments.of("/users-management/create", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
@@ -79,7 +86,6 @@ class MasterAuthorityResolverTest {
                 Arguments.of("/caches/i/cm/cn/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
                 Arguments.of("/caches/i/cm/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
                 Arguments.of("/caches/i/cm/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
 
                 // CACHES_CLEAR
                 Arguments.of("/caches/i/cache/cn", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
@@ -104,17 +110,31 @@ class MasterAuthorityResolverTest {
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY));
     }
 
-    private static Stream<Arguments> unmappedEndpoints() {
+    private static Stream<Arguments> unprotectedEndpoints() {
+        return Stream.of(
+                Arguments.of("/env/feed/i", HttpMethod.GET),
+                Arguments.of("/caches/i", HttpMethod.GET),
+                Arguments.of("/garbage-collector/logs/i/status", HttpMethod.GET),
+                Arguments.of("/users/login", HttpMethod.POST));
+    }
+
+    private static Stream<Arguments> unresolvableEndpoints() {
         return Stream.of(
                 // wrong method for known path
                 Arguments.of("/caches/i/cm/cn/disable", HttpMethod.GET),
                 Arguments.of("/scheduled-tasks/i/modify/cron-expression", HttpMethod.GET),
 
-                // known but public endpoints
-                Arguments.of("/caches/i", HttpMethod.GET),
-                Arguments.of("/garbage-collector/logs/i/status", HttpMethod.GET),
-
                 // unknown endpoint
                 Arguments.of("/unknown/path", HttpMethod.POST));
+    }
+
+    private static Stream<Arguments> operationCodes() {
+        return Stream.of(
+                Arguments.of("/env/feed/i", HttpMethod.GET, "environment:read"),
+                Arguments.of("/beans/feed/i", HttpMethod.GET, "beans:read"),
+                Arguments.of("/caches/i", HttpMethod.DELETE, "caches:clear-all"),
+                Arguments.of("/caches/i", HttpMethod.GET, "caches:read"),
+                Arguments.of("/users-management/create", HttpMethod.POST, "users:create"),
+                Arguments.of("/users/login", HttpMethod.POST, "auth:login"));
     }
 }

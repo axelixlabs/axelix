@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import tools.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,12 +35,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
@@ -58,8 +58,10 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
-import com.axelixlabs.axelix.master.service.auth.MasterAuthorityBinding;
-import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
+import com.axelixlabs.axelix.master.service.auth.MasterWebIdentityAccessManager;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathJsonInspector;
@@ -90,14 +92,18 @@ public class SecurityAutoConfiguration {
     public static final String LOCAL_LOGIN_PROPERTIES_PREFIX = "axelix.master.auth.options.local";
 
     @Bean
-    public MasterAuthorityResolver masterAuthorityResolver(List<MasterAuthorityBinding> authorityBindings) {
-        return new MasterAuthorityResolver(authorityBindings);
+    public MasterWebEndpointResolver masterWebEndpointResolver(ObjectProvider<MasterWebEndpoint> contributedEndpoints) {
+        List<MasterWebEndpoint> endpoints = new ArrayList<>(MasterWebEndpoints.oss());
+        contributedEndpoints.forEach(endpoints::add);
+        return new MasterWebEndpointResolver(endpoints);
     }
 
     @Bean
     public WebIdentityAccessManager webIdentityAccessManager(
-            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+            JwtDecoderService jwtDecoderService,
+            MasterWebEndpointResolver masterWebEndpointResolver,
+            Authorizer authorizer) {
+        return new MasterWebIdentityAccessManager(jwtDecoderService, masterWebEndpointResolver, authorizer);
     }
 
     @Bean
