@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -31,10 +33,22 @@ public class PrometheusProperties {
 
     public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 
+    public static final String SERVER_PORT_PROPERTY = "server.port";
+
+    public static final String PROMETHEUS_PORT_PROPERTY = PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port";
+
     /**
-     * Common tags to attach to every metric exposed via the Prometheus actuator endpoint.
+     * Common tags to attach to every metric exposed via the Prometheus endpoint.
      */
     private Map<String, String> tags = Map.of();
+
+    /**
+     * Port of the dedicated HTTP server that exposes the Prometheus scrape endpoint. If not set,
+     * defaults to {@code server.port}, meaning Prometheus is served through the actuator instead
+     * of a dedicated server.
+     */
+    @Nullable
+    private Integer port;
 
     public Map<String, String> getTags() {
         return tags;
@@ -42,6 +56,15 @@ public class PrometheusProperties {
 
     public PrometheusProperties setTags(Map<String, String> tags) {
         this.tags = tags;
+        return this;
+    }
+
+    public @Nullable Integer getPort() {
+        return port;
+    }
+
+    public PrometheusProperties setPort(@Nullable Integer port) {
+        this.port = port;
         return this;
     }
 }
