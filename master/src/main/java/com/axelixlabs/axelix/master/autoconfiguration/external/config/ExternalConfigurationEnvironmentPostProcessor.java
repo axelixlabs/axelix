@@ -17,14 +17,27 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.external.config;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
+import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.AXELIX_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.EXTERNAL_CONFIG_OPTION;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.MAPPED_PROPERTIES;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.PROPERTY_SOURCE_NAME;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_CLOUD_CONFIG_VALUE;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_CONFIG_IMPORT_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.WAY_OF_CONFIG_IMPORT;
 
 /**
  * An {@link EnvironmentPostProcessor} responsible for dynamically activating and
@@ -35,42 +48,59 @@ import org.springframework.core.env.MapPropertySource;
  * into the environment.</p>
  *
  * @author Vyacheslav Yanin
+ * @see AxelixConfigConstant
  */
 public class ExternalConfigurationEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    public static final String EXTERNAL_CONFIG_OPTION = "axelix.master.external-config.option";
-
-    public static final String SPRING_CLOUD_CONFIG_VALUE = "spring-cloud-config";
-
-    public static final String PROPERTY_SOURCE_NAME = "axelixExternalConfigProperties";
-
-    public static final String SPRING_CONFIG_IMPORT_PROPERTY = "spring.config.import";
-
-    public static final String SPRING_CLOUD_CONFIG_ENABLED_PROPERTY = "spring.cloud.config.enabled";
-
-    public static final String WAY_OF_CONFIG_IMPORT = "configserver:";
-
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String option = environment.getProperty(EXTERNAL_CONFIG_OPTION);
+        // Load application.yaml early to read flags before SB's main loop
+        loadEarlyApplicationYaml(environment);
 
-        if (SPRING_CLOUD_CONFIG_VALUE.equalsIgnoreCase(option)) {
+        String option = environment.getProperty(EXTERNAL_CONFIG_OPTION.value());
+
+        if (SPRING_CLOUD_CONFIG_VALUE.value().equalsIgnoreCase(option)) {
             var targetProperties = new HashMap<String, Object>();
 
-            targetProperties.put(SPRING_CONFIG_IMPORT_PROPERTY, WAY_OF_CONFIG_IMPORT);
-            targetProperties.put(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY, true);
+            targetProperties.put(SPRING_CONFIG_IMPORT_PROPERTY.value(), WAY_OF_CONFIG_IMPORT.value());
+            targetProperties.put(AxelixConfigConstant.SPRING_CLOUD_CONFIG_ENABLED_PROPERTY.value(), true);
 
-            var propertySource = new MapPropertySource(PROPERTY_SOURCE_NAME, targetProperties);
+            fillTargetProperties(environment, targetProperties);
+
+            var propertySource = new MapPropertySource(PROPERTY_SOURCE_NAME.value(), targetProperties);
             environment.getPropertySources().addFirst(propertySource);
         }
     }
 
+    private void loadEarlyApplicationYaml(ConfigurableEnvironment environment) {
+        try {
+            var resource = new ClassPathResource("application.yaml");
+            if (resource.exists()) {
+                List<PropertySource<?>> loaded = new YamlPropertySourceLoader().load("earlyApplicationYaml", resource);
+                for (PropertySource<?> source : loaded) {
+                    environment.getPropertySources().addLast(source);
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load early application.yaml", e);
+        }
+    }
+
+    private void fillTargetProperties(ConfigurableEnvironment environment, HashMap<String, Object> targetProperties) {
+        for (String prop : MAPPED_PROPERTIES) {
+            String value = environment.getProperty(AXELIX_PREFIX.value() + prop);
+            if (value != null && !value.isBlank()) {
+                targetProperties.put(SPRING_PREFIX.value() + prop, value);
+            }
+        }
+    }
+
     /**
-     * @return {@code ConfigDataEnvironmentPostProcessor.Order + 1} to ensure this processor executes after
-     *         {@code ConfigDataEnvironmentPostProcessor}.
+     * @return {@link Ordered#HIGHEST_PRECEDENCE} to ensure this processor executes before
+     *         native Spring Boot configuration importers inspect the environment.
      */
     @Override
     public int getOrder() {
-        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }

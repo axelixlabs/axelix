@@ -24,9 +24,11 @@ import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcesso
 import org.springframework.core.Ordered;
 import org.springframework.mock.env.MockEnvironment;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.external.config.ExternalConfigurationEnvironmentPostProcessor.EXTERNAL_CONFIG_OPTION;
-import static com.axelixlabs.axelix.master.autoconfiguration.external.config.ExternalConfigurationEnvironmentPostProcessor.SPRING_CLOUD_CONFIG_ENABLED_PROPERTY;
-import static com.axelixlabs.axelix.master.autoconfiguration.external.config.ExternalConfigurationEnvironmentPostProcessor.SPRING_CONFIG_IMPORT_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.AXELIX_PREFIX;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.EXTERNAL_CONFIG_OPTION;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_CLOUD_CONFIG_ENABLED_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_CONFIG_IMPORT_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.external.config.AxelixConfigConstant.SPRING_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -52,41 +54,84 @@ class ExternalConfigurationEnvironmentPostProcessorTest {
 
         postProcessor.postProcessEnvironment(environment, application);
 
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isNull();
-        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY))
+        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY.value()))
+                .isNull();
+        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY.value()))
                 .isNull();
     }
 
     @Test
     void shouldInjectConfigServerImportWhenOptionIsSpringCloudConfig() {
         var environment = new MockEnvironment();
-        environment.setProperty(EXTERNAL_CONFIG_OPTION, "spring-cloud-config");
+        environment.setProperty(EXTERNAL_CONFIG_OPTION.value(), "spring-cloud-config");
 
         postProcessor.postProcessEnvironment(environment, application);
 
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isEqualTo("configserver:");
+        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY.value()))
+                .isEqualTo("configserver:");
     }
 
     @Test
     void shouldEnableCloudConfigExplicitlyWhenOptionIsSpringCloudConfig() {
         var environment = new MockEnvironment();
-        environment.setProperty(EXTERNAL_CONFIG_OPTION, "spring-cloud-config");
+        environment.setProperty(EXTERNAL_CONFIG_OPTION.value(), "spring-cloud-config");
 
         postProcessor.postProcessEnvironment(environment, application);
 
-        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY))
+        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY.value()))
                 .isEqualTo("true");
     }
 
     @Test
     void shouldInjectPropertiesCaseInsensitively() {
         var environment = new MockEnvironment();
-        environment.setProperty(EXTERNAL_CONFIG_OPTION, "SPRING-CLOUD-CONFIG");
+        environment.setProperty(EXTERNAL_CONFIG_OPTION.value(), "SPRING-CLOUD-CONFIG");
 
         postProcessor.postProcessEnvironment(environment, application);
 
-        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY)).isEqualTo("configserver:");
-        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY))
+        assertThat(environment.getProperty(SPRING_CONFIG_IMPORT_PROPERTY.value()))
+                .isEqualTo("configserver:");
+        assertThat(environment.getProperty(SPRING_CLOUD_CONFIG_ENABLED_PROPERTY.value()))
                 .isEqualTo("true");
+    }
+
+    @Test
+    void shouldMapAllFivePropertiesWhenPresent() {
+        var environment = createEnvironment();
+
+        postProcessor.postProcessEnvironment(environment, application);
+
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "uri"))
+                .isEqualTo("http://custom-config-server:8888");
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "label")).isEqualTo("master-branch");
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "name")).isEqualTo("axelix-application");
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "username")).isEqualTo("axelix-user");
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "password")).isEqualTo("secure-password");
+    }
+
+    private MockEnvironment createEnvironment() {
+        var environment = new MockEnvironment();
+        environment.setProperty(EXTERNAL_CONFIG_OPTION.value(), "spring-cloud-config");
+
+        environment.setProperty(AXELIX_PREFIX.value() + "uri", "http://custom-config-server:8888");
+        environment.setProperty(AXELIX_PREFIX.value() + "label", "master-branch");
+        environment.setProperty(AXELIX_PREFIX.value() + "name", "axelix-application");
+        environment.setProperty(AXELIX_PREFIX.value() + "username", "axelix-user");
+        environment.setProperty(AXELIX_PREFIX.value() + "password", "secure-password");
+        return environment;
+    }
+
+    @Test
+    void shouldNotMapNullOrBlankProperties() {
+        var environment = new MockEnvironment();
+        environment.setProperty(EXTERNAL_CONFIG_OPTION.value(), "spring-cloud-config");
+
+        environment.setProperty(AXELIX_PREFIX.value() + "uri", "");
+        environment.setProperty(AXELIX_PREFIX.value() + "label", "   ");
+
+        postProcessor.postProcessEnvironment(environment, application);
+
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "uri")).isNull();
+        assertThat(environment.getProperty(SPRING_PREFIX.value() + "label")).isNull();
     }
 }
