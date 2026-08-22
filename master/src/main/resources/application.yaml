@@ -35,7 +35,7 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health" ]
+        include: [ "health", "prometheus" ]
   prometheus:
     metrics:
       export:
@@ -43,6 +43,14 @@ management:
 
 axelix:
   master:
+    external-config:
+      option:
+      spring-cloud-config:
+        uri:
+        label: master
+        name:
+        username:
+        password:
     environment:
     logging:
       json:
