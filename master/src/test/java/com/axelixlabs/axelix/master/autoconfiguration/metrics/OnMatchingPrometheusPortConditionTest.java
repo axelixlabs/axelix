@@ -49,11 +49,16 @@ class OnMatchingPrometheusPortConditionTest {
         "8080, 9404, false, true",
         "0, 0, true, false",
         "0, 0, false, true",
+        ", 8080, true, true",
+        ", 8080, false, false",
     })
     void evaluatesOutcomeAgainstExpectedMatchAttribute(
             String serverPort, String prometheusPort, boolean expectedMatch, boolean expectedOutcome) {
         // given.
-        MockEnvironment environment = new MockEnvironment().withProperty(SERVER_PORT_PROPERTY, serverPort);
+        MockEnvironment environment = new MockEnvironment();
+        if (serverPort != null) {
+            environment.withProperty(SERVER_PORT_PROPERTY, serverPort);
+        }
         if (prometheusPort != null) {
             environment.withProperty(PROMETHEUS_PORT_PROPERTY, prometheusPort);
         }

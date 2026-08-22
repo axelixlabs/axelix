@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
-import java.util.Objects;
-
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.ConditionContext;
@@ -39,6 +37,10 @@ import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusP
  * @author Dmitry Mazurov
  */
 public class OnMatchingPrometheusPortCondition extends SpringBootCondition {
+
+    // Environment does not expose server.port when it is left unset - Boot's embedded web server
+    // falls back to this port on its own, so mirror that default here.
+    private static final int DEFAULT_SERVER_PORT = 8080;
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -70,9 +72,9 @@ public class OnMatchingPrometheusPortCondition extends SpringBootCondition {
      * @return {@code true} if the ports match, {@code false} otherwise
      */
     private static boolean matchesServerPort(PropertyResolver properties) {
-        Integer serverPort = properties.getProperty(SERVER_PORT_PROPERTY, Integer.class);
+        int serverPort = properties.getProperty(SERVER_PORT_PROPERTY, Integer.class, DEFAULT_SERVER_PORT);
         Integer prometheusPort = properties.getProperty(PROMETHEUS_PORT_PROPERTY, Integer.class);
 
-        return prometheusPort == null || (prometheusPort != 0 && Objects.equals(serverPort, prometheusPort));
+        return prometheusPort == null || (prometheusPort != 0 && serverPort == prometheusPort);
     }
 }
