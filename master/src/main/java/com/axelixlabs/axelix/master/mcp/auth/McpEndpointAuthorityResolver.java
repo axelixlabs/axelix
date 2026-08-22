@@ -20,13 +20,11 @@ package com.axelixlabs.axelix.master.mcp.auth;
 import java.util.Optional;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**
  * Component that is capable to resolve the {@link Authority} that is required to access the {@link McpEndpoint}.
  *
- * @see AuthorityResolver
  * @author Mikhail Polivakha
  */
 public interface McpEndpointAuthorityResolver {

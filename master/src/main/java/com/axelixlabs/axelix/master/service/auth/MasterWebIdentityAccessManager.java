@@ -64,11 +64,11 @@ public class MasterWebIdentityAccessManager implements WebIdentityAccessManager 
             throw new InvalidJwtTokenException("Authorization token is missing");
         }
 
-        PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
-
         Optional<Authority> requiredAuthority = endpointResolver
-                .resolveEndpoint(relativeRequestPath, requestHttpMethod)
-                .map(MasterWebEndpoint::authority);
+            .resolveEndpoint(relativeRequestPath, requestHttpMethod)
+            .map(MasterWebEndpoint::authority);
+
+        PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
 
         AuthorizationRequest authorizationRequest =
                 new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
