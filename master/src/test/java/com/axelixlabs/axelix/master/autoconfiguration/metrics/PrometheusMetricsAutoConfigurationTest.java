@@ -118,7 +118,7 @@ class PrometheusMetricsAutoConfigurationTest {
                     .withBean(WebEndpointProperties.class)
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=9999",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0",
                             "server.port=8080");
 
             // when.
