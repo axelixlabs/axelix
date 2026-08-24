@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.TestSocketUtils;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusMetricsAutoConfiguration.PROMETHEUS_METRICS_ENDPOINT_PATH;
+import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,14 +56,7 @@ class ActuatorPrometheusEndpointTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private WebEndpointProperties webEndpointProperties;
-
-    @Autowired
     private ApplicationContext applicationContext;
-
-    private String prometheusMetricsHandlerPath() {
-        return webEndpointProperties.getBasePath() + PROMETHEUS_METRICS_ENDPOINT_PATH;
-    }
 
     @Nested
     @TestPropertySource(
@@ -81,7 +73,7 @@ class ActuatorPrometheusEndpointTest {
         @Test // GH-1520
         void prometheusIsNotExposedThroughActuator() {
             // when.
-            ResponseEntity<String> response = restTemplate.getForEntity(prometheusMetricsHandlerPath(), String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -91,7 +83,7 @@ class ActuatorPrometheusEndpointTest {
         void prometheusMetricsAreServedOnDedicatedHttpServer() {
             // when.
             ResponseEntity<String> response = restTemplate.getForEntity(
-                    "http://localhost:" + prometheusHttpServer.getPort() + prometheusMetricsHandlerPath(),
+                    "http://localhost:" + prometheusHttpServer.getPort() + PROMETHEUS_METRICS_SCRAPE_PATH,
                     String.class);
 
             // then.
@@ -138,7 +130,7 @@ class ActuatorPrometheusEndpointTest {
         @Test // GH-1520
         void prometheusIsServedThroughActuator() {
             // when.
-            ResponseEntity<String> response = restTemplate.getForEntity(prometheusMetricsHandlerPath(), String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -196,7 +188,7 @@ class ActuatorPrometheusEndpointTest {
         @Test // GH-1520
         void prometheusIsServedThroughActuator() {
             // when.
-            ResponseEntity<String> response = restTemplate.getForEntity(prometheusMetricsHandlerPath(), String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -225,7 +217,7 @@ class ActuatorPrometheusEndpointTest {
         @Test // GH-1520
         void prometheusIsNotAvailableThroughActuator() {
             // when.
-            ResponseEntity<String> response = restTemplate.getForEntity(prometheusMetricsHandlerPath(), String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -243,7 +235,7 @@ class ActuatorPrometheusEndpointTest {
         @Test
         void prometheusIsNotAvailableByDefault() {
             // when.
-            ResponseEntity<String> response = restTemplate.getForEntity(prometheusMetricsHandlerPath(), String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

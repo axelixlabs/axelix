@@ -27,7 +27,6 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
@@ -115,7 +114,6 @@ class PrometheusMetricsAutoConfigurationTest {
         void shouldNotCreateEndpointWhenPortDiffersFromServerPort() {
             // given.
             ApplicationContextRunner contextRunner = baselineContextRunner()
-                    .withBean(WebEndpointProperties.class)
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0",

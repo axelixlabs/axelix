@@ -32,7 +32,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -42,6 +41,8 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConf
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+
+import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
 
 /**
  * Prometheus metrics related auto-configuration.
@@ -60,8 +61,6 @@ import org.springframework.context.annotation.Bean;
 public class PrometheusMetricsAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(PrometheusMetricsAutoConfiguration.class);
-
-    public static final String PROMETHEUS_METRICS_ENDPOINT_PATH = "/prometheus";
 
     @Bean
     @ConditionalOnMissingBean
@@ -104,16 +103,13 @@ public class PrometheusMetricsAutoConfiguration {
     @Bean
     @ConditionalOnMatchingPrometheusPort(matches = false)
     HTTPServer prometheusHttpServer(
-            PrometheusMeterRegistry prometheusMeterRegistry,
-            PrometheusProperties prometheusProperties,
-            WebEndpointProperties webEndpointProperties)
+            PrometheusMeterRegistry prometheusMeterRegistry, PrometheusProperties prometheusProperties)
             throws IOException {
         int port = Objects.requireNonNull(prometheusProperties.getPort());
-        String metricsHandlerPath = webEndpointProperties.getBasePath() + PROMETHEUS_METRICS_ENDPOINT_PATH;
         HTTPServer server = HTTPServer.builder()
                 .port(port)
                 .registry(prometheusMeterRegistry.getPrometheusRegistry())
-                .metricsHandlerPath(metricsHandlerPath)
+                .metricsHandlerPath(PROMETHEUS_METRICS_SCRAPE_PATH)
                 .registerHealthHandler(false)
                 .defaultHandler(new WhitelabelNotFoundHandler())
                 .buildAndStart();
@@ -121,7 +117,7 @@ public class PrometheusMetricsAutoConfiguration {
         log.info(
                 "Prometheus HTTP server started on port {} with context path '{}'",
                 server.getPort(),
-                metricsHandlerPath);
+                PROMETHEUS_METRICS_SCRAPE_PATH);
 
         return server;
     }
