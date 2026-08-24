@@ -24,29 +24,29 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnAccessDenied;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnAuthenticationFailure;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnSuccessfulResult;
-import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebAccessDenied;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebAuthenticationFailure;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**
- * Test IAM interceptor that records the {@link MasterWebEndpoint} each auth callback is invoked with. It lets
- * {@link AbstractProtectedEndpointTest} assert that {@code WebRequestContextInitFilter} resolved the request to
- * the correct endpoint and propagated it down the auth filter chain.
+ * Test IAM Web interceptor that records the {@link MasterWebEndpoint} each auth callback is invoked with.
+ *
+ * @see CapturingIamMcpInterceptor
  *
  * @author Mikhail Polivakha
  */
 @NullMarked
-public class CapturingIamInterceptor implements OnAuthenticationFailure, OnAccessDenied, OnSuccessfulResult {
+public class CapturingIamWebInterceptor
+        implements OnWebAuthenticationFailure, OnWebAccessDenied, OnWebSuccessfulResult {
 
-    private @Nullable MasterWebEndpoint invalidTokenEndpoint;
+    private @Nullable MasterWebEndpoint authenticationFailureEndpoint;
     private @Nullable MasterWebEndpoint accessDeniedEndpoint;
     private @Nullable MasterWebEndpoint successfulEndpoint;
     private @Nullable User actor;
 
     @Override
     public void onAuthenticationFailure(MasterWebEndpoint target, HttpServletRequest request) {
-        this.invalidTokenEndpoint = target;
+        this.authenticationFailureEndpoint = target;
     }
 
     @Override
@@ -61,18 +61,15 @@ public class CapturingIamInterceptor implements OnAuthenticationFailure, OnAcces
         this.actor = user;
     }
 
-    /**
-     * Forget everything captured so far. Meant to be called before each test so assertions never observe a
-     * callback triggered by a previous test sharing the same (cached) application context.
-     */
     public void reset() {
-        this.invalidTokenEndpoint = null;
+        this.authenticationFailureEndpoint = null;
         this.accessDeniedEndpoint = null;
         this.successfulEndpoint = null;
+        this.actor = null;
     }
 
-    public @Nullable MasterWebEndpoint invalidTokenEndpoint() {
-        return invalidTokenEndpoint;
+    public @Nullable MasterWebEndpoint authenticationFailureEndpoint() {
+        return authenticationFailureEndpoint;
     }
 
     public @Nullable MasterWebEndpoint accessDeniedEndpoint() {

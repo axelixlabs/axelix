@@ -28,31 +28,31 @@ import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
-import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
+import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
- * The exception handler for {@link UserSuspendedException}.
+ * The exception handler for the {@link AuthenticationException}.
  *
  * @author Mikhail Polivakha
  */
 @Component
-public class UserSuspendedExceptionHandler extends AbstractExceptionHandler<UserSuspendedException> {
+public class AuthenticationExceptionHandler extends AbstractExceptionHandler<AuthenticationException> {
 
-    protected UserSuspendedExceptionHandler(
+    protected AuthenticationExceptionHandler(
             List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
         super(webInterceptors, mcpInterceptors);
     }
 
     @Override
-    public ApiError handle(HttpServletRequest request, UserSuspendedException exception) {
-        fireOnAccessDenied(request, exception);
-        return new SimpleApiError(ApiErrorCodes.USER_SUSPENDED.getErrorCode(), HttpStatus.FORBIDDEN.value());
+    public ApiError handle(HttpServletRequest request, AuthenticationException exception) {
+        fireOnAuthenticationFailure(request);
+        return new SimpleApiError(ApiErrorCodes.INVALID_CREDENTIALS.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override
-    public Class<UserSuspendedException> supported() {
-        return UserSuspendedException.class;
+    public Class<AuthenticationException> supported() {
+        return AuthenticationException.class;
     }
 }

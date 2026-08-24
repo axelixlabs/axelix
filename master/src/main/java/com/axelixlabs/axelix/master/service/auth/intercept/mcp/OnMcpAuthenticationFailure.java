@@ -15,19 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.filter.auth.requestcontext;
+package com.axelixlabs.axelix.master.service.auth.intercept.mcp;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebAuthenticationFailure;
 
 /**
- * Immutable data container that represents the context of the JSON-RPC HTTP request
- * sent by the MCP Client.
+ * {@link OnMcpIamEventInterceptor} to be called when authentication failure has occurred.
  *
- * <p>The {@code mcpEndpoint} is {@code null} for MCP requests that do not target a concrete
- * tool endpoint (e.g. the protocol {@code initialize} handshake or {@code tools/list}).
+ * @see OnWebAuthenticationFailure
  *
  * @author Mikhail Polivakha
  */
-public record McpRequestContext(@Nullable McpEndpoint mcpEndpoint) implements MasterRequestContext {}
+public interface OnMcpAuthenticationFailure extends OnMcpIamEventInterceptor {
+
+    /**
+     * Actual callback.
+     *
+     * @param target the mcp endpoint that was attempted to be accessed/executed.
+     *               it might be {@code null} in case unauthenticated access was
+     *               attempted at MCP protocol-related endpoint.
+     * @param request the overall http request as provided by the servlet container
+     */
+    void onAuthenticationFailure(@Nullable McpEndpoint target, HttpServletRequest request);
+}

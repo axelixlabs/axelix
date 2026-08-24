@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**
  * Auto-Configuration for the MCP-related components
@@ -56,23 +57,23 @@ public class McpAutoConfiguration {
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
             JwtEncoderService jwtEncoderService,
-            McpServerStreamableHttpProperties mcpProperties) {
+            McpServerStreamableHttpProperties mcpProperties,
+            ObjectProvider<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors) {
         return new McpAuthorizationFilter(
                 oAuth2PropertiesObjectProvider,
                 mcpIdentityAccessManager,
                 securityContextExecutor,
                 jwtEncoderService,
-                mcpProperties);
+                mcpProperties,
+                onMcpSuccessfulResultInterceptors.stream().toList());
     }
 
     @Bean
     public McpIdentityAccessManager mcpIdentityAccessManager(
             Authorizer authorizer,
-            McpEndpointResolver mcpEndpointResolver,
             McpEndpointAuthorityResolver mcpEndpointAuthorityResolver,
             List<McpAuthenticationHandler> mcpAuthenticationHandlers) {
-        return new DefaultMcpIdentityAccessManager(
-                authorizer, mcpEndpointResolver, mcpEndpointAuthorityResolver, mcpAuthenticationHandlers);
+        return new DefaultMcpIdentityAccessManager(authorizer, mcpEndpointAuthorityResolver, mcpAuthenticationHandlers);
     }
 
     @Bean

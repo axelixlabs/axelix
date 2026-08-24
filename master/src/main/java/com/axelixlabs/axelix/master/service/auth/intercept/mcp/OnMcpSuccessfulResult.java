@@ -15,28 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.intercept.web;
+package com.axelixlabs.axelix.master.service.auth.intercept.mcp;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**
- * {@link OnWebIamEventInterceptor} to be invoked when the {@link User} has no
- * permissions to access the given {@link MasterWebEndpoint}.
+ * {@link OnMcpIamEventInterceptor} to be invoked when the given {@link McpEndpoint}
+ * was called by {@link User} and returned the successful result.
  *
  * @author Mikhail Polivakha
  */
-public interface OnAccessDenied extends OnWebIamEventInterceptor {
+public interface OnMcpSuccessfulResult extends OnMcpIamEventInterceptor {
 
     /**
      * Actual callback.
      *
-     * @param target the web endpoint that was attempted to be accessed/executed.
+     * @param target the mcp endpoint that was successfully executed.
      * @param request the overall http request as provided by the servlet container
-     * @param user the user (assuming the authentication has already passed at that point)
-     *             that attempts to access the resource/exectue given action
+     * @param user the authorized user.
      */
-    void onAccessDenied(MasterWebEndpoint target, HttpServletRequest request, User user);
+    void onSuccess(McpEndpoint target, HttpServletRequest request, User user);
 }

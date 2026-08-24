@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
@@ -39,8 +40,9 @@ import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInte
 @Component
 public class InvalidCredentialsExceptionHandler extends AbstractExceptionHandler<InvalidCredentialsException> {
 
-    protected InvalidCredentialsExceptionHandler(List<OnWebIamEventInterceptor> interceptors) {
-        super(interceptors);
+    protected InvalidCredentialsExceptionHandler(
+            List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
+        super(webInterceptors, mcpInterceptors);
     }
 
     @Override

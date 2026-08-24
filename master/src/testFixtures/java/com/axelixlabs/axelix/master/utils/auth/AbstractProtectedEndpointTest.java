@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
-import com.axelixlabs.axelix.master.utils.CapturingIamInterceptor;
+import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,14 +50,14 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(CapturingIamInterceptor.class)
+@Import(CapturingIamWebInterceptor.class)
 public abstract class AbstractProtectedEndpointTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
     @Autowired
-    private CapturingIamInterceptor capturingIamInterceptor;
+    private CapturingIamWebInterceptor capturingIamWebInterceptor;
 
     /**
      * The endpoint whose cross-cutting auth behaviour is under test. Subclasses construct it inline.
@@ -67,7 +67,7 @@ public abstract class AbstractProtectedEndpointTest {
     @AfterEach
     @BeforeEach
     void resetCapturingInterceptor() {
-        capturingIamInterceptor.reset();
+        capturingIamWebInterceptor.reset();
     }
 
     @ParameterizedTest
@@ -129,30 +129,30 @@ public abstract class AbstractProtectedEndpointTest {
     public record TestableMasterWebEndpoint(MasterWebEndpoint target, String url) {}
 
     protected void assertSuccessfulCallback(MasterWebEndpoint expectedTarget, User expectedActor) {
-        assertThat(capturingIamInterceptor.successfulEndpoint())
+        assertThat(capturingIamWebInterceptor.successfulEndpoint())
                 .isNotNull()
                 .extracting(MasterWebEndpoint::operationCode)
                 .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamInterceptor.actor().getUsername()).isEqualTo(expectedActor.getUsername());
-        assertThat(capturingIamInterceptor.invalidTokenEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.accessDeniedEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.actor().getUsername()).isEqualTo(expectedActor.getUsername());
+        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
     }
 
     protected void assertAuthenticationFailure(MasterWebEndpoint expectedTarget) {
-        assertThat(capturingIamInterceptor.invalidTokenEndpoint())
+        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint())
                 .isNotNull()
                 .extracting(MasterWebEndpoint::operationCode)
                 .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamInterceptor.accessDeniedEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.successfulEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
     }
 
     protected void assertAccessDenied(MasterWebEndpoint expectedTarget) {
-        assertThat(capturingIamInterceptor.accessDeniedEndpoint())
+        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint())
                 .isNotNull()
                 .extracting(MasterWebEndpoint::operationCode)
                 .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamInterceptor.invalidTokenEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.successfulEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
     }
 }

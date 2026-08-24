@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.servlet.FilterChain;
@@ -39,16 +39,18 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
-import com.axelixlabs.axelix.master.filter.ContentCachingServletRequest;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
+import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
+import com.axelixlabs.axelix.master.filter.auth.requestcontext.McpRequestContext;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.AuthorizationHeader;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
@@ -70,17 +72,20 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
     private final SecurityContextExecutor securityContextExecutor;
     private final JwtEncoderService jwtEncoderService;
     private final McpServerStreamableHttpProperties mcpProperties;
+    private final List<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors;
 
     public McpAuthorizationFilter(
             ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
             JwtEncoderService jwtEncoderService,
-            McpServerStreamableHttpProperties mcpProperties) {
+            McpServerStreamableHttpProperties mcpProperties,
+            List<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors) {
         this.mcpIdentityAccessManager = mcpIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
         this.jwtEncoderService = jwtEncoderService;
         this.mcpProperties = mcpProperties;
+        this.onMcpSuccessfulResultInterceptors = onMcpSuccessfulResultInterceptors;
 
         OAuth2Properties oAuth2Properties = oAuth2PropertiesProvider.getIfAvailable();
 
@@ -107,38 +112,49 @@ public class McpAuthorizationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws IOException, ServletException {
 
+        McpRequestContext mcpRequestContext = MasterRequestContextInitFilter.requireMcpRequestContext();
+
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         AuthorizationHeader authorizationHeader = parseAuthHeader(authHeader);
 
         if (authorizationHeader == null) {
-            handleAuthenticationProblem(response);
-            return;
+            setResourceMetadataHeader(response);
+            throw new AuthenticationException();
         }
-
-        var wrapper = new ContentCachingServletRequest(request);
-        var requestAsString = new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         try {
             // if nothing is thrown, we expect that all IAM checks passed successfully
-            User authenticatedUser = mcpIdentityAccessManager.verifyAccess(requestAsString, authorizationHeader);
+            User authenticatedUser =
+                    mcpIdentityAccessManager.verifyAccess(mcpRequestContext.mcpEndpoint(), authorizationHeader);
 
             String accessToken = jwtEncoderService.generateToken(authenticatedUser);
 
             securityContextExecutor.runWithinSecurityContext(
-                    () -> filterChain.doFilter(wrapper, response),
+                    () -> {
+                        filterChain.doFilter(request, response);
+
+                        // we do not want to intercept the successful attempts to access the MCP protocol-related
+                        // endpoints.
+                        if (mcpRequestContext.mcpEndpoint() != null) {
+                            onSuccessfulResult(request, mcpRequestContext.mcpEndpoint(), authenticatedUser);
+                        }
+                    },
                     new DefaultSecurityContext(authenticatedUser, accessToken));
-        } catch (AuthorizationException e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } catch (AuthenticationException e) {
-            handleAuthenticationProblem(response);
+            setResourceMetadataHeader(response);
+            throw e;
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
 
-    private void handleAuthenticationProblem(@NonNull HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    private void onSuccessfulResult(@NonNull HttpServletRequest request, McpEndpoint endpoint, User authenticatedUser) {
+        onMcpSuccessfulResultInterceptors.forEach(onMcpSuccessfulResult -> {
+            onMcpSuccessfulResult.onSuccess(endpoint, request, authenticatedUser);
+        });
+    }
 
+    private void setResourceMetadataHeader(@NonNull HttpServletResponse response) {
         // If we received no auth token in a request from the MCP client while having the oauth2 flow enabled,
         // we assume that the AI Agent just tries to access the resource without token for the first time.
         //

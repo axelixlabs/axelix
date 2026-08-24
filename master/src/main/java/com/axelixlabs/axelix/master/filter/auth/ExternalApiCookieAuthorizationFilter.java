@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProp
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -63,13 +63,13 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
     private final SecurityContextExecutor securityContextExecutor;
     private final JwtDecoderService jwtDecoderService;
     private final Authorizer authorizer;
-    private final List<OnSuccessfulResult> onSuccessInterceptors;
+    private final List<OnWebSuccessfulResult> onSuccessInterceptors;
 
     public ExternalApiCookieAuthorizationFilter(
             SecurityContextExecutor securityContextExecutor,
             JwtDecoderService jwtDecoderService,
             Authorizer authorizer,
-            List<OnSuccessfulResult> interceptors) {
+            List<OnWebSuccessfulResult> interceptors) {
 
         this.securityContextExecutor = securityContextExecutor;
         this.jwtDecoderService = jwtDecoderService;

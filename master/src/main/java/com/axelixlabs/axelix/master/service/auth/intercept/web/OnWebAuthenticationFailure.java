@@ -26,7 +26,7 @@ import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
  *
  * @author Mikhail Polivakha
  */
-public interface OnAuthenticationFailure extends OnWebIamEventInterceptor {
+public interface OnWebAuthenticationFailure extends OnWebIamEventInterceptor {
 
     /**
      * Actual callback.

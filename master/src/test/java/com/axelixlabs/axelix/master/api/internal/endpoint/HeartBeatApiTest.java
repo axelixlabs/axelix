@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Snapsho
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.CapturingIamInterceptor;
+import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,7 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(CapturingIamInterceptor.class)
+@Import(CapturingIamWebInterceptor.class)
 public class HeartBeatApiTest {
 
     private static final String TEST_INSTANCE_ID = "3c994958-924f-4a12-87d0-a8782e97af10";
@@ -159,7 +159,7 @@ public class HeartBeatApiTest {
     private InstanceRegistry instanceRegistry;
 
     @Autowired
-    private CapturingIamInterceptor capturingIamInterceptor;
+    private CapturingIamWebInterceptor capturingIamWebInterceptor;
 
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
@@ -169,7 +169,7 @@ public class HeartBeatApiTest {
     void cleanDatabase() {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
-        capturingIamInterceptor.reset();
+        capturingIamWebInterceptor.reset();
     }
 
     @Test
@@ -230,9 +230,9 @@ public class HeartBeatApiTest {
                     assertThat(profile.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
                 });
 
-        assertThat(capturingIamInterceptor.accessDeniedEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.invalidTokenEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.successfulEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
     }
 
     @ParameterizedTest(name = "{0}")
@@ -248,9 +248,9 @@ public class HeartBeatApiTest {
         // and then.
         Optional<Instance> registeredInstance = instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID));
         assertThat(registeredInstance).isEmpty();
-        assertThat(capturingIamInterceptor.accessDeniedEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.invalidTokenEndpoint()).isNull();
-        assertThat(capturingIamInterceptor.successfulEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
     }
 
     private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {

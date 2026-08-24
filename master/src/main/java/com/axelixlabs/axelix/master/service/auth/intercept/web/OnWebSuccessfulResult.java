@@ -17,11 +17,25 @@
  */
 package com.axelixlabs.axelix.master.service.auth.intercept.web;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
+
 /**
- * A marker interface that represents a callback to be called in the
- * IAM-related infrastructure of Axelix Master while handling requests
- * from the web ui.
+ * {@link OnWebIamEventInterceptor} to be invoked when the given {@link MasterWebEndpoint}
+ * was called by {@link User} and returned the successful result.
  *
  * @author Mikhail Polivakha
  */
-public interface OnWebIamEventInterceptor {}
+public interface OnWebSuccessfulResult extends OnWebIamEventInterceptor {
+
+    /**
+     * Actual callback.
+     *
+     * @param target the web endpoint that was successfully executed.
+     * @param request the overall http request as provided by the servlet container
+     * @param user the authorized user.
+     */
+    void onSuccess(MasterWebEndpoint target, HttpServletRequest request, User user);
+}
