@@ -67,7 +67,7 @@ class DefaultCookieServiceTest {
         // then.
         assertThat(authCookie).isNotNull().satisfies(cookie -> {
             assertThat(cookie.getValue()).isEqualTo(testToken);
-            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthCookieName());
+            assertThat(cookie.getName()).isEqualTo(CookieProperties.AUTH_COOKIE_NAME);
             assertThat(cookie.isHttpOnly()).isTrue();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
@@ -88,7 +88,7 @@ class DefaultCookieServiceTest {
 
         // then.
         assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {
-            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
+            assertThat(cookie.getName()).isEqualTo(CookieProperties.AUTHORITIES_COOKIE_NAME);
             assertThat(cookie.isHttpOnly()).isFalse();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
@@ -111,7 +111,7 @@ class DefaultCookieServiceTest {
 
         // then.
         assertThat(authoritiesCookie).isNotNull().satisfies(cookie -> {
-            assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
+            assertThat(cookie.getName()).isEqualTo(CookieProperties.AUTHORITIES_COOKIE_NAME);
             assertThat(cookie.isHttpOnly()).isFalse();
             assertThat(cookie.getPath()).isEqualTo("/");
             assertThat(cookie.isSecure()).isEqualTo(cookieProperties.isSecure());
@@ -126,7 +126,7 @@ class DefaultCookieServiceTest {
         ResponseCookie cookie = cookieService.buildExpiredAuthCookie();
 
         // then.
-        assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthCookieName());
+        assertThat(cookie.getName()).isEqualTo(CookieProperties.AUTH_COOKIE_NAME);
         assertThat(cookie.getValue()).isEmpty();
         assertThat(cookie.getMaxAge().toSeconds()).isZero();
         assertThat(cookie.isHttpOnly()).isTrue();
@@ -138,7 +138,7 @@ class DefaultCookieServiceTest {
         ResponseCookie cookie = cookieService.buildExpiredAuthMetadataCookie();
 
         // then.
-        assertThat(cookie.getName()).isEqualTo(cookieProperties.getAuthoritiesCookieName());
+        assertThat(cookie.getName()).isEqualTo(CookieProperties.AUTHORITIES_COOKIE_NAME);
         assertThat(cookie.getValue()).isEmpty();
         assertThat(cookie.getMaxAge().toSeconds()).isZero();
         assertThat(cookie.isHttpOnly()).isFalse();

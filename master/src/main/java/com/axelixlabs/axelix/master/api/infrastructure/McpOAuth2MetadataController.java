@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.infrastructure;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -34,6 +35,7 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  * Exposes OAuth2 Protected Resource Metadata for MCP authentication discovery.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @ExternalApiRestController
 @ConditionalOnMcpServerEnabled
@@ -44,8 +46,9 @@ public class McpOAuth2MetadataController {
     private final String mcpServerFullPath;
     private final String scopes;
 
-    public McpOAuth2MetadataController(OAuth2Properties oAuth2Properties) {
-        this.mcpServerFullPath = oAuth2Properties.baseUrl() + "/api/mcp";
+    public McpOAuth2MetadataController(
+            OAuth2Properties oAuth2Properties, McpServerStreamableHttpProperties mcpProperties) {
+        this.mcpServerFullPath = oAuth2Properties.baseUrl() + mcpProperties.getMcpEndpoint();
         this.issuerUri = oAuth2Properties.issuerUri();
         this.scopes = oAuth2Properties.scopes();
     }

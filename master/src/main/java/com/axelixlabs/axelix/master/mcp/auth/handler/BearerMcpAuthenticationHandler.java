@@ -50,7 +50,8 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
         try {
             String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(credential);
             Role role = userInfoJsonAccessor.extractRole(userInfoJson);
-            return new PasswordlessUser("AI_AGENT", Set.of(role));
+            String username = userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson);
+            return new PasswordlessUser(username, Set.of(role));
         } catch (OAuth2AuthenticationException e) {
             throw new AuthenticationException(e);
         }

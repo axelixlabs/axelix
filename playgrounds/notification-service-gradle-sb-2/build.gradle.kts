@@ -49,7 +49,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0") {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.1.0-SNAPSHOT") {
         isChanging = true
     }
     implementation("org.springframework.boot:spring-boot-starter-actuator")

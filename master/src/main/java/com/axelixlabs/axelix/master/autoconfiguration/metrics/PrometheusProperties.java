@@ -21,15 +21,15 @@ import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.MetricsAutoConfiguration.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
-
 /**
  * The Prometheus related properties that are specific to Axelix Master.
  *
  * @author Dmitry Mazurov
  */
-@ConfigurationProperties(prefix = PROMETHEUS_METRICS_PROPERTIES_PREFIX)
+@ConfigurationProperties(prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX)
 public class PrometheusProperties {
+
+    public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 
     /**
      * Common tags to attach to every metric exposed via the Prometheus actuator endpoint.

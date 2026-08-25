@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.EXPLICITLY_SANITIZED_CONFIGURATION_PROPERTIES_SERVICE;
 import static com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SANITIZE_ALL_CONFIGURATION_PROPERTIES_SERVICE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,7 +65,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
             // when.
-            User user = createUserWithAuthorities();
+            User user = fromAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);
@@ -86,7 +86,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+            User user = fromAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);
@@ -111,7 +111,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
             // when.
-            User user = createUserWithAuthorities();
+            User user = fromAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);
@@ -141,7 +141,7 @@ public class DefaultConfigurationPropertiesServiceTest extends AbstractConfigPro
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = createUserWithAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+            User user = fromAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             ConfigurationPropertiesFeed configProps = securityContextExecutor.callWithinSecurityContext(
                     configurationPropertiesService::getConfigProps, securityContext);

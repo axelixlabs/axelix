@@ -41,7 +41,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
-import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
+import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +64,7 @@ class ManagedServiceMetadataEndpointProberTest {
         @Bean
         @Primary
         public SecurityContextExecutor testSecurityContextExecutor() {
-            return new TestFixedSecurityContextExecutor();
+            return new StaticTestSecurityContextExecutor();
         }
     }
 

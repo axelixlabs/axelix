@@ -52,7 +52,7 @@ public class DefaultAuthorizer implements Authorizer {
                 requiredAuthorities.stream().map(Authority::getName).collect(Collectors.toSet());
 
         if (!userAuthorities.containsAll(requiredNames)) {
-            throw new AuthorizationException("Access denied: missing required authorities " + requiredNames);
+            throw new AuthorizationException("Access denied: missing required authorities " + requiredNames, user);
         }
     }
 

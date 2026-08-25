@@ -17,14 +17,20 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
-import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
  * The exception handler for {@link UserSuspendedException}.
@@ -32,10 +38,16 @@ import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
  * @author Mikhail Polivakha
  */
 @Component
-public class UserSuspendedExceptionHandler implements ExceptionHandler<UserSuspendedException> {
+public class UserSuspendedExceptionHandler extends AbstractExceptionHandler<UserSuspendedException> {
+
+    protected UserSuspendedExceptionHandler(
+            List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
+        super(webInterceptors, mcpInterceptors);
+    }
 
     @Override
-    public ApiError handle(UserSuspendedException exception) {
+    public ApiError handle(HttpServletRequest request, UserSuspendedException exception) {
+        fireOnAccessDenied(request, exception);
         return new SimpleApiError(ApiErrorCodes.USER_SUSPENDED.getErrorCode(), HttpStatus.FORBIDDEN.value());
     }
 

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionExceptio
 public class InvalidCronExpressionExceptionHandler implements ExceptionHandler<InvalidCronExpressionException> {
 
     @Override
-    public ApiError handle(InvalidCronExpressionException exception) {
+    public ApiError handle(HttpServletRequest request, InvalidCronExpressionException exception) {
         return new SimpleApiError(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 

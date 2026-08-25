@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -59,9 +61,9 @@ public class DefaultApiExceptionTranslator implements ApiExceptionTranslator {
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public ApiError translateException(Exception e) {
+    public ApiError translateException(HttpServletRequest request, Exception e) {
         ExceptionHandler exceptionHandler = cache.computeIfAbsent(e.getClass(), this::deriveExceptionHandler);
-        return exceptionHandler.handle(e);
+        return exceptionHandler.handle(request, e);
     }
 
     private ExceptionHandler<?> deriveExceptionHandler(Class<?> targetClass) {

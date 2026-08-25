@@ -18,6 +18,10 @@
 package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,14 +35,21 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
+import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
+import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -46,20 +57,24 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@Order(FiltersOrder.COOKIE_BASED_JWT_AUTHORIZATION_FILTER)
-public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
+@Order(FiltersOrder.EXTERNAL_API_JWT_AUTHORIZATION_FILTER)
+public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
 
-    private final String authCookieName;
-    private final WebIdentityAccessManager webIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
+    private final JwtDecoderService jwtDecoderService;
+    private final Authorizer authorizer;
+    private final List<OnWebSuccessfulResult> onSuccessInterceptors;
 
-    public CookieBasedJwtAuthorizationFilter(
-            String authCookieName,
-            WebIdentityAccessManager webIdentityAccessManager,
-            SecurityContextExecutor securityContextExecutor) {
-        this.authCookieName = authCookieName;
-        this.webIdentityAccessManager = webIdentityAccessManager;
+    public ExternalApiCookieAuthorizationFilter(
+            SecurityContextExecutor securityContextExecutor,
+            JwtDecoderService jwtDecoderService,
+            Authorizer authorizer,
+            List<OnWebSuccessfulResult> interceptors) {
+
         this.securityContextExecutor = securityContextExecutor;
+        this.jwtDecoderService = jwtDecoderService;
+        this.authorizer = authorizer;
+        this.onSuccessInterceptors = interceptors;
     }
 
     @Override
@@ -70,8 +85,8 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // as well as actuator health endpoints
         // TODO: We must refactor it
         return !path.startsWith("/api/")
-                || path.startsWith("/api/actuator/health")
-                || path.startsWith("/api/actuator/prometheus")
+                || path.startsWith(InfrastructureApiPaths.HEALTH_STATUS_PATH)
+                || path.startsWith(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH)
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
                 || path.startsWith("/api/external/settings")
@@ -87,35 +102,59 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
+        ExternalWebRequestContext currentRequestContext = MasterRequestContextInitFilter.requireWebRequestContext();
+
         String token = resolveToken(request.getCookies());
 
         if (token == null || token.isBlank()) {
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        String relativePath = request.getServletPath().substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
-
-        User user = webIdentityAccessManager.verifyAccess(relativePath, HttpMethod.valueOf(request.getMethod()), token);
-
         try {
+            PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
+
+            authorizeUser(currentRequestContext, user);
+
             securityContextExecutor.runWithinSecurityContext(
-                    () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
-        } catch (ServletException | IOException e) {
+                    () -> {
+                        filterChain.doFilter(request, response);
+                        onSuccessfulResult(request, currentRequestContext, user);
+                    },
+                    new DefaultSecurityContext(user, token));
+        } catch (JwtProcessingException | ServletException | IOException e) {
             throw e;
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
 
+    private void authorizeUser(ExternalWebRequestContext currentRequestContext, PasswordlessUser decodedTokenToUser) {
+        Set<Authority> requiredAuthorities = Optional.ofNullable(
+                        currentRequestContext.masterWebEndpoint().authority())
+                .map(Set::of)
+                .orElse(Collections.emptySet());
+
+        AuthorizationRequest authorizationRequest = new AuthorizationRequest(requiredAuthorities);
+
+        authorizer.authorize(decodedTokenToUser, authorizationRequest);
+    }
+
     @Nullable
     private String resolveToken(Cookie[] cookies) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (authCookieName.equals(cookie.getName())) {
+                if (CookieProperties.AUTH_COOKIE_NAME.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
         }
+
         return null;
+    }
+
+    private void onSuccessfulResult(
+            HttpServletRequest request, ExternalWebRequestContext currentRequestContext, User user) {
+
+        onSuccessInterceptors.forEach(it -> it.onSuccess(currentRequestContext.masterWebEndpoint(), request, user));
     }
 }

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
     private static final Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @Override
-    public ApiError handle(Exception exception) {
+    public ApiError handle(HttpServletRequest request, Exception exception) {
         log.warn("Default exception handler received an exception", exception);
         return new SimpleApiError(
                 ApiErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR.value());

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 public class InstanceNotFoundExceptionExceptionHandler implements ExceptionHandler<InstanceNotFoundException> {
 
     @Override
-    public ApiError handle(InstanceNotFoundException exception) {
+    public ApiError handle(HttpServletRequest request, InstanceNotFoundException exception) {
         return new SimpleApiError(ApiErrorCodes.INSTANCE_NOT_FOUND.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 

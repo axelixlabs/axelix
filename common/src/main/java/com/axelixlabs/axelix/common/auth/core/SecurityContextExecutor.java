@@ -63,4 +63,13 @@ public interface SecurityContextExecutor {
      * Provides the security bounded to current execution, or {@link Optional#empty()} if none.
      */
     Optional<SecurityContext> getSecurityContext();
+
+    /**
+     * Requires the {@link SecurityContext} to be bounded at this point.
+     */
+    default SecurityContext requireSecurityContext() {
+        return getSecurityContext()
+                .orElseThrow(
+                        () -> new IllegalStateException("Security Context is expected to be present at this point"));
+    }
 }

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsExceptio
 public class UsernameAlreadyExistsExceptionHandler implements ExceptionHandler<UsernameAlreadyExistsException> {
 
     @Override
-    public ApiError handle(UsernameAlreadyExistsException exception) {
+    public ApiError handle(HttpServletRequest request, UsernameAlreadyExistsException exception) {
         return new SimpleApiError(ApiErrorCodes.USERNAME_ALREADY_EXISTS.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 

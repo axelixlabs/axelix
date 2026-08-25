@@ -23,28 +23,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Cookie configuration properties.
  *
  * @since 11.12.2025
+ *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @ConfigurationProperties(prefix = "axelix.master.auth.cookie")
 public class CookieProperties {
 
-    private final String authCookieName = "auth_token";
-
-    private final String authoritiesCookieName = "authorities";
+    public static final String AUTH_COOKIE_NAME = "auth_token";
+    public static final String AUTHORITIES_COOKIE_NAME = "authorities";
 
     /**
      * Secure attribute for cookies.
      * <p><b>Default:</b> true</p>
      */
     private boolean secure = true;
-
-    public String getAuthCookieName() {
-        return authCookieName;
-    }
-
-    public String getAuthoritiesCookieName() {
-        return authoritiesCookieName;
-    }
 
     public boolean isSecure() {
         return secure;

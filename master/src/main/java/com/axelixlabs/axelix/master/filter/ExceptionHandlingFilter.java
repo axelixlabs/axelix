@@ -55,9 +55,9 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (ServletException e) {
-            handleApiError(response, deriveApiError(e));
+            handleApiError(response, deriveApiError(request, e));
         } catch (Exception e) {
-            handleApiError(response, apiExceptionTranslator.translateException(e));
+            handleApiError(response, apiExceptionTranslator.translateException(request, e));
         }
     }
 
@@ -67,13 +67,13 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
      * the Servlet Container MUST wrap it up in the {@link ServletException}. So we have to unwrap it if
      * necessary.
      */
-    private ApiError deriveApiError(ServletException e) {
+    private ApiError deriveApiError(HttpServletRequest request, ServletException e) {
         Throwable rootCause = e.getRootCause();
 
         if (rootCause instanceof Exception rootCauseException) {
-            return apiExceptionTranslator.translateException(rootCauseException);
+            return apiExceptionTranslator.translateException(request, rootCauseException);
         } else {
-            return apiExceptionTranslator.translateException(e);
+            return apiExceptionTranslator.translateException(request, e);
         }
     }
 

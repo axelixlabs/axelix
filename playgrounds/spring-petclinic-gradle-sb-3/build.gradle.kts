@@ -41,7 +41,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0") {
+  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0-SNAPSHOT") {
     isChanging = true
   }
   implementation("org.springframework.boot:spring-boot-starter-cache")

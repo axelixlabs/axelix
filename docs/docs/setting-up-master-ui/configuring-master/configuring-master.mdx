@@ -33,6 +33,42 @@ the JWT signing key has no default at all. Override both — together with `axel
 over HTTPS — before exposing Master to anyone other than yourself.
 :::
 
+### Supplying properties
+
+Master is a Spring Boot application, so every property on this page can be supplied through any source Spring Boot
+reads — not only a config file:
+
+- a **YAML** or **properties** config file (`application.yaml` / `application.properties`);
+- a **JVM system property** passed with `-D` on the `java` command line;
+- an **environment variable**.
+
+Master never restricts a property to a single source. Wherever this page documents a property such as
+`axelix.master.auth.jwt.signing-key`, you may set it in whichever of the three fits your deployment — the same name
+reaches Master identically through all of them.
+
+This works because of Spring Boot's [relaxed binding](https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties.relaxed-binding):
+one logical property has several equivalent spellings, and Master reads them all as the same value. The canonical form
+used throughout this page is lowercase, dot-separated, kebab-case (`axelix.master.auth.jwt.signing-key`). The table
+below shows how that one property is written for each source:
+
+| Source                     | How you write `axelix.master.auth.jwt.signing-key`                          |
+|----------------------------|----------------------------------------------------------------------------|
+| `application.yaml`         | nested keys `axelix:` → `master:` → `auth:` → `jwt:` → `signing-key:`       |
+| `application.properties`   | `axelix.master.auth.jwt.signing-key=...`                                    |
+| JVM system property (`-D`) | `-Daxelix.master.auth.jwt.signing-key=...`                                  |
+| Environment variable       | `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`                                     |
+
+The environment-variable form follows a strict rule: **upper-case the name, replace every dot with an underscore, and
+drop any dashes**. That is why `signing-key` becomes `SIGNINGKEY` — the dash is removed, not turned into an underscore.
+A property with no dashes maps more directly: `axelix.master.metrics.prometheus.enabled` becomes
+`AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
+
+:::note
+The Docker and Docker Compose examples further down pass properties as `-D` flags inside `JAVA_TOOL_OPTIONS`, but that is
+just one option: a `-Daxelix.master.auth.jwt.signing-key=...` flag and an `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`
+environment variable are interchangeable, so use whichever your platform makes easier.
+:::
+
 ### General
 
 <UpcomingReleaseNotice />
@@ -256,6 +292,45 @@ axelix:
         tags:
           region: eu-west-1
 ```
+
+#### OTLP
+
+<UpcomingReleaseNotice />
+
+Master can push its own JVM, HTTP, database-pool, and other Micrometer metrics to an OTLP-compatible collector over
+HTTP/protobuf. This exports metrics produced by Master itself, not metrics read from services connected through an
+Axelix starter. Export of metrics via OTLP is disabled by default (see properties below).
+
+<div className={styles.ConfigTable}>
+
+| Property                                      | Default                            | Description                                                                                   |
+|-----------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------|
+| `axelix.master.metrics.otlp.enabled`          | `false`                            | Enables periodic OTLP metrics export.                                                         |
+| `axelix.master.metrics.otlp.url`              | `http://localhost:4318/v1/metrics` | Complete HTTP/protobuf metrics endpoint. Include the `/v1/metrics` path.                       |
+| `axelix.master.metrics.otlp.step`             | `1m`                               | Interval between exports, expressed as a Spring `Duration`.                                   |
+| `axelix.master.metrics.otlp.headers.*`        | empty                              | Custom request headers, for example an authorization header. Inject secret values at runtime. |
+| `axelix.master.metrics.otlp.compression-mode` | `none`                             | Request compression mode: `none` or `gzip`.                                                   |
+
+</div>
+
+```yaml
+axelix:
+  master:
+    metrics:
+      otlp:
+        enabled: true
+        url: http://otel-collector:4318/v1/metrics
+        step: 30s
+        headers:
+          Authorization: ${OTLP_AUTHORIZATION_HEADER}
+```
+
+These settings can equally be supplied as environment variables or JVM system properties — see [Supplying
+properties](#supplying-properties) for the relaxed-binding rules that map, for example,
+`axelix.master.metrics.otlp.enabled` to `AXELIX_MASTER_METRICS_OTLP_ENABLED`.
+
+Prefer injecting authentication headers from your deployment platform's secret store instead of committing them to a
+configuration file.
 
 ## Run as a JAR
 

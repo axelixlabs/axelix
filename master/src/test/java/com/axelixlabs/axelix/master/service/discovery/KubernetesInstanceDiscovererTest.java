@@ -55,7 +55,7 @@ import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInsta
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
+import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +97,7 @@ class KubernetesInstanceDiscovererTest {
 
         @Bean
         public SecurityContextExecutor securityContextExecutor() {
-            return new TestFixedSecurityContextExecutor();
+            return new StaticTestSecurityContextExecutor();
         }
 
         @Bean

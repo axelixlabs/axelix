@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,6 +30,8 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -38,13 +40,13 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultWebIdentityAccessManager implements WebIdentityAccessManager {
+public class ManagedServiceWebIdentityAccessManager implements WebIdentityAccessManager {
 
     private final JwtDecoderService jwtDecoderService;
     private final AuthorityResolver authorityResolver;
     private final Authorizer authorizer;
 
-    public DefaultWebIdentityAccessManager(
+    public ManagedServiceWebIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         this.jwtDecoderService = jwtDecoderService;
         this.authorityResolver = authorityResolver;

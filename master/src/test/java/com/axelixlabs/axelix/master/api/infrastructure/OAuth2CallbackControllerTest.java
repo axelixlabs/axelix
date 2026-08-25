@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
@@ -52,12 +53,14 @@ import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
 import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +87,7 @@ import static org.mockito.Mockito.when;
             "axelix.master.auth.options.oauth2.job-title-attribute-path=employment.jobTitle",
             "axelix.master.auth.options.oauth2.organizational-unit-attribute-path=employment.organizationalUnit"
         })
-class OAuth2CallbackControllerTest {
+class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
@@ -221,6 +224,7 @@ class OAuth2CallbackControllerTest {
         assertThat(userEntity.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(userEntity.status()).isEqualTo(UserStatus.ACTIVE);
         assertThat(userEntity.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
+        assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, decodedTokenToUser);
     }
 
     @Test
@@ -254,6 +258,7 @@ class OAuth2CallbackControllerTest {
         assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(TestRoles.EDITOR.getName());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
+        assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, new PasswordlessUser(username, Set.of()));
     }
 
     @Test
@@ -282,6 +287,7 @@ class OAuth2CallbackControllerTest {
         assertThat(response.getBody()).contains("USER_SUSPENDED");
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
         assertThat(userRepository.findById(created.id()).orElseThrow()).isEqualTo(suspended);
+        assertAccessDenied(MasterWebEndpoints.OIDC_AUTH_COMPLETE);
     }
 
     @Test
@@ -381,5 +387,10 @@ class OAuth2CallbackControllerTest {
 
     private static @NonNull String findCookie(List<String> cookies, String s) {
         return cookies.stream().filter(it -> it.contains(s)).findFirst().orElseThrow();
+    }
+
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(); // No bad auth tests for oauth2 in the parent - all in this source file
     }
 }

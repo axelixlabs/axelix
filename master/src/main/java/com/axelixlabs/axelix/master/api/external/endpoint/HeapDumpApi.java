@@ -17,13 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -51,11 +50,11 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @ExternalApiRestController
 public class HeapDumpApi {
 
-    private final List<HeapDumpCustomizer> heapDumpCustomizers;
+    private final ObjectProvider<HeapDumpCustomizer> heapDumpCustomizers;
 
     private final EndpointInvoker endpointInvoker;
 
-    public HeapDumpApi(EndpointInvoker endpointInvoker, List<HeapDumpCustomizer> heapDumpCustomizers) {
+    public HeapDumpApi(EndpointInvoker endpointInvoker, ObjectProvider<HeapDumpCustomizer> heapDumpCustomizers) {
         this.endpointInvoker = endpointInvoker;
         this.heapDumpCustomizers = heapDumpCustomizers;
     }
@@ -83,7 +82,8 @@ public class HeapDumpApi {
         Resource resource = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_HEAP_DUMP, NoHttpPayload.INSTANCE);
 
-        for (HeapDumpCustomizer heapDumpCustomizer : heapDumpCustomizers) {
+        for (HeapDumpCustomizer heapDumpCustomizer :
+                heapDumpCustomizers.orderedStream().toList()) {
             resource = heapDumpCustomizer.customize(resource);
         }
 

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.axelixlabs.axelix.master.api.error.ApiError;
 
 /**
@@ -33,5 +35,5 @@ public interface ApiExceptionTranslator {
      * @param e exception to translate. Cannot be {@code null}.
      * @return the ApiError which is a representation of an occurred exception for the API layer.
      */
-    ApiError translateException(Exception e);
+    ApiError translateException(HttpServletRequest request, Exception e);
 }

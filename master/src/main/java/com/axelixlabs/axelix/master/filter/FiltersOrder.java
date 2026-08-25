@@ -28,9 +28,11 @@ public final class FiltersOrder {
 
     private FiltersOrder() {}
 
-    public static final int EXCEPTION_HANDLING_FILTER = Ordered.HIGHEST_PRECEDENCE + 5;
-    public static final int SPA_STATIC_RESOURCES_SERVING_FILTER = Ordered.HIGHEST_PRECEDENCE + 6;
-    public static final int COOKIE_BASED_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 7;
-    public static final int HEART_BEAT_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 8;
-    public static final int MCP_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 9;
+    public static final int REQUEST_PROFILE_FILTER = Ordered.HIGHEST_PRECEDENCE + 5;
+    public static final int EXCEPTION_HANDLING_FILTER = Ordered.HIGHEST_PRECEDENCE + 6;
+    public static final int SPA_STATIC_RESOURCES_SERVING_FILTER = Ordered.HIGHEST_PRECEDENCE + 7;
+    public static final int EXTERNAL_AUTHENTICATION_API_FILTER = Ordered.HIGHEST_PRECEDENCE + 8;
+    public static final int EXTERNAL_API_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 9;
+    public static final int HEART_BEAT_JWT_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 10;
+    public static final int MCP_AUTHORIZATION_FILTER = Ordered.HIGHEST_PRECEDENCE + 11;
 }

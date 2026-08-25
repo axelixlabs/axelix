@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 public class EmailAlreadyExistsExceptionHandler implements ExceptionHandler<EmailAlreadyExistsException> {
 
     @Override
-    public ApiError handle(EmailAlreadyExistsException exception) {
+    public ApiError handle(HttpServletRequest request, EmailAlreadyExistsException exception) {
         return new SimpleApiError(ApiErrorCodes.EMAIL_ALREADY_EXISTS.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 

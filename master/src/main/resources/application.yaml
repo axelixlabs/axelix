@@ -3,6 +3,9 @@ server:
   port: 8080
 
 spring:
+  autoconfigure:
+    # OTLP metrics export is owned by OtlpTransportMetricsAutoConfiguration, not Spring Boot.
+    exclude: org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
   cloud:
     vault:
       enabled: false
@@ -61,7 +64,7 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health", "prometheus" ]
+        include: [ "health" ]
   prometheus:
     metrics:
       export:
@@ -74,6 +77,12 @@ axelix:
       json:
         enabled: false
     metrics:
+      otlp:
+        enabled: false
+        url:
+        step: 1m
+        headers: {}
+        compression-mode: none
       prometheus:
         enabled: false
         # tags:

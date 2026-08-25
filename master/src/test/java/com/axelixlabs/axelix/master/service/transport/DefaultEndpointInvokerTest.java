@@ -54,8 +54,8 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
+import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.common.domain.ActuatorEndpoint.of;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -324,7 +324,7 @@ public class DefaultEndpointInvokerTest {
         @Bean
         @Primary
         public SecurityContextExecutor testSecurityContextExecutor() {
-            return new TestFixedSecurityContextExecutor();
+            return new StaticTestSecurityContextExecutor();
         }
 
         @Bean

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 public class UserNotFoundExceptionHandler implements ExceptionHandler<UserNotFoundException> {
 
     @Override
-    public ApiError handle(UserNotFoundException exception) {
+    public ApiError handle(HttpServletRequest request, UserNotFoundException exception) {
         return new SimpleApiError(ApiErrorCodes.USER_NOT_FOUND.getErrorCode(), HttpStatus.NOT_FOUND.value());
     }
 

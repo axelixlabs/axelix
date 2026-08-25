@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +38,7 @@ import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableExcept
 public class OidcAuthenticationExceptionHandler implements ExceptionHandler<OAuth2AuthenticationException> {
 
     @Override
-    public ApiError handle(OAuth2AuthenticationException exception) {
+    public ApiError handle(HttpServletRequest request, OAuth2AuthenticationException exception) {
 
         if (exception instanceof OidcMetadataUnavailableException) {
             return new SimpleApiError(ApiErrorCodes.BAD_GATEWAY.getErrorCode(), HttpStatus.BAD_GATEWAY.value());

@@ -17,17 +17,17 @@
  */
 package com.axelixlabs.axelix.master.mcp.auth;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**
- * The main entrypoint for evaluating the possibility of processing requests came from the AI Agent (both Authentication
+ * The main entrypoint for evaluating the possibility of processing requests that come from the AI Agent (both Authentication
  * and Authorization). So essentially this service is the entrypoint for IAM checks for all requests made by AI Agents to
  * Axelix Master MCP.
- *
- * @see WebIdentityAccessManager Similar abstraction but for handling web requests.
  *
  * @author Mikhail Polivakha
  */
@@ -40,7 +40,9 @@ public interface McpIdentityAccessManager {
      * Please note that the user that is returned by this call, is the user that is using the AI Agent, i.e. it is not the user
      * that represents the AI Agent itself.
      *
-     * @param jsonRpcRequest      the body of the http request (in case of mcp client, this is a JSON-RPC request).
+     * @param mcpEndpoint         the {@link McpEndpoint} that the user attempts to access. It might be {@code null},
+     *                            in which case it means the request was for the MCP protocol-related endpoint (like
+     *                            initializeSession and so on).
      * @param authorizationHeader the contents of the incoming http authorization header.
      *
      * @return the authenticated and authorized user.
@@ -49,6 +51,6 @@ public interface McpIdentityAccessManager {
      * @throws JwtProcessingException in case the implementation is unable to verify the validity
      *                                of the token or if the token is deemed invalid.
      */
-    User verifyAccess(String jsonRpcRequest, AuthorizationHeader authorizationHeader)
+    User verifyAccess(@Nullable McpEndpoint mcpEndpoint, AuthorizationHeader authorizationHeader)
             throws AuthorizationException, JwtProcessingException;
 }

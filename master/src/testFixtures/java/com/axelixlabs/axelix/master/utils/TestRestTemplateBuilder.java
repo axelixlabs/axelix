@@ -18,9 +18,6 @@
 package com.axelixlabs.axelix.master.utils;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -30,11 +27,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
@@ -57,15 +55,12 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
 public class TestRestTemplateBuilder {
 
     private static final String HOST = "http://localhost:";
-    private static final String USERNAME = "testUser";
-    private static final String PASSWORD = "testPassword";
 
     // We cannot use @LocalServerPort here since at the time of this
     // bean initialization, the webserver is not yet started, so, we
     // kind of have to lean towards a listener here.
     private int testTomcatServerPort;
 
-    private final CookieProperties cookieProperties;
     private final JwtEncoderService defaultJwtEncoderService;
     private final JwtEncoderService expiredJwtEncoderService;
 
@@ -74,48 +69,46 @@ public class TestRestTemplateBuilder {
         this.testTomcatServerPort = event.getWebServer().getPort();
     }
 
-    public TestRestTemplateBuilder(
-            CookieProperties cookieProperties,
-            JwtProperties jwtProperties,
-            JwtEncoderService defaultJwtEncoderService) {
-        this.cookieProperties = cookieProperties;
+    public TestRestTemplateBuilder(JwtProperties jwtProperties, JwtEncoderService defaultJwtEncoderService) {
         this.defaultJwtEncoderService = defaultJwtEncoderService;
         this.expiredJwtEncoderService =
                 new DefaultJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
     }
 
-    public TestRestTemplate asViewer() {
+    public IdentityAwareTestRestTemplate asViewer() {
         return withRole(TestRoles.VIEWER);
     }
 
-    public TestRestTemplate asEditor() {
+    public IdentityAwareTestRestTemplate asEditor() {
         return withRole(TestRoles.EDITOR);
     }
 
-    public TestRestTemplate asAdmin() {
-        return withRole(TestRoles.ADMIN);
+    public IdentityAwareTestRestTemplate withRole(Role role) {
+        User user = UserUtils.fromRoles(role);
+
+        String token = defaultJwtEncoderService.generateToken(user);
+
+        return buildWithToken(user, token);
     }
 
-    public TestRestTemplate withRole(Role role) {
-        String token = generateToken(new Role[] {role});
+    public IdentityAwareTestRestTemplate withRoleTokenInAuthorizationHeader(Role role) {
+        User user = UserUtils.fromRoles(role);
 
-        return buildWithToken(token);
-    }
+        String token = defaultJwtEncoderService.generateToken(user);
 
-    public TestRestTemplate withRoleTokenInAuthorizationHeader(Role role) {
-        String token = generateToken(new Role[] {role});
-
-        return buildWithTokenInAuthorizationHeader(token);
+        return buildWithTokenInAuthorizationHeader(user, token);
     }
 
     // START: Bad token auth scenarios
-    TestRestTemplate withExpiredToken() {
-        String expiredToken = generateExpiredToken();
+    public TestRestTemplate withExpiredToken() {
+        User user = UserUtils.fromRoles();
 
-        return buildWithToken(expiredToken);
+        String expiredToken = expiredJwtEncoderService.generateToken(user);
+
+        return buildWithToken(user, expiredToken);
     }
 
-    TestRestTemplate withMalformedToken() {
+    public TestRestTemplate withMalformedToken() {
         String malformedToken = "malformed token";
 
         return buildWithToken(malformedToken);
@@ -138,10 +131,27 @@ public class TestRestTemplateBuilder {
     }
     // END: Bad token auth scenarios
 
+    private IdentityAwareTestRestTemplate buildWithToken(User user, String token) {
+        return new IdentityAwareTestRestTemplate(
+                user,
+                new RestTemplateBuilder()
+                        .baseUri(HOST + testTomcatServerPort)
+                        .defaultHeader(
+                                HttpHeaders.COOKIE, "%s=%s".formatted(CookieProperties.AUTH_COOKIE_NAME, token)));
+    }
+
     private TestRestTemplate buildWithToken(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .baseUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getAuthCookieName(), token)));
+                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(CookieProperties.AUTH_COOKIE_NAME, token)));
+    }
+
+    private IdentityAwareTestRestTemplate buildWithTokenInAuthorizationHeader(User user, String token) {
+        return new IdentityAwareTestRestTemplate(
+                user,
+                new RestTemplateBuilder()
+                        .baseUri(HOST + testTomcatServerPort)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token));
     }
 
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {
@@ -150,12 +160,7 @@ public class TestRestTemplateBuilder {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token));
     }
 
-    private String generateToken(Role[] roles) {
-        return defaultJwtEncoderService.generateToken(
-                new DefaultUser(USERNAME, PASSWORD, Arrays.stream(roles).collect(Collectors.toSet())));
-    }
-
     private String generateExpiredToken() {
-        return expiredJwtEncoderService.generateToken(new DefaultUser(USERNAME, PASSWORD, Set.of()));
+        return expiredJwtEncoderService.generateToken(UserUtils.fromRoles());
     }
 }

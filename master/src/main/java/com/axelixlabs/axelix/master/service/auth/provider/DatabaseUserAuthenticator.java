@@ -59,12 +59,15 @@ public class DatabaseUserAuthenticator implements UserAuthenticator {
         UserEntity user = userService.findUserByUsername(username).orElse(null);
 
         if (user != null && user.password() != null && passwordEncoder.matches(password, user.password())) {
+            DefaultUser domainUser =
+                    new DefaultUser(user.username(), user.password(), roleService.findRolesOfUser(user.id()));
+
             if (user.status() == UserStatus.SUSPENDED) {
-                throw new UserSuspendedException();
+                throw new UserSuspendedException("Suspended user tried to log-in", domainUser);
             }
 
             userService.updateLastLoginAt(user.username());
-            return new DefaultUser(user.username(), user.password(), roleService.findRolesOfUser(user.id()));
+            return domainUser;
         }
 
         return null;

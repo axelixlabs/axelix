@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.common.auth.exception;
 
+import com.axelixlabs.axelix.common.auth.core.User;
+
 /**
  * The exception that happened during the authorization.
  *
@@ -25,7 +27,14 @@ package com.axelixlabs.axelix.common.auth.exception;
  */
 public class AuthorizationException extends RuntimeException {
 
-    public AuthorizationException(final String message) {
-        super(message);
+    private final User user;
+
+    public AuthorizationException(String errorMessage, User user) {
+        super(errorMessage);
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

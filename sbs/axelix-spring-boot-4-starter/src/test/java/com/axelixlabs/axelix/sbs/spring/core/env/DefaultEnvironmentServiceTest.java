@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -58,7 +58,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnSanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
             // when.
-            User user = createUserWithAuthorities();
+            User user = fromAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
@@ -75,7 +75,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = createUserWithAuthorities(DefaultAuthority.ENV_VALUES_READ);
+            User user = fromAuthorities(DefaultAuthority.ENV_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
@@ -100,7 +100,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnOnlyExplicitlySanitizedConfigurationProperties_whenRequiredAuthorityIsMissing() {
             // when.
-            User user = createUserWithAuthorities();
+            User user = fromAuthorities();
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);
@@ -122,7 +122,7 @@ class DefaultEnvironmentServiceTest extends AbstractEnvSharedContextTest {
         @Test
         void shouldReturnUnsanitizedConfigurationProperties_whenUserHasRequiredAuthority() {
             // when.
-            User user = createUserWithAuthorities(DefaultAuthority.ENV_VALUES_READ);
+            User user = fromAuthorities(DefaultAuthority.ENV_VALUES_READ);
             SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
             EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
                     () -> environmentService.getEnvironmentFeed(null), securityContext);

@@ -43,7 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricherTest.CurrentTestConfig;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -59,8 +59,7 @@ class DefaultEnvPropertyEnricherTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
-    private final SecurityContext securityContext =
-            new DefaultSecurityContext(createUserWithAuthorities(), "testToken");
+    private final SecurityContext securityContext = new DefaultSecurityContext(fromAuthorities(), "testToken");
 
     @Autowired
     private EnvironmentEndpoint environmentEndpoint;

@@ -17,14 +17,20 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
-import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
  * The exception handler for the {@link InvalidCredentialsException}.
@@ -32,10 +38,16 @@ import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
  * @author Mikhail Polivakha
  */
 @Component
-public class InvalidCredentialsExceptionHandler implements ExceptionHandler<InvalidCredentialsException> {
+public class InvalidCredentialsExceptionHandler extends AbstractExceptionHandler<InvalidCredentialsException> {
+
+    protected InvalidCredentialsExceptionHandler(
+            List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
+        super(webInterceptors, mcpInterceptors);
+    }
 
     @Override
-    public ApiError handle(InvalidCredentialsException exception) {
+    public ApiError handle(HttpServletRequest request, InvalidCredentialsException exception) {
+        fireOnAuthenticationFailure(request);
         return new SimpleApiError(ApiErrorCodes.INVALID_CREDENTIALS.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 

@@ -212,5 +212,11 @@ enforce optimization policies across the whole ecosystem, at scale.
 
 ## Contributing
 
-If you are interested in contributing to the Axelix project, please read our
-[contribution guidelines](CONTRIBUTING.adoc).
+Contributors are very welcome — Axelix is an open project and we would love your help. Whether it is
+a bug fix, a docs improvement, or a new feature, there is a good place for you to start.
+
+We maintain a [contribution guide](CONTRIBUTING.adoc) that answers most of the questions you may have
+before jumping in: how to tell whether a ticket is worth taking, how to find out if someone is
+already working on it, what the overall contribution process looks like, whether you can open a PR
+without a ticket, and the branch naming convention we follow. If you are interested in contributing,
+please give it a read.

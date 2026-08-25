@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,18 +39,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,8 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LoggersApiManagementLoggingLevelTest {
+public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpointTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
     private static final String siblingInstanceId = UUID.randomUUID().toString();
@@ -138,17 +138,17 @@ public class LoggersApiManagementLoggingLevelTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO", null);
 
         // when.
-        ResponseEntity<String> body = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        requestBody,
-                        String.class,
-                        activeInstanceId,
-                        groupName);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> body = viewer.postForEntity(
+                "/api/external/loggers/{instanceId}/group/{groupName}",
+                requestBody,
+                String.class,
+                activeInstanceId,
+                groupName);
 
         // then.
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertSuccessfulCallback(MasterWebEndpoints.LOGGER_GROUP_CHANGE, viewer.getActor());
     }
 
     @Test
@@ -158,8 +158,9 @@ public class LoggersApiManagementLoggingLevelTest {
                 List.of(activeInstanceId, siblingInstanceId), "logger.name", null, "DEBUG");
 
         // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+                viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -167,6 +168,7 @@ public class LoggersApiManagementLoggingLevelTest {
                 .containsExactlyInAnyOrder(
                         "/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level",
                         "/" + siblingInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+        assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
     }
 
     @Test
@@ -174,17 +176,17 @@ public class LoggersApiManagementLoggingLevelTest {
         String loggerName = "reset.logger.name";
 
         // when
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
-                        null,
-                        String.class,
-                        activeInstanceId,
-                        loggerName);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.postForEntity(
+                "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
+                null,
+                String.class,
+                activeInstanceId,
+                loggerName);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertSuccessfulCallback(MasterWebEndpoints.LOGGER_RESET, viewer.getActor());
     }
 
     @ParameterizedTest
@@ -309,13 +311,15 @@ public class LoggersApiManagementLoggingLevelTest {
                 List.of(activeInstanceId, activeInstanceId), "logger.name", null, "DEBUG");
 
         // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response =
-                restTemplate.asViewer().postForEntity("/api/external/loggers/logger", requestBody, String.class);
+                viewer.postForEntity("/api/external/loggers/logger", requestBody, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(invokedPaths)
                 .containsExactly("/" + activeInstanceId + "/axelix-loggers/logger/logger.name/change-level");
+        assertSuccessfulCallback(MasterWebEndpoints.LOGGERS_BULK_CHANGE, viewer.getActor());
     }
 
     @Test
@@ -333,16 +337,15 @@ public class LoggersApiManagementLoggingLevelTest {
         assertThat(invokedPaths).isEmpty();
     }
 
-    @ProtectedEndpointTests(
-            method = HttpMethod.POST,
-            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName")
-    void negativeAuthTestsOnGroupName() {}
-
-    @ProtectedEndpointTests(method = HttpMethod.POST, path = "/api/external/loggers/logger")
-    void negativeAuthTestsOnLoggerName() {}
-
-    @ProtectedEndpointTests(
-            method = HttpMethod.POST,
-            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/reset.logger.name/reset")
-    void negativeAuthTestsOnResetLoggingLevelByLoggerName() {}
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.LOGGER_GROUP_CHANGE,
+                        "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName"),
+                new TestableMasterWebEndpoint(MasterWebEndpoints.LOGGERS_BULK_CHANGE, "/api/external/loggers/logger"),
+                new TestableMasterWebEndpoint(
+                        MasterWebEndpoints.LOGGER_RESET,
+                        "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/reset.logger.name/reset"));
+    }
 }

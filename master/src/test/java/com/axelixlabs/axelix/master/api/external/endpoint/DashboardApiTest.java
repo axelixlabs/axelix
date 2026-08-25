@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,16 +41,17 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Persis
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -61,8 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DashboardApiTest {
+public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
     // language=json
     private static final String EXPECTED_DASHBOARD_JSON_WITH_INSTANCES = """
@@ -216,12 +216,14 @@ public class DashboardApiTest {
     @Test
     void shouldReturnJSONDashboardResponse() {
         // when.
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DASHBOARD_JSON_WITH_INSTANCES);
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
     }
 
     @Test
@@ -230,12 +232,14 @@ public class DashboardApiTest {
         deRegisterAll();
 
         // when.
-        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DASHBOARD_JSON_EMPTY);
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
     }
 
     @Test
@@ -247,8 +251,8 @@ public class DashboardApiTest {
 
         try {
             // when.
-            ResponseEntity<String> response =
-                    restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
+            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+            ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -256,6 +260,7 @@ public class DashboardApiTest {
             assertThatJson(response.getBody())
                     .node("healthStatus.statuses.UNKNOWN")
                     .isPresent();
+            assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
         } finally {
             registry.deRegister(InstanceId.of(unknownInstanceId));
         }
@@ -269,8 +274,8 @@ public class DashboardApiTest {
                 metadata("com.example", "service-b", GarbageCollector.ZGC)));
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/dashboard/java", String.class);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/java", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -281,6 +286,7 @@ public class DashboardApiTest {
         assertThatJson(response.getBody())
                 .node("garbageCollectorDistribution.ZGC")
                 .isEqualTo(50.0);
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_JAVA, viewer.getActor());
     }
 
     @Test
@@ -293,8 +299,8 @@ public class DashboardApiTest {
                 persistenceMetadata("com.example", "service-b", List.of(), Map.of("owner", 3))));
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.asViewer().getForEntity("/api/external/dashboard/persistence", String.class);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/persistence", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -307,10 +313,13 @@ public class DashboardApiTest {
                 .when(IGNORING_ARRAY_ORDER)
                 .node("inMemoryPagination")
                 .isEqualTo("[{\"appName\":\"service-b\",\"size\":1}]");
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_PERSISTENCE, viewer.getActor());
     }
 
-    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/dashboard")
-    void negativeAuthTests() {}
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.DASHBOARD_READ, "/api/external/dashboard"));
+    }
 
     private void deRegisterAll() {
         jdbcTemplate.execute("DELETE FROM instances");

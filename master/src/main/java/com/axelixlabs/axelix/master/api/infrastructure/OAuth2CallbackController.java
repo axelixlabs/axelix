@@ -142,7 +142,7 @@ public class OAuth2CallbackController {
 
         if (entity != null) {
             checkUserOriginatedFromOIDC(user, entity);
-            checkUserIsSuspended(entity);
+            checkUserIsSuspended(user, entity);
 
             userService.updateUserPatch(
                     entity.id(),
@@ -167,9 +167,9 @@ public class OAuth2CallbackController {
         }
     }
 
-    private static void checkUserIsSuspended(UserEntity entity) {
+    private static void checkUserIsSuspended(User user, UserEntity entity) {
         if (entity.status() == UserStatus.SUSPENDED) {
-            throw new UserSuspendedException();
+            throw new UserSuspendedException("Suspended user tried to log-in", user);
         }
     }
 

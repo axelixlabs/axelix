@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -33,17 +34,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -55,8 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConfigPropsApiTest {
+public class ConfigPropsApiTest extends AbstractProtectedEndpointTest {
     // language=json
     private static final String EXPECTED_BEANS_FEED_JSON = """
             {
@@ -314,14 +314,15 @@ public class ConfigPropsApiTest {
     @Test
     void shouldReturnJSONConfigPropsFeed() {
         // when.
-        ResponseEntity<String> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response =
+                viewer.getForEntity("/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_BEANS_FEED_JSON);
+        assertSuccessfulCallback(MasterWebEndpoints.CONFIG_PROPS_READ, viewer.getActor());
     }
 
     @Test
@@ -353,8 +354,10 @@ public class ConfigPropsApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ProtectedEndpointTests(
-            method = HttpMethod.GET,
-            path = "/api/external/configprops/feed/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTests() {}
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(new TestableMasterWebEndpoint(
+                MasterWebEndpoints.CONFIG_PROPS_READ,
+                "/api/external/configprops/feed/00000000-0000-0000-0000-000000000001"));
+    }
 }

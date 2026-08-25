@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 public class BadRequestExceptionHandler implements ExceptionHandler<BadRequestException> {
 
     @Override
-    public ApiError handle(BadRequestException exception) {
+    public ApiError handle(HttpServletRequest request, BadRequestException exception) {
         return new SimpleApiError(ApiErrorCodes.BAD_REQUEST.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 

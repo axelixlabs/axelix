@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.axelixlabs.axelix.master.api.error.ApiError;
 
 /**
@@ -31,10 +33,11 @@ public interface ExceptionHandler<T extends Exception> {
     /**
      * Handle/Translate the exception to {@link ApiError}.
      *
+     * @param request
      * @param exception to handle
      * @return {@link ApiError} resulting from incoming exception.
      */
-    ApiError handle(T exception);
+    ApiError handle(HttpServletRequest request, T exception);
 
     /**
      * @return the class of the exception for processing of

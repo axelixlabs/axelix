@@ -83,7 +83,7 @@ public class DefaultCookieService implements CookieService {
      * zero in {@code cookieLifetimeInSeconds} means cookie will expire immediately.
      */
     private ResponseCookie buildAuthCookie(String token, long cookieLifetimeInSeconds) {
-        return ResponseCookie.from(cookieProperties.getAuthCookieName(), token)
+        return ResponseCookie.from(CookieProperties.AUTH_COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(cookieProperties.isSecure())
                 .path("/")
@@ -93,7 +93,7 @@ public class DefaultCookieService implements CookieService {
     }
 
     private ResponseCookie buildAuthoritiesMetadataCookie(String authoritiesJsonArray, long cookieLifetimeInSeconds) {
-        return ResponseCookie.from(cookieProperties.getAuthoritiesCookieName(), authoritiesJsonArray)
+        return ResponseCookie.from(CookieProperties.AUTHORITIES_COOKIE_NAME, authoritiesJsonArray)
                 .httpOnly(false)
                 .secure(cookieProperties.isSecure())
                 .path("/")

@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.common.testfixtures;
 
+import java.util.Arrays;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
@@ -30,12 +33,25 @@ import com.axelixlabs.axelix.common.auth.core.User;
  * Utils for create User.
  *
  * @author Niktia Kirillov
+ * @author Mikhail Polivakha
  */
 public class UserUtils {
 
-    public static User createUserWithAuthorities(DefaultAuthority... authorities) {
+    private static final Random RANDOM = new Random();
+
+    public static User fromAuthorities(DefaultAuthority... authorities) {
         Set<Authority> authoritySet = Set.of(authorities);
-        Role role = new DefaultRole("testRole", authoritySet);
-        return new PasswordlessUser("testUser", Set.of(role));
+        Role role = new DefaultRole(pseudoRandomStirng(), authoritySet);
+        return new PasswordlessUser(pseudoRandomStirng(), Set.of(role));
+    }
+
+    public static User fromRoles(Role... roles) {
+        return new PasswordlessUser(pseudoRandomStirng(), Arrays.stream(roles).collect(Collectors.toSet()));
+    }
+
+    public static String pseudoRandomStirng() {
+        return RANDOM.ints(12, 'a', 'z' + 1) // Generates lowercase letters
+                .mapToObj(i -> String.valueOf((char) i))
+                .collect(Collectors.joining());
     }
 }

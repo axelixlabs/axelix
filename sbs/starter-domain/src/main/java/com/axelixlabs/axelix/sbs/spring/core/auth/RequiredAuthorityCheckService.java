@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
-import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
@@ -27,6 +26,7 @@ import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
  * Service that checks whether the current user in the SecurityContext has a specific authority.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class RequiredAuthorityCheckService {
 
@@ -37,11 +37,7 @@ public class RequiredAuthorityCheckService {
     }
 
     public boolean hasAuthority(DefaultAuthority requiredAuthority) throws AuthorizationException {
-        return securityContextExecutor
-                .getSecurityContext()
-                .map(SecurityContext::currentUser)
-                .map(user -> userHasAuthority(user, requiredAuthority))
-                .orElseThrow(() -> new AuthorizationException("Missing required SecurityContext"));
+        return userHasAuthority(securityContextExecutor.requireSecurityContext().currentUser(), requiredAuthority);
     }
 
     private boolean userHasAuthority(User user, DefaultAuthority requiredAuthority) {

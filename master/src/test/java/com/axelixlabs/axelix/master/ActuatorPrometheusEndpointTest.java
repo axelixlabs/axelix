@@ -28,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -55,7 +57,8 @@ class ActuatorPrometheusEndpointTest {
 
         @Test
         void actuatorPrometheusReturnsScrapedMetricsWithoutAuth() {
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/prometheus", String.class);
+            ResponseEntity<String> response =
+                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getHeaders().getContentType()).isNotNull();
@@ -82,7 +85,8 @@ class ActuatorPrometheusEndpointTest {
 
         @Test
         void actuatorPrometheusIsNotAvailableWithoutAuth() {
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/prometheus", String.class);
+            ResponseEntity<String> response =
+                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
@@ -98,7 +102,8 @@ class ActuatorPrometheusEndpointTest {
 
         @Test
         void actuatorPrometheusIsNotAvailableByDefault() {
-            ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/prometheus", String.class);
+            ResponseEntity<String> response =
+                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }

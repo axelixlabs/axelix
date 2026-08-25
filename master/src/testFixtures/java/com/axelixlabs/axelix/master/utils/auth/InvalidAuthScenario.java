@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.utils;
+package com.axelixlabs.axelix.master.utils.auth;
 
 import java.util.function.Function;
 
 import org.springframework.boot.resttestclient.TestRestTemplate;
+
+import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 /**
  * This enum contains a set of invalid authentication scenarios used to parameterize API integration tests.

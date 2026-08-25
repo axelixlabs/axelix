@@ -21,6 +21,7 @@ import java.util.List;
 
 import tools.jackson.databind.json.JsonMapper;
 
+import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ import com.axelixlabs.axelix.master.mcp.auth.McpEndpointAuthorityResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulResult;
 
 /**
  * Auto-Configuration for the MCP-related components
@@ -54,19 +56,24 @@ public class McpAutoConfiguration {
             ObjectProvider<OAuth2Properties> oAuth2PropertiesObjectProvider,
             McpIdentityAccessManager mcpIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
-            JwtEncoderService jwtEncoderService) {
+            JwtEncoderService jwtEncoderService,
+            McpServerStreamableHttpProperties mcpProperties,
+            ObjectProvider<OnMcpSuccessfulResult> onMcpSuccessfulResultInterceptors) {
         return new McpAuthorizationFilter(
-                oAuth2PropertiesObjectProvider, mcpIdentityAccessManager, securityContextExecutor, jwtEncoderService);
+                oAuth2PropertiesObjectProvider,
+                mcpIdentityAccessManager,
+                securityContextExecutor,
+                jwtEncoderService,
+                mcpProperties,
+                onMcpSuccessfulResultInterceptors.stream().toList());
     }
 
     @Bean
     public McpIdentityAccessManager mcpIdentityAccessManager(
             Authorizer authorizer,
-            McpEndpointResolver mcpEndpointResolver,
             McpEndpointAuthorityResolver mcpEndpointAuthorityResolver,
             List<McpAuthenticationHandler> mcpAuthenticationHandlers) {
-        return new DefaultMcpIdentityAccessManager(
-                authorizer, mcpEndpointResolver, mcpEndpointAuthorityResolver, mcpAuthenticationHandlers);
+        return new DefaultMcpIdentityAccessManager(authorizer, mcpEndpointAuthorityResolver, mcpAuthenticationHandlers);
     }
 
     @Bean

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.service;
+package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import org.jspecify.annotations.Nullable;
 
@@ -26,8 +26,8 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * The main entrypoint for evaluating the possibility of processing the HTTP request (both Authentication
- * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request,
- * presumably made from the browser.
+ * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request
+ * (presumably that comes from the Axelix Master)
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov

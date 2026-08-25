@@ -17,14 +17,21 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
  * {@link ExceptionHandler} for {@link JwtProcessingException}.
@@ -32,10 +39,16 @@ import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
  * @author Mikhail Polivakha
  */
 @Component
-public class JwtProcessingExceptionHandler implements ExceptionHandler<JwtProcessingException> {
+public class JwtProcessingExceptionHandler extends AbstractExceptionHandler<JwtProcessingException> {
+
+    protected JwtProcessingExceptionHandler(
+            List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
+        super(webInterceptors, mcpInterceptors);
+    }
 
     @Override
-    public ApiError handle(JwtProcessingException exception) {
+    public ApiError handle(HttpServletRequest request, JwtProcessingException exception) {
+        fireOnAuthenticationFailure(request);
         return new SimpleApiError(ApiErrorCodes.INVALID_JWT_EXCEPTION.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 

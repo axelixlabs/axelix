@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
-import static com.axelixlabs.axelix.common.testfixtures.UserUtils.createUserWithAuthorities;
+import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -49,8 +49,7 @@ class DefaultEnvPropertyEnricherTest extends AbstractEnvSharedContextTest {
 
     private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
 
-    private final SecurityContext securityContext =
-            new DefaultSecurityContext(createUserWithAuthorities(), "testToken");
+    private final SecurityContext securityContext = new DefaultSecurityContext(fromAuthorities(), "testToken");
 
     @Autowired
     private EnvironmentEndpoint environmentEndpoint;

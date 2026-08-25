@@ -36,6 +36,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -45,13 +46,13 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
-import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
+import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
-import static com.axelixlabs.axelix.common.auth.core.DefaultAuthority.USERS_VIEW;
 import static com.axelixlabs.axelix.common.auth.core.DefaultRole.SUPER_ADMIN;
-import static com.axelixlabs.axelix.common.domain.http.HttpMethod.GET;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,7 +74,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.master.auth.options.super-admin.credentials.username=admin",
             "axelix.master.auth.options.super-admin.credentials.password=admin",
         })
-class UserApiTest {
+class UserApiTest extends AbstractProtectedEndpointTest {
 
     private static final String USERS_FEED_PATH = "/api/external/users/feed";
     private static final String USER_BY_ID_PATH = "/api/external/users/feed/{userId}";
@@ -83,9 +84,6 @@ class UserApiTest {
 
     @Autowired
     private TestRestTemplateBuilder restTemplateBuilder;
-
-    @Autowired
-    private CookieProperties cookieProperties;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -123,11 +121,12 @@ class UserApiTest {
 
         String cookieHeader = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
         assertThat(cookieHeader).isNotNull();
-        assertThat(cookieHeader).contains(cookieProperties.getAuthCookieName());
+        assertThat(cookieHeader).contains(CookieProperties.AUTH_COOKIE_NAME);
         assertThat(cookieHeader)
                 .contains(String.valueOf(jwtProperties.lifespan().getSeconds()));
         assertThat(cookieHeader).contains("HttpOnly");
         assertThat(cookieHeader).contains("SameSite=Strict");
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser("admin", "admin", Set.of()));
     }
 
     @Test
@@ -143,14 +142,18 @@ class UserApiTest {
 
         String cookieHeader = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
         assertThat(cookieHeader).isNull();
+        assertAuthenticationFailure(MasterWebEndpoints.LOCAL_LOGIN);
     }
 
     @Test
     void shouldAuthenticateUserFromDatabase() {
-        userService.createLocal("db-user", null, null, "db-user@example.com", null, null, "db-password", "VIEWER");
-        UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
+        String username = "db-user";
+        String password = "db-password";
 
-        LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
+        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, "VIEWER");
+        UserEntity user = userRepository.findByUsername(username).orElseThrow();
+
+        LoginRequest loginRequest = new LoginRequest(username, password);
 
         // when.
         ResponseEntity<String> response = restTemplate.exchange(
@@ -162,6 +165,7 @@ class UserApiTest {
 
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
         assertThat(updated.lastLoginAt()).isNotNull();
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser(username, password, Set.of()));
     }
 
     @Test
@@ -178,6 +182,7 @@ class UserApiTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
+        assertAuthenticationFailure(MasterWebEndpoints.LOCAL_LOGIN);
     }
 
     @Test
@@ -198,16 +203,21 @@ class UserApiTest {
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
         assertThat(userRepository.findById(user.id()).orElseThrow().lastLoginAt())
                 .isNull();
+        assertAccessDenied(MasterWebEndpoints.LOCAL_LOGIN);
     }
 
     @Test
     void shouldAuthenticateReactivatedDatabaseUser() {
         // given.
-        userService.createLocal("db-user", null, null, "db-user@example.com", null, null, "db-password", "VIEWER");
-        UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
+        String username = "db-user";
+        String password = "db-password";
+
+        // and.
+        userService.createLocal(username, null, null, "db-user@example.com", null, null, password, "VIEWER");
+        UserEntity user = userRepository.findByUsername(username).orElseThrow();
         userService.updateStatus(user.id(), UserStatus.SUSPENDED);
         userService.updateStatus(user.id(), UserStatus.ACTIVE);
-        LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
+        LoginRequest loginRequest = new LoginRequest(username, password);
 
         // when.
         ResponseEntity<String> response = restTemplate.exchange(
@@ -218,15 +228,17 @@ class UserApiTest {
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).hasSize(2);
         assertThat(userRepository.findById(user.id()).orElseThrow().lastLoginAt())
                 .isNotNull();
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser(username, password, Set.of()));
     }
 
     @Test
     void shouldClearCookieOnLogout() {
-        String token = jwtEncoderService.generateToken(new PasswordlessUser("someUser", Set.of()));
+        PasswordlessUser actor = new PasswordlessUser("someUser", Set.of());
+        String token = jwtEncoderService.generateToken(actor);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(HttpHeaders.COOKIE, cookieProperties.getAuthCookieName() + "=" + token);
+        headers.add(HttpHeaders.COOKIE, CookieProperties.AUTH_COOKIE_NAME + "=" + token);
 
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
@@ -243,9 +255,10 @@ class UserApiTest {
                     assertThat(cookieHeader.toLowerCase()).contains("max-age=0");
                 });
         assertThat(logoutResponse.getHeaders().get(HttpHeaders.SET_COOKIE))
-                .anySatisfy(cookieHeader -> assertThat(cookieHeader).contains(cookieProperties.getAuthCookieName()))
+                .anySatisfy(cookieHeader -> assertThat(cookieHeader).contains(CookieProperties.AUTH_COOKIE_NAME))
                 .anySatisfy(
-                        cookieHeader -> assertThat(cookieHeader).contains(cookieProperties.getAuthoritiesCookieName()));
+                        cookieHeader -> assertThat(cookieHeader).contains(CookieProperties.AUTHORITIES_COOKIE_NAME));
+        assertSuccessfulCallback(MasterWebEndpoints.LOGOUT, actor);
     }
 
     @Test
@@ -261,6 +274,7 @@ class UserApiTest {
 
         // then.
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertAuthenticationFailure(MasterWebEndpoints.LOGOUT);
     }
 
     @Test
@@ -306,14 +320,15 @@ class UserApiTest {
                 """.formatted(alice.id(), bob.id());
 
         // when.
-        ResponseEntity<String> response =
-                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USERS_FEED_PATH, String.class);
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedFeed);
         assertThat(response.getBody()).doesNotContain("password");
+        assertSuccessfulCallback(MasterWebEndpoints.USERS_READ, superAdmin.getActor());
     }
 
     @Test
@@ -349,14 +364,15 @@ class UserApiTest {
                 """.formatted(alice.id());
 
         // when.
-        ResponseEntity<String> response =
-                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USER_BY_ID_PATH, String.class, alice.id());
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        ResponseEntity<String> response = superAdmin.getForEntity(USER_BY_ID_PATH, String.class, alice.id());
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).isEqualTo(expectedUser);
         assertThat(response.getBody()).doesNotContain("password");
+        assertSuccessfulCallback(MasterWebEndpoints.USER_READ_ONE, superAdmin.getActor());
     }
 
     @Test
@@ -375,17 +391,20 @@ class UserApiTest {
     @Test
     void shouldReturnEmptyUsersFeed() {
         // when.
-        ResponseEntity<String> response =
-                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USERS_FEED_PATH, String.class);
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).isEqualTo("[]");
+        assertSuccessfulCallback(MasterWebEndpoints.USERS_READ, superAdmin.getActor());
     }
 
-    @ProtectedEndpointTests(method = GET, path = USERS_FEED_PATH, requiredAuthority = USERS_VIEW)
-    void negativeAuthTestsOnGetUsersFeed() {}
+    @Override
+    protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
+        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.USERS_READ, USERS_FEED_PATH));
+    }
 
     private HttpEntity<String> defaultEntity(LoginRequest loginRequest) {
         String requestBody = objectMapper.writeValueAsString(loginRequest);

@@ -23,6 +23,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+    testImplementation(testFixtures(project(":common")))
 
     // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
     // does NOT include the launcher, however, it includes the Junit engine, so, we need the launcher only

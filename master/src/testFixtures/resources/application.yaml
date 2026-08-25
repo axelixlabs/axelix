@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    # OTLP metrics export is owned by OtlpTransportMetricsAutoConfiguration, not Spring Boot.
+    exclude: org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
   cloud:
     vault:
       enabled: false
@@ -49,6 +52,12 @@ management:
 axelix:
   master:
     metrics:
+      otlp:
+        enabled: false
+        url:
+        step: 1m
+        headers: {}
+        compression-mode: none
       prometheus:
         enabled: false
     mcp-server:

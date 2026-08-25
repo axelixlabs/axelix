@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.utils;
+package com.axelixlabs.axelix.master.utils.auth;
 
 import java.util.Optional;
 import java.util.Set;
@@ -30,13 +30,13 @@ import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
 import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
 
 /**
- * {@link SecurityContextExecutor} for tests: always exposes a fixed token so actuator probers can build
+ * {@link SecurityContextExecutor} for tests: always exposes a static token so actuator probers can build
  * {@code Authorization} headers without a servlet-bound {@link SecurityContext}.
  *
  * @author Mikhail Polivakha
  */
 @NullMarked
-public final class TestFixedSecurityContextExecutor implements SecurityContextExecutor {
+public final class StaticTestSecurityContextExecutor implements SecurityContextExecutor {
 
     private static final SecurityContext CONTEXT =
             new DefaultSecurityContext(new DefaultUser("test", "", Set.of()), "test-token");

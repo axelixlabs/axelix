@@ -31,6 +31,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -54,8 +56,9 @@ class ActuatorHealthEndpointTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void actuatorHealthReturnsValidResultWithoutAuth() throws Exception {
-        ResponseEntity<String> response = restTemplate.getForEntity("/api/actuator/health", String.class);
+    void actuatorHealthReturnsValidResultWithoutAuth() {
+        ResponseEntity<String> response =
+                restTemplate.getForEntity(InfrastructureApiPaths.HEALTH_STATUS_PATH, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
