@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +27,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.master.domain.RoleEntity;
+import com.axelixlabs.axelix.master.domain.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
@@ -53,6 +59,12 @@ class DatabaseRoleServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @Autowired
+    private JdbcClient jdbcClient;
 
     @Nested
     class FindByName {
@@ -150,6 +162,148 @@ class DatabaseRoleServiceTest {
                     .filter(role -> role.getName().equals(name))
                     .findFirst()
                     .orElseThrow();
+        }
+    }
+
+    /**
+     * The bonds of {@code roles_parents} are resolved into the components of the role, which is what makes an
+     * inherited authority reach the checks. The built-in roles carry no bonds, so nothing else in this class covers
+     * it.
+     */
+    @Nested
+    class Inheritance {
+
+        @BeforeEach
+        @AfterEach
+        void cleanCustomRoles() {
+            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+            jdbcClient.sql("DELETE FROM roles_parents").update();
+            jdbcClient
+                    .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
+                    .param(RoleOrigin.BUILT_IN.name())
+                    .update();
+            jdbcClient
+                    .sql("DELETE FROM roles WHERE role_origin <> ?")
+                    .param(RoleOrigin.BUILT_IN.name())
+                    .update();
+        }
+
+        @Test
+        void shouldExposeTheRoleItDerivesFromAsAComponent() {
+            // given.
+            String parentId = customRole("PARENT", DefaultAuthority.CACHES_CLEAR);
+            String childId = customRole("CHILD", DefaultAuthority.GARBAGE_COLLECTOR);
+            deriveFrom(childId, parentId);
+
+            // when.
+            Role child = roleService.findByName("CHILD").orElseThrow();
+
+            // then. The parent is a component rather than its authorities being copied into the child
+            assertThat(child.getAuthorities()).extracting(Authority::getName).containsExactly("GARBAGE_COLLECTOR");
+            assertThat(child.getComponents()).singleElement().satisfies(parent -> {
+                assertThat(parent.getName()).isEqualTo("PARENT");
+                assertThat(parent.getAuthorities())
+                        .extracting(Authority::getName)
+                        .containsExactly("CACHES_CLEAR");
+            });
+        }
+
+        @Test
+        void shouldResolveTheBondsTransitively() {
+            // given. C derives from B, B derives from A
+            String roleA = customRole("ROLE A", DefaultAuthority.ENV_VALUES_READ);
+            String roleB = customRole("ROLE B", DefaultAuthority.CACHES_CLEAR);
+            String roleC = customRole("ROLE C", DefaultAuthority.GARBAGE_COLLECTOR);
+            deriveFrom(roleB, roleA);
+            deriveFrom(roleC, roleB);
+
+            // when.
+            Role c = roleService.findByName("ROLE C").orElseThrow();
+
+            // then.
+            assertThat(c.getEffectiveAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR", "ENV_VALUES_READ");
+        }
+
+        @Test
+        void shouldUnionTheAuthoritiesReachedThroughSeveralChains() {
+            // given. A diamond: the top role is reached through both branches
+            String top = customRole("TOP", DefaultAuthority.ENV_VALUES_READ);
+            String left = customRole("LEFT", DefaultAuthority.CACHES_CLEAR);
+            String right = customRole("RIGHT", DefaultAuthority.CACHES_TOGGLE);
+            String bottom = customRole("BOTTOM", DefaultAuthority.GARBAGE_COLLECTOR);
+            deriveFrom(left, top);
+            deriveFrom(right, top);
+            deriveFrom(bottom, left);
+            deriveFrom(bottom, right);
+
+            // when.
+            Role role = roleService.findByName("BOTTOM").orElseThrow();
+
+            // then. Reaching the same authority twice is not an error, it is simply unioned
+            assertThat(role.getEffectiveAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR", "CACHES_TOGGLE", "ENV_VALUES_READ");
+        }
+
+        @Test
+        void shouldTerminateOnABondCycleWrittenAroundTheApplication() {
+            // given. Neither lane can write this, but a hand-written row could - and the resolution runs on the
+            // login path, so looping here would leave nobody able to log in
+            String roleA = customRole("ROLE A", DefaultAuthority.ENV_VALUES_READ);
+            String roleB = customRole("ROLE B", DefaultAuthority.CACHES_CLEAR);
+            deriveFrom(roleA, roleB);
+            deriveFrom(roleB, roleA);
+
+            // when.
+            Role a = roleService.findByName("ROLE A").orElseThrow();
+
+            // then. The walk stops at the repeated role, so the authorities are still resolved
+            assertThat(a.getEffectiveAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactlyInAnyOrder("ENV_VALUES_READ", "CACHES_CLEAR");
+        }
+
+        @Test
+        void shouldResolveTheBondsOfEveryRoleTheUserHolds() {
+            // given.
+            String parentId = customRole("PARENT", DefaultAuthority.CACHES_CLEAR);
+            String childId = customRole("CHILD", DefaultAuthority.GARBAGE_COLLECTOR);
+            deriveFrom(childId, parentId);
+
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "CHILD");
+            String userId = userRepository.findByUsername("alice").orElseThrow().id();
+
+            // when.
+            Set<Role> roles = roleService.findRolesOfUser(userId);
+
+            // then.
+            assertThat(roles)
+                    .singleElement()
+                    .satisfies(role -> assertThat(role.getEffectiveAuthorities())
+                            .extracting(Authority::getName)
+                            .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR"));
+        }
+
+        private String customRole(String name, DefaultAuthority authority) {
+            String id = UUID.randomUUID().toString();
+
+            jdbcAggregateTemplate.insert(new RoleEntity(id, name, "Description", RoleOrigin.WEB_UI));
+            jdbcClient
+                    .sql("INSERT INTO roles_authorities (role_id, authority_id)"
+                            + " SELECT ?, id FROM authorities WHERE name = ?")
+                    .params(id, authority.name())
+                    .update();
+
+            return id;
+        }
+
+        private void deriveFrom(String roleId, String parentRoleId) {
+            jdbcClient
+                    .sql("INSERT INTO roles_parents (role_id, parent_role_id) VALUES (?, ?)")
+                    .params(roleId, parentRoleId)
+                    .update();
         }
     }
 

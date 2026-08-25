@@ -17,8 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,11 +37,12 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
+import com.axelixlabs.axelix.master.repository.RoleRepository.RoleParentBond;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
 
 /**
- * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities}
- * and {@code authorities} tables.
+ * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities},
+ * {@code roles_parents} and {@code authorities} tables.
  *
  * @author Sergey Cherkasov
  */
@@ -59,35 +61,83 @@ public class DatabaseRoleService implements RoleService {
 
     @Override
     public Optional<Role> findByName(String name) {
-        List<RoleWithAuthorityName> rows = roleRepository.findWithAuthoritiesByName(name);
+        RoleGraph graph = readGraph();
 
-        if (rows.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Set<Authority> authorities = rows.stream()
-                .flatMap(row -> Optional.ofNullable(row.authorityName()).stream())
-                .map(authoritiesManager::decode)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        return Optional.of(new DefaultRole(name, authorities));
+        return findRoleId(graph, name).flatMap(roleId -> composeRole(graph, roleId));
     }
 
     @Override
     public Set<Role> findRolesOfUser(String userId) {
-        List<RoleWithAuthorityName> rows = roleRepository.findWithAuthoritiesByUserId(userId);
-        Map<String, Set<Authority>> authoritiesByRole = new LinkedHashMap<>();
+        RoleGraph graph = readGraph();
 
-        for (RoleWithAuthorityName row : rows) {
-            Set<Authority> authorities = authoritiesByRole.computeIfAbsent(row.roleName(), _ -> new HashSet<>());
-            if (row.authorityName() != null) {
-                Optional.ofNullable(authoritiesManager.decode(row.authorityName()))
-                        .ifPresent(authorities::add);
-            }
-        }
-        return authoritiesByRole.entrySet().stream()
-                .map(entry -> (Role) new DefaultRole(entry.getKey(), entry.getValue()))
+        return roleRepository.findRoleIdsOfUser(userId).stream()
+                .map(roleId -> composeRole(graph, roleId))
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
     }
+
+    private RoleGraph readGraph() {
+        Map<String, String> names = new HashMap<>();
+        Map<String, Set<Authority>> authorities = new HashMap<>();
+
+        for (RoleWithAuthorityName row : roleRepository.findAllWithAuthorities()) {
+            names.put(row.roleId(), row.roleName());
+            Set<Authority> granted = authorities.computeIfAbsent(row.roleId(), _ -> new HashSet<>());
+
+            if (row.authorityName() != null) {
+                String authorityName = row.authorityName();
+                granted.add(() -> authorityName);
+            }
+        }
+
+        Map<String, List<String>> parents = new HashMap<>();
+
+        for (RoleParentBond bond : roleRepository.findAllParentBonds()) {
+            parents.computeIfAbsent(bond.roleId(), _ -> new ArrayList<>()).add(bond.parentRoleId());
+        }
+
+        return new RoleGraph(names, authorities, parents);
+    }
+
+    private Optional<String> findRoleId(RoleGraph graph, String roleName) {
+        return graph.names().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(roleName))
+                .map(Map.Entry::getKey)
+                .findFirst();
+    }
+
+    private Optional<Role> composeRole(RoleGraph graph, String roleId) {
+        return composeRole(graph, roleId, new HashSet<>());
+    }
+
+    private Optional<Role> composeRole(RoleGraph graph, String roleId, Set<String> derivationPath) {
+        String roleName = graph.names().get(roleId);
+
+        // The roles, the bonds and the roles of the user are three separate reads rather than one snapshot, so an id
+        // can point at a role the roles query did not return. Such a role is left out - this runs on the login path,
+        // and it is not worth an unresolvable id there
+        if (roleName == null) {
+            return Optional.empty();
+        }
+
+        derivationPath.add(roleId);
+        Set<Role> components = new HashSet<>();
+
+        for (String parentRoleId : graph.parents().getOrDefault(roleId, List.of())) {
+            if (derivationPath.add(parentRoleId)) {
+                composeRole(graph, parentRoleId, derivationPath).ifPresent(components::add);
+                derivationPath.remove(parentRoleId);
+            }
+        }
+
+        derivationPath.remove(roleId);
+
+        return Optional.of(new DefaultRole(roleName, graph.authorities().getOrDefault(roleId, Set.of()), components));
+    }
+
+    /**
+     * The roles and the bonds between them, as read from the database, ready to be resolved into composite roles.
+     */
+    private record RoleGraph(
+            Map<String, String> names, Map<String, Set<Authority>> authorities, Map<String, List<String>> parents) {}
 }

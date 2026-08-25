@@ -17,13 +17,11 @@
  */
 package com.axelixlabs.axelix.common.auth.service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 
@@ -44,7 +42,7 @@ public class DefaultAuthorizer implements Authorizer {
         }
 
         Set<String> userAuthorities = user.getRoles().stream()
-                .flatMap(role -> collectAuthorities(role).stream())
+                .flatMap(role -> role.getEffectiveAuthorities().stream())
                 .map(Authority::getName)
                 .collect(Collectors.toSet());
 
@@ -54,15 +52,5 @@ public class DefaultAuthorizer implements Authorizer {
         if (!userAuthorities.containsAll(requiredNames)) {
             throw new AuthorizationException("Access denied: missing required authorities " + requiredNames, user);
         }
-    }
-
-    private Set<Authority> collectAuthorities(Role role) {
-        Set<Authority> all = new HashSet<>(role.getAuthorities());
-
-        for (Role component : role.getComponents()) {
-            all.addAll(collectAuthorities(component));
-        }
-
-        return all;
     }
 }
