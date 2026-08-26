@@ -142,8 +142,8 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
 
-      - name: Build Docker Image
-        run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file Dockerfile .
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
 
       # ====================================================================================
       # Artifacts Publication, after all builds, linters, tests, and Docker pushes succeed.
@@ -155,8 +155,14 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker push to GitHub Container registry
-        run: docker push ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }}
+      - name: Build and push Docker image
+        run: |
+          docker build \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} \
+            --file Dockerfile \
+            --push \
+            .
 
       - name: Docker logout from GitHub Container Registry
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
