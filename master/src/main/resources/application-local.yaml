@@ -2,6 +2,8 @@
 
 axelix:
   master:
+    database:
+      url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
     discovery:
       self-registration:
         enabled: true
@@ -45,11 +47,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: [ "health", "prometheus" ]
-
-spring:
-  datasource:
-    url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
-  cloud:
-    config:
-      enabled: false
+        include: [ "health" ]

@@ -32,7 +32,7 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health", "prometheus" ]
+        include: [ "health" ]
   prometheus:
     metrics:
       export:
@@ -41,8 +41,8 @@ management:
 axelix:
   master:
     external-config:
-      option:
       spring-cloud-config:
+        enabled: false
         uri:
         label: master
         name:
@@ -107,3 +107,34 @@ axelix:
           scopes: openid
       cookie:
         secure: false
+---
+spring:
+  config:
+    # We have to make the spring.config.import 'optional' here in any case (regardless of whether the
+    # spring.cloud.config.enabled is true or not). The reasoning is as follows.
+    #
+    # spring.config.import is a separate mechanism - it is part of Spring Boot, not Spring Cloud. For every
+    # location listed here Spring Boot asks each ConfigDataLocationResolver "can you handle this?". The
+    # 'configserver:' resolver is contributed by Spring Cloud Config, and - this is the key point - it answers
+    # "yes" ONLY when spring.cloud.config.enabled is true (its isResolvable() literally returns the value of
+    # that property). So spring.cloud.config.enabled is evaluated at this resolvability gate, BEFORE any request
+    # to the Config Server is ever made:
+    #
+    #   - enabled=false -> the resolver declines 'configserver:', no other resolver claims it, and NOTHING is
+    #     fetched (no HTTP call). But an unresolvable location that is NOT optional is a hard startup error in
+    #     Spring Boot. That is exactly why we mark it 'optional:' - so Spring Boot silently skips it and Master
+    #     boots normally without a Config Server.
+    #   - enabled=true  -> the resolver handles the location and actually contacts the server; combined with
+    #     fail-fast=true below, an unreachable Config Server then becomes a startup failure.
+    #
+    # In other words, 'optional:' only covers the disabled case; it does NOT weaken fail-fast when enabled.
+    import: "optional:configserver:"
+  cloud:
+    config:
+      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled:false}"
+      fail-fast: true
+      uri:       "${axelix.master.external-config.spring-cloud-config.uri:}"
+      label:     "${axelix.master.external-config.spring-cloud-config.label:}"
+      name:      "${axelix.master.external-config.spring-cloud-config.name:}"
+      username:  "${axelix.master.external-config.spring-cloud-config.username:}"
+      password:  "${axelix.master.external-config.spring-cloud-config.password:}"

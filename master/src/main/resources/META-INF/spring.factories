@@ -1,3 +1,2 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor,\
-com.axelixlabs.axelix.master.autoconfiguration.external.config.ExternalConfigurationEnvironmentPostProcessor
+org.springframework.boot.EnvironmentPostProcessor=\
+com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor
