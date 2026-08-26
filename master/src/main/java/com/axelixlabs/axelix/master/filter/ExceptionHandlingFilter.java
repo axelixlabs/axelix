@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.master.api.error.ApiError;
@@ -79,6 +80,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private void handleApiError(HttpServletResponse response, ApiError apiError) throws IOException {
         response.setStatus(apiError.statusCode());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(jsonMapper.writeValueAsString(apiError.errorBody()));
         response.getWriter().flush();
     }
