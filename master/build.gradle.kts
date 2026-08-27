@@ -53,6 +53,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-otlp")
     api("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
 
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.cloud:spring-cloud-starter-vault-config")

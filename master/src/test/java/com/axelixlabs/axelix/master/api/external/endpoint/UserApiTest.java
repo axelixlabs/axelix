@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.http.client.HttpCookieHandling;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,6 +104,16 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @BeforeEach
     void cleanUsersTable() {
         userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+    }
+
+    @BeforeEach
+    void statelessRestTemplate() {
+        // The auto-configured TestRestTemplate defaults to ENABLE_WHEN_POSSIBLE cookie handling, so once an
+        // Apache HttpClient is on the classpath (pulled in transitively by spring-cloud-config) it starts
+        // persisting the auth cookie set by login-like requests across subsequent calls. That leaks a valid
+        // cookie into tests that intentionally send none (e.g. logout without a cookie). Disable cookie
+        // handling so every request is stateless and carries only the cookies it explicitly sets.
+        restTemplate = restTemplate.withCookieHandling(HttpCookieHandling.DISABLE);
     }
 
     @Test
