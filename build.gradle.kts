@@ -1,3 +1,4 @@
+import com.github.jk1.license.render.TextReportRenderer
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
@@ -20,6 +21,7 @@ plugins {
     id("signing")
     id("net.ltgt.errorprone") version "4.4.0"
     id("test-report-aggregation")
+    id("com.github.jk1.dependency-license-report") version "2.9"
 }
 
 val projectNamespace = "com.axelixlabs"
@@ -37,6 +39,11 @@ dependencies {
     subprojects.forEach {
         testReportAggregation(it)
     }
+}
+
+licenseReport {
+    renderers = arrayOf(TextReportRenderer("THIRD-PARTY-NOTICES.txt"))
+    projects = listOfNotNull(project(":master"), findProject(":master-enterprise")).toTypedArray()
 }
 
 val aggregateTestProfilerReports by tasks.register<Copy>("aggregateTestProfilerReports") {
