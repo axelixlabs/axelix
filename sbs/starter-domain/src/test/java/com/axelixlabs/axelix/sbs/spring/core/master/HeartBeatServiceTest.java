@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
@@ -116,6 +117,7 @@ class HeartBeatServiceTest {
         @Bean
         public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
             return new DefaultJwtDecoderService(
+                    new DefaultAuthorityDecoder(null),
                     authProperties.getJwt().getAlgorithm(),
                     authProperties.getJwt().getSigningKey());
         }
