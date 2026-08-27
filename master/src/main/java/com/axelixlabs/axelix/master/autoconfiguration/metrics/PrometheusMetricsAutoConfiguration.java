@@ -81,7 +81,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMatchingPrometheusPort
+    @ConditionalOnPrometheusPort(PrometheusPortMode.MATCHES_APPLICATION_PORT)
     PrometheusScrapeEndpoint prometheusEndpoint(
             PrometheusRegistry prometheusRegistry, PrometheusConfig prometheusConfig) {
         return new PrometheusScrapeEndpoint(prometheusRegistry, prometheusConfig.prometheusProperties());
@@ -101,7 +101,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMatchingPrometheusPort(matches = false)
+    @ConditionalOnPrometheusPort(PrometheusPortMode.CUSTOM_PORT_CONFIGURED)
     HTTPServer prometheusHttpServer(
             PrometheusMeterRegistry prometheusMeterRegistry, PrometheusProperties prometheusProperties)
             throws IOException {

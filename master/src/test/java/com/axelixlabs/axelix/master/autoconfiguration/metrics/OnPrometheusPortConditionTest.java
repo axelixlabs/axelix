@@ -33,11 +33,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link OnMatchingPrometheusPortCondition}.
+ * Unit tests for {@link OnPrometheusPortCondition}.
  *
  * @author Dmitry Mazurov
  */
-class OnMatchingPrometheusPortConditionTest {
+class OnPrometheusPortConditionTest {
 
     @ParameterizedTest // GH-1520
     @CsvSource({
@@ -70,7 +70,7 @@ class OnMatchingPrometheusPortConditionTest {
         AnnotatedTypeMetadata metadata = mock(AnnotatedTypeMetadata.class);
         when(metadata.getAnnotations()).thenReturn(MergedAnnotations.from(annotatedMarker));
 
-        OnMatchingPrometheusPortCondition condition = new OnMatchingPrometheusPortCondition();
+        OnPrometheusPortCondition condition = new OnPrometheusPortCondition();
 
         // when.
         ConditionOutcome outcome = condition.getMatchOutcome(context, metadata);
@@ -79,9 +79,9 @@ class OnMatchingPrometheusPortConditionTest {
         assertThat(outcome.isMatch()).isEqualTo(expectedOutcome);
     }
 
-    @ConditionalOnMatchingPrometheusPort
+    @ConditionalOnPrometheusPort(PrometheusPortMode.MATCHES_APPLICATION_PORT)
     private static final class MatchesTrueMarker {}
 
-    @ConditionalOnMatchingPrometheusPort(matches = false)
+    @ConditionalOnPrometheusPort(PrometheusPortMode.CUSTOM_PORT_CONFIGURED)
     private static final class MatchesFalseMarker {}
 }

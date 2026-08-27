@@ -26,23 +26,22 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * Conditional annotation to activate configuration depending on whether
- * {@code axelix.master.metrics.prometheus.port} matches {@code server.port}: with the default
- * {@code matches = true}, activates when the ports match (Prometheus exposed through the
- * actuator); with {@code matches = false}, activates when they differ (Prometheus exposed
- * through a dedicated HTTP server).
+ * Conditional annotation to activate configuration depending on how
+ * {@code axelix.master.metrics.prometheus.port} relates to {@code server.port}: with
+ * {@link PrometheusPortMode#MATCHES_APPLICATION_PORT}, activates when the ports match (Prometheus
+ * exposed through the actuator); with {@link PrometheusPortMode#CUSTOM_PORT_CONFIGURED}, activates
+ * when they differ (Prometheus exposed through a dedicated HTTP server).
  *
  * @author Dmitry Mazurov
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Conditional(OnMatchingPrometheusPortCondition.class)
-public @interface ConditionalOnMatchingPrometheusPort {
+@Conditional(OnPrometheusPortCondition.class)
+public @interface ConditionalOnPrometheusPort {
 
     /**
-     * Whether this condition should match when the ports are equal ({@code true}, the default)
-     * or when they differ ({@code false}).
+     * Which port relationship this condition should match.
      */
-    boolean matches() default true;
+    PrometheusPortMode value();
 }

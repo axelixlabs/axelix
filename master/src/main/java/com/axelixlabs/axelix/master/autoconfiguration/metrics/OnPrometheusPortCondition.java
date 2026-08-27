@@ -28,15 +28,15 @@ import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusP
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 
 /**
- * Condition backing {@link ConditionalOnMatchingPrometheusPort}: matches when whether
+ * Condition backing {@link ConditionalOnPrometheusPort}: matches when whether
  * {@code axelix.master.metrics.prometheus.port} equals {@code server.port} agrees with the
- * annotation's {@code matches} attribute. Activates {@link PrometheusMetricsAutoConfiguration}'s
+ * annotation's {@link PrometheusPortMode}. Activates {@link PrometheusMetricsAutoConfiguration}'s
  * {@code prometheusEndpoint} bean when the ports match, and its {@code prometheusHttpServer} bean
  * when they differ.
  *
  * @author Dmitry Mazurov
  */
-public class OnMatchingPrometheusPortCondition extends SpringBootCondition {
+public class OnPrometheusPortCondition extends SpringBootCondition {
 
     // Environment does not expose server.port when it is left unset - Boot's embedded web server
     // falls back to this port on its own, so mirror that default here.
@@ -44,10 +44,11 @@ public class OnMatchingPrometheusPortCondition extends SpringBootCondition {
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        MergedAnnotation<ConditionalOnMatchingPrometheusPort> annotation =
-                metadata.getAnnotations().get(ConditionalOnMatchingPrometheusPort.class);
+        MergedAnnotation<ConditionalOnPrometheusPort> annotation =
+                metadata.getAnnotations().get(ConditionalOnPrometheusPort.class);
 
-        boolean expectedMatch = annotation.getBoolean("matches");
+        boolean expectedMatch = annotation.getEnum("value", PrometheusPortMode.class)
+                == PrometheusPortMode.MATCHES_APPLICATION_PORT;
         boolean portsMatch = matchesServerPort(context.getEnvironment());
 
         if (portsMatch == expectedMatch) {
@@ -56,10 +57,8 @@ public class OnMatchingPrometheusPortCondition extends SpringBootCondition {
 
         return ConditionOutcome.noMatch(
                 expectedMatch
-                        ? "axelix.master.metrics.prometheus.port does not match server.port, "
-                                + "Prometheus is exposed through a dedicated HTTP server instead"
-                        : "axelix.master.metrics.prometheus.port matches server.port, "
-                                + "Prometheus is exposed through the actuator instead");
+                        ? "Prometheus is exposed through a dedicated HTTP server instead"
+                        : "Prometheus is exposed through the actuator instead");
     }
 
     /**
