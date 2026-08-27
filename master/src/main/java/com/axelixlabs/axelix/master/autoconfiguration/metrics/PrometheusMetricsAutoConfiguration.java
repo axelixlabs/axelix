@@ -43,6 +43,8 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.S
 import org.springframework.context.annotation.Bean;
 
 import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.CUSTOM_PORT_CONFIGURED;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.MATCHES_APPLICATION_PORT;
 
 /**
  * Prometheus metrics related auto-configuration.
@@ -81,7 +83,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnPrometheusPort(PrometheusPortMode.MATCHES_APPLICATION_PORT)
+    @ConditionalOnPrometheusPort(MATCHES_APPLICATION_PORT)
     PrometheusScrapeEndpoint prometheusEndpoint(
             PrometheusRegistry prometheusRegistry, PrometheusConfig prometheusConfig) {
         return new PrometheusScrapeEndpoint(prometheusRegistry, prometheusConfig.prometheusProperties());
@@ -101,7 +103,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnPrometheusPort(PrometheusPortMode.CUSTOM_PORT_CONFIGURED)
+    @ConditionalOnPrometheusPort(CUSTOM_PORT_CONFIGURED)
     HTTPServer prometheusHttpServer(
             PrometheusMeterRegistry prometheusMeterRegistry, PrometheusProperties prometheusProperties)
             throws IOException {

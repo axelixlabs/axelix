@@ -28,9 +28,9 @@ import org.springframework.context.annotation.Conditional;
 /**
  * Conditional annotation to activate configuration depending on how
  * {@code axelix.master.metrics.prometheus.port} relates to {@code server.port}: with
- * {@link PrometheusPortMode#MATCHES_APPLICATION_PORT}, activates when the ports match (Prometheus
- * exposed through the actuator); with {@link PrometheusPortMode#CUSTOM_PORT_CONFIGURED}, activates
- * when they differ (Prometheus exposed through a dedicated HTTP server).
+ * {@link Mode#MATCHES_APPLICATION_PORT}, activates when the ports match (Prometheus exposed
+ * through the actuator); with {@link Mode#CUSTOM_PORT_CONFIGURED}, activates when they differ
+ * (Prometheus exposed through a dedicated HTTP server).
  *
  * @author Dmitry Mazurov
  */
@@ -43,5 +43,22 @@ public @interface ConditionalOnPrometheusPort {
     /**
      * Which port relationship this condition should match.
      */
-    PrometheusPortMode value();
+    Mode value();
+
+    /**
+     * How {@code axelix.master.metrics.prometheus.port} relates to {@code server.port}.
+     */
+    enum Mode {
+        /**
+         * {@code axelix.master.metrics.prometheus.port} is unset or equals {@code server.port}:
+         * Prometheus is exposed through the actuator.
+         */
+        MATCHES_APPLICATION_PORT,
+
+        /**
+         * {@code axelix.master.metrics.prometheus.port} is explicitly set to a different port:
+         * Prometheus is exposed through a dedicated HTTP server.
+         */
+        CUSTOM_PORT_CONFIGURED
+    }
 }

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
+import com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.ConditionContext;
@@ -24,13 +25,14 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.MATCHES_APPLICATION_PORT;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 
 /**
  * Condition backing {@link ConditionalOnPrometheusPort}: matches when whether
  * {@code axelix.master.metrics.prometheus.port} equals {@code server.port} agrees with the
- * annotation's {@link PrometheusPortMode}. Activates {@link PrometheusMetricsAutoConfiguration}'s
+ * annotation's {@link Mode}. Activates {@link PrometheusMetricsAutoConfiguration}'s
  * {@code prometheusEndpoint} bean when the ports match, and its {@code prometheusHttpServer} bean
  * when they differ.
  *
@@ -47,8 +49,7 @@ public class OnPrometheusPortCondition extends SpringBootCondition {
         MergedAnnotation<ConditionalOnPrometheusPort> annotation =
                 metadata.getAnnotations().get(ConditionalOnPrometheusPort.class);
 
-        boolean expectedMatch = annotation.getEnum("value", PrometheusPortMode.class)
-                == PrometheusPortMode.MATCHES_APPLICATION_PORT;
+        boolean expectedMatch = annotation.getEnum("value", Mode.class) == MATCHES_APPLICATION_PORT;
         boolean portsMatch = matchesServerPort(context.getEnvironment());
 
         if (portsMatch == expectedMatch) {
