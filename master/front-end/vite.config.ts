@@ -19,11 +19,10 @@ import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 
 import * as path from "path";
-import license from "rollup-plugin-license";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 
-export default defineConfig(({ command }) => {
+export default defineConfig(() => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
     const env = loadEnv("", process.cwd(), "");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:8080";
@@ -36,38 +35,6 @@ export default defineConfig(({ command }) => {
             }),
             svgr(),
         ],
-        build: {
-            rollupOptions: {
-                plugins:
-                    command === "build"
-                        ? [
-                              license({
-                                  thirdParty: {
-                                      includePrivate: false,
-                                      output: {
-                                          file: path.resolve(
-                                              __dirname,
-                                              "reports/dependency-license/THIRD-PARTY-NOTICES.txt",
-                                          ),
-                                          template(dependencies) {
-                                              const separator = "-".repeat(80);
-
-                                              return dependencies
-                                                  .map((dep) => {
-                                                      const notice = dep.noticeText ? `\n\n${dep.noticeText}` : "";
-                                                      const text = dep.licenseText ? `\n\n${dep.licenseText}` : "";
-
-                                                      return `${dep.name}@${dep.version}\nLicense: ${dep.license}${text}${notice}`;
-                                                  })
-                                                  .join(`\n\n${separator}\n\n`);
-                                          },
-                                      },
-                                  },
-                              }),
-                          ]
-                        : [],
-            },
-        },
         server: {
             port: 3000,
             proxy: {
