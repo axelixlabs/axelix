@@ -36,10 +36,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.common.auth.service.AuthorityDecoder;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder.AuthoritiesContributor;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -130,9 +130,9 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public AuthorityDecoder authorityDecoder(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
+    public AuthoritiesManager authorityDecoder(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
 
-        return new DefaultAuthorityDecoder(authoritiesContributor.getIfAvailable());
+        return new DefaultAuthoritiesManager(authoritiesContributor.getIfAvailable());
     }
 
     @Bean
@@ -165,9 +165,9 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthorityDecoder authorityDecoder) {
+        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
             return new DefaultJwtDecoderService(
-                    authorityDecoder, jwtProperties.algorithm(), jwtProperties.signingKey());
+                    authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 
@@ -231,9 +231,11 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
-                SuperAdminConfigurationProperties staticCredentialsConfig, PasswordEncoder passwordEncoder) {
+                SuperAdminConfigurationProperties staticCredentialsConfig,
+                PasswordEncoder passwordEncoder,
+                AuthoritiesManager authoritiesManager) {
             return new SuperAdminUserAuthenticator(
-                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder));
+                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder), authoritiesManager);
         }
     }
 

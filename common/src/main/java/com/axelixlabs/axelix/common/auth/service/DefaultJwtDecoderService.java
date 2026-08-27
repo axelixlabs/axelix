@@ -29,9 +29,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.lang.Assert;
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -50,14 +52,14 @@ import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 public class DefaultJwtDecoderService implements JwtDecoderService {
 
     private final JwtVerificationStrategy verificationStrategy;
-    private final AuthorityDecoder authorityDecoder;
+    private final AuthoritiesManager authoritiesManager;
     private final String signingKey;
 
-    public DefaultJwtDecoderService(AuthorityDecoder authorityDecoder, JwtAlgorithm algorithm, String signingKey) {
+    public DefaultJwtDecoderService(AuthoritiesManager authoritiesManager, JwtAlgorithm algorithm, String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
         Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 
-        this.authorityDecoder = authorityDecoder;
+        this.authoritiesManager = authoritiesManager;
         this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
         this.signingKey = Objects.requireNonNull(signingKey);
     }
@@ -105,7 +107,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
 
         Set<Authority> authorities = authoritiesList.stream()
-                .map(authorityDecoder::decode)
+                .map(this::parseAuthority)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -116,5 +118,19 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         Set<Role> componentRoles = components.stream().map(this::mapToRole).collect(Collectors.toSet());
 
         return new DefaultRole(roleName, authorities, componentRoles);
+    }
+
+    private @Nullable Authority parseAuthority(String it) {
+        return Optional.ofNullable(authoritiesManager.decode(it)).orElseGet(() -> {
+            // well, this is not really clear that we need some complicated processing for internal authorities yet,
+            // so it is implemented in this way. We may in the future revisit the AuthoritiesAccessor or introduce
+            // some abstraction that is capable to resolve Internal Authorities, but as of now, I think, it is a bit
+            // redundant
+            if (InternalAuthorities.HEART_BEATING_AUTHORITY.getName().equals(it)) {
+                return InternalAuthorities.HEART_BEATING_AUTHORITY;
+            } else {
+                return null;
+            }
+        });
     }
 }

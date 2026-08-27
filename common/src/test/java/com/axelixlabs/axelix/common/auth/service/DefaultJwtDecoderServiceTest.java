@@ -70,7 +70,7 @@ class DefaultJwtDecoderServiceTest {
     private JwtEncoderService jwtEncoderService;
 
     @Autowired
-    private AuthorityDecoder authorityDecoder;
+    private AuthoritiesManager authoritiesManager;
 
     @ParameterizedTest
     @MethodSource("roles")
@@ -147,7 +147,7 @@ class DefaultJwtDecoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
         String token = encoder.generateToken(new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR)));
-        JwtDecoderService decoder256 = new DefaultJwtDecoderService(authorityDecoder, JwtAlgorithm.HMAC256, key256);
+        JwtDecoderService decoder256 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC256, key256);
 
         // when.
         PasswordlessUser decodedUser = decoder256.decodeTokenToUser(token);
@@ -170,7 +170,7 @@ class DefaultJwtDecoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
         String token = encoder.generateToken(new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
-        JwtDecoderService decoder384 = new DefaultJwtDecoderService(authorityDecoder, JwtAlgorithm.HMAC384, key384);
+        JwtDecoderService decoder384 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC384, key384);
 
         // when.
         PasswordlessUser decodedUser = decoder384.decodeTokenToUser(token);
@@ -275,16 +275,16 @@ class DefaultJwtDecoderServiceTest {
     static class JwtDecoderServiceConfig {
 
         @Bean
-        AuthorityDecoder authorityDecoder() {
-            return new DefaultAuthorityDecoder(() -> Set.of(CustomAuthority.CUSTOM_AUTHORITY));
+        AuthoritiesManager authorityDecoder() {
+            return new DefaultAuthoritiesManager(() -> Set.of(CustomAuthority.CUSTOM_AUTHORITY));
         }
 
         @Bean
         public JwtDecoderService jwtDecoderService(
-                final AuthorityDecoder authorityDecoder,
+                final AuthoritiesManager authoritiesManager,
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtDecoderService(authorityDecoder, algorithm, signingKey);
+            return new DefaultJwtDecoderService(authoritiesManager, algorithm, signingKey);
         }
 
         @Bean

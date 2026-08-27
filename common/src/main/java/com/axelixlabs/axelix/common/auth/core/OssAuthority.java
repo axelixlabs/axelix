@@ -66,7 +66,6 @@ public enum OssAuthority implements Authority {
 
     /**
      * Grants the right to view managed users.
-     * <p>Reserved for the {@code DefaultRole.SUPER_ADMIN} role.</p>
      */
     USERS_VIEW,
 

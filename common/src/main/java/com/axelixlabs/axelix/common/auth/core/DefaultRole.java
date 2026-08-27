@@ -32,13 +32,9 @@ import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.HEART_B
  */
 public final class DefaultRole implements Role {
 
-    public static final Role SUPER_ADMIN;
     public static final Role MANAGED_SERVICE;
 
     static {
-        // TODO: That is by itself wrong design. It will not account for extensibility
-        SUPER_ADMIN = new DefaultRole("SUPER_ADMIN", OssAuthority.asSet());
-
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(HEART_BEATING_AUTHORITY));
     }
 
@@ -48,8 +44,8 @@ public final class DefaultRole implements Role {
 
     public DefaultRole(String name, Set<Authority> authorities, Set<Role> components) {
         this.name = name;
-        this.authorities = authorities != null ? authorities : Collections.emptySet();
-        this.components = components != null ? components : Collections.emptySet();
+        this.authorities = authorities;
+        this.components = components;
     }
 
     public DefaultRole(String name, Set<Authority> authorities) {

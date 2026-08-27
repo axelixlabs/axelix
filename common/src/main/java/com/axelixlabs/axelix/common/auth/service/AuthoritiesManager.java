@@ -17,21 +17,33 @@
  */
 package com.axelixlabs.axelix.common.auth.service;
 
+import java.util.Set;
+
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 
 /**
- * An abstraction that is capable to parse the authority name given as a plan {@link String}
- * into the correct {@link Authority} implementation.
+ * An abstraction that serves as the single accessor for all the {@link Authority authorities}
+ * in the application.
+ * <p>
+ * Note, that this abstraction is now aware of the {@link InternalAuthorities}.
  *
  * @author Mikhail Polivakha
  */
-public interface AuthorityDecoder {
+public interface AuthoritiesManager {
 
     /**
      * Constructs the necessary authority
+     *
+     * @return the authority associated with the given {@code name}, or {@code null}, if there is no.
      */
     @Nullable
     Authority decode(String name);
+
+    /**
+     * @return all the authorities this accessor is aware about.
+     */
+    Set<Authority> getAll();
 }

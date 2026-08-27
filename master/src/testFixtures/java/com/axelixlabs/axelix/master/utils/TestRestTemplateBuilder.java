@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.utils;
 
 import java.time.Duration;
+import java.util.Set;
 
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -27,6 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -81,6 +84,14 @@ public class TestRestTemplateBuilder {
 
     public IdentityAwareTestRestTemplate asEditor() {
         return withRole(TestRoles.EDITOR);
+    }
+
+    public IdentityAwareTestRestTemplate asUsersFeedViewer() {
+        return withRole(new DefaultRole("USERS_FEED_VIEWER", Set.of(OssAuthority.USERS_VIEW)));
+    }
+
+    public IdentityAwareTestRestTemplate asUsersFeedEditor() {
+        return withRole(new DefaultRole("USERS_FEED_EDITOR", Set.of(OssAuthority.USERS_MANAGEMENT)));
     }
 
     public IdentityAwareTestRestTemplate withRole(Role role) {

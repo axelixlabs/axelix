@@ -29,15 +29,15 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 
 /**
- * Default implementation of {@link AuthorityDecoder}.
+ * Default implementation of {@link AuthoritiesManager}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultAuthorityDecoder implements AuthorityDecoder {
+public class DefaultAuthoritiesManager implements AuthoritiesManager {
 
     private final Map<String, Authority> effectiveAuthorities;
 
-    public DefaultAuthorityDecoder(@Nullable AuthoritiesContributor authoritiesContributor) {
+    public DefaultAuthoritiesManager(@Nullable AuthoritiesContributor authoritiesContributor) {
         Set<Authority> effectiveAuthorities = new HashSet<>(OssAuthority.asSet());
 
         if (authoritiesContributor != null) {
@@ -59,9 +59,14 @@ public class DefaultAuthorityDecoder implements AuthorityDecoder {
         return effectiveAuthorities.get(name);
     }
 
+    @Override
+    public Set<Authority> getAll() {
+        return new HashSet<>(effectiveAuthorities.values());
+    }
+
     /**
      * An SPI interface meant to be implemented by anybody who wants to contribute
-     * authorities into the {@link DefaultAuthorityDecoder}.
+     * authorities into the {@link DefaultAuthoritiesManager}.
      *
      * @author Mikhail Polivakha
      */

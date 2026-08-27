@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.service.AuthorityDecoder;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityName;
 
@@ -50,11 +50,11 @@ import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityN
 public class DatabaseRoleService implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final AuthorityDecoder authorityDecoder;
+    private final AuthoritiesManager authoritiesManager;
 
-    public DatabaseRoleService(RoleRepository roleRepository, AuthorityDecoder authorityDecoder) {
+    public DatabaseRoleService(RoleRepository roleRepository, AuthoritiesManager authoritiesManager) {
         this.roleRepository = roleRepository;
-        this.authorityDecoder = authorityDecoder;
+        this.authoritiesManager = authoritiesManager;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class DatabaseRoleService implements RoleService {
 
         Set<Authority> authorities = rows.stream()
                 .flatMap(row -> Optional.ofNullable(row.authorityName()).stream())
-                .map(authorityDecoder::decode)
+                .map(authoritiesManager::decode)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -82,7 +82,7 @@ public class DatabaseRoleService implements RoleService {
         for (RoleWithAuthorityName row : rows) {
             Set<Authority> authorities = authoritiesByRole.computeIfAbsent(row.roleName(), _ -> new HashSet<>());
             if (row.authorityName() != null) {
-                Optional.ofNullable(authorityDecoder.decode(row.authorityName()))
+                Optional.ofNullable(authoritiesManager.decode(row.authorityName()))
                         .ifPresent(authorities::add);
             }
         }

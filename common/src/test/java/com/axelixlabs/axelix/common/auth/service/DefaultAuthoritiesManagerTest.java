@@ -25,21 +25,21 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder.AuthoritiesContributor;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link DefaultAuthorityDecoder}.
+ * Unit tests for {@link DefaultAuthoritiesManager}.
  *
  * @author Mikhail Polivakha
  */
-class DefaultAuthorityDecoderTest {
+class DefaultAuthoritiesManagerTest {
 
     @ParameterizedTest
     @EnumSource(OssAuthority.class)
     void shouldDecodeEveryOssAuthority(OssAuthority authority) {
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(null);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(null);
 
         Authority decoded = decoder.decode(authority.getName());
 
@@ -48,28 +48,28 @@ class DefaultAuthorityDecoderTest {
 
     @Test
     void shouldReturnNull_WhenNameIsUnknown() {
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(null);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(null);
 
         assertThat(decoder.decode("NON_EXISTENT_AUTHORITY")).isNull();
     }
 
     @Test
     void shouldDecodeDefaultAuthorities_WhenContributorIsNull() {
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(null);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(null);
 
         assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
     }
 
     @Test
     void shouldDecodeDefaultAuthorities_WhenContributorContributesNull() {
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(() -> null);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(() -> null);
 
         assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
     }
 
     @Test
     void shouldDecodeDefaultAuthorities_WhenContributorContributesEmptySet() {
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(Set::of);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(Set::of);
 
         assertThat(decoder.decode(OssAuthority.USERS_VIEW.getName())).isSameAs(OssAuthority.USERS_VIEW);
     }
@@ -79,7 +79,7 @@ class DefaultAuthorityDecoderTest {
         Authority contributed = () -> "CUSTOM_AUTHORITY";
         AuthoritiesContributor contributor = () -> Set.of(contributed);
 
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(contributor);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(contributor);
 
         assertThat(decoder.decode("CUSTOM_AUTHORITY")).isEqualTo(contributed);
     }
@@ -89,7 +89,7 @@ class DefaultAuthorityDecoderTest {
         Authority contributed = () -> "CUSTOM_AUTHORITY";
         AuthoritiesContributor contributor = () -> Set.of(contributed);
 
-        DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(contributor);
+        DefaultAuthoritiesManager decoder = new DefaultAuthoritiesManager(contributor);
 
         assertThat(decoder.decode("CUSTOM_AUTHORITY")).isEqualTo(contributed);
         assertThat(decoder.decode(OssAuthority.CACHES_CLEAR.getName())).isEqualTo(OssAuthority.CACHES_CLEAR);

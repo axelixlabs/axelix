@@ -55,23 +55,6 @@ class DefaultAuthorizerTest {
     }
 
     @Test
-    void shouldAuthorize_UserSuperAdminHasRequiredAuthorities() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.SUPER_ADMIN));
-
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(
-                OssAuthority.SCHEDULED_TASKS_MODIFY,
-                OssAuthority.CACHES_CLEAR,
-                OssAuthority.CACHES_TOGGLE,
-                OssAuthority.GARBAGE_COLLECTOR,
-                OssAuthority.CONFIG_PROPS_VALUES_READ,
-                OssAuthority.ENV_VALUES_READ,
-                OssAuthority.USERS_MANAGEMENT,
-                OssAuthority.USERS_VIEW));
-
-        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
-    }
-
-    @Test
     void shouldAuthorize_UserAdminHasRequiredAuthorities() {
         PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.ADMIN));
 
