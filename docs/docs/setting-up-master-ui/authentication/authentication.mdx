@@ -29,13 +29,45 @@ local users, followed by a single **Sign in with OAuth2/OIDC Provider** button w
 
 ### Super-admin
 
-The built-in super-admin is the only account that is always active. Master compares the submitted credentials directly
-to `axelix.master.auth.options.super-admin.credentials.username` / `.password` — no database. Successful
-sign-in grants the `SUPER_ADMIN` role, which carries every authority Master defines (see [Roles and
-authorities](#roles-and-authorities)).
+The built-in super-admin is the only account that is always active. You can think of super-admin as the _"God Mode"_ user in Axelix:
 
-This account is meant to bootstrap Master and to recover access when other providers are misconfigured. Override the
-defaults before exposing Master to anyone — `admin / admin` grants full control over every monitored service.
+1. It carries all the authorities possible.
+2. It is build-in and _always_ active. It cannot be turned-off/deleted (see below why).
+3. It cannot be edited or modified, although, you can (and should!) change its username/password via
+`axelix.master.auth.options.super-admin.credentials.username` / `.password` settings. Note, **that these settings are re-applied
+on every Axelix Master boot** - not just during initial setup!
+
+#### When to use it
+
+Super-admin exists for two moments, not for everyday operation:
+
+1. **Initial setup.** On a fresh Master there are no other accounts yet. Sign in as super-admin to do the first-run
+   work: set up the license, create your first local users, and arrange the privileged roles that your team will use
+   from then on.
+2. **Break-glass recovery.** When the accounts your team normally uses stop working — an OIDC role mapping that resolves
+   everyone to `VIEWER`, a mistyped `issuer-uri`, an admin accidentally got deleted — super-admin is the escape hatch. Because it never
+   depends on the database or an external identity provider, it keeps letting you in while you fix whatever broke.
+
+For day-to-day work, sign in with a local or OIDC account instead. Reserve super-admin for setup and rescue.
+
+#### How it differs from other accounts
+
+The other two sign-in options leave a record in Master's database; super-admin does not.
+
+- **Local users** live entirely in Master's database and are managed from the **Users** screen.
+- **OIDC users** are owned by your identity provider, but Master still persists a record for each one — including the
+  role it resolved from `role-attribute-path` — so it can show them on the **Users** screen and reuse the mapping.
+- **Super-admin** has no database record at all. Its credentials live only in configuration. It never appears on the
+  **Users** screen, and its username is reserved: no local or OIDC user can be created, renamed, edited, or deleted into
+  that username. As a result the super-admin account itself cannot be edited or deleted from the UI.
+
+:::tip
+To change the super-admin username or password, edit `axelix.master.auth.options.super-admin.credentials` and restart
+Master. There is no in-app way to do it, by design.
+:::
+
+Override the defaults before exposing Master to anyone — `admin / admin` grants full control over every monitored
+service.
 
 The password can be provided in one of the following formats:
 
