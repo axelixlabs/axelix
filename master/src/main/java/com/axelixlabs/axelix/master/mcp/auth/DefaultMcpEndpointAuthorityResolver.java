@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 
@@ -35,10 +35,11 @@ public class DefaultMcpEndpointAuthorityResolver implements McpEndpointAuthority
 
     private static final Map<McpEndpoint, Authority> MAPPING;
 
+    // TODO: Static configuration like here is not extensible at all. That is not going to work for unified distro
     static {
         MAPPING = new HashMap<>(2);
-        MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, DefaultAuthority.CACHES_CLEAR);
-        MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, DefaultAuthority.CACHES_CLEAR);
+        MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
+        MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, OssAuthority.CACHES_CLEAR);
     }
 
     @Override

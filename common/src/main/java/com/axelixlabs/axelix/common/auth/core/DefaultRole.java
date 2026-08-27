@@ -37,7 +37,7 @@ public final class DefaultRole implements Role {
 
     static {
         // TODO: That is by itself wrong design. It will not account for extensibility
-        SUPER_ADMIN = new DefaultRole("SUPER_ADMIN", DefaultAuthority.asSet());
+        SUPER_ADMIN = new DefaultRole("SUPER_ADMIN", OssAuthority.asSet());
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(HEART_BEATING_AUTHORITY));
     }

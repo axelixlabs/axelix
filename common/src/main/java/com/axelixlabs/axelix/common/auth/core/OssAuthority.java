@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public enum DefaultAuthority implements Authority {
+public enum OssAuthority implements Authority {
 
     /**
      * Grants the right to view values in Environment.

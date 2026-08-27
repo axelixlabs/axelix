@@ -34,8 +34,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,21 +48,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class BadAuthorityEndpointInvocationContext implements TestTemplateInvocationContext {
 
-    private final DefaultAuthority accessAuthority;
+    private final OssAuthority accessAuthority;
 
     /**
      * @param accessAuthority  the authority that is required to access the given endpoint. The assumption is that for
      *                         any given endpoint there will be just one authority required. Therefore, everything else,
      *                         any other authority except this one MUST produce 403 from the backend.
      */
-    public BadAuthorityEndpointInvocationContext(DefaultAuthority accessAuthority) {
+    public BadAuthorityEndpointInvocationContext(OssAuthority accessAuthority) {
         this.accessAuthority = accessAuthority;
     }
 
     @Override
     public @NonNull List<Extension> getAdditionalExtensions() {
 
-        EnumSet<DefaultAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
+        EnumSet<OssAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
 
         return allTheOtherAuthorities.stream()
                 .map(defaultAuthority -> (Extension) new TestInvocationCallback(defaultAuthority))

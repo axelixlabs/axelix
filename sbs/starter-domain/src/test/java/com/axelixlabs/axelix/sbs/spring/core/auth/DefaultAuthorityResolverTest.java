@@ -28,7 +28,7 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +52,7 @@ class DefaultAuthorityResolverTest {
 
     @ParameterizedTest
     @MethodSource("defaultAuthority")
-    void shouldResolveAuthority(String path, HttpMethod httpMethod, DefaultAuthority authority) {
+    void shouldResolveAuthority(String path, HttpMethod httpMethod, OssAuthority authority) {
         assertThat(authorityResolver.resolve(path, httpMethod)).contains(authority);
     }
 
@@ -63,54 +63,45 @@ class DefaultAuthorityResolverTest {
                 Arguments.of(
                         "/axelix-scheduled-tasks/modify/cron-expression",
                         HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                        OssAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
                         "/axelix-scheduled-tasks/modify/interval",
                         HttpMethod.POST,
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/axelix-scheduled-tasks/enable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/axelix-scheduled-tasks/disable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        "/axelix-scheduled-tasks/execute", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                        OssAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/enable", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/disable", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/execute", HttpMethod.POST, OssAuthority.SCHEDULED_TASKS_MODIFY),
 
                 // CACHES_CLEAR
-                Arguments.of("/axelix-caches/clear", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/clear", HttpMethod.DELETE, OssAuthority.CACHES_CLEAR),
                 Arguments.of(
                         "/axelix-caches/{cacheManagerName}/{cacheName}/clear",
                         HttpMethod.DELETE,
-                        DefaultAuthority.CACHES_CLEAR),
+                        OssAuthority.CACHES_CLEAR),
                 Arguments.of(
-                        "/axelix-caches/cacheManager/cacheName/clear",
-                        HttpMethod.DELETE,
-                        DefaultAuthority.CACHES_CLEAR),
-                Arguments.of("/axelix-caches/cacheManager/clear-all", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                        "/axelix-caches/cacheManager/cacheName/clear", HttpMethod.DELETE, OssAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/cacheManager/clear-all", HttpMethod.DELETE, OssAuthority.CACHES_CLEAR),
 
                 // CACHES_TOGGLE
                 Arguments.of(
                         "/axelix-caches/{cacheManagerName}/{cacheName}/enable",
                         HttpMethod.POST,
-                        DefaultAuthority.CACHES_TOGGLE),
+                        OssAuthority.CACHES_TOGGLE),
                 Arguments.of(
-                        "/axelix-caches/cacheManager/cacheName/enable",
-                        HttpMethod.POST,
-                        DefaultAuthority.CACHES_TOGGLE),
+                        "/axelix-caches/cacheManager/cacheName/enable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
                 Arguments.of(
                         "/axelix-caches/{cacheManagerName}/{cacheName}/disable",
                         HttpMethod.POST,
-                        DefaultAuthority.CACHES_TOGGLE),
+                        OssAuthority.CACHES_TOGGLE),
                 Arguments.of(
-                        "/axelix-caches/cacheManager/cacheName/disable",
-                        HttpMethod.POST,
-                        DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                        "/axelix-caches/cacheManager/cacheName/disable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/enable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/disable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
 
                 // GC
-                Arguments.of("/axelix-gc/trigger", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of("/axelix-gc/log/enable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of("/axelix-gc/log/disable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR));
+                Arguments.of("/axelix-gc/trigger", HttpMethod.POST, OssAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/enable", HttpMethod.POST, OssAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/disable", HttpMethod.POST, OssAuthority.GARBAGE_COLLECTOR));
     }
 
     @ParameterizedTest

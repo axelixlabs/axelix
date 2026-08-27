@@ -28,8 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
@@ -78,8 +78,7 @@ class DefaultCookieServiceTest {
     @Test
     void buildAuthoritiesMetadataCookie_WithDistinctAuthorities_ReturnsBase64EncodedJsonCookie() {
         // given.
-        Role targetRole =
-                new DefaultRole("OBSERVER", Set.of(DefaultAuthority.CACHES_TOGGLE, DefaultAuthority.ENV_VALUES_READ));
+        Role targetRole = new DefaultRole("OBSERVER", Set.of(OssAuthority.CACHES_TOGGLE, OssAuthority.ENV_VALUES_READ));
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
@@ -95,8 +94,8 @@ class DefaultCookieServiceTest {
             assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
         assertThat(decodedValue).startsWith("[").endsWith("]");
-        assertThat(decodedValue).contains(DefaultAuthority.CACHES_TOGGLE.name());
-        assertThat(decodedValue).contains(DefaultAuthority.ENV_VALUES_READ.name());
+        assertThat(decodedValue).contains(OssAuthority.CACHES_TOGGLE.name());
+        assertThat(decodedValue).contains(OssAuthority.ENV_VALUES_READ.name());
     }
 
     @Test

@@ -41,7 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
@@ -205,8 +205,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         assertThat(authoritiesCookie)
                 .doesNotContain(
-                        DefaultAuthority.ENV_VALUES_READ.getName(),
-                        DefaultAuthority.CONFIG_PROPS_VALUES_READ.getName());
+                        OssAuthority.ENV_VALUES_READ.getName(), OssAuthority.CONFIG_PROPS_VALUES_READ.getName());
 
         // Verify that the OIDC user was correctly provisioned and persisted in the database
         UserEntity userEntity = userRepository.findByUsername(username).get();

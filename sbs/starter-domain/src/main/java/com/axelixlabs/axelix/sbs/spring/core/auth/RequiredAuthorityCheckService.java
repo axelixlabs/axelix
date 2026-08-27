@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
@@ -36,11 +36,11 @@ public class RequiredAuthorityCheckService {
         this.securityContextExecutor = securityContextExecutor;
     }
 
-    public boolean hasAuthority(DefaultAuthority requiredAuthority) throws AuthorizationException {
+    public boolean hasAuthority(OssAuthority requiredAuthority) throws AuthorizationException {
         return userHasAuthority(securityContextExecutor.requireSecurityContext().currentUser(), requiredAuthority);
     }
 
-    private boolean userHasAuthority(User user, DefaultAuthority requiredAuthority) {
+    private boolean userHasAuthority(User user, OssAuthority requiredAuthority) {
         return user.getRoles().stream()
                 .flatMap(role -> role.getAuthorities().stream())
                 .anyMatch(authority -> authority.getName().equals(requiredAuthority.getName()));

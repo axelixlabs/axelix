@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 
 /**
  * Default implementation of {@link AuthorityDecoder}.
@@ -38,7 +38,7 @@ public class DefaultAuthorityDecoder implements AuthorityDecoder {
     private final Map<String, Authority> effectiveAuthorities;
 
     public DefaultAuthorityDecoder(@Nullable AuthoritiesContributor authoritiesContributor) {
-        Set<Authority> effectiveAuthorities = new HashSet<>(DefaultAuthority.asSet());
+        Set<Authority> effectiveAuthorities = new HashSet<>(OssAuthority.asSet());
 
         if (authoritiesContributor != null) {
 

@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -64,7 +64,7 @@ public @interface ProtectedEndpointTests {
      * The authority that is required to access this endpoint. The size of array is expected to always be either
      * zero or one, where zero means there is no authority to check for this endpoint.
      */
-    DefaultAuthority[] requiredAuthority() default {};
+    OssAuthority[] requiredAuthority() default {};
 
     /**
      * Optional JSON request body for POST, PUT, or PATCH. When empty, the request is sent without a body (same as
