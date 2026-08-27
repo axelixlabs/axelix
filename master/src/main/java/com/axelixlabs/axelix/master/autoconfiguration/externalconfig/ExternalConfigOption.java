@@ -39,7 +39,7 @@ public enum ExternalConfigOption implements Ordered {
      * imported last in {@code spring.config.import}. Values loaded from Vault have
      * the highest priority and override properties from all previously sources.
      */
-    VAULT(Ordered.LOWEST_PRECEDENCE, "vault://", Map.of("spring.cloud.vault.enabled", true));
+    VAULT(Ordered.LOWEST_PRECEDENCE, "optional:vault://", Map.of("spring.cloud.vault.enabled", true));
 
     private final int importOrder;
     private final String importLocation;
