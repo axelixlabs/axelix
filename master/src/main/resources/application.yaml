@@ -47,6 +47,8 @@ management:
 axelix:
   master:
     external-config:
+      options: []
+      vault:
       spring-cloud-config:
         enabled: false
         uri:
@@ -150,7 +152,3 @@ spring:
       name:      "${axelix.master.external-config.spring-cloud-config.name:}"
       username:  "${axelix.master.external-config.spring-cloud-config.username:}"
       password:  "${axelix.master.external-config.spring-cloud-config.password:}"
-
-    external-config:
-      options: []
-      vault:
