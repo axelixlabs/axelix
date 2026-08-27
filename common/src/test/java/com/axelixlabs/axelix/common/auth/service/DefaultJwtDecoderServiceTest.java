@@ -275,7 +275,7 @@ class DefaultJwtDecoderServiceTest {
     static class JwtDecoderServiceConfig {
 
         @Bean
-        AuthoritiesManager authorityDecoder() {
+        AuthoritiesManager authoritiesManager() {
             return new DefaultAuthoritiesManager(() -> Set.of(CustomAuthority.CUSTOM_AUTHORITY));
         }
 

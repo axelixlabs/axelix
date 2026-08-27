@@ -130,7 +130,7 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
-    public AuthoritiesManager authorityDecoder(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
+    public AuthoritiesManager authoritiesManager(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
 
         return new DefaultAuthoritiesManager(authoritiesContributor.getIfAvailable());
     }
