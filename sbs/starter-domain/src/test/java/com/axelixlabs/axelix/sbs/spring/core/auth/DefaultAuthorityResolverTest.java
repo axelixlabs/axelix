@@ -51,12 +51,12 @@ class DefaultAuthorityResolverTest {
     }
 
     @ParameterizedTest
-    @MethodSource("defaultAuthority")
+    @MethodSource("ossAuthority")
     void shouldResolveAuthority(String path, HttpMethod httpMethod, OssAuthority authority) {
         assertThat(authorityResolver.resolve(path, httpMethod)).contains(authority);
     }
 
-    private static Stream<Arguments> defaultAuthority() {
+    private static Stream<Arguments> ossAuthority() {
         return Stream.of(
 
                 // SCHEDULED_TASKS_MODIFY

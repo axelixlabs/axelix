@@ -38,7 +38,7 @@ class DefaultAuthorityDecoderTest {
 
     @ParameterizedTest
     @EnumSource(OssAuthority.class)
-    void shouldDecodeEveryDefaultAuthority(OssAuthority authority) {
+    void shouldDecodeEveryOssAuthority(OssAuthority authority) {
         DefaultAuthorityDecoder decoder = new DefaultAuthorityDecoder(null);
 
         Authority decoded = decoder.decode(authority.getName());

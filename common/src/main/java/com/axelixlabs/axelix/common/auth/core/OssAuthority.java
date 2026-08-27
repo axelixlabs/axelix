@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Enumeration of default authorities supported by Axelix.
+ * Enumeration of OSS authorities supported by Axelix.
  *
  * @see Authority
  * @author Sergey Cherkasov

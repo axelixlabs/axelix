@@ -66,7 +66,7 @@ public class BadAuthorityEndpointInvocationContext implements TestTemplateInvoca
         EnumSet<OssAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
 
         return allTheOtherAuthorities.stream()
-                .map(defaultAuthority -> (Extension) new TestInvocationCallback(defaultAuthority))
+                .map(ossAuthority -> (Extension) new TestInvocationCallback(ossAuthority))
                 .collect(Collectors.toList());
     }
 
