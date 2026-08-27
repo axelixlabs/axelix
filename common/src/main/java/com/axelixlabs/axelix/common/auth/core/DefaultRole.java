@@ -17,11 +17,9 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.HEART_BEATING_AUTHORITY;
 
@@ -38,8 +36,8 @@ public final class DefaultRole implements Role {
     public static final Role MANAGED_SERVICE;
 
     static {
-        SUPER_ADMIN = new DefaultRole(
-                "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toUnmodifiableSet()));
+        // TODO: That is by itself wrong design. It will not account for extensibility
+        SUPER_ADMIN = new DefaultRole("SUPER_ADMIN", DefaultAuthority.asSet());
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(HEART_BEATING_AUTHORITY));
     }

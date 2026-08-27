@@ -36,7 +36,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.service.AuthorityDecoder;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorityDecoder.AuthoritiesContributor;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -127,6 +130,12 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
+    public AuthorityDecoder authorityDecoder(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
+
+        return new DefaultAuthorityDecoder(authoritiesContributor.getIfAvailable());
+    }
+
+    @Bean
     public MasterRequestContextInitFilter masterRequestContextInitFilter(
             MasterWebEndpointResolver masterWebEndpointResolver,
             ObjectProvider<McpServerStreamableHttpProperties> mcpProperties,
@@ -156,8 +165,9 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
-            return new DefaultJwtDecoderService(jwtProperties.algorithm(), jwtProperties.signingKey());
+        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthorityDecoder authorityDecoder) {
+            return new DefaultJwtDecoderService(
+                    authorityDecoder, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 

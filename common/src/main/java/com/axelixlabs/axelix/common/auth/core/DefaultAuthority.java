@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Enumeration of default authorities supported by Axelix.
  *
@@ -71,6 +75,10 @@ public enum DefaultAuthority implements Authority {
      * <p>Allows creating, updating, and deleting managed users at runtime.</p>
      */
     USERS_MANAGEMENT;
+
+    public static Set<Authority> asSet() {
+        return Arrays.stream(values()).collect(Collectors.toSet());
+    }
 
     @Override
     public String getName() {

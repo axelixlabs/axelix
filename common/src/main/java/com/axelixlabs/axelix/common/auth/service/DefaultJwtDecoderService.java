@@ -50,13 +50,14 @@ import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 public class DefaultJwtDecoderService implements JwtDecoderService {
 
     private final JwtVerificationStrategy verificationStrategy;
-
+    private final AuthorityDecoder authorityDecoder;
     private final String signingKey;
 
-    public DefaultJwtDecoderService(JwtAlgorithm algorithm, String signingKey) {
+    public DefaultJwtDecoderService(AuthorityDecoder authorityDecoder, JwtAlgorithm algorithm, String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
         Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 
+        this.authorityDecoder = authorityDecoder;
         this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
         this.signingKey = Objects.requireNonNull(signingKey);
     }
@@ -103,8 +104,10 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         List<String> authoritiesList =
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
 
-        Set<Authority> authorities =
-                authoritiesList.stream().map(s -> (Authority) () -> s).collect(Collectors.toSet());
+        Set<Authority> authorities = authoritiesList.stream()
+                .map(authorityDecoder::decode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> components =
