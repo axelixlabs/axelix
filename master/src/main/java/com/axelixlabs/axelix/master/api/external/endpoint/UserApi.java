@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * The API for working with users.

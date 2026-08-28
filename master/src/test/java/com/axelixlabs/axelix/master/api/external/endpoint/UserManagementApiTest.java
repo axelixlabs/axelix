@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;

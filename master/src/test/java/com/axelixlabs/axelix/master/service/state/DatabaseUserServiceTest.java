@@ -39,6 +39,8 @@ import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
+import com.axelixlabs.axelix.master.service.state.auth.DatabaseUserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
