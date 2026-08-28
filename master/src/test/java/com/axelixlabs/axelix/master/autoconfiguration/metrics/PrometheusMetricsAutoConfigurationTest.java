@@ -38,6 +38,7 @@ import org.springframework.core.env.StandardEnvironment;
 
 import com.axelixlabs.axelix.master.utils.TestPortUtils;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PORT_RANGE_MAX;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -155,6 +156,22 @@ class PrometheusMetricsAutoConfigurationTest {
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=-1");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsAboveValidRange() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + (PORT_RANGE_MAX + 1));
 
             // when.
             contextRunner.run(context -> {
