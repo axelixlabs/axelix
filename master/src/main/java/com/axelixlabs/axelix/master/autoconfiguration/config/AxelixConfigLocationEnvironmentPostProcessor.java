@@ -68,8 +68,9 @@ public class AxelixConfigLocationEnvironmentPostProcessor implements Environment
             return;
         }
 
-        environment.getPropertySources().addLast(new MapPropertySource(
-                PROPERTY_SOURCE_NAME,
-                Map.of(SPRING_CONFIG_ADDITIONAL_LOCATION, location)));
+        environment
+                .getPropertySources()
+                .addLast(new MapPropertySource(
+                        PROPERTY_SOURCE_NAME, Map.of(SPRING_CONFIG_ADDITIONAL_LOCATION, location)));
     }
 }

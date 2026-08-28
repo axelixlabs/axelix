@@ -57,8 +57,7 @@ class AxelixConfigLocationEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(SPRING_CONFIG_ADDITIONAL_LOCATION))
-                .isNull();
+        assertThat(environment.getProperty(SPRING_CONFIG_ADDITIONAL_LOCATION)).isNull();
     }
 
     @Test
@@ -71,8 +70,7 @@ class AxelixConfigLocationEnvironmentPostProcessorTest {
         postProcessor.postProcessEnvironment(environment, application);
 
         // then.
-        assertThat(environment.getProperty(SPRING_CONFIG_ADDITIONAL_LOCATION))
-                .isNull();
+        assertThat(environment.getProperty(SPRING_CONFIG_ADDITIONAL_LOCATION)).isNull();
     }
 
     @Test
@@ -94,8 +92,7 @@ class AxelixConfigLocationEnvironmentPostProcessorTest {
         // given.
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty(
-                AXELIX_MASTER_CONFIG_LOCATION,
-                "optional:file:/etc/axelix/master.yaml,file:/opt/axelix/override.yaml");
+                AXELIX_MASTER_CONFIG_LOCATION, "optional:file:/etc/axelix/master.yaml,file:/opt/axelix/override.yaml");
 
         // when.
         postProcessor.postProcessEnvironment(environment, application);
