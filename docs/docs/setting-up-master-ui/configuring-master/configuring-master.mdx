@@ -71,6 +71,44 @@ prefer environment variables: the Docker and Docker Compose examples below use t
 anything sensitive into the logs.
 :::
 
+### Pointing Master at a config file
+
+<UpcomingReleaseNotice />
+
+The three sources above cover most setups, but it is often the case that you would want to supply a configuration to the Axelix Master
+from the external YAML pr properties file, for example from a file mounted into a container at a custom path.
+
+It can be achieved by providing the property named `axelix.master.config.location` to Axelix Master configuration.
+
+Since Axelix Master is a Spring Boot app, it carries the full set of location shapes Spring Boot understands: a single file,
+a directory, or a comma-separated list of either, each optionally prefixed with `file:` or `optional:` (the latter tolerates a missing
+file instead of failing startup). A file named here **adds to** Master's bundled defaults rather than replacing them —
+the values it defines win, and everything it leaves out keeps its default.
+
+<div className={styles.ConfigTable}>
+
+| Property                        | Default | Description                                                                                                                                                                                                 |
+|---------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.config.location` | empty   | Location of an external configuration file (or directory) to load on top of Master's defaults. Accepts a single path, a directory, or a comma-separated list, each with an optional `file:` / `optional:` prefix. |
+
+</div>
+
+Because this property decides *where* configuration is read from, it has to be known before that reading happens. Supply
+it via a **JVM system property** or an **environment variable** — not from inside the very file it points to:
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.jar
+```
+
+or, for a container, pass it as an environment variable and mount the file in:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
 ### General
 
 <UpcomingReleaseNotice />
@@ -353,7 +391,9 @@ hand Master that configuration in any of three interchangeable ways — Axelix M
 [Supplying properties](#supplying-properties)): as **environment variables** or **`-D` JVM system properties** on the
 command line (both shown next), or from an **external config file** such as `application.yaml` / `application.properties`.
 
-**Environment variables** — handy when your shell or process manager already exports the values:
+#### Environment variables
+
+Handy when your shell or process manager already exports the values:
 
 ```bash
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
@@ -362,13 +402,34 @@ export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 java -jar master.jar
 ```
 
-**JVM system properties (`-D`)** — convenient for a quick one-off launch:
+#### JVM system properties (-D)
+
+Convenient for a quick one-off launch:
 
 ```bash
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
   -jar master.jar
+```
+
+#### External config file
+<UpcomingReleaseNotice />
+
+Keep the same settings in a YAML or properties file and point Master at it with `axelix.master.config.location`; see
+[Pointing Master at a config file](#pointing-master-at-a-config-file) for the accepted location shapes.
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: replace-with-a-long-random-secret
+```
+
+```bash
+java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.jar
 ```
 
 Master is then reachable at `http://localhost:8080`. Sign in with the super-admin credentials you configured.
@@ -409,7 +470,9 @@ A few notes about this command:
 Prefer **environment variables** — inside a container they are the safest place for configuration, and the only option
 that keeps secrets out of the startup log.
 
-**Individual environment variables (recommended)** — the relaxed-binding names from [Supplying
+#### Individual environment variables
+
+Supplying configuration via individual environment variables follows the relaxed-binding rules from [Supplying
 properties](#supplying-properties), passed with `-e`. This is what the run command above uses:
 
 ```bash
@@ -422,8 +485,18 @@ docker run --rm -p 8080:8080 \
   ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
-**`-D` system properties through `JAVA_TOOL_OPTIONS`** — the JVM applies this variable to the `java` command
-automatically, so it is a convenient hook for JVM tuning such as heap sizing. Use it for non-secret values only:
+#### System Properties (-D) via `JAVA_TOOL_OPTIONS`
+
+If you supply `-D` system properties through `JAVA_TOOL_OPTIONS` the JVM will apply this variable to the `java` command
+automatically, so it is a convenient hook for JVM tuning such as heap sizing.
+
+:::warning
+The JVM prints the full value of `JAVA_TOOL_OPTIONS` to stderr on startup (`Picked up JAVA_TOOL_OPTIONS: ...`), so
+whatever you put there lands in `docker logs` and any log collector. Never place the JWT signing key, the super-admin
+password, or database credentials in it — pass those as discrete `-e` environment variables instead.
+:::
+
+The example of using it can be found below:
 
 ```bash
 docker run --rm -p 8080:8080 \
@@ -433,11 +506,32 @@ docker run --rm -p 8080:8080 \
   ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
-:::warning
-The JVM prints the full value of `JAVA_TOOL_OPTIONS` to stderr on startup (`Picked up JAVA_TOOL_OPTIONS: ...`), so
-whatever you put there lands in `docker logs` and any log collector. Never place the JWT signing key, the super-admin
-password, or database credentials in it — pass those as discrete `-e` environment variables instead.
-:::
+#### External config file
+<UpcomingReleaseNotice />
+
+You can also supply configuration via an external config file. Mount a YAML or properties file into the container and point Master at it with
+`axelix.master.config.location` (see [Pointing Master at a config file](#pointing-master-at-a-config-file)). Keep
+secrets out of a file baked into or committed alongside the image; pass those as discrete `-e` environment variables
+just as above.
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+```
+
+And then passing it as the volume to the docker command:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
+  -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
 
 ## Run with Docker Compose
 
@@ -500,6 +594,38 @@ AXELIX_ADMIN_PASSWORD=...
 
 `AXELIX_MASTER_AUTH_COOKIE_SECURE` is `false` in this example because the snippet exposes Master over plain HTTP for
 local testing. Put Master behind a TLS-terminating proxy and flip it to `true` for any real deployment.
+
+### Supplying configuration via a mounted file
+
+<UpcomingReleaseNotice />
+
+Instead of listing every non-secret setting under `environment`, you can mount a YAML or properties file into the
+`master` service and point Master at it with `axelix.master.config.location` (see [Pointing Master at a config
+file](#pointing-master-at-a-config-file)):
+
+```yaml title="master.yaml"
+axelix:
+  master:
+    database:
+      url: jdbc:postgresql://postgres:5432/axelix
+    auth:
+      cookie:
+        secure: false
+```
+
+```yaml title="docker-compose.yaml"
+  master:
+    image: ghcr.io/axelixlabs/axelix:1.0.0
+    volumes:
+      - ./master.yaml:/etc/axelix/master.yaml:ro
+    environment:
+      AXELIX_MASTER_CONFIG_LOCATION: file:/etc/axelix/master.yaml
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+Keep secrets — the JWT signing key, the super-admin password, database credentials — out of a committed file, and pass
+those as discrete environment variables as shown above.
 
 ## Run on Kubernetes
 
