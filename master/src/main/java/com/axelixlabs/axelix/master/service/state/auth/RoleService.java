@@ -20,11 +20,10 @@ package com.axelixlabs.axelix.master.service.state.auth;
 import java.util.Optional;
 import java.util.Set;
 
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 
 /**
  * Service that resolves the roles Axelix Master knows about.

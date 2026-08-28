@@ -17,11 +17,14 @@
  */
 package com.axelixlabs.axelix.master.service.state.auth;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,9 +86,8 @@ public class DefaultRoleService implements RoleService {
             Set<Authority> granted = authorities.computeIfAbsent(row.roleId(), _ -> new HashSet<>());
 
             if (row.authorityName() != null) {
-                Optional
-                    .ofNullable(authoritiesManager.decode(row.authorityName()))
-                    .ifPresent(granted::add);
+                Optional.ofNullable(authoritiesManager.decode(row.authorityName()))
+                        .ifPresent(granted::add);
             }
         }
 
@@ -102,51 +104,80 @@ public class DefaultRoleService implements RoleService {
      * The roles and the bonds between them, as read from the database, ready to be resolved into composite roles.
      */
     private record RoleGraph(
-        Map<String, String> roleIdToName,
-        Map<String, Set<Authority>> directAuthorities,
-        Map<String, List<String>> directParents) {
+            Map<String, String> roleIdToName,
+            Map<String, Set<Authority>> directAuthorities,
+            Map<String, List<String>> directParents) {
 
         private Optional<String> findRoleId(String roleName) {
             return roleIdToName.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(roleName))
-                .map(Map.Entry::getKey)
-                .findFirst();
+                    .filter(entry -> entry.getValue().equals(roleName))
+                    .map(Map.Entry::getKey)
+                    .findFirst();
         }
 
         private Optional<Role> composeRoleFromName(String roleName) {
-            return findRoleId(roleName).flatMap(roleId -> composeRole(roleId, new HashSet<>()));
+            return findRoleId(roleName).flatMap(this::composeRole);
         }
 
         private Optional<Role> composeRole(String roleId) {
-            return composeRole(roleId, new HashSet<>());
+            return composeRole(roleId, new HashMap<>(), new ArrayDeque<>());
         }
 
-        private Optional<Role> composeRole(String roleId, Set<String> visited) {
+        /**
+         * Resolves the role identified by {@code roleId} into a composite {@link Role}, walking its ancestry
+         * depth-first while guarding against cycles - the roles are meant to form a DAG. The algorithm below
+         * is just a simple DFS with coloring (where we store already fully traversed vertexes, colloquially called
+         * "Black", and those where we have not yet finished the traversal, colloquially called "Grey")
+         * <p>
+         * The two structures track the two states a DFS needs. A role sitting in {@code resolved} is done: it, along
+         * with its whole ancestry, has been composed, so reaching it again is legitimate (a diamond simply unions the
+         * authorities) and the memoised role is returned as is. A role sitting in {@code stack} is on the current DFS
+         * traversal stack, so an edge back into it is a back-edge and therefore proves a cycle, on which we bail out with an
+         * {@link IllegalStateException}. A role in neither is untouched and gets visited.
+         *
+         * @param resolved the roles already composed, memoised so a shared ancestor is built only once
+         * @param stack     the ids of the roles currently on the DFS stack, in order, used both to spot a back-edge
+         *                 and to describe the cycle it closes
+         */
+        private Optional<Role> composeRole(String roleId, Map<String, Role> resolved, Deque<String> stack) {
             String roleName = roleIdToName.get(roleId);
 
             if (roleName == null) {
                 return Optional.empty();
             }
 
-            visited.add(roleId);
+            Role alreadyResolved = resolved.get(roleId);
+
+            if (alreadyResolved != null) {
+                return Optional.of(alreadyResolved);
+            }
+
+            stack.addLast(roleId);
             Set<Role> components = new HashSet<>();
 
             for (String parentRoleId : directParents.getOrDefault(roleId, List.of())) {
-                if (visited.add(parentRoleId)) {
-                    composeRole(parentRoleId, visited).ifPresent(components::add);
-                } else {
-                    // TODO:
-                    //  ideally, we would want to create a descriptive message here explaining what
-                    //  roles create a cycle. Like message with "A --> B --> C --> A" or something.
-                    throw new IllegalStateException(
-                        "Unable to resolve the state of the Role '%s': ".formatted(roleName) +
-                        "it's ancestry create a cycle");
+                if (stack.contains(parentRoleId)) {
+                    throw cycleDetected(stack, parentRoleId);
                 }
+                composeRole(parentRoleId, resolved, stack).ifPresent(components::add);
             }
 
-            return Optional.of(
-                new DefaultRole(roleName, directAuthorities.getOrDefault(roleId, Set.of()), components)
-            );
+            Role role = new DefaultRole(roleName, directAuthorities.getOrDefault(roleId, Set.of()), components);
+
+            stack.removeLast();
+            resolved.put(roleId, role);
+
+            return Optional.of(role);
+        }
+
+        private IllegalStateException cycleDetected(Deque<String> path, String duplicatedRoleId) {
+            List<String> ids = new ArrayList<>(path);
+            String cycle = ids.subList(ids.indexOf(duplicatedRoleId), ids.size()).stream()
+                    .map(id -> Objects.requireNonNull(roleIdToName.get(id)))
+                    .collect(Collectors.joining(" --> "));
+
+            return new IllegalStateException("Unable to resolve the state of the roles: their ancestry forms a cycle: "
+                    + cycle + " --> " + roleIdToName.get(duplicatedRoleId));
         }
     }
 }
