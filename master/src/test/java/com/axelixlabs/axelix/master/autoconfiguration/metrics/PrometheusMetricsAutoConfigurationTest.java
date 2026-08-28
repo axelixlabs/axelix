@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
@@ -34,6 +35,7 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.export.promethe
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.test.util.TestSocketUtils;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,7 +118,7 @@ class PrometheusMetricsAutoConfigurationTest {
             ApplicationContextRunner contextRunner = baselineContextRunner()
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + TestSocketUtils.findAvailableTcpPort(),
                             "server.port=8080");
 
             // when.
@@ -125,6 +127,38 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).hasSingleBean(PrometheusMeterRegistry.class);
                 assertThat(context).hasSingleBean(HTTPServer.class);
                 assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsZero() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsNegative() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=-1");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
             });
         }
 

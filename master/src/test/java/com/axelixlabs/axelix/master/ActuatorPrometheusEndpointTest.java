@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.prometheus.metrics.exporter.httpserver.HTTPServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +29,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.TestSocketUtils;
 
@@ -62,10 +62,14 @@ class ActuatorPrometheusEndpointTest {
     @TestPropertySource(
             properties = {
                 "axelix.master.metrics.prometheus.enabled=true",
-                "axelix.master.metrics.prometheus.tags.region=eu-west-1",
-                "axelix.master.metrics.prometheus.port=0"
+                "axelix.master.metrics.prometheus.tags.region=eu-west-1"
             })
     class WhenPortDiffersFromServerPort {
+
+        @DynamicPropertySource
+        static void configurePrometheusPort(DynamicPropertyRegistry registry) {
+            registry.add(PROMETHEUS_PORT_PROPERTY, TestSocketUtils::findAvailableTcpPort);
+        }
 
         @Autowired
         private HTTPServer prometheusHttpServer;
@@ -157,24 +161,14 @@ class ActuatorPrometheusEndpointTest {
                 "axelix.master.metrics.prometheus.enabled=true",
                 "axelix.master.metrics.prometheus.tags.region=eu-west-1"
             })
-    @AutoConfigureTestRestTemplate
     class WhenPortMatchesServerPort {
 
-        @BeforeAll
-        static void setPortSystemProperties() {
-            String port = String.valueOf(TestSocketUtils.findAvailableTcpPort());
-            System.setProperty(SERVER_PORT_PROPERTY, port);
-            System.setProperty(PROMETHEUS_PORT_PROPERTY, port);
+        @DynamicPropertySource
+        static void configurePorts(DynamicPropertyRegistry registry) {
+            int port = TestSocketUtils.findAvailableTcpPort();
+            registry.add(SERVER_PORT_PROPERTY, () -> port);
+            registry.add(PROMETHEUS_PORT_PROPERTY, () -> port);
         }
-
-        @AfterAll
-        static void clearPortSystemProperties() {
-            System.clearProperty(SERVER_PORT_PROPERTY);
-            System.clearProperty(PROMETHEUS_PORT_PROPERTY);
-        }
-
-        @Autowired
-        private TestRestTemplate restTemplate;
 
         @Autowired(required = false)
         private HTTPServer prometheusHttpServer;
@@ -225,12 +219,7 @@ class ActuatorPrometheusEndpointTest {
     }
 
     @Nested
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @AutoConfigureTestRestTemplate
     class WhenNotConfigured {
-
-        @Autowired
-        private TestRestTemplate restTemplate;
 
         @Test
         void prometheusIsNotAvailableByDefault() {

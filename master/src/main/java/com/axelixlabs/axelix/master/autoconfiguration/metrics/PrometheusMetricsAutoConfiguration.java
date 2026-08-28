@@ -43,8 +43,7 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.S
 import org.springframework.context.annotation.Bean;
 
 import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.CUSTOM_PORT_CONFIGURED;
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.MATCHES_APPLICATION_PORT;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 
 /**
  * Prometheus metrics related auto-configuration.
@@ -83,7 +82,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnPrometheusPort(MATCHES_APPLICATION_PORT)
+    @ConditionalOnPrometheusPort(Mode.MATCHES_APPLICATION_PORT)
     PrometheusScrapeEndpoint prometheusEndpoint(
             PrometheusRegistry prometheusRegistry, PrometheusConfig prometheusConfig) {
         return new PrometheusScrapeEndpoint(prometheusRegistry, prometheusConfig.prometheusProperties());
@@ -103,11 +102,11 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnPrometheusPort(CUSTOM_PORT_CONFIGURED)
+    @ConditionalOnPrometheusPort(Mode.CUSTOM_PORT_CONFIGURED)
     HTTPServer prometheusHttpServer(
             PrometheusMeterRegistry prometheusMeterRegistry, PrometheusProperties prometheusProperties)
             throws IOException {
-        int port = Objects.requireNonNull(prometheusProperties.getPort());
+        int port = Objects.requireNonNull(prometheusProperties.port());
         HTTPServer server = HTTPServer.builder()
                 .port(port)
                 .registry(prometheusMeterRegistry.getPrometheusRegistry())
@@ -126,7 +125,7 @@ public class PrometheusMetricsAutoConfiguration {
 
     private static void addTagsIfNeeded(
             PrometheusProperties prometheusProperties, PrometheusMeterRegistry prometheusMeterRegistry) {
-        Map<String, String> tags = prometheusProperties.getTags();
+        Map<String, String> tags = prometheusProperties.tags();
 
         if (!tags.isEmpty()) {
             Tags commonTags = Tags.of(tags.entrySet().stream()

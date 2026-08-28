@@ -23,13 +23,20 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import com.axelixlabs.axelix.common.utils.Assert;
+
 /**
  * The Prometheus related properties that are specific to Axelix Master.
  *
+ * @param tags common tags to attach to every metric exposed via the Prometheus endpoint
+ * @param port port of the dedicated HTTP server that exposes the Prometheus scrape endpoint. If
+ *     not set, defaults to {@code server.port}, meaning Prometheus is served through the actuator
+ *     instead of a dedicated server. Must be greater than {@code 0} if set - {@code 0} is
+ *     rejected rather than treated as "bind to a random free port".
  * @author Dmitry Mazurov
  */
 @ConfigurationProperties(prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX)
-public class PrometheusProperties {
+public record PrometheusProperties(Map<String, String> tags, @Nullable Integer port) {
 
     public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 
@@ -37,34 +44,14 @@ public class PrometheusProperties {
 
     public static final String PROMETHEUS_PORT_PROPERTY = PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port";
 
-    /**
-     * Common tags to attach to every metric exposed via the Prometheus endpoint.
-     */
-    private Map<String, String> tags = Map.of();
+    public PrometheusProperties {
+        Assert.isTrue(
+                port == null || port > 0,
+                "Prometheus port must be greater than 0 if set. Set " + PROMETHEUS_PORT_PROPERTY
+                        + " to a positive value, or leave it unset to use server.port.");
 
-    /**
-     * Port of the dedicated HTTP server that exposes the Prometheus scrape endpoint. If not set,
-     * defaults to {@code server.port}, meaning Prometheus is served through the actuator instead
-     * of a dedicated server.
-     */
-    @Nullable
-    private Integer port;
-
-    public Map<String, String> getTags() {
-        return tags;
-    }
-
-    public PrometheusProperties setTags(Map<String, String> tags) {
-        this.tags = tags;
-        return this;
-    }
-
-    public @Nullable Integer getPort() {
-        return port;
-    }
-
-    public PrometheusProperties setPort(@Nullable Integer port) {
-        this.port = port;
-        return this;
+        if (tags == null) {
+            tags = Map.of();
+        }
     }
 }

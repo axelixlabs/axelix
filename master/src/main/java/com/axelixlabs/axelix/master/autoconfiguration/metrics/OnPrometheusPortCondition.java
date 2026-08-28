@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
-import com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.ConditionContext;
@@ -25,7 +24,8 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.MATCHES_APPLICATION_PORT;
+import com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
+
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 
@@ -49,7 +49,7 @@ public class OnPrometheusPortCondition extends SpringBootCondition {
         MergedAnnotation<ConditionalOnPrometheusPort> annotation =
                 metadata.getAnnotations().get(ConditionalOnPrometheusPort.class);
 
-        boolean expectedMatch = annotation.getEnum("value", Mode.class) == MATCHES_APPLICATION_PORT;
+        boolean expectedMatch = Mode.MATCHES_APPLICATION_PORT.equals(annotation.getEnum("value", Mode.class));
         boolean portsMatch = matchesServerPort(context.getEnvironment());
 
         if (portsMatch == expectedMatch) {
@@ -64,8 +64,7 @@ public class OnPrometheusPortCondition extends SpringBootCondition {
 
     /**
      * Checks whether {@code axelix.master.metrics.prometheus.port} is not set, or is explicitly
-     * set and equals {@code server.port}. A literal {@code 0} never counts as a match, since it
-     * means "pick a random port" rather than "same as the other port".
+     * set and equals {@code server.port}.
      *
      * @param properties the environment to read {@code server.port} and
      *     {@code axelix.master.metrics.prometheus.port} from
@@ -75,6 +74,6 @@ public class OnPrometheusPortCondition extends SpringBootCondition {
         int serverPort = properties.getProperty(SERVER_PORT_PROPERTY, Integer.class, DEFAULT_SERVER_PORT);
         Integer prometheusPort = properties.getProperty(PROMETHEUS_PORT_PROPERTY, Integer.class);
 
-        return prometheusPort == null || (prometheusPort != 0 && serverPort == prometheusPort);
+        return prometheusPort == null || serverPort == prometheusPort;
     }
 }

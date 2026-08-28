@@ -31,9 +31,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.test.util.TestSocketUtils;
 
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.CUSTOM_PORT_CONFIGURED;
-import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode.MATCHES_APPLICATION_PORT;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,14 +83,11 @@ class OnPrometheusPortConditionTest {
     }
 
     private static Stream<Arguments> matchingPortCases() {
-        return Stream.of(
-                Arguments.of("8080", null),
-                Arguments.of("8080", "8080"),
-                Arguments.of(null, "8080"));
+        return Stream.of(Arguments.of("8080", null), Arguments.of("8080", "8080"), Arguments.of(null, "8080"));
     }
 
     private static Stream<Arguments> differingPortCases() {
-        return Stream.of(Arguments.of("8080", "9404"), Arguments.of("0", "0"));
+        return Stream.of(Arguments.of("8080", String.valueOf(TestSocketUtils.findAvailableTcpPort())));
     }
 
     private static String[] properties(@Nullable String serverPort, @Nullable String prometheusPort) {
@@ -116,13 +113,13 @@ class OnPrometheusPortConditionTest {
     static class MarkerConfiguration {
 
         @Bean
-        @ConditionalOnPrometheusPort(MATCHES_APPLICATION_PORT)
+        @ConditionalOnPrometheusPort(Mode.MATCHES_APPLICATION_PORT)
         MatchesApplicationPortMarker matchesApplicationPortMarker() {
             return new MatchesApplicationPortMarker();
         }
 
         @Bean
-        @ConditionalOnPrometheusPort(CUSTOM_PORT_CONFIGURED)
+        @ConditionalOnPrometheusPort(Mode.CUSTOM_PORT_CONFIGURED)
         CustomPortConfiguredMarker customPortConfiguredMarker() {
             return new CustomPortConfiguredMarker();
         }
