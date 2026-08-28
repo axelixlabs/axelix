@@ -8,4 +8,3 @@ com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.database.PersistenceAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusMetricsAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.metrics.OtlpTransportMetricsAutoConfiguration
-com.axelixlabs.axelix.master.autoconfiguration.externalconfig.ExternalConfigAutoConfiguration

@@ -7,9 +7,6 @@ spring:
     # OTLP metrics export is owned by OtlpTransportMetricsAutoConfiguration, not Spring Boot.
     exclude: org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
   cloud:
-    vault:
-      enabled: false
-      fail-fast: true
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
@@ -47,8 +44,6 @@ management:
 axelix:
   master:
     external-config:
-      options: []
-      vault:
       spring-cloud-config:
         enabled: false
         uri:
@@ -56,6 +51,34 @@ axelix:
         name:
         username:
         password:
+      spring-cloud-vault:
+        enabled: false
+        uri:
+        host:
+        port:
+        namespace:
+        authentication:
+        token:
+        app-role:
+          role-id:
+          secret-id:
+          role:
+          app-role-path:
+        kubernetes:
+          role:
+          kubernetes-path:
+          service-account-token-file:
+        kv:
+          enabled:
+          backend:
+          defaultContext:
+          profileSeparator:
+          application-name:
+        ssl:
+          trust-store:
+          trust-store-password:
+          key-store:
+          key-store-password:
     environment:
     logging:
       json:
@@ -142,7 +165,9 @@ spring:
     #     fail-fast=true below, an unreachable Config Server then becomes a startup failure.
     #
     # In other words, 'optional:' only covers the disabled case; it does NOT weaken fail-fast when enabled.
-    import: "optional:configserver:"
+    import:
+      - "optional:configserver:"
+      - "optional:vault://"
   cloud:
     config:
       enabled:   "${axelix.master.external-config.spring-cloud-config.enabled:false}"
@@ -152,3 +177,32 @@ spring:
       name:      "${axelix.master.external-config.spring-cloud-config.name:}"
       username:  "${axelix.master.external-config.spring-cloud-config.username:}"
       password:  "${axelix.master.external-config.spring-cloud-config.password:}"
+    vault:
+      enabled:        "${axelix.master.external-config.spring-cloud-vault.enabled:false}"
+      fail-fast:      true
+      uri:            "${axelix.master.external-config.spring-cloud-vault.uri:}"
+      host:           "${axelix.master.external-config.spring-cloud-vault.host:}"
+      port:           "${axelix.master.external-config.spring-cloud-vault.port:}"
+      namespace:      "${axelix.master.external-config.spring-cloud-vault.namespace:}"
+      authentication: "${axelix.master.external-config.spring-cloud-vault.authentication:}"
+      token:          "${axelix.master.external-config.spring-cloud-vault.token:}"
+      app-role:
+        role-id:       "${axelix.master.external-config.spring-cloud-vault.app-role.role-id:}"
+        secret-id:     "${axelix.master.external-config.spring-cloud-vault.app-role.secret-id:}"
+        role:          "${axelix.master.external-config.spring-cloud-vault.app-role.role:}"
+        app-role-path: "${axelix.master.external-config.spring-cloud-vault.app-role.app-role-path:}"
+      kubernetes:
+        role:                       "${axelix.master.external-config.spring-cloud-vault.kubernetes.role:}"
+        kubernetes-path:            "${axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path:}"
+        service-account-token-file: "${axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file:}"
+      kv:
+        enabled:          "${axelix.master.external-config.spring-cloud-vault.kv.enabled:}"
+        backend:          "${axelix.master.external-config.spring-cloud-vault.kv.backend:}"
+        defaultContext:   "${axelix.master.external-config.spring-cloud-vault.kv.defaultContext:}"
+        profileSeparator: "${axelix.master.external-config.spring-cloud-vault.kv.profileSeparator:}"
+        application-name: "${axelix.master.external-config.spring-cloud-vault.kv.application-name:}"
+      ssl:
+        trust-store:          "${axelix.master.external-config.spring-cloud-vault.ssl.trust-store:}"
+        trust-store-password: "${axelix.master.external-config.spring-cloud-vault.ssl.trust-store-password:}"
+        key-store:            "${axelix.master.external-config.spring-cloud-vault.ssl.key-store:}"
+        key-store-password:   "${axelix.master.external-config.spring-cloud-vault.ssl.key-store-password:}"

@@ -7,12 +7,12 @@ spring:
     # production application.yaml with an 'optional:configserver:' import so tests boot without a Config Server.
     import: "optional:configserver:"
   cloud:
-    vault:
-      enabled: false
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
     config:
+      enabled: false
+    vault:
       enabled: false
   application:
     name: axelix
@@ -92,5 +92,3 @@ axelix:
       cookie:
         name: auth_token
         secure: false
-    external-config:
-      options: []

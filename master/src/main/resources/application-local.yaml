@@ -48,8 +48,3 @@ management:
     web:
       exposure:
         include: [ "health" ]
-
-spring:
-  cloud:
-    vault:
-      enabled: false
