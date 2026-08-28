@@ -70,10 +70,10 @@ axelix:
           service-account-token-file:
         kv:
           enabled:
-          backend:
-          defaultContext:
-          profileSeparator:
-          application-name:
+          backend: secret
+          default-context: application
+          profile-separator: /
+          application-name: ${spring.application.name}
         ssl:
           trust-store:
           trust-store-password:
@@ -196,11 +196,11 @@ spring:
         kubernetes-path:            "${axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path:}"
         service-account-token-file: "${axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file:}"
       kv:
-        enabled:          "${axelix.master.external-config.spring-cloud-vault.kv.enabled:}"
-        backend:          "${axelix.master.external-config.spring-cloud-vault.kv.backend:}"
-        defaultContext:   "${axelix.master.external-config.spring-cloud-vault.kv.defaultContext:}"
-        profileSeparator: "${axelix.master.external-config.spring-cloud-vault.kv.profileSeparator:}"
-        application-name: "${axelix.master.external-config.spring-cloud-vault.kv.application-name:}"
+        enabled:           "${axelix.master.external-config.spring-cloud-vault.kv.enabled:}"
+        backend:           "${axelix.master.external-config.spring-cloud-vault.kv.backend:}"
+        default-context:   "${axelix.master.external-config.spring-cloud-vault.kv.default-context:}"
+        profile-separator: "${axelix.master.external-config.spring-cloud-vault.kv.profile-separator:}"
+        application-name:  "${axelix.master.external-config.spring-cloud-vault.kv.application-name:}"
       ssl:
         trust-store:          "${axelix.master.external-config.spring-cloud-vault.ssl.trust-store:}"
         trust-store-password: "${axelix.master.external-config.spring-cloud-vault.ssl.trust-store-password:}"
