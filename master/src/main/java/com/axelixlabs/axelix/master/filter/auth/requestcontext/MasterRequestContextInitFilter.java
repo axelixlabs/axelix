@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.filter.auth.requestcontext;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import jakarta.servlet.FilterChain;
@@ -34,7 +35,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
+import com.axelixlabs.axelix.master.filter.ContentCachingServletRequest;
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
+import com.axelixlabs.axelix.master.mcp.McpEndpoint;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 
@@ -49,12 +53,17 @@ public class MasterRequestContextInitFilter extends OncePerRequestFilter {
 
     private static final ScopedValue<MasterRequestContext> MASTER_REQUEST_CONTEXT = ScopedValue.newInstance();
 
-    private final MasterWebEndpointResolver masterWebEndpointResolver;
+    // Mcp Components might not be available if mcp server is not enabled.
+    private final @Nullable McpEndpointResolver mcpEndpointResolver;
     private final @Nullable McpServerStreamableHttpProperties mcpProperties;
 
+    private final MasterWebEndpointResolver masterWebEndpointResolver;
+
     public MasterRequestContextInitFilter(
+            ObjectProvider<McpEndpointResolver> mcpEndpointResolver,
             MasterWebEndpointResolver masterWebEndpointResolver,
             ObjectProvider<McpServerStreamableHttpProperties> mcpProperties) {
+        this.mcpEndpointResolver = mcpEndpointResolver.getIfAvailable();
         this.mcpProperties = mcpProperties.getIfAvailable();
         this.masterWebEndpointResolver = masterWebEndpointResolver;
     }
@@ -82,8 +91,23 @@ public class MasterRequestContextInitFilter extends OncePerRequestFilter {
         }
 
         if (mcpProperties != null && servletPath.startsWith(mcpProperties.getMcpEndpoint())) {
-            // TODO:
-            filterChain.doFilter(request, response);
+            processExternalMcpRequest(request, response, filterChain);
+        }
+    }
+
+    private void processExternalMcpRequest(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
+        if (mcpEndpointResolver != null) {
+            var wrapper = new ContentCachingServletRequest(request);
+            var requestAsString = new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+            // Requests that do not target a concrete tool endpoint (e.g. the 'initialize' handshake
+            // or 'tools/list') resolve to no endpoint, but must still be processed and authenticated.
+            McpEndpoint mcpEndpoint =
+                    mcpEndpointResolver.resolve(requestAsString).orElse(null);
+
+            executeInContext(wrapper, response, filterChain, new McpRequestContext(mcpEndpoint));
         }
     }
 
@@ -96,21 +120,29 @@ public class MasterRequestContextInitFilter extends OncePerRequestFilter {
                 masterWebEndpointResolver.resolveEndpoint(relativePath, HttpMethod.valueOf(request.getMethod()));
 
         if (masterWebEndpoint.isPresent()) {
-            MasterWebEndpoint endpoint = masterWebEndpoint.get();
-
-            try {
-                ScopedValue.where(MASTER_REQUEST_CONTEXT, new ExternalWebRequestContext(endpoint))
-                        .call(() -> {
-                            filterChain.doFilter(request, response);
-                            return null;
-                        });
-            } catch (IOException | ServletException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new ServletException(e);
-            }
+            ExternalWebRequestContext endpoint = new ExternalWebRequestContext(masterWebEndpoint.get());
+            executeInContext(request, response, filterChain, endpoint);
         } else {
             throw new ServletException("Unrecognized endpoint got invoked. Failing request fast");
+        }
+    }
+
+    private static void executeInContext(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain,
+            MasterRequestContext endpoint)
+            throws IOException, ServletException {
+
+        try {
+            ScopedValue.where(MASTER_REQUEST_CONTEXT, endpoint).call(() -> {
+                filterChain.doFilter(request, response);
+                return null;
+            });
+        } catch (IOException | ServletException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 

@@ -20,23 +20,29 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
-import com.axelixlabs.axelix.master.service.state.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 
 /**
  * Accessor for the JSON response of the {@code /userinfo} OIDC endpoint.
  *
  * @author Mikhail Polivakha
  */
+// TODO: we need to extract an interface here to clearly define the contract.
 public class UserInfoJsonAccessor {
 
     private static final String DEFAULT_ROLE_NAME = "VIEWER";
+    private static final String DEFAULT_AI_AGENT_USER = "AI_AGENT";
+    private static final Logger log = LoggerFactory.getLogger(UserInfoJsonAccessor.class);
 
     private final JmesPathJsonInspector jsonInspector;
     private final OAuth2Properties oAuth2Properties;
+
     private final RoleService roleService;
 
     public UserInfoJsonAccessor(
@@ -49,6 +55,19 @@ public class UserInfoJsonAccessor {
     @Nullable
     public String extractTextField(String userInfoJson, String field) {
         return jsonInspector.extract(userInfoJson, field);
+    }
+
+    public String extractUserBehindAiAgent(String userInfoJson) {
+        String user = jsonInspector.extract(userInfoJson, "sub");
+
+        if (user == null) {
+            log.warn("Attention! We're unable to infer the identity of the user behind the AI Agent because the 'sub' "
+                    + "claim is missing in the userinfo response from OIDC provider. Such behavior violates the OIDC spec. "
+                    + "Falling back to default user");
+            return DEFAULT_AI_AGENT_USER;
+        } else {
+            return user;
+        }
     }
 
     public Role extractRole(String userInfoJson) {

@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -50,11 +50,11 @@ class RequiredAuthorityCheckServiceTest {
     @Test
     void hasAuthority_ShouldReturnTrue_WhenSecurityContextHasUserWithAuthority() {
         securityContext = new DefaultSecurityContext(
-                UserUtils.fromAuthorities(DefaultAuthority.CONFIG_PROPS_VALUES_READ), "testToken");
+                UserUtils.fromAuthorities(OssAuthority.CONFIG_PROPS_VALUES_READ), "testToken");
 
         securityContextExecutor.runWithinSecurityContext(
                 () -> {
-                    boolean result = subject.hasAuthority(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+                    boolean result = subject.hasAuthority(OssAuthority.CONFIG_PROPS_VALUES_READ);
                     assertThat(result).isTrue();
                 },
                 securityContext);
@@ -66,7 +66,7 @@ class RequiredAuthorityCheckServiceTest {
 
         securityContextExecutor.runWithinSecurityContext(
                 () -> {
-                    boolean result = subject.hasAuthority(DefaultAuthority.ENV_VALUES_READ);
+                    boolean result = subject.hasAuthority(OssAuthority.ENV_VALUES_READ);
                     assertThat(result).isFalse();
                 },
                 securityContext);
@@ -74,7 +74,7 @@ class RequiredAuthorityCheckServiceTest {
 
     @Test
     void hasAuthority_ShouldThrowException_WhenNoSecurityContext() {
-        assertThatThrownBy(() -> subject.hasAuthority(DefaultAuthority.CONFIG_PROPS_VALUES_READ))
+        assertThatThrownBy(() -> subject.hasAuthority(OssAuthority.CONFIG_PROPS_VALUES_READ))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

@@ -19,7 +19,8 @@ package com.axelixlabs.axelix.master.service.auth.intercept.web;
 
 /**
  * A marker interface that represents a callback to be called in the
- * IAM-related filters in the {@link jakarta.servlet.FilterChain} of Axelix Master
+ * IAM-related infrastructure of Axelix Master while handling requests
+ * from the web ui.
  *
  * @author Mikhail Polivakha
  */

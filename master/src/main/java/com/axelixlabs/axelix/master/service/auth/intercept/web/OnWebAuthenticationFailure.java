@@ -19,23 +19,20 @@ package com.axelixlabs.axelix.master.service.auth.intercept.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 
 /**
- * {@link OnWebIamEventInterceptor} to be invoked when the given {@link MasterWebEndpoint}
- * was called by {@link User} and returned the successful result.
+ * {@link OnWebIamEventInterceptor} to be called when authentication failure has occurred.
  *
  * @author Mikhail Polivakha
  */
-public interface OnSuccessfulResult extends OnWebIamEventInterceptor {
+public interface OnWebAuthenticationFailure extends OnWebIamEventInterceptor {
 
     /**
      * Actual callback.
      *
-     * @param target the web endpoint that was successfully executed.
+     * @param target the web endpoint that was attempted to be accessed/executed.
      * @param request the overall http request as provided by the servlet container
-     * @param user the authorized user.
      */
-    void onSuccess(MasterWebEndpoint target, HttpServletRequest request, User user);
+    void onAuthenticationFailure(MasterWebEndpoint target, HttpServletRequest request);
 }

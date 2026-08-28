@@ -42,7 +42,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProp
 import com.axelixlabs.axelix.master.filter.FiltersOrder;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.ExternalWebRequestContext;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 
 /**
  * Filter that is supposed to intercept the authentication-related external master apis.
@@ -58,10 +58,10 @@ public class ExternalAuthenticationApiFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(ExternalAuthenticationApiFilter.class);
 
     private final JwtDecoderService jwtDecoderService;
-    private final List<OnSuccessfulResult> onSuccessInterceptors;
+    private final List<OnWebSuccessfulResult> onSuccessInterceptors;
 
     public ExternalAuthenticationApiFilter(
-            JwtDecoderService jwtDecoderService, List<OnSuccessfulResult> onSuccessInterceptors) {
+            JwtDecoderService jwtDecoderService, List<OnWebSuccessfulResult> onSuccessInterceptors) {
         this.jwtDecoderService = jwtDecoderService;
         this.onSuccessInterceptors = onSuccessInterceptors;
     }

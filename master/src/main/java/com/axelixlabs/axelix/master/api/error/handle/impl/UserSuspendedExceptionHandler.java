@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.AbstractExceptionHandler;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
+import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpIamEventInterceptor;
 import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInterceptor;
 
 /**
@@ -39,8 +40,9 @@ import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebIamEventInte
 @Component
 public class UserSuspendedExceptionHandler extends AbstractExceptionHandler<UserSuspendedException> {
 
-    protected UserSuspendedExceptionHandler(List<OnWebIamEventInterceptor> interceptors) {
-        super(interceptors);
+    protected UserSuspendedExceptionHandler(
+            List<OnWebIamEventInterceptor> webInterceptors, List<OnMcpIamEventInterceptor> mcpInterceptors) {
+        super(webInterceptors, mcpInterceptors);
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Persistent user record for users created via the Users Management UI by a SUPER_ADMIN.
+ * Persistent user record for users created via the Users Management UI.
  *
  * @param id           Unique identifier of the user (UUID generated in the service). Serves as the primary key.
  * @param username     Login name of the user.

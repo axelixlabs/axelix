@@ -36,7 +36,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager.AuthoritiesContributor;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -55,6 +58,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServer
 import com.axelixlabs.axelix.master.filter.auth.ExternalApiCookieAuthorizationFilter;
 import com.axelixlabs.axelix.master.filter.auth.ExternalAuthenticationApiFilter;
 import com.axelixlabs.axelix.master.filter.auth.requestcontext.MasterRequestContextInitFilter;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpointResolver;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BasicMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHandler;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
@@ -64,7 +68,7 @@ import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
-import com.axelixlabs.axelix.master.service.auth.intercept.web.OnSuccessfulResult;
+import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulResult;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathJsonInspector;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcAuthorizeEndpointAdditionalParametersProvider;
@@ -75,8 +79,8 @@ import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthentic
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
-import com.axelixlabs.axelix.master.service.state.RoleService;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * Autoconfiguration for security.
@@ -126,16 +130,23 @@ public class SecurityAutoConfiguration {
     }
 
     @Bean
+    public AuthoritiesManager authoritiesManager(ObjectProvider<AuthoritiesContributor> authoritiesContributor) {
+
+        return new DefaultAuthoritiesManager(authoritiesContributor.getIfAvailable());
+    }
+
+    @Bean
     public MasterRequestContextInitFilter masterRequestContextInitFilter(
             MasterWebEndpointResolver masterWebEndpointResolver,
-            ObjectProvider<McpServerStreamableHttpProperties> mcpProperties) {
+            ObjectProvider<McpServerStreamableHttpProperties> mcpProperties,
+            ObjectProvider<McpEndpointResolver> mcpEndpointResolver) {
 
-        return new MasterRequestContextInitFilter(masterWebEndpointResolver, mcpProperties);
+        return new MasterRequestContextInitFilter(mcpEndpointResolver, masterWebEndpointResolver, mcpProperties);
     }
 
     @Bean
     public ExternalAuthenticationApiFilter externalAuthenticationApiFilter(
-            JwtDecoderService jwtDecoderService, ObjectProvider<OnSuccessfulResult> onSuccessfulResultInterceptors) {
+            JwtDecoderService jwtDecoderService, ObjectProvider<OnWebSuccessfulResult> onSuccessfulResultInterceptors) {
         return new ExternalAuthenticationApiFilter(
                 jwtDecoderService, onSuccessfulResultInterceptors.stream().toList());
     }
@@ -154,8 +165,9 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
-            return new DefaultJwtDecoderService(jwtProperties.algorithm(), jwtProperties.signingKey());
+        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
+            return new DefaultJwtDecoderService(
+                    authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 
@@ -176,7 +188,7 @@ public class SecurityAutoConfiguration {
                 JwtDecoderService jwtDecoderService,
                 Authorizer authorizer,
                 SecurityContextExecutor securityContextExecutor,
-                ObjectProvider<OnSuccessfulResult> iamEvaluationInterceptors) {
+                ObjectProvider<OnWebSuccessfulResult> iamEvaluationInterceptors) {
 
             return new ExternalApiCookieAuthorizationFilter(
                     securityContextExecutor,
@@ -219,9 +231,11 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public SuperAdminUserAuthenticator staticCredentialsUserAuthenticator(
-                SuperAdminConfigurationProperties staticCredentialsConfig, PasswordEncoder passwordEncoder) {
+                SuperAdminConfigurationProperties staticCredentialsConfig,
+                PasswordEncoder passwordEncoder,
+                AuthoritiesManager authoritiesManager) {
             return new SuperAdminUserAuthenticator(
-                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder));
+                    staticCredentialsConfig, new SuperAdminPasswordEncoder(passwordEncoder), authoritiesManager);
         }
     }
 

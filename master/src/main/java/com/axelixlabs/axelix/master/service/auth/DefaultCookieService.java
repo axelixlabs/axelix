@@ -54,7 +54,7 @@ public class DefaultCookieService implements CookieService {
     @Override
     public ResponseCookie buildAuthoritiesMetadataCookie(Set<Role> roles) {
         String authoritiesJsonArray = roles.stream()
-                .flatMap(role -> role.getAuthorities().stream())
+                .flatMap(role -> role.getEffectiveAuthorities().stream())
                 .map(Authority::getName)
                 .distinct()
                 .collect(Collectors.joining(",", "[", "]"));

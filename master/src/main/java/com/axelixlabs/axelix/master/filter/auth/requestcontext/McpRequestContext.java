@@ -17,12 +17,17 @@
  */
 package com.axelixlabs.axelix.master.filter.auth.requestcontext;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 
 /**
  * Immutable data container that represents the context of the JSON-RPC HTTP request
  * sent by the MCP Client.
  *
+ * <p>The {@code mcpEndpoint} is {@code null} for MCP requests that do not target a concrete
+ * tool endpoint (e.g. the protocol {@code initialize} handshake or {@code tools/list}).
+ *
  * @author Mikhail Polivakha
  */
-public record McpRequestContext(McpEndpoint mcpEndpoint) implements MasterRequestContext {}
+public record McpRequestContext(@Nullable McpEndpoint mcpEndpoint) implements MasterRequestContext {}

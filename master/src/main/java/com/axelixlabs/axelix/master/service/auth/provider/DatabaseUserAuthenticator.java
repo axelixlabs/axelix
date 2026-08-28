@@ -27,8 +27,8 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
-import com.axelixlabs.axelix.master.service.state.RoleService;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * {@link UserAuthenticator} that authenticates a given user against the users stored in the database.
@@ -50,7 +50,7 @@ public class DatabaseUserAuthenticator implements UserAuthenticator {
     }
 
     @Override
-    public @Nullable User authenticate(String username, String password) {
+    public @Nullable User authenticate(String username, String password) throws IllegalStateException {
 
         // TODO:
         //  Maybe we can load user with his roles already here with one query?

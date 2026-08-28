@@ -26,18 +26,12 @@ import com.axelixlabs.axelix.master.autoconfiguration.database.ConditionalOnComm
 import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 
 /**
- * Test-only counterpart of the {@code LiquibaseProperties} beans that {@code PersistenceAutoConfiguration}
- * used to provide in production. In the unified distribution, the real changelog root files (and the beans
- * pointing at them) live in {@code master-enterprise} - {@code :master} on its own never runs in production,
- * only its own test suite boots a standalone context and needs a schema to run against. This class is only on
- * the test classpath (registered via {@code src/test/resources/META-INF/spring/...AutoConfiguration.imports}),
- * so it never leaks into {@code master-enterprise}, where it would otherwise clash with the enterprise
- * equivalent.
+ * Test Configuration.
  *
  * @author Nikita Kirillov
  */
 @Configuration
-public class TestLiquibaseConfiguration {
+public class MasterTestConfiguration {
 
     @Configuration
     @ConditionalOnCommunityRdbms(CommunityRDBMS.SQLITE)

@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
@@ -43,25 +45,24 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager {
 
     private final Map<AuthenticationScheme, McpAuthenticationHandler> mcpAuthenticationHandlers;
-    private final McpEndpointResolver mcpEndpointResolver;
+
     private final McpEndpointAuthorityResolver mcpEndpointAuthorityResolver;
     private final Authorizer authorizer;
 
     public DefaultMcpIdentityAccessManager(
             Authorizer authorizer,
-            McpEndpointResolver mcpEndpointResolver,
             McpEndpointAuthorityResolver mcpEndpointAuthorityResolver,
             List<McpAuthenticationHandler> mcpAuthenticationHandlers) {
         this.authorizer = authorizer;
-        this.mcpEndpointResolver = mcpEndpointResolver;
         this.mcpEndpointAuthorityResolver = mcpEndpointAuthorityResolver;
         this.mcpAuthenticationHandlers = mcpAuthenticationHandlers.stream()
                 .collect(Collectors.toMap(McpAuthenticationHandler::supportedAuthScheme, Function.identity()));
     }
 
     @Override
-    public User verifyAccess(String jsonRpcRequest, AuthorizationHeader authorizationHeader)
+    public User verifyAccess(@Nullable McpEndpoint mcpEndpoint, AuthorizationHeader authorizationHeader)
             throws AuthorizationException, JwtProcessingException {
+
         McpAuthenticationHandler mcpAuthenticationHandler =
                 mcpAuthenticationHandlers.get(authorizationHeader.authScheme());
 
@@ -69,22 +70,15 @@ public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager
                 mcpAuthenticationHandler,
                 "Unable to find McpAuthenticationHandler to handle the authentication for this request, please report this to maintainers");
 
-        @SuppressWarnings(
-                "NullAway") // null away does not reco@SuppressWarnings({"PMD.CyclomaticComplexity"})gnize custom not
-        // null assertion
+        @SuppressWarnings("NullAway") // null away does not recognize custom not null assertion
         User authenticatedUser = mcpAuthenticationHandler.handleAuthentication(authorizationHeader.credential());
 
-        Optional<McpEndpoint> mcpEndpoint = mcpEndpointResolver.resolve(jsonRpcRequest);
-
-        mcpEndpoint.ifPresent(endpoint -> authorizeAccess(endpoint, authenticatedUser));
-
-        return authenticatedUser;
-    }
-
-    private void authorizeAccess(McpEndpoint endpoint, User authenticatedUser) {
-        Optional<Authority> resolvedAuthority = mcpEndpointAuthorityResolver.resolve(endpoint);
+        Optional<Authority> resolvedAuthority =
+                Optional.ofNullable(mcpEndpoint).flatMap(mcpEndpointAuthorityResolver::resolve);
 
         resolvedAuthority.ifPresent(
                 authority -> authorizer.authorize(authenticatedUser, new AuthorizationRequest(Set.of(authority))));
+
+        return authenticatedUser;
     }
 }

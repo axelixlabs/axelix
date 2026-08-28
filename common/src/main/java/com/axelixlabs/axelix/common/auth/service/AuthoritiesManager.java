@@ -15,24 +15,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.intercept.web;
+package com.axelixlabs.axelix.common.auth.service;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Set;
 
-import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
+import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.InternalAuthorities;
 
 /**
- * {@link OnWebIamEventInterceptor} to be called when authentication failure has occurred.
+ * An abstraction that serves as the single accessor for all the {@link Authority authorities}
+ * in the application.
+ * <p>
+ * Note, that this abstraction is now aware of the {@link InternalAuthorities}.
  *
  * @author Mikhail Polivakha
  */
-public interface OnAuthenticationFailure extends OnWebIamEventInterceptor {
+public interface AuthoritiesManager {
 
     /**
-     * Actual callback.
+     * Constructs the necessary authority
      *
-     * @param target the web endpoint that was attempted to be accessed/executed.
-     * @param request the overall http request as provided by the servlet container
+     * @return the authority associated with the given {@code name}, or {@code null}, if there is no.
      */
-    void onAuthenticationFailure(MasterWebEndpoint target, HttpServletRequest request);
+    @Nullable
+    Authority decode(String name);
+
+    /**
+     * @return all the authorities this accessor is aware about.
+     */
+    Set<Authority> getAll();
 }

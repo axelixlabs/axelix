@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.state;
+package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.util.Optional;
 import java.util.Set;
@@ -23,16 +23,18 @@ import java.util.Set;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 
 /**
  * Service that resolves the roles Axelix Master knows about.
  *
  * <p>Roles are stored in the database: the built-in {@code ADMIN}, {@code EDITOR} and {@code VIEWER} roles are
  * inserted by a Liquibase migration, any other role is created by Axelix Enterprise. Note that the internal
- * {@code SUPER_ADMIN} and {@code MANAGED_SERVICE} roles are <strong>not</strong> resolvable through this service:
- * they are never persisted and never assigned to a managed user.</p>
+ * {@link SuperAdminUserAuthenticator#SUPER_ADMIN_ROLE_NAME} and {@code MANAGED_SERVICE} roles are <strong>not</strong>
+ * resolvable through this service: they are never persisted and never assigned to a managed user.</p>
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @NullMarked
 public interface RoleService {
@@ -40,16 +42,24 @@ public interface RoleService {
     /**
      * Looks up a role by its exact name.
      *
+     * @throws IllegalStateException in case implementation cannot assemble the {@link Role} due to the fact that
+     *                               its state is corrupted for any reason, e.g. the graph roles of the given user
+     *                               contains the cycle.
+     *
      * @param name Name of the role to look up.
      * @return The role, or {@link Optional#empty()} if no role with such a name exists.
      */
-    Optional<Role> findByName(String name);
+    Optional<Role> findByName(String name) throws IllegalStateException;
 
     /**
      * Looks up roles that belong to the given user.
      *
+     * @throws IllegalStateException in case implementation cannot assemble the {@link Role} due to the fact that
+     *                               its state is corrupted for any reason, e.g. the graph roles of the given user
+     *                               contains the cycle.
+     *
      * @param userId the ID of the user whose roles we want to fetch.
      * @return Roles of the user.
      */
-    Set<Role> findRolesOfUser(String userId);
+    Set<Role> findRolesOfUser(String userId) throws IllegalStateException;
 }

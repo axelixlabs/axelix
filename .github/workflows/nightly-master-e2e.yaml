@@ -120,16 +120,6 @@ jobs:
             --selector=app.kubernetes.io/component=controller \
             --timeout=120s
 
-      - name: Install ingress-nginx
-        run: |
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-
-          kubectl wait \
-            --namespace ingress-nginx \
-            --for=condition=ready pod \
-            --selector=app.kubernetes.io/component=controller \
-            --timeout=120s
-
       - name: Load images into KinD
         run: |
           kind load docker-image ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --name ${{ env.KIND_CLUSTER_NAME }}

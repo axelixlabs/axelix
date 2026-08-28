@@ -37,7 +37,7 @@ public class CompositeUserAuthenticator implements UserAuthenticator {
     }
 
     @Override
-    public @Nullable User authenticate(String username, String password) {
+    public @Nullable User authenticate(String username, String password) throws IllegalStateException {
         for (var userAuthenticator : userAuthenticators) {
             User authenticatedUser = userAuthenticator.authenticate(username, password);
 

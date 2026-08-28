@@ -39,12 +39,11 @@ import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
-import static com.axelixlabs.axelix.common.auth.core.DefaultRole.SUPER_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -97,7 +96,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """;
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
@@ -143,7 +142,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """;
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
@@ -157,7 +156,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestRoleIsNull() {
+    void shouldReturnBadRequest_WhenCreateRequest_RoleIsNull() {
         // language=json
         String request = """
                 {
@@ -170,7 +169,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -179,7 +178,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestRoleIsBlank() {
+    void shouldReturnBadRequest_WhenCreateRequest_RoleIsBlank() {
         // language=json
         String request = """
                 {
@@ -192,7 +191,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -201,7 +200,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestRoleIsSuperAdmin() {
+    void shouldReturnBadRequest_WhenCreateRequest_RoleIsSuperAdmin() {
         // language=json
         String request = """
                 {
@@ -214,7 +213,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -223,7 +222,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestRoleIsUnknown() {
+    void shouldReturnBadRequest_WhenCreateRequest_RoleIsUnknown() {
         // language=json
         String request = """
                 {
@@ -236,7 +235,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -245,7 +244,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestUsernameIsDuplicate() {
+    void shouldReturnBadRequest_WhenCreateRequest_UsernameIsDuplicate() {
         createUser("existingUser", "existing@example.com", "p");
 
         // language=json
@@ -260,7 +259,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), String.class);
 
         // then.
@@ -270,7 +269,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestEmailIsDuplicate() {
+    void shouldReturnBadRequest_WhenCreateRequest_EmailIsDuplicate() {
         createUser("user_test", "user_test@example.com", "p");
 
         // language=json
@@ -285,7 +284,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), String.class);
 
         // then.
@@ -306,7 +305,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
@@ -338,7 +337,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -359,7 +358,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldUpdateRetainingThePassword_WhenUpdateRequestContainsNullPassword() {
+    void shouldUpdateRetainingThePassword_WhenUpdateRequest_ContainsNullPassword() {
         String oldPassword = "oldPass";
         UserEntity user = createUser("oldUsername", "old-email@example.com", oldPassword);
 
@@ -377,7 +376,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id(), newUsername);
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -394,7 +393,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenUpdateRequestUsernameIsDuplicate() {
+    void shouldReturnBadRequest_WhenUpdateRequest_UsernameIsDuplicate() {
         // given.
         createUser("alice", "alice@example.com", "p");
         UserEntity bob = createUser("bob", "bob@example.com", "p");
@@ -412,7 +411,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -424,7 +423,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenUpdateRequestEmailIsDuplicate() {
+    void shouldReturnBadRequest_WhenUpdateRequest_EmailIsDuplicate() {
         // given.
         createUser("alice", "alice@example.com", "p");
         UserEntity bob = createUser("bob", "bob@example.com", "p");
@@ -442,7 +441,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
@@ -468,7 +467,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -477,7 +476,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenCreateRequestRoleIsMissing() {
+    void shouldReturnBadRequest_WhenCreatingUserRequest_RoleIsMissing() {
         // language=json
         String request = """
                 {
@@ -489,7 +488,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
 
         // then.
@@ -512,7 +511,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -535,7 +534,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -557,7 +556,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -576,7 +575,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -601,7 +600,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplate.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
 
         ResponseEntity<Void> response =
                 superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
@@ -625,7 +624,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
@@ -645,7 +644,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withRole(SUPER_ADMIN)
+                .asUsersFeedEditor()
                 .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.

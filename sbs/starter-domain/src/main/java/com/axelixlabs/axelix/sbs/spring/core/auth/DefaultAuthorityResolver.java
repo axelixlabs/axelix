@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -44,28 +44,32 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
     static {
         Map<ActuatorEndpoint, Authority> map = new LinkedHashMap<>();
 
+        // TODO:
+        //  Static configuration like here is not extensible at all. It is going to become a problem
+        //  while building the unified distro
+
         // SCHEDULED_TASKS_MODIFY
-        map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
+        map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, OssAuthority.SCHEDULED_TASKS_MODIFY);
 
         // CACHES_CLEAR
-        map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, DefaultAuthority.CACHES_CLEAR);
-        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE, DefaultAuthority.CACHES_CLEAR);
-        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE_MANAGER, DefaultAuthority.CACHES_CLEAR);
+        map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
+        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE, OssAuthority.CACHES_CLEAR);
+        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE_MANAGER, OssAuthority.CACHES_CLEAR);
 
         // CACHES_TOGGLE
-        map.put(ActuatorEndpoints.ENABLE_CACHE, DefaultAuthority.CACHES_TOGGLE);
-        map.put(ActuatorEndpoints.DISABLE_CACHE, DefaultAuthority.CACHES_TOGGLE);
-        map.put(ActuatorEndpoints.ENABLE_CACHE_MANAGER, DefaultAuthority.CACHES_TOGGLE);
-        map.put(ActuatorEndpoints.DISABLE_CACHES_MANAGER, DefaultAuthority.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.ENABLE_CACHE_MANAGER, OssAuthority.CACHES_TOGGLE);
+        map.put(ActuatorEndpoints.DISABLE_CACHES_MANAGER, OssAuthority.CACHES_TOGGLE);
 
         // GARBAGE_COLLECTOR
-        map.put(ActuatorEndpoints.GC_TRIGGER, DefaultAuthority.GARBAGE_COLLECTOR);
-        map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
-        map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.GC_TRIGGER, OssAuthority.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
+        map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, OssAuthority.GARBAGE_COLLECTOR);
 
         PATH_MAPPINGS = Collections.unmodifiableMap(map);
     }

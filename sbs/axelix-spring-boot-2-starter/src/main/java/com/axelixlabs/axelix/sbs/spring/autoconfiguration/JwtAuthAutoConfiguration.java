@@ -29,6 +29,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -61,7 +62,9 @@ public class JwtAuthAutoConfiguration {
     @Bean
     public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
         return new DefaultJwtDecoderService(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+                new DefaultAuthoritiesManager(null),
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey());
     }
 
     @Bean
