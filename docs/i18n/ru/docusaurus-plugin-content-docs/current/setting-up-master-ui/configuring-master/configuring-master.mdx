@@ -68,10 +68,11 @@ Master никогда не ограничивает свойство единс�
 `axelix.master.metrics.prometheus.enabled` превращается в `AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED`.
 
 :::note
-В примерах для Docker и Docker Compose ниже свойства передаются как флаги `-D` внутри `JAVA_TOOL_OPTIONS`, но это лишь
-один из вариантов: флаг `-Daxelix.master.auth.jwt.signing-key=...` и переменная окружения
-`AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` взаимозаменяемы, поэтому используйте тот способ, который проще на вашей
-платформе.
+Флаг `-Daxelix.master.auth.jwt.signing-key=...` и переменная окружения `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...`
+взаимозаменяемы — одно и то же значение доходит до Master в обоих случаях, поэтому используйте тот способ, который проще
+на вашей платформе. Для **секретов** предпочитайте переменные окружения: в примерах для Docker и Docker Compose ниже
+используются именно они, поскольку JVM печатает полное значение `JAVA_TOOL_OPTIONS` (обычного носителя `-D`-флагов в
+контейнере) в stderr при старте, из-за чего всё секретное попало бы в логи.
 :::
 
 ### Общие настройки
@@ -346,174 +347,50 @@ axelix:
 
 ## Запуск как JAR
 
-Используйте этот вариант, когда вам нужна максимально лёгкая среда выполнения — один процесс на машине, которой вы уже
-управляете, без контейнерного рантайма.
+По своей сути Axelix Master — это просто JVM-процесс, поэтому он поставляется в виде JAR и запускается простой командой
+`java -jar master.jar` (разумеется, на практике всё будет чуть сложнее). Если по каким-либо причинам вы не используете
+контейнеризацию, то этот вариант для вас.
 
 ### 1. Скачайте JAR
 
-Возьмите `axelix-1.0.0.jar`, прикреплённый к нужному вам релизу, со [страницы
+Возьмите JAR-файл Axelix Master, прикреплённый к нужному вам релизу, со [страницы
 релизов](https://github.com/axelixlabs/axelix/releases). Опубликованный артефакт уже включает пользовательский
 интерфейс, поэтому ничего больше собирать не нужно.
 
-### 2. Запустите Master
+### 2. Настройте и запустите Master
 
-Передайте JWT-ключ подписи и алгоритм. Всё остальное может остаться на значениях по умолчанию для первого запуска.
+Как минимум передайте JWT-ключ подписи и алгоритм; всё остальное может остаться на значениях по умолчанию для первого
+запуска. Передать эту конфигурацию Master можно любым из трёх взаимозаменяемых способов — Axelix Master читает их все
+одинаково (см. [Способы задания свойств](#способы-задания-свойств)): через **переменные окружения** или **системные
+свойства JVM (`-D`)** в командной строке (оба показаны ниже) или из **внешнего конфиг-файла**, например `application.yaml`
+/ `application.properties`.
+
+**Переменные окружения** — удобно, когда ваша оболочка или менеджер процессов уже экспортирует значения:
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar master.jar
+```
+
+**Системные свойства JVM (`-D`)** — удобно для быстрого разового запуска:
 
 ```bash
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0.jar
+  -jar master.jar
 ```
 
 После этого Master доступен по адресу `http://localhost:8080`. Войдите с учётными данными суперадминистратора, которые
 вы настроили.
 
-### Переопределение настроек через конфиг-файл
-
-Spring Boot считывает любой `application.yaml` или `application.properties`, лежащий рядом с JAR (или указанный через
-`--spring.config.location`). Кладите переопределения туда, а не накапливайте `-D`-флаги. Выберите формат, который вы
-используете для остального стека, затем движок БД — Master выбирает движок по префиксу URL JDBC, и Liquibase создаёт
-схему при первом запуске.
-
-<Tabs groupId="spring-config">
-  <TabItem value="yaml" label="application.yaml">
-
-<Tabs groupId="db-engine">
-  <TabItem value="sqlite" label="SQLite">
-
-```yaml
-axelix:
-  master:
-    database:
-      url: jdbc:sqlite:axelix.db
-    auth:
-      jwt:
-        algorithm: HMAC512
-        signing-key: ${AXELIX_JWT_SIGNING_KEY}
-        lifespan: 12h
-      options:
-        super-admin:
-          credentials:
-            username: ${AXELIX_ADMIN_USERNAME}
-            password: ${AXELIX_ADMIN_PASSWORD}
-      cookie:
-        secure: true
-```
-
-  </TabItem>
-  <TabItem value="postgres" label="PostgreSQL">
-
-```yaml
-axelix:
-  master:
-    database:
-      url: jdbc:postgresql://db.internal:5432/axelix
-      username: ${AXELIX_DB_USERNAME}
-      password: ${AXELIX_DB_PASSWORD}
-    auth:
-      jwt:
-        algorithm: HMAC512
-        signing-key: ${AXELIX_JWT_SIGNING_KEY}
-        lifespan: 12h
-      options:
-        super-admin:
-          credentials:
-            username: ${AXELIX_ADMIN_USERNAME}
-            password: ${AXELIX_ADMIN_PASSWORD}
-      cookie:
-        secure: true
-```
-
-  </TabItem>
-  <TabItem value="mysql" label="MySQL">
-
-```yaml
-axelix:
-  master:
-    database:
-      url: jdbc:mysql://db.internal:3306/axelix
-      username: ${AXELIX_DB_USERNAME}
-      password: ${AXELIX_DB_PASSWORD}
-    auth:
-      jwt:
-        algorithm: HMAC512
-        signing-key: ${AXELIX_JWT_SIGNING_KEY}
-        lifespan: 12h
-      options:
-        super-admin:
-          credentials:
-            username: ${AXELIX_ADMIN_USERNAME}
-            password: ${AXELIX_ADMIN_PASSWORD}
-      cookie:
-        secure: true
-```
-
-  </TabItem>
-</Tabs>
-
-  </TabItem>
-  <TabItem value="properties" label="application.properties">
-
-<Tabs groupId="db-engine">
-  <TabItem value="sqlite" label="SQLite">
-
-```properties
-axelix.master.database.url=jdbc:sqlite:axelix.db
-axelix.master.auth.jwt.algorithm=HMAC512
-axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
-axelix.master.auth.jwt.lifespan=12h
-axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
-axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
-axelix.master.auth.cookie.secure=true
-```
-
-  </TabItem>
-  <TabItem value="postgres" label="PostgreSQL">
-
-```properties
-axelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix
-axelix.master.database.username=${AXELIX_DB_USERNAME}
-axelix.master.database.password=${AXELIX_DB_PASSWORD}
-axelix.master.auth.jwt.algorithm=HMAC512
-axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
-axelix.master.auth.jwt.lifespan=12h
-axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
-axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
-axelix.master.auth.cookie.secure=true
-```
-
-  </TabItem>
-  <TabItem value="mysql" label="MySQL">
-
-```properties
-axelix.master.database.url=jdbc:mysql://db.internal:3306/axelix
-axelix.master.database.username=${AXELIX_DB_USERNAME}
-axelix.master.database.password=${AXELIX_DB_PASSWORD}
-axelix.master.auth.jwt.algorithm=HMAC512
-axelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
-axelix.master.auth.jwt.lifespan=12h
-axelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
-axelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
-axelix.master.auth.cookie.secure=true
-```
-
-  </TabItem>
-</Tabs>
-
-  </TabItem>
-</Tabs>
-
 ## Запуск с Docker
 
-Используйте этот вариант, если вам нужен один неизменяемый артефакт, в котором уже есть и Master, и пользовательский
-интерфейс.
-
-Конвейер выпуска публикует образ в GitHub Container Registry:
-
-```
-ghcr.io/axelixlabs/axelix:1.0.0
-```
+Если у вас есть поддержка контейнеризации, то рекомендуемый способ установки Axelix Master — через Docker-образ.
+Мы публикуем образ в GitHub Container Registry, поэтому имя образа соответствует шаблону
+`ghcr.io/axelixlabs/axelix:1.0.0`.
 
 :::note
 Приведённые ниже фрагменты кода содержат `1.0.0` для наглядности. Проверьте [страницу
@@ -527,27 +404,58 @@ ghcr.io/axelixlabs/axelix:1.0.0
 
 ```bash
 docker run --rm -p 8080:8080 \
-  -e JAVA_TOOL_OPTIONS="\
-    -Daxelix.master.auth.jwt.algorithm=HMAC512 \
-    -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-    -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
 Несколько примечаний об этой команде:
 
-- `JAVA_TOOL_OPTIONS` — стандартная переменная окружения JVM, которую JVM автоматически применяет к команде `java`,
-  поэтому именно она служит хуком для передачи `-D` системных свойств в контейнер.
 - Образ запускается от имени non-root пользователя `axelix` и использует Ahead-of-Time кэш загрузки классов, собранный
   во время сборки образа, поэтому старт быстрее, чем у обычного запуска JAR.
 - БД по умолчанию по-прежнему SQLite в рабочем каталоге (`/application/axelix.db`). Файл лежит внутри writable-слоя
   контейнера и пропадает, когда контейнер удаляется. Либо переключитесь на PostgreSQL/MySQL (см. следующий раздел), либо
   смонтируйте том по пути SQLite-файла.
 
+### Способы задания конфигурации
+
+Предпочитайте **переменные окружения** — внутри контейнера это самое безопасное место для конфигурации и единственный
+вариант, при котором секреты не попадают в стартовый лог.
+
+**Отдельные переменные окружения (рекомендуется)** — имена в форме relaxed-binding из раздела [Способы задания
+свойств](#способы-задания-свойств), переданные через `-e`. Именно их использует команда запуска выше:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
+  -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
+  -e AXELIX_MASTER_DATABASE_PASSWORD=... \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+**Системные свойства `-D` через `JAVA_TOOL_OPTIONS`** — JVM автоматически применяет эту переменную к команде `java`,
+поэтому она удобна как хук для настройки самой JVM, например размера кучи. Используйте её только для несекретных
+значений:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+:::warning
+JVM печатает полное значение `JAVA_TOOL_OPTIONS` в stderr при старте (`Picked up JAVA_TOOL_OPTIONS: ...`), поэтому всё,
+что вы туда поместите, попадёт в `docker logs` и в любой сборщик логов. Никогда не помещайте туда ключ подписи JWT,
+пароль суперадминистратора или учётные данные базы данных — передавайте их отдельными переменными окружения через `-e`.
+:::
+
 ## Запуск с Docker Compose
 
-Используйте этот вариант, если вам нужен Master и внешняя база данных в одном декларативном файле — идеальный вариант
-для небольшого self-hosted развёртывания.
+По сути, Axelix Master вполне можно запустить и в развёртывании через Docker Compose.
 
 Приведённый ниже пример представляет собой готовый стек, который можно положить в новый `docker-compose.yaml`,
 отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.0.0` —
@@ -578,21 +486,24 @@ services:
     ports:
       - "8080:8080"
     environment:
-      JAVA_TOOL_OPTIONS: >-
-        -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
-        -Daxelix.master.database.username=${AXELIX_DB_USERNAME}
-        -Daxelix.master.database.password=${AXELIX_DB_PASSWORD}
-        -Daxelix.master.auth.jwt.algorithm=HMAC512
-        -Daxelix.master.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
-        -Daxelix.master.auth.options.super-admin.credentials.username=${AXELIX_ADMIN_USERNAME}
-        -Daxelix.master.auth.options.super-admin.credentials.password=${AXELIX_ADMIN_PASSWORD}
-        -Daxelix.master.auth.cookie.secure=false
+      AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
+      AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}
+      AXELIX_MASTER_DATABASE_PASSWORD: ${AXELIX_DB_PASSWORD}
+      AXELIX_MASTER_AUTH_JWT_ALGORITHM: HMAC512
+      AXELIX_MASTER_AUTH_JWT_SIGNINGKEY: ${AXELIX_JWT_SIGNING_KEY}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_USERNAME: ${AXELIX_ADMIN_USERNAME}
+      AXELIX_MASTER_AUTH_OPTIONS_SUPERADMIN_CREDENTIALS_PASSWORD: ${AXELIX_ADMIN_PASSWORD}
+      AXELIX_MASTER_AUTH_COOKIE_SECURE: "false"
 
 volumes:
   axelix-pgdata:
 ```
 
-Передайте значения через `.env` файл рядом с Compose-файлом:
+Каждый ключ `AXELIX_MASTER_*` сопоставляется с соответствующим свойством через relaxed binding (см. [Способы задания
+свойств](#способы-задания-свойств)). Передача их отдельными переменными окружения — а не через `JAVA_TOOL_OPTIONS` —
+удерживает ключ подписи и пароли вне стартового лога контейнера.
+
+Другой вариант — передать значения через `.env` файл рядом с Compose-файлом:
 
 ```bash title=".env"
 AXELIX_DB_USERNAME=axelix
@@ -602,7 +513,7 @@ AXELIX_ADMIN_USERNAME=admin
 AXELIX_ADMIN_PASSWORD=...
 ```
 
-`axelix.master.auth.cookie.secure` в этом примере `false`, поскольку фрагмент кода предоставляет доступ к Master по
+`AXELIX_MASTER_AUTH_COOKIE_SECURE` в этом примере `false`, поскольку фрагмент кода предоставляет доступ к Master по
 протоколу HTTP для локального тестирования. Поставьте Master за TLS-терминирующий прокси и переключите в `true` для
 любого реального развёртывания.
 
