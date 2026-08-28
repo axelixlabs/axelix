@@ -2,6 +2,7 @@ import type { Config } from '@docusaurus/types';
 
 import { llmsTxtOptions } from './config/llms-txt-options';
 import { presetOptions } from './config/preset-options';
+import { searchOptions } from './config/search-options';
 import { themeConfig } from './config/theme-config';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -43,6 +44,10 @@ const config: Config = {
   presets: [['classic', presetOptions]],
 
   plugins: [['@signalwire/docusaurus-plugin-llms-txt', llmsTxtOptions]],
+
+  // Local, build-time search index (no Algolia). Registered as a theme so it
+  // swizzles in the SearchBar component.
+  themes: [[require.resolve('@easyops-cn/docusaurus-search-local'), searchOptions]],
 
   themeConfig: themeConfig,
 };

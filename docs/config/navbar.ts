@@ -61,6 +61,13 @@ export const navbar: Navbar = {
       className: 'navbar__tab',
     },
     {
+      // First item of the right cluster, so the local search bar sits just to
+      // the left of "Blog". An explicit item also overrides the search theme's
+      // default far-right auto-insertion.
+      type: 'search',
+      position: 'right',
+    },
+    {
       href: 'https://axelix.io/blog',
       label: 'Blog',
       position: 'right',
