@@ -36,7 +36,8 @@ import com.axelixlabs.axelix.common.utils.Assert;
  * @author Dmitry Mazurov
  */
 @ConfigurationProperties(prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX)
-public record PrometheusProperties(Map<String, String> tags, @Nullable Integer port) {
+public record PrometheusProperties(
+        Map<String, String> tags, @Nullable Integer port) {
 
     public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 

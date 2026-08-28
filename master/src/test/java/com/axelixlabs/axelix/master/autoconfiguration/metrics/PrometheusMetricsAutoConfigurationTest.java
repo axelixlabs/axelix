@@ -161,7 +161,10 @@ class PrometheusMetricsAutoConfigurationTest {
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasFailed();
-                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .isInstanceOf(BeanCreationException.class)
+                        .rootCause()
+                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
             });
         }
 
@@ -177,7 +180,10 @@ class PrometheusMetricsAutoConfigurationTest {
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasFailed();
-                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .isInstanceOf(BeanCreationException.class)
+                        .rootCause()
+                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
             });
         }
 
