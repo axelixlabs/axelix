@@ -34,45 +34,45 @@ class DefaultRoleTest {
     @Test
     void shouldReturnItsOwnAuthoritiesWhenItDerivesFromNobody() {
         // given.
-        Role role = new DefaultRole("VIEWER", Set.of(DefaultAuthority.CACHES_TOGGLE));
+        Role role = new DefaultRole("VIEWER", Set.of(OssAuthority.CACHES_TOGGLE));
 
         // when & then.
         assertThat(role.getEffectiveAuthorities())
                 .extracting(Authority::getName)
-                .containsExactly(DefaultAuthority.CACHES_TOGGLE.name());
+                .containsExactly(OssAuthority.CACHES_TOGGLE.name());
     }
 
     @Test
     void shouldUniteTheAuthoritiesOfTheWholeChainItDerivesFrom() {
         // given. C derives from B, B derives from A
-        Role a = new DefaultRole("A", Set.of(DefaultAuthority.ENV_VALUES_READ));
-        Role b = new DefaultRole("B", Set.of(DefaultAuthority.CACHES_CLEAR), Set.of(a));
-        Role c = new DefaultRole("C", Set.of(DefaultAuthority.GARBAGE_COLLECTOR), Set.of(b));
+        Role grandParent = new DefaultRole("A", Set.of(OssAuthority.ENV_VALUES_READ));
+        Role parent = new DefaultRole("B", Set.of(OssAuthority.CACHES_CLEAR), Set.of(grandParent));
+        Role child = new DefaultRole("C", Set.of(OssAuthority.GARBAGE_COLLECTOR), Set.of(parent));
 
         // when & then. The walk goes all the way down rather than one level
-        assertThat(c.getEffectiveAuthorities())
+        assertThat(child.getEffectiveAuthorities())
                 .extracting(Authority::getName)
                 .containsExactlyInAnyOrder(
-                        DefaultAuthority.GARBAGE_COLLECTOR.name(),
-                        DefaultAuthority.CACHES_CLEAR.name(),
-                        DefaultAuthority.ENV_VALUES_READ.name());
+                        OssAuthority.GARBAGE_COLLECTOR.name(),
+                        OssAuthority.CACHES_CLEAR.name(),
+                        OssAuthority.ENV_VALUES_READ.name());
     }
 
     @Test
     void shouldCountTheRoleReachedThroughSeveralBranchesOnce() {
         // given. A diamond: the top role is reached through both of them
-        Role top = new DefaultRole("TOP", Set.of(DefaultAuthority.ENV_VALUES_READ));
-        Role left = new DefaultRole("LEFT", Set.of(DefaultAuthority.CACHES_CLEAR), Set.of(top));
-        Role right = new DefaultRole("RIGHT", Set.of(DefaultAuthority.CACHES_TOGGLE), Set.of(top));
-        Role bottom = new DefaultRole("BOTTOM", Set.of(DefaultAuthority.GARBAGE_COLLECTOR), Set.of(left, right));
+        Role top = new DefaultRole("TOP", Set.of(OssAuthority.ENV_VALUES_READ));
+        Role left = new DefaultRole("LEFT", Set.of(OssAuthority.CACHES_CLEAR), Set.of(top));
+        Role right = new DefaultRole("RIGHT", Set.of(OssAuthority.CACHES_TOGGLE), Set.of(top));
+        Role bottom = new DefaultRole("BOTTOM", Set.of(OssAuthority.GARBAGE_COLLECTOR), Set.of(left, right));
 
         // when & then. Reaching the same authority twice neither duplicates it nor loses the rest
         assertThat(bottom.getEffectiveAuthorities())
                 .extracting(Authority::getName)
                 .containsExactlyInAnyOrder(
-                        DefaultAuthority.GARBAGE_COLLECTOR.name(),
-                        DefaultAuthority.CACHES_CLEAR.name(),
-                        DefaultAuthority.CACHES_TOGGLE.name(),
-                        DefaultAuthority.ENV_VALUES_READ.name());
+                        OssAuthority.GARBAGE_COLLECTOR.name(),
+                        OssAuthority.CACHES_CLEAR.name(),
+                        OssAuthority.CACHES_TOGGLE.name(),
+                        OssAuthority.ENV_VALUES_READ.name());
     }
 }

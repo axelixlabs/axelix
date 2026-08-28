@@ -102,23 +102,22 @@ class DefaultCookieServiceTest {
     void buildAuthoritiesMetadataCookie_WithInheritedAuthorities_IncludesTheOnesReachedThroughTheComponents() {
         // given. The front-end decides what to show from this cookie, so an inherited authority has to reach it just
         // like a direct one
-        Role parent = new DefaultRole("PARENT", Set.of(DefaultAuthority.ENV_VALUES_READ));
-        Role grandParent = new DefaultRole("GRAND_PARENT", Set.of(DefaultAuthority.CACHES_CLEAR));
-        Role targetRole = new DefaultRole(
-                "OBSERVER",
-                Set.of(DefaultAuthority.CACHES_TOGGLE),
-                Set.of(new DefaultRole("PARENT", parent.getAuthorities(), Set.of(grandParent))));
+        Role grandParent = new DefaultRole("GRAND_PARENT", Set.of(OssAuthority.CACHES_CLEAR));
+        Role child = new DefaultRole(
+                "CHILD",
+                Set.of(OssAuthority.CACHES_TOGGLE),
+                Set.of(new DefaultRole("PARENT", Set.of(OssAuthority.ENV_VALUES_READ), Set.of(grandParent))));
 
         // when.
-        ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
+        ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(child));
         String decodedValue =
                 new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
 
         // then. Own, inherited and inherited-transitively alike
         assertThat(decodedValue)
-                .contains(DefaultAuthority.CACHES_TOGGLE.name())
-                .contains(DefaultAuthority.ENV_VALUES_READ.name())
-                .contains(DefaultAuthority.CACHES_CLEAR.name());
+                .contains(OssAuthority.CACHES_TOGGLE.name())
+                .contains(OssAuthority.ENV_VALUES_READ.name())
+                .contains(OssAuthority.CACHES_CLEAR.name());
     }
 
     @Test

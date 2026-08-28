@@ -37,9 +37,8 @@ public interface Role {
     String getName();
 
     /**
-     * Authorities this role grants on its own, without the ones it reaches through its {@link #getComponents()
-     * components}. Meant for whoever stores or serializes the role as it stands; whoever decides what the holder of
-     * the role may do wants {@link #getEffectiveAuthorities()} instead.
+     * Returns the direct role's authorities, i.e. authorities this role grants on its
+     * own, without the ones that are inherited from other {@link #getComponents()}.
      *
      * @return immutable set of {@link Authority} objects associated with this role
      */
@@ -57,12 +56,8 @@ public interface Role {
     Set<Role> getComponents();
 
     /**
-     * Everything this role grants: its own {@link #getAuthorities() authorities} united with the ones of every role
-     * reachable through its {@link #getComponents() components}, however deep. An authority is not copied into the
-     * deriving role, so granting one to a component shows up here at once.
-     *
-     * <p>No visited set is kept on the way down: a composite is assembled bottom-up out of immutable roles, so the
-     * graph of objects cannot close a cycle whatever the data it was assembled from said.</p>
+     * Everything this role grants: its own {@link #getAuthorities() authorities} combined with the ones of every role
+     * reachable through its {@link #getComponents() components}, however deep.
      *
      * @return immutable set of every {@link Authority} the role grants, directly or through a component
      */

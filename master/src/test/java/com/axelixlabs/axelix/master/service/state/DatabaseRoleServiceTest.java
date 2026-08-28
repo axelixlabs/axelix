@@ -31,7 +31,7 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.RoleEntity;
@@ -191,31 +191,33 @@ class DatabaseRoleServiceTest {
         @Test
         void shouldExposeTheRoleItDerivesFromAsAComponent() {
             // given.
-            String parentId = customRole("PARENT", DefaultAuthority.CACHES_CLEAR);
-            String childId = customRole("CHILD", DefaultAuthority.GARBAGE_COLLECTOR);
+            String parentId = customRole("PARENT", OssAuthority.CACHES_CLEAR);
+            String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             deriveFrom(childId, parentId);
 
             // when.
             Role child = roleService.findByName("CHILD").orElseThrow();
 
             // then. The parent is a component rather than its authorities being copied into the child
-            assertThat(child.getAuthorities()).extracting(Authority::getName).containsExactly("GARBAGE_COLLECTOR");
+            assertThat(child.getAuthorities())
+                    .extracting(Authority::getName)
+                    .containsExactly(OssAuthority.GARBAGE_COLLECTOR.getName());
             assertThat(child.getComponents()).singleElement().satisfies(parent -> {
                 assertThat(parent.getName()).isEqualTo("PARENT");
                 assertThat(parent.getAuthorities())
                         .extracting(Authority::getName)
-                        .containsExactly("CACHES_CLEAR");
+                        .containsExactly(OssAuthority.CACHES_CLEAR.getName());
             });
         }
 
         @Test
         void shouldResolveTheBondsTransitively() {
             // given. C derives from B, B derives from A
-            String roleA = customRole("ROLE A", DefaultAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", DefaultAuthority.CACHES_CLEAR);
-            String roleC = customRole("ROLE C", DefaultAuthority.GARBAGE_COLLECTOR);
-            deriveFrom(roleB, roleA);
-            deriveFrom(roleC, roleB);
+            String grandParent = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String parent = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String child = customRole("ROLE C", OssAuthority.GARBAGE_COLLECTOR);
+            deriveFrom(parent, grandParent);
+            deriveFrom(child, parent);
 
             // when.
             Role c = roleService.findByName("ROLE C").orElseThrow();
@@ -223,16 +225,19 @@ class DatabaseRoleServiceTest {
             // then.
             assertThat(c.getEffectiveAuthorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR", "ENV_VALUES_READ");
+                    .containsExactlyInAnyOrder(
+                            OssAuthority.GARBAGE_COLLECTOR.getName(),
+                            OssAuthority.CACHES_CLEAR.getName(),
+                            OssAuthority.ENV_VALUES_READ.getName());
         }
 
         @Test
         void shouldUnionTheAuthoritiesReachedThroughSeveralChains() {
             // given. A diamond: the top role is reached through both branches
-            String top = customRole("TOP", DefaultAuthority.ENV_VALUES_READ);
-            String left = customRole("LEFT", DefaultAuthority.CACHES_CLEAR);
-            String right = customRole("RIGHT", DefaultAuthority.CACHES_TOGGLE);
-            String bottom = customRole("BOTTOM", DefaultAuthority.GARBAGE_COLLECTOR);
+            String top = customRole("TOP", OssAuthority.ENV_VALUES_READ);
+            String left = customRole("LEFT", OssAuthority.CACHES_CLEAR);
+            String right = customRole("RIGHT", OssAuthority.CACHES_TOGGLE);
+            String bottom = customRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
             deriveFrom(left, top);
             deriveFrom(right, top);
             deriveFrom(bottom, left);
@@ -244,15 +249,19 @@ class DatabaseRoleServiceTest {
             // then. Reaching the same authority twice is not an error, it is simply unioned
             assertThat(role.getEffectiveAuthorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR", "CACHES_TOGGLE", "ENV_VALUES_READ");
+                    .containsExactlyInAnyOrder(
+                            OssAuthority.GARBAGE_COLLECTOR.getName(),
+                            OssAuthority.CACHES_CLEAR.getName(),
+                            OssAuthority.CACHES_TOGGLE.getName(),
+                            OssAuthority.ENV_VALUES_READ.getName());
         }
 
         @Test
         void shouldTerminateOnABondCycleWrittenAroundTheApplication() {
             // given. Neither lane can write this, but a hand-written row could - and the resolution runs on the
             // login path, so looping here would leave nobody able to log in
-            String roleA = customRole("ROLE A", DefaultAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", DefaultAuthority.CACHES_CLEAR);
+            String roleA = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String roleB = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
             deriveFrom(roleA, roleB);
             deriveFrom(roleB, roleA);
 
@@ -262,14 +271,15 @@ class DatabaseRoleServiceTest {
             // then. The walk stops at the repeated role, so the authorities are still resolved
             assertThat(a.getEffectiveAuthorities())
                     .extracting(Authority::getName)
-                    .containsExactlyInAnyOrder("ENV_VALUES_READ", "CACHES_CLEAR");
+                    .containsExactlyInAnyOrder(
+                            OssAuthority.ENV_VALUES_READ.getName(), OssAuthority.CACHES_CLEAR.getName());
         }
 
         @Test
         void shouldResolveTheBondsOfEveryRoleTheUserHolds() {
             // given.
-            String parentId = customRole("PARENT", DefaultAuthority.CACHES_CLEAR);
-            String childId = customRole("CHILD", DefaultAuthority.GARBAGE_COLLECTOR);
+            String parentId = customRole("PARENT", OssAuthority.CACHES_CLEAR);
+            String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             deriveFrom(childId, parentId);
 
             userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "CHILD");
@@ -283,10 +293,11 @@ class DatabaseRoleServiceTest {
                     .singleElement()
                     .satisfies(role -> assertThat(role.getEffectiveAuthorities())
                             .extracting(Authority::getName)
-                            .containsExactlyInAnyOrder("GARBAGE_COLLECTOR", "CACHES_CLEAR"));
+                            .containsExactlyInAnyOrder(
+                                    OssAuthority.GARBAGE_COLLECTOR.getName(), OssAuthority.CACHES_CLEAR.getName()));
         }
 
-        private String customRole(String name, DefaultAuthority authority) {
+        private String customRole(String name, OssAuthority authority) {
             String id = UUID.randomUUID().toString();
 
             jdbcAggregateTemplate.insert(new RoleEntity(id, name, "Description", RoleOrigin.WEB_UI));
