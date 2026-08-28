@@ -31,7 +31,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.StandardEnvironment;
-import org.springframework.test.util.TestSocketUtils;
+
+import com.axelixlabs.axelix.master.utils.TestPortUtils;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
@@ -87,7 +88,7 @@ class OnPrometheusPortConditionTest {
     }
 
     private static Stream<Arguments> differingPortCases() {
-        return Stream.of(Arguments.of("8080", String.valueOf(TestSocketUtils.findAvailableTcpPort())));
+        return Stream.of(Arguments.of("8080", String.valueOf(TestPortUtils.findAvailableTcpPortOtherThan(8080))));
     }
 
     private static String[] properties(@Nullable String serverPort, @Nullable String prometheusPort) {

@@ -35,7 +35,8 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.export.promethe
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.StandardEnvironment;
-import org.springframework.test.util.TestSocketUtils;
+
+import com.axelixlabs.axelix.master.utils.TestPortUtils;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,7 +119,8 @@ class PrometheusMetricsAutoConfigurationTest {
             ApplicationContextRunner contextRunner = baselineContextRunner()
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + TestSocketUtils.findAvailableTcpPort(),
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port="
+                                    + TestPortUtils.findAvailableTcpPortOtherThan(8080),
                             "server.port=8080");
 
             // when.
