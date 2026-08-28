@@ -20,16 +20,14 @@ package com.axelixlabs.axelix.master.service.auth.provider;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.annotation.PostConstruct;
-
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
+import jakarta.annotation.PostConstruct;
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@link UserAuthenticator} that authenticates Super Admin.

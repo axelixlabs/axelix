@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.exception.auth;
 
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * Thrown when attempting to create a user with an email that is already taken.

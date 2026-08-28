@@ -26,13 +26,14 @@ import org.slf4j.LoggerFactory;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcRoleExtractionException;
-import com.axelixlabs.axelix.master.service.state.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 
 /**
  * Accessor for the JSON response of the {@code /userinfo} OIDC endpoint.
  *
  * @author Mikhail Polivakha
  */
+// TODO: we need to extract an interface here to clearly define the contract.
 public class UserInfoJsonAccessor {
 
     private static final String DEFAULT_ROLE_NAME = "VIEWER";

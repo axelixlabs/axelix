@@ -59,7 +59,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidato
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration.MCP_CONFIGURATION_PROPERTIES_PREFIX;

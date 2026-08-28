@@ -79,8 +79,8 @@ import com.axelixlabs.axelix.master.service.auth.provider.CompositeUserAuthentic
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
-import com.axelixlabs.axelix.master.service.state.RoleService;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * Autoconfiguration for security.

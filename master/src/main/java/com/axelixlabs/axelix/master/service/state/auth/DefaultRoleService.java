@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.state;
+package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,41 +41,40 @@ import com.axelixlabs.axelix.master.repository.RoleRepository.RoleWithAuthorityN
 
 /**
  * JDBC-based implementation of {@link RoleService} that reads roles from the {@code roles}, {@code roles_authorities},
- * {@code roles_parents} and {@code authorities} tables.
+ * {@code roles_parents} and {@code directAuthorities} tables.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Service
 @NullMarked
 @Transactional
-public class DatabaseRoleService implements RoleService {
+public class DefaultRoleService implements RoleService {
 
     private final RoleRepository roleRepository;
     private final AuthoritiesManager authoritiesManager;
 
-    public DatabaseRoleService(RoleRepository roleRepository, AuthoritiesManager authoritiesManager) {
+    public DefaultRoleService(RoleRepository roleRepository, AuthoritiesManager authoritiesManager) {
         this.roleRepository = roleRepository;
         this.authoritiesManager = authoritiesManager;
     }
 
     @Override
-    public Optional<Role> findByName(String name) {
-        RoleGraph graph = readGraph();
-
-        return findRoleId(graph, name).flatMap(roleId -> composeRole(graph, roleId));
+    public Optional<Role> findByName(String name) throws IllegalStateException {
+        return getGraph().composeRoleFromName(name);
     }
 
     @Override
-    public Set<Role> findRolesOfUser(String userId) {
-        RoleGraph graph = readGraph();
+    public Set<Role> findRolesOfUser(String userId) throws IllegalStateException {
+        RoleGraph graph = getGraph();
 
         return roleRepository.findRoleIdsOfUser(userId).stream()
-                .map(roleId -> composeRole(graph, roleId))
+                .map(graph::composeRole)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
     }
 
-    private RoleGraph readGraph() {
+    private RoleGraph getGraph() {
         Map<String, String> names = new HashMap<>();
         Map<String, Set<Authority>> authorities = new HashMap<>();
 
@@ -84,8 +83,9 @@ public class DatabaseRoleService implements RoleService {
             Set<Authority> granted = authorities.computeIfAbsent(row.roleId(), _ -> new HashSet<>());
 
             if (row.authorityName() != null) {
-                String authorityName = row.authorityName();
-                granted.add(() -> authorityName);
+                Optional
+                    .ofNullable(authoritiesManager.decode(row.authorityName()))
+                    .ifPresent(granted::add);
             }
         }
 
@@ -98,45 +98,55 @@ public class DatabaseRoleService implements RoleService {
         return new RoleGraph(names, authorities, parents);
     }
 
-    private Optional<String> findRoleId(RoleGraph graph, String roleName) {
-        return graph.names().entrySet().stream()
-                .filter(entry -> entry.getValue().equals(roleName))
-                .map(Map.Entry::getKey)
-                .findFirst();
-    }
-
-    private Optional<Role> composeRole(RoleGraph graph, String roleId) {
-        return composeRole(graph, roleId, new HashSet<>());
-    }
-
-    private Optional<Role> composeRole(RoleGraph graph, String roleId, Set<String> derivationPath) {
-        String roleName = graph.names().get(roleId);
-
-        // The roles, the bonds and the roles of the user are three separate reads rather than one snapshot, so an id
-        // can point at a role the roles query did not return. Such a role is left out - this runs on the login path,
-        // and it is not worth an unresolvable id there
-        if (roleName == null) {
-            return Optional.empty();
-        }
-
-        derivationPath.add(roleId);
-        Set<Role> components = new HashSet<>();
-
-        for (String parentRoleId : graph.parents().getOrDefault(roleId, List.of())) {
-            if (derivationPath.add(parentRoleId)) {
-                composeRole(graph, parentRoleId, derivationPath).ifPresent(components::add);
-                derivationPath.remove(parentRoleId);
-            }
-        }
-
-        derivationPath.remove(roleId);
-
-        return Optional.of(new DefaultRole(roleName, graph.authorities().getOrDefault(roleId, Set.of()), components));
-    }
-
     /**
      * The roles and the bonds between them, as read from the database, ready to be resolved into composite roles.
      */
     private record RoleGraph(
-            Map<String, String> names, Map<String, Set<Authority>> authorities, Map<String, List<String>> parents) {}
+        Map<String, String> roleIdToName,
+        Map<String, Set<Authority>> directAuthorities,
+        Map<String, List<String>> directParents) {
+
+        private Optional<String> findRoleId(String roleName) {
+            return roleIdToName.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(roleName))
+                .map(Map.Entry::getKey)
+                .findFirst();
+        }
+
+        private Optional<Role> composeRoleFromName(String roleName) {
+            return findRoleId(roleName).flatMap(roleId -> composeRole(roleId, new HashSet<>()));
+        }
+
+        private Optional<Role> composeRole(String roleId) {
+            return composeRole(roleId, new HashSet<>());
+        }
+
+        private Optional<Role> composeRole(String roleId, Set<String> visited) {
+            String roleName = roleIdToName.get(roleId);
+
+            if (roleName == null) {
+                return Optional.empty();
+            }
+
+            visited.add(roleId);
+            Set<Role> components = new HashSet<>();
+
+            for (String parentRoleId : directParents.getOrDefault(roleId, List.of())) {
+                if (visited.add(parentRoleId)) {
+                    composeRole(parentRoleId, visited).ifPresent(components::add);
+                } else {
+                    // TODO:
+                    //  ideally, we would want to create a descriptive message here explaining what
+                    //  roles create a cycle. Like message with "A --> B --> C --> A" or something.
+                    throw new IllegalStateException(
+                        "Unable to resolve the state of the Role '%s': ".formatted(roleName) +
+                        "it's ancestry create a cycle");
+                }
+            }
+
+            return Optional.of(
+                new DefaultRole(roleName, directAuthorities.getOrDefault(roleId, Set.of()), components)
+            );
+        }
+    }
 }

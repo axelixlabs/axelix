@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.service.state.auth.DatabaseUserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
