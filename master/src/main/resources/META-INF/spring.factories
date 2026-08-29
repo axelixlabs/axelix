@@ -1,2 +1,5 @@
 org.springframework.boot.EnvironmentPostProcessor=\
 com.axelixlabs.axelix.master.autoconfiguration.logging.AxelixStructuredLoggingEnvironmentPostProcessor
+
+org.springframework.boot.context.config.ConfigDataLocationResolver=\
+com.axelixlabs.axelix.master.autoconfiguration.externalconfig.AxelixVaultConfigDataLocationResolver
