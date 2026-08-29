@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidato
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;

@@ -28,8 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
@@ -78,8 +78,7 @@ class DefaultCookieServiceTest {
     @Test
     void buildAuthoritiesMetadataCookie_WithDistinctAuthorities_ReturnsBase64EncodedJsonCookie() {
         // given.
-        Role targetRole =
-                new DefaultRole("OBSERVER", Set.of(DefaultAuthority.CACHES_TOGGLE, DefaultAuthority.ENV_VALUES_READ));
+        Role targetRole = new DefaultRole("OBSERVER", Set.of(OssAuthority.CACHES_TOGGLE, OssAuthority.ENV_VALUES_READ));
 
         // when.
         ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(targetRole));
@@ -95,8 +94,30 @@ class DefaultCookieServiceTest {
             assertThat(cookie.getMaxAge()).isEqualTo(jwtProperties.lifespan());
         });
         assertThat(decodedValue).startsWith("[").endsWith("]");
-        assertThat(decodedValue).contains(DefaultAuthority.CACHES_TOGGLE.name());
-        assertThat(decodedValue).contains(DefaultAuthority.ENV_VALUES_READ.name());
+        assertThat(decodedValue).contains(OssAuthority.CACHES_TOGGLE.name());
+        assertThat(decodedValue).contains(OssAuthority.ENV_VALUES_READ.name());
+    }
+
+    @Test
+    void buildAuthoritiesMetadataCookie_WithInheritedAuthorities_IncludesTheOnesReachedThroughTheComponents() {
+        // given. The front-end decides what to show from this cookie, so an inherited authority has to reach it just
+        // like a direct one
+        Role grandParent = new DefaultRole("GRAND_PARENT", Set.of(OssAuthority.CACHES_CLEAR));
+        Role child = new DefaultRole(
+                "CHILD",
+                Set.of(OssAuthority.CACHES_TOGGLE),
+                Set.of(new DefaultRole("PARENT", Set.of(OssAuthority.ENV_VALUES_READ), Set.of(grandParent))));
+
+        // when.
+        ResponseCookie authoritiesCookie = cookieService.buildAuthoritiesMetadataCookie(Set.of(child));
+        String decodedValue =
+                new String(Base64.getDecoder().decode(authoritiesCookie.getValue()), StandardCharsets.UTF_8);
+
+        // then. Own, inherited and inherited-transitively alike
+        assertThat(decodedValue)
+                .contains(OssAuthority.CACHES_TOGGLE.name())
+                .contains(OssAuthority.ENV_VALUES_READ.name())
+                .contains(OssAuthority.CACHES_CLEAR.name());
     }
 
     @Test

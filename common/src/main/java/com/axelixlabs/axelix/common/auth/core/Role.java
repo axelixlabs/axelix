@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -36,7 +37,8 @@ public interface Role {
     String getName();
 
     /**
-     * Authorities of a given role.
+     * Returns the direct role's authorities, i.e. authorities this role grants on its
+     * own, without the ones that are inherited from other {@link #getComponents()}.
      *
      * @return immutable set of {@link Authority} objects associated with this role
      */
@@ -52,4 +54,20 @@ public interface Role {
      * @return immutable set of {@link Role} objects included in this role
      */
     Set<Role> getComponents();
+
+    /**
+     * Everything this role grants: its own {@link #getAuthorities() authorities} combined with the ones of every role
+     * reachable through its {@link #getComponents() components}, however deep.
+     *
+     * @return immutable set of every {@link Authority} the role grants, directly or through a component
+     */
+    default Set<Authority> getEffectiveAuthorities() {
+        Set<Authority> all = new HashSet<>(getAuthorities());
+
+        for (Role component : getComponents()) {
+            all.addAll(component.getEffectiveAuthorities());
+        }
+
+        return Set.copyOf(all);
+    }
 }

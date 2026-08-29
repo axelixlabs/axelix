@@ -27,7 +27,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
@@ -38,7 +38,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  */
 public class DefaultEnvironmentService implements EnvironmentService {
 
-    private static final DefaultAuthority FULL_ACCESS_AUTHORITY = DefaultAuthority.ENV_VALUES_READ;
+    private static final OssAuthority FULL_ACCESS_AUTHORITY = OssAuthority.ENV_VALUES_READ;
 
     private final EnvironmentEndpoint delegate;
     private final EnvironmentEndpoint sanitizedDelegate;

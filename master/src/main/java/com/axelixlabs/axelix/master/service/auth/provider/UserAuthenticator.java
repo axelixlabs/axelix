@@ -36,8 +36,12 @@ public interface UserAuthenticator {
      * @param username the user's username.
      * @param password the user's password.
      *
+     * @throws IllegalStateException in case implementation cannot assemble the {@link User} due to the fact that
+     *                               its state is corrupted for any reason, e.g. the graph roles of the given user
+     *                               contains the cycle.
+     *
      * @return the authenticated {@link User}, or null, if the user with such credentials pair was not found.
      */
     @Nullable
-    User authenticate(String username, String password);
+    User authenticate(String username, String password) throws IllegalStateException;
 }

@@ -30,8 +30,10 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
@@ -53,6 +55,7 @@ class SuperAdminUserAuthenticatorTest {
     void setup() {
         this.contextRunner = new ApplicationContextRunner()
                 .withBean(BCryptPasswordEncoder.class, BCryptPasswordEncoder::new)
+                .withBean(AuthoritiesManager.class, () -> new DefaultAuthoritiesManager(null))
                 .withConfiguration(
                         AutoConfigurations.of(SecurityAutoConfiguration.SuperAdminLoginAutoConfiguration.class));
     }
@@ -128,7 +131,9 @@ class SuperAdminUserAuthenticatorTest {
             // then.
             assertThat(user).isNotNull();
             assertThat(user.getUsername()).isEqualTo(USERNAME);
-            assertThat(user.getRoles()).containsExactly(DefaultRole.SUPER_ADMIN);
+            assertThat(user.getRoles())
+                    .extracting(Role::getName)
+                    .containsExactly(SuperAdminUserAuthenticator.SUPER_ADMIN_ROLE_NAME);
         }
 
         @Test // GH-1004

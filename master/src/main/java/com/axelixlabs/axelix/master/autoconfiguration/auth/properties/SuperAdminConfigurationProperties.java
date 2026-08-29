@@ -22,12 +22,10 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
 
 /**
- * Configuration of the {@link DefaultRole#SUPER_ADMIN}.
+ * Configuration of the Super Admin.
  *
  * @author Mikhail Polivakha
  * @author Ilya Naumov

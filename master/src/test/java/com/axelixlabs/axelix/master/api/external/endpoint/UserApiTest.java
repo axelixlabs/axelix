@@ -48,12 +48,11 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.AbstractProtectedEndpointTest;
 
-import static com.axelixlabs.axelix.common.auth.core.DefaultRole.SUPER_ADMIN;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -331,7 +330,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(alice.id(), bob.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
         ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.
@@ -375,7 +374,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(alice.id());
 
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
         ResponseEntity<String> response = superAdmin.getForEntity(USER_BY_ID_PATH, String.class, alice.id());
 
         // then.
@@ -393,7 +392,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         // when.
         ResponseEntity<String> response =
-                restTemplateBuilder.withRole(SUPER_ADMIN).getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
+                restTemplateBuilder.asUsersFeedViewer().getForEntity(USER_BY_ID_PATH, String.class, unknownUserId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -402,7 +401,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyUsersFeed() {
         // when.
-        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.withRole(SUPER_ADMIN);
+        IdentityAwareTestRestTemplate superAdmin = restTemplateBuilder.asUsersFeedViewer();
         ResponseEntity<String> response = superAdmin.getForEntity(USERS_FEED_PATH, String.class);
 
         // then.

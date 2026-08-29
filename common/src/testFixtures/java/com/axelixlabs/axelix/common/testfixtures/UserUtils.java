@@ -23,8 +23,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -39,7 +39,7 @@ public class UserUtils {
 
     private static final Random RANDOM = new Random();
 
-    public static User fromAuthorities(DefaultAuthority... authorities) {
+    public static User fromAuthorities(OssAuthority... authorities) {
         Set<Authority> authoritySet = Set.of(authorities);
         Role role = new DefaultRole(pseudoRandomStirng(), authoritySet);
         return new PasswordlessUser(pseudoRandomStirng(), Set.of(role));

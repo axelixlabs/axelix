@@ -50,10 +50,10 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
@@ -354,7 +354,7 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnForbidden_TokenWithNullNameRoles() {
-        Role role = new DefaultRole(null, Set.of(DefaultAuthority.CACHES_CLEAR));
+        Role role = new DefaultRole(null, Set.of(OssAuthority.CACHES_CLEAR));
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
 

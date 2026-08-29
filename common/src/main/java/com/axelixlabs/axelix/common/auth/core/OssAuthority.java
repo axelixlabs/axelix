@@ -17,14 +17,18 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
- * Enumeration of default authorities supported by Axelix.
+ * Enumeration of OSS authorities supported by Axelix.
  *
  * @see Authority
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public enum DefaultAuthority implements Authority {
+public enum OssAuthority implements Authority {
 
     /**
      * Grants the right to view values in Environment.
@@ -62,7 +66,6 @@ public enum DefaultAuthority implements Authority {
 
     /**
      * Grants the right to view managed users.
-     * <p>Reserved for the {@code DefaultRole.SUPER_ADMIN} role.</p>
      */
     USERS_VIEW,
 
@@ -71,6 +74,10 @@ public enum DefaultAuthority implements Authority {
      * <p>Allows creating, updating, and deleting managed users at runtime.</p>
      */
     USERS_MANAGEMENT;
+
+    public static Set<Authority> asSet() {
+        return Arrays.stream(values()).collect(Collectors.toSet());
+    }
 
     @Override
     public String getName() {

@@ -27,24 +27,31 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.service.auth.encoder.SuperAdminPasswordEncoder;
 
 /**
- * {@link UserAuthenticator} that authenticates a {@link DefaultRole#SUPER_ADMIN}.
+ * {@link UserAuthenticator} that authenticates Super Admin.
  *
  * @author Mikhail Polivakha
  * @author Ilya Naumov
  */
 public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
+    public static final String SUPER_ADMIN_ROLE_NAME = "SUPER_ADMIN";
+
     private final SuperAdminConfigurationProperties superAdminConfiguration;
     private final SuperAdminPasswordEncoder passwordEncoder;
+    private final AuthoritiesManager authoritiesManager;
 
     public SuperAdminUserAuthenticator(
-            SuperAdminConfigurationProperties superAdminConfiguration, SuperAdminPasswordEncoder passwordEncoder) {
+            SuperAdminConfigurationProperties superAdminConfiguration,
+            SuperAdminPasswordEncoder passwordEncoder,
+            AuthoritiesManager authoritiesManager) {
         this.superAdminConfiguration = superAdminConfiguration;
         this.passwordEncoder = passwordEncoder;
+        this.authoritiesManager = authoritiesManager;
     }
 
     @PostConstruct
@@ -57,10 +64,11 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
         if (Objects.equals(superAdminConfiguration.getUsername(), username)
                 && passwordEncoder.matches(password, superAdminConfiguration.getPassword())) {
+
             return new DefaultUser(
                     superAdminConfiguration.getUsername(),
                     passwordEncoder.extractEncodedPassword(superAdminConfiguration.getPassword()),
-                    Set.of(DefaultRole.SUPER_ADMIN));
+                    Set.of(new DefaultRole(SUPER_ADMIN_ROLE_NAME, authoritiesManager.getAll())));
         }
 
         return null;

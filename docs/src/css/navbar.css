@@ -176,6 +176,20 @@
   opacity: 0.85;
 }
 
+/* Local search bar — match the neighbouring pill buttons (Blog, GitHub…):
+ * same 36px height and pill radius/border so the right cluster reads as one
+ * row. The plugin renders its magnifier as an inline SVG at left 0.75rem, so
+ * the default left padding still clears the icon. */
+.navbar__search-input {
+  box-sizing: border-box;
+  height: 36px;
+  border: 1px solid var(--axelix-border);
+  border-radius: 999px;
+  background-color: transparent;
+  font-size: 0.875rem;
+  color: var(--axelix-fg);
+}
+
 .navbar-sidebar {
   background: var(--axelix-bg);
 }

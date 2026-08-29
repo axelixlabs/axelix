@@ -59,8 +59,8 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserAuthenticator;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
-import com.axelixlabs.axelix.master.service.state.RoleService;
-import com.axelixlabs.axelix.master.service.state.UserService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_LOGIN_PROPERTIES_PREFIX;
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.SUPER_ADMIN_LOGIN_PROPERTIES_PREFIX;
