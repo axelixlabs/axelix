@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.master.service.state.auth;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.domain.RoleFeed;
 import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 
 /**
@@ -62,4 +64,11 @@ public interface RoleService {
      * @return Roles of the user.
      */
     Set<Role> findRolesOfUser(String userId) throws IllegalStateException;
+
+    /**
+     * Returns the feed of all the roles.
+     *
+     * @return An entry per role, in no particular order.
+     */
+    List<RoleFeed> getRolesFeed();
 }
