@@ -68,20 +68,37 @@ least **Java 11**.
 
 The rule is simple:
 
-> **Axelix Master is compatible with a service as long as it shares the same _major_ version as that service's starter.**
+> **Axelix Master is compatible with a service as long as it shares the same _major_ AND _minor_ version as that
+> service's starter. Only a _patch_-level drift is guaranteed to be compatible.**
 
-If Axelix Master and the starter in service **X** have the same **MAJOR** version, Master will work with service X. Some
-features that service X could otherwise offer may be missing, but that is **discovered gracefully** — Master stays
-functional and simply does not expose the capabilities the older starter cannot provide.
+In other words, we guarantee compatibility only when Master and the starter differ **at most on the patch version**. If
+they diverge on the **minor** or **major** version, we guarantee **nothing** — it **may** still work, but it **may**
+break.
 
-For example, if Axelix Master is `3.6.1` and the starter in service X is `3.1.2`, the starter may lack some of the newer
-features. Master will not be able to use those specific features for service X, but everything else works as expected.
+- ✅ Master `1.4.2` with starter `1.4.5` — **only patch drift**, guaranteed compatible.
+- ⚠️ Master `1.4.2` with starter `1.3.4` — **minor drift**, not guaranteed. It may work; it may break.
+- ⚠️ Master `1.4.2` with starter `1.5.1` — **minor drift**, not guaranteed. It may work; it may break.
+- ⚠️ Any **major** drift — not guaranteed, and even less likely to work than a minor drift.
 
-:::warning[Version drift is tolerated, not recommended]
+### Why patch drift is safe but minor/major drift is not
 
-Drift on the **minor** or **patch** level is acceptable, but it is **not a best practice**. It exists primarily to
-account for security patches, bug fixes, and performance improvements on the starter side. Keep starters and Master on
-the same version where you can, and treat a **major** version match as the hard compatibility requirement.
+The assumption behind this policy is that **all functionality exposed by the starters is meant to be reached through the
+Axelix Master web UI**. There is no scenario in which you would need to bump a starter's **minor** version on its own to
+unlock some capability — that capability surfaces through Master, not through the starter in isolation. Because of that,
+we let ourselves **revisit the contract between Axelix Master and the starters in minor releases**, which keeps the
+project moving fast.
+
+Patch releases are different. As stated by [semver](https://semver.org/), a patch release may carry a **critical CVE
+fix, a bug fix, or a performance improvement** — and those changes are valuable **on their own**, regardless of Master.
+So a patch-level drift is something you may genuinely want, and we guarantee it stays compatible.
+
+:::warning[Minor and major drift may break the interaction protocol]
+
+We **may** — this does **not** mean we **will**, but we **may** — revisit the protocol of interaction between the
+managed services (starters) and Master between **minor** releases, let alone **major** ones. That means a combination
+like Master `1.4.2` with starter `1.3.4` or `1.5.1` **may** break. It does not mean it **would** break — but it **may**,
+and we do not guarantee otherwise. Keep the starter and Master on the same major **and** minor version, and only let the
+patch versions drift.
 :::
 
 ## Backward compatibility guarantees between releases
