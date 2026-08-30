@@ -21,6 +21,8 @@ permissions:
 
 jobs:
   setup-matrix:
+    # Scheduled runs must only execute in the main Axelix repository, not in forks.
+    if: github.event_name != 'schedule' || github.repository == 'axelixlabs/axelix'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.read.outputs.matrix }}
