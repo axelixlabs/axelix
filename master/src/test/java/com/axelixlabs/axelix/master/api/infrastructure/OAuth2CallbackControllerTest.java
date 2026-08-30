@@ -46,6 +46,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
@@ -257,7 +258,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(userService.findRoleNamesByUserId(updated.id())).containsOnly(TestRoles.EDITOR.getName());
         assertThat(updated.userOrigin()).isEqualTo(UserOrigin.OIDC);
         assertThat(updated.lastLoginAt()).isNotNull().isBetween(beforeLogin, afterLogin);
-        assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, new PasswordlessUser(username, Set.of()));
+        assertSuccessfulCallback(MasterWebEndpoints.OIDC_AUTH_COMPLETE, UserUtils.passwordless(username, Set.of()));
     }
 
     @Test

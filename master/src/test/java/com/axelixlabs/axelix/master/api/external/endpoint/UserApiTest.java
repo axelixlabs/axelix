@@ -37,10 +37,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
@@ -135,7 +135,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 .contains(String.valueOf(jwtProperties.lifespan().getSeconds()));
         assertThat(cookieHeader).contains("HttpOnly");
         assertThat(cookieHeader).contains("SameSite=Strict");
-        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser("admin", "admin", Set.of()));
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, UserUtils.withPassword("admin", "admin", Set.of()));
     }
 
     @Test
@@ -174,7 +174,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
         assertThat(updated.lastLoginAt()).isNotNull();
-        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser(username, password, Set.of()));
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, UserUtils.withPassword(username, password, Set.of()));
     }
 
     @Test
@@ -237,12 +237,12 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).hasSize(2);
         assertThat(userRepository.findById(user.id()).orElseThrow().lastLoginAt())
                 .isNotNull();
-        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, new DefaultUser(username, password, Set.of()));
+        assertSuccessfulCallback(MasterWebEndpoints.LOCAL_LOGIN, UserUtils.withPassword(username, password, Set.of()));
     }
 
     @Test
     void shouldClearCookieOnLogout() {
-        PasswordlessUser actor = new PasswordlessUser("someUser", Set.of());
+        PasswordlessUser actor = UserUtils.passwordless("someUser", Set.of());
         String token = jwtEncoderService.generateToken(actor);
 
         HttpHeaders headers = new HttpHeaders();

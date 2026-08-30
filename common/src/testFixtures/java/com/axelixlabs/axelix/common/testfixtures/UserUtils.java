@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -47,6 +48,14 @@ public class UserUtils {
 
     public static User fromRoles(Role... roles) {
         return new PasswordlessUser(pseudoRandomStirng(), Arrays.stream(roles).collect(Collectors.toSet()));
+    }
+
+    public static PasswordlessUser passwordless(String username, Set<Role> roles) {
+        return new PasswordlessUser(username, roles);
+    }
+
+    public static DefaultUser withPassword(String username, String password, Set<Role> roles) {
+        return new DefaultUser(username, password, roles);
     }
 
     public static String pseudoRandomStirng() {

@@ -32,12 +32,12 @@ import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.BeanSourceTestJsonSupport.beanSourceAwareJsonConverter;
 
@@ -143,10 +143,10 @@ public class TestRestTemplateBuilder {
 
     private String generateToken(Role[] roles) {
         return defaultJwtEncoderService.generateToken(
-                new DefaultUser(USERNAME, PASSWORD, Arrays.stream(roles).collect(Collectors.toSet())));
+                UserUtils.withPassword(USERNAME, PASSWORD, Arrays.stream(roles).collect(Collectors.toSet())));
     }
 
     private String generateExpiredToken() {
-        return expiredJwtEncoderService.generateToken(new DefaultUser(USERNAME, PASSWORD, Set.of()));
+        return expiredJwtEncoderService.generateToken(UserUtils.withPassword(USERNAME, PASSWORD, Set.of()));
     }
 }
