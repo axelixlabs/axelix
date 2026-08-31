@@ -30,3 +30,110 @@ public WebSecurityCustomizer webSecurityCustomizer() {
   return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
 }
 ```
+
+## 2. Не тот модуль стартера для вашей версии Spring Boot
+
+### Симптом
+
+Приложение падает при старте сразу после добавления зависимости Axelix Spring Boot Starter с ошибкой
+`NoClassDefFoundError` или `ClassNotFoundException`, указывающей на класс `javax.servlet.*` или `jakarta.servlet.*` -
+например, `javax/servlet/FilterChain` в проекте на Spring Boot 4.x, или `jakarta/servlet/FilterChain` в проекте на
+Spring Boot 2.x.
+
+### Наиболее вероятная причина
+
+Axelix предоставляет отдельный артефакт стартера под каждую мажорную версию Spring Boot - `axelix-spring-boot-2-starter`,
+`axelix-spring-boot-3-starter`, `axelix-spring-boot-4-starter` - и в classpath попал не тот. Spring Boot 2.x всё ещё
+работает на пространстве имён `javax.servlet` (до Jakarta EE), а Spring Boot 3.x и 4.x перешли на `jakarta.servlet`.
+
+### Решение
+
+Подберите стартер под **мажорную** версию Spring Boot вашего приложения - см. [Отдельный стартер под каждую мажорную
+версию Spring Boot](./compatibility-and-versioning.mdx#отдельный-стартер-под-каждую-мажорную-версию-spring-boot) и
+точные координаты в разделе [Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#добавьте-зависимость).
+
+## 3. Локально запущенный сервис не регистрируется в локальном Master
+
+### Симптом
+
+Вы запускаете Master локально, добавляете стартер в своё приложение и запускаете его из IDE. Приложение стартует без
+ошибок, но так и не появляется в Master - ни ошибки на одной из сторон, ни записи в сайдбаре.
+
+### Наиболее вероятная причина
+
+Не выполненено предварительное условие, кнопка "Run" в IDE по умолчанию просто
+компилирует код и запускает главный класс.
+
+**Build-плагин не отработал.** Плагин генерирует `META-INF/axelix-info.properties` (ваши `groupId`/`artifactId`/
+`version`) в результат сборки, и этот файл нужен стартеру, чтобы идентифицировать сервис перед Master. Maven-цель
+(`axelix-generate-project-info`) привязана к фазе `prepare-package` - обычный "скомпилировать и запустить" в IDE до
+неё не доходит. Gradle-таск специально привязан к `processResources`, чтобы запуски из IDE тоже его подхватывали, но
+это срабатывает только если IDE реально вызывает этот таск, а для этого нужно делегировать запуск/сборку на Gradle,
+а не использовать собственный инкрементальный компилятор IDE.
+
+**Master не может найти инстанс сам.** Автообнаружению Master на основе Kubernetes локально попросту нечего
+сканировать, поэтому сервис должен саморегистрироваться.
+
+### Решение
+
+Хотя бы раз выполните сборку перед тем, как полагаться на кнопку Run в IDE - `mvn package` (или
+`mvn install`), либо `./gradlew build`. См. [Что такое build-плагин
+Axelix?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) - что именно генерирует плагин и
+почему он обязателен.
+
+Дальше направьте стартер на ваш локальный Master через механизм саморегистрации и пропишите JWT-ключ подписи с обеих сторон -
+одно и то же значение должно быть на Master и на каждом инстансе, поскольку это симметричный HMAC-алгоритм:
+
+```properties
+server.port=9444
+management.endpoints.web.exposure.include=axelix-metadata
+axelix.sbs.auth.jwt.algorithm=HMAC256
+axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.instance-name=your-application-name
+axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
+axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register
+```
+
+Наконец, запустите сам Master как JAR с **тем же** алгоритмом и ключом подписи:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC256 \
+  -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
+  -jar master.jar
+```
+
+При несовпадении ключа heartbeat отклоняется с `401` вместо регистрации. Полный справочник по саморегистрации - в
+разделе [Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#дайте-master-найти-сервис), а про
+сторону Master - в разделе [Запуск как
+JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-как-jar).
+
+:::warning
+Никогда не используйте ключ подписи выше, как и любой другой пример-ключ с этой страницы, в реальном развёртывании.
+:::
+
+## 4. Некоторые разделы сайдбара остаются пустыми после регистрации
+
+### Симптом
+
+Инстанс появляется в Master, и его статус выглядит здоровым, но некоторые разделы сайдбара - Beans, Caches, Loggers и
+подобные - остаются пустыми или не загружаются.
+
+![раздел сайдбара падает с неожиданной серверной ошибкой](/img/feature/troubleshooting/troubleshooting-actuator-endpoint-error.png)
+***Выбран раздел сайдбара (Details), но вместо данных показывается "No data" и тост "Unexpected server error"***
+
+### Наиболее вероятная причина
+
+Spring Boot по умолчанию скрывает кастомные actuator-эндпоинты от веб-доступа, а каждый раздел UI Axelix читает свой
+собственный выделенный эндпоинт (`axelix-beans`, `axelix-caches`, `axelix-loggers` и так далее). Обязателен только
+`axelix-metadata` - чтобы инстанс вообще появился в Master, а все остальные эндпоинты опциональны, поэтому у раздела
+без соответствующего эндпоинта в `management.endpoints.web.exposure.include` просто нет источника данных.
+
+### Решение
+
+Добавьте недостающие ID эндпоинтов в `management.endpoints.web.exposure.include` на стороне управляемого сервиса -
+полный список см. в разделе [Откройте доступ к Axelix
+actuator-эндпоинтам](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#откройте-доступ-к-axelix-actuator-эндпоинтам).

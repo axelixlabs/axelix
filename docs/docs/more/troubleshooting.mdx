@@ -30,3 +30,111 @@ public WebSecurityCustomizer webSecurityCustomizer() {
   return (web) -> web.ignoring().requestMatchers("/actuator/axelix-**");
 }
 ```
+
+## 2. Wrong Starter Module for Your Spring Boot Version
+
+### Symptom
+
+The application fails to start right after you add an Axelix Spring Boot Starter dependency, with a
+`NoClassDefFoundError` or `ClassNotFoundException` naming a `javax.servlet.*` or `jakarta.servlet.*` class - for
+example `javax/servlet/FilterChain` in a Spring Boot 4.x project, or `jakarta/servlet/FilterChain` in a Spring Boot
+2.x project.
+
+### Most Likely Cause
+
+Axelix ships a separate starter artifact per Spring Boot major version - `axelix-spring-boot-2-starter`,
+`axelix-spring-boot-3-starter`, `axelix-spring-boot-4-starter` - and the wrong one ended up on the classpath. Spring
+Boot 2.x still runs on the pre-Jakarta EE `javax.servlet` namespace, while Spring Boot 3.x and 4.x moved to
+`jakarta.servlet`.
+
+### The Solution:
+
+Match the starter to your application's Spring Boot **major** version - see [A dedicated starter per Spring Boot
+major version](./compatibility-and-versioning.mdx#a-dedicated-starter-per-spring-boot-major-version) and the exact
+coordinates in [Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency).
+
+## 3. A Locally Started Service Doesn't Register With a Local Master
+
+### Symptom
+
+You run Master locally, add the starter to your own service, and launch that service from the IDE. It starts without
+errors, but never shows up in Master - no error on either side, no entry in the sidebar.
+
+### Most Likely Cause
+
+Two prerequisites are missing, and both are easy to skip when the IDE's default "Run" button just compiles and
+launches the main class.
+
+**The build plugin never ran.** The plugin stamps `META-INF/axelix-info.properties` (your `groupId`/`artifactId`/
+`version`) into the build output, and the starter needs that file to identify the service to Master. The Maven goal
+(`axelix-generate-project-info`) is bound to the `prepare-package` phase - a plain "compile and run" in the IDE never
+reaches it. The Gradle task is wired into `processResources` specifically so IDE runs pick it up too, but that only
+happens if the IDE actually invokes that task, which requires delegating build/run actions to Gradle rather than
+using the IDE's own incremental compiler.
+
+**Master can't find the instance on its own.** Master's Kubernetes-based autodiscovery has nothing to scan on a local
+machine, so the service must self-register instead.
+
+### The Solution:
+
+Run a real build at least once before relying on the IDE's Run button - `mvn package` (or `mvn install`), or
+`./gradlew build`. See [What is the Axelix build
+plugin?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) for what the plugin generates and
+why it's required.
+
+Then point the starter at your local Master with self-registration, and match the JWT signing key on both sides -
+the same value goes on Master and on every instance, since this is a symmetric HMAC algorithm:
+
+```properties
+server.port=9444
+management.endpoints.web.exposure.include=axelix-metadata
+axelix.sbs.auth.jwt.algorithm=HMAC256
+axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
+axelix.sbs.discovery.self-registration=true
+axelix.sbs.discovery.instance-name=your-application-name
+axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
+axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register
+```
+
+Finally, start Master itself as a JAR with the **same** algorithm and signing key:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC256 \
+  -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
+  -jar master.jar
+```
+
+A mismatched key rejects the heartbeat with `401` instead of registering it. See [Configuring Spring Boot
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#let-master-find-the-instance) for
+the full self-registration reference and [Run as a
+JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#run-as-a-jar) for the Master side.
+
+:::warning
+Never reuse the signing key above, or any example key from this page, in a real deployment.
+:::
+
+## 4. Some Sidebar Sections Stay Empty After Registration
+
+### Symptom
+
+The instance appears in Master and its status looks healthy, but some sidebar sections - Beans, Caches, Loggers, and
+similar - stay empty or fail to load.
+
+![sidebar section failing with an unexpected server error](/img/feature/troubleshooting/troubleshooting-actuator-endpoint-error.png)
+***A sidebar section (Details) selected but showing "No data" and an "Unexpected server error" toast instead of the actual data***
+
+### Most Likely Cause
+
+Spring Boot hides custom actuator endpoints from web exposure by default, and each Axelix UI section reads its own
+dedicated endpoint (`axelix-beans`, `axelix-caches`, `axelix-loggers`, and so on). Only `axelix-metadata` is required
+for the instance to appear in Master at all - every other endpoint is opt-in, so a section with no matching endpoint
+in `management.endpoints.web.exposure.include` simply has nothing to read from.
+
+### The Solution:
+
+Add the missing endpoint IDs to `management.endpoints.web.exposure.include` on the managed service - see [Expose the
+Axelix actuator
+endpoints](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#expose-the-axelix-actuator-endpoints)
+for the full list.
