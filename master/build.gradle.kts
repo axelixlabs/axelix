@@ -15,10 +15,11 @@ val springAiVersion = "2.0.0"
 // Not Managed by Spring BOM
 val springDocSwaggerVersion = "3.0.3"
 val sqliteVersion = "3.53.2.1"
-val nimbusJoseJwt ="10.9.1"
+val nimbusJoseJwt = "10.9.1"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.6.0"
 val jsonUnitAssertJVersion = "2.40.1"
+val prometheusMetricsVersion = "1.7.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.13"
@@ -77,6 +78,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.prometheus:prometheus-metrics-exporter-httpserver:${prometheusMetricsVersion}")
 
     // Test Self
     testFixturesImplementation(project(":common"))

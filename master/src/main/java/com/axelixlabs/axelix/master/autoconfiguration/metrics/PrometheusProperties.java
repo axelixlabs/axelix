@@ -19,29 +19,42 @@ package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
  * The Prometheus related properties that are specific to Axelix Master.
  *
+ * @param tags common tags to attach to every metric exposed via the Prometheus endpoint
+ * @param port port of the dedicated HTTP server that exposes the Prometheus scrape endpoint. If
+ *     not set, defaults to {@code server.port}, meaning Prometheus is served through the actuator
+ *     instead of a dedicated server. Must be between {@code 1} and {@code 65535} if set -
+ *     {@code 0} is rejected rather than treated as "bind to a random free port".
  * @author Dmitry Mazurov
  */
 @ConfigurationProperties(prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX)
-public class PrometheusProperties {
+public record PrometheusProperties(
+        Map<String, String> tags, @Nullable Integer port) {
 
     public static final String PROMETHEUS_METRICS_PROPERTIES_PREFIX = "axelix.master.metrics.prometheus";
 
-    /**
-     * Common tags to attach to every metric exposed via the Prometheus actuator endpoint.
-     */
-    private Map<String, String> tags = Map.of();
+    public static final String SERVER_PORT_PROPERTY = "server.port";
 
-    public Map<String, String> getTags() {
-        return tags;
-    }
+    public static final String PROMETHEUS_PORT_PROPERTY = PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port";
 
-    public PrometheusProperties setTags(Map<String, String> tags) {
-        this.tags = tags;
-        return this;
+    static final int PORT_RANGE_MAX = 65535;
+
+    public PrometheusProperties {
+        Assert.isTrue(
+                port == null || (port >= 1 && port <= PORT_RANGE_MAX),
+                "Prometheus port must be between 1 and 65535 if set. Set " + PROMETHEUS_PORT_PROPERTY
+                        + " to a value in that range, or leave it unset to use server.port.");
+
+        if (tags == null) {
+            tags = Map.of();
+        }
     }
 }

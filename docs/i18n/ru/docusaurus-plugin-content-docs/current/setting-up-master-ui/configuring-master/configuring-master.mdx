@@ -361,6 +361,10 @@ Master открывает эндпоинт для сбора метрик Promet
 `axelix.master.metrics.prometheus.enabled=true`. Он отвечает по адресу `/api/actuator/prometheus` и не требует
 аутентификации.
 
+По умолчанию используется тот же порт, что и у Master (`server.port`). Задайте
+`axelix.master.metrics.prometheus.port`, чтобы использовать отдельный порт — например, чтобы ограничить доступ к
+сбору метрик отдельно от основного UI и API.
+
 Добавляйте общие теги к каждой экспортируемой метрике через `axelix.master.metrics.prometheus.tags.<name>=<value>`,
 например регион развёртывания или окружение.
 
@@ -375,6 +379,7 @@ Prometheus с помощью network policy, правил ingress или дру�
 | Свойство                                      | По умолчанию | Описание                                                                        |
 |------------------------------------------------|--------------|--------------------------------------------------------------------------------------|
 | `axelix.master.metrics.prometheus.enabled` | `false`      | Открыть эндпоинт сбора метрик Prometheus по адресу `/api/actuator/prometheus`.  |
+| `axelix.master.metrics.prometheus.port`    | *(не задано)* | Порт эндпоинта Prometheus. По умолчанию совпадает с `server.port`. |
 | `axelix.master.metrics.prometheus.tags`    | empty        | Общие теги, применяемые к каждой экспортируемой метрике.                       |
 
 </div>
@@ -387,6 +392,17 @@ axelix:
         enabled: true
         tags:
           region: eu-west-1
+```
+
+Использование отдельного порта:
+
+```yaml
+axelix:
+  master:
+    metrics:
+      prometheus:
+        enabled: true
+        port: 9404
 ```
 
 #### OTLP

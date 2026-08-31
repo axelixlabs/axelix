@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -24,46 +26,166 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.TestSocketUtils;
 
-import com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths;
-
+import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies that the actuator prometheus endpoint on the master is available or absent depending on
- * {@code axelix.master.metrics.prometheus.enabled}, without requiring authentication.
+ * Verifies that Prometheus metrics are exposed differently depending on
+ * {@code axelix.master.metrics.prometheus.port}: through the actuator when it matches
+ * {@code server.port} or is not set at all, or through a dedicated HTTP server on its own port
+ * otherwise - and not exposed at all when {@code axelix.master.metrics.prometheus.enabled} is
+ * {@code false}.
  *
  * @author Dmitry Mazurov
  */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 class ActuatorPrometheusEndpointTest {
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Nested
-    @SpringBootTest(
-            webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    @TestPropertySource(
             properties = {
                 "axelix.master.metrics.prometheus.enabled=true",
                 "axelix.master.metrics.prometheus.tags.region=eu-west-1"
             })
-    @AutoConfigureTestRestTemplate
-    class WhenEnabled {
+    class WhenPortDiffersFromServerPort {
 
-        // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access
-        // settings API.
+        @DynamicPropertySource
+        static void configurePrometheusPort(DynamicPropertyRegistry registry) {
+            registry.add(PROMETHEUS_PORT_PROPERTY, TestSocketUtils::findAvailableTcpPort);
+        }
+
         @Autowired
-        private TestRestTemplate restTemplate;
+        private HTTPServer prometheusHttpServer;
 
-        @Test
-        void actuatorPrometheusReturnsScrapedMetricsWithoutAuth() {
-            ResponseEntity<String> response =
-                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+        @Test // GH-1520
+        void prometheusIsNotExposedThroughActuator() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+
+        @Test // GH-1520
+        void prometheusMetricsAreServedOnDedicatedHttpServer() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                    "http://localhost:" + prometheusHttpServer.getPort() + PROMETHEUS_METRICS_SCRAPE_PATH,
+                    String.class);
+
+            // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getHeaders().getContentType()).isNotNull();
-            assertThat(response.getHeaders().getContentType().isCompatibleWith(MediaType.TEXT_PLAIN))
-                    .isTrue();
+
+            String body = response.getBody();
+            assertThat(body).isNotBlank();
+            assertThat(body).contains("# HELP").contains("# TYPE");
+            assertThat(body).contains("jvm_memory_used_bytes");
+            assertThat(body).contains("region=\"eu-west-1\"");
+        }
+
+        @Test // GH-1520
+        void unmatchedPathsReturnNotFoundInsteadOfLandingPage() {
+            // when.
+            ResponseEntity<String> healthy = restTemplate.getForEntity(
+                    "http://localhost:" + prometheusHttpServer.getPort() + "/-/healthy", String.class);
+            ResponseEntity<String> root =
+                    restTemplate.getForEntity("http://localhost:" + prometheusHttpServer.getPort() + "/", String.class);
+
+            // then.
+            assertThat(healthy.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(root.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Nested
+    @TestPropertySource(
+            properties = {
+                "axelix.master.metrics.prometheus.enabled=true",
+                "axelix.master.metrics.prometheus.tags.region=eu-west-1"
+            })
+    class WhenPortNotConfigured {
+
+        @Autowired(required = false)
+        private HTTPServer prometheusHttpServer;
+
+        @Test // GH-1520
+        void dedicatedHttpServerIsNotStarted() {
+            // then.
+            assertThat(prometheusHttpServer).isNull();
+        }
+
+        @Test // GH-1520
+        void prometheusIsServedThroughActuator() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            String body = response.getBody();
+            assertThat(body).isNotBlank();
+            assertThat(body).contains("# HELP").contains("# TYPE");
+            assertThat(body).contains("jvm_memory_used_bytes");
+            assertThat(body).contains("region=\"eu-west-1\"");
+        }
+
+        @Test // GH-1520
+        void doesNotCreateFallbackSimpleMeterRegistry() {
+            // then.
+            assertThat(applicationContext.getBeansOfType(SimpleMeterRegistry.class))
+                    .isEmpty();
+        }
+    }
+
+    @Nested
+    @SpringBootTest(
+            webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+            properties = {
+                "axelix.master.metrics.prometheus.enabled=true",
+                "axelix.master.metrics.prometheus.tags.region=eu-west-1"
+            })
+    class WhenPortMatchesServerPort {
+
+        @DynamicPropertySource
+        static void configurePorts(DynamicPropertyRegistry registry) {
+            int port = TestSocketUtils.findAvailableTcpPort();
+            registry.add(SERVER_PORT_PROPERTY, () -> port);
+            registry.add(PROMETHEUS_PORT_PROPERTY, () -> port);
+        }
+
+        @Autowired(required = false)
+        private HTTPServer prometheusHttpServer;
+
+        @Test // GH-1520
+        void dedicatedHttpServerIsNotStarted() {
+            // then.
+            assertThat(prometheusHttpServer).isNull();
+        }
+
+        @Test // GH-1520
+        void prometheusIsServedThroughActuator() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
             String body = response.getBody();
             assertThat(body).isNotBlank();
@@ -74,37 +196,37 @@ class ActuatorPrometheusEndpointTest {
     }
 
     @Nested
-    @SpringBootTest(
-            webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-            properties = {"axelix.master.metrics.prometheus.enabled=false"})
-    @AutoConfigureTestRestTemplate
+    @TestPropertySource(properties = {"axelix.master.metrics.prometheus.enabled=false"})
     class WhenDisabled {
 
-        @Autowired
-        private TestRestTemplate restTemplate;
+        @Autowired(required = false)
+        private HTTPServer prometheusHttpServer;
 
-        @Test
-        void actuatorPrometheusIsNotAvailableWithoutAuth() {
-            ResponseEntity<String> response =
-                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+        @Test // GH-1520
+        void prometheusHttpServerIsNotStarted() {
+            // then.
+            assertThat(prometheusHttpServer).isNull();
+        }
 
+        @Test // GH-1520
+        void prometheusIsNotAvailableThroughActuator() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+
+            // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
 
     @Nested
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @AutoConfigureTestRestTemplate
     class WhenNotConfigured {
 
-        @Autowired
-        private TestRestTemplate restTemplate;
-
         @Test
-        void actuatorPrometheusIsNotAvailableByDefault() {
-            ResponseEntity<String> response =
-                    restTemplate.getForEntity(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
+        void prometheusIsNotAvailableByDefault() {
+            // when.
+            ResponseEntity<String> response = restTemplate.getForEntity(PROMETHEUS_METRICS_SCRAPE_PATH, String.class);
 
+            // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }

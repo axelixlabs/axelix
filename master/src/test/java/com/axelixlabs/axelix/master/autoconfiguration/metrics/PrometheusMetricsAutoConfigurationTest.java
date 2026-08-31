@@ -20,19 +20,25 @@ package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import io.prometheus.metrics.model.snapshots.MetricSnapshots;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.StandardEnvironment;
 
+import com.axelixlabs.axelix.master.utils.TestPortUtils;
+
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PORT_RANGE_MAX;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +53,9 @@ class PrometheusMetricsAutoConfigurationTest {
     private static ApplicationContextRunner baselineContextRunner() {
         return new ApplicationContextRunner(PrometheusMetricsAutoConfigurationTest::isolatedContext)
                 .withConfiguration(AutoConfigurations.of(
-                        ConfigurationPropertiesAutoConfiguration.class, PrometheusMetricsAutoConfiguration.class));
+                        ConfigurationPropertiesAutoConfiguration.class,
+                        MetricsAutoConfiguration.class,
+                        PrometheusMetricsAutoConfiguration.class));
     }
 
     @Nested
@@ -65,6 +73,7 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).doesNotHaveBean(PrometheusMeterRegistry.class);
                 assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
                 assertThat(context).doesNotHaveBean(PrometheusRegistry.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
             });
         }
 
@@ -79,6 +88,7 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).doesNotHaveBean(PrometheusMeterRegistry.class);
                 assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
                 assertThat(context).doesNotHaveBean(PrometheusRegistry.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
             });
         }
     }
@@ -100,6 +110,80 @@ class PrometheusMetricsAutoConfigurationTest {
                 assertThat(context).hasSingleBean(Clock.class);
                 assertThat(context).hasSingleBean(PrometheusMeterRegistry.class);
                 assertThat(context).hasSingleBean(PrometheusScrapeEndpoint.class);
+                assertThat(context).doesNotHaveBean(HTTPServer.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldNotCreateEndpointWhenPortDiffersFromServerPort() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port="
+                                    + TestPortUtils.findAvailableTcpPortOtherThan(8080),
+                            "server.port=8080");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasSingleBean(PrometheusMeterRegistry.class);
+                assertThat(context).hasSingleBean(HTTPServer.class);
+                assertThat(context).doesNotHaveBean(PrometheusScrapeEndpoint.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsZero() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsNegative() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=-1");
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure())
+                        .isInstanceOf(BeanCreationException.class)
+                        .rootCause()
+                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
+            });
+        }
+
+        @Test // GH-1520
+        void shouldFailToStartWhenPortIsAboveValidRange() {
+            // given.
+            ApplicationContextRunner contextRunner = baselineContextRunner()
+                    .withPropertyValues(
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + (PORT_RANGE_MAX + 1));
+
+            // when.
+            contextRunner.run(context -> {
+                // then.
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure())
+                        .isInstanceOf(BeanCreationException.class)
+                        .rootCause()
+                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
             });
         }
 
