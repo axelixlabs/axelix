@@ -64,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
@@ -277,8 +278,9 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
         // when.
-        ResponseEntity<String> logoutResponse =
-                restTemplate.exchange("/api/external/users/logout", HttpMethod.POST, logoutEntity, String.class);
+        ResponseEntity<String> logoutResponse = restTemplateBuilder
+                .withoutToken()
+                .exchange("/api/external/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
         // then.
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

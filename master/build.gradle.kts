@@ -56,6 +56,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
 
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.springframework.security:spring-security-crypto")
 
