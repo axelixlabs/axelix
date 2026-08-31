@@ -104,9 +104,10 @@ class DefaultLoggersServiceTest {
         Instant secondInitiatedAt = Instant.parse(secondOverride.getTemporaryLevelInitiatedAt());
         Instant secondRollsBackAt = Instant.parse(secondOverride.getTemporaryLevelRollsBackAt());
 
-        assertThat(secondInitiatedAt).isAfter(firstInitiatedAt);
+        // Use non-strict comparison due to low Windows timer resolution.
+        assertThat(secondInitiatedAt).isAfterOrEqualTo(firstInitiatedAt);
         assertThat(secondRollsBackAt).isAfter(firstRollsBackAt);
-        assertThat(secondInitiatedAt).isBetween(beforeSecondChange, afterSecondChange);
+        assertThat(secondInitiatedAt).isBetween(beforeSecondChange.minusMillis(50), afterSecondChange.plusMillis(50));
         assertThat(secondRollsBackAt)
                 .isBetween(
                         beforeSecondChange.plus(60, ChronoUnit.SECONDS),
@@ -133,9 +134,11 @@ class DefaultLoggersServiceTest {
         SingleLoggerProfile permanentOverride = subject.getSingleLogger(LOGGER_NAME);
         Instant permanentInitiatedAt = Instant.parse(permanentOverride.getTemporaryLevelInitiatedAt());
 
+        // Use non-strict comparison due to low Windows timer resolution.
         assertThat(permanentOverride.getTemporaryLevelRollsBackAt()).isNull();
-        assertThat(permanentInitiatedAt).isAfter(temporaryInitiatedAt);
-        assertThat(permanentInitiatedAt).isBetween(beforePermanentChange, afterPermanentChange);
+        assertThat(permanentInitiatedAt).isAfterOrEqualTo(temporaryInitiatedAt);
+        assertThat(permanentInitiatedAt)
+                .isBetween(beforePermanentChange.minusMillis(50), afterPermanentChange.plusMillis(50));
         assertThat(permanentOverride.getFallbackLevel()).isEqualTo("WARN");
         assertThat(permanentOverride.getConfiguredLevel()).isEqualTo("TRACE");
     }
