@@ -42,10 +42,14 @@ example `javax/servlet/FilterChain` in a Spring Boot 4.x project, or `jakarta/se
 
 ### Most Likely Cause
 
-Axelix ships a separate starter artifact per Spring Boot major version - `axelix-spring-boot-2-starter`,
-`axelix-spring-boot-3-starter`, `axelix-spring-boot-4-starter` - and the wrong one ended up on the classpath. Spring
-Boot 2.x still runs on the pre-Jakarta EE `javax.servlet` namespace, while Spring Boot 3.x and 4.x moved to
-`jakarta.servlet`.
+Axelix ships a separate starter artifact per Spring Boot major version:
+
+- `axelix-spring-boot-2-starter` for Spring Boot 2
+- `axelix-spring-boot-3-starter` for Spring Boot 3
+- `axelix-spring-boot-4-starter` for Spring Boot 4
+
+These are different Maven Artifacts, shipped separately (although they all follow the same versioning scheme). So, when adding the Spring Boot starter,
+you need to make sure to add the starter for your appropriate major version of the Spring Boot.
 
 ### The Solution:
 
@@ -54,11 +58,11 @@ major version](./compatibility-and-versioning.mdx#a-dedicated-starter-per-spring
 coordinates in [Configuring Spring Boot
 Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#add-the-dependency).
 
-## 3. A Locally Started Service Doesn't Register With a Local Master
+## 3. A Locally Started Service Doesn't Register With a Locally started Master
 
 ### Symptom
 
-You run Master locally, add the starter to your own service, and launch that service from the IDE. It starts without
+You run Axelix Master locally, add the starter to your own service, and launched that service from within the IDE. It starts without
 errors, but never shows up in Master - no error on either side, no entry in the sidebar.
 
 ### Most Likely Cause
@@ -66,12 +70,14 @@ errors, but never shows up in Master - no error on either side, no entry in the 
 Two prerequisites are missing, and both are easy to skip when the IDE's default "Run" button just compiles and
 launches the main class.
 
-**The build plugin never ran.** The plugin stamps `META-INF/axelix-info.properties` (your `groupId`/`artifactId`/
-`version`) into the build output, and the starter needs that file to identify the service to Master. The Maven goal
-(`axelix-generate-project-info`) is bound to the `prepare-package` phase - a plain "compile and run" in the IDE never
-reaches it. The Gradle task is wired into `processResources` specifically so IDE runs pick it up too, but that only
-happens if the IDE actually invokes that task, which requires delegating build/run actions to Gradle rather than
-using the IDE's own incremental compiler.
+**The build plugin never ran.** Axelix has the build plugins for Maven & Gradle.
+These plugins stamp `META-INF/axelix-info.properties` (that contain service's `groupId`/`artifactId`/
+`version`) into the build output, and the starter needs that file to identify the service to Master.
+
+And in case of Maven, e.g. the goal that does the job (i.e. `axelix-generate-project-info`) is bound to the `prepare-package`
+phase - a plain "compile and run" in the IDE never reaches it. The Gradle task is wired into `processResources` specifically
+so IDE runs pick it up too, but that only happens if the IDE actually invokes that task, which requires delegating build/run
+actions to Gradle rather than using the IDE's own incremental compiler.
 
 **Master can't find the instance on its own.** Master's Kubernetes-based autodiscovery has nothing to scan on a local
 machine, so the service must self-register instead.
