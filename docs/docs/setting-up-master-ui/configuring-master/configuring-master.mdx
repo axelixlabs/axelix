@@ -109,6 +109,48 @@ docker run --rm -p 8080:8080 \
   ghcr.io/axelixlabs/axelix:1.0.0
 ```
 
+### Loading configuration from a Spring Cloud Config Server
+
+<UpcomingReleaseNotice />
+
+If you already run a [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html) to
+centralise configuration across your fleet, Master can pull its own settings from it too. Master acts as a Spring Cloud
+Config **client**: on startup it fetches configuration for its application name and merges it in. Any `axelix.master.*`
+property on this page can therefore live in the Config Server's backing store instead of a local file.
+
+The feature is off by default. Turn it on with `axelix.master.external-config.spring-cloud-config.enabled=true` and
+point Master at the server with the `uri` property.
+
+<div className={styles.ConfigTable}>
+
+| Property                                                       | Default  | Description                                                                                                                                                    |
+|----------------------------------------------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-config.enabled`    | `false`  | Load configuration from a Spring Cloud Config Server on startup.                                                                                               |
+| `axelix.master.external-config.spring-cloud-config.uri`        | empty    | Base URL of the Config Server, for example `http://config-server:8888`. Required when `enabled=true`.                                                          |
+| `axelix.master.external-config.spring-cloud-config.name`       | empty    | Application name the server resolves configuration for — the `{application}` segment of its request path. When left empty, Master uses its own name, `axelix`. |
+| `axelix.master.external-config.spring-cloud-config.label`      | `master` | The `{label}` requested from the server, typically a Git branch or tag in the backing repository.                                                              |
+| `axelix.master.external-config.spring-cloud-config.username`   | empty    | Basic-auth username, when the Config Server requires HTTP Basic authentication.                                                                                |
+| `axelix.master.external-config.spring-cloud-config.password`   | empty    | Basic-auth password, paired with `username`.                                                                                                                   |
+
+</div>
+
+Like the config-file location above, these properties decide *where* configuration is read from, so they must be known
+before that reading starts. Supply them as **JVM system properties** or **environment variables** — not from a file the
+Config Server would itself serve. A minimal launch looks like this:
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-config.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-config.uri=http://config-server:8888 \
+  -jar master.jar
+```
+
+:::warning
+When the feature is enabled, Master starts in fail-fast mode. If the Config Server cannot be reached at startup, Master
+refuses to boot rather than starting with incomplete configuration. While the feature stays off (the default), Master
+never contacts a server and boots normally.
+:::
+
 ### General
 
 <UpcomingReleaseNotice />
