@@ -38,6 +38,11 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
  */
 public class DefaultCookieService implements CookieService {
 
+    /**
+     * The OAuth2 {@code state} cookie only needs to outlive the round-trip to the OIDC provider's login page.
+     */
+    private static final long OAUTH2_STATE_COOKIE_LIFESPAN_SECONDS = 300L;
+
     private final CookieProperties cookieProperties;
     private final JwtProperties jwtProperties;
 
@@ -77,6 +82,29 @@ public class DefaultCookieService implements CookieService {
     public ResponseCookie buildExpiredAuthMetadataCookie() {
         // The browser will expire the cookie anyway, so empty string is fine
         return buildAuthoritiesMetadataCookie("", 0L);
+    }
+
+    @Override
+    public ResponseCookie buildOAuth2StateCookie(String state) {
+        return buildOAuth2StateCookie(state, OAUTH2_STATE_COOKIE_LIFESPAN_SECONDS);
+    }
+
+    @Override
+    public ResponseCookie buildExpiredOAuth2StateCookie() {
+        // The browser will expire the cookie anyway, so empty string is fine
+        return buildOAuth2StateCookie("", 0L);
+    }
+
+    private ResponseCookie buildOAuth2StateCookie(String state, long cookieLifetimeInSeconds) {
+        return ResponseCookie.from(CookieProperties.OAUTH2_STATE_COOKIE_NAME, state)
+                .httpOnly(true)
+                .secure(cookieProperties.isSecure())
+                .path("/")
+                .maxAge(cookieLifetimeInSeconds)
+                // "Lax", not "Strict": must still be sent on the top-level redirect the OIDC provider issues
+                // back to /oauth2/callback.
+                .sameSite("Lax")
+                .build();
     }
 
     /**

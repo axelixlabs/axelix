@@ -66,4 +66,20 @@ public interface CookieService {
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
     ResponseCookie buildExpiredAuthMetadataCookie();
+
+    /**
+     * Builds a short-lived HTTP cookie holding the OAuth2 {@code state} value, to be compared against the
+     * {@code state} query parameter the OIDC provider echoes back on the authorization code flow callback.
+     *
+     * @param state the freshly generated, unguessable {@code state} value
+     * @return configured ResponseCookie instance ready to be set in HTTP response
+     */
+    ResponseCookie buildOAuth2StateCookie(String state);
+
+    /**
+     * Builds an expired OAuth2 {@code state} HTTP cookie, used to invalidate it after a single use.
+     *
+     * @return configured ResponseCookie instance ready to be set in HTTP response
+     */
+    ResponseCookie buildExpiredOAuth2StateCookie();
 }

@@ -269,6 +269,7 @@ public class SecurityAutoConfiguration {
                     oAuth2Properties.clientId(),
                     oAuth2Properties.redirectUri(),
                     additionalParameters,
+                    oAuth2Properties.stateRequired(),
                     Lazy.of(oidcMetadataProvider::getAuthorizationEndpoint));
         }
 

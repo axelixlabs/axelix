@@ -32,6 +32,7 @@ public class CookieProperties {
 
     public static final String AUTH_COOKIE_NAME = "auth_token";
     public static final String AUTHORITIES_COOKIE_NAME = "authorities";
+    public static final String OAUTH2_STATE_COOKIE_NAME = "oauth2_state";
 
     /**
      * Secure attribute for cookies.

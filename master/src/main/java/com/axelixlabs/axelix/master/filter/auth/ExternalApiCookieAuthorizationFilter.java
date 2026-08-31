@@ -89,6 +89,7 @@ public class ExternalApiCookieAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith(InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH)
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
+                || path.startsWith("/api/external/oauth2/state")
                 || path.startsWith("/api/external/settings")
                 || path.equalsIgnoreCase("/api/internal/service/register")
                 || path.startsWith("/api/mcp")

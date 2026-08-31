@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.infrastructure;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,6 +40,7 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
@@ -97,13 +101,20 @@ public class OAuth2CallbackController {
     }
 
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
-    public ResponseEntity<?> callback(@RequestParam(required = false) String code) {
+    public ResponseEntity<?> callback(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String state,
+            @CookieValue(name = CookieProperties.OAUTH2_STATE_COOKIE_NAME, required = false) String stateCookie) {
 
         // TODO: Well, the code is actually required, but we have to throw exception manually
         // here instead of relying on spring web binding mechanism to throw it. We need to think about it.
         // The way it is currently implemented (required = false) can confuse the reader
         if (code == null || code.isBlank()) {
             throw new BadRequestException("The authorization code is required");
+        }
+
+        if (oAuth2Properties.stateRequired()) {
+            checkState(state, stateCookie);
         }
 
         Tokens tokens = oidcClient.exchangeCodeForTokens(code);
@@ -126,12 +137,29 @@ public class OAuth2CallbackController {
 
         ResponseCookie cookie = cookieService.buildAuthCookie(ourToken);
         ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());
+        ResponseCookie expiredStateCookie = cookieService.buildExpiredOAuth2StateCookie();
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
+                .header(HttpHeaders.SET_COOKIE, expiredStateCookie.toString())
                 .header(HttpHeaders.LOCATION, WALLBOARD_PATH)
                 .build();
+    }
+
+    /**
+     * Verifies that the {@code state} the OIDC provider echoed back matches the one this login attempt
+     * originated with.
+     */
+    private static void checkState(@Nullable String state, @Nullable String stateCookie) {
+        if (state == null
+                || state.isBlank()
+                || stateCookie == null
+                || stateCookie.isBlank()
+                || !MessageDigest.isEqual(
+                        state.getBytes(StandardCharsets.UTF_8), stateCookie.getBytes(StandardCharsets.UTF_8))) {
+            throw new BadRequestException("The OAuth2 state parameter is missing or invalid");
+        }
     }
 
     // Always update role & email. Update names only when the provider supplies them.

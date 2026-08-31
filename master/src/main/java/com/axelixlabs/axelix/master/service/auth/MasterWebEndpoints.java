@@ -225,6 +225,8 @@ public final class MasterWebEndpoints {
     // Oidc/Oauth
     public static final MasterWebEndpoint OIDC_AUTH_COMPLETE =
             register("oidc:auth:complete", HttpMethod.GET, ApiPaths.OAuth2Api.CALLBACK, null);
+    public static final MasterWebEndpoint OIDC_AUTH_STATE =
+            register("oidc:auth:state", HttpMethod.GET, ApiPaths.OAuth2Api.STATE, null);
 
     // User management
     public static final MasterWebEndpoint USER_CREATE = register(

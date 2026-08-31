@@ -110,9 +110,6 @@ axelix:
           base-url:
           client-id:
           client-secret:
-          role-attribute-path:
-          job-title-attribute-path:
-          organizational-unit-attribute-path:
           scopes: openid
       cookie:
         secure: false
