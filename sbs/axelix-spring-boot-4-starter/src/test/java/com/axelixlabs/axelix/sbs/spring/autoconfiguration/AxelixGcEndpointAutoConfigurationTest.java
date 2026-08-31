@@ -23,8 +23,8 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.DiagnosticCommandExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +44,7 @@ class AxelixGcEndpointAutoConfigurationTest {
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(JcmdExecutor.class);
+            assertThat(context).hasSingleBean(DiagnosticCommandExecutor.class);
             assertThat(context).hasSingleBean(GcLogService.class);
             assertThat(context).hasSingleBean(AxelixGcEndpoint.class);
         });
@@ -56,7 +56,7 @@ class AxelixGcEndpointAutoConfigurationTest {
                 .withPropertyValues("management.endpoint.axelix-gc.enabled=false")
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixGcEndpointAutoConfiguration.class);
-                    assertThat(context).hasSingleBean(JcmdExecutor.class);
+                    assertThat(context).hasSingleBean(DiagnosticCommandExecutor.class);
                     assertThat(context).hasSingleBean(GcLogService.class);
                     assertThat(context).doesNotHaveBean(AxelixGcEndpoint.class);
                 });
@@ -70,7 +70,7 @@ class AxelixGcEndpointAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixGcEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixGcEndpoint.class);
-                    assertThat(context).hasSingleBean(JcmdExecutor.class);
+                    assertThat(context).hasSingleBean(DiagnosticCommandExecutor.class);
                     assertThat(context).hasSingleBean(GcLogService.class);
                 });
     }

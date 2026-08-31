@@ -27,9 +27,6 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 /**
  * Auto-configuration for GC Log Endpoint functionality.
  *
- * <p>Configuration is conditional on the presence of JCMD utility and will not activate
- * if JCMD is not available in the system PATH.</p>
- *
  * @since 26.12.2025
  * @author Nikita Kirillov
  */
