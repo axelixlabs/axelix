@@ -17,11 +17,13 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.user;
 
+import java.util.List;
+
 /**
- * Request payload to delete a managed user by id.
+ * Request payload to delete one or more managed users by their ids.
  *
- * @param id Unique identifier of the user to delete.
+ * @param ids Unique identifiers of the users to delete.
  *
  * @author Sergey Cherkasov
  */
-public record UserDeleteRequest(String id) {}
+public record UserDeleteRequest(List<String> ids) {}
