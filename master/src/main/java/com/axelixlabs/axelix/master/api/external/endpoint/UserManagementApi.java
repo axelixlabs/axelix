@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserStatusUpdateRe
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
@@ -79,11 +80,21 @@ public class UserManagementApi {
         }
     }
 
+    @DefaultApiResponse(
+            summary = "Delete one or more users",
+            description =
+                    "The operation is atomic: if any of the given ids does not match a persisted user, nothing is deleted and the response is 400.")
+    @ApiResponse(description = "No Content", responseCode = "204")
+    @ApiResponse(description = "Bad Request", responseCode = "400")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
-    public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
+    public ResponseEntity<Void> deleteUsers(@RequestBody UserDeleteRequest request) {
+        try {
+            userService.deleteByIds(request.ids());
+            return ResponseEntity.noContent().build();
 
-        userService.deleteById(request.id());
-        return ResponseEntity.noContent().build();
+        } catch (UserInvalidValueException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
@@ -111,13 +122,20 @@ public class UserManagementApi {
         }
     }
 
+    @DefaultApiResponse(
+            summary = "Change the status of one or more users",
+            description =
+                    "The operation is atomic: if any of the given ids does not match a persisted user, no status is changed and the response is 400.")
+    @ApiResponse(description = "No Content", responseCode = "204")
+    @ApiResponse(description = "Bad Request", responseCode = "400")
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_STATUS)
-    public ResponseEntity<Void> updateUserStatus(@RequestBody UserStatusUpdateRequest request) {
-        if (request.id() == null || request.id().isBlank() || request.status() == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Void> updateUsersStatus(@RequestBody UserStatusUpdateRequest request) {
+        try {
+            userService.updateStatusByIds(request.ids(), request.status());
+            return ResponseEntity.noContent().build();
 
-        userService.updateStatus(request.id(), request.status());
-        return ResponseEntity.noContent().build();
+        } catch (UserInvalidValueException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

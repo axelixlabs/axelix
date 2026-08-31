@@ -131,12 +131,20 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     @BeforeEach
     void prepare() {
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @AfterEach
     void cleanUp() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @Test
@@ -295,6 +303,10 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 expectedOidcSubject(SUBJECT),
                 TestRoles.VIEWER.getName());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
+                username, "Original", "Name", "original@gmail.com", null, null, TestRoles.VIEWER.getName());
+        UserEntity created = userRepository.findByUsername(username).orElseThrow();
+        userService.updateStatusByIds(List.of(created.id()), UserStatus.SUSPENDED);
+        UserEntity suspended = userRepository.findById(created.id()).orElseThrow();
 
         // and the provider now presents a DIFFERENT username for the SAME subject.
         String userInfoJson = "{}";
