@@ -44,7 +44,6 @@ import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -72,7 +71,11 @@ class DatabaseUserServiceTest {
     @BeforeEach
     @AfterEach
     void setup() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @Test
@@ -244,21 +247,67 @@ class DatabaseUserServiceTest {
     }
 
     @Test
-    void deleteAllById_shouldRemoveUser() {
+    void deleteByIds_shouldRemoveUser() {
         userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.deleteById(existing.id());
+        userService.deleteByIds(List.of(existing.id()));
 
         // then.
         assertThat(userRepository.findById(existing.id())).isEmpty();
     }
 
     @Test
-    void deleteAllById_shouldBeNoOpWhenUserDoesNotExist() {
+    void deleteByIds_shouldThrowUserInvalidValue_WhenIdsIsEmpty() {
         // when.
-        assertThatCode(() -> userService.deleteById("non-existent-id")).doesNotThrowAnyException();
+        assertThatThrownBy(() -> userService.deleteByIds(List.of()))
+                // then.
+                .isInstanceOf(UserInvalidValueException.class);
+    }
+
+    @Test
+    void deleteByIds_shouldThrowUserNotFound_WhenUserDoesNotExist() {
+        // when.
+        assertThatThrownBy(() -> userService.deleteByIds(List.of("non-existent-id")))
+                // then.
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void deleteByIds_shouldNotDeleteAnyUser_WhenSomeIdsDoNotExist() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "VIEWER");
+
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.deleteByIds(List.of(alice.id(), bob.id(), "non-existent-id")))
+                // then.
+                .isInstanceOf(UserNotFoundException.class);
+
+        assertThat(userRepository.findById(alice.id())).isPresent();
+        assertThat(userRepository.findById(bob.id())).isPresent();
+        assertThat(userService.findRoleNamesByUserId(alice.id())).containsExactly("VIEWER");
+        assertThat(userService.findRoleNamesByUserId(bob.id())).containsExactly("VIEWER");
+    }
+
+    @Test
+    void deleteByIds_shouldRemoveUser_WhenUserHasNoRoles() {
+        // given.
+        userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+
+        userRepository.deleteUserRolesMappings(existing.id());
+        assertThat(userService.findRoleNamesByUserId(existing.id())).isEmpty();
+
+        // when.
+        userService.deleteByIds(List.of(existing.id()));
+
+        // then.
+        assertThat(userRepository.findById(existing.id())).isEmpty();
     }
 
     @Test
@@ -333,28 +382,48 @@ class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateStatus_shouldUpdateOnlyStatus() {
+    void updateStatusByIds_shouldUpdateSeveralUsers() {
         // given.
-        userService.createLocal("alice", "Alice", "Smith", "a@example.com", null, null, "p", "VIEWER");
-        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "VIEWER");
+
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
 
         // when.
-        userService.updateStatus(existing.id(), UserStatus.SUSPENDED);
+        userService.updateStatusByIds(List.of(alice.id(), bob.id()), UserStatus.SUSPENDED);
 
         // then.
-        UserEntity saved = userRepository.findById(existing.id()).orElseThrow();
-        assertThat(saved.status()).isEqualTo(UserStatus.SUSPENDED);
-        assertThat(saved).usingRecursiveComparison().ignoringFields("status").isEqualTo(existing);
+        assertThat(userRepository.findById(alice.id()).orElseThrow().status()).isEqualTo(UserStatus.SUSPENDED);
+        assertThat(userRepository.findById(bob.id()).orElseThrow().status()).isEqualTo(UserStatus.SUSPENDED);
     }
 
     @Test
-    void updateStatus_shouldBeIdempotent() {
+    void updateStatusByIds_shouldRestoreSeveralSuspendedUsers() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "VIEWER");
+
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+        userService.updateStatusByIds(List.of(alice.id(), bob.id()), UserStatus.SUSPENDED);
+
+        // when.
+        userService.updateStatusByIds(List.of(alice.id(), bob.id()), UserStatus.ACTIVE);
+
+        // then.
+        assertThat(userRepository.findById(alice.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(userRepository.findById(bob.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void updateStatusByIds_shouldBeIdempotent() {
         // given.
         userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.updateStatus(existing.id(), UserStatus.ACTIVE);
+        userService.updateStatusByIds(List.of(existing.id()), UserStatus.ACTIVE);
 
         // then.
         assertThat(userRepository.findById(existing.id()).orElseThrow().status())
@@ -362,12 +431,44 @@ class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateStatus_shouldReportUnknownUser() {
+    void updateStatusByIds_shouldNotUpdateAnyUser_WhenSomeIdsDoNotExist() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
+        userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "VIEWER");
+
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
         // when.
-        assertThatThrownBy(() -> userService.updateStatus("non-existent-id", UserStatus.SUSPENDED))
+        assertThatThrownBy(() -> userService.updateStatusByIds(
+                        List.of(alice.id(), bob.id(), "non-existent-id"), UserStatus.SUSPENDED))
                 // then.
                 .isInstanceOf(UserNotFoundException.class);
-        assertThat(userRepository.findAll()).isEmpty();
+
+        assertThat(userRepository.findById(alice.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(userRepository.findById(bob.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void updateStatusByIds_shouldThrowUserInvalidValue_WhenIdsIsEmpty() {
+        // when.
+        assertThatThrownBy(() -> userService.updateStatusByIds(List.of(), UserStatus.ACTIVE))
+                // then.
+                .isInstanceOf(UserInvalidValueException.class);
+    }
+
+    @Test
+    void updateStatusByIds_shouldThrowUserInvalidValue_WhenStatusIsNull() {
+        // given.
+        userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.updateStatusByIds(List.of(existing.id()), null))
+                // then.
+                .isInstanceOf(UserInvalidValueException.class);
+        assertThat(userRepository.findById(existing.id()).orElseThrow().status())
+                .isEqualTo(UserStatus.ACTIVE);
     }
 
     @Test
@@ -698,13 +799,13 @@ class DatabaseUserServiceTest {
     }
 
     @Test
-    void deleteById_shouldRevokeRoles() {
+    void deleteByIds_shouldRevokeRoles() {
         // given.
         userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "ADMIN");
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.deleteById(existing.id());
+        userService.deleteByIds(List.of(existing.id()));
 
         // then.
         assertThat(userService.findRoleNamesByUserId(existing.id())).isEmpty();

@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,11 +100,14 @@ public interface UserService {
             String role);
 
     /**
-     * Deletes the user with the given identifier. No-op if the user does not exist.
+     * Deletes the users with the given identifiers along with their role assignments.
      *
-     * @param id Unique identifier of the user to delete.
+     * @param ids Unique identifiers of the users to delete.
+     *
+     * @throws UserInvalidValueException if no identifier is provided.
+     * @throws UserNotFoundException if any of the given ids does not match a persisted user.
      */
-    void deleteById(String id);
+    void deleteByIds(Collection<String> ids) throws UserInvalidValueException, UserNotFoundException;
 
     /**
      * Returns all managed users.
@@ -153,13 +157,16 @@ public interface UserService {
     void updateLastLoginAt(String username);
 
     /**
-     * Changes the status of a persisted user without modifying other user data.
+     * Changes the status of the users with the given identifiers without modifying other user data.
      *
-     * @param id Unique identifier of the user.
-     * @param status New status of the user.
-     * @throws UserNotFoundException if no user with the given id exists.
+     * @param ids Unique identifiers of the users to update.
+     * @param status New status of the users.
+     *
+     * @throws UserInvalidValueException if no identifier is provided, any of them is blank, or no status is provided.
+     * @throws UserNotFoundException if any of the given ids does not match a persisted user.
      */
-    void updateStatus(String id, UserStatus status);
+    void updateStatusByIds(Collection<String> ids, UserStatus status)
+            throws UserInvalidValueException, UserNotFoundException;
 
     /**
      * Applies a partial update to the user with the given id within a single transaction.

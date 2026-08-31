@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,12 +61,20 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
     void deleteUserRolesMappings(@Param("userId") String userId);
 
     @Modifying
+    @Query("DELETE FROM users_roles WHERE user_id IN (:userIds)")
+    void deleteUserRolesMappingsByUserIds(@Param("userIds") Collection<String> userIds);
+
+    @Modifying
+    @Query("DELETE FROM users WHERE id IN (:ids)")
+    int deleteByIds(@Param("ids") Collection<String> ids);
+
+    @Modifying
     @Query("UPDATE users SET last_login_at = :lastLoginAt WHERE username = :username")
     void updateLastLoginAt(@Param("username") String username, @Param("lastLoginAt") Instant lastLoginAt);
 
     @Modifying
-    @Query("UPDATE users SET status = :status WHERE id = :id")
-    void updateStatus(@Param("id") String id, @Param("status") UserStatus status);
+    @Query("UPDATE users SET status = :status WHERE id IN (:ids)")
+    int updateStatusByIds(@Param("ids") Collection<String> ids, @Param("status") UserStatus status);
 
     @Modifying
     @Query("""

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.e2e.auth;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,13 +67,13 @@ public class OAuth2LoginE2ETest {
 
         try {
             // when admin suspends eht OIDC user
-            adminClient.updateUserStatus(userId, "SUSPENDED");
+            adminClient.updateUsersStatus(List.of(userId), "SUSPENDED");
 
             // then.
             AxelixMasterApiClient suspendedUserClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());
             suspendedUserClient.verifySuspendedUserCannotLoginViaOAuth2(username, password);
         } finally {
-            adminClient.updateUserStatus(userId, "ACTIVE");
+            adminClient.updateUsersStatus(List.of(userId), "ACTIVE");
         }
     }
 }

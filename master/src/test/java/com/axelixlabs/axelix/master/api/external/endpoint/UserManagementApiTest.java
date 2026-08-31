@@ -75,7 +75,11 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
     @BeforeEach
     void cleanUsersTable() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @Test
@@ -300,7 +304,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         // language=json
         String request = """
                 {
-                  "id":"%s"
+                  "ids": ["%s"]
                 }
                 """.formatted(user.id());
 
@@ -314,6 +318,94 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(userRepository.findById(user.id())).isEmpty();
         assertSuccessfulCallback(MasterWebEndpoints.USER_DELETE, superAdmin.getActor());
+    }
+
+    @Test
+    void shouldDeleteSeveralUsers() {
+        // given.
+        UserEntity first = createUser("firstToDelete", "first@example.com", "p");
+        UserEntity second = createUser("secondToDelete", "second@example.com", "p");
+        UserEntity third = createUser("thirdToDelete", "third@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s", "%s", "%s"]
+                }
+                """.formatted(first.id(), second.id(), third.id());
+
+        // when.
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+
+        ResponseEntity<Void> response =
+                superAdmin.exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(userRepository.findById(first.id())).isEmpty();
+        assertThat(userRepository.findById(second.id())).isEmpty();
+        assertThat(userRepository.findById(third.id())).isEmpty();
+        assertSuccessfulCallback(MasterWebEndpoints.USER_DELETE, superAdmin.getActor());
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenSomeUsersDoNotExist() {
+        // given.
+        UserEntity user = createUser("toDelete", "d@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s", "non-existent-id"]
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findById(user.id())).isPresent();
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenIdsIsEmpty() {
+        // given.
+        // language=json
+        String request = """
+                {
+                  "ids": []
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenIdsContainsNull() {
+        // given.
+        // language=json
+        String request = """
+                {
+                  "ids": [null]
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -567,9 +659,11 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     void shouldChangeOnlyUserStatus() {
         // given.
         UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
         String request = """
                 {
-                  "id": "%s",
+                  "ids": ["%s"],
                   "status": "SUSPENDED"
                 }
                 """.formatted(user.id());
@@ -589,12 +683,69 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
+    void shouldChangeStatusOfSeveralUsers() {
+        // given.
+        UserEntity first = createUser("first", "first@example.com", "p");
+        UserEntity second = createUser("second", "second@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s", "%s"],
+                  "status": "SUSPENDED"
+                }
+                """.formatted(first.id(), second.id());
+
+        // when.
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+
+        ResponseEntity<Void> response =
+                superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(userRepository.findById(first.id()).orElseThrow().status()).isEqualTo(UserStatus.SUSPENDED);
+        assertThat(userRepository.findById(second.id()).orElseThrow().status()).isEqualTo(UserStatus.SUSPENDED);
+        assertSuccessfulCallback(MasterWebEndpoints.USER_CHANGE_STATUS, superAdmin.getActor());
+    }
+
+    @Test
+    void shouldActivateSeveralUsers() {
+        // given.
+        UserEntity first = createUser("first", "first@example.com", "p");
+        UserEntity second = createUser("second", "second@example.com", "p");
+        userService.updateStatusByIds(List.of(first.id(), second.id()), UserStatus.SUSPENDED);
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s", "%s"],
+                  "status": "ACTIVE"
+                }
+                """.formatted(first.id(), second.id());
+
+        // when.
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+
+        ResponseEntity<Void> response =
+                superAdmin.exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(userRepository.findById(first.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(userRepository.findById(second.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+        assertSuccessfulCallback(MasterWebEndpoints.USER_CHANGE_STATUS, superAdmin.getActor());
+    }
+
+    @Test
     void shouldAllowIdempotentStatusChange() {
         // given.
         UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
         String request = """
                 {
-                  "id": "%s",
+                  "ids": ["%s"],
                   "status": "ACTIVE"
                 }
                 """.formatted(user.id());
@@ -612,13 +763,15 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenStatusIsUnknown() {
+    void shouldReturnBadRequest_WhenChangingStatusOfUnknownUser() {
         // given.
         UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
         String request = """
                 {
-                  "id": "%s",
-                  "status": "UNKNOWN"
+                  "ids": ["%s", "unknown-id"],
+                  "status": "SUSPENDED"
                 }
                 """.formatted(user.id());
 
@@ -633,23 +786,88 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnNotFound_WhenChangingStatusOfUnknownUser() {
+    void shouldReturnBadRequest_WhenStatusIdsIsEmpty() {
         // given.
+        // language=json
         String request = """
                 {
-                  "id": "unknown-id",
-                  "status": "SUSPENDED"
+                  "ids": [],
+                  "status": "ACTIVE"
                 }
                 """;
 
         // when.
-        ResponseEntity<String> response = restTemplate
+        ResponseEntity<Void> response = restTemplate
                 .asUsersFeedEditor()
-                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
 
         // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).contains("USER_NOT_FOUND");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenStatusIdsContainsNull() {
+        // given.
+        // language=json
+        String request = """
+                {
+                  "ids": [null],
+                  "status": "ACTIVE"
+                }
+                """;
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenStatusIsMissing() {
+        // given.
+        UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s"]
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findById(user.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenStatusIsUnknown() {
+        // given.
+        UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "ids": ["%s"],
+                  "status": "UNKNOWN"
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(userRepository.findById(user.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
     }
 
     @Override

@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -101,7 +102,11 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
     @BeforeEach
     void cleanUsersTable() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @BeforeEach
@@ -199,7 +204,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         // given.
         userService.createLocal("db-user", null, null, "db-user@example.com", null, null, "db-password", "VIEWER");
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
-        userService.updateStatus(user.id(), UserStatus.SUSPENDED);
+        userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
 
         // when.
@@ -224,8 +229,8 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         // and.
         userService.createLocal(username, null, null, "db-user@example.com", null, null, password, "VIEWER");
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
-        userService.updateStatus(user.id(), UserStatus.SUSPENDED);
-        userService.updateStatus(user.id(), UserStatus.ACTIVE);
+        userService.updateStatusByIds(List.of(user.id()), UserStatus.SUSPENDED);
+        userService.updateStatusByIds(List.of(user.id()), UserStatus.ACTIVE);
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         // when.
@@ -293,7 +298,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "VIEWER");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
-        userService.updateStatus(bob.id(), UserStatus.SUSPENDED);
+        userService.updateStatusByIds(List.of(bob.id()), UserStatus.SUSPENDED);
 
         // language=json
         String expectedFeed = """
@@ -352,7 +357,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 "aliceSecret",
                 "ADMIN");
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
-        userService.updateStatus(alice.id(), UserStatus.SUSPENDED);
+        userService.updateStatusByIds(List.of(alice.id()), UserStatus.SUSPENDED);
 
         // language=json
         String expectedUser = """
