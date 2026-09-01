@@ -46,7 +46,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class DefaultGcLogServiceTest {
 
-    private static final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor(), new NoOpLogger());
+    private static final DefaultGcLogService subject =
+            new DefaultGcLogService(new DiagnosticCommandExecutor(), new NoOpLogger());
 
     @AfterEach
     void tearDown() {
@@ -87,7 +88,7 @@ class DefaultGcLogServiceTest {
     @MethodSource("enabledGcLogStatusProvider")
     void getStatus_shouldReturnEnabled_whenUnifiedLoggingSelectorsContainGc(String vmLogOutput, String level) {
         // given.
-        var subject = new DefaultGcLogService(new StaticJcmdExecutor(vmLogOutput), new NoOpLogger());
+        var subject = new DefaultGcLogService(new StaticDiagnosticCommandExecutor(vmLogOutput), new NoOpLogger());
 
         // when.
         GcLogStatus status = subject.getStatus();
@@ -124,7 +125,7 @@ class DefaultGcLogServiceTest {
     @MethodSource("disabledGcLogStatusProvider")
     void getStatus_shouldReturnDisabled_whenUnifiedLoggingSelectorsDoNotContainGc(String vmLogOutput) {
         // given.
-        var subject = new DefaultGcLogService(new StaticJcmdExecutor(vmLogOutput), new NoOpLogger());
+        var subject = new DefaultGcLogService(new StaticDiagnosticCommandExecutor(vmLogOutput), new NoOpLogger());
 
         // when.
         GcLogStatus status = subject.getStatus();
@@ -150,7 +151,7 @@ class DefaultGcLogServiceTest {
     @MethodSource("specifiedLogFileProvider")
     void isGcLogFileSpecified_shouldReturnTrue_whenJvmLogFileOutputIsSpecified(String vmLogOutput) {
         // given.
-        var subject = new DefaultGcLogService(new StaticJcmdExecutor(vmLogOutput), new NoOpLogger());
+        var subject = new DefaultGcLogService(new StaticDiagnosticCommandExecutor(vmLogOutput), new NoOpLogger());
 
         // when.
         boolean status = subject.isGcLogFileSpecified();
@@ -173,7 +174,7 @@ class DefaultGcLogServiceTest {
     @MethodSource("notSpecifiedLogFileProvider")
     void isGcLogFileSpecified_shouldReturnFalse_whenJvmLogFileOutputIsNotSpecified(String vmLogOutput) {
         // given.
-        var subject = new DefaultGcLogService(new StaticJcmdExecutor(vmLogOutput), new NoOpLogger());
+        var subject = new DefaultGcLogService(new StaticDiagnosticCommandExecutor(vmLogOutput), new NoOpLogger());
 
         // when.
         boolean status = subject.isGcLogFileSpecified();
@@ -236,23 +237,23 @@ class DefaultGcLogServiceTest {
         assertThatThrownBy(() -> subject.enable("off")).isInstanceOf(GcLogException.class);
     }
 
-    // Builds a minimal VM.log list output for parser tests without calling real jcmd.
+    // Builds a minimal VM.log list output for parser tests without calling the real DiagnosticCommandMBean.
     private static String vmLogList(String... outputConfigurations) {
         return "Available log levels: off, trace, debug, info, warning, error\n"
                 + "Log output configuration:\n"
                 + String.join("\n", outputConfigurations);
     }
 
-    private static final class StaticJcmdExecutor extends JcmdExecutor {
+    private static final class StaticDiagnosticCommandExecutor extends DiagnosticCommandExecutor {
         private final String output;
 
-        private StaticJcmdExecutor(String output) {
+        private StaticDiagnosticCommandExecutor(String output) {
             this.output = output;
         }
 
         @Override
-        public ProcessResult execute(String... command) {
-            return new ProcessResult(0, output);
+        public String execute(String diagnosticCommand, String... args) {
+            return output;
         }
     }
 }
