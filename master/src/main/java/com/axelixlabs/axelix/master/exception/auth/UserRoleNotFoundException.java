@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.Role;
 
 /**
- * Thrown if the role name is not found in the Axelix system {@link Role}.
+ * Thrown if the role is not found.
  *
  * @see Role
  * @author Sergey Cherkasov

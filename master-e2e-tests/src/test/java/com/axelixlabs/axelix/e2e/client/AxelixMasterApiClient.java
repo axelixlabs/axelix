@@ -78,13 +78,13 @@ public class AxelixMasterApiClient {
         requestSpec().post(EXTERNAL_API_BASE_PATH + "/users/logout");
     }
 
-    public void registerLocalUser(String username, @Nullable String email, String password, String role) {
+    public void registerLocalUser(String username, @Nullable String email, String password, String roleId) {
         // Using a Map instead of text blocks because the email can be null.
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("username", username);
         body.put("email", email);
         body.put("password", password);
-        body.put("role", role);
+        body.put("roleIds", Set.of(roleId));
 
         requestSpec()
                 .body(body)

@@ -55,6 +55,7 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
@@ -118,6 +119,9 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private UserService userService;
@@ -322,7 +326,15 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
-        userService.createLocal(username, null, null, null, null, null, "test-password", "ADMIN");
+        userService.createLocal(
+                username,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "test-password",
+                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
 
         // and.
         String userInfoJson = "someJson";

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.user;
 
+import java.util.Set;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @param jobTitle   The user's job title, which may be {@code null}.
  * @param organizationalUnit The user's organizational unit, which may be {@code null}.
  * @param password   Plain-text password.
- * @param role       Name of the role to grant to the user.
+ * @param roleIds    Ids of the roles to grant to the user.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
@@ -42,12 +44,12 @@ public record UserCreateRequest(
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
         String password,
-        String role) {
+        Set<String> roleIds) {
 
     @Override
     public String toString() {
         return "UserCreateRequest[username=[%s], firstName=[REDACTED], lastName=[REDACTED],"
                 + " email=[REDACTED], jobTitle=[REDACTED], organizationalUnit=[REDACTED],"
-                + " password=[REDACTED], role=%s]".formatted(username, role);
+                + " password=[REDACTED], roleIds=%s]".formatted(username, roleIds);
     }
 }

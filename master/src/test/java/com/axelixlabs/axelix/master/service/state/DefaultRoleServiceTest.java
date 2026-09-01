@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.RoleEntity;
 import com.axelixlabs.axelix.master.domain.RoleOrigin;
-import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
@@ -64,6 +64,9 @@ class DefaultRoleServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
@@ -120,7 +123,8 @@ class DefaultRoleServiceTest {
         @Test
         void findRolesOfUser_shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
-            String userId = createUserWithRoles("VIEWER");
+            String userId =
+                    createUserWithRoles(roleRepository.findIdByName("VIEWER").orElseThrow());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
@@ -132,7 +136,9 @@ class DefaultRoleServiceTest {
         @Test
         void findRolesOfUser_shouldReturnEveryRoleWithItsAuthorities() {
             // given.
-            String userId = createUserWithRoles("ADMIN", "EDITOR");
+            String userId = createUserWithRoles(
+                    roleRepository.findIdByName("ADMIN").orElseThrow(),
+                    roleRepository.findIdByName("EDITOR").orElseThrow());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
@@ -152,14 +158,9 @@ class DefaultRoleServiceTest {
             assertThat(roles).isEmpty();
         }
 
-        private String createUserWithRoles(String... roles) {
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", roles[0]);
-            UserEntity user = userRepository.findByUsername("alice").orElseThrow();
-            if (roles.length > 1) {
-                userService.updateUserPatch(
-                        user.id(), "alice", null, null, "alice@example.com", null, null, null, Set.of(roles), null);
-            }
-            return user.id();
+        private String createUserWithRoles(String... roleIds) {
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of(roleIds));
+            return userRepository.findByUsername("alice").orElseThrow().id();
         }
 
         private static Role roleNamed(Set<Role> roles, String name) {
@@ -268,7 +269,7 @@ class DefaultRoleServiceTest {
             String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "CHILD");
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of(childId));
             String userId = userRepository.findByUsername("alice").orElseThrow().id();
 
             // when.
@@ -380,7 +381,7 @@ class DefaultRoleServiceTest {
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
-            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "ROLE A");
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", Set.of(roleA));
             String userId = userRepository.findByUsername("alice").orElseThrow().id();
 
             // when.

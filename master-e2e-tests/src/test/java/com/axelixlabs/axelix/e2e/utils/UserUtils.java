@@ -28,6 +28,9 @@ public class UserUtils {
 
     public static final String PASSWORD = "password";
 
+    // TODO: Pending issue GH-1559 – take the role id from the roles feed
+    public static final String EDITOR_ROLE_ID = "00000000-0000-0000-0000-0000000000b2";
+
     public static String generateUniqueUsername() {
         return "user-" + UUID.randomUUID();
     }

@@ -24,6 +24,7 @@ import com.axelixlabs.axelix.e2e.client.AxelixMasterApiClient;
 import com.axelixlabs.axelix.e2e.client.McpClient;
 import com.axelixlabs.axelix.e2e.config.E2ETestConfig;
 
+import static com.axelixlabs.axelix.e2e.utils.UserUtils.EDITOR_ROLE_ID;
 import static com.axelixlabs.axelix.e2e.utils.UserUtils.PASSWORD;
 import static com.axelixlabs.axelix.e2e.utils.UserUtils.generateUniqueUsername;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -52,7 +53,7 @@ public class McpLoginAuthLocalE2ETest {
     void shouldLoginLocalUser() {
         // given.
         String username = generateUniqueUsername();
-        client.registerLocalUser(username, null, PASSWORD, "EDITOR");
+        client.registerLocalUser(username, null, PASSWORD, EDITOR_ROLE_ID);
 
         // when.
         McpClient mcpClient = new McpClient(E2ETestConfig.masterBaseUrl(), username, PASSWORD);
