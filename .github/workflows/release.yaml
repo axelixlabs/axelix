@@ -15,36 +15,18 @@ env:
   RELEASE_TAG: ${{ github.event.inputs.git_tag }}
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          ref: v${{ env.RELEASE_TAG }}
-          fetch-depth: 0
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'liberica'
-          java-version: '25'
-
-      - name: Build and Test
-        run: ./gradlew clean build
-
   starter-compatibility-tests:
-    name: ${{ matrix.starter }} on Java ${{ matrix.javaVersion }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.starterConfig.starter }} on Java ${{ matrix.starterConfig.javaVersion }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        starterConfig:
           - starter: Spring Boot 2 starter
             javaVersion: 11
-            tasks: :sbs:axelix-spring-boot-2-starter:build
-          - starter: Spring Boot 2 starter
-            javaVersion: 14
             tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
             javaVersion: 17
@@ -77,20 +59,29 @@ jobs:
           ref: v${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
+      - name: Prepare Windows runner
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          git config --global core.autocrlf true
+          git config --global core.longPaths true
+          Stop-Service -name Docker
+
       - name: Set up starter test JDK and Gradle JDK 25
         uses: actions/setup-java@v5
         with:
           distribution: 'liberica'
           java-version: |
-            ${{ matrix.javaVersion }}
+            ${{ matrix.starterConfig.javaVersion }}
             25
 
       - name: Run starter compatibility tests
+        shell: bash
+        # Both X64 and AARCH64 are listed since Gradle just ignores whichever env vars aren't set for this OS/arch.
         run: >-
           ./gradlew
-          ${{ matrix.tasks }}
-          -Paxelix.starter.tests.java.version=${{ matrix.javaVersion }}
-          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.javaVersion }}_X64,JAVA_HOME_25_X64
+          ${{ matrix.starterConfig.tasks }}
+          -Paxelix.starter.tests.java.version=${{ matrix.starterConfig.javaVersion }}
+          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_X64,JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_AARCH64,JAVA_HOME_25_X64,JAVA_HOME_25_AARCH64
 
 #  security-check:
 #    runs-on: ubuntu-latest
@@ -109,7 +100,7 @@ jobs:
 #        uses: ./.github/actions/security-check
 
   release-artifacts:
-    needs: [build-and-test, starter-compatibility-tests]
+    needs: [starter-compatibility-tests]
     runs-on: ubuntu-latest
     permissions:
       contents: read

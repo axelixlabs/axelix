@@ -20,12 +20,12 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.gclog.ConditionalOnJcmd;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.DefaultGcLogService;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.DiagnosticCommandExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 /**
@@ -35,17 +35,17 @@ import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnClass(name = "com.sun.management.DiagnosticCommandMBean")
 public class GarbageCollectionAutoConfiguration {
 
     @Bean
-    @ConditionalOnJcmd
-    public JcmdExecutor jcmdExecutor() {
-        return new JcmdExecutor();
+    public DiagnosticCommandExecutor diagnosticCommandExecutor() {
+        return new DiagnosticCommandExecutor();
     }
 
     @Bean
-    public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
+    public GcLogService gcLogService(DiagnosticCommandExecutor diagnosticCommandExecutor) {
         return new DefaultGcLogService(
-                jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
+                diagnosticCommandExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
     }
 }

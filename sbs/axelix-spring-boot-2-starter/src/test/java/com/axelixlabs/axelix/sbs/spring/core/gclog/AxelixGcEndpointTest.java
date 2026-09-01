@@ -176,14 +176,14 @@ class AxelixGcEndpointTest {
     static class AxelixGcEndpointTestConfiguration {
 
         @Bean
-        public JcmdExecutor jcmdExecutor() {
-            return new JcmdExecutor();
+        public DiagnosticCommandExecutor diagnosticCommandExecutor() {
+            return new DiagnosticCommandExecutor();
         }
 
         @Bean
-        public GcLogService gcLogService(JcmdExecutor jcmdExecutor) {
+        public GcLogService gcLogService(DiagnosticCommandExecutor diagnosticCommandExecutor) {
             return new DefaultGcLogService(
-                    jcmdExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
+                    diagnosticCommandExecutor, new SLF4JLogger(LoggerFactory.getLogger(DefaultGcLogService.class)));
         }
 
         @Bean

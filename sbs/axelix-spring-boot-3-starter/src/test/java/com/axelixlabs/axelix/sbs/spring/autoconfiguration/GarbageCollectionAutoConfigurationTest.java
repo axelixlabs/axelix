@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import com.axelixlabs.axelix.sbs.spring.core.gclog.DiagnosticCommandExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
-import com.axelixlabs.axelix.sbs.spring.core.gclog.JcmdExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +41,7 @@ class GarbageCollectionAutoConfigurationTest {
     @Test
     void shouldCreateGcLogServiceBeansUnconditionally() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(JcmdExecutor.class);
+            assertThat(context).hasSingleBean(DiagnosticCommandExecutor.class);
             assertThat(context).hasSingleBean(GcLogService.class);
         });
     }
