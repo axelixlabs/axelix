@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
@@ -32,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
  */
 @AutoConfiguration(after = GarbageCollectionAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixGcEndpoint.class)
+@ConditionalOnBean(GcLogService.class)
 public class AxelixGcEndpointAutoConfiguration {
 
     @Bean

@@ -74,4 +74,15 @@ class AxelixGcEndpointAutoConfigurationTest {
                     assertThat(context).hasSingleBean(GcLogService.class);
                 });
     }
+
+    @Test
+    void shouldNotFailContextWhenGcLogServiceIsUnavailable() {
+        new ApplicationContextRunner()
+                .withPropertyValues("management.endpoints.web.exposure.include=axelix-gc")
+                .withConfiguration(AutoConfigurations.of(AxelixGcEndpointAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context).doesNotHaveBean(AxelixGcEndpoint.class);
+                });
+    }
 }

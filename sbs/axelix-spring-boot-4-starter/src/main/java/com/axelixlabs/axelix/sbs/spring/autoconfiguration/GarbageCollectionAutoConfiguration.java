@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.DefaultGcLogService;
@@ -34,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnClass(name = "com.sun.management.DiagnosticCommandMBean")
 public class GarbageCollectionAutoConfiguration {
 
     @Bean
