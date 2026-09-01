@@ -77,7 +77,7 @@ public class UserManagementApi {
                     request.jobTitle(),
                     request.organizationalUnit(),
                     request.password(),
-                    request.role());
+                    request.roleIds());
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (UserInvalidValueException

@@ -57,9 +57,9 @@ public interface UserService {
      * @param jobTitle Job title of the new user, or {@code null} if not provided.
      * @param organizationalUnit Organizational unit of the new user, or {@code null} if not provided.
      * @param password Plain-text password (must be hashed server-side before persistence).
-     * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
+     * @param roleIds  Ids of the roles to assign to the new user. Must not be empty or contain blanks.
      *
-     * @throws UserRoleNotFoundException if the provided role does not exist in the service.
+     * @throws UserRoleNotFoundException if any of the provided role ids does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      * @throws UsernameAlreadyExistsException if a user with the given username already exists.
      * @throws EmailAlreadyExistsException if a user with the given email already exists.
@@ -72,7 +72,7 @@ public interface UserService {
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
             String password,
-            String role);
+            Set<String> roleIds);
 
     /**
      * Creates a new {@link UserOrigin#OIDC} user.

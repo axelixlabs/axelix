@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.e2e.client.AxelixMasterApiClient;
 import com.axelixlabs.axelix.e2e.config.E2ETestConfig;
 
+import static com.axelixlabs.axelix.e2e.utils.UserUtils.EDITOR_ROLE_ID;
 import static com.axelixlabs.axelix.e2e.utils.UserUtils.PASSWORD;
 import static com.axelixlabs.axelix.e2e.utils.UserUtils.generateUniqueEmail;
 import static com.axelixlabs.axelix.e2e.utils.UserUtils.generateUniqueUsername;
@@ -50,7 +51,7 @@ public class LocalAuthE2ETest {
     void shouldLoginLocalUser() {
         // given when.
         String username = generateUniqueUsername();
-        client.registerLocalUser(username, generateUniqueEmail(), PASSWORD, "EDITOR");
+        client.registerLocalUser(username, generateUniqueEmail(), PASSWORD, EDITOR_ROLE_ID);
 
         // logout as super-admin
         client.logout();
@@ -63,7 +64,7 @@ public class LocalAuthE2ETest {
     void shouldPreventSuspendedUserFromLoggingIn() {
         // given.
         String username = generateUniqueUsername();
-        client.registerLocalUser(username, generateUniqueEmail(), PASSWORD, "EDITOR");
+        client.registerLocalUser(username, generateUniqueEmail(), PASSWORD, EDITOR_ROLE_ID);
         String userId = client.getUserId(username);
 
         // when.
