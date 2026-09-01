@@ -24,10 +24,11 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import com.sun.management.DiagnosticCommandMBean;
-
 /**
- * Invokes HotSpot diagnostic commands - via the {@link DiagnosticCommandMBean}.
+ * Invokes HotSpot diagnostic commands - via the {@code com.sun.management.DiagnosticCommandMBean}.
+ *
+ * <p>Deliberately not importing that type: it's HotSpot-specific and unavailable on some JVMs, so this
+ * class only ever refers to it by name/string to keep this module compilable on any JDK.
  *
  * @since 29.12.2025
  * @author Nikita Kirillov
@@ -38,9 +39,10 @@ public class DiagnosticCommandExecutor {
     private static final MBeanServer PLATFORM_MBEAN_SERVER = ManagementFactory.getPlatformMBeanServer();
 
     /**
-     * Invokes the given {@link DiagnosticCommandMBean} operation (e.g. {@code "vmLog"}) with the given
-     * arguments (e.g. {@code "list"}, {@code "what=gc=info"}) and returns its textual output.
+     * Invokes the given {@code DiagnosticCommandMBean} operation (e.g. {@code "vmLog"}) with the given
+     * arguments (e.g. {@code "list"}, {@code "what=gc=info"}).
      *
+     * @return the operation's raw text output
      * @throws JMException if the operation is unknown, its arguments are invalid, or the invocation fails
      */
     public String execute(String operation, String... args) throws JMException {

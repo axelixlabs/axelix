@@ -107,6 +107,7 @@ class DefaultLoggersServiceTest {
         // Use non-strict comparison due to low Windows timer resolution.
         assertThat(secondInitiatedAt).isAfterOrEqualTo(firstInitiatedAt);
         assertThat(secondRollsBackAt).isAfter(firstRollsBackAt);
+        // Instant.now() isn't monotonic.
         assertThat(secondInitiatedAt).isBetween(beforeSecondChange.minusMillis(50), afterSecondChange.plusMillis(50));
         assertThat(secondRollsBackAt)
                 .isBetween(
@@ -137,6 +138,7 @@ class DefaultLoggersServiceTest {
         // Use non-strict comparison due to low Windows timer resolution.
         assertThat(permanentOverride.getTemporaryLevelRollsBackAt()).isNull();
         assertThat(permanentInitiatedAt).isAfterOrEqualTo(temporaryInitiatedAt);
+        // Instant.now() isn't monotonic.
         assertThat(permanentInitiatedAt)
                 .isBetween(beforePermanentChange.minusMillis(50), afterPermanentChange.plusMillis(50));
         assertThat(permanentOverride.getFallbackLevel()).isEqualTo("WARN");
