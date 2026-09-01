@@ -111,7 +111,7 @@ public class UserManagementApi {
                     request.jobTitle(),
                     request.organizationalUnit(),
                     request.password(),
-                    request.roles(),
+                    request.roleIds(),
                     null);
 
             return ResponseEntity.noContent().build();

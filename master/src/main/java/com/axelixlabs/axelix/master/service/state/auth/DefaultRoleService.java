@@ -68,6 +68,11 @@ public class DefaultRoleService implements RoleService {
     }
 
     @Override
+    public Optional<String> findIdByName(String roleName) {
+        return roleRepository.findIdByName(roleName);
+    }
+
+    @Override
     public Set<Role> findRolesOfUser(String userId) throws IllegalStateException {
         RoleGraph graph = getGraph();
 

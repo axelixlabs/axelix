@@ -204,11 +204,11 @@ public class DatabaseUserService implements UserService {
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
             @Nullable String password,
-            Set<String> roles,
+            Set<String> roleIds,
             @Nullable Instant lastLoginAt)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
-        if (roles.isEmpty()) {
+        if (roleIds.isEmpty()) {
             throw new UserInvalidValueException(null);
         }
 
@@ -242,7 +242,7 @@ public class DatabaseUserService implements UserService {
                 lastLoginAt);
 
         userRepository.deleteUserRolesMappings(id);
-        grantRoles(id, roles);
+        grantRolesByIds(id, roleIds);
     }
 
     // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization

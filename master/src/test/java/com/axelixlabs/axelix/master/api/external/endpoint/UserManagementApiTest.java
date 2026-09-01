@@ -331,10 +331,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "email": "new@example.com",
                   "jobTitle": "Engineering Manager",
                   "organizationalUnit": "Engineering",
-                  "roles": ["ADMIN", "EDITOR"],
+                  "roleIds": ["%s", "%s"],
                   "password": "newPass"
                 }
-                """.formatted(user.id());
+                """.formatted(
+                        user.id(),
+                        roleRepository.findIdByName("ADMIN").orElseThrow(),
+                        roleRepository.findIdByName("EDITOR").orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -370,10 +373,11 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "id": "%s",
                   "username": "%s",
                   "email": null,
-                  "roles": ["VIEWER"],
+                  "roleIds": ["%s"],
                   "password": null
                 }
-                """.formatted(user.id(), newUsername);
+                """.formatted(
+                user.id(), newUsername, roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -399,15 +403,16 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity bob = createUser("bob", "bob@example.com", "p");
 
         // language=json
-        String request = """
+        String request =
+                """
                 {
                   "id": "%s",
                   "username": "alice",
                   "email": "bob@example.com",
-                  "roles": ["VIEWER"],
+                  "roleIds": ["%s"],
                   "password": null
                 }
-                """.formatted(bob.id());
+                """.formatted(bob.id(), roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -429,15 +434,16 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity bob = createUser("bob", "bob@example.com", "p");
 
         // language=json
-        String request = """
+        String request =
+                """
                 {
                   "id": "%s",
                   "username": "bob",
                   "email": "alice@example.com",
-                  "roles": ["VIEWER"],
+                  "roleIds": ["%s"],
                   "password": null
                 }
-                """.formatted(bob.id());
+                """.formatted(bob.id(), roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -461,7 +467,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": ["VIEWER", "  SUPER_ADMIN "]
+                  "roleIds": ["%s", "  SUPER_ADMIN "]
                 }
                 """.formatted(user.id());
 
@@ -505,7 +511,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": []
+                  "roleIds": []
                 }
                 """.formatted(user.id());
 
@@ -524,13 +530,14 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
-        String request = """
+        String request =
+                """
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": ["VIEWER", "   "]
+                  "roleIds": ["%s", "   "]
                 }
-                """.formatted(user.id());
+                """.formatted(user.id(), roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -546,11 +553,12 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity user = createUser("u", "u@example.com", "p");
 
         // language=json
-        String request = """
+        String request =
+                """
                 {
                   "id": "%s",
                   "username": "u",
-                  "roles": ["NOT_A_REAL_ROLE"]
+                  "roleIds": ["NOT_A_REAL_ROLE"]
                 }
                 """.formatted(user.id());
 
@@ -561,6 +569,32 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldGrantTheRoleOnce_WhenUpdateRepeatsTheSameRoleId() {
+        UserEntity user = createUser("u", "u@example.com", "p");
+
+        // language=json
+        String request = """
+                {
+                  "id": "%s",
+                  "username": "u",
+                  "roleIds": ["%s", "%s"]
+                }
+                """.formatted(
+                        user.id(),
+                        roleRepository.findIdByName("ADMIN").orElseThrow(),
+                        roleRepository.findIdByName("ADMIN").orElseThrow());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(userService.findRoleNamesByUserId(user.id())).containsExactly("ADMIN");
     }
 
     @Test
@@ -620,7 +654,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "id": "%s",
                   "status": "UNKNOWN"
                 }
-                """.formatted(user.id());
+                """.formatted(user.id(), roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<Void> response = restTemplate
