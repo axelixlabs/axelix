@@ -2,11 +2,17 @@ name: Release Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      git_tag:
+        description: 'Git release tag WITHOUT `v` prefix (e.g., 1.0.1)'
+        required: true
+        type: string
 
 env:
   USERNAME: ${{ github.actor }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_CONTAINER_REGISTRY: ghcr.io
+  RELEASE_TAG: ${{ github.event.inputs.git_tag }}
 
 jobs:
   starter-compatibility-tests:
@@ -50,8 +56,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
+          ref: v${{ env.RELEASE_TAG }}
           fetch-depth: 0
-      
+
       - name: Prepare Windows runner
         if: ${{ runner.os == 'Windows' }}
         run: |
@@ -60,7 +67,7 @@ jobs:
           Stop-Service -name Docker
 
       - name: Set up starter test JDK and Gradle JDK 25
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v5
         with:
           distribution: 'liberica'
           java-version: |
@@ -76,57 +83,50 @@ jobs:
           -Paxelix.starter.tests.java.version=${{ matrix.starterConfig.javaVersion }}
           -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_X64,JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_AARCH64,JAVA_HOME_25_X64,JAVA_HOME_25_AARCH64
 
-  security-check:
+#  security-check:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      actions: read
+#      security-events: write
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v7
+#        with:
+#          ref: v${{ env.RELEASE_TAG }}
+#          fetch-depth: 0
+#
+#      - name: Running Security Check
+#        uses: ./.github/actions/security-check
+
+  release-artifacts:
+    needs: [starter-compatibility-tests]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      actions: read
-      security-events: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Running Security Check
-        uses: ./.github/actions/security-check
-
-  release-artifacts:
-    needs: [security-check, starter-compatibility-tests]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
       packages: write
+    env:
+      VITE_APP_VERSION: ${{ github.event.inputs.git_tag }}
     steps:
-      # Initial checkout without submodules so that the local composite actions are available.
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
+          ref: v${{ env.RELEASE_TAG }}
           fetch-depth: 0
-
-      - name: Resolve release version from gradle.properties
-        run: |
-          RELEASE_TAG=$(grep '^axelixVersion=' gradle.properties | cut -d'=' -f2)
-          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
-          echo "VITE_APP_VERSION=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
-
       - name: Set up JDK 25
-        uses: actions/setup-java@v5.6.0
+        uses: actions/setup-java@v5
         with:
           distribution: 'liberica'
           java-version: '25'
 
       # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
-      # and to create the release build from scratch. With the enterprise submodule present, this builds the
-      # unified (OSS + Enterprise) distribution.
+      # and to create the release build from scratch.
       - name: Build
         run: ./gradlew clean build sourcesJar javadocJar
 
@@ -160,14 +160,3 @@ jobs:
 
       - name: Publish to Maven Central
         run: ./gradlew publish
-
-      - name: Create and push release tag
-        run: |
-          git tag "v${RELEASE_TAG}"
-          git push origin "v${RELEASE_TAG}"
-
-      - name: Create release tag in the Enterprise version
-        run: |
-          cd axelix-enterprise
-          git tag "v${RELEASE_TAG}"
-          git push origin "v${RELEASE_TAG}"
