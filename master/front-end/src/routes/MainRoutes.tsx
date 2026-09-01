@@ -21,11 +21,12 @@ import { Navigate, Route, Routes } from "react-router";
 import Loadable from "@/components";
 import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
-import { DashboardSiderMenu } from "@/layout/siders";
+import { DashboardSiderMenu, InstanceSiderMenu, UsersSiderMenu } from "@/layout/siders";
 
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DashboardOverview = Loadable(lazy(() => import("@/pages/Dashboard/DashboardOverview")));
+const RolesAndPermissions = Loadable(lazy(() => import("@/pages/RolesAndPermissions")));
 const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
@@ -33,7 +34,8 @@ const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
 const EntitiesMap = Loadable(lazy(() => import("@/pages/EntitiesMap")));
 const Environment = Loadable(lazy(() => import("@/pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("@/pages/ConfigProps")));
-const UserProfile = Loadable(lazy(() => import("@/pages/UserProfile")));
+const UserDetails = Loadable(lazy(() => import("@/pages/UserDetails")));
+const RoleDetails = Loadable(lazy(() => import("@/pages/RoleDetails")));
 const Conditions = Loadable(lazy(() => import("@/pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("@/pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("@/pages/Wallboard")));
@@ -43,6 +45,7 @@ const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
 const Caches = Loadable(lazy(() => import("@/pages/Caches")));
 const Beans = Loadable(lazy(() => import("@/pages/Beans")));
 const Users = Loadable(lazy(() => import("@/pages/Users")));
+const Role = Loadable(lazy(() => import("@/pages/Role")));
 const MCP = Loadable(lazy(() => import("@/pages/MCP")));
 
 export const MainRoutes = () => {
@@ -66,12 +69,15 @@ export const MainRoutes = () => {
                     <Route path="spring-framework" element={<DashboardSpringFramework />} />
                 </Route>
 
-                <Route path="/" element={<MainLayout hideSider />}>
+                <Route path="/" element={<MainLayout siderContent={<UsersSiderMenu />} />}>
                     <Route path="/users" element={<Users />} />
-                    <Route path="/users/:userId" element={<UserProfile />} />
+                    <Route path="/users/roles-permissions" element={<RolesAndPermissions />} />
+                    <Route path="/users/roles-permissions/:roleId" element={<RoleDetails />} />
+                    <Route path="/users/roles-permissions-v2" element={<Role />} />
+                    <Route path="/users/:userId" element={<UserDetails />} />
                 </Route>
 
-                <Route element={<MainLayout />}>
+                <Route element={<MainLayout siderContent={<InstanceSiderMenu />} />}>
                     <Route path="/instance/:instanceId/details" element={<Details />} />
                     <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
                     <Route path="/instance/:instanceId/environment" element={<Environment />} />

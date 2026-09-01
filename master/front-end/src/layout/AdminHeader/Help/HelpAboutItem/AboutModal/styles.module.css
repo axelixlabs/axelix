@@ -1,28 +1,11 @@
-.HeaderWrapper {
-    margin-bottom: 20px;
-}
-
-.Version {
-    margin-top: 8px;
-    color: var(--axelix-bold-grey);
-}
-
-.ParagraphGutter {
+.Paragraph {
     margin-bottom: 12px;
+
+    &:last-child {
+        margin-bottom: 20px;
+    }
 }
 
-.ParagraphGutter:last-child {
-    margin-bottom: 20px;
-}
-
-.ParagraphGutter > a {
-    color: var(--axelix-primary-blue);
-    transition: color 0.3s;
-}
-
-.ParagraphGutter > a:hover {
-    color: var(--axelix-primary-light-blue);
-}
 
 .ActionsWrapper {
     display: flex;

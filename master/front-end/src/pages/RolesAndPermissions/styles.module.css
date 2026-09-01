@@ -1,0 +1,19 @@
+.TableRow {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1.5fr 1.5fr 0.8fr 1.2fr;
+
+    &:hover {
+        color: inherit;
+    }
+}
+
+.Description,
+.LastChangeMeta {
+    margin-top: 8px;
+    color: var(--axelix-bold-grey);
+}
+
+.ViewOnly {
+    margin-left: 8px;
+    color: var(--axelix-bold-grey);
+}

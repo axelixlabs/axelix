@@ -1,0 +1,8 @@
+.TableRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.Danger {
+    color: var(--axelix-primary-red);
+}

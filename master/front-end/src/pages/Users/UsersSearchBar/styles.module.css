@@ -1,0 +1,23 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 8px;
+    margin-bottom: 30px;
+}
+
+.SearchBarWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+    flex: 1;
+}
+
+.FiltersWrapper {
+    display: flex;
+    column-gap: 8px;
+}
+
+.ShownItemsInfo {
+    color: var(--axelix-bold-grey);
+}

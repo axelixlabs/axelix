@@ -15,9 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
-
-import { TooltipWithCopy } from "@/components";
+import { StyledTag, TooltipWithCopy } from "@/components";
 import { defineBeanScopeColor } from "@/helpers";
 import type { IBean } from "@/models";
 
@@ -44,9 +42,7 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
                         <TooltipWithCopy text={className} />
                     </div>
                 </div>
-                <Tag variant="outlined" color={defineBeanScopeColor(scope)} className={styles.Scope}>
-                    {scope}
-                </Tag>
+                <StyledTag color={defineBeanScopeColor(scope)}>{scope}</StyledTag>
             </div>
         </>
     );

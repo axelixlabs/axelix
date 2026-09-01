@@ -93,7 +93,6 @@ export const ValidTagCombinations = ({ validTagCombinations, selectedTags, setSe
                             placeholder={t("Metrics.selectValue")}
                             options={createMetricTagSelectOptions(values)}
                             allowClear
-                            className={styles.TagSelect}
                             classNames={{
                                 popup: {
                                     root: styles.SelectPopupRoot,

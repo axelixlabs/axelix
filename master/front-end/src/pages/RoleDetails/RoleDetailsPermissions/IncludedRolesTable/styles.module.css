@@ -1,0 +1,14 @@
+.ContributedGrants {
+    color: var(--axelix-bold-grey);
+}
+
+.RoleInfo {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.TableFooter {
+    border-top: 1px solid var(--axelix-medium-grey);
+    color: var(--axelix-bold-grey);
+}

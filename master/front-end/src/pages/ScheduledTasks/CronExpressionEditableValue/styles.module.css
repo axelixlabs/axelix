@@ -26,3 +26,7 @@
     align-items: center;
     column-gap: 8px;
 }
+
+.AlertStyles {
+    padding-block: 4px;
+}

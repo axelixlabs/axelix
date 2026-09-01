@@ -9,13 +9,6 @@
   max-width: max-content;
 }
 
-.Scope {
-  display: inline-block;
-  padding: 8px;
-  font-size: inherit;
-  font-weight: 500;
-}
-
 .ClassName {
   color: var(--axelix-bold-grey);
   margin-top: 8px;

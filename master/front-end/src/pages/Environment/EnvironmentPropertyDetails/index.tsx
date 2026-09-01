@@ -73,10 +73,7 @@ export const EnvironmentPropertyDetails = ({ property }: IProps) => {
                             {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
                                 <div className={`${styles.Value} ${styles.InjectionPointWrapper}`} key={beanName}>
                                     <span>{beanName} </span>
-                                    <Link
-                                        to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
-                                        className={styles.LinkIcon}
-                                    >
+                                    <Link to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}>
                                         <LinkIcon />
                                     </Link>
                                 </div>

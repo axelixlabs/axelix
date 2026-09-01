@@ -87,7 +87,7 @@
     "Header": {
         "dashboard": "Dashboard",
         "wallboard": "Wallboard",
-        "users": "Users",
+        "administration": "Administration",
         "Help": {
             "title": "Help",
             "about": "About",
@@ -469,7 +469,6 @@
         "lastLogin": "Last login",
         "provider": "Provider",
         "role": "Role",
-        "roles": "Roles",
         "origin": "Origin",
         "back": "Back",
         "userInformation": "User Profile",
@@ -484,11 +483,54 @@
         "userEdited": "User data updated successfully",
         "userDeleted": "User deleted successfully",
         "userNotFound": "User not found",
+        "Table": {
+            "user": "User",
+            "department": "Department",
+            "status": "Status",
+            "roles": "Roles",
+            "lastActivity": "Last Activity"
+        },
+        "SiderMenu": {
+            "users": "Users",
+            "rolesPermissions": "Roles & permissions",
+            "authentication": "Authentication",
+            "auditLog": "Audit log"
+        },
         "ValidationErrors": {
-            "username": "Please input username!",
+            "firstname": "Please input first name!",
+            "lastname": "Please input last name!",
+            "department": "Please select department!",
             "emailFormat": "Invalid email format!",
             "password": "Please input password!",
             "roles": "Please select roles!"
+        },
+        "SelectionActionBar": {
+            "selectedUsers_one": "{{count}} user selected",
+            "selectedUsers_other": "{{count}} users selected",
+            "oidcLocal": "{{oidcCount}} OIDC · {{localCount}} local",
+            "suspend": "Suspend",
+            "delete": "Delete",
+            "clear": "Clear"
+        },
+        "CreateUser": {
+            "confirmPassword": "Confirm password",
+            "roles": "Roles",
+            "Roles": {
+                "Viewer": {
+                    "label": "VIEWER",
+                    "description": "Read dashboards, wallboards and reports"
+                },
+                "Editor": {
+                    "label": "EDITOR",
+                    "description": "Create and edit content, run MCP actions"
+                },
+                "Admin": {
+                    "label": "ADMIN",
+                    "description": "Full administration, including users and auth"
+                }
+            },
+            "jobTitle": "Job title",
+            "optional": "optional"
         }
     }
 }

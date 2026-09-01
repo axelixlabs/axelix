@@ -21,7 +21,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 
 import "./index.css";
-import "./customizedTable.css";
+import "./customTable.css";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>

@@ -1,0 +1,41 @@
+.CustomTable {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    margin-bottom: 40px;
+    box-shadow: var(--axelix-box-shadow-light);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.TableHeader {
+    background-color: var(--axelix-primary-light-green);
+    font-weight: 600;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    border-top-left-radius: var(--axelix-border-radius-large);
+    border-top-right-radius: var(--axelix-border-radius-large);
+}
+
+.TableRow {
+    transition: background-color 0.3s;
+    overflow: hidden;
+
+    &:nth-child(even) {
+        background-color: var(--axelix-light-grey);
+    }
+
+    &:hover {
+        background-color: var(--axelix-medium-grey);
+    }
+}
+
+.TableRowChunk {
+    word-break: break-all;
+    border-right: 1px solid var(--axelix-medium-grey);
+    padding: 16px;
+
+    &:last-child {
+        border-right: none;
+    }
+}

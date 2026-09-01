@@ -1,0 +1,26 @@
+.SectionTitle {
+    color: var(--axelix-bold-grey);
+    margin-bottom: 20px;
+}
+
+.TableRow {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+}
+
+.ResourceName {
+    font-weight: 500;
+}
+
+.ResourceDesc {
+    color: var(--axelix-bold-grey);
+}
+
+.CheckboxWrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.FooterText {
+    color: var(--axelix-bold-grey);
+}

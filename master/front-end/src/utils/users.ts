@@ -16,10 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { InputProps } from "antd";
+import type { TFunction } from "i18next";
 
-import { ERoles, type UserProfileEditableValueField } from "@/models";
+import { ERoles, type IRoleCheckboxOption, type UserDetailsEditableValueField } from "@/models";
 
-export const userProfileInputTypeMap: Record<UserProfileEditableValueField, InputProps["type"]> = {
+export const PAGINATION_SIZE = 10;
+
+export const userDetailsInputTypeMap: Record<UserDetailsEditableValueField, InputProps["type"]> = {
     username: "text",
     email: "email",
     password: "password",
@@ -30,3 +33,23 @@ export const roleOptions = Object.values(ERoles).map((role) => {
         value: role,
     };
 });
+
+export const getRoleCheckboxOptions = (t: TFunction): IRoleCheckboxOption[] => {
+    return [
+        {
+            value: ERoles.VIEWER,
+            label: t("Users.CreateUser.Roles.Viewer.label"),
+            description: t("Users.CreateUser.Roles.Viewer.description"),
+        },
+        {
+            value: ERoles.EDITOR,
+            label: t("Users.CreateUser.Roles.Editor.label"),
+            description: t("Users.CreateUser.Roles.Editor.description"),
+        },
+        {
+            value: ERoles.ADMIN,
+            label: t("Users.CreateUser.Roles.Admin.label"),
+            description: t("Users.CreateUser.Roles.Admin.description"),
+        },
+    ];
+};

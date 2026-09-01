@@ -17,12 +17,12 @@
  */
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
-import { Alert, App, Button, Input, Popover, Tooltip } from "antd";
+import { App, Button, Input, Popover, Tooltip } from "antd";
 import { type ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { NoRequiredAuthorityTooltip } from "@/components";
+import { AppAlert, NoRequiredAuthorityTooltip } from "@/components";
 import { getCronDescription } from "@/helpers";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, type ICron } from "@/models";
@@ -110,12 +110,7 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
                             </Tooltip>
 
                             <div className={styles.AlertWithActionsWrapper}>
-                                <Alert
-                                    title={isCronExpressionValid ? "Valid" : "Invalid"}
-                                    type={isCronExpressionValid ? "success" : "error"}
-                                    showIcon
-                                    styles={{ root: { paddingBlock: "4px" } }}
-                                />
+                                <AppAlert title={isCronExpressionValid ? "Valid" : "Invalid"} type={isCronExpressionValid ? "success" : "error"} className={styles.AlertStyles} />
 
                                 <div className={styles.EditActionsButtonsWrapper}>
                                     <Button icon={<CloseOutlined />} type="primary" onClick={handleCancel} />

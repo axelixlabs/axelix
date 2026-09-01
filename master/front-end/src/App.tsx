@@ -41,9 +41,28 @@ export const App = () => {
                 tooltip={{
                     styles: {
                         root: {
-                            maxWidth: "600px",
+                            maxWidth: 600,
                             whiteSpace: "normal",
                         },
+                    },
+                }}
+                select={{
+                    styles: {
+                        root: {
+                            minWidth: 120,
+                        },
+                    },
+                }}
+                breadcrumb={{
+                    styles: {
+                        root: {
+                            marginBottom: 8,
+                        },
+                    },
+                }}
+                avatar={{
+                    style: {
+                        flexShrink: 0,
                     },
                 }}
             >

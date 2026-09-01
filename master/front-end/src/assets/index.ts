@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export { default as ScheduledTasksIcon } from "../assets/icons/scheduledTasks.svg?react";
-export { default as BackwardArrowIcon } from "../assets/icons/backwardArrow.svg?react";
 export { default as LockOutlinedIcon } from "../assets/icons/lockOutlined.svg?react";
 export { default as ConfigPropsIcon } from "../assets/icons/configProps.svg?react";
 export { default as EnvironmentIcon } from "../assets/icons/environment.svg?react";

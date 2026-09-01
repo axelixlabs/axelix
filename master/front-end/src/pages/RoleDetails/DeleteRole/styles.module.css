@@ -1,0 +1,20 @@
+.InfoCard {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.InfoCardTitle {
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.InfoCardDescription {
+    color: var(--axelix-bold-grey);
+    margin-bottom: 16px;
+}
+
+.SecondaryText {
+    color: var(--axelix-bold-grey);
+}

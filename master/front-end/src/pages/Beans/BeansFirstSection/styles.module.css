@@ -11,26 +11,15 @@
 }
 
 .Tag {
-    display: inline-flex;
-    align-items: center;
     background-color: var(--axelix-primary-green);
     color: var(--axelix-primary-white);
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: inherit;
-    cursor: pointer;
 
     &:hover {
-        background-color: #1db865;
-        cursor: default;
+        background-color: var(--axelix-primary-dark-green);
     }
 }
 
 .CloseIcon {
     margin-left: 8px;
-    color: var(--axelix-primary-white);
-
-    &:hover {
-        cursor: pointer;
-    }
+    cursor: pointer;
 }

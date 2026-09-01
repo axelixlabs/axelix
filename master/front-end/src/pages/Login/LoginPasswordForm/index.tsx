@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Alert, Button, Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,6 +25,7 @@ import { EIgnoredErrors, type IErrorResponse, type ILoginSubmitRequestData, Stat
 import { login } from "@/services";
 
 import styles from "./styles.module.css";
+import { AppAlert } from "@/components";
 
 export const LoginPasswordForm = () => {
     const { t } = useTranslation();
@@ -73,12 +74,7 @@ export const LoginPasswordForm = () => {
                     <Input.Password />
                 </Form.Item>
                 {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
-                    <Alert
-                        title={t(`Error.codes.${loginData.error}`)}
-                        type="error"
-                        showIcon
-                        className={styles.ErrorAlert}
-                    />
+                    <AppAlert title={t(`Error.codes.${loginData.error}`)} type="error" />
                 )}
                 <Button type="primary" htmlType="submit" loading={loginData.loading} className={styles.SubmitButton}>
                     {t("Authentication.loginPasswordForm.loginButtonText")}

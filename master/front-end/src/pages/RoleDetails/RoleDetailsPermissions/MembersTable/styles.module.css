@@ -1,0 +1,14 @@
+.MemberRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.MemberInfo {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.MemberSource {
+    color: var(--axelix-bold-grey);
+}

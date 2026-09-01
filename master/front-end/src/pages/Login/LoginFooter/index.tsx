@@ -29,11 +29,11 @@ export const LoginFooter = () => {
     return (
         <>
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
+                <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer">
                     {t("Authentication.docs")}
                 </a>
                 <div className={styles.Divider}>|</div>
-                <a href={blogLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
+                <a href={blogLink} target="_blank" rel="noopener noreferrer">
                     {t("blog")}
                 </a>
                 <div className={styles.Divider}>|</div>

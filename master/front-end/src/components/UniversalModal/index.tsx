@@ -16,8 +16,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Modal } from "antd";
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+
+import styles from "./styles.module.css";
 
 export interface IProps {
     /** Whether the modal is visible */
@@ -27,7 +29,9 @@ export interface IProps {
     onOk: () => void;
 
     /** Modal title */
-    title?: string;
+    title: string;
+
+    subtitle?: string;
 
     /** Callback when the modal is cancelled or closed */
     onClose?: () => void;
@@ -52,11 +56,17 @@ export interface IProps {
      * Whether it is possible to close the Modal via clicking on the mask.
      */
     maskCloseable?: boolean;
+
+    /**
+     * Extra content rendered on the left side of the modal footer, next to the buttons.
+     */
+    footerExtra?: ReactNode;
 }
 
 export const UniversalModal = ({
     children,
     title,
+    subtitle,
     open,
     onOk,
     onClose,
@@ -65,13 +75,13 @@ export const UniversalModal = ({
     displayCancel = true,
     displayOkay = true,
     maskCloseable = false,
+    footerExtra,
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
     return (
         <>
             <Modal
-                title={title}
                 open={open}
                 onOk={onOk}
                 onCancel={onClose}
@@ -102,7 +112,24 @@ export const UniversalModal = ({
                     closable: maskCloseable,
                     blur: true,
                 }}
+                footer={footerExtra
+                    ? (_, { OkBtn, CancelBtn }) => (
+                          <div className={styles.Footer}>
+                              <div>{footerExtra}</div>
+                              <div className={styles.FooterButtons}>
+                                  <CancelBtn />
+                                  <OkBtn />
+                              </div>
+                          </div>
+                      )
+                    : undefined
+                }
             >
+                <div className={styles.Header}>
+                    <div className="TextMedium">{title}</div>
+                    {subtitle && <div className={styles.Subtitle}>{subtitle}</div>}
+                </div>
+
                 {children}
             </Modal>
         </>

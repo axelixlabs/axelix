@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { DashboardPagesFirstSection } from "./Dashboard/DashboardPagesFirstSection";
 export { NoRequiredAuthorityTooltip } from "./NoRequiredAuthorityTooltip";
 export { DashboardDonutChart } from "./Dashboard/DashboardDonutChart";
 export { DashboardGauge } from "./Dashboard/DashboardGauge";
+export { AdministrationTable } from "./AdministrationTable";
+export { ManageIncludedRoles } from "./ManageIncludedRoles";
 export { DashboardCard } from "./Dashboard/DashboardCard";
+export { PagesFirstSection } from "./PagesFirstSection";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
@@ -34,6 +36,8 @@ export { HintTooltip } from "./HintTooltip";
 export { PageSearch } from "./PageSearch";
 export { StyledLink } from "./StyledLink";
 export { Accordion } from "./Accordion";
+export { StyledTag } from "./StyledTag";
+export { AppAlert } from "./AppAlert";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";
 export { Copy } from "./Copy";

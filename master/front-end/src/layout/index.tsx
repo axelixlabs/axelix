@@ -22,9 +22,9 @@ import { Outlet } from "react-router";
 import { AccessProvider } from "@/components";
 
 import { AdminHeader } from "./AdminHeader";
-import { LicenseStatusAlert } from "./LicenseStatusAlert";
-import { InstanceSiderMenu } from "./siders";
+
 import styles from "./styles.module.css";
+import { LicenseStatusAlert } from "./LicenseStatusAlert";
 
 const { Content, Sider } = Layout;
 
@@ -35,12 +35,12 @@ interface IProps {
     hideSider?: boolean;
 
     /**
-     * Overrides the default {@link InstanceSiderMenu}
+     * The content of the sider
      */
     siderContent?: JSX.Element;
 }
 
-export const MainLayout = ({ hideSider, siderContent = <InstanceSiderMenu /> }: IProps) => {
+export const MainLayout = ({ hideSider, siderContent }: IProps) => {
     return (
         <>
             <AccessProvider />

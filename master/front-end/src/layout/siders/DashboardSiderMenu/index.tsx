@@ -20,8 +20,6 @@ import { Link, useLocation } from "react-router";
 
 import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "@/models";
 
-import styles from "./styles.module.css";
-
 const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
     return items.map(({ path, label }) => ({
         key: path,
@@ -73,7 +71,6 @@ export const DashboardSiderMenu = () => {
             selectedKeys={[pathname]}
             mode="inline"
             items={getDashboardItems()}
-            className={styles.Menu}
         />
     );
 };

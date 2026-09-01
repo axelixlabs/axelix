@@ -1,0 +1,4 @@
+.TableRow {
+    display: grid;
+    grid-template-columns: auto 3fr 2fr 1fr 2fr 0.8fr 1.5fr;
+}

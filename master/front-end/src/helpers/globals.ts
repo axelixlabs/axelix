@@ -152,3 +152,9 @@ export const parseAuthorities = (authorities: string): EAuthorities[] => {
         .map((authorityName) => EAuthorities[authorityName as keyof typeof EAuthorities])
         .filter((value) => value !== undefined && value !== null);
 };
+
+export const getInitials = (name: string): string => {
+    const nameParts = name.split(" ").filter(Boolean);
+
+    return nameParts.map((part) => part[0].toUpperCase()).join("");
+};

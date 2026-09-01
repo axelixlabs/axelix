@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router";
 
 import { CloseIcon } from "@/assets";
-import { PageSearch } from "@/components";
+import { PageSearch, StyledTag } from "@/components";
 import { getBeanShortName } from "@/helpers";
 
 import styles from "./styles.module.css";
@@ -62,10 +61,10 @@ export const BeansFirstSection = ({ addonAfter, setSearch, selectedBeanName, sel
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
             {selectedBeanName && (
                 <div className={styles.SelectedBeanTagWrapper}>
-                    <Tag className={styles.Tag}>
+                    <StyledTag className={styles.Tag}>
                         {getBeanShortName(selectedBeanName)}
                         <CloseIcon onClick={clearSelectedBean} className={styles.CloseIcon} />
-                    </Tag>
+                    </StyledTag>
                 </div>
             )}
         </div>

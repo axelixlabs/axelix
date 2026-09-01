@@ -1,0 +1,20 @@
+.SuspendButton {
+    background-color: var(--axelix-primary-white);
+    color: #1a1a1a;
+    border: none;
+
+    &:hover {
+        background-color: #f0f0f0 !important;
+        color: #1a1a1a !important;
+    }
+}
+
+.FooterExtra {
+    color: var(--axelix-bold-grey);
+}
+
+.ModalContentWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}

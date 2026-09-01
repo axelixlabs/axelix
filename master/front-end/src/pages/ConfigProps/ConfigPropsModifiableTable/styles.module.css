@@ -16,7 +16,14 @@
     padding: 0;
 }
 
+.TableRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .KeyChunk {
+    display: flex;
+    align-items: center;
     column-gap: 8px;
 }
 

@@ -1,0 +1,25 @@
+.MainWrapper {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+    margin-bottom: 30px;
+}
+
+.HeaderInfo {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.Username {
+    font-weight: 600;
+}
+
+.Subtitle {
+    color: var(--axelix-bold-grey);
+}
+
+.ActionButtonsWrapper {
+    display: flex;
+    column-gap: 8px;
+}

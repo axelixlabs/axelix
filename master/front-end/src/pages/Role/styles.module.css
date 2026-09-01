@@ -1,0 +1,50 @@
+.RolesList {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    margin-bottom: 30px;
+}
+
+.RoleRow {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    column-gap: 20px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.RoleUsersCount {
+    margin-top: 8px;
+    color: var(--axelix-bold-grey);
+}
+
+.RoleDescription {
+    color: var(--axelix-bold-grey);
+    margin-top: 4px;
+}
+
+.EnterpriseCard {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 20px;
+}
+
+.EnterpriseContent {
+    width: 100%;
+}
+
+.EnterpriseTitle {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.EnterpriseText {
+    color: var(--axelix-bold-grey);
+}

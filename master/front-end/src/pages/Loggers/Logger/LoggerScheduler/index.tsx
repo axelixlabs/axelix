@@ -68,7 +68,6 @@ export const LoggerScheduler = ({ handleChange, levels, checkedLevel, remainingT
                                 value: level,
                             };
                         })}
-                        className={styles.LevelSelect}
                     />
                 </div>
             }

@@ -15,14 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Alert } from "antd";
 import dayjs from "dayjs";
 import { Trans, useTranslation } from "react-i18next";
 
 import type { IAlertConfigItem, TLicenseCheckResponseBody } from "@/models";
 import { ISO_DATE_FORMAT, LICENSE_KEY_VALID_FLAG } from "@/utils";
-
-import styles from "./styles.module.css";
+import { AppAlert } from "@/components";
 
 interface IProps {
     validationData: TLicenseCheckResponseBody | null;
@@ -102,7 +100,7 @@ export const LicenseKeyFormAlert = ({ validationData }: IProps) => {
 
                     // TODO: Add href from .env
                     components={[
-                        <a key="0" href="#" target="_blank" rel="noopener noreferrer" className={styles.ContactLink} />,
+                        <a key="0" href="#" target="_blank" rel="noopener noreferrer" className="AccentedLink" />,
                     ]}
                 />
             ),
@@ -120,30 +118,11 @@ export const LicenseKeyFormAlert = ({ validationData }: IProps) => {
         return null;
     }
 
-    // TODO: Improve this part in the future
-    const contentColor = alertConfigData.type === "success" ? "#00ab55" : "#ff000a";
-
     return (
-        <Alert
-            title={alertConfigData.title}
-            description={<div className="TextSmall">{alertConfigData.description}</div>}
-            type={alertConfigData.type}
-            classNames={{
-                root: styles.AlertRoot,
-            }}
-            styles={{
-                root: {
-                    padding: "16px",
-                },
-                title: {
-                    fontSize: "inherit",
-                    fontWeight: 600,
-                    color: contentColor,
-                },
-                description: {
-                    color: contentColor,
-                },
-            }}
-        />
+        <>
+            <AppAlert type={alertConfigData.type} title={alertConfigData.title}>
+                <div className="TextSmall">{alertConfigData.description}</div>
+            </AppAlert>
+        </>
     );
 };

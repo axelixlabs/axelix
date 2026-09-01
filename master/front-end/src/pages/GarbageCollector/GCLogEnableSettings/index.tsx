@@ -99,7 +99,6 @@ export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, loggingStatus
                         defaultValue={selectedLevel}
                         onChange={(level) => setSelectedLevel(level)}
                         options={getLevelsSelectData(availableLevels)}
-                        className={styles.LoggingLevelSelect}
                     />
                 </div>
             </UniversalModal>

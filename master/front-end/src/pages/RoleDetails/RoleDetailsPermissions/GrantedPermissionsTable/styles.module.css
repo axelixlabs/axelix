@@ -1,0 +1,18 @@
+.GrantedPermissions {
+    color: var(--axelix-bold-grey);
+}
+
+.PermissionCategoryTitle {
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.PermissionRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.5fr;
+}
+
+.NoAccessScope {
+    color: var(--axelix-bold-grey);
+}

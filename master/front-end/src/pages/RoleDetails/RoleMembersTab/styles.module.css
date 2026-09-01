@@ -1,0 +1,24 @@
+.MembersToolbar {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+}
+
+.TableRow {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+}
+
+.MemberInfoWrap {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.MemberName {
+    font-weight: 500;
+}
+
+.MemberEmail {
+    color: var(--axelix-bold-grey);
+}

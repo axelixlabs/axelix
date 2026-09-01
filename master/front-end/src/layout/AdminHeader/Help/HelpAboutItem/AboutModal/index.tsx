@@ -54,42 +54,61 @@ export const AboutModal = ({ open, setOpen }: IProps) => {
 
     return (
         <>
-            <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false} displayOkay={false}>
-                <div className={`TextSmall ${styles.HeaderWrapper}`}>
-                    <p className="TextLarge">{t("About.title")}</p>
-                    <p className={styles.Version}>
-                        {t("About.version")}: {version}
-                    </p>
-                </div>
-
+            <UniversalModal
+                title={t("About.title")}
+                subtitle={`${t("About.version")}: ${version}`}
+                open={open}
+                onOk={onClose}
+                onClose={onClose}
+                displayCancel={false}
+                displayOkay={false}
+            >
                 <div>
-                    <p className={styles.ParagraphGutter}>
+                    <p className={styles.Paragraph}>
                         <Trans t={t} i18nKey={"About.intro"} components={[<b key="0" />]} />
                     </p>
 
-                    <p className={styles.ParagraphGutter}>
+                    <p className={styles.Paragraph}>
                         <Trans
                             t={t}
                             i18nKey={"About.licensing"}
                             components={[
                                 <b key="0" />,
-                                <a key="1" href={licenseLink} target="_blank" rel="noopener noreferrer" />,
-                                <a key="2" href={sourceCodeLink} target="_blank" rel="noopener noreferrer" />,
+                                <a
+                                    key="1"
+                                    href={licenseLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="AccentedLink"
+                                />,
+                                <a
+                                    key="2"
+                                    href={sourceCodeLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="AccentedLink"
+                                />,
                             ]}
                         />
                     </p>
 
-                    <p className={styles.ParagraphGutter}>
+                    <p className={styles.Paragraph}>
                         <Trans
                             t={t}
                             i18nKey={"About.contact"}
                             components={[
-                                <a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />,
+                                <a
+                                    key="0"
+                                    href={referenceGuideLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="AccentedLink"
+                                />,
                             ]}
                         />
                     </p>
 
-                    <p className={styles.ParagraphGutter}>{t("About.bug")}</p>
+                    <p className={styles.Paragraph}>{t("About.bug")}</p>
                 </div>
 
                 <div className={styles.ActionsWrapper}>

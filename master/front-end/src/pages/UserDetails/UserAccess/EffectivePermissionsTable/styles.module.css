@@ -1,0 +1,20 @@
+.TableRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
+.PermissionLevel {
+    font-weight: 500;
+}
+
+.Full {
+    color: var(--axelix-primary-green);
+}
+
+.ReadOnly {
+    color: var(--axelix-bold-grey);
+}
+
+.NoAccess {
+    color: var(--axelix-primary-red);
+}

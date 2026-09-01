@@ -15,7 +15,7 @@
     margin-top: -10px;
     overflow-y: auto;
     scrollbar-width: thin;
-    padding-block: 10px; 
+    padding-block: 20px 10px; 
 }
 
 .Content {

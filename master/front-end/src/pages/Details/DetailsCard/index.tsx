@@ -44,18 +44,18 @@ export const DetailsCard = ({ children, i18nPropertiesPrefix, title, records }: 
 
     return (
         <>
-            <div className={`CustomizedTable ${styles.Card}`}>
+            <div className={`CustomTable ${styles.Card}`}>
                 <div className="TableHeader">
-                    <div className={`RowChunk ${styles.TableHeaderRowChunk}`}>
+                    <div className={`TableRowChunk ${styles.TableHeaderRowChunk}`}>
                         {children}
                         {t(title)}
                     </div>
                 </div>
 
                 {records.map(({ key, value }) => (
-                    <div className="TableRow" key={key}>
-                        <div className="RowChunk">{t(`${i18nPropertiesPrefix}.${key}`)}</div>
-                        <div className={`RowChunk ${styles.ValueChunk}`}>
+                    <div className={`TableRow ${styles.TableRow}`} key={key}>
+                        <div className="TableRowChunk">{t(`${i18nPropertiesPrefix}.${key}`)}</div>
+                        <div className={`TableRowChunk ${styles.ValueChunk}`}>
                             <div className={styles.ValueWrapper}>{value}</div>
                         </div>
                     </div>

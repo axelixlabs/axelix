@@ -89,7 +89,7 @@
     "Header": {
         "dashboard": "Дашборд",
         "wallboard": "Панель",
-        "users": "Пользователи",
+        "administration": "Администрация",
         "Help": {
             "title": "Помощь",
             "about": "О программе",
@@ -472,7 +472,6 @@
         "provider": "Провайдер",
         "origin": "Происхождение",
         "role": "Роль",
-        "roles": "Роли",
         "back": "Назад",
         "userInformation": "Информация о Пользователе",
         "selectRoles": "Выберите роли",
@@ -486,11 +485,49 @@
         "userEdited": "Данные пользователя успешно обновлены",
         "userDeleted": "Пользователь успешно удалён",
         "userNotFound": "Пользователь не найден",
+        "SiderMenu": {
+            "users": "Пользователи",
+            "rolesPermissions": "Роли и права",
+            "authentication": "Аутентификация",
+            "auditLog": "Журнал аудита"
+        },
         "ValidationErrors": {
-            "username": "Пожалуйста, введите имя пользователя!",
+            "firstname": "Пожалуйста, введите имя!",
+            "lastname": "Пожалуйста, введите фамилию!",
+            "department": "Пожалуйста, выберите отдел!",
             "emailFormat": "Неверный формат email!",
             "password": "Пожалуйста, введите пароль!",
             "roles": "Пожалуйста, выберите роли!"
+        },
+        "SelectionActionBar": {
+            "selectedUsers_one": "Выбран {{count}} пользователь",
+            "selectedUsers_few": "Выбрано {{count}} пользователя",
+            "selectedUsers_many": "Выбрано {{count}} пользователей",
+            "selectedUsers_other": "Выбрано {{count}} пользователей",
+            "oidcLocal": "{{oidcCount}} OIDC · {{localCount}} локальных",
+            "suspend": "Заблокировать",
+            "delete": "Удалить",
+            "clear": "Очистить"
+        },
+        "CreateUser": {
+            "confirmPassword": "Подтверждение пароля",
+            "roles": "Роли",
+            "Roles": {
+                "Viewer": {
+                    "label": "ПРОСМОТР",
+                    "description": "Просмотр дашбордов, видеостен и отчётов"
+                },
+                "Editor": {
+                    "label": "РЕДАКТОР",
+                    "description": "Создание и редактирование контента, запуск действий MCP"
+                },
+                "Admin": {
+                    "label": "АДМИНИСТРАТОР",
+                    "description": "Полное администрирование, включая пользователей и авторизацию"
+                }
+            },
+            "jobTitle": "Должность",
+            "optional": "Опционально"
         }
     }
 }

@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { EmptyHandler, Loader, PagesFirstSection } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDashboardResponseBody, StatefulRequest } from "@/models";
 import { getDashboardOverviewData } from "@/services";
@@ -45,10 +45,7 @@ const DashboardOverview = () => {
 
     return (
         <>
-            <DashboardPagesFirstSection
-                title={t("Dashboard.distributions")}
-                subtitle={t("Dashboard.distributionsSubtitle")}
-            />
+            <PagesFirstSection title={t("Dashboard.distributions")} subtitle={t("Dashboard.distributionsSubtitle")} />
             <Distributions distributions={distributions} />
         </>
     );

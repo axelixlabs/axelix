@@ -1,0 +1,31 @@
+.Manage {
+    color: var(--axelix-primary-green);
+    padding: 0;
+    cursor: pointer;
+}
+
+.RoleRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.DisabledNote {
+    color: var(--axelix-bold-grey);
+    margin-block: 16px;
+}
+
+.FooterExtra {
+    color: var(--axelix-bold-grey);
+}
+
+.EffectiveCount {
+    color: var(--axelix-primary-green);
+    font-weight: 500;
+}

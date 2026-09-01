@@ -3,9 +3,8 @@
 }
 
 .TableHeaderRowChunk {
-    flex-direction: row;
+    display: flex;
     align-items: center;
-    justify-content: flex-start;
     column-gap: 8px;
 }
 
@@ -19,4 +18,9 @@
 .ValueChunk {
     display: flex;
     justify-content: flex-end;
+}
+
+.TableRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 }
