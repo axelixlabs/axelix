@@ -26,6 +26,8 @@ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -117,11 +119,14 @@ class PrometheusMetricsAutoConfigurationTest {
         @Test // GH-1520
         void shouldNotCreateEndpointWhenPortDiffersFromServerPort() {
             // given.
+            int prometheusPort =
+                    TestPortUtils.findAvailableTcpPortOtherThan(OnPrometheusPortCondition.DEFAULT_SERVER_PORT);
+
+            // and.
             ApplicationContextRunner contextRunner = baselineContextRunner()
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port="
-                                    + TestPortUtils.findAvailableTcpPortOtherThan(8080),
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + prometheusPort,
                             "server.port=8080");
 
             // when.
@@ -133,57 +138,20 @@ class PrometheusMetricsAutoConfigurationTest {
             });
         }
 
-        @Test // GH-1520
-        void shouldFailToStartWhenPortIsZero() {
+        @ParameterizedTest // GH-1520
+        @ValueSource(ints = {0, -1, PORT_RANGE_MAX + 1})
+        void shouldFailToStartWhenPortIsOutOfValidRange(int invalidPort) {
             // given.
             ApplicationContextRunner contextRunner = baselineContextRunner()
                     .withPropertyValues(
                             PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=0");
+                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + invalidPort);
 
             // when.
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
-            });
-        }
-
-        @Test // GH-1520
-        void shouldFailToStartWhenPortIsNegative() {
-            // given.
-            ApplicationContextRunner contextRunner = baselineContextRunner()
-                    .withPropertyValues(
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=-1");
-
-            // when.
-            contextRunner.run(context -> {
-                // then.
-                assertThat(context).hasFailed();
-                assertThat(context.getStartupFailure())
-                        .isInstanceOf(BeanCreationException.class)
-                        .rootCause()
-                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
-            });
-        }
-
-        @Test // GH-1520
-        void shouldFailToStartWhenPortIsAboveValidRange() {
-            // given.
-            ApplicationContextRunner contextRunner = baselineContextRunner()
-                    .withPropertyValues(
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".enabled=true",
-                            PROMETHEUS_METRICS_PROPERTIES_PREFIX + ".port=" + (PORT_RANGE_MAX + 1));
-
-            // when.
-            contextRunner.run(context -> {
-                // then.
-                assertThat(context).hasFailed();
-                assertThat(context.getStartupFailure())
-                        .isInstanceOf(BeanCreationException.class)
-                        .rootCause()
-                        .hasMessageContaining("Prometheus port must be between 1 and 65535");
             });
         }
 

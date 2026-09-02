@@ -34,17 +34,16 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.TestSocketUtils;
 
+import com.axelixlabs.axelix.master.autoconfiguration.metrics.OnPrometheusPortCondition;
+import com.axelixlabs.axelix.master.utils.TestPortUtils;
+
 import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.PROMETHEUS_PORT_PROPERTY;
 import static com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusProperties.SERVER_PORT_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies that Prometheus metrics are exposed differently depending on
- * {@code axelix.master.metrics.prometheus.port}: through the actuator when it matches
- * {@code server.port} or is not set at all, or through a dedicated HTTP server on its own port
- * otherwise - and not exposed at all when {@code axelix.master.metrics.prometheus.enabled} is
- * {@code false}.
+ * Integration tests for Prometheus metrics exposure.
  *
  * @author Dmitry Mazurov
  */
@@ -68,7 +67,9 @@ class ActuatorPrometheusEndpointTest {
 
         @DynamicPropertySource
         static void configurePrometheusPort(DynamicPropertyRegistry registry) {
-            registry.add(PROMETHEUS_PORT_PROPERTY, TestSocketUtils::findAvailableTcpPort);
+            int prometheusPort =
+                    TestPortUtils.findAvailableTcpPortOtherThan(OnPrometheusPortCondition.DEFAULT_SERVER_PORT);
+            registry.add(PROMETHEUS_PORT_PROPERTY, () -> prometheusPort);
         }
 
         @Autowired

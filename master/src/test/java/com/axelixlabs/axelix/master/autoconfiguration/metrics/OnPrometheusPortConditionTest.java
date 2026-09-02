@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.NonNull;
@@ -43,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link OnPrometheusPortCondition}.
  *
  * @author Dmitry Mazurov
+ * @author Mikhail Polivakha
  */
 class OnPrometheusPortConditionTest {
 
@@ -56,8 +56,9 @@ class OnPrometheusPortConditionTest {
     void shouldActivateMatchesApplicationPortModeWhenPortsMatch(
             @Nullable String serverPort, @Nullable String prometheusPort) {
         // given.
-        ApplicationContextRunner contextRunner =
-                baselineContextRunner().withPropertyValues(properties(serverPort, prometheusPort));
+        ApplicationContextRunner contextRunner = baselineContextRunner()
+                .withPropertyValues(
+                        SERVER_PORT_PROPERTY + "=" + serverPort, PROMETHEUS_PORT_PROPERTY + "=" + prometheusPort);
 
         // when.
         contextRunner.run(context -> {
@@ -70,10 +71,11 @@ class OnPrometheusPortConditionTest {
     @ParameterizedTest // GH-1520
     @MethodSource("differingPortCases")
     void shouldActivateCustomPortConfiguredModeWhenPortsDiffer(
-            @Nullable String serverPort, @Nullable String prometheusPort) {
+            @Nullable Integer serverPort, @Nullable Integer prometheusPort) {
         // given.
-        ApplicationContextRunner contextRunner =
-                baselineContextRunner().withPropertyValues(properties(serverPort, prometheusPort));
+        ApplicationContextRunner contextRunner = baselineContextRunner()
+                .withPropertyValues(
+                        SERVER_PORT_PROPERTY + "=" + serverPort, PROMETHEUS_PORT_PROPERTY + "=" + prometheusPort);
 
         // when.
         contextRunner.run(context -> {
@@ -84,21 +86,17 @@ class OnPrometheusPortConditionTest {
     }
 
     private static Stream<Arguments> matchingPortCases() {
-        return Stream.of(Arguments.of("8080", null), Arguments.of("8080", "8080"), Arguments.of(null, "8080"));
+        return Stream.of(
+                Arguments.of(OnPrometheusPortCondition.DEFAULT_SERVER_PORT, null),
+                Arguments.of(
+                        OnPrometheusPortCondition.DEFAULT_SERVER_PORT, OnPrometheusPortCondition.DEFAULT_SERVER_PORT),
+                Arguments.of(null, OnPrometheusPortCondition.DEFAULT_SERVER_PORT));
     }
 
     private static Stream<Arguments> differingPortCases() {
-        return Stream.of(Arguments.of("8080", String.valueOf(TestPortUtils.findAvailableTcpPortOtherThan(8080))));
-    }
-
-    private static String[] properties(@Nullable String serverPort, @Nullable String prometheusPort) {
-        return Stream.of(property(SERVER_PORT_PROPERTY, serverPort), property(PROMETHEUS_PORT_PROPERTY, prometheusPort))
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
-    }
-
-    private static @Nullable String property(String name, @Nullable String value) {
-        return value == null ? null : name + "=" + value;
+        return Stream.of(Arguments.of(
+                OnPrometheusPortCondition.DEFAULT_SERVER_PORT,
+                TestPortUtils.findAvailableTcpPortOtherThan(OnPrometheusPortCondition.DEFAULT_SERVER_PORT)));
     }
 
     private static @NonNull AnnotationConfigApplicationContext isolatedContext() {
