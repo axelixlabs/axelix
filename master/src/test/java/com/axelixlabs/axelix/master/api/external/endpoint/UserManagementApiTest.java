@@ -37,6 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
@@ -68,6 +69,9 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -91,9 +95,9 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "jobTitle": "Software Engineer",
                   "organizationalUnit": "Engineering",
                   "password": "plainPassword",
-                  "role": "EDITOR"
+                  "roleIds": ["%s"]
                 }
-                """;
+                """.formatted(roleRepository.findIdByName("EDITOR").orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -137,9 +141,9 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "jobTitle": null,
                   "organizationalUnit": null,
                   "password": "plainPassword",
-                  "role": "EDITOR"
+                  "roleIds": ["%s"]
                 }
-                """;
+                """.formatted(roleRepository.findIdByName("EDITOR").orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -163,7 +167,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": null
+                  "roleIds": null
                 }
                 """;
 
@@ -185,7 +189,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "   "
+                  "roleIds": ["   "]
                 }
                 """;
 
@@ -207,7 +211,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "  super_admin  "
+                  "roleIds": ["  super_admin  "]
                 }
                 """;
 
@@ -229,7 +233,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "u",
                   "email": "u@example.com",
                   "password": "p",
-                  "role": "NOT_A_REAL_ROLE"
+                  "roleIds": ["NOT_A_REAL_ROLE"]
                 }
                 """;
 
@@ -244,6 +248,68 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
+    void shouldCreateUserWithSeveralRoleIds() {
+        // given.
+        // language=json
+        String request = """
+                {
+                  "username": "newUser",
+                  "email": "newUser@example.com",
+                  "password": "plainPassword",
+                  "roleIds": [
+                    "%s",
+                    "%s"
+                  ]
+                }
+                """.formatted(
+                        roleRepository.findIdByName("VIEWER").orElseThrow(),
+                        roleRepository.findIdByName("EDITOR").orElseThrow());
+
+        // when.
+        IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
+
+        ResponseEntity<Void> response =
+                superAdmin.exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        UserEntity saved = userRepository.findByUsername("newUser").orElseThrow();
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactlyInAnyOrder("VIEWER", "EDITOR");
+        assertSuccessfulCallback(MasterWebEndpoints.USER_CREATE, superAdmin.getActor());
+    }
+
+    @Test
+    void shouldGrantTheRoleOnce_WhenCreateRequest_RepeatsTheSameRoleId() {
+        // given.
+        // language=json
+        String request = """
+                {
+                  "username": "newUser",
+                  "email": "newUser@example.com",
+                  "password": "plainPassword",
+                  "roleIds": [
+                    "%s",
+                    "%s"
+                  ]
+                }
+                """.formatted(
+                        roleRepository.findIdByName("EDITOR").orElseThrow(),
+                        roleRepository.findIdByName("EDITOR").orElseThrow());
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_CREATE_PATH, HttpMethod.POST, defaultEntity(request), Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        UserEntity saved = userRepository.findByUsername("newUser").orElseThrow();
+        assertThat(userService.findRoleNamesByUserId(saved.id())).containsExactly("EDITOR");
+    }
+
+    @Test
     void shouldReturnBadRequest_WhenCreateRequest_UsernameIsDuplicate() {
         createUser("existingUser", "existing@example.com", "p");
 
@@ -253,9 +319,9 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "other@example.com",
                   "password": "p",
-                  "role": "VIEWER"
+                  "roleIds": ["%s"]
                 }
-                """;
+                """.formatted(roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -278,9 +344,9 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "username": "existingUser",
                   "email": "user_test@example.com",
                   "password": "p",
-                  "role": "VIEWER"
+                  "roleIds": ["%s"]
                 }
-                """;
+                """.formatted(roleRepository.findIdByName("VIEWER").orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -668,7 +734,15 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     private UserEntity createUser(String username, String email, String password) {
-        userService.createLocal(username, null, null, email, null, null, password, "VIEWER");
+        userService.createLocal(
+                username,
+                null,
+                null,
+                email,
+                null,
+                null,
+                password,
+                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
         return userRepository.findByUsername(username).orElseThrow();
     }
 }

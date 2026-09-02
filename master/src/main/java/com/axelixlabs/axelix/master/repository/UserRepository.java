@@ -56,6 +56,10 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
     int attachRole(@Param("userId") String userId, @Param("roleName") String roleName);
 
     @Modifying
+    @Query("INSERT INTO users_roles (user_id, role_id) SELECT :userId, r.id FROM roles r WHERE r.id = :roleId")
+    int attachRoleById(@Param("userId") String userId, @Param("roleId") String roleId);
+
+    @Modifying
     @Query("DELETE FROM users_roles WHERE user_id = :userId")
     void deleteUserRolesMappings(@Param("userId") String userId);
 

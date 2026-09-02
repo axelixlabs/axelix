@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class DatabaseUserService implements UserService {
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
             String password,
-            String role)
+            Set<String> roleIds)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         UserEntity userEntity = new UserEntity(
@@ -110,7 +109,7 @@ public class DatabaseUserService implements UserService {
         }
 
         jdbcAggregateTemplate.insert(userEntity);
-        grantRoles(userEntity.id(), Collections.singleton(role));
+        grantRolesByIds(userEntity.id(), roleIds);
     }
 
     @Override
@@ -243,6 +242,25 @@ public class DatabaseUserService implements UserService {
 
         userRepository.deleteUserRolesMappings(id);
         grantRoles(id, roles);
+    }
+
+    private void grantRolesByIds(String userId, @Nullable Set<String> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            throw new UserInvalidValueException(null);
+        }
+
+        roleIds.forEach(roleId -> {
+            if (roleId == null) {
+                throw new UserInvalidValueException(null);
+            }
+
+            String normalizedRoleId = requireNonBlankTrimmed(roleId);
+            int rowsAffected = userRepository.attachRoleById(userId, normalizedRoleId);
+
+            if (rowsAffected != 1) {
+                throw new UserRoleNotFoundException(normalizedRoleId);
+            }
+        });
     }
 
     // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization
