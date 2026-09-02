@@ -18,8 +18,22 @@
 }
 
 .List {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
     margin-block: 30px;
-    overflow: hidden;
+}
+
+.ListItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 20px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+
+    &:last-child {
+        border-bottom: none;
+    }
 }
 
 .LoaderWrapper {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, List, Switch } from "antd";
+import { Button, Switch } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
@@ -34,6 +34,8 @@ interface IProps {
      */
     instanceName: string;
 }
+
+const allComponents = Object.values(EExportableComponent);
 
 export const DetailsHeader = ({ instanceName }: IProps) => {
     const { instanceId } = useParams();
@@ -101,16 +103,14 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                             <Loader />
                         </div>
                     ) : (
-                        <List
-                            bordered
-                            dataSource={Object.values(EExportableComponent)}
-                            renderItem={(component) => (
-                                <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
-                                    {t(`Details.Components.${component}`)}
-                                </List.Item>
-                            )}
-                            className={styles.List}
-                        />
+                        <div className={styles.List}>
+                            {allComponents.map((component) => (
+                                <div key={component} className={styles.ListItem}>
+                                    <div>{t(`Details.Components.${component}`)}</div>
+                                    <Switch onChange={() => handleChange(component)} />
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </UniversalModal>
             </div>
