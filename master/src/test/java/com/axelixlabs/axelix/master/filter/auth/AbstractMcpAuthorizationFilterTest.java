@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.filter.auth;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -55,6 +56,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.McpAutoConfiguration;
+import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
@@ -128,7 +130,11 @@ abstract class AbstractMcpAuthorizationFilterTest {
     void setUpRestTemplate() {
         capturingIamMcpInterceptor.reset();
         instanceRepository.deleteAll();
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
         this.restTemplate = new TestRestTemplate(new RestTemplateBuilder().baseUri("http://localhost:" + port));
     }
 

@@ -65,7 +65,7 @@ public final class ApiPaths {
         public static final String USERS_UPDATE = "/users-management/update";
 
         /**
-         * Endpoint to change the status of a managed user.
+         * Endpoint to change the status of one or more managed users.
          */
         public static final String USERS_STATUS = "/users-management/status";
     }
