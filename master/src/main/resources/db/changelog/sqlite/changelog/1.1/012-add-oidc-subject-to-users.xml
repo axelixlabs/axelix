@@ -30,4 +30,14 @@
 
     <sql dbms="sqlite">CREATE UNIQUE INDEX uq_users_oidc_subject ON users (oidc_subject)</sql>
   </changeSet>
+
+  <!--
+    Backward-incompatible cleanup: OIDC users created before this release have no oidc_subject and were
+    deduplicated by username, which is no longer valid. Purge them (and their role assignments, since the
+    fk_users_roles_user FK has no ON DELETE CASCADE) so they are re-provisioned cleanly on their next login.
+  -->
+  <changeSet id="1.1-012-3-sqlite-delete-legacy-oidc-users" author="Axelix Team">
+    <sql dbms="sqlite">DELETE FROM users_roles WHERE user_id IN (SELECT id FROM users WHERE user_origin = 'OIDC')</sql>
+    <sql dbms="sqlite">DELETE FROM users WHERE user_origin = 'OIDC'</sql>
+  </changeSet>
 </databaseChangeLog>
