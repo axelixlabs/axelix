@@ -101,18 +101,32 @@ and supply `issuer-uri`, `client-id`, `client-secret`, and the public `base-url`
 
 The end-to-end flow:
 
-1. User clicks **Sign in with OAuth2/OIDC Provider** on `/login`. The browser is redirected to the IdP's authorization
-   endpoint with `client-id` and `redirect_uri` set to `<base-url>/api/external/oauth2/callback`.
-2. The IdP authenticates the user and redirects back to the callback with a `code`.
-3. `OAuth2CallbackController` exchanges the code for an ID token + access token via the IdP's token endpoint, validates
+1. If `axelix.master.auth.options.oauth2.state-required=true`, the front-end first calls `GET /api/external/oauth2/state`.
+   `OAuth2StateController` generates a fresh, unguessable CSRF-protection `state` value, stashes it in a short-lived
+   `HttpOnly` cookie, and returns it in the response body (with `Cache-Control: no-store`, so intermediary caches never
+   replay it to a different user).
+2. User clicks **Sign in with OAuth2/OIDC Provider** on `/login`. The browser is redirected to the IdP's authorization
+   endpoint with `client-id`, `redirect_uri` set to `<base-url>/api/external/oauth2/callback`, and, when state is
+   required, the `state` value from step 1.
+3. The IdP authenticates the user and redirects back to the callback with a `code` (and the `state` it was given, if
+   any).
+4. When `state-required=true`, `OAuth2CallbackController` compares the `state` query parameter against the cookie set
+   in step 1 using a constant-time check, before doing anything else. A missing or mismatched `state` is rejected with
+   `400 Bad Request` and the code is never exchanged.
+5. `OAuth2CallbackController` exchanges the code for an ID token + access token via the IdP's token endpoint, validates
    the ID token, and extracts the username.
-4. The role is resolved by evaluating the JMESPath expression in `axelix.master.auth.options.oauth2.role-attribute-path`
+6. The role is resolved by evaluating the JMESPath expression in `axelix.master.auth.options.oauth2.role-attribute-path`
    against the userinfo response. The result is mapped to `admin`, `editor`, or `viewer`. If `role-attribute-path` is
    left unset, every OIDC user lands on the `VIEWER` role.
-5. Before minting the session cookie, Master upserts the user in its own database with origin `OIDC`, refreshes the
+7. Before minting the session cookie, Master upserts the user in its own database with origin `OIDC`, refreshes the
    stored email from userinfo when one is present, and updates `Last login`.
-6. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
+8. Master mints its own session JWT (same encoder as the password flows) and redirects the browser to `/wallboard` with
    the session cookies set.
+
+`state-required` defaults to `false`. Turn it on for defense-in-depth CSRF protection on the authorization code flow.
+Enabling it requires no change on your OAuth2/OIDC provider — echoing the `state` parameter back on the callback is a
+mandatory part of the OAuth2 Authorization Code Grant ([RFC 6749](https://www.rfc-editor.org/rfc/rfc6749#section-4.1.1)),
+and every spec-compliant provider (Keycloak, Auth0, Okta, Google, ...) already supports it out of the box.
 
 The Authorization Code Flow only fires through the browser. The OIDC tokens themselves are never stored — Master uses
 them once to identify the user and then issues its own session JWT.
@@ -135,6 +149,7 @@ username already belongs to a non-OIDC account, Master rejects the sign-in rathe
 | `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className="Required">required</span> | Public base URL of this Master instance. Used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
 | `axelix.master.auth.options.oauth2.scopes`              | `openid`                                             | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
 | `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                            | JMESPath expression evaluated against the userinfo response to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+| `axelix.master.auth.options.oauth2.state-required`      | `false`                                               | Require and validate a CSRF-protection `state` value on the authorization code flow. See the flow description above. |
 
 </div>
 

@@ -73,6 +73,11 @@ public final class ApiPaths {
     public static final class OAuth2Api {
 
         public static final String CALLBACK = "/oauth2/callback";
+
+        /**
+         * Endpoint to generate a fresh CSRF-protection {@code state} value for the OIDC authorization code flow.
+         */
+        public static final String STATE = "/oauth2/state";
     }
 
     public static final class InstancesApi {

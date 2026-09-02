@@ -26,6 +26,7 @@ import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,9 @@ import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -47,6 +50,7 @@ import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
@@ -383,6 +387,90 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+    }
+
+    @Nested
+    @TestPropertySource(properties = "axelix.master.auth.options.oauth2.state-required=true")
+    class WhenStateRequired {
+
+        private static final String USER_INFO_JSON = "{}";
+
+        @Test
+        void shouldAllowLoginWhenStateMatchesTheOneIssuedByOAuth2StateController() {
+            // given.
+            String username = "state-test-user";
+            stubHappyPathOidcClient(username);
+            String state = fetchState();
+
+            // when.
+            ResponseEntity<Void> response = doCallback(state, state);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+            assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNotEmpty();
+            assertThat(userRepository.findByUsername(username)).isPresent();
+        }
+
+        @Test
+        void shouldReturn400WhenStateDoesNotMatchTheCookie() {
+            // given.
+            stubHappyPathOidcClient("state-mismatch-user");
+            String state = fetchState();
+
+            // when.
+            ResponseEntity<Void> response = doCallback(state, "some-other-state");
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
+            assertThat(userRepository.findByUsername("state-mismatch-user")).isEmpty();
+        }
+
+        @Test
+        void shouldReturn400WhenStateCookieIsMissing() {
+            // given.
+            stubHappyPathOidcClient("state-missing-user");
+            String state = fetchState();
+
+            // when.
+            ResponseEntity<Void> response = doCallback(state, null);
+
+            // then.
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(userRepository.findByUsername("state-missing-user")).isEmpty();
+        }
+
+        private void stubHappyPathOidcClient(String username) {
+            when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+            when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+            when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(USER_INFO_JSON);
+            when(userInfoJsonAccessor.extractRole(USER_INFO_JSON)).thenReturn(TestRoles.EDITOR);
+        }
+
+        private String fetchState() {
+            ResponseEntity<OAuth2StateController.OAuth2StateResponse> response = restTemplate.getForEntity(
+                    "http://localhost:" + port + "/api/external/oauth2/state",
+                    OAuth2StateController.OAuth2StateResponse.class);
+            return response.getBody().state();
+        }
+
+        private ResponseEntity<Void> doCallback(String state, String stateCookieValue) {
+            TestRestTemplate freshRestTemplate =
+                    new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
+
+            StringBuilder url =
+                    new StringBuilder("http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE);
+            if (state != null) {
+                url.append("&state=").append(state);
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            if (stateCookieValue != null) {
+                headers.add(HttpHeaders.COOKIE, CookieProperties.OAUTH2_STATE_COOKIE_NAME + "=" + stateCookieValue);
+            }
+
+            return freshRestTemplate.exchange(url.toString(), HttpMethod.GET, new HttpEntity<>(headers), Void.class);
+        }
     }
 
     private static @NonNull String findCookie(List<String> cookies, String s) {

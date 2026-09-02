@@ -50,6 +50,9 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  * @param organizationalUnitAttributePath JMESPath expression evaluated against ID token claims to obtain the user's
  *                                        organizational unit
  *
+ * @param stateRequired whether the front-end must fetch and echo back a CSRF-protection {@code state} value on
+ *                      the authorization code flow. Defaults to {@code false}.
+ *
  * @since 27.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -63,7 +66,8 @@ public record OAuth2Properties(
         String scopes,
         @Nullable String roleAttributePath,
         @Nullable String jobTitleAttributePath,
-        @Nullable String organizationalUnitAttributePath) {
+        @Nullable String organizationalUnitAttributePath,
+        boolean stateRequired) {
 
     private static final String OPENID_SCOPE = "openid";
 

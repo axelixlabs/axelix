@@ -56,6 +56,11 @@ export type OIDCLoginOption = {
      * The URL of the /authorize on the OIDC provider side.
      */
     authorizationEndpoint: string;
+
+    /**
+     * Whether the front-end must fetch a CSRF-protection `state` value (via `/oauth2/state`) before redirecting.
+     */
+    stateRequired: boolean;
 };
 
 /**

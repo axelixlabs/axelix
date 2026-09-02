@@ -250,6 +250,7 @@ java \
 | `axelix.master.auth.options.oauth2.base-url`            | *(не задано)* <span className="Required">обязательное</span> | Публичный базовый URL-адрес этого сервиса Master, используется для создания URI обратного вызова OAuth2. Требуется при `oauth2.enabled=true`.                                                    |
 | `axelix.master.auth.options.oauth2.scopes`              | `openid`                                                     | Разделённые пробелами области действия, запрашиваемые при использовании кода авторизации. `openid` добавляется автоматически, если отсутствует.                                                  |
 | `axelix.master.auth.options.oauth2.role-attribute-path` | *(не задано)*                                                | Выражение JMESPath, применяемое к ответу userinfo для определения роли в Axelix. Если не указано, каждый пользователь OIDC становится `VIEWER`. |
+| `axelix.master.auth.options.oauth2.state-required`      | `false`                                                       | Требовать и проверять значение `state` для защиты от CSRF в потоке авторизации с использованием кода. См. [Аутентификация](../authentication/authentication.mdx#oauth2--oidc). |
 
 </div>
 

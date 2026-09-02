@@ -57,6 +57,8 @@ class MasterWebEndpointResolverTest {
                 Arguments.of("/applications/grid", HttpMethod.GET, MasterWebEndpoints.INSTANCES_READ),
                 Arguments.of("/users/login", HttpMethod.POST, MasterWebEndpoints.LOCAL_LOGIN),
                 Arguments.of("/dashboard", HttpMethod.GET, MasterWebEndpoints.DASHBOARD_READ),
+                Arguments.of("/oauth2/callback", HttpMethod.GET, MasterWebEndpoints.OIDC_AUTH_COMPLETE),
+                Arguments.of("/oauth2/state", HttpMethod.GET, MasterWebEndpoints.OIDC_AUTH_STATE),
 
                 // Single trailing template variable.
                 Arguments.of("/env/feed/42", HttpMethod.GET, MasterWebEndpoints.ENVIRONMENT_READ),

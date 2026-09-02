@@ -39,6 +39,7 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
     private final String clientId;
     private final String redirectUri;
     private final Map<String, String> additionalParameters;
+    private final boolean stateRequired;
     private final Lazy<String> authorizationEndpointResolver;
 
     public OidcAuthenticationOption(
@@ -46,11 +47,13 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
             String clientId,
             String redirectUri,
             Map<String, String> additionalParameters,
+            boolean stateRequired,
             Lazy<String> authorizationEndpointResolver) {
         this.scope = scope;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.additionalParameters = additionalParameters;
+        this.stateRequired = stateRequired;
         this.authorizationEndpointResolver = authorizationEndpointResolver;
     }
 
@@ -91,6 +94,15 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
     @JsonGetter("additionalParameters")
     public Map<String, String> getAdditionalParameters() {
         return additionalParameters;
+    }
+
+    /**
+     * Whether the front-end must fetch a CSRF-protection {@code state} value (via {@code /oauth2/state}) before
+     * redirecting to the OIDC provider's {@code /authorize} endpoint.
+     */
+    @JsonGetter("stateRequired")
+    public boolean isStateRequired() {
+        return stateRequired;
     }
 
     public String getScope() {

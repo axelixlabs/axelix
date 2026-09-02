@@ -242,6 +242,7 @@ When `axelix.master.auth.options.oauth2.enabled=true`, the following properties 
 | `axelix.master.auth.options.oauth2.base-url`            | *(unset)* <span className="Required">required</span> | Public base URL of this Master instance, used to build the OAuth2 callback redirect URI. Required whenever `oauth2.enabled=true`.                                          |
 | `axelix.master.auth.options.oauth2.scopes`              | `openid`                                             | Space-separated scopes requested during the authorization code flow. `openid` is appended automatically if missing.                                                        |
 | `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                            | JMESPath expression evaluated against the userinfo response to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
+| `axelix.master.auth.options.oauth2.state-required`      | `false`                                               | Require and validate a CSRF-protection `state` value on the authorization code flow. See [Authentication](../authentication/authentication.mdx#oauth2--oidc). |
 
 </div>
 

@@ -26,15 +26,25 @@ export const logout = () => {
     return apiFetch.post("users/logout");
 };
 
+const fetchOAuth2State = async (): Promise<string> => {
+    const response = await apiFetch.get<{ state: string }>("oauth2/state");
+    return response.data.state;
+};
+
 /**
  * Invoke OIDC '/authorize' endpoint
  */
-export const authorize = (option: OIDCLoginOption) => {
+export const authorize = async (option: OIDCLoginOption) => {
+    const state = option.stateRequired ? await fetchOAuth2State() : undefined;
+
     const params = new URLSearchParams();
     params.append("client_id", option.clientId);
     params.append("scope", option.scope);
     params.append("response_type", "code");
     params.append("redirect_uri", option.redirectUri);
+    if (state) {
+        params.append("state", state);
+    }
 
     Object.entries(option.additionalParameters ?? {}).forEach(([key, value]) => params.append(key, value));
 
