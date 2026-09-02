@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
+import java.util.Objects;
+
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.ConditionContext;
@@ -71,9 +73,9 @@ public class OnPrometheusPortCondition extends SpringBootCondition {
      * @return {@code true} if the ports match, {@code false} otherwise
      */
     private static boolean matchesServerPort(PropertyResolver properties) {
-        int serverPort = properties.getProperty(SERVER_PORT_PROPERTY, Integer.class, DEFAULT_SERVER_PORT);
+        Integer serverPort = properties.getProperty(SERVER_PORT_PROPERTY, Integer.class, DEFAULT_SERVER_PORT);
         Integer prometheusPort = properties.getProperty(PROMETHEUS_PORT_PROPERTY, Integer.class);
 
-        return prometheusPort == null || serverPort == prometheusPort;
+        return prometheusPort == null || Objects.equals(serverPort, prometheusPort);
     }
 }

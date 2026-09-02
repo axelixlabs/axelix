@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.NonNull;
@@ -54,11 +56,9 @@ class OnPrometheusPortConditionTest {
     @ParameterizedTest // GH-1520
     @MethodSource("matchingPortCases")
     void shouldActivateMatchesApplicationPortModeWhenPortsMatch(
-            @Nullable String serverPort, @Nullable String prometheusPort) {
+            @Nullable Integer serverPort, @Nullable Integer prometheusPort) {
         // given.
-        ApplicationContextRunner contextRunner = baselineContextRunner()
-                .withPropertyValues(
-                        SERVER_PORT_PROPERTY + "=" + serverPort, PROMETHEUS_PORT_PROPERTY + "=" + prometheusPort);
+        ApplicationContextRunner contextRunner = contextRunnerWith(serverPort, prometheusPort);
 
         // when.
         contextRunner.run(context -> {
@@ -73,9 +73,7 @@ class OnPrometheusPortConditionTest {
     void shouldActivateCustomPortConfiguredModeWhenPortsDiffer(
             @Nullable Integer serverPort, @Nullable Integer prometheusPort) {
         // given.
-        ApplicationContextRunner contextRunner = baselineContextRunner()
-                .withPropertyValues(
-                        SERVER_PORT_PROPERTY + "=" + serverPort, PROMETHEUS_PORT_PROPERTY + "=" + prometheusPort);
+        ApplicationContextRunner contextRunner = contextRunnerWith(serverPort, prometheusPort);
 
         // when.
         contextRunner.run(context -> {
@@ -97,6 +95,18 @@ class OnPrometheusPortConditionTest {
         return Stream.of(Arguments.of(
                 OnPrometheusPortCondition.DEFAULT_SERVER_PORT,
                 TestPortUtils.findAvailableTcpPortOtherThan(OnPrometheusPortCondition.DEFAULT_SERVER_PORT)));
+    }
+
+    private static ApplicationContextRunner contextRunnerWith(
+            @Nullable Integer serverPort, @Nullable Integer prometheusPort) {
+        List<String> properties = new ArrayList<>();
+        if (serverPort != null) {
+            properties.add(SERVER_PORT_PROPERTY + "=" + serverPort);
+        }
+        if (prometheusPort != null) {
+            properties.add(PROMETHEUS_PORT_PROPERTY + "=" + prometheusPort);
+        }
+        return baselineContextRunner().withPropertyValues(properties.toArray(new String[0]));
     }
 
     private static @NonNull AnnotationConfigApplicationContext isolatedContext() {
