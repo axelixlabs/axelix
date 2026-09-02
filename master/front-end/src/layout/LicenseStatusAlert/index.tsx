@@ -21,7 +21,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { LicenseKeyForm, UniversalModal } from "@/components";
-import { getLicenseDaysLeft, isLicenseExpiringSoon, isLicenseKeyAlertDismissed } from "@/helpers";
+import { getLicenseDaysLeft, isLicenseExpiringSoon, shouldShowLicenseKeyAlert } from "@/helpers";
 import { useAppSelector, useAuthority } from "@/hooks";
 import { EAuthorities, ELicenseFormType } from "@/models";
 import { LICENSE_ALERT_DISMISSED_AT_KEY } from "@/utils";
@@ -38,12 +38,12 @@ interface IProps {
 export const LicenseStatusAlert = ({ hideSider }: IProps) => {
     const { t } = useTranslation();
 
-    const enterLicenseAccess = useAuthority(EAuthorities["license:enter"]);
+    const enterLicenseAccess = useAuthority(EAuthorities.LICENSE_ENTER);
 
     const { licensing } = useAppSelector((state) => state.settings);
 
     const [licenseFormType, setLicenseFormType] = useState<ELicenseFormType | null>(null);
-    const [isDismissed, setIsDismissed] = useState<boolean>(isLicenseKeyAlertDismissed);
+    const [shouldShow, setShouldShow] = useState<boolean>(shouldShowLicenseKeyAlert);
 
     const onClose = (): void => {
         setLicenseFormType(null);
@@ -51,10 +51,10 @@ export const LicenseStatusAlert = ({ hideSider }: IProps) => {
 
     const onDismiss = (): void => {
         localStorage.setItem(LICENSE_ALERT_DISMISSED_AT_KEY, String(Date.now()));
-        setIsDismissed(true);
+        setShouldShow(false);
     };
 
-    if (!enterLicenseAccess || isDismissed || !isLicenseExpiringSoon(licensing.validUntil)) {
+    if (!enterLicenseAccess || !shouldShow || !isLicenseExpiringSoon(licensing.validUntil)) {
         return null;
     }
 

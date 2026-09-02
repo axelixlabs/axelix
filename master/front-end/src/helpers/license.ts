@@ -58,16 +58,16 @@ export const getLicenseDaysLeft = (msLeft: number): number => {
     return Math.ceil(msLeft / MS_IN_DAY);
 };
 
-export const isLicenseKeyAlertDismissed = (): boolean => {
+export const shouldShowLicenseKeyAlert = (): boolean => {
     const dismissedAt = localStorage.getItem(LICENSE_ALERT_DISMISSED_AT_KEY);
 
     if (!dismissedAt) {
-        return false;
+        return true;
     }
 
     const msElapsed = dayjs().diff(dayjs(Number(dismissedAt)));
 
-    return msElapsed >= 0 && msElapsed < MS_IN_DAY;
+    return msElapsed < 0 || msElapsed >= MS_IN_DAY;
 };
 
 export const isLicenseExpiringSoon = (validUntil: string | null): boolean => {
