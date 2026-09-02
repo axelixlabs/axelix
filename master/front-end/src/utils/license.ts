@@ -19,3 +19,6 @@ export const IS_ENTERPRISE_FLAG = "Enterprise";
 export const LGPL_LINK = "https://opensource.org/license/lgpl-3-0";
 export const ISO_DATE_FORMAT = "YYYY-MM-DD";
 export const LICENSE_KEY_VALID_FLAG = "VALID";
+export const LICENSE_ALERT_DISMISSED_AT_KEY = "licenseAlertDismissedAt";
+export const LICENSE_EXPIRING_SOON_DAYS_THRESHOLD = 14;
+export const MS_IN_DAY = 1000 * 60 * 60 * 24;

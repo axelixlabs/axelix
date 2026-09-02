@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 import { getTimeLeftText } from "@/helpers";
 import { ELicenseFormType, type ILicensing } from "@/models";
 
-import { LicenseBadge } from "../../LicenseBadge";
+import { LicenseStatusBadge } from "../../LicenseStatusBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
 import { LicenseRecord } from "../LicenseRecord";
 
@@ -46,7 +46,7 @@ export const EnterpriseLicenseDetails = ({ licensing, setLicenseFormType }: IPro
 
             <div className={styles.ContentWrapper}>
                 <div className={`TextSmall ${styles.Meta}`}>
-                    <LicenseBadge isEnterprise enterpriseText="Enterprise" ossText="Open Source" />
+                    <LicenseStatusBadge isEnterprise enterpriseText="Enterprise" ossText="Open Source" />
 
                     <div className={`${styles.MetaStatus} ${styles.MetaStatusEnterprise}`}>
                         <span>{t("LicenseModal.active")}</span>

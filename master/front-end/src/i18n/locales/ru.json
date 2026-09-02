@@ -17,6 +17,13 @@
     "username": "Имя пользователя",
     "password": "Пароль",
     "license": "Лицензия",
+    "LicenseStatusAlert": {
+        "licenseExpiringSoonAlertTitle_one": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} день ({{date}}). После этой даты корпоративные функции перестанут работать.",
+        "licenseExpiringSoonAlertTitle_few": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дня ({{date}}). После этой даты корпоративные функции перестанут работать.",
+        "licenseExpiringSoonAlertTitle_many": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дней ({{date}}). После этой даты корпоративные функции перестанут работать.",
+        "licenseExpiringSoonAlertTitle_other": "Срок действия вашей лицензии Axelix Enterprise истекает через {{count}} дней ({{date}}). После этой даты корпоративные функции перестанут работать.",
+        "licenseAlertActionText": "Обновить ключ"
+    },
     "notEnoughAuthorities": "У вас недостаточно полномочий",
     "Details": {
         "downloadState": "Выгрузить состояние",

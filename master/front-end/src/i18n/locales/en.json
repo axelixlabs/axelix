@@ -18,6 +18,11 @@
     "password": "Password",
     "notEnoughAuthorities": "You don't have enough authorities",
     "license": "License",
+    "LicenseStatusAlert": {
+        "licenseExpiringSoonAlertTitle_one": "Your Axelix Enterprise license expires in {{count}} day ({{date}}). Enterprise features stop after that date.",
+        "licenseExpiringSoonAlertTitle_other": "Your Axelix Enterprise license expires in {{count}} days ({{date}}). Enterprise features stop after that date.",
+        "licenseAlertActionText": "Update key"
+    },
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
