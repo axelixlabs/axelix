@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Prop
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
@@ -48,6 +49,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidato
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
@@ -77,6 +79,7 @@ public class OAuth2CallbackController {
     private final OAuth2Properties oAuth2Properties;
     private final UserService userService;
     private final UserInfoJsonAccessor userInfoJsonAccessor;
+    private final RoleService roleService;
     private final List<OidcIdTokenClaimsValidator> claimsValidators;
 
     public OAuth2CallbackController(
@@ -86,6 +89,7 @@ public class OAuth2CallbackController {
             OAuth2Properties oAuth2Properties,
             UserService userService,
             UserInfoJsonAccessor userInfoJsonAccessor,
+            RoleService roleService,
             List<OidcIdTokenClaimsValidator> claimsValidators) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
@@ -93,6 +97,7 @@ public class OAuth2CallbackController {
         this.oAuth2Properties = oAuth2Properties;
         this.userService = userService;
         this.userInfoJsonAccessor = userInfoJsonAccessor;
+        this.roleService = roleService;
         this.claimsValidators = claimsValidators;
     }
 
@@ -153,7 +158,7 @@ public class OAuth2CallbackController {
                     metadata.jobTitle() == null ? entity.jobTitle() : metadata.jobTitle(),
                     metadata.organizationalUnit() == null ? entity.organizationalUnit() : metadata.organizationalUnit(),
                     null,
-                    Set.of(role.getName()),
+                    Set.of(resolveRoleId(role)),
                     Instant.now());
         } else {
             userService.createFromOidc(
@@ -165,6 +170,12 @@ public class OAuth2CallbackController {
                     metadata.organizationalUnit(),
                     role.getName());
         }
+    }
+
+    private String resolveRoleId(Role role) {
+        return roleService
+                .findIdByName(role.getName())
+                .orElseThrow(() -> new UserRoleNotFoundException(role.getName()));
     }
 
     private static void checkUserIsSuspended(User user, UserEntity entity) {

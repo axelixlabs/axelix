@@ -166,7 +166,7 @@ public interface UserService {
      *
      * <p>Field semantics:
      * <ul>
-     *   <li>{@code username} and {@code roles} are required and must not be {@code null}.</li>
+     *   <li>{@code username} and {@code roleIds} are required and must not be {@code null}.</li>
      *   <li>{@code firstName}, {@code lastName}, {@code email}, {@code jobTitle}, and
      *       {@code organizationalUnit} are nullable: passing {@code null} clears them.</li>
      *   <li>{@code password} is nullable: passing {@code null} <b>preserves</b> the previously stored password.</li>
@@ -182,9 +182,9 @@ public interface UserService {
      * @param organizationalUnit New organizational unit, or {@code null} to clear the stored organizational unit.
      * @param password New plain-text password (hashed server-side), or {@code null} to keep the existing password.
      *                 Must not be blank when.
-     * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
+     * @param roleIds  New set of role ids. Replaces any roles previously assigned. Must not be empty or contain blanks.
      * @param lastLoginAt New last-login timestamp, or {@code null} to preserve the stored timestamp.
-     * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
+     * @throws UserRoleNotFoundException if any of the provided role ids does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      * @throws UsernameAlreadyExistsException if another user with the given username already exists.
      * @throws EmailAlreadyExistsException if another user with the given email already exists.
@@ -198,7 +198,7 @@ public interface UserService {
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
             @Nullable String password,
-            Set<String> roles,
+            Set<String> roleIds,
             @Nullable Instant lastLoginAt)
             throws UserRoleNotFoundException, UserInvalidValueException;
 }

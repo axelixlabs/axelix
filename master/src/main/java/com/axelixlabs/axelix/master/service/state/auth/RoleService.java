@@ -52,6 +52,14 @@ public interface RoleService {
     Optional<Role> findByName(String name) throws IllegalStateException;
 
     /**
+     * Looks up the id of a role by its exact name.
+     *
+     * @param roleName Name of the role to look up.
+     * @return The id of the role, or {@link Optional#empty()} if no role with such a name exists.
+     */
+    Optional<String> findIdByName(String roleName);
+
+    /**
      * Looks up roles that belong to the given user.
      *
      * @throws IllegalStateException in case implementation cannot assemble the {@link Role} due to the fact that

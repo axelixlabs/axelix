@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @param email    New email address. Must be unique when provided.
  * @param jobTitle New job title, which may be {@code null}.
  * @param organizationalUnit New organizational unit, which may be {@code null}.
- * @param roles    New set of role names.
+ * @param roleIds  New set of role ids.
  * @param password Plain-text new password, or null, if it should not be changed.
  *
  * @author Sergey Cherkasov
@@ -44,13 +44,13 @@ public record UserUpdateRequest(
         @Nullable String email,
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
-        Set<String> roles,
+        Set<String> roleIds,
         @Nullable String password) {
 
     @Override
     public String toString() {
         return "UserUpdateRequest[id=%s, username=[REDACTED], firstName=[REDACTED],"
                 + " lastName=[REDACTED], email=[REDACTED], jobTitle=[REDACTED],"
-                + " organizationalUnit=[REDACTED], roles=%s, password=[REDACTED]]".formatted(id, roles);
+                + " organizationalUnit=[REDACTED], roleIds=%s, password=[REDACTED]]".formatted(id, roleIds);
     }
 }
