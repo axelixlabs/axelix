@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
@@ -95,6 +96,8 @@ class DefaultJwtEncoderServiceTest {
 
         // payload
         assertThat(claims.getPayload().getSubject()).isEqualTo(USER_NAME);
+        assertThat(claims.getPayload().get(TokenClaim.USER_ID.getEncoding(), String.class))
+                .isEqualTo(user.getId());
         assertThat(claims.getPayload().getIssuedAt()).isCloseTo(Instant.now(), 1000);
         assertThat(claims.getPayload().getExpiration())
                 .isEqualTo(claims.getPayload().getIssuedAt().toInstant().plus(lifespan));
@@ -130,7 +133,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -162,7 +165,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -189,7 +192,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -239,7 +242,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -255,7 +258,7 @@ class DefaultJwtEncoderServiceTest {
         // language=json
         String expectedPayload = String.format("{" + "  \"sub\": \"%s\"," + "  \"roles\": []" + "}", USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat", "uid").isEqualTo(expectedPayload);
     }
 
     @Test
@@ -294,7 +297,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -330,7 +333,7 @@ class DefaultJwtEncoderServiceTest {
                         + "}",
                 USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat", "uid").isEqualTo(expectedPayload);
     }
 
     @Test

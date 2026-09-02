@@ -41,6 +41,12 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
     public static final String SUPER_ADMIN_ROLE_NAME = "SUPER_ADMIN";
 
+    /**
+     * Static, stable id of the built-in Super Admin. Super Admin is not backed by a database row, so it carries
+     * a fixed identifier rather than a generated one.
+     */
+    public static final String SUPER_ADMIN_USER_ID = "AXELIX.SUPER_ADMIN";
+
     private final SuperAdminConfigurationProperties superAdminConfiguration;
     private final SuperAdminPasswordEncoder passwordEncoder;
     private final AuthoritiesManager authoritiesManager;
@@ -66,6 +72,7 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
                 && passwordEncoder.matches(password, superAdminConfiguration.getPassword())) {
 
             return new DefaultUser(
+                    SUPER_ADMIN_USER_ID,
                     superAdminConfiguration.getUsername(),
                     passwordEncoder.extractEncodedPassword(superAdminConfiguration.getPassword()),
                     Set.of(new DefaultRole(SUPER_ADMIN_ROLE_NAME, authoritiesManager.getAll())));

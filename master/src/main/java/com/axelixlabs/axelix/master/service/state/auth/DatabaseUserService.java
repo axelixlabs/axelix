@@ -95,6 +95,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 null,
+                null,
                 UserOrigin.LOCAL,
                 UserStatus.ACTIVE,
                 null);
@@ -114,13 +115,14 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void createFromOidc(
+    public String createFromOidc(
             String username,
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
+            String oidcSubject,
             String role) {
 
         UserEntity userEntity = new UserEntity(
@@ -132,6 +134,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 null,
+                requireNonBlankTrimmed(oidcSubject),
                 null,
                 UserOrigin.OIDC,
                 UserStatus.ACTIVE,
@@ -143,6 +146,13 @@ public class DatabaseUserService implements UserService {
 
         jdbcAggregateTemplate.insert(userEntity);
         grantRoles(userEntity.id(), Set.of(role));
+
+        return userEntity.id();
+    }
+
+    @Override
+    public Optional<UserEntity> findByOidcSubject(String oidcSubject) {
+        return userRepository.findByOidcSubject(oidcSubject);
     }
 
     @Override

@@ -291,7 +291,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
         userService.createLocal("alice", "Alice", "Smith", "alice@example.com", null, null, "aliceSecret", "ADMIN");
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
-        userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "VIEWER");
+        userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
         userService.updateStatus(bob.id(), UserStatus.SUSPENDED);
 

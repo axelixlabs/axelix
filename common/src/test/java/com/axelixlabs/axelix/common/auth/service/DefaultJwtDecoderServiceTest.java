@@ -18,10 +18,14 @@
 package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,12 +39,15 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -62,6 +69,9 @@ class DefaultJwtDecoderServiceTest {
 
     @Value("${axelix.master.auth.jwt.lifespan}")
     private Duration lifespan;
+
+    @Value("${axelix.master.auth.jwt.signing_key}")
+    private String signingKey;
 
     @Autowired
     private JwtDecoderService jwtDecoderService;
@@ -255,6 +265,37 @@ class DefaultJwtDecoderServiceTest {
 
         assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token))
                 .isInstanceOf(InvalidJwtTokenException.class);
+    }
+
+    @Test
+    void shouldPreserveUserIdWhenDecodingToken() {
+        // given.
+        String userId = "stable-id-42";
+        User user = new DefaultUser(userId, USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
+        String token = jwtEncoderService.generateToken(user);
+
+        // when.
+        PasswordlessUser decoded = jwtDecoderService.decodeTokenToUser(token);
+
+        // then.
+        assertThat(decoded.getId()).isEqualTo(userId);
+        assertThat(decoded.getUsername()).isEqualTo(USER_NAME);
+    }
+
+    @Test
+    void shouldThrowInCaseUserIdIsNotPresentInJWT() {
+        // given a token issued with no uid claim.
+        String tokenWithNoUserId = Jwts.builder()
+                .subject(USER_NAME)
+                .claim(TokenClaim.ROLES.getEncoding(), List.of())
+                .signWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
+                .compact();
+
+        // when.
+        ThrowableAssert.ThrowingCallable callable = () -> jwtDecoderService.decodeTokenToUser(tokenWithNoUserId);
+
+        // then.
+        assertThatThrownBy(callable).isInstanceOf(JwtParsingException.class);
     }
 
     enum CustomAuthority implements Authority {

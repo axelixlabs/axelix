@@ -111,10 +111,11 @@ class DatabaseUserServiceTest {
     @Test
     void createFroOidc_shouldAllowNullEmail() {
         // when.
-        userService.createFromOidc("bob", null, null, null, null, null, "VIEWER");
+        userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
+        assertThat(saved.oidcSubject()).isEqualTo("hash-bob");
         assertThat(saved.firstName()).isNull();
         assertThat(saved.lastName()).isNull();
         assertThat(saved.email()).isNull();
@@ -135,6 +136,7 @@ class DatabaseUserServiceTest {
                         "impostor@example.com",
                         null,
                         null,
+                        "hash-impostor",
                         "VIEWER"))
                 // then.
                 .isInstanceOf(UsernameAlreadyExistsException.class);
@@ -264,7 +266,7 @@ class DatabaseUserServiceTest {
     @Test
     void findAll_shouldReturnAllUsers() {
         userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
-        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "ADMIN");
+        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "hash-bob", "ADMIN");
 
         // when.
         List<UserEntity> all = userService.findAll();
@@ -667,7 +669,7 @@ class DatabaseUserServiceTest {
     @Test
     void createFromOidc_shouldGrantRolesThroughUsersRolesTable() {
         // when.
-        userService.createFromOidc("bob", null, null, "bob@example.com", null, null, "VIEWER");
+        userService.createFromOidc("bob", null, null, "bob@example.com", null, null, "hash-bob", "VIEWER");
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();

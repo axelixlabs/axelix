@@ -31,12 +31,19 @@ import org.jspecify.annotations.Nullable;
  */
 public final class PasswordlessUser implements User {
 
+    private final String id;
     private final String username;
     private final Set<Role> roles;
 
-    public PasswordlessUser(String username, Set<Role> roles) {
+    public PasswordlessUser(String id, String username, Set<Role> roles) {
+        this.id = id;
         this.username = username;
         this.roles = roles;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     public String getUsername() {
@@ -71,6 +78,6 @@ public final class PasswordlessUser implements User {
 
     @Override
     public String toString() {
-        return "PasswordlessUser[" + "username=" + username + ", roles=" + roles + ']';
+        return "PasswordlessUser[" + "id=" + id + ", username=" + username + ", roles=" + roles + ']';
     }
 }

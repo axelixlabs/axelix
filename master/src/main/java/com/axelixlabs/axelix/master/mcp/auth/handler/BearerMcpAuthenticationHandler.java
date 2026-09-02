@@ -50,8 +50,12 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
         try {
             String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(credential);
             Role role = userInfoJsonAccessor.extractRole(userInfoJson);
-            String username = userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson);
-            return new PasswordlessUser(username, Set.of(role));
+            // TODO:
+            //  This is not exactly correct. We need to recognize the same user that has authenticated
+            //  via OAuth2 in the OIDC via web ui and via the ai agent. If we say the id = subject claim,
+            //  we're simply going to fool the callback infrastructure
+            String subject = userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson);
+            return new PasswordlessUser(subject, subject, Set.of(role));
         } catch (OAuth2AuthenticationException e) {
             throw new AuthenticationException(e);
         }

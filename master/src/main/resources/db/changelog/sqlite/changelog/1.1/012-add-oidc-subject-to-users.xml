@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    On SQLite, Liquibase's <addColumn>/<createIndex> for a table that is referenced by a foreign key
+    (users_roles.user_id -> users.id) recreate the table via a temporary-table copy, which corrupts the
+    referencing FK. SQLite natively supports both statements below, so we issue raw SQL to avoid the copy.
+  -->
+  <changeSet id="1.1-012-1-sqlite-add-oidc-subject-to-users" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="users" columnName="oidc_subject"/>
+      </not>
+    </preConditions>
+
+    <sql dbms="sqlite">ALTER TABLE users ADD COLUMN oidc_subject TEXT</sql>
+  </changeSet>
+
+  <changeSet id="1.1-012-2-sqlite-unique-index-on-users-oidc-subject" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <indexExists tableName="users" indexName="uq_users_oidc_subject"/>
+      </not>
+    </preConditions>
+
+    <sql dbms="sqlite">CREATE UNIQUE INDEX uq_users_oidc_subject ON users (oidc_subject)</sql>
+  </changeSet>
+</databaseChangeLog>

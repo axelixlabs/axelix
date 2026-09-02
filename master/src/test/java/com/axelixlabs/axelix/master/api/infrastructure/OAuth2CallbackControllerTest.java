@@ -34,6 +34,7 @@ import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
@@ -57,6 +59,7 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
@@ -93,6 +96,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
     private static final String ACCESS_TOKEN = "test-access-token";
+    private static final String SUBJECT = "oidc-subject-123";
     private static final Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
     @LocalServerPort
@@ -117,6 +121,12 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OAuth2Properties oAuth2Properties;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     @BeforeEach
     void prepare() {
@@ -151,7 +161,8 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
         // and.
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, identityClaims));
+        when(oidcClient.validateIdToken(ID_TOKEN))
+                .thenReturn(new ValidatedOidcIdentity(username, SUBJECT, identityClaims));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
         when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "given_name")).thenReturn(firstName);
@@ -218,6 +229,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         assertThat(userEntity.jobTitle()).isEqualTo(jobTitle);
         assertThat(userEntity.organizationalUnit()).isEqualTo(organizationalUnit);
         assertThat(userEntity.password()).isNull();
+        assertThat(userEntity.oidcSubject()).isEqualTo(expectedOidcSubject(SUBJECT));
         assertThat(userService.findRoleNamesByUserId(userEntity.id()))
                 .hasSize(1)
                 .containsOnly("EDITOR");
@@ -233,12 +245,19 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         String username = "test-user";
         String updatedEmail = "updated@gmail.com";
         userService.createFromOidc(
-                username, "Original", "Name", "original@gmail.com", null, null, TestRoles.VIEWER.getName());
+                username,
+                "Original",
+                "Name",
+                "original@gmail.com",
+                null,
+                null,
+                expectedOidcSubject(SUBJECT),
+                TestRoles.VIEWER.getName());
 
         // and.
         String userInfoJson = "{\"email\": \"%s\"}".formatted(updatedEmail);
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
         when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
         when(userInfoJsonAccessor.extractTextField(userInfoJson, "email")).thenReturn(updatedEmail);
@@ -266,7 +285,14 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         // given.
         String username = "test-user";
         userService.createFromOidc(
-                username, "Original", "Name", "original@gmail.com", null, null, TestRoles.VIEWER.getName());
+                username,
+                "Original",
+                "Name",
+                "original@gmail.com",
+                null,
+                null,
+                expectedOidcSubject(SUBJECT),
+                TestRoles.VIEWER.getName());
         UserEntity created = userRepository.findByUsername(username).orElseThrow();
         userService.updateStatus(created.id(), UserStatus.SUSPENDED);
         UserEntity suspended = userRepository.findById(created.id()).orElseThrow();
@@ -274,7 +300,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         // and.
         String userInfoJson = "{\"email\": \"updated@gmail.com\"}";
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
         when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
 
@@ -291,6 +317,44 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
+    void shouldDeduplicateByOidcSubjectAcrossUsernameChange() {
+        // given an existing OIDC user provisioned under the original username.
+        String originalUsername = "john.old";
+        String newUsername = "john.new";
+        userService.createFromOidc(
+                originalUsername,
+                "John",
+                "Doe",
+                "john@example.com",
+                null,
+                null,
+                expectedOidcSubject(SUBJECT),
+                TestRoles.VIEWER.getName());
+        UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
+
+        // and the provider now presents a DIFFERENT username for the SAME subject.
+        String userInfoJson = "{}";
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
+        when(oidcClient.validateIdToken(ID_TOKEN))
+                .thenReturn(new ValidatedOidcIdentity(newUsername, SUBJECT, Map.of()));
+        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
+        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
+
+        // when.
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
+
+        // then: the same row is reused - only the username changed, no duplicate is created.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(userRepository.findAll()).singleElement().satisfies(user -> {
+            assertThat(user.id()).isEqualTo(original.id());
+            assertThat(user.username()).isEqualTo(newUsername);
+            assertThat(user.oidcSubject()).isEqualTo(expectedOidcSubject(SUBJECT));
+        });
+        assertThat(userRepository.findByUsername(originalUsername)).isEmpty();
+    }
+
+    @Test
     void shouldReturn400WhenOidcUserConflictsWithExistingLocalAccount() {
         // given.
         String username = "test-user";
@@ -299,7 +363,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         // and.
         String userInfoJson = "someJson";
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
         when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
 
@@ -355,7 +419,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
         // given.
         String username = "test-user";
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, Map.of()));
+        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
         doThrow(new OAuth2AuthenticationException("claims validation failed"))
                 .when(claimsValidator)
                 .validate(Map.of());
@@ -373,7 +437,8 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturn502WhenUserInfoEndpointUnavailable() {
         when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity("test-user", Map.of()));
+        when(oidcClient.validateIdToken(ID_TOKEN))
+                .thenReturn(new ValidatedOidcIdentity("test-user", SUBJECT, Map.of()));
         when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                 .thenThrow(new OidcMetadataUnavailableException("metadata unavailable"));
 
@@ -387,6 +452,10 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
 
     private static @NonNull String findCookie(List<String> cookies, String s) {
         return cookies.stream().filter(it -> it.contains(s)).findFirst().orElseThrow();
+    }
+
+    private String expectedOidcSubject(String subject) {
+        return OidcSubjectHash.of(oAuth2Properties.issuerUri(), subject);
     }
 
     @Override

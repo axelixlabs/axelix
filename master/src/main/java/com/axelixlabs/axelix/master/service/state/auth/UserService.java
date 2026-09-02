@@ -83,20 +83,32 @@ public interface UserService {
      * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
      * @param jobTitle Job title of the new user, or {@code null} if not provided.
      * @param organizationalUnit Organizational unit of the new user, or {@code null} if not provided.
+     * @param oidcSubject Stable OIDC identity of the user ({@code hash(iss + sub)}). Must be unique.
      * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
+     *
+     * @return the generated unique identifier of the created user.
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      * @throws UsernameAlreadyExistsException if the given username is reserved for the super-admin.
      */
-    void createFromOidc(
+    String createFromOidc(
             String username,
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
+            String oidcSubject,
             String role);
+
+    /**
+     * Looks up a user by its stable OIDC identity ({@code hash(iss + sub)}).
+     *
+     * @param oidcSubject Stable OIDC identity to search for.
+     * @return The matching user, or {@link Optional#empty()} if no user with that OIDC identity exists.
+     */
+    Optional<UserEntity> findByOidcSubject(String oidcSubject);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.

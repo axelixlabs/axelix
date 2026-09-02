@@ -143,7 +143,7 @@ public class DefaultOidcClient implements OidcClient {
                     .parseSignedClaims(idToken)
                     .getPayload();
 
-            return new ValidatedOidcIdentity(extractUsername(claims), claims);
+            return new ValidatedOidcIdentity(extractUsername(claims), claims.getSubject(), claims);
 
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtTokenException("OAuth2Jwt token has expired", e);

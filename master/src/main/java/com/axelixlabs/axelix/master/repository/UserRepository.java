@@ -42,6 +42,8 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
     Optional<UserEntity> findByEmail(@Param("email") String email);
 
+    Optional<UserEntity> findByOidcSubject(@Param("oidcSubject") String oidcSubject);
+
     @Query("SELECT r.name FROM users_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = :userId")
     List<String> findRoleNamesByUserId(@Param("userId") String userId);
 

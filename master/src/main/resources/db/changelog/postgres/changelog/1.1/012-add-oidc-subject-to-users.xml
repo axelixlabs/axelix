@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1.1-012-1-postgres-add-oidc-subject-to-users" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="users" columnName="oidc_subject"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="users">
+      <column name="oidc_subject" type="TEXT"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="1.1-012-2-postgres-unique-index-on-users-oidc-subject" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <indexExists tableName="users" indexName="uq_users_oidc_subject"/>
+      </not>
+    </preConditions>
+
+    <createIndex tableName="users" indexName="uq_users_oidc_subject" unique="true">
+      <column name="oidc_subject"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

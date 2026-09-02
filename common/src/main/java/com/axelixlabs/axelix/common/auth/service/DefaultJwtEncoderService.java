@@ -76,6 +76,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
                     .subject(user.getUsername())
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(lifespan)))
+                    .claim(TokenClaim.USER_ID.getEncoding(), user.getId())
                     .claim(TokenClaim.ROLES.getEncoding(), roleClaims);
 
             return signingStrategy.signToken(builder, signingKey).compact();

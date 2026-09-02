@@ -29,6 +29,7 @@ import java.util.Set;
  */
 public final class DefaultUser implements User {
 
+    private final String id;
     private final String username;
     private final String password;
     private final Set<Role> roles;
@@ -36,10 +37,16 @@ public final class DefaultUser implements User {
     /**
      * @param password the password of the given user. May be hash, may be plain-text.
      */
-    public DefaultUser(String username, String password, Set<Role> roles) {
+    public DefaultUser(String id, String username, String password, Set<Role> roles) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.roles = roles;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -78,6 +85,6 @@ public final class DefaultUser implements User {
 
     @Override
     public String toString() {
-        return "DefaultUser[" + "username=" + username + ", roles=" + roles + ']';
+        return "DefaultUser[" + "id=" + id + ", username=" + username + ", roles=" + roles + ']';
     }
 }

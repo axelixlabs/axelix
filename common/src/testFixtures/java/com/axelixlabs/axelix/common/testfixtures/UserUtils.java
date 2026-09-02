@@ -43,19 +43,20 @@ public class UserUtils {
     public static User fromAuthorities(OssAuthority... authorities) {
         Set<Authority> authoritySet = Set.of(authorities);
         Role role = new DefaultRole(pseudoRandomStirng(), authoritySet);
-        return new PasswordlessUser(pseudoRandomStirng(), Set.of(role));
+        return new PasswordlessUser(pseudoRandomStirng(), pseudoRandomStirng(), Set.of(role));
     }
 
     public static User fromRoles(Role... roles) {
-        return new PasswordlessUser(pseudoRandomStirng(), Arrays.stream(roles).collect(Collectors.toSet()));
+        return new PasswordlessUser(
+                pseudoRandomStirng(), pseudoRandomStirng(), Arrays.stream(roles).collect(Collectors.toSet()));
     }
 
     public static PasswordlessUser passwordless(String username, Set<Role> roles) {
-        return new PasswordlessUser(username, roles);
+        return new PasswordlessUser(pseudoRandomStirng(), username, roles);
     }
 
     public static DefaultUser withPassword(String username, String password, Set<Role> roles) {
-        return new DefaultUser(username, password, roles);
+        return new DefaultUser(pseudoRandomStirng(), username, password, roles);
     }
 
     public static String pseudoRandomStirng() {

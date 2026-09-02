@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.infrastructure;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
@@ -45,6 +47,7 @@ import com.axelixlabs.axelix.master.exception.auth.UserSuspendedException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcIdTokenClaimsValidator;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.ValidatedOidcIdentity;
@@ -118,9 +121,11 @@ public class OAuth2CallbackController {
 
         Role role = userInfoJsonAccessor.extractRole(userInfoJson);
 
-        User user = new PasswordlessUser(identity.username(), Set.of(role));
+        String oidcSubject = OidcSubjectHash.of(oAuth2Properties.issuerUri(), identity.subject());
 
-        upsertUserInfo(user, userInfoJson, role);
+        String userId = upsertUserInfo(identity.username(), oidcSubject, userInfoJson, role);
+
+        User user = new PasswordlessUser(userId, identity.username(), Set.of(role));
 
         String ourToken = jwtEncoderService.generateToken(user);
 
@@ -135,18 +140,18 @@ public class OAuth2CallbackController {
     }
 
     // Always update role & email. Update names only when the provider supplies them.
-    private void upsertUserInfo(User user, String userInfoJson, Role role) {
-        UserEntity entity = userService.findUserByUsername(user.getUsername()).orElse(null);
-
+    // Returns the stable id of the resolved (existing or freshly created) user.
+    private String upsertUserInfo(String username, String oidcSubject, String userInfoJson, Role role) {
         OidcUserMetadata metadata = extractStandardMetadata(userInfoJson);
 
+        UserEntity entity = resolveExistingUser(username, oidcSubject);
+
         if (entity != null) {
-            checkUserOriginatedFromOIDC(user, entity);
-            checkUserIsSuspended(user, entity);
+            checkUserIsSuspended(entity);
 
             userService.updateUserPatch(
                     entity.id(),
-                    entity.username(),
+                    username,
                     metadata.firstName() == null ? entity.firstName() : metadata.firstName(),
                     metadata.lastName() == null ? entity.lastName() : metadata.lastName(),
                     metadata.email(),
@@ -155,28 +160,41 @@ public class OAuth2CallbackController {
                     null,
                     Set.of(role.getName()),
                     Instant.now());
+            return entity.id();
         } else {
-            userService.createFromOidc(
-                    user.getUsername(),
+            return userService.createFromOidc(
+                    username,
                     metadata.firstName(),
                     metadata.lastName(),
                     metadata.email(),
                     metadata.jobTitle(),
                     metadata.organizationalUnit(),
+                    oidcSubject,
                     role.getName());
         }
     }
 
-    private static void checkUserIsSuspended(User user, UserEntity entity) {
-        if (entity.status() == UserStatus.SUSPENDED) {
-            throw new UserSuspendedException("Suspended user tried to log-in", user);
+    @Nullable
+    private UserEntity resolveExistingUser(String username, String oidcSubject) {
+        UserEntity bySubject = userService.findByOidcSubject(oidcSubject).orElse(null);
+
+        if (bySubject != null) {
+            Assert.state(
+                    () -> Objects.equals(bySubject.userOrigin(), UserOrigin.OIDC),
+                    "OIDC user with username '" + username
+                            + "' originally came nor from OIDC source, but from the source: "
+                            + bySubject.userOrigin().getDisplayName());
+
+            return bySubject;
+        } else {
+            return null;
         }
     }
 
-    private static void checkUserOriginatedFromOIDC(User user, UserEntity entity) {
-        if (entity.userOrigin() != UserOrigin.OIDC) {
-            throw new BadRequestException(
-                    "OIDC user with username '" + user.getUsername() + "' conflicts with an existing non-OIDC account");
+    private static void checkUserIsSuspended(UserEntity entity) {
+        if (entity.status() == UserStatus.SUSPENDED) {
+            throw new UserSuspendedException(
+                    "Suspended user tried to log-in", new PasswordlessUser(entity.id(), entity.username(), Set.of()));
         }
     }
 
