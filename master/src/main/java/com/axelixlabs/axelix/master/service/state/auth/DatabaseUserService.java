@@ -140,7 +140,8 @@ public class DatabaseUserService implements UserService {
                 UserStatus.ACTIVE,
                 Instant.now()); // the assumption is that the user is created during the initial login
 
-        if (isUsernameReservedForSuperAdmin(userEntity.username())) {
+        if (isUsernameReservedForSuperAdmin(userEntity.username())
+                || userRepository.findByUsername(userEntity.username()).isPresent()) {
             throw new UsernameAlreadyExistsException(userEntity.username());
         }
 

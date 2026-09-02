@@ -61,7 +61,9 @@ import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
+import com.axelixlabs.axelix.master.service.auth.provider.SuperAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.CapturingIamMcpInterceptor;
@@ -203,7 +205,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             // then.
             assertSuccessfulToolCallResponse(response);
-            assertSuccessfulLogin(McpEndpoints.BEANS_FEED, username);
+            assertSuccessfulLogin(McpEndpoints.BEANS_FEED, SuperAdminUserAuthenticator.SUPER_ADMIN_USER_ID);
         }
 
         @Test
@@ -215,6 +217,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             userService.createLocal(
                     username, null, null, "test-email@example.com", null, null, password, TestRoles.VIEWER.getName());
+            String userId = userService.findUserByUsername(username).orElseThrow().id();
 
             // and.
             registerInstanceForBeansTool(activeInstanceId);
@@ -231,7 +234,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             // then.
             assertSuccessfulToolCallResponse(response);
-            assertSuccessfulLogin(McpEndpoints.BEANS_FEED, username);
+            assertSuccessfulLogin(McpEndpoints.BEANS_FEED, userId);
         }
 
         @ParameterizedTest
@@ -317,11 +320,29 @@ abstract class AbstractMcpAuthorizationFilterTest {
             })
     static class BearerAuthTest extends AbstractMcpAuthorizationFilterTest {
 
+        private static final String OIDC_ISSUER_URI = "http://localhost:8999";
+        private static final String OIDC_SUBJECT = "ai-agent-user";
+
         @MockitoBean
         private OidcClient oidcClient;
 
         @MockitoBean
         private UserInfoJsonAccessor userInfoJsonAccessor;
+
+        // Mirrors the user the web-UI OAuth2 callback would have persisted, so the MCP handler can correlate the
+        // AI agent with that same account via its stable OIDC subject hash. Returns the stable id assigned on
+        // provisioning - the exact id the recorded MCP actor must carry.
+        private String persistOidcAgentUser() {
+            return userService.createFromOidc(
+                    OIDC_SUBJECT,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    OidcSubjectHash.of(OIDC_ISSUER_URI, OIDC_SUBJECT),
+                    TestRoles.VIEWER.getName());
+        }
 
         @Test
         void shouldAuthenticateAndProxyMcpToolCallEndToEnd() {
@@ -330,10 +351,11 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String userInfoJson = "someJson";
 
             // given.
+            String provisionedUserId = persistOidcAgentUser();
             registerInstanceForBeansTool(activeInstanceId);
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
             when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.VIEWER);
-            when(userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson)).thenReturn("ai-agent-user");
+            when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
             String mcpSessionId = initializeMcpSession(restTemplate, headers, mcpProperties);
             headers.set(MCP_SESSION_ID_HEADER, mcpSessionId);
@@ -346,6 +368,8 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             // then.
             assertSuccessfulToolCallResponse(response);
+            // The agent must be recorded as the very same account the web UI provisioned, not the raw OIDC subject.
+            assertSuccessfulLogin(McpEndpoints.BEANS_FEED, provisionedUserId);
         }
 
         @Test
@@ -354,9 +378,10 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String token = "viewer-access-token";
             String userInfoJson = "someJson";
 
+            persistOidcAgentUser();
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
             when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.VIEWER);
-            when(userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson)).thenReturn("ai-agent-user");
+            when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
 
             // when.
@@ -415,8 +440,10 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String token = "viewer-access-token";
             String userInfoJson = "someJson";
 
+            persistOidcAgentUser();
             when(oidcClient.validateAccessTokenAndExtractUserInfo(token)).thenReturn(userInfoJson);
             when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.VIEWER);
+            when(userInfoJsonAccessor.extractSubject(userInfoJson)).thenReturn(OIDC_SUBJECT);
             HttpHeaders headers = bearerAuthHeaders(token);
 
             // when.
@@ -470,11 +497,11 @@ abstract class AbstractMcpAuthorizationFilterTest {
                 .isEqualTo(response.getBody());
     }
 
-    void assertSuccessfulLogin(McpEndpoint mcpEndpoint, String username) {
+    void assertSuccessfulLogin(McpEndpoint mcpEndpoint, String userId) {
         assertThat(capturingIamMcpInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamMcpInterceptor.authenticationFailureEndpoint()).isNull();
         assertThat(capturingIamMcpInterceptor.successfulEndpoint()).isEqualTo(mcpEndpoint);
-        assertThat(capturingIamMcpInterceptor.actor().getUsername()).isEqualTo(username);
+        assertThat(capturingIamMcpInterceptor.actor().getId()).isEqualTo(userId);
     }
 
     void assertAuthenticationFailure(McpEndpoint mcpEndpoint) {

@@ -24,10 +24,14 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
 import com.axelixlabs.axelix.master.service.auth.oauth.UserInfoJsonAccessor;
+import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**
  * {@link McpAuthenticationHandler} that is capable to authenticate {@link AuthenticationSchemes#BEARER Bearer auth} requests.
@@ -38,10 +42,18 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
 
     private final OidcClient oidcClient;
     private final UserInfoJsonAccessor userInfoJsonAccessor;
+    private final UserService userService;
+    private final OAuth2Properties oAuth2Properties;
 
-    public BearerMcpAuthenticationHandler(OidcClient oidcClient, UserInfoJsonAccessor userInfoJsonAccessor) {
+    public BearerMcpAuthenticationHandler(
+            OidcClient oidcClient,
+            UserInfoJsonAccessor userInfoJsonAccessor,
+            UserService userService,
+            OAuth2Properties oAuth2Properties) {
         this.oidcClient = oidcClient;
         this.userInfoJsonAccessor = userInfoJsonAccessor;
+        this.userService = userService;
+        this.oAuth2Properties = oAuth2Properties;
     }
 
     @Override
@@ -50,12 +62,25 @@ public class BearerMcpAuthenticationHandler implements McpAuthenticationHandler 
         try {
             String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(credential);
             Role role = userInfoJsonAccessor.extractRole(userInfoJson);
-            // TODO:
-            //  This is not exactly correct. We need to recognize the same user that has authenticated
-            //  via OAuth2 in the OIDC via web ui and via the ai agent. If we say the id = subject claim,
-            //  we're simply going to fool the callback infrastructure
-            String subject = userInfoJsonAccessor.extractUserBehindAiAgent(userInfoJson);
-            return new PasswordlessUser(subject, subject, Set.of(role));
+
+            // Correlate the agent's identity with the same account the user logged in with via the web UI.
+            // Both paths derive the identical key OidcSubjectHash.of(issuerUri, sub) - here 'sub' comes from the
+            // userinfo response - so we resolve the very same persisted user and reuse its stable id and username.
+            String subject = userInfoJsonAccessor.extractSubject(userInfoJson);
+            if (subject == null) {
+                throw new AuthenticationException("The 'sub' claim is missing in the userinfo response from the OIDC "
+                        + "provider, so the user behind the AI agent cannot be identified");
+            }
+
+            String oidcSubject = OidcSubjectHash.of(oAuth2Properties.issuerUri(), subject);
+
+            UserEntity user = userService
+                    .findByOidcSubject(oidcSubject)
+                    .orElseThrow(
+                            () -> new AuthenticationException("The user behind the AI agent has no Axelix account; "
+                                    + "sign in via the web UI once before using the MCP server"));
+
+            return new PasswordlessUser(user.id(), user.username(), Set.of(role));
         } catch (OAuth2AuthenticationException e) {
             throw new AuthenticationException(e);
         }
