@@ -56,4 +56,8 @@ export enum EAuthorities {
     GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR",
     USERS_VIEW = "USERS_VIEW",
     USERS_MANAGEMENT = "USERS_MANAGEMENT",
+
+    // TODO Fix in the future
+    // eslint-disable-next-line
+    "license:enter" = "license:enter",
 }

@@ -23,7 +23,7 @@ interface IProps {
     ossText: string;
 }
 
-export const LicenseBadge = ({ isEnterprise, enterpriseText, ossText }: IProps) => {
+export const LicenseStatusBadge = ({ isEnterprise, enterpriseText, ossText }: IProps) => {
     return (
         <>
             <span className={`TextUltraSmall ${isEnterprise ? styles.EnterpriseBadge : styles.OSSBadge}`}>

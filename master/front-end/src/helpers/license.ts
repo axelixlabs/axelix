@@ -19,7 +19,12 @@ import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 
 import type { ILicensing } from "@/models";
-import { IS_ENTERPRISE_FLAG } from "@/utils";
+import {
+    IS_ENTERPRISE_FLAG,
+    LICENSE_ALERT_DISMISSED_AT_KEY,
+    LICENSE_EXPIRING_SOON_DAYS_THRESHOLD,
+    MS_IN_DAY,
+} from "@/utils";
 
 export const isEnterpriseLicense = (licensing: ILicensing): boolean => licensing.license === IS_ENTERPRISE_FLAG;
 
@@ -47,4 +52,36 @@ export const getTimeLeftText = (validUntil: string | null, t: TFunction) => {
     }
 
     return t("LicenseModal.timeLeft.days", { count: daysLeft });
+};
+
+export const getLicenseDaysLeft = (msLeft: number): number => {
+    return Math.ceil(msLeft / MS_IN_DAY);
+};
+
+export const isLicenseKeyAlertDismissed = (): boolean => {
+    const dismissedAt = localStorage.getItem(LICENSE_ALERT_DISMISSED_AT_KEY);
+
+    if (!dismissedAt) {
+        return false;
+    }
+
+    const msElapsed = dayjs().diff(dayjs(Number(dismissedAt)));
+
+    return msElapsed >= 0 && msElapsed < MS_IN_DAY;
+};
+
+export const isLicenseExpiringSoon = (validUntil: string | null): boolean => {
+    if (!validUntil) {
+        return false;
+    }
+
+    const msLeft = dayjs(validUntil).diff(dayjs());
+
+    if (msLeft <= 0) {
+        return false;
+    }
+
+    const daysLeft = getLicenseDaysLeft(msLeft);
+
+    return daysLeft <= LICENSE_EXPIRING_SOON_DAYS_THRESHOLD;
 };

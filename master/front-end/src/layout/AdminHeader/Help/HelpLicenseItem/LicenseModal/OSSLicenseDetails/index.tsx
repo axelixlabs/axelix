@@ -22,7 +22,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { ELicenseFormType, type ILicensing } from "@/models";
 import { LGPL_LINK } from "@/utils";
 
-import { LicenseBadge } from "../../LicenseBadge";
+import { LicenseStatusBadge } from "../../LicenseStatusBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
 
 import styles from "./styles.module.css";
@@ -43,7 +43,7 @@ export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => 
 
             <div className={styles.ContentWrapper}>
                 <div className={`TextSmall ${styles.Meta}`}>
-                    <LicenseBadge isEnterprise={false} enterpriseText="Enterprise" ossText="Open Source" />
+                    <LicenseStatusBadge isEnterprise={false} enterpriseText="Enterprise" ossText="Open Source" />
 
                     <div className={`${styles.MetaStatus} ${styles.MetaStatusOSS}`}>
                         <span>{license}</span>
