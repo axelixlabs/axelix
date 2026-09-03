@@ -14,7 +14,16 @@ spring:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
       compatible-boot-versions: 4.1.x
     config:
-      enabled: false
+      # Mirror the production application.yaml: bind the Spring Cloud Config client to the axelix.master.*
+      # surface so integration tests can drive it through the same properties users configure. It stays
+      # disabled unless a test opts in by setting axelix.master.external-config.spring-cloud-config.enabled.
+      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled:false}"
+      fail-fast: true
+      uri:       "${axelix.master.external-config.spring-cloud-config.uri:}"
+      label:     "${axelix.master.external-config.spring-cloud-config.label:}"
+      name:      "${axelix.master.external-config.spring-cloud-config.name:}"
+      username:  "${axelix.master.external-config.spring-cloud-config.username:}"
+      password:  "${axelix.master.external-config.spring-cloud-config.password:}"
   application:
     name: axelix
   datasource:
