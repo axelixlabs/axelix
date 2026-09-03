@@ -32,6 +32,11 @@ export const App = () => {
             fontSize: 15,
             lineHeight: 1.5,
         },
+        components: {
+            Listy: {
+                controlItemBgHover: "transparent",
+            },
+        },
     };
 
     return (

@@ -31,6 +31,7 @@ export { UserRoleTags } from "./UsersRoleTags";
 export { EmptyHandler } from "./EmptyHandler";
 export { InfoTooltip } from "./InfoTooltip";
 export { HintTooltip } from "./HintTooltip";
+export { VirtualList } from "./VirtualList";
 export { PageSearch } from "./PageSearch";
 export { StyledLink } from "./StyledLink";
 export { Accordion } from "./Accordion";
