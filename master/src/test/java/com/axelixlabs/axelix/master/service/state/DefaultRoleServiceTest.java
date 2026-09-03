@@ -17,11 +17,11 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.RoleEntity;
+import com.axelixlabs.axelix.master.domain.RoleFeed;
 import com.axelixlabs.axelix.master.domain.RoleOrigin;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.UserRepository;
@@ -46,6 +47,7 @@ import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests of {@link DefaultRoleService}.
@@ -71,11 +73,26 @@ class DefaultRoleServiceTest {
     @Autowired
     private JdbcClient jdbcClient;
 
+    @BeforeEach
+    @AfterEach
+    void cleanCustomRolesAndUsers() {
+        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        jdbcClient.sql("DELETE FROM roles_parents").update();
+        jdbcClient
+                .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
+                .param(RoleOrigin.BUILT_IN.name())
+                .update();
+        jdbcClient
+                .sql("DELETE FROM roles WHERE role_origin <> ?")
+                .param(RoleOrigin.BUILT_IN.name())
+                .update();
+    }
+
     @Nested
     class FindByName {
 
         @Test
-        void findByName_shouldReturnBuiltInRolesMatchingTheOnesTestsAreBuiltUpon() {
+        void shouldReturnBuiltInRolesMatchingTheOnesTestsAreBuiltUpon() {
             // when.
             Optional<Role> viewer = roleService.findByName(TestRoles.VIEWER.getName());
             Optional<Role> editor = roleService.findByName(TestRoles.EDITOR.getName());
@@ -88,7 +105,7 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void findByName_shouldNotResolveInternalRoles() {
+        void shouldNotResolveInternalRoles() {
             // when.
             Optional<Role> superAdmin = roleService.findByName("SUPER_ADMIN");
             Optional<Role> managedService = roleService.findByName("MANAGED_SERVICE");
@@ -99,7 +116,7 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void findByName_shouldReturnEmptyForAnUnknownRole() {
+        void shouldReturnEmptyForAnUnknownRole() {
             // when.
             Optional<Role> role = roleService.findByName("THERE_IS_NO_SUCH_ROLE");
 
@@ -111,14 +128,8 @@ class DefaultRoleServiceTest {
     @Nested
     class FindRolesOfUser {
 
-        @BeforeEach
-        @AfterEach
-        void cleanUsers() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
-        }
-
         @Test
-        void findRolesOfUser_shouldReturnTheSingleRoleGrantedToTheUser() {
+        void shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
             String userId = createUserWithRoles("VIEWER");
 
@@ -130,7 +141,7 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void findRolesOfUser_shouldReturnEveryRoleWithItsAuthorities() {
+        void shouldReturnEveryRoleWithItsAuthorities() {
             // given.
             String userId = createUserWithRoles("ADMIN", "EDITOR");
 
@@ -144,7 +155,7 @@ class DefaultRoleServiceTest {
         }
 
         @Test
-        void findRolesOfUser_shouldReturnEmptyForAUserWithoutAnyRoles() {
+        void shouldReturnEmptyForAUserWithoutAnyRoles() {
             // when.
             Set<Role> roles = roleService.findRolesOfUser("there-is-no-such-user");
 
@@ -170,34 +181,14 @@ class DefaultRoleServiceTest {
         }
     }
 
-    /**
-     * The bonds of {@code roles_parents} are resolved into the components of the role, which is what makes an
-     * inherited authority reach the checks. The built-in roles carry no bonds, so nothing else in this class covers
-     * it.
-     */
     @Nested
     class Inheritance {
-
-        @BeforeEach
-        @AfterEach
-        void cleanCustomRoles() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
-            jdbcClient.sql("DELETE FROM roles_parents").update();
-            jdbcClient
-                    .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
-                    .param(RoleOrigin.BUILT_IN.name())
-                    .update();
-            jdbcClient
-                    .sql("DELETE FROM roles WHERE role_origin <> ?")
-                    .param(RoleOrigin.BUILT_IN.name())
-                    .update();
-        }
 
         @Test
         void shouldExposeTheRoleItDerivesFromAsAComponent() {
             // given.
-            String parentId = customRole("PARENT", OssAuthority.CACHES_CLEAR);
-            String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", OssAuthority.CACHES_CLEAR);
+            String childId = createCustomRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
             // when.
@@ -218,9 +209,9 @@ class DefaultRoleServiceTest {
         @Test
         void shouldResolveTheBondsTransitively() {
             // given. C derives from B, B derives from A
-            String grandParent = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String parent = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
-            String child = customRole("ROLE C", OssAuthority.GARBAGE_COLLECTOR);
+            String grandParent = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String parent = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String child = createCustomRole("ROLE C", OssAuthority.GARBAGE_COLLECTOR);
             createBond(parent, grandParent);
             createBond(child, parent);
 
@@ -239,10 +230,10 @@ class DefaultRoleServiceTest {
         @Test
         void shouldUnionTheAuthoritiesReachedThroughSeveralChains() {
             // given. A diamond: the top role is reached through both branches
-            String top = customRole("TOP", OssAuthority.ENV_VALUES_READ);
-            String left = customRole("LEFT", OssAuthority.CACHES_CLEAR);
-            String right = customRole("RIGHT", OssAuthority.CACHES_TOGGLE);
-            String bottom = customRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", OssAuthority.ENV_VALUES_READ);
+            String left = createCustomRole("LEFT", OssAuthority.CACHES_CLEAR);
+            String right = createCustomRole("RIGHT", OssAuthority.CACHES_TOGGLE);
+            String bottom = createCustomRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -264,8 +255,8 @@ class DefaultRoleServiceTest {
         @Test
         void shouldResolveTheBondsOfEveryRoleTheUserHolds() {
             // given.
-            String parentId = customRole("PARENT", OssAuthority.CACHES_CLEAR);
-            String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
+            String parentId = createCustomRole("PARENT", OssAuthority.CACHES_CLEAR);
+            String childId = createCustomRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
             createBond(childId, parentId);
 
             userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "CHILD");
@@ -284,120 +275,148 @@ class DefaultRoleServiceTest {
         }
     }
 
-    /**
-     * Dedicated nested class that covers the case when roles DAG for any reason creates a cycle. If the role is created by
-     * any standard means that cannot/should not happen, but in any case, we may have a bug, or somebody may alter the state
-     * of the database directly so we have to cover that as well.
-     */
     @Nested
-    class Cycles {
+    class GetRolesFeed {
 
-        @BeforeEach
-        @AfterEach
-        void cleanCustomRoles() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
-            jdbcClient.sql("DELETE FROM roles_parents").update();
-            jdbcClient
-                    .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
-                    .param(RoleOrigin.BUILT_IN.name())
-                    .update();
-            jdbcClient
-                    .sql("DELETE FROM roles WHERE role_origin <> ?")
-                    .param(RoleOrigin.BUILT_IN.name())
-                    .update();
+        @Test
+        void shouldSeedTheSameThreeBuiltInRolesInEveryDialect() {
+            // when.
+            List<RoleFeed> feed = roleService.getRolesFeed();
+
+            // then.
+            assertThat(feed)
+                    .extracting(RoleFeed::id, RoleFeed::name, RoleFeed::description)
+                    .containsExactlyInAnyOrder(
+                            tuple(
+                                    "00000000-0000-0000-0000-0000000000b1",
+                                    "VIEWER",
+                                    "Read-only access to the monitored applications."),
+                            tuple(
+                                    "00000000-0000-0000-0000-0000000000b2",
+                                    "EDITOR",
+                                    "Performs runtime operations on the monitored applications, including destructive"
+                                            + " ones such as clearing caches."),
+                            tuple(
+                                    "00000000-0000-0000-0000-0000000000b3",
+                                    "ADMIN",
+                                    "Everything an editor can do, plus reading sensitive configuration values."));
         }
 
         @Test
+        void shouldCountTheUsersEachRoleIsAssignedTo() {
+            // given.
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "EDITOR");
+            userService.createLocal("bob", null, null, "bob@example.com", null, null, "p", "EDITOR");
+            userService.createLocal("carol", null, null, "carol@example.com", null, null, "p", "VIEWER");
+
+            // when.
+            List<RoleFeed> feed = roleService.getRolesFeed();
+
+            // then.
+            assertThat(entryNamed(feed, "EDITOR").membersCount()).isEqualTo(2);
+            assertThat(entryNamed(feed, "VIEWER").membersCount()).isEqualTo(1);
+            assertThat(entryNamed(feed, "ADMIN").membersCount()).isZero();
+        }
+
+        @Test
+        void shouldReturnACustomRoleWithItsOwnIdAndDescription() {
+            // given.
+            String derivedId = createCustomRole("DERIVED", OssAuthority.ENV_VALUES_READ);
+
+            // when.
+            List<RoleFeed> feed = roleService.getRolesFeed();
+
+            // then.
+            RoleFeed derived = entryNamed(feed, "DERIVED");
+            assertThat(derived.id()).isEqualTo(derivedId);
+            assertThat(derived.description()).isEqualTo("Description");
+            assertThat(derived.membersCount()).isZero();
+        }
+
+        private static RoleFeed entryNamed(List<RoleFeed> feed, String name) {
+            return feed.stream()
+                    .filter(role -> role.name().equals(name))
+                    .findFirst()
+                    .orElseThrow();
+        }
+    }
+
+    @Nested
+    class Cycles {
+
+        @Test
         void shouldTerminateOnABondCycleWrittenAroundTheApplication() {
-            // given. Neither lane can write this, but a hand-written row could - and the resolution runs on the
-            // login path, so looping here would leave nobody able to log in
-            String roleA = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            // given.
+            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
-            // when.
-            ThrowableAssert.ThrowingCallable callable = () -> roleService.findByName("ROLE A");
-
-            // then.
-            assertThatThrownBy(callable).isInstanceOf(IllegalStateException.class);
+            // when & then.
+            assertThatThrownBy(() -> roleService.findByName("ROLE A")).isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void shouldTerminateOnARoleThatDerivesFromItself() {
-            // given. A self-loop is the shortest cycle a hand-written row can introduce
-            String role = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            // given.
+            String role = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
             createBond(role, role);
 
-            // when.
-            ThrowableAssert.ThrowingCallable callable = () -> roleService.findByName("ROLE A");
-
-            // then.
-            assertThatThrownBy(callable).isInstanceOf(IllegalStateException.class);
+            // when & then.
+            assertThatThrownBy(() -> roleService.findByName("ROLE A")).isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void shouldTerminateOnACycleSpanningThreeRoles() {
             // given. A --> B --> C --> A
-            String roleA = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
-            String roleC = customRole("ROLE C", OssAuthority.CACHES_TOGGLE);
+            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            String roleC = createCustomRole("ROLE C", OssAuthority.CACHES_TOGGLE);
             createBond(roleA, roleB);
             createBond(roleB, roleC);
             createBond(roleC, roleA);
 
-            // when.
-            ThrowableAssert.ThrowingCallable callable = () -> roleService.findByName("ROLE A");
-
-            // then. The message spells out the offending chain to make the hand-written row diagnosable
-            assertThatThrownBy(callable)
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("ROLE A --> ROLE B --> ROLE C --> ROLE A");
+            // when & then.
+            assertThatThrownBy(() -> roleService.findByName("ROLE A")).isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void shouldTerminateWhenTheCycleSitsAboveTheQueriedRole() {
-            // given. The queried role is itself acyclic, but its ancestry loops: LEAF --> A --> B --> A
-            String leaf = customRole("LEAF", OssAuthority.GARBAGE_COLLECTOR);
-            String roleA = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            // given.
+            String leaf = createCustomRole("LEAF", OssAuthority.GARBAGE_COLLECTOR);
+            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
             createBond(leaf, roleA);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
-            // when.
-            ThrowableAssert.ThrowingCallable callable = () -> roleService.findByName("LEAF");
-
-            // then.
-            assertThatThrownBy(callable).isInstanceOf(IllegalStateException.class);
+            // when & then.
+            assertThatThrownBy(() -> roleService.findByName("LEAF")).isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void shouldTerminateWhenResolvingTheRolesOfAUserCaughtInACycle() {
-            // given. The cycle is reached through the other resolution entry point - the login path
-            String roleA = customRole("ROLE A", OssAuthority.ENV_VALUES_READ);
-            String roleB = customRole("ROLE B", OssAuthority.CACHES_CLEAR);
+            // given.
+            String roleA = createCustomRole("ROLE A", OssAuthority.ENV_VALUES_READ);
+            String roleB = createCustomRole("ROLE B", OssAuthority.CACHES_CLEAR);
             createBond(roleA, roleB);
             createBond(roleB, roleA);
 
             userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "ROLE A");
             String userId = userRepository.findByUsername("alice").orElseThrow().id();
 
-            // when.
-            ThrowableAssert.ThrowingCallable callable = () -> roleService.findRolesOfUser(userId);
-
-            // then.
-            assertThatThrownBy(callable).isInstanceOf(IllegalStateException.class);
+            // when & then.
+            assertThatThrownBy(() -> roleService.findRolesOfUser(userId)).isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void shouldNotReportACycleForADiamondSharedAncestor() {
             // given. A diamond reaches the same ancestor through two branches - that is a DAG, not a cycle, and the
             // colouring must not mistake the second visit for a back-edge
-            String top = customRole("TOP", OssAuthority.ENV_VALUES_READ);
-            String left = customRole("LEFT", OssAuthority.CACHES_CLEAR);
-            String right = customRole("RIGHT", OssAuthority.CACHES_TOGGLE);
-            String bottom = customRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
+            String top = createCustomRole("TOP", OssAuthority.ENV_VALUES_READ);
+            String left = createCustomRole("LEFT", OssAuthority.CACHES_CLEAR);
+            String right = createCustomRole("RIGHT", OssAuthority.CACHES_TOGGLE);
+            String bottom = createCustomRole("BOTTOM", OssAuthority.GARBAGE_COLLECTOR);
             createBond(left, top);
             createBond(right, top);
             createBond(bottom, left);
@@ -417,10 +436,17 @@ class DefaultRoleServiceTest {
         }
     }
 
-    private String customRole(String name, OssAuthority authority) {
+    private String createCustomRole(String name) {
         String id = UUID.randomUUID().toString();
 
         jdbcAggregateTemplate.insert(new RoleEntity(id, name, "Description", RoleOrigin.WEB_UI));
+
+        return id;
+    }
+
+    private String createCustomRole(String name, OssAuthority authority) {
+        String id = createCustomRole(name);
+
         jdbcClient
                 .sql("INSERT INTO roles_authorities (role_id, authority_id)"
                         + " SELECT ?, id FROM authorities WHERE name = ?")

@@ -47,6 +47,14 @@ public final class ApiPaths {
         public static final String GET_USER_BY_ID = "/users/feed/{userId}";
     }
 
+    public static final class RolesApi {
+
+        /**
+         * Endpoint to retrieve the feed of the roles.
+         */
+        public static final String ROLES_FEED = "/roles/feed";
+    }
+
     public static final class UsersManagementApi {
 
         /**

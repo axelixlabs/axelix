@@ -222,6 +222,10 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint LOGOUT =
             register("auth:logout", HttpMethod.POST, ApiPaths.UsersApi.LOGOUT, null);
 
+    // Roles
+    public static final MasterWebEndpoint ROLES_READ =
+            register("roles:read", HttpMethod.GET, ApiPaths.RolesApi.ROLES_FEED, OssAuthority.USERS_VIEW);
+
     // Oidc/Oauth
     public static final MasterWebEndpoint OIDC_AUTH_COMPLETE =
             register("oidc:auth:complete", HttpMethod.GET, ApiPaths.OAuth2Api.CALLBACK, null);
