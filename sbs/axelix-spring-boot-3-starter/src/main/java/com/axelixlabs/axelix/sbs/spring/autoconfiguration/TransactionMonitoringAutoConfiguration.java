@@ -22,6 +22,7 @@ import java.util.List;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.DispatcherType;
 
+import feign.Feign;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
@@ -33,6 +34,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomi
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -54,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.NPlusOneInteg
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.ConditionalOnLoggingSystem;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.Log4j2InMemoryPaginationAppenderRegistrar;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.pagination.LogbackInMemoryPaginationAppenderRegistrar;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallFeignCapability;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
@@ -150,6 +153,16 @@ public class TransactionMonitoringAutoConfiguration {
         public ExternalCallRestTemplateCustomizer axelixRestTemplateCustomizer(
                 TransactionAccessor transactionAccessor) {
             return new ExternalCallRestTemplateCustomizer(transactionAccessor);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass({Feign.class, FeignClient.class})
+    static class FeignMonitoringConfiguration {
+
+        @Bean
+        public ExternalCallFeignCapability axelixFeignCapability(TransactionAccessor transactionAccessor) {
+            return new ExternalCallFeignCapability(transactionAccessor);
         }
     }
 
