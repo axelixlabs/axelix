@@ -22,8 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.axelixlabs.axelix.master.api.external.response.LicensingInfoResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.database.ConditionalOnCommunityRdbms;
 import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.service.LicensingInfoResolver;
 
 /**
  * Test Configuration.
@@ -32,6 +34,11 @@ import com.axelixlabs.axelix.master.domain.database.OssRdbms;
  */
 @Configuration
 public class MasterTestConfiguration {
+
+    @Bean
+    public LicensingInfoResolver licensingInfoResolver() {
+        return LicensingInfoResponse::oss;
+    }
 
     @Configuration
     @ConditionalOnCommunityRdbms(OssRdbms.SQLITE)

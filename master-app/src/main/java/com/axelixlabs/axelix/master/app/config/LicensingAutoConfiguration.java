@@ -15,34 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.app.persistence;
+package com.axelixlabs.axelix.master.app.config;
 
-import java.util.Map;
-
-import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-import com.axelixlabs.axelix.master.autoconfiguration.database.LiquibasePropertiesBuilder;
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.api.external.response.LicensingInfoResponse;
+import com.axelixlabs.axelix.master.service.LicensingInfoResolver;
 
 /**
- * Persistence-related configuration for the OSS distribution.
+ * AutoConfiguration for the OSS licensing.
  *
  * @author Mikhail Polivakha
  */
 @Configuration
-public class OssPersistenceConfiguration {
-
-    private static final Map<OssRdbms, String> CHANGE_LOGS = Map.of(
-            OssRdbms.SQLITE, "db/changelog/sqlite/db.changelog.sqlite.xml",
-            OssRdbms.POSTGRES, "db/changelog/postgres/db.changelog.postgresql.xml",
-            OssRdbms.MYSQL, "db/changelog/mysql/db.changelog.mysql.xml");
+public class LicensingAutoConfiguration {
 
     @Bean
-    @Primary
-    public LiquibaseProperties liquibaseProperties(LiquibasePropertiesBuilder liquibasePropertiesBuilder) {
-        return liquibasePropertiesBuilder.forActiveRdbms(CHANGE_LOGS);
+    public LicensingInfoResolver licensingInfoResolver() {
+        return LicensingInfoResponse::oss;
     }
 }
