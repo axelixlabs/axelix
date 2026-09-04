@@ -2,7 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.kotlin.dsl.axelix
 
 plugins {
-    id("shared")
+    id("master-runtime")
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
@@ -113,12 +113,6 @@ configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-
 tasks.processResources {
 
     val projectVersion = version.toString()
@@ -132,11 +126,6 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-parameters")
-    options.release = 25
 }
 
 axelix {

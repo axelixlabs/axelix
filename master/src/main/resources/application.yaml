@@ -140,7 +140,7 @@ spring:
     import: "optional:configserver:"
   cloud:
     config:
-      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled:false}"
+      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled}"
       fail-fast: true
       uri:       "${axelix.master.external-config.spring-cloud-config.uri:}"
       label:     "${axelix.master.external-config.spring-cloud-config.label:}"
