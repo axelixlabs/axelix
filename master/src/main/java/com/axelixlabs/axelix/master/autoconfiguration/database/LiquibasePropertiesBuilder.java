@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.autoconfiguration.database;
 import java.util.Map;
 
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
+import org.springframework.core.env.Environment;
+import org.springframework.util.Assert;
 
 import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
@@ -28,17 +30,24 @@ import com.axelixlabs.axelix.master.domain.database.OssRdbms;
  *
  * @author Mikhail Polivakha
  */
-public final class MasterLiquibasePropertiesBuilder {
+public class LiquibasePropertiesBuilder {
 
-    private MasterLiquibasePropertiesBuilder() {}
+    private final Environment environment;
+    private final AxelixMigrationProperties credentials;
+
+    public LiquibasePropertiesBuilder(Environment environment, AxelixMigrationProperties credentials) {
+        this.environment = environment;
+        this.credentials = credentials;
+    }
 
     /**
-     * @param jdbcUrl the resolved JDBC url.
      * @param changeLogByRdbms root changelog location per supported {@link OssRdbms}
-     * @param credentials credentials Liquibase authenticates with (applied only for networked databases)
      */
-    public static LiquibaseProperties forActiveRdbms(
-            String jdbcUrl, Map<OssRdbms, String> changeLogByRdbms, AxelixMigrationProperties credentials) {
+    public LiquibaseProperties forActiveRdbms(Map<OssRdbms, String> changeLogByRdbms) {
+        String jdbcUrl = environment.getProperty("spring.datasource.url");
+
+        Assert.notNull(jdbcUrl, "Axelix Master requires the database to work with, so JDBC url must be configured");
+
         OssRdbms rdbms = OssRdbms.fromJdbcUrl(jdbcUrl);
 
         String changeLog = changeLogByRdbms.get(rdbms);

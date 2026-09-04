@@ -23,11 +23,8 @@ import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
-import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.master.autoconfiguration.database.AxelixMigrationProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.database.MasterLiquibasePropertiesBuilder;
+import com.axelixlabs.axelix.master.autoconfiguration.database.LiquibasePropertiesBuilder;
 import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
@@ -45,11 +42,7 @@ public class OssPersistenceConfiguration {
 
     @Bean
     @Primary
-    public LiquibaseProperties liquibaseProperties(Environment environment, AxelixMigrationProperties credentials) {
-        String jdbcUrl = environment.getProperty("spring.datasource.url");
-
-        Assert.notNull(jdbcUrl, "Axelix Master requires the database to work with, so JDBC url must be configured");
-
-        return MasterLiquibasePropertiesBuilder.forActiveRdbms(jdbcUrl, CHANGE_LOGS, credentials);
+    public LiquibaseProperties liquibaseProperties(LiquibasePropertiesBuilder liquibasePropertiesBuilder) {
+        return liquibasePropertiesBuilder.forActiveRdbms(CHANGE_LOGS);
     }
 }

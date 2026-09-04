@@ -38,6 +38,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Environment;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
@@ -63,6 +64,13 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 public class PersistenceAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceAutoConfiguration.class);
+
+    @Bean
+    public LiquibasePropertiesBuilder liquibasePropertiesBuilder(
+            Environment environment, AxelixMigrationProperties credentials) {
+
+        return new LiquibasePropertiesBuilder(environment, credentials);
+    }
 
     /**
      * Autoconfiguration for SQLite-based {@link InstanceRegistry}.
