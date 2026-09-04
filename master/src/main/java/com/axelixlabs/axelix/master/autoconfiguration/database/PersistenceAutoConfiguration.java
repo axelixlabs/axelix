@@ -34,6 +34,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
@@ -46,7 +47,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -58,6 +59,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
+@EnableConfigurationProperties(AxelixMigrationProperties.class)
 public class PersistenceAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(PersistenceAutoConfiguration.class);
@@ -66,7 +68,7 @@ public class PersistenceAutoConfiguration {
      * Autoconfiguration for SQLite-based {@link InstanceRegistry}.
      */
     @AutoConfiguration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.SQLITE)
+    @ConditionalOnCommunityRdbms(OssRdbms.SQLITE)
     public static class SQLiteAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Autowired
@@ -176,7 +178,7 @@ public class PersistenceAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.POSTGRES)
+    @ConditionalOnCommunityRdbms(OssRdbms.POSTGRES)
     public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Override
@@ -187,7 +189,7 @@ public class PersistenceAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.MYSQL)
+    @ConditionalOnCommunityRdbms(OssRdbms.MYSQL)
     public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
 
     public static class BaseJdbcConvertersAutoConfiguration extends AbstractJdbcConfiguration {

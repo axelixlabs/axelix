@@ -40,7 +40,7 @@ import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
  * The specific context provider for {@link org.junit.jupiter.api.ClassTemplate} annotations, that is used
@@ -56,11 +56,11 @@ import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 @SuppressWarnings("rawtypes")
 public class DataSourceSetupExtension implements ClassTemplateInvocationContextProvider {
 
-    private static final Map<CommunityRDBMS, ContainerLifecycle> CONTAINERS = new HashMap<>();
+    private static final Map<OssRdbms, ContainerLifecycle> CONTAINERS = new HashMap<>();
 
     static {
-        CONTAINERS.put(CommunityRDBMS.POSTGRES, new ContainerLifecycle(() -> new PostgreSQLContainer("postgres:18")));
-        CONTAINERS.put(CommunityRDBMS.MYSQL, new ContainerLifecycle(() -> new MySQLContainer("mysql:8.4")));
+        CONTAINERS.put(OssRdbms.POSTGRES, new ContainerLifecycle(() -> new PostgreSQLContainer("postgres:18")));
+        CONTAINERS.put(OssRdbms.MYSQL, new ContainerLifecycle(() -> new MySQLContainer("mysql:8.4")));
     }
 
     @Override
@@ -72,37 +72,35 @@ public class DataSourceSetupExtension implements ClassTemplateInvocationContextP
     public Stream<OverridingDataSourceInvocationContext> provideClassTemplateInvocationContexts(
             ExtensionContext context) {
 
-        return Arrays.stream(CommunityRDBMS.values()).map(OverridingDataSourceInvocationContext::new);
+        return Arrays.stream(OssRdbms.values()).map(OverridingDataSourceInvocationContext::new);
     }
 
-    public record OverridingDataSourceInvocationContext(CommunityRDBMS communityRDBMS)
-            implements ClassTemplateInvocationContext {
+    public record OverridingDataSourceInvocationContext(OssRdbms ossRdbms) implements ClassTemplateInvocationContext {
 
         @Override
         public String getDisplayName(int invocationIndex) {
-            return communityRDBMS.name();
+            return ossRdbms.name();
         }
 
         @Override
         public List<Extension> getAdditionalExtensions() {
-            return List.of(
-                    new BootstrapContainerExtension(communityRDBMS), new TearDownContainerExtension(communityRDBMS));
+            return List.of(new BootstrapContainerExtension(ossRdbms), new TearDownContainerExtension(ossRdbms));
         }
     }
 
-    record BootstrapContainerExtension(CommunityRDBMS communityRDBMS) implements BeforeClassTemplateInvocationCallback {
+    record BootstrapContainerExtension(OssRdbms ossRdbms) implements BeforeClassTemplateInvocationCallback {
 
         @Override
         public void beforeClassTemplateInvocation(ExtensionContext context) throws Exception {
-            CONTAINERS.computeIfPresent(communityRDBMS, (_, lifecycle) -> lifecycle.boot());
+            CONTAINERS.computeIfPresent(ossRdbms, (_, lifecycle) -> lifecycle.boot());
         }
     }
 
-    record TearDownContainerExtension(CommunityRDBMS communityRDBMS) implements AfterClassTemplateInvocationCallback {
+    record TearDownContainerExtension(OssRdbms ossRdbms) implements AfterClassTemplateInvocationCallback {
 
         @Override
         public void afterClassTemplateInvocation(ExtensionContext context) throws Exception {
-            CONTAINERS.computeIfPresent(communityRDBMS, (_, lifecycle) -> lifecycle.tearDown());
+            CONTAINERS.computeIfPresent(ossRdbms, (_, lifecycle) -> lifecycle.tearDown());
             evictSpringContext(context);
         }
     }

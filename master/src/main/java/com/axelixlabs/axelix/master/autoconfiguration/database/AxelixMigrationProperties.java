@@ -15,31 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.domain.database;
+package com.axelixlabs.axelix.master.autoconfiguration.database;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Community-supported RDBMS to be sued by Axelix Master.
+ * Credentials Liquibase authenticates with while applying migrations.
  *
  * @author Mikhail Polivakha
  */
-public enum CommunityRDBMS {
-    SQLITE("org.sqlite.JDBC", "jdbc:sqlite:"),
-    POSTGRES("org.postgresql.Driver", "jdbc:postgresql:"),
-    MYSQL("com.mysql.cj.jdbc.Driver", "jdbc:mysql:");
-
-    private final String driverClassName;
-    private final String jdbcUrlPrefix;
-
-    CommunityRDBMS(String driverClassName, String jdbcUrlPrefix) {
-        this.driverClassName = driverClassName;
-        this.jdbcUrlPrefix = jdbcUrlPrefix;
-    }
-
-    public String driverClassName() {
-        return driverClassName;
-    }
-
-    public String jdbcUrlPrefix() {
-        return jdbcUrlPrefix;
-    }
-}
+@ConfigurationProperties(prefix = "axelix.master.migrations")
+public record AxelixMigrationProperties(String username, String password) {}

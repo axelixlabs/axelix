@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.master.autoconfiguration.database.ConditionalOnCommunityRdbms;
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
  * Test Configuration.
@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 public class MasterTestConfiguration {
 
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.SQLITE)
+    @ConditionalOnCommunityRdbms(OssRdbms.SQLITE)
     public static class SQLiteTestLiquibaseAutoConfiguration {
 
         @Bean
@@ -47,7 +47,7 @@ public class MasterTestConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.POSTGRES)
+    @ConditionalOnCommunityRdbms(OssRdbms.POSTGRES)
     public static class PostgresTestLiquibaseAutoConfiguration {
 
         @Bean
@@ -60,7 +60,7 @@ public class MasterTestConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.MYSQL)
+    @ConditionalOnCommunityRdbms(OssRdbms.MYSQL)
     public static class MySqlTestLiquibaseAutoConfiguration {
 
         @Bean
