@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Function;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -37,19 +38,39 @@ import com.axelixlabs.axelix.master.mcp.auth.McpIdentityAccessManager;
  *
  * @author Abubakar Muradov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class CachingEndpointProber<T> implements EndpointProber<T> {
 
     private final EndpointProber<T> delegate;
     private final Cache<CacheKey, T> cache;
+    private final Function<T, T> cloner;
 
+    /**
+     * Constructor for immutable generic type, it sets the default value for the clone function.
+     */
     public CachingEndpointProber(EndpointProber<T> delegate) {
-        this(delegate, defaultCache());
+        this(delegate, defaultCache(), Function.identity());
     }
 
+    /**
+     * Constructor for immutable generic type, it sets the default value for the clone function.
+     */
     CachingEndpointProber(EndpointProber<T> delegate, Cache<CacheKey, T> cache) {
+        this(delegate, cache, Function.identity());
+    }
+
+    /**
+     * Constructor for mutable generic type, it sets the passed value for the clone function.
+     */
+    public CachingEndpointProber(EndpointProber<T> delegate, Function<T, T> cloner) {
+        this(delegate, defaultCache(), cloner);
+    }
+
+    CachingEndpointProber(EndpointProber<T> delegate, Cache<CacheKey, T> cache, Function<T, T> cloner) {
         this.delegate = delegate;
         this.cache = cache;
+        this.cloner = cloner;
     }
 
     private static <T> Cache<CacheKey, T> defaultCache() {
@@ -63,14 +84,15 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
     @Override
     public @NonNull T invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
-        return cache.get(
+        T cacheResult =  cache.get(
                 new CacheKey(instanceId, httpPayload), key -> delegate.invoke(key.instanceId(), key.httpPayload()));
+        return cloner.apply(cacheResult);
     }
 
     @Override
     public @NonNull T invoke(@NonNull String baseUrl, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException {
-        return delegate.invoke(baseUrl, httpPayload);
+        return cloner.apply(delegate.invoke(baseUrl, httpPayload));
     }
 
     @Override

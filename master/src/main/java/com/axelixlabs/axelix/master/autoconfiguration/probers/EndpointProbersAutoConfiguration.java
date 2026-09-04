@@ -34,6 +34,8 @@ import com.axelixlabs.axelix.master.service.transport.DiscardingAbstractEndpoint
 import com.axelixlabs.axelix.master.service.transport.EndpointProber;
 import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
 
+import java.util.Arrays;
+
 /**
  * Configuration that creates necessary {@link EndpointProber} instances to
  * access the API on the managed service side.
@@ -41,6 +43,7 @@ import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 public class EndpointProbersAutoConfiguration {
@@ -149,7 +152,8 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getBeansEndpointProber() {
         return new CachingEndpointProber<>(
-                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor));
+                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor),
+            bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
     // ThreadDump
@@ -271,7 +275,8 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getConditionsProber() {
         return new CachingEndpointProber<>(new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor));
+                instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor),
+            bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
     // Configuration Properties

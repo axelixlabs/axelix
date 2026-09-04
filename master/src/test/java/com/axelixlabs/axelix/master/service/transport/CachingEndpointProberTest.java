@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link CachingEndpointProber}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @ExtendWith(MockitoExtension.class)
 class CachingEndpointProberTest {
@@ -76,7 +78,7 @@ class CachingEndpointProberTest {
     @BeforeEach
     void setUp() {
         Cache<CacheKey, byte[]> cache = Caffeine.newBuilder().build();
-        subject = new CachingEndpointProber<>(delegate, cache);
+        subject = new CachingEndpointProber<>(delegate, cache, bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
     @Nested
