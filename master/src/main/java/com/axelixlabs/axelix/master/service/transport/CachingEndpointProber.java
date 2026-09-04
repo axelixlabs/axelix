@@ -84,7 +84,7 @@ public class CachingEndpointProber<T> implements EndpointProber<T> {
     @Override
     public @NonNull T invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
-        T cacheResult =  cache.get(
+        T cacheResult = cache.get(
                 new CacheKey(instanceId, httpPayload), key -> delegate.invoke(key.instanceId(), key.httpPayload()));
         return cloner.apply(cacheResult);
     }
