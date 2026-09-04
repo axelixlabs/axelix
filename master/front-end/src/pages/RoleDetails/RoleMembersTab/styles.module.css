@@ -6,19 +6,5 @@
 
 .TableRow {
     display: grid;
-    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
-}
-
-.MemberInfoWrap {
-    display: flex;
-    align-items: center;
-    column-gap: 20px;
-}
-
-.MemberName {
-    font-weight: 500;
-}
-
-.MemberEmail {
-    color: var(--axelix-bold-grey);
+    grid-template-columns: 3fr 3fr 3fr 1fr;
 }

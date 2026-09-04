@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { UsersStats } from "./UsersTable/UsersStats";
-import { Pagination } from "antd";
 import { useEffect, useState } from "react";
 
 import { EmptyHandler, Loader, PagesFirstSection } from "@/components";
@@ -30,7 +29,7 @@ import { CreateUser } from "./CreateUser";
 import { UsersSearchBar } from "./UsersSearchBar";
 import { UsersSelectionActionBar } from "./UsersSelectionActionBar";
 import { UsersTable } from "./UsersTable";
-import styles from "./styles.module.css";
+import { Pagination } from "antd";
 
 const Users = () => {
     const { authenticationOptions } = useAppSelector((state) => state.settings);
@@ -96,9 +95,10 @@ const Users = () => {
             <Pagination
                 current={currentPage}
                 pageSize={PAGINATION_SIZE}
-                total={effectiveUsers.length}
+                total={100}
+                hideOnSinglePage
+                showSizeChanger={false}
                 onChange={setCurrentPage}
-                className={styles.Pagination}
             />
         </>
     );

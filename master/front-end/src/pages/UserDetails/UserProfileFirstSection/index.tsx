@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Avatar, Button } from "antd";
-
-import { getInitials } from "@/helpers";
+import { Button } from "antd";
 
 import styles from "./styles.module.css";
+import { AdministrationAvatarWithData } from "@/components";
 
 interface IProps {
     username: string;
@@ -29,15 +28,7 @@ export const UserDetailsFirstSection = ({ username }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={styles.HeaderInfo}>
-                    <Avatar size="large">{getInitials(username)}</Avatar>
-                    <div>
-                        <div className="TextMedium">{username}</div>
-                        <div className={styles.Subtitle}>
-                            Reliability Engineer · Operations · employee 8842 · SSO (Okta)
-                        </div>
-                    </div>
-                </div>
+                <AdministrationAvatarWithData primaryText={username} secondaryText="Reliability Engineer · Operations · employee 8842 · SSO (Okta)" size="large" primaryTextStyles="TextMedium" />
 
                 <div className={styles.ActionButtonsWrapper}>
                     <Button>Edit profile</Button>

@@ -20,8 +20,6 @@ import type { TFunction } from "i18next";
 
 import { ERoles, type IRoleCheckboxOption, type UserDetailsEditableValueField } from "@/models";
 
-export const PAGINATION_SIZE = 10;
-
 export const userDetailsInputTypeMap: Record<UserDetailsEditableValueField, InputProps["type"]> = {
     username: "text",
     email: "email",

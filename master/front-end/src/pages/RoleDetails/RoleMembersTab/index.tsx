@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Avatar, Button } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { PageSearch } from "@/components";
-import { getInitials } from "@/helpers";
+import { AdministrationAvatarWithData, PageSearch } from "@/components";
 
 import styles from "./styles.module.css";
 
@@ -38,23 +37,15 @@ export const RoleMembersTab = () => {
                 <div className={`TableHeader ${styles.TableRow}`}>
                     <div className="TableRowChunk">Member</div>
                     <div className="TableRowChunk">Department</div>
-                    <div className="TableRowChunk">Held</div>
                     <div className="TableRowChunk">Last activity</div>
                     <div />
                 </div>
 
                 <div className={`TableRow ${styles.TableRow}`}>
                     <div className="TableRowChunk">
-                        <div className={styles.MemberInfoWrap}>
-                            <Avatar>{getInitials("Anja Novak")}</Avatar>
-                            <div>
-                                <div className={styles.MemberName}>Anja Novak</div>
-                                <div className={`TextSmall ${styles.MemberEmail}`}>anja.novak@example.com</div>
-                            </div>
-                        </div>
+                        <AdministrationAvatarWithData primaryText="Anja Novak" secondaryText="anja.novak@example.com" />
                     </div>
                     <div className="TableRowChunk">Operations</div>
-                    <div className="TableRowChunk">Direct</div>
                     <div className="TableRowChunk">Yesterday</div>
                     <div className="TableRowChunk">
                         <Link to="#" className="AccentedLink">

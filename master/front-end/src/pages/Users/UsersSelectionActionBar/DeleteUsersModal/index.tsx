@@ -36,7 +36,7 @@ export const DeleteUsersAction = () => {
 
     return (
         <>
-            <Button className={styles.DeleteButton} danger onClick={() => setIsModalOpen(true)}>
+            <Button danger onClick={() => setIsModalOpen(true)}>
                 {t("Users.SelectionActionBar.delete")}
             </Button>
 
@@ -47,6 +47,7 @@ export const DeleteUsersAction = () => {
                 onOk={() => setIsModalOpen(false)}
                 onClose={() => setIsModalOpen(false)}
                 okText={modalOkText}
+                okDanger
                 footerExtra={<div className={`TextSmall ${styles.FooterExtra}`}>{modalFooterExtra}</div>}
             >
                 {true ? (

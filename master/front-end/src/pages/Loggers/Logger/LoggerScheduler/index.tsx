@@ -25,7 +25,7 @@ import type { TChangeLoggerLevel } from "@/models";
 import { LoggerTimePicker } from "./LoggerTimePicker";
 import styles from "./styles.module.css";
 
-export interface IProps {
+interface IProps {
     /**
      * Callback to change the logger level.
      */

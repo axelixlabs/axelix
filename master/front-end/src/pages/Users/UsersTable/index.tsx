@@ -24,7 +24,7 @@ import { ERoles, EUserOrigin, type IUser } from "@/models";
 import { UsersTableRow } from "./UsersTableRow";
 import sharedStyles from "./shared.module.css";
 
-export interface IProps {
+interface IProps {
     /**
      * List of users
      */

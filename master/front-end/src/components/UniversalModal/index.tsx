@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
-export interface IProps {
+interface IProps {
     /** Whether the modal is visible */
     open: boolean;
 
@@ -38,6 +38,21 @@ export interface IProps {
 
     /** Text for the OK button */
     okText?: string;
+
+    /**
+     * Marks the OK button as a danger (destructive) action.
+     */
+    okDanger?: boolean;
+
+    /**
+     * Inline style overrides for the OK button.
+     */
+    okButtonStyle?: React.CSSProperties;
+
+    /**
+     * CSS class for the OK button.
+     */
+    okButtonClassName?: string;
 
     /** Loading state for the OK button */
     loading?: boolean;
@@ -71,6 +86,9 @@ export const UniversalModal = ({
     onOk,
     onClose,
     okText,
+    okDanger,
+    okButtonStyle,
+    okButtonClassName,
     loading,
     displayCancel = true,
     displayOkay = true,
@@ -78,6 +96,18 @@ export const UniversalModal = ({
     footerExtra,
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
+
+    const getOkButtonProps = (): React.ComponentProps<typeof Modal>["okButtonProps"] => {
+        if (!displayOkay) {
+            return { style: { display: "none" } };
+        }
+
+        return {
+            danger: okDanger,
+            style: okButtonStyle,
+            className: okButtonClassName,
+        };
+    }
 
     return (
         <>
@@ -93,35 +123,27 @@ export const UniversalModal = ({
                 cancelButtonProps={
                     !displayCancel
                         ? {
-                              style: {
-                                  display: "none",
-                              },
-                          }
+                            style: {
+                                display: "none",
+                            },
+                        }
                         : {}
                 }
-                okButtonProps={
-                    !displayOkay
-                        ? {
-                              style: {
-                                  display: "none",
-                              },
-                          }
-                        : {}
-                }
+                okButtonProps={getOkButtonProps()}
                 mask={{
                     closable: maskCloseable,
                     blur: true,
                 }}
                 footer={footerExtra
                     ? (_, { OkBtn, CancelBtn }) => (
-                          <div className={styles.Footer}>
-                              <div>{footerExtra}</div>
-                              <div className={styles.FooterButtons}>
-                                  <CancelBtn />
-                                  <OkBtn />
-                              </div>
-                          </div>
-                      )
+                        <div className={styles.Footer}>
+                            <div>{footerExtra}</div>
+                            <div className={styles.FooterButtons}>
+                                <CancelBtn />
+                                <OkBtn />
+                            </div>
+                        </div>
+                    )
                     : undefined
                 }
             >

@@ -1,7 +1,3 @@
-.DeleteButton {
-    background-color: transparent;
-}
-
 .ModalContentWrapper {
     display: flex;
     flex-direction: column;
@@ -10,4 +6,4 @@
 
 .FooterExtra {
     color: var(--axelix-bold-grey);
-}
+}

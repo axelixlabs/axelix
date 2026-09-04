@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Avatar, Badge, Checkbox } from "antd";
+import { Badge, Checkbox } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { UserRoleTags } from "@/components";
-import { getInitials } from "@/helpers";
+import { AdministrationAvatarWithData, UserRoleTags } from "@/components";
 import type { IUser } from "@/models";
 
 import sharedStyles from "../shared.module.css";
@@ -54,13 +53,7 @@ export const UsersTableRow = ({ user }: IProps) => {
                     className={styles.RowLink}
                 >
                     <div className="TableRowChunk">
-                        <div className={styles.UserDataWrapper}>
-                            <Avatar>{getInitials(username)}</Avatar>
-                            <div>
-                                <div className={styles.PrimaryText}>{username}</div>
-                                <div className={`TextSmall ${styles.SecondaryText}`}>{email}</div>
-                            </div>
-                        </div>
+                        <AdministrationAvatarWithData primaryText={username} secondaryText={email} />
                     </div>
                     <div className="TableRowChunk">
                         <div className={styles.PrimaryText}>Operations</div>

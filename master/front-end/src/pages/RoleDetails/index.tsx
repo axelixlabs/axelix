@@ -54,6 +54,8 @@ const RoleDetails = () => {
             <PagesFirstSection
                 title="Wallboard Operator"
                 subtitle="Shift floor staff: read dashboard values and modify wallboards."
+                tagText="Web UI"
+                tagColor="green"
                 rightContent={
                     <div className={styles.ActionButtonsWrapper}>
                         <Button>Clone</Button>

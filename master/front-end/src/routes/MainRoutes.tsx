@@ -39,6 +39,7 @@ const RoleDetails = Loadable(lazy(() => import("@/pages/RoleDetails")));
 const Conditions = Loadable(lazy(() => import("@/pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("@/pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("@/pages/Wallboard")));
+const AuditLog = Loadable(lazy(() => import("@/pages/AuditLog")));
 const Loggers = Loadable(lazy(() => import("@/pages/Loggers")));
 const Details = Loadable(lazy(() => import("@/pages/Details")));
 const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
@@ -75,6 +76,7 @@ export const MainRoutes = () => {
                     <Route path="/users/roles-permissions/:roleId" element={<RoleDetails />} />
                     <Route path="/users/roles-permissions-v2" element={<Role />} />
                     <Route path="/users/:userId" element={<UserDetails />} />
+                    <Route path="/users/audit-log" element={<AuditLog />} />
                 </Route>
 
                 <Route element={<MainLayout siderContent={<InstanceSiderMenu />} />}>

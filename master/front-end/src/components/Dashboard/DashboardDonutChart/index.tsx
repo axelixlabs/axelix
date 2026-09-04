@@ -53,12 +53,12 @@ interface IProps {
     onPieClick?: (categoryName: string, event: React.MouseEvent) => void;
 }
 
-export interface ITitle {
+interface ITitle {
     title: string;
     subtitle: string;
 }
 
-export interface IRestCategory {
+interface IRestCategory {
     /**
      * Show the 'rest' category?
      */

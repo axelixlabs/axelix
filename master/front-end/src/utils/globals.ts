@@ -67,3 +67,5 @@ export const colorPalette: Record<string, IColorPallete> = {
         colorPrimaryActive: "#cccccc",
     },
 };
+
+export const PAGINATION_SIZE = 10;

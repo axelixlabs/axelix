@@ -1,0 +1,105 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 8px;
+    margin-bottom: 30px;
+}
+
+.SearchBarWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+    flex: 1;
+}
+
+.FiltersWrapper {
+    display: flex;
+    column-gap: 8px;
+}
+
+.ShownItemsInfo {
+    color: var(--axelix-bold-grey);
+}
+
+
+
+
+.FilterDropdown :global(.ant-select-dropdown) {
+    padding: 0;
+}
+
+.DropdownBody {
+    padding: 12px;
+    min-width: 260px;
+}
+
+.OptionRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+}
+
+.SectionLabel {
+    font-size: 11px;
+    color: #8c8c8c;
+    letter-spacing: 0.5px;
+    margin: 10px 0 4px;
+}
+
+.ScrollArea {
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.DropdownFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.SelectedCount {
+    color: #8c8c8c;
+    font-size: 12px;
+}
+
+.FooterActions {
+    display: flex;
+    gap: 8px;
+}
+
+.TimeOption {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 4px;
+    cursor: pointer;
+}
+
+.TimeOptionActive {
+    color: #2e7d32;
+    font-weight: 600;
+    background: #f6ffed;
+}
+
+.CheckMark {
+    color: #2e7d32;
+}
+
+.FieldRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.FieldLabel {
+    width: 40px;
+    color: #8c8c8c;
+    font-size: 13px;
+}

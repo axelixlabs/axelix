@@ -31,19 +31,15 @@
 }
 
 .SuspendButton {
-    background-color: var(--axelix-primary-white);
-    color: #1a1a1a;
-    border: none;
+    background-color: var(--axelix-primary-white) !important;
+    border: var(--axelix-primary-black) !important;
 }
 
 .SuspendButton:hover {
-    background-color: #f0f0f0 !important;
-    color: #1a1a1a !important;
+    background-color: var(--axelix-light-grey) !important;
+    color: var(--axelix-light-grey) !important;
 }
 
-.DeleteButton {
-    background-color: transparent;
-}
 
 .ClearButton {
     color: var(--axelix-primary-white);

@@ -15,11 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Avatar } from "antd";
 import { Link } from "react-router";
 
-import { AdministrationTable } from "@/components";
-import { getInitials } from "@/helpers";
+import { AdministrationAvatarWithData, AdministrationTable } from "@/components";
 
 import styles from "./styles.module.css";
 
@@ -56,9 +54,8 @@ export const MembersTable = () => {
                 {members.map(({ name, source }) => {
                     return (
                         <div className={`TableRow ${styles.MemberRow}`}>
-                            <div className={`TableRowChunk ${styles.MemberInfo}`}>
-                                <Avatar>{getInitials(name)}</Avatar>
-                                <div>{name}</div>
+                            <div className="TableRowChunk">
+                                <AdministrationAvatarWithData primaryText={name} />
                             </div>
                             <div className={`TableRowChunk ${styles.MemberSource}`}>{source}</div>
                         </div>

@@ -18,19 +18,25 @@
 import type { ReactNode } from "react";
 
 import styles from "./styles.module.css";
+import { StyledTag } from "../StyledTag";
 
 interface IProps {
     title: string;
     subtitle: string;
     rightContent?: ReactNode;
+    tagText?: string;
+    tagColor?: string;
 }
 
-export const PagesFirstSection = ({ title, subtitle, rightContent }: IProps) => {
+export const PagesFirstSection = ({ title, subtitle, rightContent, tagText, tagColor }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div>
-                    <div className="TextLarge">{title}</div>
+                    <div className={styles.TitleContainer}>
+                        <div className="TextLarge">{title}</div>
+                        {tagText && <StyledTag color={tagColor}>{tagText}</StyledTag>}
+                    </div>
                     <p className={styles.Subtitle}>{subtitle}</p>
                 </div>
 

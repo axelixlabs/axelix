@@ -13,6 +13,12 @@
     color: var(--axelix-bold-grey);
 }
 
+.SuspendOkButton:hover {
+    background-color: var(--axelix-primary-light-black) !important;
+    border-color: var(--axelix-primary-light-black) !important;
+}
+
+
 .ModalContentWrapper {
     display: flex;
     flex-direction: column;

@@ -1,0 +1,13 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.PrimaryText {
+    font-weight: 500;
+}
+
+.SecondaryText {
+    color: var(--axelix-bold-grey);
+}

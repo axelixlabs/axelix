@@ -5,6 +5,12 @@
     margin-bottom: 30px;
 }
 
+.TitleContainer {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
 .Subtitle {
     color: var(--axelix-bold-grey);
     margin-top: 8px;

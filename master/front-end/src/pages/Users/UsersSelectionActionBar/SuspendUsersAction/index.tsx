@@ -43,6 +43,8 @@ export const SuspendUsersAction = () => {
                 onOk={() => setIsModalOpen(false)}
                 onClose={() => setIsModalOpen(false)}
                 okText={"Suspend users"}
+                okButtonStyle={{ backgroundColor: "var(--axelix-primary-black)", borderColor: "var(--axelix-primary-black)" }}
+                okButtonClassName={styles.SuspendOkButton}
                 footerExtra={<div className={`TextUltraSmall ${styles.FooterExtra}`}>Seats stay allocated</div>}
             >
                 <div className={styles.ModalContentWrapper}>
