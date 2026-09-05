@@ -1,23 +1,67 @@
 # Compatibility & Versioning
 
 This page explains how Axelix itself is versioned and how it stays compatible with the major parties in play:
-the **Java** version your services run on, the **Spring Boot** major version they are built against, and the
-**Axelix Master** ↔ **Spring Boot Starter** relationship.
+the **Java** version your services run on, the **Spring Boot** major version they are built against, and how Axelix's
+own components stay compatible **with each other**.
 
-## One version for every component
+## How Axelix components are versioned
 
-Axelix is released as a single, coordinated distribution. All components share **exactly the same version**.
+Axelix uses a **hybrid** versioning model, easiest to understand in two halves.
 
-When a new distribution of Axelix is released — say **Axelix OSS 3.1.2** — every released component carries that
-same version `3.1.2`:
+**Minor and major versions move in lockstep.** When a new minor or major line is cut — say **Axelix 3.1.0** — *every*
+component is released together under that same version `3.1.0`:
 
 - The **Spring Boot Starters** (published as Maven artifacts).
 - The **plugins** (also published as Maven artifacts).
 - The **Axelix Master** standalone JAR.
 - The **Axelix Master** Docker image.
+- The **Axelix Master** Helm chart.
 
-There is no independent versioning per component. If you know the version of one Axelix artifact, you know the version
-of them all in that release.
+A minor/major release is a single, coordinated cut of the whole distribution — the entire fleet moves to `3.1.0` at
+once.
+
+**Patch versions move per component.** Once a minor line is out, individual components receive patches on their own. A
+critical CVE fix, a bug fix, or a performance improvement in one component ships as a patch of *that component only* —
+the others stay where they are. So within one minor line you will routinely see a **ragged** set of patch numbers:
+
+- Master `3.1.2`, while the starters are still `3.1.0`.
+- A starter `3.1.3`, while Master is still `3.1.0` and the plugin never left `3.1.0`.
+
+There is no rule that a given patch number exists for every component — a `3.1.1` starter may simply never be released.
+
+:::info[The only number that matters is `major.minor`]
+You never need a compatibility matrix. Everything sharing the same **`major.minor`** is compatible, whatever the patch
+numbers happen to be — see [Compatibility between components](#compatibility-between-components) below.
+:::
+
+### Why patches are per component and not lockstep
+
+It would be simpler to say "every component always shares the exact same version," and that is in fact what we do for
+**minor and major** releases. So why not patches too?
+
+Because patch pressure is relentless and mostly comes from **outside** our own code. Consider what forces a patch:
+
+- A CVE in the **Docker base image** → we must publish a new **Axelix Master** Docker image.
+- A CVE in a **transitive library** on Master's classpath → we must publish a new **Axelix Master** JAR (and image, and
+  Helm chart).
+- A bug fix or performance improvement in a single starter.
+
+None of these have anything to do with the starters or the plugins. But under strict lockstep, *every one of them* would
+force us to re-release the starters and plugins in step — bumping them to a new patch version that is **byte-for-byte
+identical** to the previous one. Over the life of a single minor line that easily adds up to **dozens** of patch
+releases, and for a starter or plugin the overwhelming majority of them would carry **zero** real changes.
+
+That is bad for us and worse for you:
+
+- Your dependency updates become noise. A new `axelix-spring-boot-3-starter` patch would show up in your build
+  constantly, and almost every time nothing actually changed.
+- You could never tell a meaningful starter fix from a version bump that only exists to keep the fleet aligned.
+
+Releasing patches **per component** fixes both. Master can absorb its stream of base-image and transitive-dependency
+CVEs on its own patch line without dragging anything else along. And when you *do* see a new starter or plugin patch,
+it means that component genuinely changed and the upgrade is worth your attention. The `major.minor` contract is what
+lets us do this safely — the components stay compatible the whole time, no matter how far their patch numbers drift
+apart.
 
 ## A dedicated starter per Spring Boot major version
 
@@ -37,17 +81,6 @@ choose from:
 - The **Gradle plugin** is tested to work on Gradle major versions **5 through 9**.
 - The **Maven plugin** is compatible with **Maven 3**, which is what virtually every Maven project uses today.
 
-## Starter and plugin versions must match
-
-Within a single service, the **starter** and the **plugin** you apply **must be on exactly the same version**. This
-matches the [one version for every component](#one-version-for-every-component) rule — both ship from the same Axelix
-release, so keep them in lockstep.
-
-:::danger[Do not mix starter and plugin versions]
-We do **not** guarantee that a starter of version `3.1.2` will work with a plugin of version `3.3.1`. It **may** work,
-but that combination is **not tested** and is unsupported. Always pin the starter and the plugin to the same version.
-:::
-
 ## Java version compatibility
 
 **Axelix Master** is itself a Spring Boot application, written on **Java 25**. This will be the concern only in case you'd
@@ -64,41 +97,42 @@ plugins**. Spring Boot 2 users who can theoretically still be on **Java 8** cann
 least **Java 11**.
 :::
 
-## How to tell whether Master is compatible with a starter
+## Compatibility between components
 
-The rule is simple:
+There is a single rule, and it applies to **every** Axelix component:
 
-> **Axelix Master is compatible with a service as long as it shares the same _major_ AND _minor_ version as that
-> service's starter. Only a _patch_-level drift is guaranteed to be compatible.**
+> **Any two Axelix components are guaranteed compatible as long as they share the same `major` and `minor` version. The
+> patch version is irrelevant.**
 
-In other words, we guarantee compatibility only when Master and the starter differ **at most on the patch version**. If
-they diverge on the **minor** or **major** version, we guarantee **nothing** — it **may** still work, but it **may**
-break.
+That is the whole contract. It covers every pairing at once — Master with a starter, a starter with its plugin, all of
+them together — so you never need a compatibility matrix. Just line up `major.minor`.
 
-- ✅ Master `1.4.2` with starter `1.4.5` — **only patch drift**, guaranteed compatible.
+- ✅ Master `1.4.2`, starter `1.4.5`, plugin `1.4.0` — all on `1.4`, guaranteed compatible.
+- ✅ Starter `1.4.3` with plugin `1.4.0` — same `1.4`, guaranteed compatible.
 - ⚠️ Master `1.4.2` with starter `1.3.4` — **minor drift**, not guaranteed. It may work; it may break.
-- ⚠️ Master `1.4.2` with starter `1.5.1` — **minor drift**, not guaranteed. It may work; it may break.
+- ⚠️ Starter `3.1.x` with plugin `3.3.x` — **minor drift**, not guaranteed and unsupported.
 - ⚠️ Any **major** drift — not guaranteed, and even less likely to work than a minor drift.
+
+If components diverge on the **minor** or **major** version we guarantee **nothing** — the combination may still work,
+but it may break, and it is not tested.
 
 ### Why patch drift is safe but minor/major drift is not
 
-The assumption behind this policy is that **all functionality exposed by the starters is meant to be reached through the
-Axelix Master web UI**. There is no scenario in which you would need to bump a starter's **minor** version on its own to
-unlock some capability — that capability surfaces through Master, not through the starter in isolation. Because of that,
-we let ourselves **revisit the contract between Axelix Master and the starters in minor releases**, which keeps the
-project moving fast.
+The assumption behind this policy is that **all functionality the components expose is meant to be reached through the
+Axelix Master web UI**. There is no scenario in which you would bump a single component's **minor** version on its own to
+unlock some capability — that capability surfaces through Master, not through the component in isolation. Because of
+that, we let ourselves **revisit the contracts between components in minor releases**, which keeps the project moving
+fast.
 
 Patch releases are different. As stated by [semver](https://semver.org/), a patch release may carry a **critical CVE
-fix, a bug fix, or a performance improvement** — and those changes are valuable **on their own**, regardless of Master.
-So a patch-level drift is something you may genuinely want, and we guarantee it stays compatible.
+fix, a bug fix, or a performance improvement** — and those changes are valuable **on their own**. So patch-level drift
+is something you may genuinely want, and we guarantee it stays compatible.
 
-:::warning[Minor and major drift may break the interaction protocol]
-
-We **may** — this does **not** mean we **will**, but we **may** — revisit the protocol of interaction between the
-managed services (starters) and Master between **minor** releases, let alone **major** ones. That means a combination
-like Master `1.4.2` with starter `1.3.4` or `1.5.1` **may** break. It does not mean it **would** break — but it **may**,
-and we do not guarantee otherwise. Keep the starter and Master on the same major **and** minor version, and only let the
-patch versions drift.
+:::warning[Minor and major drift may break the interaction protocols]
+We **may** — this does **not** mean we **will**, but we **may** — revisit the protocols between components (Master ↔
+starter, plugin ↔ starter) between **minor** releases, let alone **major** ones. That means any combination that crosses
+a minor boundary **may** break. It does not mean it **would** — but it **may**, and we do not guarantee otherwise. Keep
+every component on the same major **and** minor version, and only let the patch versions drift.
 :::
 
 ## Backward compatibility guarantees between releases
