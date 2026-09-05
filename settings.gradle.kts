@@ -8,7 +8,7 @@ if (enterpriseDir.exists() && file("axelix-enterprise/master-enterprise/build.gr
 
 include(
     ":master",
-    ":master-oss-distribution",
+    ":master-oss",
     ":master-e2e-tests",
     ":sbs:axelix-spring-boot-2-starter",
     ":sbs:axelix-spring-boot-3-starter",
