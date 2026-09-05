@@ -39,6 +39,12 @@ build:
 	@echo "=== Running Backend Build ==="
 	./gradlew build
 
+master-oss:
+	./gradlew master-app:build
+
+master-oss-image: master-oss
+	docker build -t master-oss:local -f master-app/Dockerfile master-app
+
 re-build:
 	@echo "=== Running Backend Build ==="
 	./gradlew build --no-build-cache --no-configuration-cache --rerun-tasks
