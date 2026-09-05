@@ -40,10 +40,10 @@ build:
 	./gradlew build
 
 master-oss:
-	./gradlew master-app:build
+	./gradlew master-oss-distribution:build
 
 master-oss-image: master-oss
-	docker build -t master-oss:local -f master-app/Dockerfile master-app
+	docker build -t master-oss:local -f master-oss-distribution/Dockerfile master-oss-distribution
 
 re-build:
 	@echo "=== Running Backend Build ==="
