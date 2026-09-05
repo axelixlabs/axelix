@@ -2,11 +2,21 @@
 // ignore this file when scanning the docs content tree.
 const prefix = 'more';
 
-const pages: string[] = [
+const pages = [
   'glossary',
   'why-not-spring-boot-admin',
   'compatibility-and-versioning',
   'troubleshooting',
 ].map((id) => `${prefix}/${id}`);
 
-export default pages;
+const sidebar = [
+  ...pages,
+  {
+    type: 'category' as const,
+    label: 'Development',
+    collapsed: false,
+    items: [`${prefix}/development/branching-model`],
+  },
+];
+
+export default sidebar;

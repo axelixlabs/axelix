@@ -1,0 +1,41 @@
+# Branching Model
+
+Axelix is developed in the open as a monorepo, so understanding how the codebase evolves also explains
+**why releases arrive the way they do**. This page describes the branches we use, how changes land, and
+how that maps onto the [releases](../compatibility-and-versioning.mdx) you consume.
+
+## The trunk
+
+Axelix follows a **trunk-based development** model, with a couple of deliberate exceptions. There is one
+main trunk: the **`master`** branch.
+
+- Whenever we develop a new feature or a fix, we create a branch _from_ `master`.
+- We merge it _back into_ `master` through a Pull Request.
+
+`master` is always the source of truth for "what Axelix is right now". **Minor and major releases are cut
+directly from it** — which is why every component in a minor or major release shares the same version (see
+[Compatibility & Versioning](../compatibility-and-versioning.mdx#how-axelix-components-are-versioned)).
+
+## Breaking changes
+
+Not every finished change is merged immediately. If a change carries **breaking changes**, we do not merge
+it into `master` as part of the normal flow. Instead we:
+
+1. Postpone the Pull Request.
+2. Label it `breaking-changes`.
+3. Merge it later, when the time is right — typically when we begin working towards the next **major**
+   version.
+
+This keeps `master` **releasable as a minor or patch version at any time**, while breaking work waits for a
+major-release boundary. It is a big part of why you can trust that a new **minor** never sneaks a breaking
+change past you.
+
+## Where patch work lives
+
+Fixes for an already-released minor line do **not** go straight onto `master` for release. They are released
+from a dedicated **patch branch** that forks off that minor's tag.
+
+This is exactly what lets a single component receive a patch — a CVE fix, a bug fix, a performance
+improvement — without dragging the rest of the distribution along. The reasoning behind releasing patches
+per component is covered in
+[Why patches are per component and not lockstep](../compatibility-and-versioning.mdx#why-patches-are-per-component-and-not-lockstep).
