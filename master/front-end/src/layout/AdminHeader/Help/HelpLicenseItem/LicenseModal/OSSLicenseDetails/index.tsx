@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button } from "antd";
+// License key entry is moving to the Enterprise distro; button temporarily disabled.
+// import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -32,7 +33,7 @@ interface IProps {
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => {
+export const OSSLicenseDetails = ({ licensing }: IProps) => {
     const { t } = useTranslation();
 
     const { license, functions } = licensing;
@@ -73,11 +74,12 @@ export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => 
 
                 <LicenseFunctions functions={functions} />
 
-                <div className={styles.ActionsWrapper}>
+                {/* License key entry is moving to the Enterprise distro; button temporarily disabled. */}
+                {/* <div className={styles.ActionsWrapper}>
                     <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.CREATE)}>
                         {t("LicenseModal.enterKey")}
                     </Button>
-                </div>
+                </div> */}
             </div>
         </>
     );
