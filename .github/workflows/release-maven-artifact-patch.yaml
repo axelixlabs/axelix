@@ -1,16 +1,5 @@
 name: Release Maven Artifact Patch
 
-# Per-component patch release for a single Axelix component (a Spring Boot starter or a build plugin).
-# Run this workflow FROM the component's patch branch (`X.Y.0-<slug>`, forked from the `v<X.Y.0>` fleet tag):
-# the developer has already made the fix and bumped that component's own gradle.properties to the new patch
-# version on the branch. The workflow reads that version, publishes only this component to Maven Central, and
-# tags `X.Y.Z-<slug>` + a GitHub Release. All other components are left untouched. See docs more/development.
-#
-# Patches deliberately skip the security-check and the full Java compatibility matrix that the lockstep
-# release runs — a patch is a small change on an already-released minor whose compatibility surface was
-# validated when v<X.Y.0> shipped. It still builds and runs the component's own test suite once, on a
-# representative JDK, before publishing.
-
 on:
   workflow_dispatch:
     inputs:
