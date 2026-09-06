@@ -60,11 +60,8 @@ jobs:
           registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Tag the component release and publish the GitHub Release
+      - name: Tag the component release
         uses: ./.github/actions/finalize-component-release
         with:
           slug: master
-          component-name: Axelix Master
           version: ${{ steps.version.outputs.version }}
-          branch: ${{ github.ref_name }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}

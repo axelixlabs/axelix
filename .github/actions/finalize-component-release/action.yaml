@@ -1,25 +1,16 @@
 name: Finalize component release
 description: >-
-  Creates and pushes the component's release tag "<version>-<slug>" on the current (patch-branch) commit and
-  publishes a GitHub Release for that tag, with notes rendered from .github/release-notes/patch-release-notes.md.
+  Creates and pushes the component's release tag "<version>-<slug>" on the current (patch-branch) commit.
   The patch branch itself is pushed by the developer before the release runs; this action only tags what is
-  already there. Runs only after the component has been published successfully.
+  already there, and the developer creates the GitHub Release (with notes) manually afterwards. Runs only
+  after the component has been published successfully.
 
 inputs:
   slug:
     description: Component slug, e.g. "sbs-2".
     required: true
-  component-name:
-    description: Human-readable component name for the release notes, e.g. "Axelix Spring Boot 2 Starter".
-    required: true
   version:
     description: The patch version being released, "X.Y.Z".
-    required: true
-  branch:
-    description: The component patch branch the release is cut from, "X.Y.0-<slug>" (used in the notes).
-    required: true
-  github-token:
-    description: 'Token used to create the GitHub Release (needs "contents: write").'
     required: true
 
 runs:
@@ -27,9 +18,6 @@ runs:
   steps:
     - shell: bash
       env:
-        GH_TOKEN: ${{ inputs.github-token }}
         SLUG: ${{ inputs.slug }}
-        COMPONENT_NAME: ${{ inputs.component-name }}
         VERSION: ${{ inputs.version }}
-        BRANCH: ${{ inputs.branch }}
       run: bash "${{ github.action_path }}/finalize-release.sh"
