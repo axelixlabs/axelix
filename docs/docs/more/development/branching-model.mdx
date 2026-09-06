@@ -44,49 +44,15 @@ This is the per-component half of the model — see
 for the reasoning,
 [why patches are per component and not lockstep](../compatibility-and-versioning.mdx#why-patches-are-per-component-and-not-lockstep).
 
-Once we know which component needs a patch, the flow is:
+Because of that, patch work lives on a dedicated **patch branch per component**, forked from the minor's
+`vX.Y.0` tag and named with the pattern `X.Y.0-<component>`. Since there is a branch per component, several
+components can be on independent patch lines at the same time without interfering with each other.
 
-1. **Fork a component-specific patch branch off that minor's fleet tag.** The branch name encodes both the
-   minor line and the component, following the pattern `X.Y.0-<component>` and forked from the `vX.Y.0`
-   tag.
-
-2. **Make the fix on that branch.** Only the code of that one component changes — the branch exists to carry
-   this one component's patch, nothing else.
-
-3. **Pin the component's version in its local `gradle.properties`.** Every releasable component carries its
-   own `gradle.properties`. On the patch branch we set `axelixVersion` there to the new patch version.
-   Because the build reads the *nearest* `gradle.properties` per component, this raises **only that
-   component's** version; every other component keeps inheriting the fleet-wide `axelixVersion` from the
-   repository root and is left untouched.
-
-4. **Release that single component.** The one patched artifact is published, and the release is marked (by the
-   release pipeline) with a component-specific tag that follows this pattern: `vX.Y.Z-<component>`, where `Z` is the
-   patch version number.
-
-Let's go through the simple example:
-
-Imagine we need to create a patch for the Axelix Spring Boot 3 Starter released in the `3.1.0` Axelix release.
-Such patches *must* live on a branch named `3.1.0-sbs3`, and that branch *must* forked from `v3.1.0` git tag (the tag for
-the `3.1.0` Axelix release). If we have already released patches for the Axelix Spring Boot 3 Starter released in the `3.1.0`,
-then branch `3.1.0-sbs3` should've obviously existed before.
-
-Once we applied the necessary patches, we modify the local `gradle.properties` file for that specific gradle sub-project.
-In particular, we specify version `3.1.1`, since this is the patch version we want to release.
-
-Then we launch a release pipeline, that is in turn going to create the tag named
-`v3.1.1-sbs3` (again, pattern `vX.Y.Z-<component>`) and release the patch for that specific component, whether it is the Maven
-Artifact, Docker Image or Helm Chart - does not matter, the release pipeline will handle that.
-
-:::note[Patch branches exists per-component]
-I would like to empathize - each patch branch exists **per individual component**.
-It means that patches for the Axelix Master, for example, will live in the dedicated branch names `3.1.0-master`,
-which is also forked from the `3.1.0` git tag. The patches for the Maven Plugin will live in the separate patch
-branch - `3.1.0-maven`.
+:::note[Patch branches exist per component]
+Each patch branch exists **per individual component**. Patches for the Axelix Spring Boot 3 starter on the
+`3.1` line live on `3.1.0-sbs3`; patches for Axelix Master live on a dedicated `3.1.0-master` branch; patches
+for the Maven plugin live on their own `3.1.0-maven` branch — each forked from the same `v3.1.0` tag.
 :::
 
-The result is the **ragged** set of patch numbers described in
-[how components are versioned](../compatibility-and-versioning.mdx#how-axelix-components-are-versioned) —
-Master may sit at `3.1.4` while a starter is still `3.1.1` and a plugin never left `3.1.0`. They stay
-compatible the entire time, because
-[compatibility is guaranteed by `major.minor`](../compatibility-and-versioning.mdx#compatibility-between-components),
-whatever the patch numbers happen to be.
+The exact steps to cut a patch — checking out the branch, pinning the version, bumping the playgrounds, and
+launching the pipeline — are on the [Releases](./releases.mdx) page.

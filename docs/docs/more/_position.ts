@@ -15,7 +15,10 @@ const sidebar = [
     type: 'category' as const,
     label: 'Development',
     collapsed: false,
-    items: [`${prefix}/development/branching-model`],
+    items: [
+      `${prefix}/development/branching-model`,
+      `${prefix}/development/releases`,
+    ],
   },
 ];
 
