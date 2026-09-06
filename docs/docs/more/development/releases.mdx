@@ -74,18 +74,18 @@ documentation step is skipped — patches do not change the docs.
      do not inherit `axelixVersion`.
 
 4. **Launch the release pipeline.** It publishes the single patched artifact and creates a component-specific
-   tag `vX.Y.Z-<component>`, where `Z` is the new patch number.
+   tag `X.Y.Z-<component>`, where `Z` is the new patch number.
 
 ### Worked example
 
 Say we need to patch the **Axelix Spring Boot 3 Starter** from the `3.1.0` release:
 
-1. The patch lives on the branch `3.1.0-sbs3`, forked from the `v3.1.0` tag. If the starter has been patched
+1. The patch lives on the branch `3.1.0-sbs-3`, forked from the `v3.1.0` tag. If the starter has been patched
    on this line before, that branch already exists; otherwise we create it from `v3.1.0`.
 2. We apply the fix on that branch.
 3. In that starter's own `gradle.properties` we set `axelixVersion` to `3.1.1` — the patch version we want to
    release — and bump the Spring Boot 3 playground(s) to `3.1.1`.
-4. We launch the release pipeline. It creates the tag `v3.1.1-sbs3` and publishes the patched starter —
+4. We launch the release pipeline. It creates the tag `3.1.1-sbs-3` and publishes the patched starter —
    whether the deliverable is a Maven artifact, a Docker image, or a Helm chart, the pipeline handles it.
 
 The result is the **ragged** set of patch numbers described in
