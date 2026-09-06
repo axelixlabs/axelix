@@ -194,6 +194,51 @@ The full setup (sharing the JWT signing key with Master, self-registration, sani
 property values) is documented in
 [Configuring the Spring Boot Starter](docs/docs/setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
 
+## Building the community distribution from source
+
+The releases above are the easiest way to run Master, but you can also assemble the **community
+(OSS) distribution of Axelix Master** yourself from this repository. It lives in the
+[`master-oss`](master-oss) module — the open-core assembly of Axelix Master, packaged as a runnable
+Spring Boot fat jar and a Docker image.
+
+Builds are driven through Make (a thin layer over Gradle; see the [`Makefile`](Makefile)). You need a
+JDK 25 and the bundled Gradle wrapper (`./gradlew`) — nothing else.
+
+**Build the runnable jar:**
+
+```bash
+make master-oss
+```
+
+This runs `./gradlew master-oss:build` and produces the fat jar at
+`master-oss/build/libs/master.jar`. Run it exactly like the released jar:
+
+```bash
+java \
+  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
+  -jar master-oss/build/libs/master.jar
+```
+
+**Build the Docker image:**
+
+```bash
+make master-oss-image
+```
+
+This first builds the jar (the target depends on `master-oss`) and then builds a local image tagged
+`master-oss:local` from [`master-oss/Dockerfile`](master-oss/Dockerfile). Run it with:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e JAVA_OTHER_ARGS="\
+    -Daxelix.master.auth.jwt.algorithm=HMAC512 \
+    -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret" \
+  master-oss:local
+```
+
+Either way Master serves the UI at `http://localhost:8080`, just like the published artifacts.
+
 ## Documentation
 
 Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](docs/docs):
