@@ -14,8 +14,7 @@ on:
       # CI/CD configuration
       - '.github/**'
 
-      # Docker
-      - 'Dockerfile'
+      - 'master-oss/Dockerfile'
 
       # Application modules
       - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
@@ -70,9 +69,6 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
-
       # Java 25 will be installed at this step.
       - name: Build Backend
         id: build-backend
@@ -100,7 +96,7 @@ jobs:
       # TODO remove --provenance=false
       - name: Build Docker Image
         run: |
-          docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
+          docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file master-oss/Dockerfile master-oss
 
       - name: Docker login to Yandex Cloud CR
         run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL

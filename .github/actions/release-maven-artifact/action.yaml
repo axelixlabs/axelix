@@ -1,0 +1,49 @@
+name: Release Maven artifacts
+description: >-
+  Publishes an explicit list of Axelix Maven artifacts (starters and/or plugins) to Maven Central. The
+  caller always states exactly which artifacts to release — a single one for a component patch, or the
+  full set for a lockstep release — so what gets published is never implicit. Signing (GPG) and the OSSRH
+  promote step are handled inside the Gradle build.
+
+inputs:
+  bw-access-token:
+    description: Bitwarden access token, used to load Maven Central + GPG credentials.
+    required: true
+  artifacts:
+    description: >-
+      Whitespace/newline-separated list of Gradle project paths to publish, e.g.
+      ":sbs:axelix-spring-boot-2-starter :plugins:axelix-gradle-plugin". Each listed artifact is
+      published with its ":<path>:publish" task. Required and must be non-empty.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Load release secrets
+      uses: ./.github/actions/bitwarden
+      with:
+        bw-access-token: ${{ inputs.bw-access-token }}
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v5.6.0
+      with:
+        distribution: liberica
+        java-version: '25'
+
+    - name: Publish to Maven Central
+      shell: bash
+      env:
+        ARTIFACTS: ${{ inputs.artifacts }}
+      run: |
+        set -euo pipefail
+        chmod +x ./gradlew
+        tasks=()
+        for artifact in $ARTIFACTS; do
+          tasks+=("${artifact}:publish")
+        done
+        if [ ${#tasks[@]} -eq 0 ]; then
+          echo "::error::release-maven-artifact requires a non-empty 'artifacts' list."
+          exit 1
+        fi
+        echo "Publishing: ${tasks[*]}"
+        ./gradlew "${tasks[@]}"

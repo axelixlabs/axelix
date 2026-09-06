@@ -1,0 +1,94 @@
+name: Prepare component patch
+description: >-
+  Ensures the per-component patch branch exists (creating it from the minor's fleet tag on first use),
+  computes the next patch version for the component from its existing tags, and pins the component's
+  version in its local gradle.properties as a local commit. The commit and tag are pushed later by the
+  finalize-component-release action, so nothing is published to the remote until the release succeeds.
+
+inputs:
+  slug:
+    description: Component slug, e.g. "sbs-2", "gradle-plugin", "master".
+    required: true
+  module-dir:
+    description: The component's project directory, e.g. "sbs/axelix-spring-boot-2-starter". Its local
+      gradle.properties is where axelixVersion gets pinned for this patch.
+    required: true
+  minor:
+    description: Minor line to patch, "X.Y" (e.g. "1.1"). The base fleet tag "v<X.Y.0>" must already exist.
+    required: true
+
+outputs:
+  version:
+    description: The resolved patch version, "X.Y.Z".
+    value: ${{ steps.compute.outputs.version }}
+  branch:
+    description: The component patch branch, "X.Y.0-<slug>".
+    value: ${{ steps.compute.outputs.branch }}
+
+runs:
+  using: composite
+  steps:
+    - id: compute
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        minor="${{ inputs.minor }}"
+        slug="${{ inputs.slug }}"
+        props="${{ inputs.module-dir }}/gradle.properties"
+
+        if [[ ! "$minor" =~ ^[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::minor must be 'X.Y' (got '$minor')"; exit 1
+        fi
+
+        base="${minor}.0"
+        branch="${base}-${slug}"
+
+        git fetch --tags --force --prune origin
+
+        if ! git rev-parse -q --verify "refs/tags/v${base}" >/dev/null; then
+          echo "::error::Base fleet tag v${base} not found — cut the v${base} minor release before patching a component."
+          exit 1
+        fi
+
+        # Ensure the component patch branch exists (create it from the fleet tag on first patch), then check it out.
+        if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+          git fetch origin "$branch"
+          git checkout -B "$branch" "origin/$branch"
+        else
+          echo "Creating patch branch $branch from v${base}"
+          git checkout -b "$branch" "v${base}"
+          git push origin "$branch"
+        fi
+
+        # Next patch = highest existing "<minor>.<n>-<slug>" tag + 1 (tags are the source of truth for what shipped).
+        max=0
+        while IFS= read -r tag; do
+          [ -z "$tag" ] && continue
+          p="${tag#${minor}.}"
+          p="${p%-${slug}}"
+          if [[ "$p" =~ ^[0-9]+$ ]] && [ "$p" -gt "$max" ]; then max="$p"; fi
+        done < <(git tag -l "${minor}.*-${slug}")
+        version="${minor}.$((max + 1))"
+
+        echo "Releasing ${slug} ${version} on ${branch}"
+
+        # Pin axelixVersion in the component's own gradle.properties. On the first patch of a branch the
+        # line is the commented "# axelixVersion=" template; on a re-patch it is already an active override.
+        if [ ! -f "$props" ]; then
+          echo "::error::expected ${props} to exist (component template gradle.properties)"; exit 1
+        fi
+        if grep -qE '^axelixVersion=' "$props"; then
+          sed -i -E "s/^axelixVersion=.*/axelixVersion=${version}/" "$props"
+        elif grep -qE '^# ?axelixVersion=' "$props"; then
+          sed -i -E "s/^# ?axelixVersion=.*/axelixVersion=${version}/" "$props"
+        else
+          printf 'axelixVersion=%s\n' "$version" >> "$props"
+        fi
+
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git commit -am "release: ${slug} ${version}"
+
+        echo "version=${version}" >> "$GITHUB_OUTPUT"
+        echo "branch=${branch}" >> "$GITHUB_OUTPUT"

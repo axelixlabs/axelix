@@ -1,0 +1,119 @@
+name: Release Patch
+
+# Per-component patch release for a single Axelix component (a Spring Boot starter or a build plugin).
+# Automates the branch/tag dance: creates (or reuses) the `X.Y.0-<slug>` patch branch off the `v<X.Y.0>`
+# fleet tag, bumps only that component's version, publishes it to Maven Central, and tags `X.Y.Z-<slug>`.
+# All other components are left untouched. See wiki development/05-patch-release.adoc.
+#
+# Patches deliberately skip the security-check and the full Java compatibility matrix that the lockstep
+# release runs — a patch is a small change on an already-released minor whose compatibility surface was
+# validated when v<X.Y.0> shipped. It still builds and runs the component's own test suite once, on a
+# representative JDK, before publishing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: Which component to patch
+        type: choice
+        options: [ sb2, sb3, sb4, gradle, maven ]
+        required: true
+      minor:
+        description: Minor line to patch, "X.Y" (e.g. "1.1"). Its v<X.Y.0> fleet tag must already exist.
+        type: string
+        required: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      module: ${{ steps.map.outputs.module }}
+      moduleDir: ${{ steps.map.outputs.moduleDir }}
+      slug: ${{ steps.map.outputs.slug }}
+      javaVersion: ${{ steps.map.outputs.javaVersion }}
+    steps:
+      - id: map
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ inputs.component }}" in
+            sb2)    module=":sbs:axelix-spring-boot-2-starter"; slug="sbs-2";        jv=17 ;;
+            sb3)    module=":sbs:axelix-spring-boot-3-starter"; slug="sbs-3";        jv=21 ;;
+            sb4)    module=":sbs:axelix-spring-boot-4-starter"; slug="sbs-4";        jv=25 ;;
+            gradle) module=":plugins:axelix-gradle-plugin";     slug="gradle-plugin"; jv=25 ;;
+            maven)  module=":plugins:axelix-maven-plugin";      slug="maven-plugin";  jv=25 ;;
+            *) echo "::error::unknown component '${{ inputs.component }}'"; exit 1 ;;
+          esac
+          # The project directory is the Gradle path without the leading ':' and with ':' as '/'.
+          dir="${module#:}"; dir="${dir//://}"
+          {
+            echo "module=$module"
+            echo "moduleDir=$dir"
+            echo "slug=$slug"
+            echo "javaVersion=$jv"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up component test JDK and Gradle JDK 25
+        uses: actions/setup-java@v5.6.0
+        with:
+          distribution: 'liberica'
+          java-version: |
+            ${{ needs.setup.outputs.javaVersion }}
+            25
+
+      - name: Build and test the component
+        shell: bash
+        # For plugins the starter-test-java property is a no-op (it only rebinds starter test launchers).
+        # Both X64 and AARCH64 are listed since Gradle ignores whichever env vars aren't set for this OS/arch.
+        run: >-
+          ./gradlew
+          ${{ needs.setup.outputs.module }}:build
+          -Paxelix.starter.tests.java.version=${{ needs.setup.outputs.javaVersion }}
+          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ needs.setup.outputs.javaVersion }}_X64,JAVA_HOME_${{ needs.setup.outputs.javaVersion }}_AARCH64,JAVA_HOME_25_X64,JAVA_HOME_25_AARCH64
+
+  release:
+    needs: [ setup, build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Prepare the component patch branch
+        id: prepare
+        uses: ./.github/actions/prepare-component-patch
+        with:
+          slug: ${{ needs.setup.outputs.slug }}
+          module-dir: ${{ needs.setup.outputs.moduleDir }}
+          minor: ${{ inputs.minor }}
+
+      - name: Publish the component to Maven Central
+        uses: ./.github/actions/release-maven-artifact
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+          artifacts: ${{ needs.setup.outputs.module }}
+
+      - name: Tag the component release
+        uses: ./.github/actions/finalize-component-release
+        with:
+          slug: ${{ needs.setup.outputs.slug }}
+          version: ${{ steps.prepare.outputs.version }}
+          branch: ${{ steps.prepare.outputs.branch }}

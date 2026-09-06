@@ -54,9 +54,6 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
-
       - name: Checkout helm-charts
         uses: actions/checkout@v7
         with:
@@ -79,7 +76,7 @@ jobs:
         run: ./gradlew :master-enterprise:bootJar --no-configuration-cache --no-build-cache
 
       - name: Build Master Docker image
-        run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file Dockerfile .
+        run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file master-oss/Dockerfile master-oss
 
       - name: Publish Axelix Gradle Plugin to Maven local
         run: ./gradlew :plugins:axelix-gradle-plugin:publishToMavenLocal --no-configuration-cache --no-build-cache

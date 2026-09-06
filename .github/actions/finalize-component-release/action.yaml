@@ -1,0 +1,34 @@
+name: Finalize component release
+description: >-
+  Pushes the version-bump commit produced by prepare-component-patch and creates + pushes the component's
+  release tag "<version>-<slug>". Runs only after the component has been published successfully, so the
+  remote branch and tag reflect an actually-released component.
+
+inputs:
+  slug:
+    description: Component slug, e.g. "sbs-2".
+    required: true
+  version:
+    description: The patch version being released, "X.Y.Z".
+    required: true
+  branch:
+    description: The component patch branch, "X.Y.0-<slug>".
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        tag="${{ inputs.version }}-${{ inputs.slug }}"
+
+        if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+          echo "::error::Tag ${tag} already exists — refusing to overwrite a released component."
+          exit 1
+        fi
+
+        git push origin "HEAD:${{ inputs.branch }}"
+        git tag "$tag"
+        git push origin "$tag"
+        echo "Tagged ${tag} on ${{ inputs.branch }}"
