@@ -1,12 +1,5 @@
 name: Release Patch Master
 
-# Per-component patch release for Axelix Master. Run this workflow FROM the `X.Y.0-master` patch branch
-# (forked from `v<X.Y.0>`), where the developer has already pinned axelixVersion in master-oss/gradle.properties
-# to the new patch version. The workflow reads that version, rebuilds and pushes the Master OSS image, and tags
-# `X.Y.Z-master` + a GitHub Release. The private Enterprise (unified) image ships under this same component/branch
-# and is a deferred addition — when wired it must share this version, so its master-enterprise/gradle.properties
-# would be pinned too (see wiki 02-versioning-and-components.adoc).
-
 on:
   workflow_dispatch:
 
@@ -63,4 +56,4 @@ jobs:
       - name: Tag the component release
         uses: ./.github/actions/create-release-tag
         with:
-          tag: ${{ steps.version.outputs.version }}-master
+          tag: v${{ steps.version.outputs.version }}-master

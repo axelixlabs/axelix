@@ -39,6 +39,12 @@ Housekeeping is the set of **manual changes** made before the release. They all 
 its pre-release checks, and only if everything is green does it create the `vX.Y.0` tag and publish every
 component of the fleet.
 
+:::info[Release notes are written by hand]
+The pipeline creates the **tag** — it does **not** write the release notes. Composing the release notes for the
+freshly created `vX.Y.0` tag is left to the **developer** cutting the release, who writes them manually against
+that tag.
+:::
+
 :::note[Major releases]
 A major release is cut **exactly the same way**. The one addition is that the held-back breaking-change work
 (see [Branching Model → Breaking changes](./branching-model.mdx#breaking-changes)) is merged into `master`
@@ -58,7 +64,8 @@ instead of `master`, and the version is pinned **locally** so only that one comp
 documentation step is skipped — patches do not change the docs.
 
 1. **Check out the component's patch branch.** Patch work lives on a per-component branch named
-   `X.Y.0-<component>`, forked from the minor's `vX.Y.0` tag (see
+   `X.Y.x-<component>` — the literal `x` marks it as the whole patch line, and, unlike a tag, the branch name
+   carries **no** `v` prefix. It is forked from the minor's `vX.Y.0` tag (see
    [Branching Model → Where patch work lives](./branching-model.mdx#where-patch-work-lives)). Create it from
    the tag if this is that component's first patch on the line; otherwise it already exists.
 
@@ -74,18 +81,20 @@ documentation step is skipped — patches do not change the docs.
      do not inherit `axelixVersion`.
 
 4. **Launch the release pipeline.** It publishes the single patched artifact and creates a component-specific
-   tag `X.Y.Z-<component>`, where `Z` is the new patch number.
+   tag `vX.Y.Z-<component>`, where `Z` is the new patch number. Like every Axelix tag it carries the `v`
+   prefix. As with a minor release, the pipeline creates the tag but **not** the release notes — the developer
+   writes those manually against the new tag.
 
 ### Worked example
 
 Say we need to patch the **Axelix Spring Boot 3 Starter** from the `3.1.0` release:
 
-1. The patch lives on the branch `3.1.0-sbs-3`, forked from the `v3.1.0` tag. If the starter has been patched
+1. The patch lives on the branch `3.1.x-sbs-3`, forked from the `v3.1.0` tag. If the starter has been patched
    on this line before, that branch already exists; otherwise we create it from `v3.1.0`.
 2. We apply the fix on that branch.
 3. In that starter's own `gradle.properties` we set `axelixVersion` to `3.1.1` — the patch version we want to
    release — and bump the Spring Boot 3 playground(s) to `3.1.1`.
-4. We launch the release pipeline. It creates the tag `3.1.1-sbs-3` and publishes the patched starter —
+4. We launch the release pipeline. It creates the tag `v3.1.1-sbs-3` and publishes the patched starter —
    whether the deliverable is a Maven artifact, a Docker image, or a Helm chart, the pipeline handles it.
 
 The result is the **ragged** set of patch numbers described in

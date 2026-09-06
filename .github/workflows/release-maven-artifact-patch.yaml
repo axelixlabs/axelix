@@ -101,4 +101,4 @@ jobs:
       - name: Tag the component release
         uses: ./.github/actions/create-release-tag
         with:
-          tag: ${{ steps.version.outputs.version }}-${{ needs.setup.outputs.slug }}
+          tag: v${{ steps.version.outputs.version }}-${{ needs.setup.outputs.slug }}

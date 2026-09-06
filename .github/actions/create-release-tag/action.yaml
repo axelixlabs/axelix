@@ -5,7 +5,7 @@ description: >-
 
 inputs:
   tag:
-    description: The tag to create and push (e.g. "v1.4.0", "1.4.2-master", "1.4.2-sbs-3").
+    description: The tag to create and push (e.g. "v1.4.0", "v1.4.2-master", "v1.4.2-sbs-3").
     required: true
 
 runs:
