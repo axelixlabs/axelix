@@ -34,16 +34,4 @@ runs:
       shell: bash
       env:
         ARTIFACTS: ${{ inputs.artifacts }}
-      run: |
-        set -euo pipefail
-        chmod +x ./gradlew
-        tasks=()
-        for artifact in $ARTIFACTS; do
-          tasks+=("${artifact}:publish")
-        done
-        if [ ${#tasks[@]} -eq 0 ]; then
-          echo "::error::release-maven-artifact requires a non-empty 'artifacts' list."
-          exit 1
-        fi
-        echo "Publishing: ${tasks[*]}"
-        ./gradlew "${tasks[@]}"
+      run: bash "${{ github.action_path }}/publish-artifacts.sh"

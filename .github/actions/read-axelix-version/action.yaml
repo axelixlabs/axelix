@@ -1,0 +1,32 @@
+name: Read Axelix version
+description: >-
+  Reads the `axelixVersion` property from a gradle.properties file and returns it. Optionally validates the
+  value against a caller-supplied regular expression, failing the build when it does not match — e.g. a
+  lockstep release requires `X.Y.0`, a component patch requires `X.Y.Z` with a non-zero patch.
+
+inputs:
+  file:
+    description: Path to the gradle.properties to read (relative to the workspace).
+    required: false
+    default: gradle.properties
+  pattern:
+    description: >-
+      Optional POSIX extended regular expression the version must match (anchored as written, e.g.
+      "^[0-9]+\.[0-9]+\.0$"). When empty, no validation is performed.
+    required: false
+    default: ''
+
+outputs:
+  version:
+    description: The resolved axelixVersion.
+    value: ${{ steps.read.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - id: read
+      shell: bash
+      env:
+        FILE: ${{ inputs.file }}
+        PATTERN: ${{ inputs.pattern }}
+      run: bash "${{ github.action_path }}/read-axelix-version.sh"

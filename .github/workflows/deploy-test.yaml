@@ -80,29 +80,21 @@ jobs:
         uses: docker/setup-docker-action@v5
 
       - name: Read Gradle Properties file
-        uses: madhead/read-java-properties@4
+        uses: ./.github/actions/read-axelix-version
         id: gradleProperties
-        env:
-          # We have to clear the JAVA_HOME here, since the read-java-properties
-          # is a docker-based action, and it assumes to have its own JAVA_HOME, different from
-          # the one that we set up above. Be invoking read-java-properties the JAVA_HOME from
-          # the runner leaks into container, and overrides the correct JAVA_HOME for the container.
-          # So we must clean it up explicitly
-          JAVA_HOME: ""
         with:
           file: gradle.properties
-          property: axelixVersion
 
       # TODO remove --provenance=false
       - name: Build Docker Image
         run: |
-          docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file master-oss/Dockerfile master-oss
+          docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.version }} --file master-oss/Dockerfile master-oss
 
       - name: Docker login to Yandex Cloud CR
         run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
+        run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.version }}
 
       - name: Docker logout
         run: docker logout
@@ -130,7 +122,7 @@ jobs:
           helm upgrade \
             --set image.pullPolicy=Always \
             --set image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
-            --set image.ref=${{ steps.gradleProperties.outputs.value }} \
+            --set image.ref=${{ steps.gradleProperties.outputs.version }} \
             --set axelix.master.auth.jwt.signingKey=${{ env.SANDBOX_JWT_SIGNING_KEY }} \
             --set axelix.master.auth.jwt.algorithm=HMAC512 \
             --set axelix.master.auth.cookie.secure=false \

@@ -97,13 +97,13 @@ jobs:
           fetch-depth: 0
 
       - name: Read the patch version from the component's gradle.properties
-        uses: madhead/read-java-properties@4
         id: version
-        env:
-          JAVA_HOME: ""
+        uses: ./.github/actions/read-axelix-version
         with:
           file: ${{ needs.setup.outputs.moduleDir }}/gradle.properties
-          property: axelixVersion
+          # A patch must be X.Y.Z with a non-zero patch — this also rejects a run on master, where the
+          # component's axelixVersion is left commented out (unset).
+          pattern: '^[0-9]+\.[0-9]+\.[1-9][0-9]*$'
 
       - name: Publish the component to Maven Central
         uses: ./.github/actions/release-maven-artifact
@@ -116,6 +116,6 @@ jobs:
         with:
           slug: ${{ needs.setup.outputs.slug }}
           component-name: ${{ needs.setup.outputs.componentName }}
-          version: ${{ steps.version.outputs.value }}
+          version: ${{ steps.version.outputs.version }}
           branch: ${{ github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

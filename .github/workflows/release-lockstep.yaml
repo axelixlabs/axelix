@@ -107,17 +107,17 @@ jobs:
           fetch-depth: 0
 
       - name: Resolve release version from gradle.properties
-        run: |
-          RELEASE_TAG=$(grep '^axelixVersion=' gradle.properties | cut -d'=' -f2)
-          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
-          echo "VITE_APP_VERSION=$RELEASE_TAG" >> "$GITHUB_ENV"
+        id: version
+        uses: ./.github/actions/read-axelix-version
+        with:
+          file: gradle.properties
+          # A lockstep release must be a released X.Y.0 (no SNAPSHOT, patch always 0).
+          pattern: '^[0-9]+\.[0-9]+\.0$'
 
-      - name: Guard against a snapshot / non-".0" fleet version
+      - name: Export release version to the job env
         run: |
-          if [[ ! "$RELEASE_TAG" =~ ^[0-9]+\.[0-9]+\.0$ ]]; then
-            echo "::error::When releasing the entire fleet via lockstep, axelixVersion must be a released X.Y.0 (got '$RELEASE_TAG')."
-            exit 1
-          fi
+          echo "RELEASE_TAG=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+          echo "VITE_APP_VERSION=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.6.0
