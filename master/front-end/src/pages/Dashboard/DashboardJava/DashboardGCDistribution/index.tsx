@@ -27,10 +27,9 @@ interface IProps {
 export const DashboardGCDistribution = ({ gcDistributionData }: IProps) => {
     const { t } = useTranslation();
 
-    const mostUsedGc = gcDistributionData.reduce(
-        (max, item) => (item.value > max.value ? item : max),
-        gcDistributionData[0],
-    );
+    const mostUsedGc = gcDistributionData.length
+        ? gcDistributionData.reduce((max, item) => (item.value > max.value ? item : max), gcDistributionData[0])
+        : undefined;
 
     return (
         <DashboardDonutChart
@@ -40,7 +39,7 @@ export const DashboardGCDistribution = ({ gcDistributionData }: IProps) => {
                 subtitle: t("Dashboard.Java.gcDistributionChartSubtitle"),
             }}
             centre={{
-                title: mostUsedGc.categoryName,
+                title: mostUsedGc?.categoryName ?? "",
                 subtitle: t("Dashboard.Java.gcDistributionChartCentreSubtitle"),
             }}
             rest={{
