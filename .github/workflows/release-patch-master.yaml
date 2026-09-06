@@ -61,7 +61,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tag the component release
-        uses: ./.github/actions/finalize-component-release
-        with:
-          slug: master
-          version: ${{ steps.version.outputs.version }}
+        env:
+          TAG: ${{ steps.version.outputs.version }}-master
+        run: |
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::Tag ${TAG} already exists — refusing to overwrite a released component."
+            exit 1
+          fi
+          git tag "${TAG}"
+          git push origin "${TAG}"
+          echo "Tagged ${TAG}"
