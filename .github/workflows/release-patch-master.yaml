@@ -1,18 +1,14 @@
 name: Release Patch Master
 
-# Per-component patch release for Axelix Master. Automates the branch/tag dance: creates/reuses
-# `X.Y.0-master` off `v<X.Y.0>`, pins axelixVersion in master-oss/gradle.properties, rebuilds and pushes
-# the Master OSS image, and tags `X.Y.Z-master`. The private Enterprise (unified) image ships under this
-# same component/branch and is a deferred addition — when wired it must share this version, so its
-# master-enterprise/gradle.properties would be pinned too (see wiki 02-versioning-and-components.adoc).
+# Per-component patch release for Axelix Master. Run this workflow FROM the `X.Y.0-master` patch branch
+# (forked from `v<X.Y.0>`), where the developer has already pinned axelixVersion in master-oss/gradle.properties
+# to the new patch version. The workflow reads that version, rebuilds and pushes the Master OSS image, and tags
+# `X.Y.Z-master` + a GitHub Release. The private Enterprise (unified) image ships under this same component/branch
+# and is a deferred addition — when wired it must share this version, so its master-enterprise/gradle.properties
+# would be pinned too (see wiki 02-versioning-and-components.adoc).
 
 on:
   workflow_dispatch:
-    inputs:
-      minor:
-        description: Minor line to patch, "X.Y" (e.g. "1.1"). Its v<X.Y.0> fleet tag must already exist.
-        type: string
-        required: true
 
 env:
   USERNAME: ${{ github.actor }}
@@ -47,25 +43,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare the component patch branch
-        id: prepare
-        uses: ./.github/actions/prepare-component-patch
+      - name: Read the patch version from master-oss/gradle.properties
+        uses: madhead/read-java-properties@4
+        id: version
+        env:
+          JAVA_HOME: ""
         with:
-          slug: master
-          module-dir: master-oss
-          minor: ${{ inputs.minor }}
+          file: master-oss/gradle.properties
+          property: axelixVersion
 
       - name: Build and push the Master OSS image
         uses: ./.github/actions/release-oss-image
         with:
-          version: ${{ steps.prepare.outputs.version }}
+          version: ${{ steps.version.outputs.value }}
           owner: ${{ github.repository_owner }}
           registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Tag the component release
+      - name: Tag the component release and publish the GitHub Release
         uses: ./.github/actions/finalize-component-release
         with:
           slug: master
-          version: ${{ steps.prepare.outputs.version }}
-          branch: ${{ steps.prepare.outputs.branch }}
+          component-name: Axelix Master
+          version: ${{ steps.version.outputs.value }}
+          branch: ${{ github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

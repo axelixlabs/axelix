@@ -1,9 +1,10 @@
-name: Release Patch
+name: Release Maven Artifact Patch
 
 # Per-component patch release for a single Axelix component (a Spring Boot starter or a build plugin).
-# Automates the branch/tag dance: creates (or reuses) the `X.Y.0-<slug>` patch branch off the `v<X.Y.0>`
-# fleet tag, bumps only that component's version, publishes it to Maven Central, and tags `X.Y.Z-<slug>`.
-# All other components are left untouched. See wiki development/05-patch-release.adoc.
+# Run this workflow FROM the component's patch branch (`X.Y.0-<slug>`, forked from the `v<X.Y.0>` fleet tag):
+# the developer has already made the fix and bumped that component's own gradle.properties to the new patch
+# version on the branch. The workflow reads that version, publishes only this component to Maven Central, and
+# tags `X.Y.Z-<slug>` + a GitHub Release. All other components are left untouched. See docs more/development.
 #
 # Patches deliberately skip the security-check and the full Java compatibility matrix that the lockstep
 # release runs — a patch is a small change on an already-released minor whose compatibility surface was
@@ -14,13 +15,9 @@ on:
   workflow_dispatch:
     inputs:
       component:
-        description: Which component to patch
+        description: Which component to patch (must match the patch branch this run is started from)
         type: choice
         options: [ sb2, sb3, sb4, gradle, maven ]
-        required: true
-      minor:
-        description: Minor line to patch, "X.Y" (e.g. "1.1"). Its v<X.Y.0> fleet tag must already exist.
-        type: string
         required: true
 
 env:
@@ -33,6 +30,7 @@ jobs:
       module: ${{ steps.map.outputs.module }}
       moduleDir: ${{ steps.map.outputs.moduleDir }}
       slug: ${{ steps.map.outputs.slug }}
+      componentName: ${{ steps.map.outputs.componentName }}
       javaVersion: ${{ steps.map.outputs.javaVersion }}
     steps:
       - id: map
@@ -40,11 +38,11 @@ jobs:
         run: |
           set -euo pipefail
           case "${{ inputs.component }}" in
-            sb2)    module=":sbs:axelix-spring-boot-2-starter"; slug="sbs-2";        jv=17 ;;
-            sb3)    module=":sbs:axelix-spring-boot-3-starter"; slug="sbs-3";        jv=21 ;;
-            sb4)    module=":sbs:axelix-spring-boot-4-starter"; slug="sbs-4";        jv=25 ;;
-            gradle) module=":plugins:axelix-gradle-plugin";     slug="gradle-plugin"; jv=25 ;;
-            maven)  module=":plugins:axelix-maven-plugin";      slug="maven-plugin";  jv=25 ;;
+            sb2)    module=":sbs:axelix-spring-boot-2-starter"; slug="sbs-2";         name="Axelix Spring Boot 2 Starter"; jv=17 ;;
+            sb3)    module=":sbs:axelix-spring-boot-3-starter"; slug="sbs-3";         name="Axelix Spring Boot 3 Starter"; jv=21 ;;
+            sb4)    module=":sbs:axelix-spring-boot-4-starter"; slug="sbs-4";         name="Axelix Spring Boot 4 Starter"; jv=25 ;;
+            gradle) module=":plugins:axelix-gradle-plugin";     slug="gradle-plugin"; name="Axelix Gradle Plugin";         jv=25 ;;
+            maven)  module=":plugins:axelix-maven-plugin";      slug="maven-plugin";  name="Axelix Maven Plugin";          jv=25 ;;
             *) echo "::error::unknown component '${{ inputs.component }}'"; exit 1 ;;
           esac
           # The project directory is the Gradle path without the leading ':' and with ':' as '/'.
@@ -53,6 +51,7 @@ jobs:
             echo "module=$module"
             echo "moduleDir=$dir"
             echo "slug=$slug"
+            echo "componentName=$name"
             echo "javaVersion=$jv"
           } >> "$GITHUB_OUTPUT"
 
@@ -97,13 +96,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare the component patch branch
-        id: prepare
-        uses: ./.github/actions/prepare-component-patch
+      - name: Read the patch version from the component's gradle.properties
+        uses: madhead/read-java-properties@4
+        id: version
+        env:
+          JAVA_HOME: ""
         with:
-          slug: ${{ needs.setup.outputs.slug }}
-          module-dir: ${{ needs.setup.outputs.moduleDir }}
-          minor: ${{ inputs.minor }}
+          file: ${{ needs.setup.outputs.moduleDir }}/gradle.properties
+          property: axelixVersion
 
       - name: Publish the component to Maven Central
         uses: ./.github/actions/release-maven-artifact
@@ -111,9 +111,11 @@ jobs:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
           artifacts: ${{ needs.setup.outputs.module }}
 
-      - name: Tag the component release
+      - name: Tag the component release and publish the GitHub Release
         uses: ./.github/actions/finalize-component-release
         with:
           slug: ${{ needs.setup.outputs.slug }}
-          version: ${{ steps.prepare.outputs.version }}
-          branch: ${{ steps.prepare.outputs.branch }}
+          component-name: ${{ needs.setup.outputs.componentName }}
+          version: ${{ steps.version.outputs.value }}
+          branch: ${{ github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
