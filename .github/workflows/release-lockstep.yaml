@@ -151,6 +151,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create and push the fleet release tag
-        run: |
-          git tag "v${RELEASE_TAG}"
-          git push origin "v${RELEASE_TAG}"
+        uses: ./.github/actions/create-release-tag
+        with:
+          tag: v${{ env.RELEASE_TAG }}

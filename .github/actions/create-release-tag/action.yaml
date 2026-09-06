@@ -1,0 +1,17 @@
+name: Create release tag
+description: >-
+  Creates a git tag and pushes it to origin, refusing to overwrite a tag that already exists — so a release
+  can never silently re-tag an already-released version. Used by the lockstep and per-component patch releases.
+
+inputs:
+  tag:
+    description: The tag to create and push (e.g. "v1.4.0", "1.4.2-master", "1.4.2-sbs-3").
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TAG: ${{ inputs.tag }}
+      run: bash "${{ github.action_path }}/create-release-tag.sh"
