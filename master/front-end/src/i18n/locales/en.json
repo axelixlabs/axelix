@@ -282,7 +282,7 @@
         "thirdPartyNotices": "Third-party notices",
         "updateKey": "Update key",
         "enterKey": "Enter key",
-        "ossDescription": "You are running <b>Axelix Core</b>, licensed under <a>{{license}}</a>. Enterprise capabilities are not enabled on this instance.",
+        "ossDescription": "You are running <b>Axelix OSS</b> distribution licensed under <a>{{license}}</a>. Enterprise capabilities are not enabled on this instance.",
         "licensedTo": "LICENSED TO",
         "licensedId": "LICENSE ID",
         "validFrom": "VALID FROM",

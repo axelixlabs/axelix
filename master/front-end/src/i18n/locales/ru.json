@@ -284,7 +284,7 @@
         "thirdPartyNotices": "Сторонние лицензии",
         "updateKey": "Обновить ключ",
         "enterKey": "Ввести ключ",
-        "ossDescription": "Вы используете <b>Axelix Core</b>, лицензированный по лицензии <a>{{license}}</a>. Возможности Enterprise на этом экземпляре не активированы.",
+        "ossDescription": "Вы используете <b>Axelix OSS</b> дистрибутив в рамках лицензии <a>{{license}}</a>. Возможности Enterprise на этом экземпляре не активированы.",
         "licensedTo": "ЛИЦЕНЗИАТ",
         "licensedId": "ID ЛИЦЕНЗИИ",
         "validFrom": "ДЕЙСТВУЕТ С",
