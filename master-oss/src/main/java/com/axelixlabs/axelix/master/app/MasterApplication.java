@@ -19,21 +19,20 @@ package com.axelixlabs.axelix.master.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.axelixlabs.axelix.master.AxelixMasterApplication;
+
 /**
  * The entrypoint of the OSS (community) distribution of Axelix Master.
  *
  * @author Mikhail Polivakha
+ * @author Dmitry Mazurov
  */
-@SpringBootApplication(
-        exclude = {CompositeDiscoveryClientAutoConfiguration.class, SimpleDiscoveryClientAutoConfiguration.class})
+@AxelixMasterApplication
 @ComponentScan(
         basePackages = {"com.axelixlabs.axelix.master"},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = AutoConfiguration.class))
