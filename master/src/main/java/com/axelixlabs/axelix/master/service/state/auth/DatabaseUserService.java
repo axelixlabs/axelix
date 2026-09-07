@@ -51,6 +51,7 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
  * JDBC-based implementation of {@link UserService} that persists users in a relational database.
  *
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @Service
 @NullMarked

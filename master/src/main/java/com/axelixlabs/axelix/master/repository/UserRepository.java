@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.master.domain.UserStatus;
  * Repository for {@link UserEntity} aggregate.
  *
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
