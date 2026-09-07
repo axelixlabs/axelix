@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -56,6 +57,16 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
     @Modifying
     @Query("INSERT INTO users_roles (user_id, role_id) SELECT :userId, r.id FROM roles r WHERE r.name = :roleName")
     int attachRole(@Param("userId") String userId, @Param("roleName") String roleName);
+
+    /**
+     * @return the amount of rows affected (should equal {@code roleNames.size()} when every role exists)
+     */
+    @Modifying
+    @Query("""
+        INSERT INTO users_roles (user_id, role_id)
+        SELECT :userId, r.id FROM roles r WHERE r.name IN (:roleNames)
+        """)
+    int bulkAttachRoles(@Param("userId") String userId, @Param("roleNames") Set<String> roleNames);
 
     @Modifying
     @Query("DELETE FROM users_roles WHERE user_id = :userId")
