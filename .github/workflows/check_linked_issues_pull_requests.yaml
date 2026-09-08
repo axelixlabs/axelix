@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'master/**'
+      - 'master-oss/**'
       - 'sbs/**'
       - 'common/**'
     branches: [ master ]

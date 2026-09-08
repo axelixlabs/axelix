@@ -14,10 +14,12 @@ main trunk: the **`master`** branch.
 
 `master` is always the source of truth for "what Axelix is right now". **Minor and major releases are cut
 directly from it by tagging the trunk** with a tag of the form `vX.Y.0` — for example `v3.1.0`. The patch
-component of a fleet tag is **always `0`**: a `vX.Y.0` tag marks the coordinated, whole-fleet cut in which
-every component ships together under that one version (see
-[how components are versioned](../compatibility-and-versioning.mdx#how-axelix-components-are-versioned)).
-That single tag on `master` is the *only* thing a minor or major release is.
+version of such a tag is **always `0`**.
+
+Patch releases, on the other hand, are cut as tags from the dedicated patch branches that follow the pattern `X.Y.x` (more on that below).
+
+Such tags (either made from the master trunk or from the patch branch) mark the coordinated cut of the whole
+fleet, in which every component ships together under that [one shared version](../compatibility-and-versioning.mdx#one-version-for-every-component)
 
 ## Breaking changes
 
@@ -35,26 +37,27 @@ change past you.
 
 ## Where patch work lives
 
-Fixes for an already-released minor line do **not** go straight onto `master` for release. And unlike a
-minor or major cut, a patch is **never** cut for the product as a whole — it is always cut for **one
-specific component**: a single starter, a single plugin, or Master. So the first step is recognizing that a
-particular component needs the fix, not the whole distribution; everything else stays exactly where it is.
-This is the per-component half of the model — see
-[how components are versioned](../compatibility-and-versioning.mdx#how-axelix-components-are-versioned) and,
-for the reasoning,
-[why patches are per component and not lockstep](../compatibility-and-versioning.mdx#why-patches-are-per-component-and-not-lockstep).
+Fixes for an already-released minor line do **not** ship straight from `master` — by the time a fix is
+needed, the trunk has usually moved on and contains work destined for the *next* minor. Instead, every
+released minor line gets a single, **long-living patch branch** that lives alongside the `master` trunk.
 
-Because of that, patch work lives on a dedicated **patch branch per component**, forked from the minor's
-`vX.Y.0` tag and named with the pattern `X.Y.x-<component>` — the literal `x` marks the whole patch line, and,
-unlike the tag it is forked from, the branch name carries **no** `v` prefix. Since there is a branch per
-component, several components can be on independent patch lines at the same time without interfering with each
-other.
+The patch branch is forked from the minor's `vX.Y.0` tag and named with the pattern `X.Y.x` — the literal
+`x` marks the whole patch line, and, unlike the tag it is forked from, the branch name carries **no** `v`
+prefix. For example, the patch line of the `1.0.0` release is the branch `1.0.x`, forked from the `v1.0.0`
+tag — you can inspect it in the repository to see the model in action.
 
-:::note[Patch branches exist per component]
-Each patch branch exists **per individual component**. Patches for the Axelix Spring Boot 3 starter on the
-`3.1` line live on `3.1.x-sbs-3`; patches for Axelix Master live on a dedicated `3.1.x-master` branch; patches
-for the Maven plugin live on their own `3.1.x-maven-plugin` branch — each forked from the same `v3.1.0` tag.
+A fix typically lands on `master` first (through the normal Pull Request flow) and is then **backported**
+to the patch branch of the affected line. Every patch release of the fleet — `vX.Y.1`, `vX.Y.2`, and so on —
+is then cut from that branch, and, like every Axelix release, it ships **all components together** under the
+same version (see
+[one version for every component](../compatibility-and-versioning.mdx#one-version-for-every-component)).
+
+:::note[One patch branch per minor line — not per component]
+There is exactly **one** patch branch per released minor line, shared by the whole fleet. Patches for the
+`3.1` line — whether the fix touches a starter, a plugin, or Master — all live on the single `3.1.x` branch,
+forked from the `v3.1.0` tag. There are no per-component branches, because there are no per-component
+releases: the fleet is versioned and released as one.
 :::
 
-The exact steps to cut a patch — checking out the branch, pinning the version, bumping the playgrounds, and
-launching the pipeline — are on the [Releases](./releases.mdx) page.
+The exact steps to cut a release — housekeeping, setting the version, and launching the pipeline — are on
+the [Releases](./releases.mdx) page.

@@ -73,7 +73,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Master jar
-        run: ./gradlew :master-enterprise:bootJar --no-configuration-cache --no-build-cache
+        run: ./gradlew :master-oss:bootJar --no-configuration-cache --no-build-cache
 
       - name: Build Master Docker image
         run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file master-oss/Dockerfile master-oss

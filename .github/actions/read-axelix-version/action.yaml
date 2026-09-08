@@ -2,7 +2,7 @@ name: Read Axelix version
 description: >-
   Reads the `axelixVersion` property from a gradle.properties file and returns it. Optionally validates the
   value against a caller-supplied regular expression, failing the build when it does not match — e.g. a
-  lockstep release requires `X.Y.0`, a component patch requires `X.Y.Z` with a non-zero patch.
+  release requires `X.Y.Z` with no SNAPSHOT suffix.
 
 inputs:
   file:
