@@ -1,0 +1,63 @@
+# Branching Model
+
+Axelix is developed in the open as a monorepo, so understanding how the codebase evolves also explains
+**why releases arrive the way they do**. This page describes the branches we use, how changes land, and
+how that maps onto the [releases](../compatibility-and-versioning.mdx) you consume.
+
+## The trunk
+
+Axelix follows a **trunk-based development** model, with a couple of deliberate exceptions. There is one
+main trunk: the **`master`** branch.
+
+- Whenever we develop a new feature or a fix, we create a branch _from_ `master`.
+- We merge it _back into_ `master` through a Pull Request.
+
+`master` is always the source of truth for "what Axelix is right now". **Minor and major releases are cut
+directly from it by tagging the trunk** with a tag of the form `vX.Y.0` — for example `v3.1.0`. The patch
+version of such a tag is **always `0`**.
+
+Patch releases, on the other hand, are cut as tags from the dedicated patch branches that follow the pattern `X.Y.x` (more on that below).
+
+Such tags (either made from the master trunk or from the patch branch) mark the coordinated cut of the whole
+fleet, in which every component ships together under that [one shared version](../compatibility-and-versioning.mdx#one-version-for-every-component)
+
+## Breaking changes
+
+Not every finished change is merged immediately. If a change carries **breaking changes**, we do not merge
+it into `master` as part of the normal flow. Instead we:
+
+1. Postpone the Pull Request.
+2. Label it `breaking-changes`.
+3. Merge it later, when the time is right — typically when we begin working towards the next **major**
+   version.
+
+This keeps `master` **releasable as a minor or patch version at any time**, while breaking work waits for a
+major-release boundary. It is a big part of why you can trust that a new **minor** never sneaks a breaking
+change past you.
+
+## Where patch work lives
+
+Fixes for an already-released minor line do **not** ship straight from `master` — by the time a fix is
+needed, the trunk has usually moved on and contains work destined for the *next* minor. Instead, every
+released minor line gets a single, **long-living patch branch** that lives alongside the `master` trunk.
+
+The patch branch is forked from the minor's `vX.Y.0` tag and named with the pattern `X.Y.x` — the literal
+`x` marks the whole patch line, and, unlike the tag it is forked from, the branch name carries **no** `v`
+prefix. For example, the patch line of the `1.0.0` release is the branch `1.0.x`, forked from the `v1.0.0`
+tag — you can inspect it in the repository to see the model in action.
+
+A fix typically lands on `master` first (through the normal Pull Request flow) and is then **backported**
+to the patch branch of the affected line. Every patch release of the fleet — `vX.Y.1`, `vX.Y.2`, and so on —
+is then cut from that branch, and, like every Axelix release, it ships **all components together** under the
+same version (see
+[one version for every component](../compatibility-and-versioning.mdx#one-version-for-every-component)).
+
+:::note[One patch branch per minor line — not per component]
+There is exactly **one** patch branch per released minor line, shared by the whole fleet. Patches for the
+`3.1` line — whether the fix touches a starter, a plugin, or Master — all live on the single `3.1.x` branch,
+forked from the `v3.1.0` tag. There are no per-component branches, because there are no per-component
+releases: the fleet is versioned and released as one.
+:::
+
+The exact steps to cut a release — housekeeping, setting the version, and launching the pipeline — are on
+the [Releases](./releases.mdx) page.
