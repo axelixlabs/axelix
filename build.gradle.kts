@@ -26,10 +26,6 @@ val projectNamespace = "com.axelixlabs"
 
 allprojects {
     group = projectNamespace
-    // Each project resolves its own axelixVersion: a component may pin a patch version in its local
-    // gradle.properties (on a component patch branch); otherwise it inherits the fleet-wide value from
-    // the root gradle.properties. Gradle loads the nearest gradle.properties per project, so this is
-    // resolved locally with no per-module wiring.
     version = project.findProperty("axelixVersion")!!
 
     repositories {

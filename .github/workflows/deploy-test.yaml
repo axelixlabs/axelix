@@ -14,12 +14,11 @@ on:
       # CI/CD configuration
       - '.github/**'
 
-      - 'master-oss/Dockerfile'
-
       # Application modules
       - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
       - 'common/**'
       - 'master/**'
+      - 'master-oss/**'
       - 'plugins/**'
       - 'sbs/**'
 

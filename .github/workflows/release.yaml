@@ -1,6 +1,4 @@
-name: Release Lockstep
-
-# Lockstep release. Used to release either the Major or the Minor versions of Axelix project.
+name: Release Pipeline
 
 on:
   workflow_dispatch:
@@ -61,14 +59,13 @@ jobs:
           git config --global core.longPaths true
           Stop-Service -name Docker
 
-        # Master runs on Java 25
       - name: Set up starter test JDK and Gradle JDK 25
         uses: actions/setup-java@v5.6.0
         with:
           distribution: 'liberica'
           java-version: |
             ${{ matrix.starterConfig.javaVersion }}
-            25 
+            25
 
       - name: Run starter compatibility tests
         shell: bash
@@ -111,13 +108,19 @@ jobs:
         uses: ./.github/actions/read-axelix-version
         with:
           file: gradle.properties
-          # A lockstep release must be a released X.Y.0 (no SNAPSHOT, patch always 0).
-          pattern: '^[0-9]+\.[0-9]+\.0$'
+          # A release must be a released X.Y.Z (no SNAPSHOT). Major, minor and patch releases are all
+          # cut in lockstep from this single fleet-wide version.
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
 
       - name: Export release version to the job env
         run: |
           echo "RELEASE_TAG=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
           echo "VITE_APP_VERSION=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+
+      - name: Loading Secrets
+        uses: ./.github/actions/bitwarden
+        with:
+          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.6.0
@@ -131,26 +134,44 @@ jobs:
           ./gradlew clean build sourcesJar javadocJar
 
       - name: Publish Maven Artifacts to Maven Central
-        uses: ./.github/actions/release-maven-artifact
+        # The OSS artifacts, stated explicitly — the starters and the plugins. Signing (GPG) and the
+        # OSSRH promote step run inside the Gradle build.
+        run: >-
+          ./gradlew
+          :sbs:axelix-spring-boot-2-starter:publish
+          :sbs:axelix-spring-boot-3-starter:publish
+          :sbs:axelix-spring-boot-4-starter:publish
+          :plugins:axelix-gradle-plugin:publish
+          :plugins:axelix-maven-plugin:publish
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v4
         with:
-          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-          # Every artifact the fleet publishes, stated explicitly.
-          artifacts: |
-            :sbs:axelix-spring-boot-2-starter
-            :sbs:axelix-spring-boot-3-starter
-            :sbs:axelix-spring-boot-4-starter
-            :plugins:axelix-gradle-plugin
-            :plugins:axelix-maven-plugin
+          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push the Master OSS image
-        uses: ./.github/actions/release-oss-image
-        with:
-          version: ${{ env.RELEASE_TAG }}
-          owner: ${{ github.repository_owner }}
-          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew :master-oss:bootJar
+          docker build \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} \
+            --file master-oss/Dockerfile \
+            --push \
+            master-oss
+
+      - name: Docker logout from GitHub Container Registry
+        if: always()
+        run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
       - name: Create and push the fleet release tag
-        uses: ./.github/actions/create-release-tag
-        with:
-          tag: v${{ env.RELEASE_TAG }}
+        run: |
+          git tag "v${RELEASE_TAG}"
+          git push origin "v${RELEASE_TAG}"
