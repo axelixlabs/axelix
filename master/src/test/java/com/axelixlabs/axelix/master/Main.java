@@ -18,17 +18,14 @@
 package com.axelixlabs.axelix.master;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.
  *
  * @author Nikita Kirillov
+ * @author Dmitry Mazurov
  */
-@SpringBootApplication(
-        exclude = {CompositeDiscoveryClientAutoConfiguration.class, SimpleDiscoveryClientAutoConfiguration.class})
+@AxelixMasterApplication
 public class Main {
 
     static void main(String[] args) {

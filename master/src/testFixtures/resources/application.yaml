@@ -1,10 +1,4 @@
 spring:
-  autoconfigure:
-    # OTLP and Prometheus metrics export are owned by OtlpTransportMetricsAutoConfiguration and
-    # PrometheusMetricsAutoConfiguration respectively, not Spring Boot's own auto-configurations.
-    exclude:
-      - org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
-      - org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration
   config:
     # spring-cloud-starter-config is on the classpath, so Spring Cloud requires a spring.config.import. Mirror the
     # production application.yaml with an 'optional:configserver:' import so tests boot without a Config Server.
