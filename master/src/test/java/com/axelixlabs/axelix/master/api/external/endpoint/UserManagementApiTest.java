@@ -51,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = "axelix.master.auth.options.local.enabled=true")
@@ -633,6 +634,28 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
+    void shouldReturnBadRequest_WhenChangingStatusOfOidcUser() {
+        // given.
+        UserEntity user = createOidcUser("u", "u@example.com", "hash-u");
+        String request = """
+                {
+                  "id": "%s",
+                  "status": "SUSPENDED"
+                }
+                """.formatted(user.id());
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asUsersFeedEditor()
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("USER_STATUS_CHANGE_NOT_ALLOWED");
+        assertThat(userRepository.findById(user.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
     void shouldReturnNotFound_WhenChangingStatusOfUnknownUser() {
         // given.
         String request = """
@@ -669,6 +692,11 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
 
     private UserEntity createUser(String username, String email, String password) {
         userService.createLocal(username, null, null, email, null, null, password, "VIEWER");
+        return userRepository.findByUsername(username).orElseThrow();
+    }
+
+    private UserEntity createOidcUser(String username, String email, String oidcSubject) {
+        userService.createFromOidc(username, null, null, email, null, null, oidcSubject, "VIEWER");
         return userRepository.findByUsername(username).orElseThrow();
     }
 }

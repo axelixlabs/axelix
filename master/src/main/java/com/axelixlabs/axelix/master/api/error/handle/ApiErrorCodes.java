@@ -21,6 +21,8 @@ package com.axelixlabs.axelix.master.api.error.handle;
  * The error codes that are be returned from the HTTP API.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public enum ApiErrorCodes {
 
@@ -42,6 +44,7 @@ public enum ApiErrorCodes {
     USERNAME_ALREADY_EXISTS("USERNAME_ALREADY_EXISTS"),
     EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS"),
     USER_NOT_FOUND("USER_NOT_FOUND"),
+    USER_STATUS_CHANGE_NOT_ALLOWED("USER_STATUS_CHANGE_NOT_ALLOWED"),
     PARTIALLY_UPDATED("PARTIALLY_UPDATED");
 
     /**
