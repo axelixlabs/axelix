@@ -19,6 +19,12 @@ package com.axelixlabs.axelix.master.autoconfiguration.externalconfig;
 
 import org.springframework.cloud.vault.config.VaultProperties;
 
+/**
+ * Axelix-specific binding of {@link VaultProperties}, exposed under the {@value #AXELIX_PREFIX} prefix
+ * (see {@link AxelixVaultConfigDataLocationResolver}).
+ *
+ * @author Ilya Naumov
+ */
 public class AxelixVaultProperties extends VaultProperties {
     public static final String AXELIX_PREFIX = "axelix.master.external-config.spring-cloud-vault";
 }

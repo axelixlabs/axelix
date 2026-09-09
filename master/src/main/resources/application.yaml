@@ -44,8 +44,12 @@ axelix:
         name:
         username:
         password:
-      # These properties are automatically bound to VaultProperties
-      # (see AxelixVaultConfigDataLocationResolver), except for the kv properties.
+      # Normally we enumerate every Axelix property in this file with its default value. We don't do
+      # that here: Hashicorp Vault has a lot of properties for connecting to it, and enumerating all
+      # of them with defaults would be excessive. These properties are instead automatically bound to
+      # org.springframework.cloud.vault.config.VaultProperties (see AxelixVaultConfigDataLocationResolver),
+      # except for the properties under 'kv', which bind to
+      # org.springframework.cloud.vault.config.VaultKeyValueBackendProperties (the kv secrets engine).
       spring-cloud-vault:
         enabled: false
         fail-fast: true
