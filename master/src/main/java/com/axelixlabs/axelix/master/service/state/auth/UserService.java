@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 
 /**
@@ -43,6 +44,7 @@ import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsExceptio
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @NullMarked
 public interface UserService {
@@ -165,11 +167,13 @@ public interface UserService {
     void updateLastLoginAt(String username);
 
     /**
-     * Changes the status of a persisted user without modifying other user data.
+     * Changes the status of a persisted user without modifying other user data. Only supported for
+     * users of {@link UserOrigin#LOCAL} origin;
      *
      * @param id Unique identifier of the user.
      * @param status New status of the user.
      * @throws UserNotFoundException if no user with the given id exists.
+     * @throws UserStatusChangeNotAllowedException if the user's origin is not {@link UserOrigin#LOCAL}.
      */
     void updateStatus(String id, UserStatus status);
 

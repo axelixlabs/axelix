@@ -281,42 +281,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnForbiddenForSuspendedOidcUserWithoutUpdatingIt() {
-        // given.
-        String username = "test-user";
-        userService.createFromOidc(
-                username,
-                "Original",
-                "Name",
-                "original@gmail.com",
-                null,
-                null,
-                expectedOidcSubject(SUBJECT),
-                TestRoles.VIEWER.getName());
-        UserEntity created = userRepository.findByUsername(username).orElseThrow();
-        userService.updateStatus(created.id(), UserStatus.SUSPENDED);
-        UserEntity suspended = userRepository.findById(created.id()).orElseThrow();
-
-        // and.
-        String userInfoJson = "{\"email\": \"updated@gmail.com\"}";
-        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(tokens);
-        when(oidcClient.validateIdToken(ID_TOKEN)).thenReturn(new ValidatedOidcIdentity(username, SUBJECT, Map.of()));
-        when(oidcClient.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN)).thenReturn(userInfoJson);
-        when(userInfoJsonAccessor.extractRole(userInfoJson)).thenReturn(TestRoles.EDITOR);
-
-        // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-        assertThat(response.getBody()).contains("USER_SUSPENDED");
-        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNullOrEmpty();
-        assertThat(userRepository.findById(created.id()).orElseThrow()).isEqualTo(suspended);
-        assertAccessDenied(MasterWebEndpoints.OIDC_AUTH_COMPLETE);
-    }
-
-    @Test
     void shouldDeduplicateByOidcSubjectAcrossUsernameChange() {
         // given an existing OIDC user provisioned under the original username.
         String originalUsername = "john.old";

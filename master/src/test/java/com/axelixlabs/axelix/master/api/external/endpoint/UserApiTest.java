@@ -293,7 +293,6 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
-        userService.updateStatus(bob.id(), UserStatus.SUSPENDED);
 
         // language=json
         String expectedFeed = """
@@ -321,7 +320,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                     "organizationalUnit": null,
                     "roles": ["VIEWER"],
                     "userOrigin": "OAUTH2/OIDC",
-                    "status": "SUSPENDED",
+                    "status": "ACTIVE",
                     "lastLoginAt": "${json-unit.any-string}"
                   }
                 ]

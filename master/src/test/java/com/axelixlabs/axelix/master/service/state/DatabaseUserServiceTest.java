@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.auth.DatabaseUserService;
@@ -370,6 +371,20 @@ class DatabaseUserServiceTest {
                 // then.
                 .isInstanceOf(UserNotFoundException.class);
         assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void updateStatus_shouldRejectOidcUser() {
+        // given.
+        userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.updateStatus(existing.id(), UserStatus.SUSPENDED))
+                // then.
+                .isInstanceOf(UserStatusChangeNotAllowedException.class);
+        assertThat(userRepository.findById(existing.id()).orElseThrow().status())
+                .isEqualTo(existing.status());
     }
 
     @Test
