@@ -18,18 +18,18 @@
 import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 
+import * as fs from "fs";
 import * as path from "path";
+import { pathToFileURL } from "url";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
-import * as fs from "fs";
-import { pathToFileURL } from "url";
 
 export default defineConfig(async () => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
     const env = loadEnv("", process.cwd(), "");
     const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:8080";
 
-    const ENTERPRISE_ALIASES_PATH = path.resolve(__dirname, "./src/enterprise/front-end/src/aliases.ts");
+    const ENTERPRISE_ALIASES_PATH = path.resolve(__dirname, "../../axelix-enterprise/front-end/src/aliases.ts");
     const enterpriseAliasesUrl = pathToFileURL(ENTERPRISE_ALIASES_PATH).href;
     let enterpriseAliases = {};
 

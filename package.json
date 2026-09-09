@@ -1,0 +1,9 @@
+{
+    "name": "axelix-frontend-workspace",
+    "private": true,
+    "workspaces": [
+        "master/front-end",
+        "axelix-enterprise/front-end",
+        "distributions/*"
+    ]
+}

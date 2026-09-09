@@ -6,6 +6,7 @@ build/
 playgrounds/**/src/main/target/
 playgrounds/**/src/main/build/
 **/providers
+node_modules
 
 ### Axelix ###
 master/local
