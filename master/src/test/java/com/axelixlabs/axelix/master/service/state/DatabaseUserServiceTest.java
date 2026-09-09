@@ -475,17 +475,35 @@ class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateStatus_shouldRejectOidcUser() {
+    void updateStatusByIds_shouldRejectOidcUser() {
         // given.
         userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
         UserEntity existing = userRepository.findByUsername("bob").orElseThrow();
 
         // when.
-        assertThatThrownBy(() -> userService.updateStatus(existing.id(), UserStatus.SUSPENDED))
+        assertThatThrownBy(() -> userService.updateStatusByIds(List.of(existing.id()), UserStatus.SUSPENDED))
                 // then.
                 .isInstanceOf(UserStatusChangeNotAllowedException.class);
         assertThat(userRepository.findById(existing.id()).orElseThrow().status())
                 .isEqualTo(existing.status());
+    }
+
+    @Test
+    void updateStatusByIds_shouldNotUpdateAnyUser_WhenSomeUserIsNotLocal() {
+        // given.
+        userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", "VIEWER");
+        userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
+
+        UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
+        UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.updateStatusByIds(List.of(alice.id(), bob.id()), UserStatus.SUSPENDED))
+                // then.
+                .isInstanceOf(UserStatusChangeNotAllowedException.class);
+
+        assertThat(userRepository.findById(alice.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(userRepository.findById(bob.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
     }
 
     @Test

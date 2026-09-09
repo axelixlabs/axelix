@@ -303,10 +303,6 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 expectedOidcSubject(SUBJECT),
                 TestRoles.VIEWER.getName());
         UserEntity original = userRepository.findByUsername(originalUsername).orElseThrow();
-                username, "Original", "Name", "original@gmail.com", null, null, TestRoles.VIEWER.getName());
-        UserEntity created = userRepository.findByUsername(username).orElseThrow();
-        userService.updateStatusByIds(List.of(created.id()), UserStatus.SUSPENDED);
-        UserEntity suspended = userRepository.findById(created.id()).orElseThrow();
 
         // and the provider now presents a DIFFERENT username for the SAME subject.
         String userInfoJson = "{}";

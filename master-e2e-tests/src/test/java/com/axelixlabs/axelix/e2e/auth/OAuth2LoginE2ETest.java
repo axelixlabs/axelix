@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.e2e.auth;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,29 +49,5 @@ public class OAuth2LoginE2ETest {
         // If the OIDC round-trip actually set a valid auth cookie, an authenticated call
         // through the same client should now succeed.
         client.getRegisteredInstanceNames();
-    }
-
-    @Test
-    void shouldPreventSuspendedOidcUserFromLoggingIn() {
-        // given OIDC user is there (appears after login)
-        String username = E2ETestConfig.oAuth2TestUsername();
-        String password = E2ETestConfig.oAuth2TestPassword();
-        client.loginViaOAuth2(username, password);
-
-        // and given admin account.
-        AxelixMasterApiClient adminClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());
-        adminClient.login(E2ETestConfig.superAdminUsername(), E2ETestConfig.superAdminPassword());
-        String userId = adminClient.getUserId(username);
-
-        try {
-            // when admin suspends eht OIDC user
-            adminClient.updateUsersStatus(List.of(userId), "SUSPENDED");
-
-            // then.
-            AxelixMasterApiClient suspendedUserClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());
-            suspendedUserClient.verifySuspendedUserCannotLoginViaOAuth2(username, password);
-        } finally {
-            adminClient.updateUsersStatus(List.of(userId), "ACTIVE");
-        }
     }
 }

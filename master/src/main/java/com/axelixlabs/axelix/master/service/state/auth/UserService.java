@@ -114,7 +114,8 @@ public interface UserService {
     Optional<UserEntity> findByOidcSubject(String oidcSubject);
 
     /**
-     * Deletes the users with the given identifiers along with their role assignments.
+     * Deletes the users with the given identifiers, revoking the roles granted to them. The roles themselves are
+     * left intact.
      *
      * @param ids Unique identifiers of the users to delete.
      *
@@ -171,18 +172,16 @@ public interface UserService {
     void updateLastLoginAt(String username);
 
     /**
-     * Changes the status of a persisted user without modifying other user data. Only supported for
-     * users of {@link UserOrigin#LOCAL} origin;
+     * Changes the status of the users with the given identifiers without modifying other user data. Only supported
+     * for users of {@link UserOrigin#LOCAL} origin.
      *
-     * @param id Unique identifier of the user.
-     * @param status New status of the user.
-     * @throws UserNotFoundException if no user with the given id exists.
-     * @throws UserStatusChangeNotAllowedException if the user's origin is not {@link UserOrigin#LOCAL}.
      * @param ids Unique identifiers of the users to update.
      * @param status New status of the users.
      *
      * @throws UserInvalidValueException if no identifier is provided, any of them is blank, or no status is provided.
      * @throws UserNotFoundException if any of the given ids does not match a persisted user.
+     * @throws UserStatusChangeNotAllowedException if any of the given users does not originate from
+     *         {@link UserOrigin#LOCAL}.
      */
     void updateStatusByIds(Collection<String> ids, UserStatus status)
             throws UserInvalidValueException, UserNotFoundException;
