@@ -91,8 +91,59 @@ jobs:
       - name: Running Security Check
         uses: ./.github/actions/security-check
 
+  master-e2e-tests:
+    uses: ./.github/workflows/nightly-master-e2e.yaml
+    secrets: inherit
+
+  playground-compatibility-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-25
+        with:
+          distribution: 'liberica'
+          java-version: '25'
+
+      - name: Set up JDK 17 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-17
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+
+      - name: Set up JDK 21 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-21
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+
+      - name: Grant execution access to the wrapper
+        run: chmod +x gradlew
+
+      - name: Build every playground project
+        env:
+          JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
+          JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
+          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
+        run: make build-playground
+
   release-artifacts:
-    needs: [security-check, starter-compatibility-tests]
+    needs:
+      [
+        security-check,
+        starter-compatibility-tests,
+        master-e2e-tests,
+        playground-compatibility-tests,
+      ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
