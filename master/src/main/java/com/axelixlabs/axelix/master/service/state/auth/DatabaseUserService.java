@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -206,19 +207,25 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void updateStatus(String id, UserStatus status) {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        if (user.userOrigin() != UserOrigin.LOCAL) {
-            throw new UserStatusChangeNotAllowedException(id, user.userOrigin());
+    public void updateStatusByIds(Collection<String> ids, UserStatus status) {
+        if (status == null) {
+            throw new UserInvalidValueException(null);
         }
 
         List<String> requestedIds = requireNonBlankIds(ids);
-        int rowsAffected = userRepository.updateStatusByIds(requestedIds, status);
+        List<UserEntity> users = userRepository.findAllById(requestedIds);
 
-        if (rowsAffected != requestedIds.size()) {
+        if (users.size() != requestedIds.size()) {
             throw new UserNotFoundException(requestedIds);
         }
+
+        for (UserEntity user : users) {
+            if (user.userOrigin() != UserOrigin.LOCAL) {
+                throw new UserStatusChangeNotAllowedException(user.id(), user.userOrigin());
+            }
+        }
+
+        userRepository.updateStatusByIds(requestedIds, status);
     }
 
     private List<String> requireNonBlankIds(Collection<String> ids) {

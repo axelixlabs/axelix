@@ -298,7 +298,6 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
-        userService.updateStatusByIds(List.of(bob.id()), UserStatus.SUSPENDED);
 
         // language=json
         String expectedFeed = """

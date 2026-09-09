@@ -350,7 +350,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenSomeUsersDoNotExist() {
+    void shouldReturnNotFound_WhenSomeUsersDoNotExist() {
         // given.
         UserEntity user = createUser("toDelete", "d@example.com", "p");
 
@@ -362,12 +362,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        ResponseEntity<Void> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asUsersFeedEditor()
-                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), Void.class);
+                .exchange(USERS_DELETE_PATH, HttpMethod.DELETE, defaultEntity(request), String.class);
 
         // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).contains("USER_NOT_FOUND");
         assertThat(userRepository.findById(user.id())).isPresent();
     }
 
@@ -764,7 +765,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
     }
 
     @Test
-    void shouldReturnBadRequest_WhenChangingStatusOfUnknownUser() {
+    void shouldReturnNotFound_WhenChangingStatusOfUnknownUser() {
         // given.
         UserEntity user = createUser("u", "u@example.com", "p");
 
@@ -777,12 +778,13 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 """.formatted(user.id());
 
         // when.
-        ResponseEntity<Void> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asUsersFeedEditor()
-                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
+                .exchange(USERS_STATUS_PATH, HttpMethod.PUT, defaultEntity(request), String.class);
 
         // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).contains("USER_NOT_FOUND");
         assertThat(userRepository.findById(user.id()).orElseThrow().status()).isEqualTo(UserStatus.ACTIVE);
     }
 
@@ -792,7 +794,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
         UserEntity user = createOidcUser("u", "u@example.com", "hash-u");
         String request = """
                 {
-                  "id": "%s",
+                  "ids": ["%s"],
                   "status": "SUSPENDED"
                 }
                 """.formatted(user.id());
