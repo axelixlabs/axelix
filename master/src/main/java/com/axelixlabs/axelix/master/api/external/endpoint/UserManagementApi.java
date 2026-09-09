@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -36,7 +33,6 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserCreateRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserStatusUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
@@ -47,9 +43,6 @@ import com.axelixlabs.axelix.master.service.state.auth.UserService;
  *
  * @author Sergey Cherkasov
  */
-@Tag(
-        name = "Users Management API",
-        description = "The endpoints for viewing, creating, deleting, and modifying managed users")
 @ExternalApiRestController
 @ConditionalOnProperty(
         prefix = SecurityAutoConfiguration.LOCAL_LOGIN_PROPERTIES_PREFIX,
@@ -63,8 +56,6 @@ public class UserManagementApi {
         this.userService = userService;
     }
 
-    @DefaultApiResponse(summary = "Create a new user")
-    @ApiResponse(description = "Created", responseCode = "201")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_CREATE)
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request) {
         try {
@@ -88,8 +79,6 @@ public class UserManagementApi {
         }
     }
 
-    @DefaultApiResponse(summary = "Delete a user")
-    @ApiResponse(description = "No Content", responseCode = "204")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
 
@@ -97,8 +86,6 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
-    @DefaultApiResponse(summary = "Update a user")
-    @ApiResponse(description = "No Content", responseCode = "204")
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
     public ResponseEntity<Void> updateUser(@RequestBody UserUpdateRequest request) {
         try {
@@ -124,10 +111,6 @@ public class UserManagementApi {
         }
     }
 
-    @DefaultApiResponse(summary = "Change a user's status")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @ApiResponse(description = "Bad Request", responseCode = "400")
-    @ApiResponse(description = "Not Found", responseCode = "404")
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_STATUS)
     public ResponseEntity<Void> updateUserStatus(@RequestBody UserStatusUpdateRequest request) {
         if (request.id() == null || request.id().isBlank() || request.status() == null) {

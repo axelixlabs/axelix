@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,6 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  *
  * @author Sergey Cherkasov
  */
-@Hidden
 @InternalApiRestController
 @ConditionalOnProperty(
         prefix = "axelix.master.discovery.self-registration",

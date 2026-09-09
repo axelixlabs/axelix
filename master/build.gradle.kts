@@ -13,7 +13,6 @@ val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
-val springDocSwaggerVersion = "3.0.3"
 val sqliteVersion = "3.53.2.1"
 val nimbusJoseJwt = "10.9.1"
 val jmesPathVersion = "0.6.0"
@@ -62,7 +61,6 @@ dependencies {
 
     api("org.slf4j:slf4j-api")
     api("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:

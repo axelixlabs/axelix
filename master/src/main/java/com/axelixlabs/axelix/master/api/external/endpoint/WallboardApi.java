@@ -19,17 +19,11 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Collection;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.convert.response.InstancesToShortProfileConverter;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -40,7 +34,6 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @since 19.07.2025
  * @author Mikhail Polivakha
  */
-@Tag(name = "Wallboard API", description = "The endpoints related to wallboard grid rendering")
 @ExternalApiRestController
 public class WallboardApi {
 
@@ -53,14 +46,6 @@ public class WallboardApi {
         this.instancesToShortProfileConverter = instancesToShortProfileConverter;
     }
 
-    @DefaultApiResponse(summary = "Returns all instances that are managed by this Axelix deployment")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = InstancesGridResponse.class)))
     @GetMapping(path = ApiPaths.InstancesApi.GRID)
     @SuppressWarnings("NullAway")
     public InstancesGridResponse getInstancesGrid() {

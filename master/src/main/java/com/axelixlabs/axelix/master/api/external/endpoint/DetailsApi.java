@@ -19,11 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -33,8 +28,6 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -46,9 +39,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */
-@Tag(
-        name = "Details API",
-        description = "The details endpoint provides general information about the particular Spring Boot instance")
 @ExternalApiRestController
 public class DetailsApi {
 
@@ -61,15 +51,6 @@ public class DetailsApi {
         this.converter = converter;
     }
 
-    @DefaultApiResponse(summary = "Returns general information about the instance.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = InstanceDetailsResponse.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
     public InstanceDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
             throws InstanceNotFoundException {
