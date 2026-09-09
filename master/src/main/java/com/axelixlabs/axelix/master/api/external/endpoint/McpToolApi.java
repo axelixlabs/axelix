@@ -17,18 +17,11 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.McpToolFeedResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.mcp.ConditionalOnMcpServerEnabled;
 import com.axelixlabs.axelix.master.service.McpToolsService;
 
@@ -37,9 +30,6 @@ import com.axelixlabs.axelix.master.service.McpToolsService;
  *
  * @author Sergey Cherkasov
  */
-@Tag(
-        name = "MCP Tools API",
-        description = "The endpoints related to rendering MCP tools configured in the master service.")
 @ExternalApiRestController
 @ConditionalOnMcpServerEnabled
 public class McpToolApi {
@@ -50,14 +40,6 @@ public class McpToolApi {
         this.mcpToolsService = mcpToolsService;
     }
 
-    @DefaultApiResponse(summary = "Retrieve information about all MCP tools.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardResponse.class)))
     @GetMapping(path = ApiPaths.McpToolApi.TOOLS_LIST)
     public McpToolFeedResponse getMcpToolFeed() {
         return mcpToolsService.getMcpToolsFeed();

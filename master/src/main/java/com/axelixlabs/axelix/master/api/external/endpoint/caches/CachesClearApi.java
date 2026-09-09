@@ -19,10 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,8 +29,6 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -44,7 +38,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @ExternalApiRestController
 public class CachesClearApi {
 
@@ -54,23 +47,12 @@ public class CachesClearApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(summary = "Clears all caches in the application.")
-    @ApiResponse(description = "OK", responseCode = "200")
-    @InstanceIdParameter
     @DeleteMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public void clearAllCaches(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invokeNoValue(
                 InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 
-    @DefaultApiResponse(summary = "Clears the cache by its name and cache manager name.")
-    @ApiResponse(description = "OK", responseCode = "200")
-    @Parameter(name = "cacheName", description = "The name of the cache to clear", required = true)
-    @Parameter(
-            name = "cacheManager",
-            description = "The name of the cache manager where the cache with the given 'cacheName' resides",
-            required = true)
-    @InstanceIdParameter
     @DeleteMapping(path = ApiPaths.CachesApi.CACHE_NAME)
     public void clearSpecificCacheEntity(
             @PathVariable("instanceId") String instanceId,

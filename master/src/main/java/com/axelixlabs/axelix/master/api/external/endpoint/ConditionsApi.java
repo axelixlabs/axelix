@@ -17,23 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -43,10 +35,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 16.10.2025
  * @author Nikita Kirillov
  */
-@Tag(
-        name = "Conditions API",
-        description =
-                "The conditions endpoint provides information about the application's auto-configuration conditions evaluation.")
 @ExternalApiRestController
 public class ConditionsApi {
 
@@ -56,12 +44,6 @@ public class ConditionsApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(summary = "Returns conditions feed for the given instance")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConditionsFeed.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.ConditionsApi.FEED)
     public ResponseEntity<byte[]> getConditionsFeed(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(

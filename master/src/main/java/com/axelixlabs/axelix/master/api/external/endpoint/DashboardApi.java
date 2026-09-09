@@ -17,11 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -30,7 +25,6 @@ import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
@@ -39,7 +33,6 @@ import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationS
  *
  * @author Mikhail Polivakha
  */
-@Tag(name = "Dashboard API", description = "API for rendering the dashboard")
 @ExternalApiRestController
 public class DashboardApi {
 
@@ -53,55 +46,33 @@ public class DashboardApi {
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
     }
 
-    @DefaultApiResponse(summary = "Retrieve information about the entire ecosystem to render the dashboard")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardResponse.class)))
+    /**
+     * Retrieve information about the entire ecosystem to render the dashboard.
+     */
     @GetMapping(path = ApiPaths.DashboardApi.MAIN)
     public DashboardResponse getDashboard() {
         return dashboardService.getDashboardInfo();
     }
 
-    @DefaultApiResponse(summary = "Retrieve the aggregated Java/JVM features adoption across the entire ecosystem")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = JavaDashboardResponse.class)))
+    /**
+     * Retrieve the aggregated Java/JVM features adoption across the entire ecosystem.
+     */
     @GetMapping(path = ApiPaths.DashboardApi.JAVA)
     public JavaDashboardResponse getJavaDashboard() {
         return databaseHistoricalApplicationSnapshotService.getJavaDashboard();
     }
 
-    @DefaultApiResponse(
-            summary = "Retrieve the aggregated Spring Framework features adoption across the entire ecosystem")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SpringFrameworkDashboardResponse.class)))
+    /**
+     * Retrieve the aggregated Spring Framework features adoption across the entire ecosystem.
+     */
     @GetMapping(path = ApiPaths.DashboardApi.SPRING_FRAMEWORK)
     public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
         return databaseHistoricalApplicationSnapshotService.getSpringFrameworkDashboard();
     }
 
-    @DefaultApiResponse(
-            summary = "Retrieve the aggregated persistence problems (N + 1, in-memory pagination) across the ecosystem")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = PersistenceDashboardResponse.class)))
+    /**
+     * Retrieve the aggregated persistence problems across the ecosystem.
+     */
     @GetMapping(path = ApiPaths.DashboardApi.PERSISTENCE)
     public PersistenceDashboardResponse getPersistenceDashboard() {
         return databaseHistoricalApplicationSnapshotService.getPersistenceDashboard();

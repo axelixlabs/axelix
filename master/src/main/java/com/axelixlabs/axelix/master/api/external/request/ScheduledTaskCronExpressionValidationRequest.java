@@ -17,14 +17,10 @@
  */
 package com.axelixlabs.axelix.master.api.external.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * Represents a request to validate cron expression syntax.
  *
  * @param cronExpression cron expression to validate
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskCronExpressionValidationRequest(
-        @Schema(description = "Cron expression to validate", example = "*/5 * * * * *")
-        String cronExpression) {}
+public record ScheduledTaskCronExpressionValidationRequest(String cronExpression) {}

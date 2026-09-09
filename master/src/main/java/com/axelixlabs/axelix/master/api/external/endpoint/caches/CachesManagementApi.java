@@ -19,10 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -31,8 +27,6 @@ import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -42,9 +36,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 26.11.2025
  * @author Nikita Kirillov
  */
-@Tag(
-        name = "Caches Management API",
-        description = "The caches management endpoint provides operations to manage application's caches.")
 @ExternalApiRestController
 public class CachesManagementApi {
 
@@ -54,14 +45,6 @@ public class CachesManagementApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(
-            summary = "Enables a specific cache in the cache manager",
-            description =
-                    "Activates caching operations for the specified cache. After enabling, the cache will start storing and retrieving data.")
-    @ApiResponse(description = "Cache enabled successfully", responseCode = "200")
-    @Parameter(name = "cacheManagerName", description = "The name of the cache manager", required = true)
-    @Parameter(name = "cacheName", description = "The name of the cache to enable", required = true)
-    @InstanceIdParameter
     @PostMapping(ApiPaths.CachesApi.ENABLE_CACHE)
     public void enableCache(
             @PathVariable("instanceId") String instanceId,
@@ -74,14 +57,6 @@ public class CachesManagementApi {
                 createCachePayload(cacheManagerName, cacheName));
     }
 
-    @DefaultApiResponse(
-            summary = "Disables a specific cache in the cache manager",
-            description =
-                    "Deactivates caching operations for the specified cache. After disabling, cache operations become no-op.")
-    @ApiResponse(description = "Cache disabled successfully", responseCode = "200")
-    @Parameter(name = "cacheManagerName", description = "The name of the cache manager", required = true)
-    @Parameter(name = "cacheName", description = "The name of the cache to disable", required = true)
-    @InstanceIdParameter
     @PostMapping(ApiPaths.CachesApi.DISABLE_CACHE)
     public void disableCache(
             @PathVariable("instanceId") String instanceId,
@@ -94,12 +69,6 @@ public class CachesManagementApi {
                 createCachePayload(cacheManagerName, cacheName));
     }
 
-    @DefaultApiResponse(
-            summary = "Enables all caches in the cache manager",
-            description = "Activates caching operations for all caches managed by the specified cache manager.")
-    @ApiResponse(description = "Cache manager enabled successfully", responseCode = "200")
-    @Parameter(name = "cacheManagerName", description = "The name of the cache manager to enable", required = true)
-    @InstanceIdParameter
     @PostMapping(ApiPaths.CachesApi.ENABLE_CACHE_MANAGER)
     public void enableCacheManager(
             @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
@@ -110,12 +79,6 @@ public class CachesManagementApi {
                 createCacheManagerPayload(cacheManagerName));
     }
 
-    @DefaultApiResponse(
-            summary = "Disables all caches in the cache manager",
-            description = "Deactivates caching operations for all caches managed by the specified cache manager.")
-    @ApiResponse(description = "Cache manager disabled successfully", responseCode = "200")
-    @Parameter(name = "cacheManagerName", description = "The name of the cache manager to disable", required = true)
-    @InstanceIdParameter
     @PostMapping(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER)
     public void disableCacheManager(
             @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
