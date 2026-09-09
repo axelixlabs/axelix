@@ -22,9 +22,12 @@ val prometheusMetricsVersion = "1.7.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.13"
-val nettyVersion = "4.2.16.Final"
-val tomcatVersion = "11.0.24"
+val nettyVersion = "4.2.17.Final"
+val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
+val httpcore5Version = "5.4.3"
+val bcprovVersion = "1.81.1"
+val jacksonDatabindVersion = "3.1.5"
 
 dependencies {
     // Self
@@ -44,6 +47,10 @@ dependencies {
         implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+        implementation("org.apache.httpcomponents.core5:httpcore5:$httpcore5Version")
+        implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
+        implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
+        implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
 
     // Boot Starters
