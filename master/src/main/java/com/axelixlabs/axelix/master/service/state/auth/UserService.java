@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 
 /**
@@ -43,6 +44,7 @@ import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsExceptio
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @NullMarked
 public interface UserService {
@@ -83,20 +85,32 @@ public interface UserService {
      * @param email    Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
      * @param jobTitle Job title of the new user, or {@code null} if not provided.
      * @param organizationalUnit Organizational unit of the new user, or {@code null} if not provided.
+     * @param oidcSubject Stable OIDC identity of the user ({@code hash(iss + sub)}). Must be unique.
      * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
+     *
+     * @return the generated unique identifier of the created user.
      *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
-     * @throws UsernameAlreadyExistsException if the given username is reserved for the super-admin.
+     * @throws UsernameAlreadyExistsException if the given username already exists or is reserved for the super-admin.
      */
-    void createFromOidc(
+    String createFromOidc(
             String username,
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
+            String oidcSubject,
             String role);
+
+    /**
+     * Looks up a user by its stable OIDC identity ({@code hash(iss + sub)}).
+     *
+     * @param oidcSubject Stable OIDC identity to search for.
+     * @return The matching user, or {@link Optional#empty()} if no user with that OIDC identity exists.
+     */
+    Optional<UserEntity> findByOidcSubject(String oidcSubject);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.
@@ -153,11 +167,13 @@ public interface UserService {
     void updateLastLoginAt(String username);
 
     /**
-     * Changes the status of a persisted user without modifying other user data.
+     * Changes the status of a persisted user without modifying other user data. Only supported for
+     * users of {@link UserOrigin#LOCAL} origin;
      *
      * @param id Unique identifier of the user.
      * @param status New status of the user.
      * @throws UserNotFoundException if no user with the given id exists.
+     * @throws UserStatusChangeNotAllowedException if the user's origin is not {@link UserOrigin#LOCAL}.
      */
     void updateStatus(String id, UserStatus status);
 

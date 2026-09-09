@@ -20,8 +20,6 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
@@ -37,8 +35,6 @@ import com.axelixlabs.axelix.master.service.state.auth.RoleService;
 public class UserInfoJsonAccessor {
 
     private static final String DEFAULT_ROLE_NAME = "VIEWER";
-    private static final String DEFAULT_AI_AGENT_USER = "AI_AGENT";
-    private static final Logger log = LoggerFactory.getLogger(UserInfoJsonAccessor.class);
 
     private final JmesPathJsonInspector jsonInspector;
     private final OAuth2Properties oAuth2Properties;
@@ -57,17 +53,15 @@ public class UserInfoJsonAccessor {
         return jsonInspector.extract(userInfoJson, field);
     }
 
-    public String extractUserBehindAiAgent(String userInfoJson) {
-        String user = jsonInspector.extract(userInfoJson, "sub");
-
-        if (user == null) {
-            log.warn("Attention! We're unable to infer the identity of the user behind the AI Agent because the 'sub' "
-                    + "claim is missing in the userinfo response from OIDC provider. Such behavior violates the OIDC spec. "
-                    + "Falling back to default user");
-            return DEFAULT_AI_AGENT_USER;
-        } else {
-            return user;
-        }
+    /**
+     * Extracts the {@code sub} (subject) claim from the userinfo response. This is the provider-local, stable
+     * identifier of the user, mandated to be present in the userinfo response by OpenID Connect Core 1.0 Section 5.3.2.
+     *
+     * @return the {@code sub} claim, or {@code null} if it is absent (which violates the OIDC spec).
+     */
+    @Nullable
+    public String extractSubject(String userInfoJson) {
+        return jsonInspector.extract(userInfoJson, "sub");
     }
 
     public Role extractRole(String userInfoJson) {

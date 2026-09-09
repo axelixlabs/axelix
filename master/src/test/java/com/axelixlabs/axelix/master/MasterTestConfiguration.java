@@ -22,8 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.axelixlabs.axelix.master.api.external.response.LicensingInfoResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.database.ConditionalOnCommunityRdbms;
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.service.LicensingInfoResolver;
 
 /**
  * Test Configuration.
@@ -33,8 +35,13 @@ import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
 @Configuration
 public class MasterTestConfiguration {
 
+    @Bean
+    public LicensingInfoResolver licensingInfoResolver() {
+        return LicensingInfoResponse::oss;
+    }
+
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.SQLITE)
+    @ConditionalOnCommunityRdbms(OssRdbms.SQLITE)
     public static class SQLiteTestLiquibaseAutoConfiguration {
 
         @Bean
@@ -47,7 +54,7 @@ public class MasterTestConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.POSTGRES)
+    @ConditionalOnCommunityRdbms(OssRdbms.POSTGRES)
     public static class PostgresTestLiquibaseAutoConfiguration {
 
         @Bean
@@ -60,7 +67,7 @@ public class MasterTestConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCommunityRdbms(CommunityRDBMS.MYSQL)
+    @ConditionalOnCommunityRdbms(OssRdbms.MYSQL)
     public static class MySqlTestLiquibaseAutoConfiguration {
 
         @Bean

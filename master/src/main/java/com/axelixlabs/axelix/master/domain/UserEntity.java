@@ -36,6 +36,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param jobTitle     Job title of the user, which may be {@code null}.
  * @param organizationalUnit Organizational unit of the user, which may be {@code null}.
  * @param password     Hash of the user's password, which may be {@code null}.
+ * @param oidcSubject  Stable OIDC identity of the user, computed as the {@code hash(iss + sub)}. Non-{@code null} only for
+ *                     {@link UserOrigin#OIDC} users; used to deduplicate them across username changes.
  * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
  * @param userOrigin   Origin of the user account.
  * @param status       Status that controls whether the user can log in.
@@ -56,6 +58,7 @@ public record UserEntity(
         @Nullable String jobTitle,
         @Nullable String organizationalUnit,
         @Nullable String password,
+        @Nullable String oidcSubject,
 
         @Nullable @Deprecated(forRemoval = true, since = "1.1")
         Roles roles,
@@ -75,7 +78,7 @@ public record UserEntity(
         return "User[id=" + id + ", username=[REDACTED], firstName=[REDACTED]"
                 + ", lastName=[REDACTED], email=[REDACTED]"
                 + ", jobTitle=[REDACTED], organizationalUnit=[REDACTED]"
-                + ", password=[REDACTED]" + ", userOrigin=" + userOrigin
+                + ", password=[REDACTED]" + ", oidcSubject=" + oidcSubject + ", userOrigin=" + userOrigin
                 + ", status=" + status + ", lastLoginAt=" + lastLoginAt + ']';
     }
 }

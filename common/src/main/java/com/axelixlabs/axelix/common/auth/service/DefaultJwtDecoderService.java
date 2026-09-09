@@ -70,7 +70,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
 
         try {
             Claims claims = parseClaims(token).getPayload();
-            return new PasswordlessUser(claims.getSubject(), extractRoles(claims));
+            return new PasswordlessUser(extractUserId(claims), claims.getSubject(), extractRoles(claims));
         } catch (JwtParsingException e) {
             throw new JwtParsingException(e);
         } catch (ExpiredJwtException e) {
@@ -84,6 +84,12 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
 
     private Jws<Claims> parseClaims(String token) {
         return verificationStrategy.verifyAndParse(token, signingKey);
+    }
+
+    private String extractUserId(Claims claims) {
+        return Optional.ofNullable(claims.get(TokenClaim.USER_ID.getEncoding(), String.class))
+                .orElseThrow(() -> new JwtParsingException(String.format(
+                        "'%s' claim is required in the incoming JWT token", TokenClaim.USER_ID.getEncoding())));
     }
 
     private Set<Role> extractRoles(Claims claims) {

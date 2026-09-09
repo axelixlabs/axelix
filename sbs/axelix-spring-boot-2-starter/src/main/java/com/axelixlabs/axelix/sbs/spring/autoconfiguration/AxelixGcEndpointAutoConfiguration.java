@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpoint;
@@ -27,14 +28,12 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 /**
  * Auto-configuration for GC Log Endpoint functionality.
  *
- * <p>Configuration is conditional on the presence of JCMD utility and will not activate
- * if JCMD is not available in the system PATH.</p>
- *
  * @since 26.12.2025
  * @author Nikita Kirillov
  */
 @AutoConfiguration(after = GarbageCollectionAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixGcEndpoint.class)
+@ConditionalOnBean(GcLogService.class)
 public class AxelixGcEndpointAutoConfiguration {
 
     @Bean

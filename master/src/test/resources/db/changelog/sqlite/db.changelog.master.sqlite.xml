@@ -23,4 +23,5 @@
   <include relativeToChangelogFile="true" file="changelog/1.1/009-insert-default-roles-authorities.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.1/010-migrate-user-roles-to-users-roles.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.1/012-add-oidc-subject-to-users.xml"/>
 </databaseChangeLog>

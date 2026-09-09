@@ -44,6 +44,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 
@@ -51,6 +52,7 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
  * JDBC-based implementation of {@link UserService} that persists users in a relational database.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 @Service
 @NullMarked
@@ -95,6 +97,7 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(organizationalUnit),
                 passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 null,
+                null,
                 UserOrigin.LOCAL,
                 UserStatus.ACTIVE,
                 null);
@@ -114,13 +117,14 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void createFromOidc(
+    public String createFromOidc(
             String username,
             @Nullable String firstName,
             @Nullable String lastName,
             @Nullable String email,
             @Nullable String jobTitle,
             @Nullable String organizationalUnit,
+            String oidcSubject,
             String role) {
 
         UserEntity userEntity = new UserEntity(
@@ -132,17 +136,26 @@ public class DatabaseUserService implements UserService {
                 normalizeOptional(jobTitle),
                 normalizeOptional(organizationalUnit),
                 null,
+                requireNonBlankTrimmed(oidcSubject),
                 null,
                 UserOrigin.OIDC,
                 UserStatus.ACTIVE,
                 Instant.now()); // the assumption is that the user is created during the initial login
 
-        if (isUsernameReservedForSuperAdmin(userEntity.username())) {
+        if (isUsernameReservedForSuperAdmin(userEntity.username())
+                || userRepository.findByUsername(userEntity.username()).isPresent()) {
             throw new UsernameAlreadyExistsException(userEntity.username());
         }
 
         jdbcAggregateTemplate.insert(userEntity);
         grantRoles(userEntity.id(), Set.of(role));
+
+        return userEntity.id();
+    }
+
+    @Override
+    public Optional<UserEntity> findByOidcSubject(String oidcSubject) {
+        return userRepository.findByOidcSubject(oidcSubject);
     }
 
     @Override
@@ -186,8 +199,10 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void updateStatus(String id, UserStatus status) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        if (user.userOrigin() != UserOrigin.LOCAL) {
+            throw new UserStatusChangeNotAllowedException(id, user.userOrigin());
         }
 
         userRepository.updateStatus(id, status);

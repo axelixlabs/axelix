@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,7 +57,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldAuthorize_UserAdminHasRequiredAuthorities() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.ADMIN));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
                 OssAuthority.SCHEDULED_TASKS_MODIFY,
@@ -71,7 +72,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldAuthorize_UserEditorHasRequiredAuthorities() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.EDITOR));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
                 OssAuthority.SCHEDULED_TASKS_MODIFY,
@@ -85,21 +86,21 @@ class DefaultAuthorizerTest {
     @ParameterizedTest
     @MethodSource("allRoles")
     void shouldAuthorizeEmptyRequestWithRole(Role role) {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(role));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(role));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of())));
     }
 
     @Test
     void shouldAuthorizeEmptyRequestWithNoRoles() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of());
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of());
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of())));
     }
 
     @Test
     void shouldThrowAuthorizationException_UserEditorRequiredAuthorities() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.EDITOR));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.EDITOR));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
                 OssAuthority.SCHEDULED_TASKS_MODIFY,
@@ -116,7 +117,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldThrowAuthorizationException_UserViewerRequiredAuthorities() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.VIEWER));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.VIEWER));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
                 OssAuthority.SCHEDULED_TASKS_MODIFY,
@@ -133,7 +134,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldThrowAuthorizationException_WhenRequestContainsUnrecognizedAuthority() {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.ADMIN));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(
                 OssAuthority.SCHEDULED_TASKS_MODIFY,
@@ -150,7 +151,7 @@ class DefaultAuthorizerTest {
     @ParameterizedTest
     @MethodSource("adminAuthorities")
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(OssAuthority authority) {
-        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(TestRoles.ADMIN, TestRoles.EDITOR));
+        PasswordlessUser user = UserUtils.passwordless(USER_NAME, Set.of(TestRoles.ADMIN, TestRoles.EDITOR));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of(authority))));

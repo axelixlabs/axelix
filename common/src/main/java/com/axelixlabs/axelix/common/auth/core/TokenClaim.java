@@ -27,7 +27,8 @@ package com.axelixlabs.axelix.common.auth.core;
 public enum TokenClaim {
     ROLES("roles"),
     ROLE_NAME("name"),
-    AUTHORITIES("authorities");
+    AUTHORITIES("authorities"),
+    USER_ID("uid");
 
     /**
      * The string value that will be used as the key when this claim is encoded in a token.

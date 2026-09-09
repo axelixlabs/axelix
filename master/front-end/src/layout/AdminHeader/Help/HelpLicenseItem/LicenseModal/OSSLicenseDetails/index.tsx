@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button } from "antd";
+// License key entry is moving to the Enterprise distro; button temporarily disabled.
+// import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { ELicenseFormType, type ILicensing } from "@/models";
 import { LGPL_LINK } from "@/utils";
 
-import { LicenseBadge } from "../../LicenseBadge";
+import { LicenseStatusBadge } from "../../LicenseStatusBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
 
 import styles from "./styles.module.css";
@@ -32,7 +33,7 @@ interface IProps {
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => {
+export const OSSLicenseDetails = ({ licensing }: IProps) => {
     const { t } = useTranslation();
 
     const { license, functions } = licensing;
@@ -43,7 +44,7 @@ export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => 
 
             <div className={styles.ContentWrapper}>
                 <div className={`TextSmall ${styles.Meta}`}>
-                    <LicenseBadge isEnterprise={false} enterpriseText="Enterprise" ossText="Open Source" />
+                    <LicenseStatusBadge isEnterprise={false} enterpriseText="Enterprise" ossText="Open Source" />
 
                     <div className={`${styles.MetaStatus} ${styles.MetaStatusOSS}`}>
                         <span>{license}</span>
@@ -73,11 +74,12 @@ export const OSSLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => 
 
                 <LicenseFunctions functions={functions} />
 
-                <div className={styles.ActionsWrapper}>
+                {/* License key entry is moving to the Enterprise distro; button temporarily disabled. */}
+                {/* <div className={styles.ActionsWrapper}>
                     <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.CREATE)}>
                         {t("LicenseModal.enterKey")}
                     </Button>
-                </div>
+                </div> */}
             </div>
         </>
     );

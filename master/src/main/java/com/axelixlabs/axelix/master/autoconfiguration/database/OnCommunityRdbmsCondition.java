@@ -17,19 +17,20 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.database;
 
-import org.jspecify.annotations.NonNull;
+import java.util.Objects;
 
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
- * Condition to activate certain parts of configuration only in case the given {@link CommunityRDBMS} is active.
+ * Condition to activate certain parts of configuration only in case the given {@link OssRdbms} is active.
  *
  * @author Mikhail Polivakha
  */
@@ -40,27 +41,28 @@ public class OnCommunityRdbmsCondition extends SpringBootCondition {
         MergedAnnotation<ConditionalOnCommunityRdbms> annotation =
                 metadata.getAnnotations().get(ConditionalOnCommunityRdbms.class);
 
-        CommunityRDBMS database = annotation.getEnum("value", CommunityRDBMS.class);
+        OssRdbms expected = annotation.getEnum("value", OssRdbms.class);
 
-        String driverClassName = database.driverClassName();
+        String driverClassName = expected.driverClassName();
 
         if (ClassUtils.isPresent(driverClassName, getClass().getClassLoader())) {
-            return checkJdbcUrlPrefix(context, database.jdbcUrlPrefix());
+            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
+
+            Assert.notNull(jdbcUrl, "Axelix Master requires the database to work with, so JDBC url must be configured");
+
+            OssRdbms actual = OssRdbms.fromJdbcUrl(jdbcUrl);
+
+            if (Objects.equals(actual, expected)) {
+                return ConditionOutcome.match();
+            } else {
+                return ConditionOutcome.noMatch(
+                        "Expected to work with '%s' database, but actually '%s' database is in use"
+                                .formatted(expected.name(), actual.name()));
+            }
+
         } else {
             return ConditionOutcome.noMatch("For the '%s' database unable to find driver class '%s' in classpath"
-                    .formatted(database.name(), driverClassName));
-        }
-    }
-
-    private static @NonNull ConditionOutcome checkJdbcUrlPrefix(
-            ConditionContext context, String expectedJdbcUrlPrefix) {
-        String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
-
-        if (jdbcUrl != null && jdbcUrl.startsWith(expectedJdbcUrlPrefix)) {
-            return ConditionOutcome.match();
-        } else {
-            return ConditionOutcome.noMatch("jdbcUrlPrefix was expected to be '%s', but JDBC url actually is '%s'"
-                    .formatted(expectedJdbcUrlPrefix, jdbcUrl));
+                    .formatted(expected.name(), driverClassName));
         }
     }
 }

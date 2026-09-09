@@ -17,12 +17,11 @@
  */
 import { type Dispatch, type SetStateAction, useState } from "react";
 
-import { UniversalModal } from "@/components";
+import { LicenseKeyForm, UniversalModal } from "@/components";
 import { isEnterpriseLicense } from "@/helpers/license";
 import { ELicenseFormType, type ILicensing } from "@/models";
 
 import { EnterpriseLicenseDetails } from "./EnterpriseLicenseDetails";
-import { EnterLicenseKeyForm } from "./LicenseKeyForm";
 import { OSSLicenseDetails } from "./OSSLicenseDetails";
 
 interface IProps {
@@ -63,7 +62,7 @@ export const LicenseModal = ({ isModalOpen, setIsModalOpen, licensing }: IProps)
                 displayOkay={false}
             >
                 {licenseFormType ? (
-                    <EnterLicenseKeyForm
+                    <LicenseKeyForm
                         licenseFormType={licenseFormType}
                         setLicenseFormType={setLicenseFormType}
                         licensing={licensing}

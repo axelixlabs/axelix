@@ -122,6 +122,18 @@ void yourTestMethod() { … }
 6. Make sure you follow the <<commit-messages>> guidelines.
 7. All external contributors must sign a CLA (Contributor License Agreement) before their changes can be accepted into the Axelix Project.
 
+[[building-from-source]]
+=== Building from source
+
+Axelix is a monorepo built through Make, which is a thin layer on top of Gradle (see the `Makefile`
+in the repository root). For most backend work `make build` (equivalent to `./gradlew build`) is all
+you need.
+
+The community (OSS) distribution of Axelix Master lives in the `master-oss` module and can be
+assembled from sources with `make master-oss` (jar) or `make master-oss-image` (Docker image). See
+link:README.md#building-the-community-distribution-from-source[Building the community distribution from source]
+in the README for the full walkthrough.
+
 [[ai-agents]]
 === Using AI agents
 

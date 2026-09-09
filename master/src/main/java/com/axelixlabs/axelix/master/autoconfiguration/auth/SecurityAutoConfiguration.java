@@ -250,8 +250,11 @@ public class SecurityAutoConfiguration {
         @Bean
         @ConditionalOnMcpServerEnabled
         public McpAuthenticationHandler bearerMcpAuthenticationHandler(
-                OidcClient oidcClient, UserInfoJsonAccessor userInfoJsonAccessor) {
-            return new BearerMcpAuthenticationHandler(oidcClient, userInfoJsonAccessor);
+                OidcClient oidcClient,
+                UserInfoJsonAccessor userInfoJsonAccessor,
+                UserService userService,
+                OAuth2Properties oAuth2Properties) {
+            return new BearerMcpAuthenticationHandler(oidcClient, userInfoJsonAccessor, userService, oAuth2Properties);
         }
 
         @Bean

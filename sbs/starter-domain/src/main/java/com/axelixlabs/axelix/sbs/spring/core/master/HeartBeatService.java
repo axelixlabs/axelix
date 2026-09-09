@@ -54,7 +54,7 @@ public class HeartBeatService implements Closeable {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final PasswordlessUser TECH_USER =
-            new PasswordlessUser("AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
+            new PasswordlessUser("AXELIX.STARTER", "AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
 
     private final HttpClient httpClient;
     private final JsonSerializationFunction serializationFunction;

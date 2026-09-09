@@ -9,45 +9,18 @@ env:
   GITHUB_CONTAINER_REGISTRY: ghcr.io
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      # Initial checkout without submodules so that the local composite actions are available.
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Loading Secrets
-        uses: ./.github/actions/bitwarden
-        with:
-          bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5.6.0
-        with:
-          distribution: 'liberica'
-          java-version: '25'
-
-      # With the enterprise submodule present, the build produces the unified (OSS + Enterprise) distribution.
-      - name: Build and Test
-        run: ./gradlew clean build
-
   starter-compatibility-tests:
-    name: ${{ matrix.starter }} on Java ${{ matrix.javaVersion }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.starterConfig.starter }} on Java ${{ matrix.starterConfig.javaVersion }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        starterConfig:
           - starter: Spring Boot 2 starter
             javaVersion: 11
-            tasks: :sbs:axelix-spring-boot-2-starter:build
-          - starter: Spring Boot 2 starter
-            javaVersion: 14
             tasks: :sbs:axelix-spring-boot-2-starter:build
           - starter: Spring Boot 2 starter
             javaVersion: 17
@@ -79,20 +52,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prepare Windows runner
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          git config --global core.autocrlf true
+          git config --global core.longPaths true
+          Stop-Service -name Docker
+
       - name: Set up starter test JDK and Gradle JDK 25
         uses: actions/setup-java@v5.6.0
         with:
           distribution: 'liberica'
           java-version: |
-            ${{ matrix.javaVersion }}
+            ${{ matrix.starterConfig.javaVersion }}
             25
 
       - name: Run starter compatibility tests
+        shell: bash
+        # Both X64 and AARCH64 are listed since Gradle just ignores whichever env vars aren't set for this OS/arch.
         run: >-
           ./gradlew
-          ${{ matrix.tasks }}
-          -Paxelix.starter.tests.java.version=${{ matrix.javaVersion }}
-          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.javaVersion }}_X64,JAVA_HOME_25_X64
+          ${{ matrix.starterConfig.tasks }}
+          -Paxelix.starter.tests.java.version=${{ matrix.starterConfig.javaVersion }}
+          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_X64,JAVA_HOME_${{ matrix.starterConfig.javaVersion }}_AARCH64,JAVA_HOME_25_X64,JAVA_HOME_25_AARCH64
 
   security-check:
     runs-on: ubuntu-latest
@@ -109,32 +91,87 @@ jobs:
       - name: Running Security Check
         uses: ./.github/actions/security-check
 
+  master-e2e-tests:
+    uses: ./.github/workflows/nightly-master-e2e.yaml
+    secrets: inherit
+
+  playground-compatibility-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-25
+        with:
+          distribution: 'liberica'
+          java-version: '25'
+
+      - name: Set up JDK 17 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-17
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+
+      - name: Set up JDK 21 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-21
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+
+      - name: Grant execution access to the wrapper
+        run: chmod +x gradlew
+
+      - name: Build every playground project
+        env:
+          JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
+          JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
+          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
+        run: make build-playground
+
   release-artifacts:
-    needs: [build-and-test, security-check, starter-compatibility-tests]
+    needs:
+      [
+        security-check,
+        starter-compatibility-tests,
+        master-e2e-tests,
+        playground-compatibility-tests,
+      ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
     steps:
-      # Initial checkout without submodules so that the local composite actions are available.
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Resolve release version from gradle.properties
+        id: version
+        uses: ./.github/actions/read-axelix-version
+        with:
+          file: gradle.properties
+          # A release must be a released X.Y.Z (no SNAPSHOT). Major, minor and patch releases are all
+          # cut in lockstep from this single fleet-wide version.
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
+      - name: Export release version to the job env
         run: |
-          RELEASE_TAG=$(grep '^axelixVersion=' gradle.properties | cut -d'=' -f2)
-          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
-          echo "VITE_APP_VERSION=$RELEASE_TAG" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+          echo "VITE_APP_VERSION=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.6.0
@@ -142,21 +179,28 @@ jobs:
           distribution: 'liberica'
           java-version: '25'
 
-      # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
-      # and to create the release build from scratch. With the enterprise submodule present, this builds the
-      # unified (OSS + Enterprise) distribution.
-      - name: Build
-        run: ./gradlew clean build sourcesJar javadocJar
+      - name: Build and test the fleet
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build sourcesJar javadocJar
+
+      - name: Publish Maven Artifacts to Maven Central
+        # The OSS artifacts, stated explicitly — the starters and the plugins. Signing (GPG) and the
+        # OSSRH promote step run inside the Gradle build.
+        run: >-
+          ./gradlew
+          :sbs:axelix-spring-boot-2-starter:publish
+          :sbs:axelix-spring-boot-3-starter:publish
+          :sbs:axelix-spring-boot-4-starter:publish
+          :plugins:axelix-gradle-plugin:publish
+          :plugins:axelix-maven-plugin:publish
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
 
-      - name: Build Docker Image
-        run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file Dockerfile .
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
 
-      # ====================================================================================
-      # Artifacts Publication, after all builds, linters, tests, and Docker pushes succeed.
-      # ====================================================================================
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v4
         with:
@@ -164,22 +208,21 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker push to GitHub Container registry
-        run: docker push ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }}
+      - name: Build and push the Master OSS image
+        run: |
+          ./gradlew :master-oss:bootJar
+          docker build \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} \
+            --file master-oss/Dockerfile \
+            --push \
+            master-oss
 
       - name: Docker logout from GitHub Container Registry
+        if: always()
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
-      - name: Publish to Maven Central
-        run: ./gradlew publish
-
-      - name: Create and push release tag
+      - name: Create and push the fleet release tag
         run: |
-          git tag "v${RELEASE_TAG}"
-          git push origin "v${RELEASE_TAG}"
-
-      - name: Create release tag in the Enterprise version
-        run: |
-          cd axelix-enterprise
           git tag "v${RELEASE_TAG}"
           git push origin "v${RELEASE_TAG}"

@@ -82,14 +82,14 @@ public class AxelixMetadataEndpointAutoConfiguration {
     @Bean
     public InsightsInfoProvider insightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
-            GcLogService gcLogService,
+            ObjectProvider<GcLogService> gcLogServiceProvider,
             VmOptionsAccessor vmOptionsAccessor,
             TransactionStatsCollector transactionStatsCollector,
             TransactionAttributesRegistry transactionAttributesRegistry,
             ObjectProvider<JpaEntitiesProfileProvider> entitiesMapProvider) {
         return new DefaultInsightsInfoProvider(
                 openSessionInViewStateProvider,
-                gcLogService,
+                gcLogServiceProvider.getIfAvailable(),
                 vmOptionsAccessor,
                 transactionStatsCollector,
                 transactionAttributesRegistry,

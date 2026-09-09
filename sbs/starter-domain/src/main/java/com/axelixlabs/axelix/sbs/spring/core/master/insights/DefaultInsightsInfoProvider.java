@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
@@ -36,6 +38,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Transa
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
@@ -58,9 +61,13 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmO
  */
 public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
 
+    private static final GcLogStatus DISABLED_GC_LOG_STATUS = new GcLogStatus(false, null, List.of());
+
     private final OpenSessionInViewStateProvider openSessionInViewStateProvider;
 
+    @Nullable
     private final GcLogService gcLogService;
+
     private final VmOptionsAccessor vmOptionsAccessor;
     private final TransactionStatsCollector transactionStatsCollector;
     private final TransactionAttributesRegistry transactionAttributesRegistry;
@@ -70,11 +77,13 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
      * Creates a new DefaultInsightsInfoProvider.
      *
      * @param openSessionInViewStateProvider provider of the Spring Open Session in View state.
+     * @param gcLogService                   GC log service, or {@code null} when the HotSpot DiagnosticCommandMBean
+     *                                        is unavailable and GC log insights cannot be reported.
      * @param entitiesMapProvider            provider of the scanned JPA entities map.
      */
     public DefaultInsightsInfoProvider(
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
-            GcLogService gcLogService,
+            @Nullable GcLogService gcLogService,
             VmOptionsAccessor vmOptionsAccessor,
             TransactionStatsCollector transactionStatsCollector,
             TransactionAttributesRegistry transactionAttributesRegistry,
@@ -89,7 +98,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
 
     @Override
     public Insights getInsight() {
-        GcLogStatus gcLogStatus = gcLogService.getStatus();
+        GcLogStatus gcLogStatus = resolveGcLogStatus();
 
         return new Insights(
                 new HotSpotInsights(
@@ -178,6 +187,26 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     }
 
     private InsightFeature getGcLogFileSpecifiedFeature() {
-        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), gcLogService.isGcLogFileSpecified());
+        boolean fileSpecified = false;
+        if (gcLogService != null) {
+            try {
+                fileSpecified = gcLogService.isGcLogFileSpecified();
+            } catch (GcLogException ignored) {
+                // Reporting GC-log insights must never break the rest of the insights payload.
+            }
+        }
+        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), fileSpecified);
+    }
+
+    private GcLogStatus resolveGcLogStatus() {
+        if (gcLogService == null) {
+            return DISABLED_GC_LOG_STATUS;
+        }
+        try {
+            return gcLogService.getStatus();
+        } catch (GcLogException e) {
+            // Reporting GC-log insights must never break the rest of the insights payload.
+            return DISABLED_GC_LOG_STATUS;
+        }
     }
 }

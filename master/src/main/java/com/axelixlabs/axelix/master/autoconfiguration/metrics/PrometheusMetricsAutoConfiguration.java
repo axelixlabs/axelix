@@ -17,22 +17,33 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.metrics;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+
+import static com.axelixlabs.axelix.master.api.infrastructure.InfrastructureApiPaths.PROMETHEUS_METRICS_SCRAPE_PATH;
+import static com.axelixlabs.axelix.master.autoconfiguration.metrics.ConditionalOnPrometheusPort.Mode;
 
 /**
  * Prometheus metrics related auto-configuration.
@@ -40,13 +51,17 @@ import org.springframework.context.annotation.Bean;
  * @author Dmitry Mazurov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration
+@AutoConfiguration(
+        before = {CompositeMeterRegistryAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class},
+        after = MetricsAutoConfiguration.class)
 @EnableConfigurationProperties(PrometheusProperties.class)
 @ConditionalOnProperty(
         prefix = PrometheusProperties.PROMETHEUS_METRICS_PROPERTIES_PREFIX,
         name = "enabled",
         havingValue = "true")
 public class PrometheusMetricsAutoConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(PrometheusMetricsAutoConfiguration.class);
 
     @Bean
     @ConditionalOnMissingBean
@@ -67,11 +82,7 @@ public class PrometheusMetricsAutoConfiguration {
     }
 
     @Bean
-    Clock mainClock() {
-        return Clock.SYSTEM;
-    }
-
-    @Bean
+    @ConditionalOnPrometheusPort(Mode.MATCHES_APPLICATION_PORT)
     PrometheusScrapeEndpoint prometheusEndpoint(
             PrometheusRegistry prometheusRegistry, PrometheusConfig prometheusConfig) {
         return new PrometheusScrapeEndpoint(prometheusRegistry, prometheusConfig.prometheusProperties());
@@ -90,9 +101,31 @@ public class PrometheusMetricsAutoConfiguration {
         return prometheusMeterRegistry;
     }
 
+    @Bean
+    @ConditionalOnPrometheusPort(Mode.CUSTOM_PORT_CONFIGURED)
+    HTTPServer prometheusHttpServer(
+            PrometheusMeterRegistry prometheusMeterRegistry, PrometheusProperties prometheusProperties)
+            throws IOException {
+        int port = Objects.requireNonNull(prometheusProperties.port());
+        HTTPServer server = HTTPServer.builder()
+                .port(port)
+                .registry(prometheusMeterRegistry.getPrometheusRegistry())
+                .metricsHandlerPath(PROMETHEUS_METRICS_SCRAPE_PATH)
+                .registerHealthHandler(false)
+                .defaultHandler(new WhitelabelNotFoundHandler())
+                .buildAndStart();
+
+        log.info(
+                "Prometheus HTTP server started on port {} with context path '{}'",
+                server.getPort(),
+                PROMETHEUS_METRICS_SCRAPE_PATH);
+
+        return server;
+    }
+
     private static void addTagsIfNeeded(
             PrometheusProperties prometheusProperties, PrometheusMeterRegistry prometheusMeterRegistry) {
-        Map<String, String> tags = prometheusProperties.getTags();
+        Map<String, String> tags = prometheusProperties.tags();
 
         if (!tags.isEmpty()) {
             Tags commonTags = Tags.of(tags.entrySet().stream()

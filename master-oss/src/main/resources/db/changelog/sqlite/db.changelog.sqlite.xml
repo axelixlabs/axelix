@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <include file="db/changelog/sqlite/changelog/1.0.0-create-instances-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.0.0-create-users-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.0.0-drop-vm-features.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.0.0-add-application-id-to-instances.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.0.0-create-historical-application-snapshots-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.0.0-add-persistence-insights-to-historical-application-snapshots.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/001-add-firstname-lastname-status-to-users.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/002-create-roles-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/003-create-authorities-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/004-create-roles-authorities-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/005-create-users-roles-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/006-create-roles-parents-table.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/007-insert-default-authorities.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/008-insert-default-roles.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/009-insert-default-roles-authorities.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/010-migrate-user-roles-to-users-roles.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
+  <include file="db/changelog/sqlite/changelog/1.1/012-add-oidc-subject-to-users.xml"/>
+</databaseChangeLog>

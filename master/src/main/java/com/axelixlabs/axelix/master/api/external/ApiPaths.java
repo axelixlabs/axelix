@@ -30,6 +30,14 @@ public final class ApiPaths {
 
     private ApiPaths() {}
 
+    public static final class SettingsApi {
+
+        /**
+         * Endpoint to retrieve the master settings (authentication options, MCP availability, licensing).
+         */
+        public static final String SETTINGS = "/settings";
+    }
+
     public static final class UsersApi {
 
         public static final String LOGIN = "/users/login";

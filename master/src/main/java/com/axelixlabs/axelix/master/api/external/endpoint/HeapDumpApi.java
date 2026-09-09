@@ -17,11 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -35,8 +30,6 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.HeapDumpCustomizer;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
@@ -59,23 +52,6 @@ public class HeapDumpApi {
         this.heapDumpCustomizers = heapDumpCustomizers;
     }
 
-    @DefaultApiResponse(
-            summary = "Download heap dump for the given instance",
-            description = "Returns binary heap dump file")
-    @ApiResponse(
-            description = "Heap dump file",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/octet-stream",
-                            schema = @Schema(type = "string", format = "binary")),
-            headers = {
-                @Header(
-                        name = "Content-Disposition",
-                        description = "Attachment with filename",
-                        schema = @Schema(type = "string"))
-            })
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.HeapDumpApi.INSTANCE_ID)
     public ResponseEntity<Resource> getHeapDump(@PathVariable("instanceId") String instanceId) {
 

@@ -25,11 +25,11 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Conditional;
 
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
  * Conditional annotation to activate certain parts of configuration only in case
- * the given {@link CommunityRDBMS} is active.
+ * the given {@link OssRdbms} is active.
  *
  * @author Mikhail Polivakha
  */
@@ -42,5 +42,5 @@ public @interface ConditionalOnCommunityRdbms {
     /**
      * Axelix community database to be active
      */
-    CommunityRDBMS value();
+    OssRdbms value();
 }

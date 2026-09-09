@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Badge } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { isEnterpriseLicense } from "@/helpers";
+import { isEnterpriseLicense, isLicenseExpiringSoon } from "@/helpers";
 import { useAppSelector } from "@/hooks";
 
-import { LicenseBadge } from "./LicenseBadge";
 import { LicenseModal } from "./LicenseModal";
+import { LicenseStatusBadge } from "./LicenseStatusBadge";
 import styles from "./styles.module.css";
 
 export const HelpLicenseItem = () => {
@@ -35,7 +36,16 @@ export const HelpLicenseItem = () => {
         <>
             <div className={styles.LicenseItemWrapper} onClick={() => setIsLicenseModalOpen(true)}>
                 {t("license")}
-                <LicenseBadge isEnterprise={isEnterpriseLicense(licensing)} enterpriseText="ENT" ossText="OSS" />
+
+                {isLicenseExpiringSoon(licensing.validUntil) ? (
+                    <Badge status="warning" />
+                ) : (
+                    <LicenseStatusBadge
+                        isEnterprise={isEnterpriseLicense(licensing)}
+                        enterpriseText="ENT"
+                        ossText="OSS"
+                    />
+                )}
             </div>
 
             <LicenseModal

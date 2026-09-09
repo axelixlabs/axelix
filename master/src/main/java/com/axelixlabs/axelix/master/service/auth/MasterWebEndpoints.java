@@ -47,6 +47,10 @@ public final class MasterWebEndpoints {
 
     // spotless:off
 
+    // Settings
+    public static final MasterWebEndpoint SETTINGS_READ =
+            register("settings", HttpMethod.GET, ApiPaths.SettingsApi.SETTINGS, null);
+
     // Beans
     public static final MasterWebEndpoint BEANS_READ =
             register("beans:read", HttpMethod.GET, ApiPaths.BeansApi.FEED, null);

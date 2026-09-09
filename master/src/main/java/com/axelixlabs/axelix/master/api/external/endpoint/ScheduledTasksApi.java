@@ -17,11 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
@@ -43,8 +37,6 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
@@ -56,9 +48,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@Tag(
-        name = "ScheduledTasks API",
-        description = "The scheduled-tasks endpoint provides information about the application’s scheduled tasks.")
 @ExternalApiRestController
 public class ScheduledTasksApi {
 
@@ -71,15 +60,6 @@ public class ScheduledTasksApi {
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
-    @DefaultApiResponse(summary = "Returns the feed of the application’s scheduled tasks")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ServiceScheduledTasks.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
@@ -87,11 +67,6 @@ public class ScheduledTasksApi {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
-    @DefaultApiResponse(
-            summary =
-                    "Allows enabling a scheduled task either according to its configured schedule or forcibly, ignoring the schedule.")
-    @ApiResponse(description = "OK", responseCode = "200")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.ENABLE_TASK)
     public void enableSingleScheduledTask(
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
@@ -99,9 +74,6 @@ public class ScheduledTasksApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_SCHEDULED_TASK, payload);
     }
 
-    @DefaultApiResponse(summary = "Allows disabling a scheduled task.")
-    @ApiResponse(description = "OK", responseCode = "200")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.DISABLE_TASK)
     public void disableSingleScheduledTask(
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
@@ -109,14 +81,6 @@ public class ScheduledTasksApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.DISABLE_SCHEDULED_TASK, payload);
     }
 
-    @DefaultApiResponse(summary = "Endpoint to validate cron expression")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ScheduledTaskCronExpressionValidationResponse.class)))
     @PostMapping(path = ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION)
     public ScheduledTaskCronExpressionValidationResponse validateCronExpression(
             @RequestBody ScheduledTaskCronExpressionValidationRequest request) {
@@ -125,10 +89,6 @@ public class ScheduledTasksApi {
                 CronExpression.isValidExpression(request.cronExpression()));
     }
 
-    @DefaultApiResponse(summary = "Endpoint allows modification of the cron expression for a scheduled task.")
-    @ApiResponse(description = "Cron expression successfully modified", responseCode = "204")
-    @ApiResponse(description = "Cron expression is invalid", responseCode = "400")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION)
     public ResponseEntity<?> modifyCronExpression(
             @PathVariable("instanceId") String instanceId,
@@ -145,9 +105,6 @@ public class ScheduledTasksApi {
         return ResponseEntity.noContent().build();
     }
 
-    @DefaultApiResponse(summary = "Endpoint allows modification of the interval for a scheduled task.")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL)
     public ResponseEntity<Void> modifyInterval(
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskIntervalModifyRequest request) {
@@ -158,9 +115,6 @@ public class ScheduledTasksApi {
         return ResponseEntity.noContent().build();
     }
 
-    @DefaultApiResponse(summary = "Endpoint allows forcing a scheduled task to run now.")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.EXECUTE)
     public ResponseEntity<Void> executeScheduledTask(
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskExecuteRequest request) {

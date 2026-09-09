@@ -36,12 +36,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -78,7 +79,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateTokenWithRequiredClaims() {
         // given.
         Role viewer = TestRoles.VIEWER;
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(viewer));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(viewer));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -95,6 +96,8 @@ class DefaultJwtEncoderServiceTest {
 
         // payload
         assertThat(claims.getPayload().getSubject()).isEqualTo(USER_NAME);
+        assertThat(claims.getPayload().get(TokenClaim.USER_ID.getEncoding(), String.class))
+                .isEqualTo(user.getId());
         assertThat(claims.getPayload().getIssuedAt()).isCloseTo(Instant.now(), 1000);
         assertThat(claims.getPayload().getExpiration())
                 .isEqualTo(claims.getPayload().getIssuedAt().toInstant().plus(lifespan));
@@ -105,7 +108,7 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleAdmin() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -130,14 +133,14 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleEditor() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -162,14 +165,14 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleViewer() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -189,14 +192,15 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
 
     @Test
     void shouldGenerateValidJwtToken_MultipleRoles() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
+        User user = UserUtils.withPassword(
+                USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN, TestRoles.EDITOR, TestRoles.VIEWER));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -238,14 +242,14 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
 
     @Test
     void shouldGenerateValidJwtToken_ForUserWithoutRoles() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of());
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -254,7 +258,7 @@ class DefaultJwtEncoderServiceTest {
         // language=json
         String expectedPayload = String.format("{" + "  \"sub\": \"%s\"," + "  \"roles\": []" + "}", USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat", "uid").isEqualTo(expectedPayload);
     }
 
     @Test
@@ -262,7 +266,7 @@ class DefaultJwtEncoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
 
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
         // when.
         String token = encoder.generateToken(user);
@@ -293,7 +297,7 @@ class DefaultJwtEncoderServiceTest {
                 USER_NAME);
 
         assertThatJson(getPayload(token))
-                .whenIgnoringPaths("exp", "iat")
+                .whenIgnoringPaths("exp", "iat", "uid")
                 .when(IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedPayload);
     }
@@ -304,7 +308,7 @@ class DefaultJwtEncoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
 
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
         // when.
         String token = encoder.generateToken(user);
@@ -329,7 +333,7 @@ class DefaultJwtEncoderServiceTest {
                         + "}",
                 USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat", "uid").isEqualTo(expectedPayload);
     }
 
     @Test
@@ -338,14 +342,14 @@ class DefaultJwtEncoderServiceTest {
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
         DefaultJwtEncoderService invalidService = new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
         assertThatThrownBy(() -> invalidService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }
 
     @Test
     void shouldGenerateProperlyFormattedToken() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of());
+        User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = jwtEncoderService.generateToken(user);
 
         assertThat(token.split("\\.")).hasSize(3);

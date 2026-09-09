@@ -5,7 +5,12 @@ on:
     branches: [ master ]
     paths:
       - 'master-e2e-tests/**'
+  push:
+    branches: [ master ]
+    paths:
+      - 'master-e2e-tests/**'
   workflow_dispatch:
+  workflow_call:
   schedule:
     - cron: '0 2 * * *'
 
@@ -21,6 +26,8 @@ permissions:
 
 jobs:
   setup-matrix:
+    # Scheduled runs must only execute in the main Axelix repository, not in forks.
+    if: github.event_name != 'schedule' || github.repository == 'axelixlabs/axelix'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.read.outputs.matrix }}
@@ -52,9 +59,6 @@ jobs:
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
 
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
-
       - name: Checkout helm-charts
         uses: actions/checkout@v7
         with:
@@ -74,10 +78,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Master jar
-        run: ./gradlew :master-enterprise:bootJar --no-configuration-cache --no-build-cache
+        run: ./gradlew :master-oss:bootJar --no-configuration-cache --no-build-cache
 
       - name: Build Master Docker image
-        run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file Dockerfile .
+        run: docker build --tag ${{ env.MASTER_IMAGE_NAME }}:${{ env.MASTER_IMAGE_TAG }} --file master-oss/Dockerfile master-oss
 
       - name: Publish Axelix Gradle Plugin to Maven local
         run: ./gradlew :plugins:axelix-gradle-plugin:publishToMavenLocal --no-configuration-cache --no-build-cache

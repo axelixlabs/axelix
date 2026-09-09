@@ -7,7 +7,11 @@ on:
 
 jobs:
   run-concurrency-tests:
+    # Scheduled runs must only execute in the main Axelix repository, not in forks.
+    if: github.event_name != 'schedule' || github.repository == 'axelixlabs/axelix'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -21,7 +25,7 @@ jobs:
       - name: Run Concurrency Tests
         run: >
           ./gradlew clean
-          :sbs:axelix-spring-boot-3:concurrencyTest
+          :sbs:axelix-spring-boot-3-starter:concurrencyTest
           :sbs:starter-domain:concurrencyTest
           --no-build-cache
           --no-configuration-cache

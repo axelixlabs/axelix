@@ -1,0 +1,98 @@
+# Releases
+
+This page describes the **exact procedure** by which we release Axelix. There are two kinds of release,
+and they share the same shape — both ship the **whole fleet** at once, under one version:
+
+- A **minor** release is cut from `master` and opens a new `X.Y` line.
+- A **patch** release is cut from that line's **patch branch** (`X.Y.x`) and moves the whole fleet to
+  `X.Y.Z`.
+
+Of course, we're going to have a major release as well. When it comes to major release as well - we'll document it also.
+
+For the branch layout underneath all of this see [Branching Model](./branching-model.mdx).
+
+## Minor releases
+
+A minor release publishes every component together under a single `X.Y.0` version and marks it with a
+`vX.Y.0` tag on `master` (see
+[one version for every component](../compatibility-and-versioning.mdx#one-version-for-every-component)). The
+procedure, in order:
+
+### 1. Housekeeping
+
+Housekeeping is the set of **manual changes** made before the release. They all go into a **single commit on
+`master`**, so the whole release can be reset or cherry-picked cleanly if we have to postpone it.
+
+- **Set the fleet version.** Between releases, `axelixVersion` in the **root** `gradle.properties` carries the
+  upcoming version with a `-SNAPSHOT` suffix — for example `3.1.0-SNAPSHOT` while `3.1.0` is in development.
+  Housekeeping strips the suffix, setting it to the exact version we are releasing — for `3.1.0`, set it to
+  `3.1.0`. This is the value the release pipeline reads and what the resulting tag is named after; the
+  pipeline **refuses** to release a `-SNAPSHOT` version. The root `gradle.properties` is the **only** place
+  the version lives — every component of the fleet inherits it from there.
+- **Bump the playgrounds.** The example apps under `playgrounds/` are, by design, **separate projects** — they
+  do **not** inherit `axelixVersion`, they pin the Axelix starter and plugin versions they consume explicitly.
+  Bump those pinned versions to the version being released.
+- **Update the documentation.** We keep versioned docs per **major** line only. For example, while a minor is in
+  development we add "upcoming release" notices for the features it will ship; when we cut the minor that
+  actually ships them, those notices are replaced with the corresponding "released in" notices.
+
+### 2. Launch the release pipeline
+
+**We do not create the tag by hand.** The release pipeline reads the version from `gradle.properties`, runs
+its pre-release checks, and only if everything is green does it create the `vX.Y.0` tag and publish every
+component of the fleet — the Maven artifacts (starters and plugins) and the Master Docker image alike.
+
+:::info[Release notes are written by hand]
+The pipeline creates the **tag** — it does **not** write the release notes. Composing the release notes for the
+freshly created `vX.Y.0` tag is left to the **developer** cutting the release, who writes them manually against
+that tag.
+:::
+
+## Patch releases
+
+A patch release, like every Axelix release, ships the **whole fleet** under one version — there are no
+per-component patches. The procedure mirrors a minor release, with one structural difference: it is cut from
+the minor line's **patch branch** instead of `master`. The documentation step is skipped — patches do not
+change the docs.
+
+1. **Check out the patch branch.** Patch work lives on the line's single branch named `X.Y.x` — the literal
+   `x` marks it as the whole patch line, and, unlike a tag, the branch name carries **no** `v` prefix. It is
+   forked from the minor's `vX.Y.0` tag (see
+   [Branching Model → Where patch work lives](./branching-model.mdx#where-patch-work-lives)). Create it from
+   the tag if this is the line's first patch; otherwise it already exists.
+
+2. **Land the fixes on that branch.** A fix typically lands on `master` first and is backported to the patch
+   branch; only what the patch actually fixes changes.
+
+3. **Housekeeping on the branch (single commit).**
+   - **Set the fleet version.** Set `axelixVersion` in the **root** `gradle.properties` to the new patch
+     version `X.Y.Z`. Unlike `master`, the patch branch carries no `-SNAPSHOT` suffix between releases — it
+     simply stays at the last released version of its line until the next patch bumps it.
+   - **Bump the playground(s).** Update the playground apps to the new patch version — same reason as for a
+     minor release: playgrounds pin their Axelix versions explicitly and do not inherit `axelixVersion`.
+
+4. **Launch the release pipeline.** It is the **same pipeline** as for a minor release, launched from the
+   patch branch instead of `master`. It runs the same pre-release checks, publishes every component of the
+   fleet under `X.Y.Z`, and creates the fleet tag `vX.Y.Z`. Like every Axelix tag it carries the `v` prefix.
+   As with a minor release, the pipeline creates the tag but **not** the release notes — the developer writes
+   those manually against the new tag.
+
+### Worked example
+
+Say the `3.1.0` release needs a fix in the **Axelix Spring Boot 3 Starter**:
+
+1. The patch lives on the branch `3.1.x`, forked from the `v3.1.0` tag. If the `3.1` line has been patched
+   before, that branch already exists; otherwise we create it from `v3.1.0`.
+2. We backport the fix from `master` to that branch.
+3. In the root `gradle.properties` we set `axelixVersion` to `3.1.1` — the patch version we want to
+   release — and bump the playgrounds to `3.1.1`.
+4. We launch the release pipeline from the `3.1.x` branch. It creates the fleet tag `v3.1.1` and publishes
+   **every** component — the starters, the plugins, and Master — under `3.1.1`, even though only one starter
+   actually changed.
+
+The result is what
+[one version for every component](../compatibility-and-versioning.mdx#one-version-for-every-component)
+promises: after the cut, `3.1.1` exists for the entire fleet. Whether *you* upgrade every deployed component
+at once or only the one that was actually fixed is up to you —
+[compatibility is guaranteed by `major.minor`](../compatibility-and-versioning.mdx#compatibility-between-components),
+so patch-level drift between deployed components is always safe.

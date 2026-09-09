@@ -22,9 +22,7 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * SPI interface of a User. The user, from a conceptual perspective, is
- * identified by his/her {@link #getUsername()} and a set of {@link #getRoles()}
- * that are assigned to him/her.
+ * An abstraction of the user, who tries to interact with Axelix in any shape or form.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
@@ -32,12 +30,20 @@ import org.jspecify.annotations.Nullable;
 public interface User {
 
     /**
-     * Username of the given user.
+     * Stable, immutable identifier of the user. Unlike {@link #getUsername()}, this value
+     * never changes for a given user and is therefore the safe key to correlate a user
+     * across logins.
+     */
+    String getId();
+
+    /**
+     * Human-facing username of the given user. Username is by it nature mutable and thus <strong>must not</strong>
+     * be used as a stable identity - use {@link #getId()} for that purpose.
      */
     String getUsername();
 
     /**
-     * Password of the given user. It might be null
+     * Password of the given user. It might be null.
      */
     @Nullable
     String getPassword();

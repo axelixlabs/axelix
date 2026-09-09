@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.auth.DatabaseUserService;
@@ -111,10 +112,11 @@ class DatabaseUserServiceTest {
     @Test
     void createFroOidc_shouldAllowNullEmail() {
         // when.
-        userService.createFromOidc("bob", null, null, null, null, null, "VIEWER");
+        userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
+        assertThat(saved.oidcSubject()).isEqualTo("hash-bob");
         assertThat(saved.firstName()).isNull();
         assertThat(saved.lastName()).isNull();
         assertThat(saved.email()).isNull();
@@ -135,6 +137,7 @@ class DatabaseUserServiceTest {
                         "impostor@example.com",
                         null,
                         null,
+                        "hash-impostor",
                         "VIEWER"))
                 // then.
                 .isInstanceOf(UsernameAlreadyExistsException.class);
@@ -264,7 +267,7 @@ class DatabaseUserServiceTest {
     @Test
     void findAll_shouldReturnAllUsers() {
         userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
-        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "ADMIN");
+        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "hash-bob", "ADMIN");
 
         // when.
         List<UserEntity> all = userService.findAll();
@@ -368,6 +371,20 @@ class DatabaseUserServiceTest {
                 // then.
                 .isInstanceOf(UserNotFoundException.class);
         assertThat(userRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void updateStatus_shouldRejectOidcUser() {
+        // given.
+        userService.createFromOidc("bob", null, null, null, null, null, "hash-bob", "VIEWER");
+        UserEntity existing = userRepository.findByUsername("bob").orElseThrow();
+
+        // when.
+        assertThatThrownBy(() -> userService.updateStatus(existing.id(), UserStatus.SUSPENDED))
+                // then.
+                .isInstanceOf(UserStatusChangeNotAllowedException.class);
+        assertThat(userRepository.findById(existing.id()).orElseThrow().status())
+                .isEqualTo(existing.status());
     }
 
     @Test
@@ -667,7 +684,7 @@ class DatabaseUserServiceTest {
     @Test
     void createFromOidc_shouldGrantRolesThroughUsersRolesTable() {
         // when.
-        userService.createFromOidc("bob", null, null, "bob@example.com", null, null, "VIEWER");
+        userService.createFromOidc("bob", null, null, "bob@example.com", null, null, "hash-bob", "VIEWER");
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();

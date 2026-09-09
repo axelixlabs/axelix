@@ -2,7 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.kotlin.dsl.axelix
 
 plugins {
-    id("shared")
+    id("master-runtime")
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
@@ -13,18 +13,21 @@ val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
-val springDocSwaggerVersion = "3.0.3"
 val sqliteVersion = "3.53.2.1"
-val nimbusJoseJwt ="10.9.1"
+val nimbusJoseJwt = "10.9.1"
 val jmesPathVersion = "0.6.0"
 val instancioVersion = "5.6.0"
 val jsonUnitAssertJVersion = "2.40.1"
+val prometheusMetricsVersion = "1.7.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.13"
-val nettyVersion = "4.2.16.Final"
-val tomcatVersion = "11.0.24"
+val nettyVersion = "4.2.17.Final"
+val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
+val httpcore5Version = "5.4.3"
+val bcprovVersion = "1.81.1"
+val jacksonDatabindVersion = "3.1.5"
 
 dependencies {
     // Self
@@ -44,6 +47,10 @@ dependencies {
         implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+        implementation("org.apache.httpcomponents.core5:httpcore5:$httpcore5Version")
+        implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
+        implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
+        implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
 
     // Boot Starters
@@ -62,7 +69,6 @@ dependencies {
 
     api("org.slf4j:slf4j-api")
     api("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:
@@ -78,6 +84,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.xerial:sqlite-jdbc:${sqliteVersion}")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.prometheus:prometheus-metrics-exporter-httpserver:${prometheusMetricsVersion}")
 
     // Test Self
     testFixturesImplementation(project(":common"))
@@ -112,12 +119,6 @@ configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
-}
-
 tasks.processResources {
 
     val projectVersion = version.toString()
@@ -131,11 +132,6 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-parameters")
-    options.release = 25
 }
 
 axelix {

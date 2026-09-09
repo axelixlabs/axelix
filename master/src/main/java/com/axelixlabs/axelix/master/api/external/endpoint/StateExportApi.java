@@ -19,9 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -34,8 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.state.StateExportRequest;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.request.StateExportRequestConverter;
 import com.axelixlabs.axelix.master.service.export.StateArchiveFileNameGenerator;
@@ -64,13 +59,9 @@ public class StateExportApi {
         this.stateExportRequestConverter = stateExportRequestConverter;
     }
 
-    @DefaultApiResponse(summary = "Exports the application's state")
-    @ApiResponse(description = "OK", responseCode = "200", content = @Content(mediaType = "application/zip"))
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
     public ResponseEntity<Resource> exportInstanceState(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody @RequestBody StateExportRequest request,
-            @PathVariable String instanceId) {
+            @RequestBody StateExportRequest request, @PathVariable String instanceId) {
 
         InstanceId id = InstanceId.of(instanceId);
 

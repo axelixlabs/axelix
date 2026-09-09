@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
@@ -143,6 +144,44 @@ class DefaultInsightsInfoProviderTest {
         var subject = new DefaultInsightsInfoProvider(
                 osivDisabled(),
                 gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider());
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+    }
+
+    @Test
+    void returnsGcLoggingDisabled_whenGcLogServiceIsUnavailable() {
+        // given: no GcLogService bean, e.g. because the HotSpot DiagnosticCommandMBean is unavailable.
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                null,
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider());
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOGGING_ENABLED, false);
+        assertFeatureEnabled(insights.getHotSpot().getGc(), GC_LOG_FILE_SPECIFIED, false);
+    }
+
+    @Test
+    void returnsGcLoggingDisabled_whenGcLogServiceThrows() {
+        // given: GcLogService is present but fails, e.g. a transient JMX invocation error.
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                throwingGcLogService(),
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
@@ -323,6 +362,10 @@ class DefaultInsightsInfoProviderTest {
         return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), true);
     }
 
+    private static GcLogService throwingGcLogService() {
+        return new ThrowingGcLogService();
+    }
+
     private static OpenSessionInViewStateProvider osivDisabled() {
         return () -> false;
     }
@@ -358,6 +401,34 @@ class DefaultInsightsInfoProviderTest {
         @Override
         public boolean isGcLogFileSpecified() {
             return logFileSpecified;
+        }
+
+        @Override
+        public void enable(String level) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void disable() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private static final class ThrowingGcLogService implements GcLogService {
+
+        @Override
+        public GcLogStatus getStatus() {
+            throw new GcLogException("simulated failure");
+        }
+
+        @Override
+        public File getGcLogFile() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isGcLogFileSpecified() {
+            throw new GcLogException("simulated failure");
         }
 
         @Override

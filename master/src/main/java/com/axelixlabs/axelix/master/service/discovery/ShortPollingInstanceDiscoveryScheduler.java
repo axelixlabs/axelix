@@ -48,7 +48,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
-    private static final PasswordlessUser TECH_USER = new PasswordlessUser("AXELIX.MASTER", Set.of());
+    private static final PasswordlessUser TECH_USER = new PasswordlessUser("AXELIX.MASTER", "AXELIX.MASTER", Set.of());
 
     private final InstancesDiscoverer instancesDiscoverer;
     private final InstanceRegistry instanceRegistry;

@@ -3,14 +3,6 @@ server:
   port: 8080
 
 spring:
-  autoconfigure:
-    exclude:
-      # OTLP metrics export is owned by OtlpTransportMetricsAutoConfiguration, not Spring Boot.
-      - org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.OtlpMetricsExportAutoConfiguration
-      # We only need to use Vault at startup.
-      - org.springframework.cloud.vault.config.VaultAutoConfiguration
-      # Since we don't keep a live Vault client, the indicator is not useful.
-      - org.springframework.cloud.vault.config.VaultHealthIndicatorAutoConfiguration
   cloud:
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
@@ -40,11 +32,7 @@ management:
     web:
       base-path: /api/actuator
       exposure:
-        include: [ "health" ]
-  prometheus:
-    metrics:
-      export:
-        enabled: ${axelix.master.metrics.prometheus.enabled}
+        include: [ "health", "prometheus" ]
 
 axelix:
   master:
@@ -80,6 +68,7 @@ axelix:
         compression-mode: none
       prometheus:
         enabled: false
+        # port:
         # tags:
     web:
       static-resources:
@@ -158,7 +147,7 @@ spring:
       - "optional:vault://"
   cloud:
     config:
-      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled:false}"
+      enabled:   "${axelix.master.external-config.spring-cloud-config.enabled}"
       fail-fast: true
       uri:       "${axelix.master.external-config.spring-cloud-config.uri:}"
       label:     "${axelix.master.external-config.spring-cloud-config.label:}"

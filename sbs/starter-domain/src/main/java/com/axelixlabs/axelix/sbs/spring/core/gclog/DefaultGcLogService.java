@@ -37,37 +37,32 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  */
 public class DefaultGcLogService implements GcLogService {
 
-    private static final String JCMD_COMMAND = "jcmd";
-    private static final String JCMD_VM_LOG_COMMAND = "VM.log";
-    private static final String JCMD_VM_LOG_LIST_ARGUMENT = "list";
+    private static final String VM_LOG_OPERATION = "vmLog";
+    private static final String VM_LOG_LIST_ARGUMENT = "list";
     private static final String DEFAULT_FILE_NAME = "gc.log";
     private static final String DEFAULT_LOG_LEVEL = "info";
     private static final String OFF_LOG_LEVEL = "off";
 
-    private final JcmdExecutor jcmdExecutor;
+    private final DiagnosticCommandExecutor diagnosticCommandExecutor;
     private final Logger logger;
-
-    @Nullable
-    private volatile String pid;
 
     @Nullable
     private volatile List<String> availableLevels;
 
-    public DefaultGcLogService(JcmdExecutor jcmdExecutor, Logger logger) {
-        this.jcmdExecutor = jcmdExecutor;
+    public DefaultGcLogService(DiagnosticCommandExecutor diagnosticCommandExecutor, Logger logger) {
+        this.diagnosticCommandExecutor = diagnosticCommandExecutor;
         this.logger = logger;
     }
 
     @Override
     public GcLogStatus getStatus() {
         try {
-            ProcessResult result =
-                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
+            String output = diagnosticCommandExecutor.execute(VM_LOG_OPERATION, VM_LOG_LIST_ARGUMENT);
 
-            return parseStatus(result.getOutput());
+            return parseStatus(output);
 
         } catch (Exception e) {
-            throw new GcLogException("Failed to get GC log status via jcmd", e);
+            throw new GcLogException("Failed to get GC log status", e);
         }
     }
 
@@ -96,10 +91,9 @@ public class DefaultGcLogService implements GcLogService {
     @Override
     public boolean isGcLogFileSpecified() throws GcLogException {
         try {
-            ProcessResult result =
-                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
+            String output = diagnosticCommandExecutor.execute(VM_LOG_OPERATION, VM_LOG_LIST_ARGUMENT);
 
-            for (String line : result.getOutput().split("\n")) {
+            for (String line : output.split("\n")) {
                 String trim = line.trim();
                 if (!trim.startsWith("#")) {
                     continue;
@@ -122,7 +116,7 @@ public class DefaultGcLogService implements GcLogService {
             return false;
 
         } catch (Exception e) {
-            throw new GcLogException("Failed to get GC log file output status via jcmd", e);
+            throw new GcLogException("Failed to get GC log file output status", e);
         }
     }
 
@@ -146,18 +140,12 @@ public class DefaultGcLogService implements GcLogService {
         validateLevel(level);
 
         try {
-            ProcessResult result = jcmdExecutor.execute(
-                    JCMD_COMMAND,
-                    getPid(),
-                    JCMD_VM_LOG_COMMAND,
+            diagnosticCommandExecutor.execute(
+                    VM_LOG_OPERATION,
                     "what=gc=" + level.toLowerCase(Locale.ROOT),
                     "output=file=" + DEFAULT_FILE_NAME,
                     "output_options=filecount=1,filesize=10M",
                     "decorators=time,level,tags");
-
-            if (!result.isSuccess()) {
-                throw new GcLogException(result.getOutput());
-            }
 
             logger.info("GC logging enabled: level={}, file={}", level, DEFAULT_FILE_NAME);
 
@@ -169,28 +157,13 @@ public class DefaultGcLogService implements GcLogService {
     @Override
     public void disable() throws GcLogException {
         try {
-            ProcessResult result = jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, "disable");
-
-            if (!result.isSuccess()) {
-                throw new GcLogException(result.getOutput());
-            }
+            diagnosticCommandExecutor.execute(VM_LOG_OPERATION, "disable");
 
             logger.info("GC logging disabled");
 
         } catch (Exception e) {
             throw new GcLogException("Failed to disable GC logging", e);
         }
-    }
-
-    private String getPid() {
-        if (pid == null) {
-            synchronized (this) {
-                if (pid == null) {
-                    pid = String.valueOf(ProcessHandle.current().pid());
-                }
-            }
-        }
-        return pid;
     }
 
     private List<String> getAvailableLevels() {
@@ -221,10 +194,9 @@ public class DefaultGcLogService implements GcLogService {
      */
     private List<String> loadAvailableLevels() {
         try {
-            ProcessResult result =
-                    jcmdExecutor.execute(JCMD_COMMAND, getPid(), JCMD_VM_LOG_COMMAND, JCMD_VM_LOG_LIST_ARGUMENT);
+            String output = diagnosticCommandExecutor.execute(VM_LOG_OPERATION, VM_LOG_LIST_ARGUMENT);
 
-            for (String line : result.getOutput().split("\n")) {
+            for (String line : output.split("\n")) {
                 String trim = line.trim();
 
                 if (trim.startsWith("Available log levels:")) {

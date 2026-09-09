@@ -22,12 +22,13 @@ import java.util.Map;
 /**
  * Identity data obtained from a successfully validated OIDC ID token.
  *
- * @param username the username selected from the token claims
+ * @param username the username selected from the token claims (mutable, human-facing)
+ * @param subject the {@code sub} claim - the provider-local, stable identifier of the user
  * @param claims all validated ID token claims
  *
  * @author Mikhail Polivakha
  */
-public record ValidatedOidcIdentity(String username, Map<String, Object> claims) {
+public record ValidatedOidcIdentity(String username, String subject, Map<String, Object> claims) {
 
     public ValidatedOidcIdentity {
         claims = Map.copyOf(claims);

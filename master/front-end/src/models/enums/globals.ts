@@ -56,4 +56,5 @@ export enum EAuthorities {
     GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR",
     USERS_VIEW = "USERS_VIEW",
     USERS_MANAGEMENT = "USERS_MANAGEMENT",
+    LICENSE_ENTER = "license:enter",
 }

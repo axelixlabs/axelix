@@ -28,11 +28,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.master.domain.database.CommunityRDBMS;
+import com.axelixlabs.axelix.master.domain.database.OssRdbms;
 
 /**
  * Composed annotation to demarcate the given integration test as the one, where all the test methods
- * must run against all the {@link CommunityRDBMS community supported databases}.
+ * must run against all the {@link OssRdbms community supported databases}.
  * <p>
  * There is a very important implementation note here.
  * <p>

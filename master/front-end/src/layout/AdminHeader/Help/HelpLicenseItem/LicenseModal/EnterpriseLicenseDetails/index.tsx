@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button } from "antd";
+// License key entry is moving to the Enterprise distro; button temporarily disabled.
+// import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getTimeLeftText } from "@/helpers";
 import { ELicenseFormType, type ILicensing } from "@/models";
 
-import { LicenseBadge } from "../../LicenseBadge";
+import { LicenseStatusBadge } from "../../LicenseStatusBadge";
 import { LicenseFunctions } from "../LicenseFunctions";
 import { LicenseRecord } from "../LicenseRecord";
 
@@ -33,7 +34,7 @@ interface IProps {
     setLicenseFormType: Dispatch<SetStateAction<ELicenseFormType | null>>;
 }
 
-export const EnterpriseLicenseDetails = ({ licensing, setLicenseFormType }: IProps) => {
+export const EnterpriseLicenseDetails = ({ licensing }: IProps) => {
     const { t } = useTranslation();
 
     const { functions, validUntil } = licensing;
@@ -46,7 +47,7 @@ export const EnterpriseLicenseDetails = ({ licensing, setLicenseFormType }: IPro
 
             <div className={styles.ContentWrapper}>
                 <div className={`TextSmall ${styles.Meta}`}>
-                    <LicenseBadge isEnterprise enterpriseText="Enterprise" ossText="Open Source" />
+                    <LicenseStatusBadge isEnterprise enterpriseText="Enterprise" ossText="Open Source" />
 
                     <div className={`${styles.MetaStatus} ${styles.MetaStatusEnterprise}`}>
                         <span>{t("LicenseModal.active")}</span>
@@ -59,11 +60,12 @@ export const EnterpriseLicenseDetails = ({ licensing, setLicenseFormType }: IPro
 
                 <LicenseFunctions functions={functions} />
 
-                <div className={styles.ActionsWrapper}>
+                {/* License key entry is moving to the Enterprise distro; button temporarily disabled. */}
+                {/* <div className={styles.ActionsWrapper}>
                     <Button type="primary" onClick={() => setLicenseFormType(ELicenseFormType.UPDATE)}>
                         {t("LicenseModal.updateKey")}
                     </Button>
-                </div>
+                </div> */}
             </div>
         </>
     );
