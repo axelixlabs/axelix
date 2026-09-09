@@ -94,8 +94,10 @@ class CachingEndpointProberTest {
             byte[] second = subject.invoke(INSTANCE_A, NoHttpPayload.INSTANCE);
 
             // then.
-            assertThat(first).isSameAs(CACHED_BODY);
-            assertThat(second).isSameAs(CACHED_BODY);
+            assertThat(first).isEqualTo(CACHED_BODY);
+            assertThat(first).isNotSameAs(CACHED_BODY);
+            assertThat(second).isEqualTo(CACHED_BODY);
+            assertThat(second).isNotSameAs(CACHED_BODY);
             verify(delegate, times(1)).invoke(eq(INSTANCE_A), same(NoHttpPayload.INSTANCE));
         }
 
@@ -110,8 +112,10 @@ class CachingEndpointProberTest {
             byte[] resultB = subject.invoke(INSTANCE_B, NoHttpPayload.INSTANCE);
 
             // then.
-            assertThat(resultA).isSameAs(CACHED_BODY);
-            assertThat(resultB).isSameAs(OTHER_BODY);
+            assertThat(resultA).isEqualTo(CACHED_BODY);
+            assertThat(resultA).isNotSameAs(CACHED_BODY);
+            assertThat(resultB).isEqualTo(OTHER_BODY);
+            assertThat(resultB).isNotSameAs(OTHER_BODY);
             verify(delegate).invoke(eq(INSTANCE_A), same(NoHttpPayload.INSTANCE));
             verify(delegate).invoke(eq(INSTANCE_B), same(NoHttpPayload.INSTANCE));
         }
@@ -133,8 +137,8 @@ class CachingEndpointProberTest {
             byte[] second = subject.invoke(INSTANCE_A, secondPayload);
 
             // then.
-            assertThat(first).isSameAs(CACHED_BODY);
-            assertThat(second).isSameAs(OTHER_BODY);
+            assertThat(first).isEqualTo(CACHED_BODY);
+            assertThat(second).isEqualTo(OTHER_BODY);
             verify(delegate).invoke(eq(INSTANCE_A), same(firstPayload));
             verify(delegate).invoke(eq(INSTANCE_A), same(secondPayload));
         }
@@ -152,8 +156,10 @@ class CachingEndpointProberTest {
         byte[] second = subject.invoke(BASE_URL, NoHttpPayload.INSTANCE);
 
         // then.
-        assertThat(first).isSameAs(CACHED_BODY);
-        assertThat(second).isSameAs(OTHER_BODY);
+        assertThat(first).isEqualTo(CACHED_BODY);
+        assertThat(first).isNotSameAs(CACHED_BODY);
+        assertThat(second).isEqualTo(OTHER_BODY);
+        assertThat(second).isNotSameAs(OTHER_BODY);
         verify(delegate, times(2)).invoke(eq(BASE_URL), same(NoHttpPayload.INSTANCE));
         verifyNoMoreInteractions(delegate);
     }
@@ -172,7 +178,7 @@ class CachingEndpointProberTest {
         byte[] result = subject.invoke(INSTANCE_A, NoHttpPayload.INSTANCE);
 
         // then.
-        assertThat(result).isSameAs(CACHED_BODY);
+        assertThat(result).isEqualTo(CACHED_BODY);
         verify(delegate, times(2)).invoke(eq(INSTANCE_A), same(NoHttpPayload.INSTANCE));
     }
 
@@ -186,7 +192,7 @@ class CachingEndpointProberTest {
         ActuatorEndpoint result = subject.supports();
 
         // then.
-        assertThat(result).isSameAs(endpoint);
+        assertThat(result).isEqualTo(endpoint);
         verify(delegate).supports();
     }
 
