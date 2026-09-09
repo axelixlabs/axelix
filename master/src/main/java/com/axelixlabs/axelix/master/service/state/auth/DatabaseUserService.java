@@ -51,6 +51,7 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
  * JDBC-based implementation of {@link UserService} that persists users in a relational database.
  *
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @Service
 @NullMarked
@@ -256,16 +257,15 @@ public class DatabaseUserService implements UserService {
         grantRoles(id, roles);
     }
 
-    // TODO: Right now this is acceptable (i.e. a non-bulk INSERT) but in the future that may need optimization
     private void grantRoles(String userId, Set<String> roleNames) {
-        roleNames.forEach(roleName -> {
-            String normalizedRole = validateAndNormalizeRole(roleName);
-            int rowsAffected = userRepository.attachRole(userId, normalizedRole);
+        Set<String> normalizedRoles =
+                roleNames.stream().map(this::validateAndNormalizeRole).collect(Collectors.toUnmodifiableSet());
 
-            if (rowsAffected != 1) {
-                throw new UserRoleNotFoundException(normalizedRole);
-            }
-        });
+        int rowsAffected = userRepository.bulkAttachRoles(userId, normalizedRoles);
+
+        if (rowsAffected != normalizedRoles.size()) {
+            throw new UserRoleNotFoundException(normalizedRoles);
+        }
     }
 
     private String validateAndNormalizeRole(@Nullable String role) throws UserInvalidValueException {
