@@ -5,6 +5,10 @@ on:
     branches: [ master ]
     paths:
       - 'master-e2e-tests/**'
+  push:
+    branches: [ master ]
+    paths:
+      - 'master-e2e-tests/**'
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'
