@@ -158,6 +158,146 @@ java \
 обращается к серверу и запускается штатно.
 :::
 
+### Загрузка конфигурации из HashiCorp Vault
+
+<UpcomingReleaseNotice />
+
+Если ваша организация хранит секреты в [HashiCorp Vault](https://developer.hashicorp.com/vault), Master может читать
+оттуда и свою конфигурацию. При старте Master получает секрет из
+[движка секретов KV](https://developer.hashicorp.com/vault/docs/secrets/kv) и подмешивает каждый ключ этого секрета к
+своим настройкам — ровно так, как если бы эти ключи были записаны в файле конфигурации. Благодаря этому любое свойство
+`axelix.master.*` с этой страницы может храниться в Vault. Обычно там держат чувствительную часть — скажем,
+`axelix.master.database.password` и `axelix.master.auth.jwt.signing-key` — а остальное оставляют в обычном файле
+конфигурации.
+
+По умолчанию функция выключена. Включите её свойством `axelix.master.external-config.spring-cloud-vault.enabled=true` и
+укажите адрес сервера Vault свойством `uri`. С настройками по умолчанию Master читает секрет по пути `secret/axelix`:
+маунт KV `secret` плюс имя приложения самого Master. Ожидается версия 2 движка KV — она используется по умолчанию для
+любого маунта, созданного современным Vault. Запись значения конфигурации выглядит так:
+
+```bash
+vault kv put secret/axelix \
+  axelix.master.database.password=a-strong-password \
+  axelix.master.auth.jwt.signing-key=cSuGCTNSJUW7yobufJTZ4C7BScamq2Yz
+```
+
+<div className={styles.ConfigTable}>
+
+| Свойство                                                                | По умолчанию  | Описание                                                                                                                                       |
+|-------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.enabled`              | `false`       | Загружать конфигурацию из HashiCorp Vault при старте.                                                                                            |
+| `axelix.master.external-config.spring-cloud-vault.uri`                  | пусто         | Базовый URL сервера Vault, например `http://vault:8200`. Обязательно при `enabled=true`.                                                          |
+| `axelix.master.external-config.spring-cloud-vault.authentication`       | `TOKEN`       | Метод аутентификации. `TOKEN`, `APPROLE` и `KUBERNETES` описаны ниже.                                                                             |
+| `axelix.master.external-config.spring-cloud-vault.fail-fast`            | `true`        | Не стартовать, если Vault недоступен, вместо запуска с неполной конфигурацией.                                                                    |
+| `axelix.master.external-config.spring-cloud-vault.kv.enabled`           | `true`        | Читать секреты из движка секретов KV.                                                                                                             |
+| `axelix.master.external-config.spring-cloud-vault.kv.backend`           | `secret`      | Путь маунта движка секретов KV.                                                                                                                   |
+| `axelix.master.external-config.spring-cloud-vault.kv.application-name`  | `axelix`      | Имя секрета, который Master читает в маунте — `secret/axelix` с настройками по умолчанию.                                                         |
+| `axelix.master.external-config.spring-cloud-vault.kv.default-context`   | `application` | Общий секрет, читаемый в дополнение к секрету приложения (`secret/application` с настройками по умолчанию) — для настроек, общих для нескольких приложений. |
+| `axelix.master.external-config.spring-cloud-vault.kv.profile-separator` | `/`           | Разделитель между именем приложения и Spring-профилем в путях профильных секретов.                                                                |
+
+</div>
+
+Внутри Master выступает клиентом [Spring Cloud Vault](https://docs.spring.io/spring-cloud-vault/reference/). Поэтому под
+тем же префиксом `axelix.master.external-config.spring-cloud-vault.*` доступен весь набор настроек подключения Spring
+Cloud Vault: TLS-параметры под `ssl.*`, `namespace` для Vault Enterprise, тайм-ауты соединения и чтения, а также другие
+методы аутентификации помимо трёх, описанных ниже. В таблице выше перечислены только свойства, которые нужны в
+большинстве инсталляций.
+
+Vault читается **один раз, при старте**. Изменённый секрет вступает в силу после перезапуска Master, и читается только
+статический движок KV — динамические движки секретов, например короткоживущие учётные данные БД, в эту функцию не
+входят.
+
+#### Аутентификация статическим токеном
+
+`TOKEN` — метод по умолчанию, поэтому достаточно указать токен Vault. Это самый быстрый способ попробовать функцию на
+машине разработчика. Однако долгоживущий статический токен — ровно тот тип учётных данных, от которого Vault и призван
+избавить, поэтому в продакшене используйте [AppRole](#аутентификация-через-approle) или [Kubernetes](#аутентификация-через-kubernetes) ниже.
+
+<div className={styles.ConfigTable}>
+
+| Свойство                                                  | По умолчанию | Описание                                                                 |
+|-----------------------------------------------------------|--------------|-----------------------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.token`  | пусто        | Статический токен Vault, которым аутентифицируется Master. Обязателен для `TOKEN`. |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://localhost:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
+  -jar master.jar
+```
+
+#### Аутентификация через AppRole
+
+[AppRole](https://developer.hashicorp.com/vault/docs/auth/approle) — метод «машина-машина» для сред без платформенной
+идентичности: виртуальные машины, bare metal, Docker Compose. Master предъявляет пару `role-id`/`secret-id`, а Vault
+обменивает её на короткоживущий токен с политикой роли.
+
+<div className={styles.ConfigTable}>
+
+| Свойство                                                               | По умолчанию | Описание                                                     |
+|------------------------------------------------------------------------|--------------|-----------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.app-role.role-id`    | пусто        | RoleID роли AppRole, под которой входит Master.              |
+| `axelix.master.external-config.spring-cloud-vault.app-role.secret-id`  | пусто        | SecretID в паре с `role-id`.                                 |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role`       | пусто        | Имя роли, необязательно, используется в pull-режиме.         |
+| `axelix.master.external-config.spring-cloud-vault.app-role.app-role-path` | `approle` | Путь маунта бэкенда аутентификации AppRole.                  |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://vault:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.authentication=APPROLE \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.role-id=5f3420cd-2c65-4a0e-87f4-b525b8e26a54 \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.secret-id=f8e77c67-40b6-49aa-a548-e50c62a765b3 \
+  -jar master.jar
+```
+
+`secret-id` сам по себе является секретом, поэтому на контейнерных платформах передавайте его переменной окружения
+(`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_APPROLE_SECRETID`), а не флагом `-D`.
+
+#### Аутентификация через Kubernetes
+
+В Kubernetes мы рекомендуем [метод аутентификации Kubernetes](https://developer.hashicorp.com/vault/docs/auth/kubernetes):
+Master аутентифицируется токеном сервис-аккаунта, который и так есть у его пода, так что статических учётных данных не
+существует вовсе. На стороне Vault создайте роль в бэкенде аутентификации Kubernetes и привяжите её к сервис-аккаунту
+Master. На стороне Master укажите имя этой роли:
+
+<div className={styles.ConfigTable}>
+
+| Свойство                                                                                 | По умолчанию                                           | Описание                                              |
+|-------------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.role`                        | пусто                                                  | Роль Vault, под которой выполняется вход. Обязательно. |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path`             | `kubernetes`                                           | Путь маунта бэкенда аутентификации Kubernetes.         |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file`  | `/var/run/secrets/kubernetes.io/serviceaccount/token`  | Путь к файлу токена сервис-аккаунта пода.              |
+
+</div>
+
+```yaml
+env:
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_ENABLED
+    value: "true"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_URI
+    value: "http://vault.vault.svc:8200"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_AUTHENTICATION
+    value: "KUBERNETES"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_KUBERNETES_ROLE
+    value: "axelix-master"
+```
+
+Как и в соседних разделах выше, все эти свойства определяют, *откуда* читается конфигурация, поэтому должны быть
+известны до начала чтения: задавайте их через системные свойства JVM или переменные окружения — но не ключами внутри
+секрета Vault.
+
+:::warning
+Когда функция включена, Master стартует в режиме fail-fast. Если Vault недоступен при запуске, Master не загрузится,
+вместо того чтобы стартовать с неполной конфигурацией. Пока функция выключена (по умолчанию), Master не обращается к
+Vault и запускается штатно.
+:::
+
 ### Общие настройки
 
 <UpcomingReleaseNotice />
