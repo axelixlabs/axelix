@@ -1,5 +1,5 @@
 {
-    "name": "axelix-oss",
+    "name": "axelix-enterprise",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -10,14 +10,15 @@
     },
     "dependencies": {
         "@axelix/core": "*",
+        "@axelix/enterprise": "*",
         "react": "^19.2.8",
         "react-dom": "^19.2.8"
     },
     "devDependencies": {
+        "@rolldown/plugin-babel": "^0.2.4",
         "@vitejs/plugin-react": "^6.1.1",
-        "@rolldown/plugin-babel": "^0.2.3",
         "babel-plugin-react-compiler": "^1.0.0",
-        "vite-plugin-svgr": "^4.5.0",
-        "vite": "^8.2.2"
+        "vite": "^8.2.2",
+        "vite-plugin-svgr": "^4.5.0"
     }
 }

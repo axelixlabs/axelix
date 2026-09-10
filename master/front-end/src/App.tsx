@@ -22,6 +22,8 @@ import { store } from "@/store";
 
 import { AppRoutes } from "./routes";
 
+import "./index.css";
+import "./customizedTable.css";
 import "./i18n/i18n";
 
 export const App = () => {

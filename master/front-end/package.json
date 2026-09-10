@@ -5,8 +5,6 @@
     "type": "module",
     "main": "./src/index.ts",
     "scripts": {
-        "dev": "vite",
-        "build": "tsc -b && vite build",
         "lint": "eslint .",
         "lint-css": "stylelint \"src/**/*.css\"",
         "lint:fix": "eslint . --fix",
