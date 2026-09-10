@@ -44,6 +44,21 @@ axelix:
         name:
         username:
         password:
+      # Normally we enumerate every Axelix property in this file with its default value. We don't do
+      # that here: Hashicorp Vault has a lot of properties for connecting to it, and enumerating all
+      # of them with defaults would be excessive. These properties are instead automatically bound to
+      # org.springframework.cloud.vault.config.VaultProperties (see AxelixVaultConfigDataLocationResolver),
+      # except for the properties under 'kv', which bind to
+      # org.springframework.cloud.vault.config.VaultKeyValueBackendProperties (the kv secrets engine).
+      spring-cloud-vault:
+        enabled: false
+        fail-fast: true
+        kv:
+          enabled: true
+          backend: secret
+          default-context: application
+          profile-separator: /
+          application-name: ${spring.application.name}
     environment:
     logging:
       json:
@@ -131,7 +146,9 @@ spring:
     #     fail-fast=true below, an unreachable Config Server then becomes a startup failure.
     #
     # In other words, 'optional:' only covers the disabled case; it does NOT weaken fail-fast when enabled.
-    import: "optional:configserver:"
+    import:
+      - "optional:configserver:"
+      - "optional:vault://"
   cloud:
     config:
       enabled:   "${axelix.master.external-config.spring-cloud-config.enabled}"
@@ -141,3 +158,10 @@ spring:
       name:      "${axelix.master.external-config.spring-cloud-config.name:}"
       username:  "${axelix.master.external-config.spring-cloud-config.username:}"
       password:  "${axelix.master.external-config.spring-cloud-config.password:}"
+    vault:
+      kv:
+        enabled:           "${axelix.master.external-config.spring-cloud-vault.kv.enabled:}"
+        backend:           "${axelix.master.external-config.spring-cloud-vault.kv.backend:}"
+        default-context:   "${axelix.master.external-config.spring-cloud-vault.kv.default-context:}"
+        profile-separator: "${axelix.master.external-config.spring-cloud-vault.kv.profile-separator:}"
+        application-name:  "${axelix.master.external-config.spring-cloud-vault.kv.application-name:}"

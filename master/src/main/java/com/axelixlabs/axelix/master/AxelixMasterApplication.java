@@ -27,6 +27,8 @@ import org.springframework.boot.micrometer.metrics.autoconfigure.export.otlp.Otl
 import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration;
 import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
+import org.springframework.cloud.vault.config.VaultAutoConfiguration;
+import org.springframework.cloud.vault.config.VaultHealthIndicatorAutoConfiguration;
 
 /**
  * Composed {@link SpringBootApplication} meta-annotation shared by every Axelix Master entrypoint.
@@ -41,6 +43,10 @@ import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAu
             CompositeDiscoveryClientAutoConfiguration.class,
             SimpleDiscoveryClientAutoConfiguration.class,
             OtlpMetricsExportAutoConfiguration.class,
-            PrometheusMetricsExportAutoConfiguration.class
+            PrometheusMetricsExportAutoConfiguration.class,
+            // We only need to use Vault at startup.
+            VaultAutoConfiguration.class,
+            // Since we don't keep a live Vault client, the indicator is not useful.
+            VaultHealthIndicatorAutoConfiguration.class
         })
 public @interface AxelixMasterApplication {}

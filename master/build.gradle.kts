@@ -65,6 +65,7 @@ dependencies {
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.springframework.security:spring-security-crypto")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
     api("org.slf4j:slf4j-api")
     api("com.github.ben-manes.caffeine:caffeine")
@@ -102,6 +103,7 @@ dependencies {
 
     testFixturesApi("org.testcontainers:testcontainers-postgresql")
     testFixturesApi("org.testcontainers:testcontainers-mysql")
+    testFixturesApi("org.testcontainers:testcontainers-vault")
     testFixturesApi("org.testcontainers:testcontainers-junit-jupiter")
     testFixturesApi("com.squareup.okhttp3:mockwebserver")
     testFixturesApi("com.squareup.okhttp3:okhttp")

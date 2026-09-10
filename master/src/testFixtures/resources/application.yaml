@@ -2,7 +2,9 @@ spring:
   config:
     # spring-cloud-starter-config is on the classpath, so Spring Cloud requires a spring.config.import. Mirror the
     # production application.yaml with an 'optional:configserver:' import so tests boot without a Config Server.
-    import: "optional:configserver:"
+    import:
+      - "optional:configserver:"
+      - "optional:vault://"
   cloud:
     compatibility-verifier:
       # TODO: This is a temporary fix, until we wait for the official cloud support of boot 4.1
@@ -18,6 +20,8 @@ spring:
       name:      "${axelix.master.external-config.spring-cloud-config.name:}"
       username:  "${axelix.master.external-config.spring-cloud-config.username:}"
       password:  "${axelix.master.external-config.spring-cloud-config.password:}"
+    vault:
+      enabled: false
   application:
     name: axelix
   datasource:
