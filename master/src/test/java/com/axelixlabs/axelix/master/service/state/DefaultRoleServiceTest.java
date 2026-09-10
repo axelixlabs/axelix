@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -41,6 +42,7 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.state.auth.DefaultRoleService;
 import com.axelixlabs.axelix.master.service.state.auth.RoleService;
+import com.axelixlabs.axelix.master.service.state.auth.RoleService.GrantedRole;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -281,6 +283,94 @@ class DefaultRoleServiceTest {
                             .extracting(Authority::getName)
                             .containsExactlyInAnyOrder(
                                     OssAuthority.GARBAGE_COLLECTOR.getName(), OssAuthority.CACHES_CLEAR.getName()));
+        }
+    }
+
+    /**
+     * The profile page needs more than the name of a role: what the role is for, and what it adds up to being allowed
+     * to do. Neither comes from the composed {@link Role} itself - the description is read from the {@code roles}
+     * table, the authorities are collected across the whole component chain.
+     */
+    @Nested
+    class FindGrantedRolesOfUser {
+
+        @BeforeEach
+        @AfterEach
+        void cleanUsersAndCustomRoles() {
+            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+            jdbcClient.sql("DELETE FROM roles_parents").update();
+            jdbcClient
+                    .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
+                    .param(RoleOrigin.BUILT_IN.name())
+                    .update();
+            jdbcClient
+                    .sql("DELETE FROM roles WHERE role_origin <> ?")
+                    .param(RoleOrigin.BUILT_IN.name())
+                    .update();
+        }
+
+        @Test
+        void shouldCarryTheDescriptionStoredAlongsideTheRole() {
+            // given.
+            String userId = createUserWithRoles("ADMIN");
+
+            // when.
+            List<GrantedRole> granted = roleService.findGrantedRolesOfUser(userId);
+
+            // then.
+            assertThat(granted).singleElement().satisfies(role -> {
+                assertThat(role.name()).isEqualTo("ADMIN");
+                assertThat(role.description())
+                        .isEqualTo("Everything an editor can do, plus reading sensitive configuration values.");
+                assertThat(role.authorities())
+                        .containsExactlyInAnyOrderElementsOf(TestRoles.ADMIN.getAuthorities().stream()
+                                .map(Authority::getName)
+                                .toList());
+            });
+        }
+
+        @Test
+        void shouldOrderTheRolesByNameAndLeaveARoleGrantingNothingEmpty() {
+            // given. Assigned in reverse order, so the ordering below is the service's doing rather than the input's
+            String userId = createUserWithRoles("VIEWER", "ADMIN");
+
+            // when.
+            List<GrantedRole> granted = roleService.findGrantedRolesOfUser(userId);
+
+            // then. VIEWER grants nothing, which is an empty set rather than an absent role
+            assertThat(granted).extracting(GrantedRole::name).containsExactly("ADMIN", "VIEWER");
+            assertThat(granted.get(1).authorities()).isEmpty();
+        }
+
+        @Test
+        void shouldExposeTheAuthoritiesReachedThroughAComponentRole() {
+            // given.
+            String parentId = customRole("PARENT", OssAuthority.CACHES_CLEAR);
+            String childId = customRole("CHILD", OssAuthority.GARBAGE_COLLECTOR);
+            createBond(childId, parentId);
+            String userId = createUserWithRoles("CHILD");
+
+            // when.
+            List<GrantedRole> granted = roleService.findGrantedRolesOfUser(userId);
+
+            // then. The inherited authority is part of what the role grants, and the names come out ordered
+            assertThat(granted)
+                    .singleElement()
+                    .satisfies(role -> assertThat(role.authorities())
+                            .containsExactly(
+                                    OssAuthority.CACHES_CLEAR.getName(), OssAuthority.GARBAGE_COLLECTOR.getName()));
+        }
+
+        private String createUserWithRoles(String... roles) {
+            userService.createLocal("alice", null, null, "alice@example.com", null, null, "p", roles[0]);
+            UserEntity user = userRepository.findByUsername("alice").orElseThrow();
+
+            if (roles.length > 1) {
+                userService.updateUserPatch(
+                        user.id(), "alice", null, null, "alice@example.com", null, null, null, Set.of(roles), null);
+            }
+
+            return user.id();
         }
     }
 
