@@ -123,8 +123,8 @@ class DefaultRoleServiceTest {
         @Test
         void findRolesOfUser_shouldReturnTheSingleRoleGrantedToTheUser() {
             // given.
-            String userId =
-                    createUserWithRoles(roleRepository.findIdByName("VIEWER").orElseThrow());
+            String userId = createUserWithRoles(
+                    roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);
@@ -137,8 +137,8 @@ class DefaultRoleServiceTest {
         void findRolesOfUser_shouldReturnEveryRoleWithItsAuthorities() {
             // given.
             String userId = createUserWithRoles(
-                    roleRepository.findIdByName("ADMIN").orElseThrow(),
-                    roleRepository.findIdByName("EDITOR").orElseThrow());
+                    roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow(),
+                    roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow());
 
             // when.
             Set<Role> roles = roleService.findRolesOfUser(userId);

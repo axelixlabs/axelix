@@ -39,6 +39,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
@@ -170,7 +171,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 password,
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest(username, password);
@@ -198,7 +199,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 "db-password",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         LoginRequest loginRequest = new LoginRequest("db-user", "wrong-password");
 
@@ -223,7 +224,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 "db-password",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
         userService.updateStatus(user.id(), UserStatus.SUSPENDED);
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
@@ -256,7 +257,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 password,
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity user = userRepository.findByUsername(username).orElseThrow();
         userService.updateStatus(user.id(), UserStatus.SUSPENDED);
         userService.updateStatus(user.id(), UserStatus.ACTIVE);
@@ -330,7 +331,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 "aliceSecret",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
@@ -391,7 +392,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                 "Engineering Manager",
                 "Engineering",
                 "aliceSecret",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
         userService.updateStatus(alice.id(), UserStatus.SUSPENDED);
 

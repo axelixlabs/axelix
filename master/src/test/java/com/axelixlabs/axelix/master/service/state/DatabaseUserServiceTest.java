@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
@@ -91,7 +92,7 @@ class DatabaseUserServiceTest {
                 " Software Engineer ",
                 " Platform ",
                 "plainPass",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
 
         // then.
         List<UserEntity> users = userRepository.findAll();
@@ -179,7 +180,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "p",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -196,7 +199,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "p",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -213,7 +218,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "   ",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -240,7 +247,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         // when.
         assertThatThrownBy(() -> userService.createLocal(
@@ -251,7 +258,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "p",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(UsernameAlreadyExistsException.class);
         assertThat(userRepository.findAll()).hasSize(1);
@@ -268,7 +277,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "p",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(UsernameAlreadyExistsException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -285,7 +296,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         // when.
         assertThatThrownBy(() -> userService.createLocal(
@@ -296,7 +307,9 @@ class DatabaseUserServiceTest {
                         null,
                         null,
                         "p",
-                        Set.of(roleRepository.findIdByName("VIEWER").orElseThrow())))
+                        Set.of(roleRepository
+                                .findIdByName(TestRoles.VIEWER.getName())
+                                .orElseThrow())))
                 // then.
                 .isInstanceOf(EmailAlreadyExistsException.class);
         assertThat(userRepository.findAll()).hasSize(1);
@@ -312,7 +325,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -330,8 +343,6 @@ class DatabaseUserServiceTest {
 
     @Test
     void findAll_shouldReturnAllUsers() {
-        userService.createLocal("alice", null, null, "a@example.com", null, null, "p", "VIEWER");
-        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "hash-bob", "ADMIN");
         userService.createLocal(
                 "alice",
                 null,
@@ -340,8 +351,8 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
-        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "ADMIN");
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
+        userService.createFromOidc("bob", null, null, "b@example.com", null, null, "hash-bob", "ADMIN");
 
         // when.
         List<UserEntity> all = userService.findAll();
@@ -366,7 +377,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         // when.
         Optional<UserEntity> found = userService.findUserByUsername("alice");
@@ -394,7 +405,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -423,7 +434,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         // when.
         userService.updateLastLoginAt("alice");
@@ -444,7 +455,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -467,7 +478,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -511,7 +522,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "oldPass",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("oldName").orElseThrow();
 
         // when.
@@ -551,7 +562,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 oldPassword,
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("oldName").orElseThrow();
 
         // when.
@@ -585,7 +596,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "oldPass",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -617,7 +628,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -639,7 +650,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -661,7 +672,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -683,7 +694,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -714,7 +725,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -736,7 +747,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -768,7 +779,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         userService.createLocal(
                 "bob",
                 null,
@@ -777,7 +788,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
 
         // when.
@@ -801,7 +812,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -834,7 +845,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         userService.createLocal(
                 "bob",
                 null,
@@ -843,7 +854,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
 
         // when.
@@ -867,7 +878,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity alice = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -891,7 +902,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -924,7 +935,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "plainPass",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
 
         // then.
         UserEntity saved = userRepository.findByUsername("alice").orElseThrow();
@@ -943,8 +954,8 @@ class DatabaseUserServiceTest {
                 null,
                 "plainPass",
                 Set.of(
-                        roleRepository.findIdByName("VIEWER").orElseThrow(),
-                        roleRepository.findIdByName("EDITOR").orElseThrow()));
+                        roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow(),
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow()));
 
         // then.
         UserEntity saved = userRepository.findByUsername("alice").orElseThrow();
@@ -982,7 +993,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -1013,7 +1024,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -1034,7 +1045,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
         userService.createLocal(
                 "bob",
                 null,
@@ -1043,7 +1054,7 @@ class DatabaseUserServiceTest {
                 null,
                 null,
                 "p",
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
 
         String aliceId = userRepository.findByUsername("alice").orElseThrow().id();
         String bobId = userRepository.findByUsername("bob").orElseThrow().id();

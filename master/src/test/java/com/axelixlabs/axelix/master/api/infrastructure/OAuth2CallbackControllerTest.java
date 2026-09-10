@@ -334,7 +334,7 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 "test-password",
-                Set.of(roleRepository.findIdByName("ADMIN").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.ADMIN.getName()).orElseThrow()));
 
         // and.
         String userInfoJson = "someJson";

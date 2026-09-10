@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.domain.UserStatus;
@@ -98,7 +99,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "password": "plainPassword",
                   "roleIds": ["%s"]
                 }
-                """.formatted(roleRepository.findIdByName("EDITOR").orElseThrow());
+                """.formatted(
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -144,7 +146,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "password": "plainPassword",
                   "roleIds": ["%s"]
                 }
-                """.formatted(roleRepository.findIdByName("EDITOR").orElseThrow());
+                """.formatted(
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -263,8 +266,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   ]
                 }
                 """.formatted(
-                        roleRepository.findIdByName("VIEWER").orElseThrow(),
-                        roleRepository.findIdByName("EDITOR").orElseThrow());
+                        roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow(),
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow());
 
         // when.
         IdentityAwareTestRestTemplate superAdmin = restTemplate.asUsersFeedEditor();
@@ -295,8 +298,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   ]
                 }
                 """.formatted(
-                        roleRepository.findIdByName("EDITOR").orElseThrow(),
-                        roleRepository.findIdByName("EDITOR").orElseThrow());
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow(),
+                        roleRepository.findIdByName(TestRoles.EDITOR.getName()).orElseThrow());
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -322,7 +325,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "password": "p",
                   "roleIds": ["%s"]
                 }
-                """.formatted(roleRepository.findIdByName("VIEWER").orElseThrow());
+                """.formatted(
+                        roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -347,7 +351,8 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                   "password": "p",
                   "roleIds": ["%s"]
                 }
-                """.formatted(roleRepository.findIdByName("VIEWER").orElseThrow());
+                """.formatted(
+                        roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow());
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -765,7 +770,7 @@ public class UserManagementApiTest extends AbstractProtectedEndpointTest {
                 null,
                 null,
                 password,
-                Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                Set.of(roleRepository.findIdByName(TestRoles.VIEWER.getName()).orElseThrow()));
         return userRepository.findByUsername(username).orElseThrow();
     }
 

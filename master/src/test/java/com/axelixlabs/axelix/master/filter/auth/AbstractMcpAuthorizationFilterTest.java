@@ -221,9 +221,6 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String password = "test-password";
 
             userService.createLocal(
-                    username, null, null, "test-email@example.com", null, null, password, TestRoles.VIEWER.getName());
-            String userId =
-                    userService.findUserByUsername(username).orElseThrow().id();
                     username,
                     null,
                     null,
@@ -231,7 +228,11 @@ abstract class AbstractMcpAuthorizationFilterTest {
                     null,
                     null,
                     password,
-                    Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
+            String userId =
+                    userService.findUserByUsername(username).orElseThrow().id();
 
             // and.
             registerInstanceForBeansTool(activeInstanceId);
@@ -295,7 +296,9 @@ abstract class AbstractMcpAuthorizationFilterTest {
                     null,
                     null,
                     password,
-                    Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -323,7 +326,9 @@ abstract class AbstractMcpAuthorizationFilterTest {
                     null,
                     null,
                     password,
-                    Set.of(roleRepository.findIdByName("VIEWER").orElseThrow()));
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
