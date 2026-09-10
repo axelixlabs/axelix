@@ -1,0 +1,37 @@
+.Notice {
+    /* Accent for the "released" marker. Green reads as "shipped / available now",
+       mirroring the purple "future" accent of UpcomingReleaseNotice. */
+    --released-accent: #2e8555;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -4px 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--axelix-border);
+    font-size: 0.85rem;
+    color: var(--axelix-fg-subtle);
+}
+
+:global(html[data-theme='dark']) .Notice {
+    --released-accent: #7fd8a5;
+}
+
+.Label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--released-accent);
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--released-accent);
+}
+
+.Separator {
+    color: var(--axelix-border-strong);
+}
