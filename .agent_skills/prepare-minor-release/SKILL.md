@@ -1,6 +1,6 @@
 ---
 name: prepare-minor-release
-description: Prepare an Axelix minor lockstep release — the pre-release housekeeping changes, a hand-editable release-notes draft, and the post-release bump to the next -SNAPSHOT. Use this skill whenever the user says they are cutting, preparing, or shipping a release ("we're releasing 1.1.0", "prepare the minor release", "release housekeeping"), asks to draft or write release notes for a version, or asks to move master to the next snapshot / development version after a release. Also use it for the docs part alone ("swap the upcoming notices for released notices") — that swap is a release-housekeeping step.
+description: Prepare an Axelix minor lockstep release — the pre-release housekeeping changes, a hand-editable release-notes draft, and the post-release bump to the next -SNAPSHOT. Use this skill whenever the user says they are cutting, preparing, or shipping a release ("we're releasing 1.1.0", "prepare the minor release", "release housekeeping"), asks to draft or write release notes for a version, or asks to move master to the next snapshot / development version after a release. Also use it for the docs part alone ("swap the upcoming notices for released notices") — that swap is a post-release-housekeeping step.
 ---
 
 # Prepare a minor release
@@ -14,9 +14,9 @@ This skill covers three phases. Figure out from the conversation which one the u
 version is not stated, derive it from `axelixVersion` in the root `gradle.properties` (strip `-SNAPSHOT`) and
 confirm it with the user before editing anything.
 
-1. **Pre-release housekeeping** — version, playgrounds, docs notices.
+1. **Pre-release housekeeping** — version, playgrounds.
 2. **Release notes draft** — diff against the previous minor tag.
-3. **Post-release bump** — move `master` to the next minor's `-SNAPSHOT`.
+3. **Post-release housekeeping** — move `master` to the next minor's `-SNAPSHOT`, swap the docs notices.
 
 ## Hard boundaries
 
@@ -33,7 +33,7 @@ the developer pulls the trigger.
 
 ## Phase 1 — Pre-release housekeeping
 
-All of the following becomes one commit (made by the user). Three groups of edits:
+All of the following becomes one commit (made by the user). Two groups of edits:
 
 ### 1. Fleet version
 
@@ -62,22 +62,6 @@ grep -rn "com.axelixlabs" playgrounds/ --include="build.gradle*" --include="pom.
 Afterwards verify no Axelix `-SNAPSHOT` or stale pin survived:
 `grep -rn "com.axelixlabs" playgrounds/ --include="build.gradle*" --include="pom.xml" | grep -v "X.Y.0"`
 should only return lines that carry no version at all (e.g. Maven `<artifactId>` lines).
-
-### 3. Docs notices
-
-While a minor is in development, docs sections shipping with it carry an `<UpcomingReleaseNotice />`
-(components in `docs/src/components/`). When the minor is cut, each of those becomes a
-`<ReleasedInNotice version="X.Y.0" />`.
-
-- Find every usage: `grep -rn "UpcomingReleaseNotice" docs/`.
-- In each page, replace the JSX usage **and** swap the import (`UpcomingReleaseNotice` →
-  `ReleasedInNotice`, both come from `@site/src/components`).
-- Every English page under `docs/docs/` has a mirrored Russian copy under
-  `docs/i18n/ru/docusaurus-plugin-content-docs/current/` — update both, or the docs CI build fails on the
-  `ru` locale.
-- All existing notices should belong to the release being cut (they were added for it); if a notice looks
-  like it belongs to a *future* release, stop and ask the user instead of converting it.
-- Verify: the grep above must come back empty for `docs/docs/` and the ru mirror when done.
 
 ### Wrap-up
 
@@ -111,13 +95,32 @@ them so the developer edits instead of starting from scratch.
    developer: it stays **untracked** and must not slip into the housekeeping commit — say so explicitly, and
    never `git add` it. The developer publishes the final text against the `vX.Y.0` tag manually.
 
-## Phase 3 — Post-release bump
+## Phase 3 — Post-release housekeeping
 
 After the pipeline has published the fleet and created `vX.Y.0`, development on `master` moves to the next
-minor. One commit (again: stage only, the user commits):
+minor. One commit (again: stage only, the user commits). Two groups of edits:
+
+### 1. Snapshot bump
 
 - Root `gradle.properties`: `axelixVersion` → `X.(Y+1).0-SNAPSHOT`.
 - Playgrounds: **all** Axelix pins — starters *and* plugins — → `X.(Y+1).0-SNAPSHOT`, found with the same
   grep as in Phase 1.
 
-Verify with the same greps, show the summary, let the user commit.
+### 2. Docs notices
+
+While a minor is in development, docs sections shipping with it carry an `<UpcomingReleaseNotice />`
+(components in `docs/src/components/`). Now that the minor is cut, each of those becomes a
+`<ReleasedInNotice version="X.Y.0" />` — where `X.Y.0` is the version **just released**, not the new
+snapshot.
+
+- Find every usage: `grep -rn "UpcomingReleaseNotice" docs/`.
+- In each page, replace the JSX usage **and** swap the import (`UpcomingReleaseNotice` →
+  `ReleasedInNotice`, both come from `@site/src/components`).
+- Every English page under `docs/docs/` has a mirrored Russian copy under
+  `docs/i18n/ru/docusaurus-plugin-content-docs/current/` — update both, or the docs CI build fails on the
+  `ru` locale.
+- All existing notices should belong to the release just cut (they were added for it); if a notice looks
+  like it belongs to a *future* release, stop and ask the user instead of converting it.
+- Verify: the grep above must come back empty for `docs/docs/` and the ru mirror when done.
+
+Verify with the same greps as Phase 1, show the summary, let the user commit.
