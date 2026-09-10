@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { ReleasedInNotice } from '@site/src/components';
 
 # Database Migrations
 
@@ -30,7 +30,7 @@ By default, migrations use the **same credentials Master connects with** — `ax
 
 ### Using a dedicated migration user
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Some teams run the application day-to-day under a least-privilege user that can only read and write rows, and apply
 schema changes under a separate, more privileged user. Master supports this with two properties:

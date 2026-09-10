@@ -12,10 +12,11 @@ const LABEL: Record<string, string> = {
 
 /**
  * Localized detail that follows the separator, keyed by locale. Falls back to English.
+ * The version itself is rendered separately as a highlighted badge.
  */
-const DETAIL: Record<string, (version: string) => string> = {
-    en: (version) => `Available since release ${version}`,
-    ru: (version) => `Доступно начиная с релиза ${version}`,
+const DETAIL: Record<string, string> = {
+    en: 'Available since release',
+    ru: 'Доступно начиная с релиза',
 };
 
 type ReleasedInNoticeProps = {
@@ -35,10 +36,10 @@ export const ReleasedInNotice = ({ version }: ReleasedInNoticeProps): ReactNode 
     } = useDocusaurusContext();
 
     const label = LABEL[currentLocale] ?? LABEL.en;
-    const detail = (DETAIL[currentLocale] ?? DETAIL.en)(version);
+    const detail = DETAIL[currentLocale] ?? DETAIL.en;
 
     return (
-        <div className={styles.Notice} role="note" aria-label={`${label} — ${detail}`}>
+        <div className={styles.Notice} role="note" aria-label={`${label} — ${detail} ${version}`}>
             <span className={styles.Label}>
                 <span className={styles.Dot} aria-hidden="true" />
                 {label}
@@ -46,7 +47,9 @@ export const ReleasedInNotice = ({ version }: ReleasedInNoticeProps): ReactNode 
             <span className={styles.Separator} aria-hidden="true">
                 |
             </span>
-            <span>{detail}</span>
+            <span>
+                {detail}: <span className={styles.Version}>{version}</span>
+            </span>
         </div>
     );
 };

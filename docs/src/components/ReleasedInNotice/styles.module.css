@@ -35,3 +35,8 @@
 .Separator {
     color: var(--axelix-border-strong);
 }
+
+.Version {
+    font-weight: 700;
+    color: var(--released-accent);
+}

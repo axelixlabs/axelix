@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { ReleasedInNotice } from '@site/src/components';
 
 # Configuring Master
 
@@ -73,7 +73,7 @@ anything sensitive into the logs.
 
 ### Pointing Master at a config file
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 The three sources above cover most setups, but it is often the case that you would want to supply a configuration to the Axelix Master
 from the external YAML pr properties file, for example from a file mounted into a container at a custom path.
@@ -111,7 +111,7 @@ docker run --rm -p 8080:8080 \
 
 ### Loading configuration from a Spring Cloud Config Server
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 If you already run a [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html) to
 centralise configuration across your fleet, Master can pull its own settings from it too. Master acts as a Spring Cloud
@@ -153,7 +153,7 @@ never contacts a server and boots normally.
 
 ### Loading configuration from HashiCorp Vault
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 If your organisation keeps secrets in [HashiCorp Vault](https://developer.hashicorp.com/vault), Master can read its own
 configuration from there too. On startup Master fetches a secret from Vault's
@@ -291,7 +291,7 @@ contacts Vault and boots normally.
 
 ### General
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 <div className={styles.ConfigTable}>
 
@@ -461,7 +461,7 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 
 ### Structured logging
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 By default, Master logs plain text to the console (i.e. the process stdout). Set `axelix.master.logging.json.enabled=true`
 to switch to [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON
@@ -480,7 +480,7 @@ when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aw
 
 #### Prometheus
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master exposes a Prometheus scrape endpoint once you turn it on with `axelix.master.metrics.prometheus.enabled=true`.
 It responds at `/api/actuator/prometheus` and does not require authentication.
@@ -531,7 +531,7 @@ axelix:
 
 #### OTLP
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master can push its own JVM, HTTP, database-pool, and other Micrometer metrics to an OTLP-compatible collector over
 HTTP/protobuf. This exports metrics produced by Master itself, not metrics read from services connected through an
@@ -610,7 +610,7 @@ java \
 ```
 
 #### External config file
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Keep the same settings in a YAML or properties file and point Master at it with `axelix.master.config.location`; see
 [Pointing Master at a config file](#pointing-master-at-a-config-file) for the accepted location shapes.
@@ -703,7 +703,7 @@ docker run --rm -p 8080:8080 \
 ```
 
 #### External config file
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 You can also supply configuration via an external config file. Mount a YAML or properties file into the container and point Master at it with
 `axelix.master.config.location` (see [Pointing Master at a config file](#pointing-master-at-a-config-file)). Keep
@@ -793,7 +793,7 @@ local testing. Put Master behind a TLS-terminating proxy and flip it to `true` f
 
 ### Supplying configuration via a mounted file
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Instead of listing every non-secret setting under `environment`, you can mount a YAML or properties file into the
 `master` service and point Master at it with `axelix.master.config.location` (see [Pointing Master at a config

@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { ReleasedInNotice } from '@site/src/components';
 
 # Настройка Master
 
@@ -77,7 +77,7 @@ Master никогда не ограничивает свойство единс�
 
 ### Указание файла конфигурации для Master
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Трёх источников выше хватает для большинства случаев, но нередко конфигурацию Axelix Master хочется задать из внешнего
 файла YAML или properties — например, из файла, смонтированного в контейнер по нестандартному пути.
@@ -117,7 +117,7 @@ docker run --rm -p 8080:8080 \
 
 ### Загрузка конфигурации из Spring Cloud Config Server
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Если у вас уже развёрнут [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html)
 для централизованного хранения конфигурации всех сервисов, Master тоже может читать из него свои настройки. Master
@@ -160,7 +160,7 @@ java \
 
 ### Загрузка конфигурации из HashiCorp Vault
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Если ваша организация хранит секреты в [HashiCorp Vault](https://developer.hashicorp.com/vault), Master может читать
 оттуда и свою конфигурацию. При старте Master получает секрет из
@@ -300,7 +300,7 @@ Vault и запускается штатно.
 
 ### Общие настройки
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 <div className={styles.ConfigTable}>
 
@@ -475,7 +475,7 @@ Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.
 
 ### Структурированное логирование
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 По умолчанию Master выводит в консоль (то есть в stdout процесса) обычный текст. Установите
 `axelix.master.logging.json.enabled=true`, чтобы переключиться на структурированное JSON-логирование в формате
@@ -495,7 +495,7 @@ Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.
 
 #### Prometheus
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master открывает эндпоинт для сбора метрик Prometheus, если включить его через
 `axelix.master.metrics.prometheus.enabled=true`. Он отвечает по адресу `/api/actuator/prometheus` и не требует
@@ -547,7 +547,7 @@ axelix:
 
 #### OTLP
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master может отправлять собственные метрики JVM, HTTP, пула соединений с базой данных и другие метрики Micrometer в
 OTLP-совместимый коллектор по HTTP/protobuf. Экспортируются метрики самого Master, а не метрики сервисов, подключённых
@@ -627,7 +627,7 @@ java \
 ```
 
 #### Внешний конфиг-файл
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Держите те же настройки в файле YAML или properties и укажите его Master через `axelix.master.config.location`;
 допустимые формы расположения см. в разделе [Указание файла конфигурации для
@@ -722,7 +722,7 @@ docker run --rm -p 8080:8080 \
 ```
 
 #### Внешний конфиг-файл
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Конфигурацию также можно задать через внешний конфиг-файл. Смонтируйте в контейнер файл YAML или properties и укажите
 его Master через `axelix.master.config.location` (см. [Указание файла конфигурации для
@@ -814,7 +814,7 @@ AXELIX_ADMIN_PASSWORD=...
 
 ### Передача конфигурации через смонтированный файл
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Вместо того чтобы перечислять каждую несекретную настройку в `environment`, вы можете смонтировать файл YAML или
 properties в сервис `master` и указать его Master через `axelix.master.config.location` (см. [Указание файла
