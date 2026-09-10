@@ -29,6 +29,7 @@ import org.testcontainers.vault.VaultContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class AxelixVaultAppRoleIntegrationTest {
 
     private static final String VAULT_CONFIG_PREFIX = AxelixVaultProperties.AXELIX_PREFIX;
