@@ -23,8 +23,8 @@ import { fetchData } from "@/helpers";
 import { type IEnvironmentResponseBody, StatefulRequest } from "@/models";
 import { getEnvironmentData } from "@/services";
 
-import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
+import styles from "./styles.module.css";
 
 const Environment = () => {
     const { instanceId } = useParams();
@@ -53,10 +53,9 @@ const Environment = () => {
     const propertySources = respBody.propertySources;
 
     return (
-        <>
-            {eventualProfiles.length !== 0 && <EnvironmentProfiles activeProfiles={eventualProfiles} />}
-            <EnvironmentTables propertySources={propertySources} />
-        </>
+        <div className={styles.Page}>
+            <EnvironmentTables propertySources={propertySources} profiles={eventualProfiles} />
+        </div>
     );
 };
 

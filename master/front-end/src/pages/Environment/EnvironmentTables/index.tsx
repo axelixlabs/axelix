@@ -15,24 +15,46 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, PageSearch } from "@/components";
-import { buildAutoCompleteOptions, filterPropertySources, getPropertiesCount } from "@/helpers";
-import type { IEnvironmentPropertySource } from "@/models";
+import { PageSearch } from "@/components";
+import { buildAutoCompleteOptions, buildPrecedenceIndex, filterPropertySources, getPropertiesCount } from "@/helpers";
+import type { EPropertyTriageTag, IEnvironmentPropertySource } from "@/models";
 
 import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
+import { EnvironmentProfiles } from "../EnvironmentProfiles";
+import { EnvironmentTriageFilters } from "../EnvironmentTriageFilters";
+import pageStyles from "../styles.module.css";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
      * The list of property sources to render
      */
     propertySources: IEnvironmentPropertySource[];
+
+    /**
+     * The profiles the inspected application runs with
+     */
+    profiles: string[];
 }
 
-export const EnvironmentTables = ({ propertySources }: IProps) => {
+export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
+    const { t } = useTranslation();
+
     const [search, setSearch] = useState<string>("");
-    const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
+    const [triageTags, setTriageTags] = useState<EPropertyTriageTag[]>([]);
+
+    const isFiltered = !!search || triageTags.length > 0;
+    const effectivePropertySources = isFiltered
+        ? filterPropertySources(propertySources, search, triageTags)
+        : propertySources;
+
+    // Built from the full list on purpose: a chain assembled from the filtered subset would hide the
+    // very sources that explain which value wins.
+    const precedenceIndex = useMemo(() => buildPrecedenceIndex(propertySources), [propertySources]);
 
     const totalPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(propertySources);
     const filteredPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(effectivePropertySources);
@@ -43,15 +65,39 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} autocompleteOptions={autocompleteOptions} />
+            <div className={styles.Toolbar}>
+                <div className={styles.ToolbarRow}>
+                    {profiles.length !== 0 && <EnvironmentProfiles activeProfiles={profiles} />}
+                    <div className={styles.SearchSlot}>
+                        <PageSearch
+                            addonAfter={addonAfter}
+                            setSearch={setSearch}
+                            autocompleteOptions={autocompleteOptions}
+                            removeBottomGutter
+                        />
+                    </div>
+                </div>
 
-            <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
-                <>
-                    {effectivePropertySources.map((propertySource) => (
-                        <EnvironmentModifiableTable propertySource={propertySource} key={propertySource.name} />
-                    ))}
-                </>
-            </EmptyHandler>
+                <EnvironmentTriageFilters
+                    propertySources={propertySources}
+                    selectedTags={triageTags}
+                    onSelectedTagsChange={setTriageTags}
+                />
+            </div>
+
+            <div className={pageStyles.Groups}>
+                {effectivePropertySources.length === 0 ? (
+                    <div className={styles.NoResults}>{t("Environments.noMatchingProperties")}</div>
+                ) : (
+                    effectivePropertySources.map((propertySource) => (
+                        <EnvironmentModifiableTable
+                            propertySource={propertySource}
+                            precedenceIndex={precedenceIndex}
+                            key={propertySource.name}
+                        />
+                    ))
+                )}
+            </div>
         </>
     );
 };

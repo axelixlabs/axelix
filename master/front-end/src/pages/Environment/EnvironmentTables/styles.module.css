@@ -1,0 +1,50 @@
+.Toolbar {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9edec;
+}
+
+.ToolbarRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.SearchSlot {
+    flex: 1;
+    min-width: 280px;
+}
+
+/*
+ * PageSearch is shared across pages, so its look is nudged from the outside here rather than changed
+ * at the source: full width instead of the default 400px cap, and the monospace face the property
+ * keys are set in, since that is what is being typed into it.
+ */
+.SearchSlot > :global(.ant-space-compact) {
+    width: 100%;
+}
+
+.SearchSlot :global(.ant-input) {
+    height: 38px;
+    font-size: 13.5px;
+}
+
+.SearchSlot :global(.ant-space-addon) {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--prop-text-faint);
+    background-color: var(--prop-surface-sunken);
+}
+
+.NoResults {
+    padding: 48px;
+    font-size: 13.5px;
+    text-align: center;
+    color: var(--prop-text-faint);
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-panel-border);
+    border-radius: var(--prop-radius);
+}

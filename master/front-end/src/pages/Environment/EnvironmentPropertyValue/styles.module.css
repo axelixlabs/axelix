@@ -1,24 +1,46 @@
-.MainWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    column-gap: 20px;
-    min-width: 0;
-    max-width: 100%;
-}
-
 .Value {
+    justify-self: end;
     min-width: 0;
-    overflow: hidden;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: right;
+    color: var(--prop-text);
+    overflow-wrap: anywhere;
+}
+
+.SuppressedValue {
+    color: var(--prop-text-faint);
+    text-decoration: line-through;
+}
+
+.StatusCell {
+    display: inline-flex;
+    justify-self: end;
+    align-items: center;
+}
+
+.Status {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    border-radius: 5px;
+    cursor: default;
 }
 
-.IconPlaceholder {
-    visibility: hidden;
-    pointer-events: none;
+.Active {
+    color: var(--prop-accent-strong);
+    background-color: var(--prop-accent-surface);
+    border: 1px solid var(--prop-accent-border);
 }
 
-.PrimaryIcon {
-    flex-shrink: 0;
+.Suppressed {
+    color: var(--prop-text-faint);
+    background-color: var(--prop-surface-sunken);
+    border: 1px solid var(--prop-border-soft);
 }

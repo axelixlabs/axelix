@@ -17,8 +17,16 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { filterPropertySources } from "@/helpers";
-import type { IEnvironmentPropertySource } from "@/models";
+import {
+    buildPrecedenceIndex,
+    countTriageTag,
+    filterPropertySources,
+    precedenceChainOf,
+    splitProperties,
+} from "@/helpers";
+import { EPropertyTriageTag, type IEnvProperty, type IEnvironmentPropertySource } from "@/models";
+
+const namesOf = (properties: IEnvProperty[]): string[] => properties.map(({ name }) => name);
 
 describe("Filter propertySources", () => {
     const propertySources: IEnvironmentPropertySource[] = [
@@ -79,5 +87,84 @@ describe("Filter propertySources", () => {
     it("If nothing is found, returns an empty array", () => {
         const result = filterPropertySources(propertySources, "zzz-not-found");
         expect(result).toEqual([]);
+    });
+
+    it("Narrows down to the selected triage tag even when the propertySource name matches", () => {
+        const result = filterPropertySources(propertySources, "AXELIX_PROPERTY_SOURCE_", [
+            EPropertyTriageTag.SUPPRESSED,
+        ]);
+
+        expect(result).toHaveLength(1);
+        expect(namesOf(result[0].properties)).toEqual(["sun.jnu.encoding"]);
+    });
+
+    it("Combines the search with the triage tags, so that both have to match", () => {
+        expect(filterPropertySources(propertySources, "specification", [EPropertyTriageTag.SUPPRESSED])).toEqual([]);
+    });
+});
+
+describe("Precedence chain", () => {
+    const property = (name: string, value: string, isPrimary: boolean): IEnvProperty => ({
+        name,
+        value,
+        isPrimary,
+        configPropsBeanName: null,
+        description: null,
+    });
+
+    /**
+     * Ordered the way the starter reports them - the highest precedence source first.
+     */
+    const propertySources: IEnvironmentPropertySource[] = [
+        {
+            name: "systemEnvironment",
+            description: null,
+            properties: [property("SPRING_JPA_OPEN_IN_VIEW", "true", true)],
+        },
+        {
+            name: "application-prod.properties",
+            description: null,
+            properties: [property("spring.jpa.open-in-view", "false", false)],
+        },
+        {
+            name: "application.properties",
+            description: null,
+            properties: [
+                property("spring.jpa.open-in-view", "false", false),
+                property("spring.thymeleaf.mode", "HTML", true),
+            ],
+        },
+    ];
+
+    const precedenceIndex = buildPrecedenceIndex(propertySources);
+
+    it("Collects every occurrence of a property across the sources, highest precedence first", () => {
+        expect(precedenceChainOf(precedenceIndex, "spring.jpa.open-in-view")).toEqual([
+            { propertySourceName: "systemEnvironment", value: "true" },
+            { propertySourceName: "application-prod.properties", value: "false" },
+            { propertySourceName: "application.properties", value: "false" },
+        ]);
+    });
+
+    it("Indexes relaxed-binding variants of a name onto the same chain", () => {
+        expect(precedenceChainOf(precedenceIndex, "SPRING_JPA_OPEN_IN_VIEW")).toEqual(
+            precedenceChainOf(precedenceIndex, "spring.jpa.open-in-view"),
+        );
+    });
+
+    it("Returns an empty chain for a property that is defined nowhere", () => {
+        expect(precedenceChainOf(precedenceIndex, "spring.not.there")).toEqual([]);
+    });
+
+    it("Gives a property a drop-down once more than one source defines it", () => {
+        const [withDropDown, withoutDropDown] = splitProperties(propertySources[2].properties, precedenceIndex);
+
+        expect(namesOf(withDropDown)).toEqual(["spring.jpa.open-in-view"]);
+        expect(namesOf(withoutDropDown)).toEqual(["spring.thymeleaf.mode"]);
+    });
+
+    it("Counts the suppressed properties across all the sources", () => {
+        expect(countTriageTag(propertySources, EPropertyTriageTag.SUPPRESSED)).toBe(2);
+        expect(countTriageTag(propertySources, EPropertyTriageTag.DEPRECATED)).toBe(0);
     });
 });
