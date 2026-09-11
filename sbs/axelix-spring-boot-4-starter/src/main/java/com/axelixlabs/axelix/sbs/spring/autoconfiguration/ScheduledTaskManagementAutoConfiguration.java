@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  * @since 14.10.2025
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 

@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 public class LibraryInformationProviderAutoConfiguration {
 
     @Bean

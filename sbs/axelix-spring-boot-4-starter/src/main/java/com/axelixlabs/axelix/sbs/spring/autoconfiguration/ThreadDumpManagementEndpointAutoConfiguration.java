@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndp
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = ThreadDumpManagementEndpoint.class)
 public class ThreadDumpManagementEndpointAutoConfiguration {
 

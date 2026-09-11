@@ -46,6 +46,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
