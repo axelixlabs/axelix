@@ -168,6 +168,16 @@ jobs:
           echo "RELEASE_TAG=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
           echo "VITE_APP_VERSION=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
 
+      - name: Determine whether this release is the latest
+        # A patch release cut on an older minor line (e.g. 1.0.5 after 1.1.0 shipped) must not
+        # move the 'latest' image tag. The fleet release tags pushed by this pipeline are the
+        # source of truth for what has been released so far; the tag for the version being
+        # released right now is only pushed at the end of this job, hence RELEASE_TAG itself
+        # is added to the comparison explicitly.
+        run: |
+          highest="$(printf '%s\n' "${RELEASE_TAG}" $(git tag --list 'v[0-9]*' | sed 's/^v//') | sort -V | tail -n 1)"
+          echo "IS_LATEST_RELEASE=$([ "${highest}" = "${RELEASE_TAG}" ] && echo true || echo false)" >> "$GITHUB_ENV"
+
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
         with:
@@ -211,9 +221,14 @@ jobs:
       - name: Build and push the Master OSS image
         run: |
           ./gradlew :master-oss:bootJar
+          image="${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix"
+          tags=(--tag "${image}:${RELEASE_TAG}")
+          if [ "${IS_LATEST_RELEASE}" = "true" ]; then
+            tags+=(--tag "${image}:latest")
+          fi
           docker build \
             --platform linux/amd64,linux/arm64 \
-            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} \
+            "${tags[@]}" \
             --file master-oss/Dockerfile \
             --push \
             master-oss
