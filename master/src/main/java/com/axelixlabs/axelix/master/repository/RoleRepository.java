@@ -48,8 +48,19 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
     @Query("SELECT role_id FROM users_roles WHERE user_id = :userId")
     List<String> findRoleIdsOfUser(@Param("userId") String userId);
 
+    @Query("SELECT role_id AS role_id, COUNT(*) AS members FROM users_roles GROUP BY role_id")
+    List<RoleMembers> findAllMembersCounts();
+
     record RoleWithAuthorityName(
             String roleId, String roleName, @Nullable String authorityName) {}
 
     record RoleParentBond(String roleId, String parentRoleId) {}
+
+    /**
+     * Number of users a role is assigned to.
+     *
+     * @param roleId  Identifier of the role.
+     * @param members Number of users the role is assigned to.
+     */
+    record RoleMembers(String roleId, int members) {}
 }
