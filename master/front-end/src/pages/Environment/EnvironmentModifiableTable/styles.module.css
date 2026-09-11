@@ -1,36 +1,134 @@
-.AccordionWrapper {
-    margin-bottom: 40px;
+.Panel {
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-panel-border);
+    border-radius: var(--prop-radius);
+    box-shadow: var(--prop-shadow-card);
 }
 
-.AccordionHeader {
+/*
+ * Accordion draws a bottom border on its own wrapper to separate stacked items. The panel is a
+ * standalone card with its own border, and the rows inside supply their own separators, so both are
+ * restated here. The class is doubled to out-specify Accordion's own single-class rule regardless of
+ * the order the two CSS modules end up in.
+ */
+.PanelAccordion.PanelAccordion {
+    border-bottom: none;
+}
+
+.RowAccordion.RowAccordion {
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.PanelHeader.PanelHeader {
     display: flex;
     align-items: center;
-    column-gap: 8px;
-    font-weight: 600;
+    min-height: 44px;
+    padding: 0 16px 0 34px;
+    background-color: var(--prop-surface-soft);
+    border-radius: 9px 9px 0 0;
 }
 
-.MainAccordionHeaderStyles {
-    background-color: var(--axelix-primary-light-green);
-    padding: 16px;
+.PanelHeader.PanelHeader::before {
+    left: 14px;
+    width: 12px;
+    height: 12px;
 }
 
-.KeyChunk {
-    padding-right: 16px;
-    flex-shrink: 0;
-    word-break: break-all;
-}
-
-.ValueChunk {
+.PanelHeaderInner {
     display: flex;
-    justify-content: flex-end;
-    word-break: break-all;
-    padding-left: 16px;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 14px;
+    width: 100%;
+    min-width: 0;
 }
 
-.DeprecatedPropertyAccordionsHeader {
-    background-color: var(--axelix-primary-light-red);
+.PanelTitleGroup {
+    display: flex;
+    align-items: center;
+    column-gap: 9px;
+    min-width: 0;
 }
 
-.ListAccordionStyles {
+.PanelTitle {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--prop-text);
+    overflow-wrap: anywhere;
+}
+
+.InfoTrigger {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--prop-text-dim);
+    cursor: help;
+    transition: color 0.12s;
+}
+
+.InfoTrigger:hover {
+    color: var(--prop-text);
+}
+
+.TooltipName {
+    font-family: var(--prop-mono);
+    font-size: 11.5px;
+    color: var(--prop-text-dim);
+    overflow-wrap: anywhere;
+}
+
+.PanelCounters {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    flex-shrink: 0;
+}
+
+.FlaggedCounter {
+    padding: 2px 7px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--prop-danger);
+    background-color: var(--prop-danger-surface);
+    border: 1px solid var(--prop-danger-border);
+    border-radius: 5px;
+}
+
+.PropertiesCounter {
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--prop-text-faint);
+}
+
+.PanelBody.PanelBody {
     padding: 0;
+}
+
+/*
+ * The row itself owns its padding so that its grid can line the caret gutter up with the columns.
+ */
+.RowHeader.RowHeader {
+    padding: 0;
+    background-color: transparent;
+}
+
+.RowHeader.RowHeader::before {
+    left: 21px;
+    width: 11px;
+    height: 11px;
+}
+
+.RowBody.RowBody {
+    padding: 14px 16px 16px 45px;
+    background-color: #fbfcfd;
+    border-top: 1px solid var(--prop-border-faint);
+}
+
+.EmptySource {
+    padding: 24px 16px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--prop-text-faint);
 }

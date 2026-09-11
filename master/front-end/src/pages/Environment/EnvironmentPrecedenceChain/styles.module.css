@@ -1,0 +1,92 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 7px;
+    min-width: 0;
+}
+
+.Cells {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.Cell {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    flex: 1 1 160px;
+    min-width: 0;
+    padding: 9px 12px;
+    background-color: var(--prop-surface-soft);
+    border: 1px solid var(--prop-border-soft);
+    border-top: 3px solid #e4e7ec;
+    border-radius: 8px;
+}
+
+.WinningCell {
+    background-color: var(--prop-surface);
+    border-color: var(--prop-accent-border);
+    border-top-color: var(--prop-accent);
+}
+
+.CellHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 8px;
+    min-width: 0;
+}
+
+.SourceName {
+    font-size: 12px;
+    color: var(--prop-text-faint);
+    overflow-wrap: anywhere;
+}
+
+.WinningCell .SourceName {
+    font-weight: 700;
+    color: var(--prop-text);
+}
+
+.WinsBadge {
+    flex-shrink: 0;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--prop-accent-strong);
+    background-color: var(--prop-accent-surface);
+    border-radius: 3px;
+}
+
+.Value {
+    font-family: var(--prop-mono);
+    font-size: 14px;
+    color: var(--prop-text-faint);
+    text-decoration: line-through;
+    overflow-wrap: anywhere;
+}
+
+.WinningCell .Value {
+    font-weight: 700;
+    color: var(--prop-text);
+    text-decoration: none;
+}
+
+.Rail {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    font-size: 11.5px;
+    color: var(--prop-text-dim);
+}
+
+.RailLine {
+    flex: 1;
+    height: 1px;
+    background-color: var(--prop-border-soft);
+}

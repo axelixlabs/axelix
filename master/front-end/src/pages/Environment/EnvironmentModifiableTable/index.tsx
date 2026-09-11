@@ -15,15 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useTranslation } from "react-i18next";
+
 import { InfoIcon } from "@/assets";
-import { Accordion, EmptyHandler, InfoTooltip } from "@/components";
-import { splitProperties } from "@/helpers";
-import type { IEnvironmentPropertySource } from "@/models";
+import { Accordion, HintTooltip } from "@/components";
+import { precedenceChainOf, splitProperties } from "@/helpers";
+import type { IEnvironmentPropertySource, TPrecedenceIndex } from "@/models";
 
 import { EnvironmentPropertyDetails } from "../EnvironmentPropertyDetails";
 
 import { EnvironmentProperty } from "./EnvironmentProperty";
-import sharedStyles from "./shared.module.css";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -31,11 +32,21 @@ interface IProps {
      * The property source data
      */
     propertySource: IEnvironmentPropertySource;
+
+    /**
+     * Index of every property occurrence across all the property sources, used to render the
+     * precedence chain of an individual property
+     */
+    precedenceIndex: TPrecedenceIndex;
 }
 
-export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
+export const EnvironmentModifiableTable = ({ propertySource, precedenceIndex }: IProps) => {
+    const { t } = useTranslation();
+
     const { name, properties, description } = propertySource;
-    const [withDropDown, withoutDropDown] = splitProperties(properties);
+    const [withDropDown, withoutDropDown] = splitProperties(properties, precedenceIndex);
+
+    const deprecatedCount = properties.filter(({ deprecation }) => deprecation).length;
 
     const allProperties = [
         ...withDropDown.map((property) => ({
@@ -49,65 +60,71 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
     ];
 
     return (
-        <>
-            <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
-                <Accordion
-                    header={
-                        <div className={styles.AccordionHeader}>
-                            {name}
+        <div className={styles.Panel}>
+            <Accordion
+                header={
+                    <div className={styles.PanelHeaderInner}>
+                        <span className={styles.PanelTitleGroup}>
+                            <span className={styles.PanelTitle}>{name}</span>
                             {description && (
-                                <InfoTooltip text={description}>
-                                    <InfoIcon color="#1890ff" />
-                                </InfoTooltip>
+                                <HintTooltip
+                                    placement="bottomLeft"
+                                    content={
+                                        <>
+                                            <span className={styles.TooltipName}>{name}</span>
+                                            <span>{description}</span>
+                                        </>
+                                    }
+                                >
+                                    <span className={styles.InfoTrigger}>
+                                        <InfoIcon color="currentColor" />
+                                    </span>
+                                </HintTooltip>
                             )}
-                        </div>
-                    }
-                    headerStyles={styles.MainAccordionHeaderStyles}
-                    accordionExpanded
-                >
-                    <div className="AccordionsWrapper">
-                        <EmptyHandler isEmpty={!properties.length}>
-                            {allProperties.map(({ property, hasDropdown }, index) => {
-                                const isEvenElement = index % 2 === 0;
+                        </span>
 
-                                if (hasDropdown) {
-                                    const headerStyles = [
-                                        styles.ListAccordionStyles,
-                                        property.deprecation && styles.DeprecatedPropertyAccordionsHeader,
-                                        isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement,
-                                    ]
-                                        .filter(Boolean)
-                                        .join(" ");
-
-                                    return (
-                                        <Accordion
-                                            header={
-                                                <EnvironmentProperty
-                                                    property={property}
-                                                    isEvenElement={isEvenElement}
-                                                />
-                                            }
-                                            headerStyles={headerStyles}
-                                            key={property.name}
-                                        >
-                                            <EnvironmentPropertyDetails property={property} />
-                                        </Accordion>
-                                    );
-                                }
-
-                                return (
-                                    <EnvironmentProperty
-                                        property={property}
-                                        isEvenElement={isEvenElement}
-                                        accordionAligned
-                                        key={property.name}
-                                    />
-                                );
-                            })}
-                        </EmptyHandler>
+                        <span className={styles.PanelCounters}>
+                            {deprecatedCount > 0 && (
+                                <span className={styles.FlaggedCounter}>
+                                    {t("Environments.flaggedCount", { value: deprecatedCount })}
+                                </span>
+                            )}
+                            <span className={styles.PropertiesCounter}>
+                                {t("Environments.propertiesCount", { value: properties.length })}
+                            </span>
+                        </span>
                     </div>
-                </Accordion>
-            </div>
-        </>
+                }
+                wrapperStyles={styles.PanelAccordion}
+                headerStyles={styles.PanelHeader}
+                contentStyles={styles.PanelBody}
+                accordionExpanded
+            >
+                {allProperties.length === 0 ? (
+                    <div className={styles.EmptySource}>{t("Environments.noPropertiesInSource")}</div>
+                ) : (
+                    allProperties.map(({ property, hasDropdown }) => {
+                        if (hasDropdown) {
+                            return (
+                                <Accordion
+                                    header={<EnvironmentProperty property={property} />}
+                                    wrapperStyles={styles.RowAccordion}
+                                    headerStyles={styles.RowHeader}
+                                    contentStyles={styles.RowBody}
+                                    key={property.name}
+                                >
+                                    <EnvironmentPropertyDetails
+                                        property={property}
+                                        precedenceChain={precedenceChainOf(precedenceIndex, property.name)}
+                                    />
+                                </Accordion>
+                            );
+                        }
+
+                        return <EnvironmentProperty property={property} caretPlaceholder key={property.name} />;
+                    })
+                )}
+            </Accordion>
+        </div>
     );
 };

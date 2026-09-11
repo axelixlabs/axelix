@@ -1,0 +1,12 @@
+.Page {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+    color: var(--prop-text);
+}
+
+.Groups {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}

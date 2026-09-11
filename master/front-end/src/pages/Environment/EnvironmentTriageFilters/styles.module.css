@@ -1,0 +1,89 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.Chip {
+    --chip-accent: var(--prop-text-faint);
+    --chip-surface: var(--prop-surface-sunken);
+
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #475467;
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-border);
+    border-radius: 7px;
+    box-shadow: var(--prop-shadow-card);
+    cursor: pointer;
+    user-select: none;
+    transition:
+        color 0.12s,
+        background-color 0.12s,
+        border-color 0.12s;
+}
+
+.Chip:hover {
+    border-color: var(--chip-accent);
+}
+
+.Selected {
+    color: var(--chip-accent);
+    background-color: var(--chip-surface);
+    border-color: var(--chip-accent);
+}
+
+.Deprecated {
+    --chip-accent: var(--prop-danger);
+    --chip-surface: var(--prop-danger-surface);
+}
+
+.Suppressed {
+    --chip-accent: #475467;
+    --chip-surface: var(--prop-surface-sunken);
+}
+
+.Dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    background-color: var(--chip-accent);
+    border-radius: 2px;
+}
+
+.Count {
+    padding: 1px 5px;
+    font-family: var(--prop-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--prop-text-faint);
+    background-color: var(--prop-border-faint);
+    border-radius: 4px;
+}
+
+.Selected .Count {
+    color: var(--chip-accent);
+    background-color: var(--prop-surface);
+}
+
+.Clear {
+    padding: 6px 4px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--prop-text-faint);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.Clear:hover {
+    color: var(--prop-text);
+}

@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Copy } from "@/components";
+import { useTranslation } from "react-i18next";
+
+import { Copy, HintTooltip } from "@/components";
 import type { IEnvProperty } from "@/models";
 
 import { EnvironmentPropertyValue } from "../../EnvironmentPropertyValue";
-import sharedStyles from "../shared.module.css";
 
 import styles from "./styles.module.css";
 
@@ -30,35 +31,56 @@ interface IProps {
     property: IEnvProperty;
 
     /**
-     * Whether this row is in an even position in the shared list
+     * Reserves the caret gutter on rows that cannot be expanded, so that every row in a source lines
+     * up on the same columns
      */
-    isEvenElement: boolean;
-
-    /**
-     * Adds left padding to align with accordion rows that have an expand arrow
-     */
-    accordionAligned?: boolean;
+    caretPlaceholder?: boolean;
 }
 
-export const EnvironmentProperty = ({ property, isEvenElement, accordionAligned }: IProps) => {
-    const { name } = property;
+export const EnvironmentProperty = ({ property, caretPlaceholder }: IProps) => {
+    const { name, deprecation, isPrimary } = property;
 
-    const rowBackgroundStyle = isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement;
+    const { t } = useTranslation();
+
+    const rowStyles = [
+        styles.MainWrapper,
+        deprecation ? styles.FlaggedRow : "",
+        !deprecation && !isPrimary ? styles.SuppressedRow : "",
+        caretPlaceholder ? styles.CaretPlaceholder : "",
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
-        <>
-            <div
-                className={`${styles.MainWrapper} ${rowBackgroundStyle} ${accordionAligned ? styles.AccordionAligned : ""}`}
-            >
-                <div className={styles.KeyChunk}>
-                    <div className={styles.CopyableValue}>
-                        {name} <Copy text={name} />
-                    </div>
-                </div>
-                <div className={styles.ValueChunk}>
-                    <EnvironmentPropertyValue property={property} />
-                </div>
+        <div className={rowStyles}>
+            {/* Holds the caret gutter open; the caret itself is drawn by the surrounding Accordion. */}
+            <span className={styles.CaretCell} />
+
+            <div className={styles.KeyChunk}>
+                <span className={styles.Key}>{name}</span>
+                <Copy text={name} />
+                {deprecation && (
+                    <HintTooltip
+                        placement="bottomLeft"
+                        content={
+                            <>
+                                <span className={styles.TooltipLabel}>
+                                    <span className={styles.TooltipDot} />
+                                    {t("Environments.deprecated")}
+                                </span>
+                                <span>{deprecation.message}</span>
+                            </>
+                        }
+                    >
+                        <span className={styles.DeprecationChip}>
+                            <span className={styles.ChipDot} />
+                            {t("Environments.deprecated")}
+                        </span>
+                    </HintTooltip>
+                )}
             </div>
-        </>
+
+            <EnvironmentPropertyValue property={property} />
+        </div>
     );
 };

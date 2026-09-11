@@ -71,11 +71,29 @@
     },
     "Environments": {
         "activeProfiles": "Профили:",
-        "primaryProperty": "Актуальное значение",
+        "primaryProperty": "Активное",
+        "primaryPropertyHint": "Это значение, которое приложение использует для данного свойства",
+        "suppressedProperty": "Перекрыто",
+        "suppressedPropertyHint": "Свойство определено также в источнике с более высоким приоритетом, поэтому это значение не применяется",
         "deprecated": "Устаревшее",
         "description": "Описание",
         "configProps": "Configuration Properties",
-        "injectedIn": "Инжектируется в"
+        "injectedIn": "Инжектируется в",
+        "profilesCount": "Профили: {{value}}",
+        "profilesPrecedenceHint": "Перечислены в порядке приоритета, начиная с наименьшего — профиль, активированный позже, перекрывает предыдущие.",
+        "propertiesCount": "Свойства: {{value}}",
+        "flaggedCount": "Отмечено: {{value}}",
+        "clearFilters": "Сбросить",
+        "triageTags": {
+            "DEPRECATED": "Устаревшее",
+            "SUPPRESSED": "Перекрыто"
+        },
+        "definedInSources": "Определено в источниках: {{value}}",
+        "wins": "Применяется",
+        "highestPrecedence": "Наивысший приоритет",
+        "lowestPrecedence": "Наименьший",
+        "noMatchingProperties": "Нет свойств, соответствующих поиску и фильтрам.",
+        "noPropertiesInSource": "Этот источник не определяет ни одного свойства."
     },
     "Loggers": {
         "loggers": "Логгеры",
