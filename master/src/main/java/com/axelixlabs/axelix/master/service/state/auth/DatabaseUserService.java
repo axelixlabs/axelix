@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.state.auth;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +36,8 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
@@ -159,9 +162,15 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void deleteById(String id) {
-        userRepository.deleteUserRolesMappings(id);
-        userRepository.deleteById(id);
+    public void deleteByIds(Collection<String> ids) {
+        List<String> requestedIds = requireNonBlankIds(ids);
+
+        userRepository.deleteUserRolesMappingsByUserIds(requestedIds);
+        int rowsAffected = userRepository.deleteByIds(requestedIds);
+
+        if (rowsAffected != requestedIds.size()) {
+            throw new UserNotFoundException(requestedIds);
+        }
     }
 
     @Override
@@ -198,14 +207,33 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void updateStatus(String id, UserStatus status) {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        if (user.userOrigin() != UserOrigin.LOCAL) {
-            throw new UserStatusChangeNotAllowedException(id, user.userOrigin());
+    public void updateStatusByIds(Collection<String> ids, UserStatus status) {
+        if (status == null) {
+            throw new UserInvalidValueException(null);
         }
 
-        userRepository.updateStatus(id, status);
+        List<String> requestedIds = requireNonBlankIds(ids);
+        List<UserEntity> users = userRepository.findAllById(requestedIds);
+
+        if (users.size() != requestedIds.size()) {
+            throw new UserNotFoundException(requestedIds);
+        }
+
+        for (UserEntity user : users) {
+            if (user.userOrigin() != UserOrigin.LOCAL) {
+                throw new UserStatusChangeNotAllowedException(user.id(), user.userOrigin());
+            }
+        }
+
+        userRepository.updateStatusByIds(requestedIds, status);
+    }
+
+    private List<String> requireNonBlankIds(Collection<String> ids) {
+        if (CollectionUtils.isEmpty(ids) || ids.stream().anyMatch(id -> !StringUtils.hasText(id))) {
+            throw new UserInvalidValueException(null);
+        }
+
+        return ids.stream().distinct().toList();
     }
 
     @Override

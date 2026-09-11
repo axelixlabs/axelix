@@ -17,14 +17,17 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.user;
 
+import java.util.List;
+
 import com.axelixlabs.axelix.master.domain.UserStatus;
 
 /**
- * Request payload to change a managed user's status.
+ * Request payload to change the status of one or more managed users.
  *
- * @param id Unique identifier of the user.
- * @param status New status of the user.
+ * @param ids Unique identifiers of the users to update.
+ * @param status New status of the users.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public record UserStatusUpdateRequest(String id, UserStatus status) {}
+public record UserStatusUpdateRequest(List<String> ids, UserStatus status) {}

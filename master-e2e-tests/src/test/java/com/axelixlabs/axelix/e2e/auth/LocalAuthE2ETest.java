@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.e2e.auth;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +69,7 @@ public class LocalAuthE2ETest {
         String userId = client.getUserId(username);
 
         // when.
-        client.updateUserStatus(userId, "SUSPENDED");
+        client.updateUsersStatus(List.of(userId), "SUSPENDED");
 
         // then.
         AxelixMasterApiClient userClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());

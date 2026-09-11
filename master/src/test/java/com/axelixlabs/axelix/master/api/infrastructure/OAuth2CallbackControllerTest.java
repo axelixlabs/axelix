@@ -131,12 +131,20 @@ class OAuth2CallbackControllerTest extends AbstractProtectedEndpointTest {
     @BeforeEach
     void prepare() {
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @AfterEach
     void cleanUp() {
-        userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+        List<String> ids = userRepository.findAll().stream().map(UserEntity::id).toList();
+
+        if (!ids.isEmpty()) {
+            userService.deleteByIds(ids);
+        }
     }
 
     @Test
