@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixHeapDumpEndpoint.class)
 public class AxelixHeapDumpEndpointAutoConfiguration {
 

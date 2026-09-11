@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnBean(MeterRegistry.class)
 public class AxelixMetricsPublisherAutoConfiguration {
 

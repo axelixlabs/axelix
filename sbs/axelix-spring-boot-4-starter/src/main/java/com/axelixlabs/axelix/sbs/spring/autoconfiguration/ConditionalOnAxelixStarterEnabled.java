@@ -17,23 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
-import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
- * Auto-configuration for the {@link SecurityContextExecutor}.
+ * Global kill-switch for the Axelix starter: put on every {@code @AutoConfiguration} class this module
+ * contributes. When {@code axelix.sbs.enabled} is {@code false}, the annotated auto-configuration is
+ * skipped entirely.
  *
- * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
-public class SecurityContextExecutorAutoConfiguration {
-
-    @Bean
-    public SecurityContextExecutor securityContextExecutor() {
-        return new ThreadLocalSecurityContextExecutor();
-    }
-}
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@ConditionalOnProperty(prefix = "axelix.sbs", name = "enabled", matchIfMissing = true)
+public @interface ConditionalOnAxelixStarterEnabled {}

@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 

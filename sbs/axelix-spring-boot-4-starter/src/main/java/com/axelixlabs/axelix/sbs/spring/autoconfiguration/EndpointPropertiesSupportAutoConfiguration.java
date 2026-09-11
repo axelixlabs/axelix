@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class})
+@ConditionalOnAxelixStarterEnabled
 public class EndpointPropertiesSupportAutoConfiguration {
 
     @Bean

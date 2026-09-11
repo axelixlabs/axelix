@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.sbs.spring.core.loggers.LoggersService;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnBean(LoggingSystem.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixLoggersEndpoint.class)
 public class AxelixLoggersEndpointAutoConfiguration {

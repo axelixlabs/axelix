@@ -61,6 +61,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
             LibraryInformationProviderAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class,
         })
+@ConditionalOnAxelixStarterEnabled
 public class AxelixMetadataEndpointAutoConfiguration {
 
     @Bean
