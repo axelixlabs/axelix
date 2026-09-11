@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jdbc.repository.query.Query;
@@ -155,6 +156,29 @@ public interface HistoricalApplicationSnapshotRepository
         """)
     HistoricalApplicationSnapshot findLatestApplicationSnapshot(
             @Param("groupId") String groupId, @Param("artifactId") String artifactId);
+
+    /**
+     * Every (service, date) pair with at least one snapshot on or after {@code from} - one row per day a
+     * service was actually observed, not deduplicated by month.
+     *
+     * @param from the earliest date (inclusive) to include.
+     * @return the matching (service, date) pairs, unordered.
+     */
+    @Query("""
+            SELECT group_id, artifact_id, date
+            FROM historical_application_snapshots
+            WHERE date >= :from
+            """)
+    List<ApplicationSnapshotDate> findSnapshotDatesFrom(@Param("from") LocalDate from);
+
+    /**
+     * A single (service, date) pair: {@code artifactId} is used as the service's displayable name.
+     *
+     * @param groupId the group id of the service.
+     * @param artifactId the artifact id of the service.
+     * @param date the snapshot date this row refers to.
+     */
+    record ApplicationSnapshotDate(String groupId, String artifactId, LocalDate date) {}
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Java/JVM features.
