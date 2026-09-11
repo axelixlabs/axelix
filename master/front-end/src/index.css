@@ -25,6 +25,33 @@
     --axelix-border-radius-small: 4px;
     --axelix-box-shadow-bold: 4px 6px 14px rgb(15 23 42 / 25%);
     --axelix-box-shadow-light: 0 4px 20px rgb(0 0 0 / 10%);
+
+    /*
+     * Palette of the Properties page. Declared globally rather than scoped to that page because antd
+     * renders tooltips and popovers into a portal on document.body, which a page-scoped block would
+     * never reach.
+     */
+    --prop-text: #101828;
+    --prop-text-muted: #344054;
+    --prop-text-faint: #667085;
+    --prop-text-dim: #98a2b3;
+    --prop-border: #d0d5dd;
+    --prop-border-soft: #eaecf0;
+    --prop-border-faint: #f2f4f7;
+    --prop-panel-border: #e6e9ee;
+    --prop-surface: #fff;
+    --prop-surface-soft: #fcfcfd;
+    --prop-surface-sunken: #f9fafb;
+    --prop-accent: #16a34a;
+    --prop-accent-strong: #067647;
+    --prop-accent-surface: #ecfdf3;
+    --prop-accent-border: #abefc6;
+    --prop-danger: #b42318;
+    --prop-danger-surface: #fef3f2;
+    --prop-danger-border: #fecdca;
+    --prop-mono: ui-monospace, sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
+    --prop-radius: 10px;
+    --prop-shadow-card: 0 1px 2px rgb(16 24 40 / 4%);
 }
 
 *,

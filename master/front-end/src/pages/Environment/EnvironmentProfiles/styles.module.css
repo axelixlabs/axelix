@@ -1,26 +1,96 @@
-.MainWrapper {
-    margin-bottom: 30px;
+.Trigger {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 9px;
+    flex-shrink: 0;
+    height: 38px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--prop-text);
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-border);
+    border-radius: 8px;
+    box-shadow: var(--prop-shadow-card);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s;
 }
 
-.ProfilesWrapper {
+.Trigger:hover,
+.TriggerOpen {
+    border-color: var(--prop-text);
+}
+
+.TriggerIcon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.Caret {
+    font-size: 10px;
+    color: var(--prop-text-dim);
+}
+
+.Dropdown {
+    width: 288px;
+    overflow: hidden;
+    border-radius: var(--prop-radius);
+}
+
+.DropdownHeader {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-weight: 500;
-    letter-spacing: 0%;
+    flex-direction: column;
+    row-gap: 3px;
+    padding: 10px 13px;
+    background-color: var(--prop-surface-soft);
+    border-bottom: 1px solid var(--prop-border-soft);
 }
 
-.ProfileTitle {
-    background-color: var(--axelix-primary-light-green);
-    border-radius: var(--axelix-border-radius-small);
+.DropdownTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--prop-text-faint);
 }
 
-.ProfileValue {
-    background-color: var(--axelix-light-grey);
-    border-radius: var(--axelix-border-radius-small);
+.DropdownHint {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--prop-text-faint);
+    text-wrap: pretty;
 }
 
-.ProfileTitle,
-.ProfileValue {
-    padding: 8px;
+.ProfileRow {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 10px;
+    padding: 8px 13px;
+}
+
+.ProfileRow:not(:last-child) {
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.ProfileOrder {
+    font-family: var(--prop-mono);
+    font-size: 11px;
+    color: var(--prop-text-faint);
+}
+
+.ProfileName {
+    font-family: var(--prop-mono);
+    font-size: 12.5px;
+    color: var(--prop-text-muted);
+    overflow-wrap: anywhere;
+}
+
+.HighestPrecedenceProfile .ProfileOrder,
+.HighestPrecedenceProfile .ProfileName {
+    font-weight: 700;
+    color: var(--prop-text);
 }

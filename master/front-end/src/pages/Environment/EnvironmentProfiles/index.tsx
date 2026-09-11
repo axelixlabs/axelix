@@ -15,7 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Popover } from "antd";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { ProfileIcon } from "@/assets";
 
 import styles from "./styles.module.css";
 
@@ -29,18 +33,44 @@ interface IProps {
 export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
     const { t } = useTranslation();
 
-    return (
-        <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.ProfilesWrapper}>
-                    <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
-                    {activeProfiles.map((activeProfile) => (
-                        <div className={styles.ProfileValue} key={activeProfile}>
-                            {activeProfile}
-                        </div>
-                    ))}
-                </div>
+    const [open, setOpen] = useState<boolean>(false);
+
+    const content = (
+        <div className={styles.Dropdown}>
+            <div className={styles.DropdownHeader}>
+                <div className={styles.DropdownTitle}>{t("Environments.activeProfiles")}</div>
+                <div className={styles.DropdownHint}>{t("Environments.profilesPrecedenceHint")}</div>
             </div>
-        </>
+
+            {activeProfiles.map((activeProfile, index) => {
+                const isLastProfile = index === activeProfiles.length - 1;
+
+                return (
+                    <div
+                        className={`${styles.ProfileRow} ${isLastProfile ? styles.HighestPrecedenceProfile : ""}`}
+                        key={activeProfile}
+                    >
+                        <span className={styles.ProfileOrder}>{index + 1}</span>
+                        <span className={styles.ProfileName}>{activeProfile}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
+
+    return (
+        <Popover
+            content={content}
+            trigger="click"
+            placement="bottomLeft"
+            onOpenChange={setOpen}
+            styles={{ container: { padding: 0 } }}
+        >
+            <button type="button" className={`${styles.Trigger} ${open ? styles.TriggerOpen : ""}`}>
+                <ProfileIcon className={styles.TriggerIcon} />
+                {t("Environments.profilesCount", { value: activeProfiles.length })}
+                <span className={styles.Caret}>{open ? "▴" : "▾"}</span>
+            </button>
+        </Popover>
     );
 };

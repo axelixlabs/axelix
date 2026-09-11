@@ -26,3 +26,21 @@ export enum EPropertyInjectionType {
     CONSTRUCTOR_PARAMETER = "CONSTRUCTOR_PARAMETER",
     METHOD_PARAMETER = "METHOD_PARAMETER",
 }
+
+/**
+ * The categories a property can be triaged into. They are the facets the user can filter the
+ * property list down to, so that the handful of properties that need attention do not have to be
+ * spotted by eye among the hundreds that do not.
+ */
+export enum EPropertyTriageTag {
+    /**
+     * The property is deprecated according to the Spring Boot configuration metadata.
+     */
+    DEPRECATED = "DEPRECATED",
+
+    /**
+     * The property is defined in this property source, but a source of a higher precedence
+     * defines it as well, so this occurrence never takes effect.
+     */
+    SUPPRESSED = "SUPPRESSED",
+}
