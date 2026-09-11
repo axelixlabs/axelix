@@ -49,7 +49,6 @@
     --prop-danger: #b42318;
     --prop-danger-surface: #fef3f2;
     --prop-danger-border: #fecdca;
-    --prop-mono: ui-monospace, sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
     --prop-radius: 10px;
     --prop-shadow-card: 0 1px 2px rgb(16 24 40 / 4%);
 }

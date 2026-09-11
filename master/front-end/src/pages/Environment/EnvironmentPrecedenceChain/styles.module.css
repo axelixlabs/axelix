@@ -64,7 +64,6 @@
 }
 
 .Value {
-    font-family: var(--prop-mono);
     font-size: 14px;
     color: var(--prop-text-faint);
     text-decoration: line-through;

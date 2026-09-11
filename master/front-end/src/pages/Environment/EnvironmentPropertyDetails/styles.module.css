@@ -27,8 +27,7 @@
     text-wrap: pretty;
 }
 
-.MonoValue {
-    font-family: var(--prop-mono);
+.BeanName {
     font-size: 12.5px;
     overflow-wrap: anywhere;
 }
