@@ -71,7 +71,6 @@
 }
 
 .TooltipName {
-    font-family: var(--prop-mono);
     font-size: 11.5px;
     color: var(--prop-text-dim);
     overflow-wrap: anywhere;

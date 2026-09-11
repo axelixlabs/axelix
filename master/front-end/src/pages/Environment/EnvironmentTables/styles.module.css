@@ -29,12 +29,10 @@
 
 .SearchSlot :global(.ant-input) {
     height: 38px;
-    font-family: var(--prop-mono);
     font-size: 13.5px;
 }
 
 .SearchSlot :global(.ant-space-addon) {
-    font-family: var(--prop-mono);
     font-size: 12px;
     font-variant-numeric: tabular-nums;
     color: var(--prop-text-faint);

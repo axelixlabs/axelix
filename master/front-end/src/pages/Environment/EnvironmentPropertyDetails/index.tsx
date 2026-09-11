@@ -64,7 +64,7 @@ export const EnvironmentPropertyDetails = ({ property, precedenceChain }: IProps
                     <StyledLink
                         href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
                     >
-                        <span className={styles.MonoValue}>{configPropsBeanName}</span>
+                        <span className={styles.BeanName}>{configPropsBeanName}</span>
                     </StyledLink>
                 </DetailRow>
             )}
@@ -73,7 +73,7 @@ export const EnvironmentPropertyDetails = ({ property, precedenceChain }: IProps
                 <DetailRow label={t("Environments.injectedIn")}>
                     {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
                         <div className={styles.InjectionPointWrapper} key={beanName}>
-                            <span className={styles.MonoValue}>{beanName}</span>
+                            <span className={styles.BeanName}>{beanName}</span>
                             <Link
                                 to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
                                 className={styles.LinkIcon}
