@@ -10,6 +10,16 @@ body {
   font-feature-settings: 'cv01' on, 'cv02' on, 'cv06' on, 'cv07' on, 'cv08' on, 'cv10' on;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+ * The page scrollbar belongs to the viewport, so `overflow-y` is declared on
+ * <html> only. Declaring it on <body> as well turns <body> into its own scroll
+ * container: the browser's initial `#anchor` scroll then lands on `body`
+ * instead of the viewport, and hydration resets it back to the top — deep
+ * links opened in a fresh tab never reach their section.
+ */
+html {
   scrollbar-gutter: stable;
   overflow-y: scroll;
 }
