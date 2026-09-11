@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.filter.auth;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -59,6 +60,7 @@ import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.repository.RoleRepository;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcSubjectHash;
@@ -108,6 +110,9 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
     @Autowired
     protected UserRepository userRepository;
+
+    @Autowired
+    protected RoleRepository roleRepository;
 
     @Autowired
     protected McpServerStreamableHttpProperties mcpProperties;
@@ -216,7 +221,16 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String password = "test-password";
 
             userService.createLocal(
-                    username, null, null, "test-email@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    "test-email@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
             String userId =
                     userService.findUserByUsername(username).orElseThrow().id();
 
@@ -275,7 +289,16 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    username + "@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
@@ -296,7 +319,16 @@ abstract class AbstractMcpAuthorizationFilterTest {
             String username = "viewer-user";
             String password = "viewer-password";
             userService.createLocal(
-                    username, null, null, username + "@example.com", null, null, password, TestRoles.VIEWER.getName());
+                    username,
+                    null,
+                    null,
+                    username + "@example.com",
+                    null,
+                    null,
+                    password,
+                    Set.of(roleRepository
+                            .findIdByName(TestRoles.VIEWER.getName())
+                            .orElseThrow()));
 
             HttpHeaders headers = commonMcpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Basic " + basicCredentials(username, password));
