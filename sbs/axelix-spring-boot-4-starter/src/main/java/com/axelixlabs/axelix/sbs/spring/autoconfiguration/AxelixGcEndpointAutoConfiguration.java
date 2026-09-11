@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
  * @author Nikita Kirillov
  */
 @AutoConfiguration(after = GarbageCollectionAutoConfiguration.class)
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixGcEndpoint.class)
 @ConditionalOnBean(GcLogService.class)
 public class AxelixGcEndpointAutoConfiguration {

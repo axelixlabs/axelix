@@ -44,6 +44,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.ServiceMetricsGroupsAssembl
  * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = {MetricsAutoConfiguration.class, CompositeMeterRegistryAutoConfiguration.class})
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixMetricsEndpoint.class)
 @ConditionalOnBean(MeterRegistry.class)
 public class AxelixMetricsAutoConfiguration {

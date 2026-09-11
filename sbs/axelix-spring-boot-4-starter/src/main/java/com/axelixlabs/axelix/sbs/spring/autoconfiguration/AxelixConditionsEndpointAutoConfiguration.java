@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTarget
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConditionsEndpoint.class)
 public class AxelixConditionsEndpointAutoConfiguration {
 

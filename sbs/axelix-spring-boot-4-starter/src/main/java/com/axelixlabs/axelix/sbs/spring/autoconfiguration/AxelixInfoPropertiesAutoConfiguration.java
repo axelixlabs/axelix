@@ -38,6 +38,7 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesL
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 public class AxelixInfoPropertiesAutoConfiguration {
 
     @Bean

@@ -40,6 +40,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixBeansEndpoint.class)
 public class AxelixBeansEndpointAutoConfiguration {
 
