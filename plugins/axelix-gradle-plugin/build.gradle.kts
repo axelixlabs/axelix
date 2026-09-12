@@ -29,9 +29,14 @@ gradlePlugin {
 val jgitVersion = "6.10.1.202505221210-r"
 val junitBomVersion = "5.14.4"
 val assertjVersion = "3.27.7"
+// cyclonedx-core-java 13.2.0 and its whole transitive tree are Java 8/9 bytecode, so they clear the
+// plugin's Java 11 floor and run inside legacy Gradle daemons. It only ever executes at build time
+// on an isolated plugin classpath, so its footprint never reaches the managed application's runtime.
+val cyclonedxVersion = "13.2.0"
 
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
+    implementation("org.cyclonedx:cyclonedx-core-java:${cyclonedxVersion}")
 
     testImplementation(platform("org.junit:junit-bom:${junitBomVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -39,6 +39,11 @@ public class AxelixGradlePlugin implements Plugin<Project> {
         // Detection is deferred to afterEvaluate: the build script's dependencies {} block runs after
         // the java plugin is applied, so inspecting the configurations any earlier would always see them empty.
         project.getPluginManager()
-                .withPlugin("java", appliedPlugin -> project.afterEvaluate(ProjectInfoGenerator::configure));
+                .withPlugin(
+                        "java",
+                        appliedPlugin -> project.afterEvaluate(evaluated -> {
+                            ProjectInfoGenerator.configure(evaluated);
+                            DependencySbomGenerator.configure(evaluated);
+                        }));
     }
 }
