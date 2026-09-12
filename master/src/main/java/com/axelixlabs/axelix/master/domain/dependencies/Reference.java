@@ -24,7 +24,7 @@ import java.net.URI;
  * verify the {@link SupportStatus} Axelix claims. Every entry carries one, so that no verdict shown in the UI is
  * unattributed.
  *
- * @param label the human readable title of the page, e.g. {@code Sleuth to Micrometer Tracing migration}
+ * @param label the human-readable title of the page, e.g. {@code Sleuth to Micrometer Tracing migration}
  * @param url   the location of the page
  *
  * @author Mikhail Polivakha

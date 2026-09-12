@@ -69,7 +69,6 @@ class LibraryManifestLoaderTest {
         // then.
         assertThat(sleuth.displayName()).isEqualTo("Spring Cloud Sleuth");
         assertThat(sleuth.status()).isEqualTo(SupportStatus.SUNSET);
-        assertThat(sleuth.isFlagged()).isTrue();
         assertThat(sleuth.summary()).startsWith("Discontinued after the 3.1.x line.");
 
         assertThat(sleuth.coordinates())
@@ -91,7 +90,6 @@ class LibraryManifestLoaderTest {
 
         // then.
         assertThat(micrometer.status()).isEqualTo(SupportStatus.ACTIVE);
-        assertThat(micrometer.isFlagged()).isFalse();
         assertThat(micrometer.succession()).isNull();
     }
 
@@ -109,7 +107,7 @@ class LibraryManifestLoaderTest {
     }
 
     @Test
-    void reportsAnUncuratedArtifactAsAbsentRatherThanAsAVerdict() {
+    void reportsAnUncuratedArtifactAsAbsent() {
         // given.
         LibraryCatalog catalog = new DefaultLibraryCatalog(loader.load());
 

@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.domain.dependencies;
 
 /**
  * The area of a running application a library belongs to. This is purely a presentation grouping - it carries no
- * judgement and does not participate in resolving the {@link SupportStatus}. One manifest file is curated per
+ * judgement and does not participate in resolving the {@link SupportStatus}. At Axelix, we keep one manifest file per
  * ecosystem, which is what keeps the classification consistent across entries.
  *
  * @author Mikhail Polivakha

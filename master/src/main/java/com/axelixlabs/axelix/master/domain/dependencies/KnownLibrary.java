@@ -62,14 +62,4 @@ public record KnownLibrary(
 
         coordinates = Set.copyOf(coordinates);
     }
-
-    /**
-     * Whether the project is something a team should look at. This is the predicate the whole UI hangs off: a flagged
-     * library gets a chip and an accent, everything else renders plainly.
-     *
-     * @return true when the project is no longer actively developed
-     */
-    public boolean isFlagged() {
-        return status != SupportStatus.ACTIVE;
-    }
 }
