@@ -1,0 +1,15 @@
+# Fixture for LibraryManifestLoaderTest. See observability.yaml.
+ecosystem: PERSISTENCE
+libraries:
+  - id: ehcache2
+    name: Ehcache 2
+    status: MAINTENANCE
+    summary: The 2.x line is closed. Development moved to org.ehcache:ehcache 3.x.
+    coordinates:
+      - net.sf.ehcache:ehcache
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Replacing it is an architectural choice, the 3.x API is not compatible
+    reference:
+      label: Ehcache 3 migration guide
+      url: https://example.invalid/ehcache-migration

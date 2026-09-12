@@ -1,0 +1,12 @@
+# Fixture: coordinates carry a version, which the catalog is deliberately version-free about.
+ecosystem: OTHER
+libraries:
+  - id: versioned
+    name: Versioned
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - com.acme:versioned:1.2.3
+    reference:
+      label: Versioned releases
+      url: https://example.invalid/versioned

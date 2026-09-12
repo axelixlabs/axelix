@@ -1,0 +1,29 @@
+# Fixture for LibraryManifestLoaderTest. The facts here are illustrative and the URLs are deliberately
+# unreachable - the real curated manifests live under src/main/resources/axelix/dependencies.
+ecosystem: OBSERVABILITY
+libraries:
+  - id: spring-cloud-sleuth
+    name: Spring Cloud Sleuth
+    status: SUNSET
+    summary: >-
+      Discontinued after the 3.1.x line. Tracing moved into Micrometer Tracing, which Spring Boot
+      autoconfigures from 3.0 onward.
+    coordinates:
+      - org.springframework.cloud:spring-cloud-sleuth-core
+      - org.springframework.cloud:spring-cloud-sleuth-api
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.micrometer:micrometer-tracing-bridge-brave
+    reference:
+      label: Sleuth to Micrometer Tracing migration
+      url: https://example.invalid/sleuth-migration
+
+  - id: micrometer
+    name: Micrometer
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - io.micrometer:micrometer-core
+    reference:
+      label: Micrometer releases
+      url: https://example.invalid/micrometer-releases

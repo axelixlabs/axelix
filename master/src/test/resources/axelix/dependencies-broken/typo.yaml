@@ -1,0 +1,12 @@
+# Fixture: 'summry' is a typo for 'summary'. The loader must refuse it rather than drop the field.
+ecosystem: OTHER
+libraries:
+  - id: typo
+    name: Typo
+    status: ACTIVE
+    summry: Actively developed.
+    coordinates:
+      - com.acme:typo
+    reference:
+      label: Typo releases
+      url: https://example.invalid/typo
