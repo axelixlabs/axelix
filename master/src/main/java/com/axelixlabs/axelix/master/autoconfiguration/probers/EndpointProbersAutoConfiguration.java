@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.probers;
 
+import java.util.Arrays;
+
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -41,6 +43,7 @@ import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 public class EndpointProbersAutoConfiguration {
@@ -149,7 +152,8 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public EndpointProber<byte[]> getBeansEndpointProber() {
         return new CachingEndpointProber<>(
-                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor));
+                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_BEANS, securityContextExecutor),
+                bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
     // ThreadDump
@@ -270,8 +274,9 @@ public class EndpointProbersAutoConfiguration {
     // Conditions
     @Bean
     public EndpointProber<byte[]> getConditionsProber() {
-        return new CachingEndpointProber<>(new ProxyingEndpointProber(
-                instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor));
+        return new CachingEndpointProber<>(
+                new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_CONDITIONS, securityContextExecutor),
+                bytes -> Arrays.copyOf(bytes, bytes.length));
     }
 
     // Configuration Properties
