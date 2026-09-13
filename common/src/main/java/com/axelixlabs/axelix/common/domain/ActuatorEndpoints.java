@@ -71,6 +71,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Conditions
     public static final ActuatorEndpoint GET_CONDITIONS = endpoint("/axelix-conditions", HttpMethod.GET);
 
+    // Dependencies (SBOM)
+    public static final ActuatorEndpoint GET_DEPENDENCIES_SBOM = endpoint("/axelix-dependencies", HttpMethod.GET);
+
     // @ConfigurationProperties beans
     public static final ActuatorEndpoint GET_CONFIG_PROPS = endpoint("/axelix-configprops", HttpMethod.GET);
 
