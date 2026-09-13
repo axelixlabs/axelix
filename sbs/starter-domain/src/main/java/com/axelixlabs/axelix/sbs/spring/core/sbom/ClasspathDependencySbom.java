@@ -25,7 +25,8 @@ import java.util.Optional;
 /**
  * Reads the CycloneDX dependency SBOM that the Axelix build plugins package into the application
  * archive at {@value #DEFAULT_RESOURCE}. The resource is absent when the application was built
- * without an Axelix build plugin, in which case {@link #read()} returns an empty {@link Optional}.
+ * without an Axelix build plugin (which should not happen, since we require the presence of the build plugin),
+ * in which case {@link #read()} returns an empty {@link Optional}.
  *
  * @author Mikhail Polivakha
  */
