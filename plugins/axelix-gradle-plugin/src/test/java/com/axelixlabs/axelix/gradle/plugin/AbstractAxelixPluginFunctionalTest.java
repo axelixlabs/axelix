@@ -43,7 +43,7 @@ public abstract class AbstractAxelixPluginFunctionalTest {
     /**
      * Gradle versions exercised by the enclosing test task, supplied as a comma-separated list via the
      * {@code axelix.test.gradle.versions} system property. No single JVM can launch the whole supported
-     * range (Gradle 5-7 require Java &lt;= 11, Gradle 8.10.2's bundled Groovy can't compile scripts on
+     * range (Gradle 7.6 requires Java &lt;= 19, Gradle 8.10.2's bundled Groovy can't compile scripts on
      * JDKs newer than it supports, Gradle 9 requires Java &gt;= 17), so the {@code test}, {@code
      * gradle810Test} and {@code legacyGradleTest} tasks each pass the subset valid for their toolchain.
      */

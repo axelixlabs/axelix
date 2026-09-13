@@ -25,12 +25,13 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.axelixlabs.axelix.gradle.plugin.AbstractAxelixPluginFunctionalTest;
-import com.axelixlabs.axelix.gradle.plugin.GradleProjectFixtures;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import com.axelixlabs.axelix.gradle.plugin.AbstractAxelixPluginFunctionalTest;
+import com.axelixlabs.axelix.gradle.plugin.GradleProjectFixtures;
 
 import static com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector.PROFILER_DETECTED_PROPERTY;
 import static com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator.GENERATE_TASK_NAME;

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator;
 import org.cyclonedx.Version;
 import org.cyclonedx.exception.GeneratorException;
 import org.cyclonedx.generators.BomGeneratorFactory;
@@ -53,6 +52,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.gradle.plugin.AxelixGradlePlugin;
 import com.axelixlabs.axelix.gradle.plugin.BuildDirAccessor;
 import com.axelixlabs.axelix.gradle.plugin.GeneratedResourcesPackager;
+import com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator;
 
 /**
  * Generates a CycloneDX SBOM of the project's runtime dependency graph and packages it into the
