@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -49,6 +50,7 @@ import org.gradle.api.artifacts.result.ResolvedDependencyResult;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generates a CycloneDX SBOM of the project's runtime dependency graph and packages it into the
@@ -137,44 +139,26 @@ public final class DependencySbomGenerator {
         Map<ComponentIdentifier, ResolvedComponentResult> libraries = new LinkedHashMap<>();
         collectLibraries(root, libraries, new HashSet<>());
 
-        Bom bom = new Bom();
-
-        Metadata metadata = new Metadata();
-        metadata.setComponent(componentOf(root, Component.Type.APPLICATION));
-        bom.setMetadata(metadata);
-
-        List<Component> components = new ArrayList<>();
-        for (ResolvedComponentResult library : libraries.values()) {
-            components.add(componentOf(library, Component.Type.LIBRARY));
-        }
-        bom.setComponents(components);
-
         Map<String, Set<String>> edges = new LinkedHashMap<>();
         addEdges(root, edges);
         for (ResolvedComponentResult library : libraries.values()) {
             addEdges(library, edges);
         }
 
-        List<Dependency> dependencies = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> edge : edges.entrySet()) {
-            Dependency dependency = new Dependency(edge.getKey());
-            for (String child : edge.getValue()) {
-                dependency.addDependency(new Dependency(child));
-            }
-            dependencies.add(dependency);
-        }
-        bom.setDependencies(dependencies);
-
-        writeToFile(generatedDir, serialize(bom));
+        writeToFile(generatedDir, serialize(bomOf(root, libraries.values(), edges)));
     }
 
     /**
      * Depth-first walk collecting every external module reachable from the root. Only components
-     * whose identity is a {@link ModuleComponentIdentifier} are kept: those are the third-party
-     * artifacts resolved from a repository, which is exactly what Master matches against its
-     * curated registry. The application's own project components (root and sub-modules) are not
-     * libraries and are deliberately excluded here. Keyed by identity so a diamond is kept once,
-     * and the {@code visited} set breaks any cycles Gradle may report.
+     * whose identity is a {@link ModuleComponentIdentifier} are kept -those are the third-party
+     * artifacts resolved from a repository. If the components do not have the {@link ModuleComponentIdentifier},
+     * which is quite rare, we assume that this is the component that is bundled into classpath like a just a
+     * separate file or by some other means.
+     * <p>
+     * Again, technically, in real SBOM, ideally, we would want to show it, but in our case it is not going make much sense,
+     * since Axelix Master will just not recognize such component as the "well-known".
+     * <p>
+     * Keyed by identity so a diamond is kept once, and the {@code visited} set breaks any cycles Gradle may report.
      */
     private static void collectLibraries(
             ResolvedComponentResult node,
@@ -216,13 +200,18 @@ public final class DependencySbomGenerator {
         if (!visited.add(node.getId())) {
             return;
         }
+        // direct outgoing edge to other component
         if (node.getId() instanceof ModuleComponentIdentifier) {
-            // A library boundary: this is an edge target. Its own outgoing edges are added
-            // separately, when it is itself the 'from' node, so we stop descending here.
             targets.add(referenceOf(node));
             return;
         }
-        // A project component on the path: see through it to the libraries beneath.
+        // A "project" component on the path, e.g. something like that
+        //
+        // dependencies {
+        //     implementation(project(":sub-compnent"))
+        // }
+        //
+        // So we need it to go through it to the libraries beneath.
         for (ResolvedComponentResult child : resolvedChildren(node)) {
             collectNearestLibraries(child, targets, visited);
         }
@@ -230,6 +219,8 @@ public final class DependencySbomGenerator {
 
     private static List<ResolvedComponentResult> resolvedChildren(ResolvedComponentResult node) {
         List<ResolvedComponentResult> children = new ArrayList<>();
+        // The application's own project components (root and sub-modules) are not
+        // libraries and are deliberately excluded here.
         for (DependencyResult dependency : node.getDependencies()) {
             // A constraint (e.g. from a platform/BOM) pins a version without pulling the artifact in
             // on its own, so it is not a real edge in the shipped graph. isConstraint() is declared
@@ -247,46 +238,60 @@ public final class DependencySbomGenerator {
         return children;
     }
 
-    private static Component componentOf(ResolvedComponentResult component, Component.Type type) {
-        Component result = new Component();
-        result.setType(type);
-
-        ModuleVersionIdentifier moduleVersion = component.getModuleVersion();
-        if (moduleVersion != null) {
-            result.setGroup(moduleVersion.getGroup());
-            result.setName(moduleVersion.getName());
-            result.setVersion(moduleVersion.getVersion());
-        } else {
-            result.setName(component.getId().getDisplayName());
-        }
-
-        String reference = referenceOf(component);
-        result.setBomRef(reference);
-        result.setPurl(reference);
-        return result;
+    private static String referenceOf(ResolvedComponentResult component) {
+        return Coordinates.of(component).reference();
     }
 
     /**
-     * The stable reference a component is keyed by in the SBOM - its package URL. Master parses
-     * these back into coordinates, so the {@code group:name:version} form must be exact. Built from
-     * the module identifier for libraries; the root application falls back to its project
-     * coordinates, which Gradle always populates (an unset version resolves to {@code unspecified}).
+     * Assembles a CycloneDX 1.6 document from the collected graph: a metadata component for the
+     * application, a flat list of library components, and the {@code dependsOn} edges.
      */
-    private static String referenceOf(ResolvedComponentResult component) {
-        ComponentIdentifier id = component.getId();
-        if (id instanceof ModuleComponentIdentifier) {
-            ModuleComponentIdentifier module = (ModuleComponentIdentifier) id;
-            return purl(module.getGroup(), module.getModule(), module.getVersion());
+    private static Bom bomOf(
+            ResolvedComponentResult root,
+            Collection<ResolvedComponentResult> libraries,
+            Map<String, Set<String>> edges) {
+
+        Bom bom = new Bom();
+
+        Metadata metadata = new Metadata();
+        metadata.setComponent(componentOf(root, Component.Type.APPLICATION));
+        bom.setMetadata(metadata);
+
+        List<Component> components = new ArrayList<>();
+        for (ResolvedComponentResult library : libraries) {
+            components.add(componentOf(library, Component.Type.LIBRARY));
         }
-        ModuleVersionIdentifier moduleVersion = component.getModuleVersion();
-        if (moduleVersion == null) {
-            return component.getId().getDisplayName();
+        bom.setComponents(components);
+
+        List<Dependency> dependencies = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> edge : edges.entrySet()) {
+            Dependency dependency = new Dependency(edge.getKey());
+            for (String target : edge.getValue()) {
+                dependency.addDependency(new Dependency(target));
+            }
+            dependencies.add(dependency);
         }
-        return purl(moduleVersion.getGroup(), moduleVersion.getName(), moduleVersion.getVersion());
+        bom.setDependencies(dependencies);
+
+        return bom;
     }
 
-    private static String purl(String group, String name, String version) {
-        return "pkg:maven/" + group + "/" + name + "@" + version + "?type=jar";
+    private static Component componentOf(ResolvedComponentResult component, Component.Type type) {
+        Coordinates coordinates = Coordinates.of(component);
+        String reference = coordinates.reference();
+
+        Component result = new Component();
+        result.setType(type);
+        result.setBomRef(reference);
+        if (coordinates.group != null) {
+            result.setGroup(coordinates.group);
+        }
+        result.setName(coordinates.name);
+        if (coordinates.version != null) {
+            result.setVersion(coordinates.version);
+        }
+        result.setPurl(reference);
+        return result;
     }
 
     private static String serialize(Bom bom) {
@@ -294,6 +299,49 @@ public final class DependencySbomGenerator {
             return BomGeneratorFactory.createJson(Version.VERSION_16, bom).toJsonString(true);
         } catch (GeneratorException e) {
             throw new GradleException("Failed to serialize the Axelix dependency SBOM", e);
+        }
+    }
+
+    /**
+     * The Maven coordinates of a resolved component. Libraries take them from the module identifier
+     * (always complete); the root application falls back to its project coordinates, which Gradle
+     * populates even when unset (an unset version resolves to {@code unspecified}), or to the
+     * identifier's display name in the rare case none are available.
+     */
+    private static final class Coordinates {
+
+        private final @Nullable String group;
+        private final String name;
+        private final @Nullable String version;
+
+        private Coordinates(@Nullable String group, String name, @Nullable String version) {
+            this.group = group;
+            this.name = name;
+            this.version = version;
+        }
+
+        static Coordinates of(ResolvedComponentResult component) {
+            ComponentIdentifier id = component.getId();
+            if (id instanceof ModuleComponentIdentifier) {
+                ModuleComponentIdentifier module = (ModuleComponentIdentifier) id;
+                return new Coordinates(module.getGroup(), module.getModule(), module.getVersion());
+            }
+            ModuleVersionIdentifier moduleVersion = component.getModuleVersion();
+            if (moduleVersion == null) {
+                return new Coordinates(null, id.getDisplayName(), null);
+            }
+            return new Coordinates(moduleVersion.getGroup(), moduleVersion.getName(), moduleVersion.getVersion());
+        }
+
+        /**
+         * The package URL Master parses back into coordinates, so the {@code group/name@version}
+         * form must be exact.
+         */
+        String reference() {
+            if (group == null || version == null) {
+                return name;
+            }
+            return "pkg:maven/" + group + "/" + name + "@" + version + "?type=jar";
         }
     }
 

@@ -1,7 +1,7 @@
 plugins {
+    java
     id("com.axelixlabs.axelix")
 }
-apply(plugin = "java")
 
 group = "com.example"
 version = "1.2.3"
