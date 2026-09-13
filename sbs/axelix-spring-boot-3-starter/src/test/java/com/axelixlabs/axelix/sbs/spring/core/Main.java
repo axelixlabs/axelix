@@ -27,6 +27,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAu
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCoreNamingAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDependenciesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfiguration;
@@ -61,6 +62,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ValidationListenerAuto
             AxelixCachesEndpointAutoConfiguration.class,
             AxelixConditionsEndpointAutoConfiguration.class,
             AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
+            AxelixDependenciesEndpointAutoConfiguration.class,
             AxelixDetailsEndpointAutoConfiguration.class,
             AxelixEnvironmentEndpointAutoConfiguration.class,
             AxelixHeapDumpEndpointAutoConfiguration.class,

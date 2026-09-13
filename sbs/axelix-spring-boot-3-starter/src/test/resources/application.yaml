@@ -33,6 +33,7 @@ management:
           - axelix-configprops
           - axelix-caches
           - axelix-conditions
+          - axelix-dependencies
           - configprops
           - env
           - axelix-thread-dump
