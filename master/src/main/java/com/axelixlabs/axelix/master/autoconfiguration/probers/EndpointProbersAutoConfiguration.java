@@ -281,6 +281,13 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS, securityContextExecutor);
     }
 
+    // Dependencies (SBOM)
+    @Bean
+    public EndpointProber<byte[]> getDependenciesSbomProber() {
+        return new CachingEndpointProber<>(new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_DEPENDENCIES_SBOM, securityContextExecutor));
+    }
+
     // Feign Client
     @Bean
     public ProxyingEndpointProber getFeignClientEndpointProber() {
