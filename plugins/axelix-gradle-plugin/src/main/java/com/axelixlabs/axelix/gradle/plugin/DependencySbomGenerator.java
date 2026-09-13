@@ -47,9 +47,6 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
 import org.gradle.api.artifacts.result.DependencyResult;
 import org.gradle.api.artifacts.result.ResolvedComponentResult;
 import org.gradle.api.artifacts.result.ResolvedDependencyResult;
-import org.gradle.api.file.DuplicatesStrategy;
-import org.gradle.api.tasks.Copy;
-import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -112,23 +109,7 @@ public final class DependencySbomGenerator {
         generateTask.getOutputs().dir(generatedDir);
         generateTask.doLast(task -> writeSbom(project, generatedDir));
 
-        project.getTasks().configureEach(task -> {
-            String taskName = task.getName();
-            if ("jar".equals(taskName) || "bootJar".equals(taskName)) {
-                task.dependsOn(generateTask);
-                if (task instanceof AbstractArchiveTask) {
-                    ((AbstractArchiveTask) task)
-                            .from(generatedDir, spec -> spec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE));
-                }
-            } else if ("processResources".equals(taskName)) {
-                // Mirror ProjectInfoGenerator: also copy into build/resources/main so `bootRun`,
-                // `test` and IDE runs - which read that directory directly - see the SBOM too.
-                task.dependsOn(generateTask);
-                if (task instanceof Copy) {
-                    ((Copy) task).from(generatedDir);
-                }
-            }
-        });
+        GeneratedResourcesPackager.packageIntoArchives(project, generateTask, generatedDir);
     }
 
     private static void writeSbom(Project project, File generatedDir) {
