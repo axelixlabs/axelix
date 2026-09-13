@@ -32,11 +32,11 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-final class GeneratedResourcesPackager {
+public final class GeneratedResourcesPackager {
 
     private GeneratedResourcesPackager() {}
 
-    static void packageIntoArchives(Project project, Task generateTask, File generatedDir) {
+    public static void packageIntoArchives(Project project, Task generateTask, File generatedDir) {
         project.getTasks().configureEach(task -> {
             String taskName = task.getName();
             if ("jar".equals(taskName) || "bootJar".equals(taskName)) {

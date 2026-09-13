@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.gradle.plugin;
+package com.axelixlabs.axelix.gradle.plugin.properties;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +39,10 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+
+import com.axelixlabs.axelix.gradle.plugin.BuildDirAccessor;
+import com.axelixlabs.axelix.gradle.plugin.GeneratedResourcesPackager;
+import com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector;
 
 import static com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector.PROFILER_DETECTED_PROPERTY;
 

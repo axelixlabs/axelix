@@ -20,6 +20,9 @@ package com.axelixlabs.axelix.gradle.plugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+import com.axelixlabs.axelix.gradle.plugin.sbom.DependencySbomGenerator;
+import com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator;
+
 /**
  * Axelix Gradle plugin entry point.
  *

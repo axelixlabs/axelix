@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.gradle.plugin;
+package com.axelixlabs.axelix.gradle.plugin.sbom;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,13 +24,15 @@ import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.axelixlabs.axelix.gradle.plugin.AbstractAxelixPluginFunctionalTest;
+import com.axelixlabs.axelix.gradle.plugin.GradleProjectFixtures;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static com.axelixlabs.axelix.gradle.plugin.DependencySbomGenerator.GENERATE_TASK_NAME;
-import static com.axelixlabs.axelix.gradle.plugin.DependencySbomGenerator.SBOM_RESOURCE_PATH;
+import static com.axelixlabs.axelix.gradle.plugin.sbom.DependencySbomGenerator.GENERATE_TASK_NAME;
+import static com.axelixlabs.axelix.gradle.plugin.sbom.DependencySbomGenerator.SBOM_RESOURCE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -135,7 +137,7 @@ class DependencySbomGeneratorFunctionalTest extends AbstractAxelixPluginFunction
 
     private void setupProject() throws IOException {
         writeFile("settings.gradle", "rootProject.name = 'axelix-plugin-test'\n");
-        writeFile("build.gradle.kts", GradleProjectFixtures.loadContent("sbom.gradle.kts"));
+        writeFile("build.gradle.kts", GradleProjectFixtures.loadContent("sbom/sbom.gradle.kts"));
     }
 
     private String readGenerated() throws IOException {

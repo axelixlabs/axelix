@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.gradle.plugin;
+package com.axelixlabs.axelix.gradle.plugin.sbom;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator;
 import org.cyclonedx.Version;
 import org.cyclonedx.exception.GeneratorException;
 import org.cyclonedx.generators.BomGeneratorFactory;
@@ -49,6 +50,10 @@ import org.gradle.api.artifacts.result.ResolvedComponentResult;
 import org.gradle.api.artifacts.result.ResolvedDependencyResult;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.gradle.plugin.AxelixGradlePlugin;
+import com.axelixlabs.axelix.gradle.plugin.BuildDirAccessor;
+import com.axelixlabs.axelix.gradle.plugin.GeneratedResourcesPackager;
+
 /**
  * Generates a CycloneDX SBOM of the project's runtime dependency graph and packages it into the
  * archive at {@code META-INF/axelix/dependencies.cdx.json}, alongside the build-info written by
@@ -67,7 +72,7 @@ public final class DependencySbomGenerator {
 
     public static final String GENERATE_TASK_NAME = "generateAxelixDependenciesSbom";
 
-    static final String SBOM_RESOURCE_PATH = "META-INF/axelix/dependencies.cdx.json";
+    public static final String SBOM_RESOURCE_PATH = "META-INF/axelix/dependencies.cdx.json";
 
     private static final String RUNTIME_CLASSPATH = "runtimeClasspath";
 

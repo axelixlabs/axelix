@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.gradle.plugin;
+package com.axelixlabs.axelix.gradle.plugin.properties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,13 +25,15 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.axelixlabs.axelix.gradle.plugin.AbstractAxelixPluginFunctionalTest;
+import com.axelixlabs.axelix.gradle.plugin.GradleProjectFixtures;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static com.axelixlabs.axelix.gradle.plugin.ProjectInfoGenerator.GENERATE_TASK_NAME;
 import static com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector.PROFILER_DETECTED_PROPERTY;
+import static com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator.GENERATE_TASK_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -47,7 +49,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
     @MethodSource("gradleVersionsUnderTest")
     void generatesBuildAndGitInfoTogether(String gradleVersion) throws IOException, InterruptedException {
         // given.
-        setupProject("build-info.gradle.kts");
+        setupProject("properties/build-info.gradle.kts");
         initGitRepository();
 
         // when.
@@ -63,7 +65,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
     @MethodSource("gradleVersionsUnderTest")
     void writesBuildInfoOnlyWhenNotInsideAGitRepository(String gradleVersion) throws IOException {
         // given. group/version are set, but no git repository initialized.
-        setupProject("build-info.gradle.kts");
+        setupProject("properties/build-info.gradle.kts");
 
         // when.
         BuildResult result =
@@ -78,7 +80,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
     @MethodSource("gradleVersionsUnderTest")
     void failsOnlyWhenProjectInfoIsActuallyGeneratedWithoutGroupSet(String gradleVersion) throws IOException {
         // given.
-        setupProject("no-group.gradle.kts");
+        setupProject("properties/no-group.gradle.kts");
 
         // when. an unrelated task must succeed even though group is unset.
         BuildResult unrelated =
@@ -102,7 +104,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
             throws IOException, InterruptedException {
         // given. the fixture declares no profiler dependency at all, to prove build/git info
         // collection is unconditional and independent of it.
-        setupProject("build-info.gradle.kts");
+        setupProject("properties/build-info.gradle.kts");
         initGitRepository();
 
         // when.
@@ -119,7 +121,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
     void packagesProjectInfoIntoPlainJarWhenTheresNoBootJarTask(String gradleVersion)
             throws IOException, InterruptedException {
         // given. no Spring Boot plugin applied, so only the standard 'jar' task exists.
-        setupProject("plain-jar-build-info.gradle.kts");
+        setupProject("properties/plain-jar-build-info.gradle.kts");
         initGitRepository();
 
         // when. the 'build' lifecycle task, not a task we name explicitly.
@@ -138,7 +140,7 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
             throws IOException, InterruptedException {
         // given. consumers like 'test' or 'bootRun' run off build/resources/main directly, never
         // touching the packaged jar.
-        setupProject("build-info.gradle.kts");
+        setupProject("properties/build-info.gradle.kts");
         initGitRepository();
 
         // when.
