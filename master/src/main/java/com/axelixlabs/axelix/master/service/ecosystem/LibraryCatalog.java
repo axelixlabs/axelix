@@ -20,8 +20,8 @@ package com.axelixlabs.axelix.master.service.dependencies;
 import java.util.Collection;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.domain.dependencies.ArtifactCoordinates;
-import com.axelixlabs.axelix.master.domain.dependencies.KnownLibrary;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 
 /**
  * The read side of the curated catalog of known Java libraries. Given the coordinates of a dependency a managed
@@ -39,7 +39,7 @@ public interface LibraryCatalog {
      * @return the curated entry, or {@link Optional#empty()} when Axelix has nothing to say about this artifact.
      *         An empty result is not a negative verdict - it only means the artifact is not curated.
      */
-    Optional<KnownLibrary> find(ArtifactCoordinates coordinates);
+    Optional<SoftwareProject> find(ArtifactCoordinates coordinates);
 
     /**
      * Every curated entry, in the order the manifests declare them. Intended for administrative views and for the
@@ -47,5 +47,5 @@ public interface LibraryCatalog {
      *
      * @return an unmodifiable view of the whole catalog
      */
-    Collection<KnownLibrary> all();
+    Collection<SoftwareProject> all();
 }

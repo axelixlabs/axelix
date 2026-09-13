@@ -24,9 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.domain.dependencies.ArtifactCoordinates;
-import com.axelixlabs.axelix.master.domain.dependencies.KnownLibrary;
-import com.axelixlabs.axelix.master.domain.dependencies.LibraryId;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 /**
  * The catalog held fully in memory and indexed by coordinates. It is immutable once built, so it is safe to share
@@ -40,25 +40,25 @@ import com.axelixlabs.axelix.master.domain.dependencies.LibraryId;
  */
 public class DefaultLibraryCatalog implements LibraryCatalog {
 
-    private final Map<LibraryId, KnownLibrary> byId;
-    private final Map<ArtifactCoordinates, KnownLibrary> byCoordinates;
+    private final Map<SoftwareProjectId, SoftwareProject> byId;
+    private final Map<ArtifactCoordinates, SoftwareProject> byCoordinates;
 
     /**
      * @param libraries the curated entries, typically the merged result of every manifest
      *
      * @throws LibraryCatalogException when two entries share an id, or when two entries claim the same artifact
      */
-    public DefaultLibraryCatalog(Collection<KnownLibrary> libraries) {
+    public DefaultLibraryCatalog(Collection<SoftwareProject> libraries) {
         this.byId = new LinkedHashMap<>(libraries.size());
         this.byCoordinates = new HashMap<>(libraries.size());
 
-        for (KnownLibrary library : libraries) {
+        for (SoftwareProject library : libraries) {
             index(library);
         }
     }
 
-    private void index(KnownLibrary library) {
-        KnownLibrary duplicateId = byId.putIfAbsent(library.id(), library);
+    private void index(SoftwareProject library) {
+        SoftwareProject duplicateId = byId.putIfAbsent(library.id(), library);
 
         if (duplicateId != null) {
             throw new LibraryCatalogException("Duplicate library id '%s', declared by both '%s' and '%s'"
@@ -66,7 +66,7 @@ public class DefaultLibraryCatalog implements LibraryCatalog {
         }
 
         for (ArtifactCoordinates coordinates : library.coordinates()) {
-            KnownLibrary owner = byCoordinates.putIfAbsent(coordinates, library);
+            SoftwareProject owner = byCoordinates.putIfAbsent(coordinates, library);
 
             if (owner != null) {
                 throw new LibraryCatalogException("Artifact '%s' is claimed by both '%s' and '%s'"
@@ -76,12 +76,12 @@ public class DefaultLibraryCatalog implements LibraryCatalog {
     }
 
     @Override
-    public Optional<KnownLibrary> find(ArtifactCoordinates coordinates) {
+    public Optional<SoftwareProject> find(ArtifactCoordinates coordinates) {
         return Optional.ofNullable(byCoordinates.get(coordinates));
     }
 
     @Override
-    public Collection<KnownLibrary> all() {
+    public Collection<SoftwareProject> all() {
         return Collections.unmodifiableCollection(byId.values());
     }
 }

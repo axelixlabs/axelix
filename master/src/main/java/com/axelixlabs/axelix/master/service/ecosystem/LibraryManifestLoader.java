@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
@@ -33,7 +35,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-import com.axelixlabs.axelix.master.domain.dependencies.KnownLibrary;
+import com.axelixlabs.axelix.master.domain.ecosystem.Reference;
+import com.axelixlabs.axelix.master.domain.ecosystem.Succession;
+import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 /**
  * Reads every curated manifest off the classpath and flattens them into the entries a {@link LibraryCatalog} is built
@@ -83,7 +91,7 @@ public class LibraryManifestLoader {
      *
      * @throws LibraryCatalogException when a manifest cannot be located, read or parsed
      */
-    public List<KnownLibrary> load() {
+    public List<SoftwareProject> load() {
         Resource[] manifests;
 
         try {
@@ -95,7 +103,7 @@ public class LibraryManifestLoader {
 
         Arrays.sort(manifests, BY_FILENAME);
 
-        List<KnownLibrary> libraries = new ArrayList<>();
+        List<SoftwareProject> libraries = new ArrayList<>();
 
         for (Resource manifest : manifests) {
             libraries.addAll(read(manifest));
@@ -104,12 +112,65 @@ public class LibraryManifestLoader {
         return libraries;
     }
 
-    private List<KnownLibrary> read(Resource manifest) {
+    private List<SoftwareProject> read(Resource manifest) {
         try (InputStream source = manifest.getInputStream()) {
             return yamlMapper.readValue(source, LibraryManifest.class).toLibraries();
         } catch (IOException | JacksonException | IllegalArgumentException e) {
             throw new LibraryCatalogException(
                     "Failed to read the library manifest %s".formatted(manifest.getDescription()), e);
         }
+    }
+
+    /**
+     * The on-disk shape of one curated manifest file.
+     *
+     * The {@link Ecosystem} is declared once per file rather than on every entry. One file per ecosystem is what keeps
+     * the grouping consistent, and it removes a field that would otherwise be repeated identically on every entry.
+     *
+     * @param ecosystem the area every library in this file belongs to
+     * @param libraries the curated entries
+     *
+     * @author Mikhail Polivakha
+     */
+    record LibraryManifest(Ecosystem ecosystem, List<Entry> libraries) {
+
+        List<SoftwareProject> toLibraries() {
+            return libraries.stream().map(entry -> entry.toLibrary(ecosystem)).toList();
+        }
+
+        /**
+         * @param id          the stable identifier, in lower kebab-case
+         * @param name        the name the project is known by
+         * @param status      what the authors are still doing with the project
+         * @param summary     what happened to the project, in prose
+         * @param coordinates every artifact of the project, in the {@code groupId:artifactId} notation
+         * @param succession  where to go instead, omitted for an active project
+         * @param reference   the upstream page backing the status
+         */
+        record Entry(
+                String id,
+                String name,
+                SupportStatus status,
+                String summary,
+                List<String> coordinates,
+                @Nullable SuccessionEntry succession,
+                ReferenceEntry reference) {
+
+            SoftwareProject toLibrary(Ecosystem ecosystem) {
+                return new SoftwareProject(
+                        SoftwareProjectId.of(id),
+                        name,
+                        ecosystem,
+                        status,
+                        summary,
+                        coordinates.stream().map(ArtifactCoordinates::parse).collect(Collectors.toUnmodifiableSet()),
+                        succession == null ? null : new Succession(succession.kind(), succession.value()),
+                        Reference.of(reference.label(), reference.url()));
+            }
+        }
+
+        record SuccessionEntry(Succession.Kind kind, String value) {}
+
+        record ReferenceEntry(String label, String url) {}
     }
 }

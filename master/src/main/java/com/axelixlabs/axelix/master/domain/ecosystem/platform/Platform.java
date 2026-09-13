@@ -23,15 +23,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The curated support policy of a single platform (e.g. {@code Spring Boot}): every release line Axelix knows about
- * and the maintenance window of each. This is what the version an instance runs is dated against.
+ * The platform that Axelix Master is aware about.
+ * <p>
+ * Platform is considered to be a fundamental part of the application. It may be, for example:
  *
  * @param name  the name of the platform, e.g. {@code Spring Boot} or Quarkus
  * @param lines every release line of the platform Axelix knows about; never empty
  *
  * @author Mikhail Polivakha
  */
-public record Platform(String name, List<PlatformReleaseLine> lines) {
+public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
 
     private static final Comparator<PlatformReleaseLine> BY_RELEASE_DATE =
             Comparator.comparing(PlatformReleaseLine::releasedAt);

@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import com.axelixlabs.axelix.master.domain.dependencies.ArtifactCoordinates;
-import com.axelixlabs.axelix.master.domain.dependencies.Ecosystem;
-import com.axelixlabs.axelix.master.domain.dependencies.KnownLibrary;
-import com.axelixlabs.axelix.master.domain.dependencies.LibraryId;
-import com.axelixlabs.axelix.master.domain.dependencies.Succession;
-import com.axelixlabs.axelix.master.domain.dependencies.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.Succession;
+import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,7 +49,7 @@ class LibraryManifestLoaderTest {
     @Test
     void loadsEveryManifestAndStampsTheEcosystemOfItsFile() {
         // when.
-        List<KnownLibrary> libraries = loader.load();
+        List<SoftwareProject> libraries = loader.load();
 
         // then. Filename order: observability.yaml before persistence.yaml
         assertThat(libraries)
@@ -57,14 +57,14 @@ class LibraryManifestLoaderTest {
                 .containsExactly("spring-cloud-sleuth", "micrometer", "ehcache2");
 
         assertThat(libraries)
-                .extracting(KnownLibrary::ecosystem)
+                .extracting(SoftwareProject::ecosystem)
                 .containsExactly(Ecosystem.OBSERVABILITY, Ecosystem.OBSERVABILITY, Ecosystem.PERSISTENCE);
     }
 
     @Test
     void bindsEveryCuratedFieldOfAnEntry() {
         // when.
-        KnownLibrary sleuth = loader.load().getFirst();
+        SoftwareProject sleuth = loader.load().getFirst();
 
         // then.
         assertThat(sleuth.displayName()).isEqualTo("Spring Cloud Sleuth");
@@ -86,7 +86,7 @@ class LibraryManifestLoaderTest {
     @Test
     void leavesSuccessionAbsentForAnActiveProject() {
         // when.
-        KnownLibrary micrometer = loader.load().get(1);
+        SoftwareProject micrometer = loader.load().get(1);
 
         // then.
         assertThat(micrometer.status()).isEqualTo(SupportStatus.ACTIVE);
@@ -100,10 +100,12 @@ class LibraryManifestLoaderTest {
 
         // when, then. Both Sleuth artifacts resolve to the one curated project.
         assertThat(catalog.find(ArtifactCoordinates.of("org.springframework.cloud", "spring-cloud-sleuth-core")))
-                .hasValueSatisfying(library -> assertThat(library.id()).isEqualTo(LibraryId.of("spring-cloud-sleuth")));
+                .hasValueSatisfying(
+                        library -> assertThat(library.id()).isEqualTo(SoftwareProjectId.of("spring-cloud-sleuth")));
 
         assertThat(catalog.find(ArtifactCoordinates.of("org.springframework.cloud", "spring-cloud-sleuth-api")))
-                .hasValueSatisfying(library -> assertThat(library.id()).isEqualTo(LibraryId.of("spring-cloud-sleuth")));
+                .hasValueSatisfying(
+                        library -> assertThat(library.id()).isEqualTo(SoftwareProjectId.of("spring-cloud-sleuth")));
     }
 
     @Test

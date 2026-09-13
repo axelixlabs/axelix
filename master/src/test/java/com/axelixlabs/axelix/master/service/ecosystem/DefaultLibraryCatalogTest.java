@@ -22,12 +22,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.domain.dependencies.ArtifactCoordinates;
-import com.axelixlabs.axelix.master.domain.dependencies.Ecosystem;
-import com.axelixlabs.axelix.master.domain.dependencies.KnownLibrary;
-import com.axelixlabs.axelix.master.domain.dependencies.LibraryId;
-import com.axelixlabs.axelix.master.domain.dependencies.Reference;
-import com.axelixlabs.axelix.master.domain.dependencies.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.Reference;
+import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,7 +43,7 @@ class DefaultLibraryCatalogTest {
     @Test
     void refusesTwoEntriesSharingAnId() {
         // given.
-        List<KnownLibrary> duplicated = List.of(
+        List<SoftwareProject> duplicated = List.of(
                 library("jackson", "com.fasterxml.jackson.core:jackson-core"), library("jackson", "com.acme:x"));
 
         // when, then.
@@ -55,7 +55,7 @@ class DefaultLibraryCatalogTest {
     @Test
     void refusesTwoEntriesClaimingTheSameArtifact() {
         // given. A real curation mistake: the artifact was moved to a new entry but left on the old one.
-        List<KnownLibrary> overlapping = List.of(
+        List<SoftwareProject> overlapping = List.of(
                 library("sleuth", "org.springframework.cloud:spring-cloud-sleuth-core"),
                 library("micrometer-tracing", "org.springframework.cloud:spring-cloud-sleuth-core"));
 
@@ -69,8 +69,8 @@ class DefaultLibraryCatalogTest {
     @Test
     void refusesAnEntryThatNothingCouldEverMatch() {
         // when, then.
-        assertThatThrownBy(() -> new KnownLibrary(
-                        LibraryId.of("ghost"),
+        assertThatThrownBy(() -> new SoftwareProject(
+                        SoftwareProjectId.of("ghost"),
                         "Ghost",
                         Ecosystem.OTHER,
                         SupportStatus.ACTIVE,
@@ -92,9 +92,9 @@ class DefaultLibraryCatalogTest {
         assertThat(catalog.all()).extracting(entry -> entry.id().value()).containsExactly("first", "second");
     }
 
-    private static KnownLibrary library(String id, String coordinates) {
-        return new KnownLibrary(
-                LibraryId.of(id),
+    private static SoftwareProject library(String id, String coordinates) {
+        return new SoftwareProject(
+                SoftwareProjectId.of(id),
                 id,
                 Ecosystem.OTHER,
                 SupportStatus.ACTIVE,
