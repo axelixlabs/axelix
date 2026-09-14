@@ -41,7 +41,7 @@ class PlatformManifestLoaderTest {
     @Test
     void loadsManifestsInFilenameOrderMappingEveryField() {
         // given
-        PlatformManifestLoader subject = loaderOf("classpath*:axelix/platforms-test/*.yaml");
+        PlatformManifestLoader subject = loaderOf("classpath*:axelix/platforms/valid/*.yaml");
 
         // when
         List<Platform> platforms = subject.load();
@@ -74,7 +74,7 @@ class PlatformManifestLoaderTest {
     @Test
     void refusesManifestWithUnknownProperty() {
         // given
-        PlatformManifestLoader subject = loaderOf("classpath:axelix/platforms-broken/typo.yaml");
+        PlatformManifestLoader subject = loaderOf("classpath:axelix/platforms/broken/typo.yaml");
 
         // when / then
         assertThatThrownBy(subject::load)
@@ -85,7 +85,7 @@ class PlatformManifestLoaderTest {
     @Test
     void refusesManifestDeclaringUnknownPlatform() {
         // given
-        PlatformManifestLoader subject = loaderOf("classpath:axelix/platforms-broken/unknown-platform.yaml");
+        PlatformManifestLoader subject = loaderOf("classpath:axelix/platforms/broken/unknown-platform.yaml");
 
         // when / then
         assertThatThrownBy(subject::load)

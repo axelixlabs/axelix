@@ -45,7 +45,7 @@ class SoftwareProjectsManifestLoaderTest {
     @Test
     void loadsManifestsInFilenameOrderMappingEveryField() {
         // given
-        SoftwareProjectsManifestLoader subject = loaderOf("classpath*:axelix/dependencies-test/*.yaml");
+        SoftwareProjectsManifestLoader subject = loaderOf("classpath*:axelix/softwareprojects/valid/*.yaml");
 
         // when
         List<SoftwareProject> projects = subject.load();
@@ -92,7 +92,7 @@ class SoftwareProjectsManifestLoaderTest {
     @Test
     void refusesManifestWithUnknownProperty() {
         // given
-        SoftwareProjectsManifestLoader subject = loaderOf("classpath:axelix/dependencies-broken/typo.yaml");
+        SoftwareProjectsManifestLoader subject = loaderOf("classpath:axelix/softwareprojects/broken/typo.yaml");
 
         // when / then
         assertThatThrownBy(subject::load)
@@ -103,7 +103,7 @@ class SoftwareProjectsManifestLoaderTest {
     @Test
     void refusesManifestWithVersionedCoordinates() {
         // given
-        SoftwareProjectsManifestLoader subject = loaderOf("classpath:axelix/dependencies-broken/versioned.yaml");
+        SoftwareProjectsManifestLoader subject = loaderOf("classpath:axelix/softwareprojects/broken/versioned.yaml");
 
         // when / then
         assertThatThrownBy(subject::load)
