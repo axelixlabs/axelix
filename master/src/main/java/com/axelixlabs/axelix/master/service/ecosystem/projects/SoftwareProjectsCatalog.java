@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.dependencies;
+package com.axelixlabs.axelix.master.service.ecosystem;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -24,7 +24,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinat
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 
 /**
- * The read side of the curated catalog of known Java libraries. Given the coordinates of a dependency a managed
+ * The read side of the curated catalog of known Java libraries. Given the libraries of a dependency a managed
  * application resolved at runtime, it answers what Axelix knows about the project behind it.
  *
  * @author Mikhail Polivakha
@@ -34,7 +34,7 @@ public interface LibraryCatalog {
     /**
      * Looks up the project that publishes the given artifact.
      *
-     * @param coordinates the version-free coordinates of a resolved dependency
+     * @param coordinates the version-free libraries of a resolved dependency
      *
      * @return the curated entry, or {@link Optional#empty()} when Axelix has nothing to say about this artifact.
      *         An empty result is not a negative verdict - it only means the artifact is not curated.

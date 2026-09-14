@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.dependencies;
+package com.axelixlabs.axelix.master.service.ecosystem;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +29,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 /**
- * The catalog held fully in memory and indexed by coordinates. It is immutable once built, so it is safe to share
+ * The catalog held fully in memory and indexed by libraries. It is immutable once built, so it is safe to share
  * across requests.
  * <p>
  * The two uniqueness invariants of the curated data - one entry per id, one entry per artifact - are enforced here,
@@ -65,7 +65,7 @@ public class DefaultLibraryCatalog implements LibraryCatalog {
                     .formatted(library.id(), duplicateId.displayName(), library.displayName()));
         }
 
-        for (ArtifactCoordinates coordinates : library.coordinates()) {
+        for (ArtifactCoordinates coordinates : library.libraries()) {
             SoftwareProject owner = byCoordinates.putIfAbsent(coordinates, library);
 
             if (owner != null) {

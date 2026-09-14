@@ -15,22 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.dependencies;
+package com.axelixlabs.axelix.master.domain.ecosystem.projects;
+
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 
 /**
- * Raised when the curated catalog cannot be read or does not hold together, e.g. a malformed manifest or two entries
- * claiming the same artifact. The catalog is data Axelix ships, so any such failure is a defect in the distribution
- * rather than anything a user did, and it is meant to abort startup.
+ * The stable identifier of a curated project, e.g. {@code spring-cloud-sleuth}.
+ * <p>
+ * It identifies the <em>project</em>, not an artifact: one id owns every {@link Library} the project
+ * publishes.
+ *
+ * @param value the identifier, in lower kebab-case
  *
  * @author Mikhail Polivakha
  */
-public class LibraryCatalogException extends RuntimeException {
+public record SoftwareProjectId(String value) {
 
-    public LibraryCatalogException(String message) {
-        super(message);
+    public static SoftwareProjectId of(String value) {
+        return new SoftwareProjectId(value);
     }
 
-    public LibraryCatalogException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public String toString() {
+        return value;
     }
 }
