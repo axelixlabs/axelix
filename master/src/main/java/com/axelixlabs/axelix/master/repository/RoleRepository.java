@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -47,6 +48,9 @@ public interface RoleRepository extends ListCrudRepository<RoleEntity, String> {
 
     @Query("SELECT role_id FROM users_roles WHERE user_id = :userId")
     List<String> findRoleIdsOfUser(@Param("userId") String userId);
+
+    @Query("SELECT id FROM roles WHERE name = :roleName")
+    Optional<String> findIdByName(@Param("roleName") String roleName);
 
     record RoleWithAuthorityName(
             String roleId, String roleName, @Nullable String authorityName) {}
