@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -60,6 +62,8 @@ class DefaultPropertyMetadataExtractorTest {
         assertThat(serverPortMetadata.getDeprecation()).isNotNull();
         assertThat(serverPortMetadata.getDeprecation().getMessage())
                 .isEqualTo("Just because. Deprecated in favor of new.prop.test.server.port property.");
+        assertThat(serverPortMetadata.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.ERROR);
+        assertThat(serverPortMetadata.getDeprecation().getReplacedBy()).isEqualTo("new.prop.test.server.port");
     }
 
     @Test
@@ -70,6 +74,8 @@ class DefaultPropertyMetadataExtractorTest {
         assertThat(metadataWithoutReason.getDescription()).isNull();
         assertThat(metadataWithoutReason.getDeprecation()).isNotNull();
         assertThat(metadataWithoutReason.getDeprecation().getMessage()).isEqualTo("Marked for deletion.");
+        assertThat(metadataWithoutReason.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.WARNING);
+        assertThat(metadataWithoutReason.getDeprecation().getReplacedBy()).isNull();
     }
 
     @Test
@@ -81,6 +87,9 @@ class DefaultPropertyMetadataExtractorTest {
         assertThat(metadataWithoutReplacament.getDeprecation()).isNotNull();
         assertThat(metadataWithoutReplacament.getDeprecation().getMessage())
                 .isEqualTo("Deprecated in favor of new.custom.test.without.reason.property property.");
+        assertThat(metadataWithoutReplacament.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.WARNING);
+        assertThat(metadataWithoutReplacament.getDeprecation().getReplacedBy())
+                .isEqualTo("new.custom.test.without.reason.property");
     }
 
     @Test

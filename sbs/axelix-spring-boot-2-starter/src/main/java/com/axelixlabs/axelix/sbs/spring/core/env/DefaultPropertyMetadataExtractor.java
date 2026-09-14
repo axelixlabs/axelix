@@ -39,6 +39,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
 
 /**
@@ -144,6 +145,8 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         boolean deprecated = false;
         String reason = null;
         String replacement = null;
+        // Spring Boot treats a deprecation whose metadata omits the level as a WARNING.
+        DeprecationLevel level = DeprecationLevel.WARNING;
 
         String description = extractTextOrNull(propertyNode, "description");
 
@@ -157,6 +160,9 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
                 deprecated = true;
                 reason = extractTextOrNull(deprecationNode, "reason");
                 replacement = extractTextOrNull(deprecationNode, "replacement");
+                level = "error".equalsIgnoreCase(extractTextOrNull(deprecationNode, "level"))
+                        ? DeprecationLevel.ERROR
+                        : DeprecationLevel.WARNING;
             }
         }
 
@@ -166,7 +172,7 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
 
         if (deprecated) {
             String message = buildDeprecationMessage(reason, replacement);
-            return new PropertyMetadata(description, new Deprecation(message));
+            return new PropertyMetadata(description, new Deprecation(message, level, replacement));
         }
 
         return new PropertyMetadata(description, null);

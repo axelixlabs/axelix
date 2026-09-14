@@ -21,6 +21,8 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
+
 /**
  * Metadata for a Spring Boot property, including description and deprecation info.
  *
@@ -86,15 +88,33 @@ public final class PropertyMetadata {
 
         private final String message;
 
+        private final DeprecationLevel level;
+
+        @Nullable
+        private final String replacedBy;
+
         /**
          * @param message explaining why the property is deprecated and, optionally, what should be used instead.
+         * @param level the severity with which the deprecation is reported.
+         * @param replacedBy the name of the property that supersedes the deprecated one, if any.
          */
-        public Deprecation(String message) {
+        public Deprecation(String message, DeprecationLevel level, @Nullable String replacedBy) {
             this.message = message;
+            this.level = level;
+            this.replacedBy = replacedBy;
         }
 
         public String getMessage() {
             return message;
+        }
+
+        public DeprecationLevel getLevel() {
+            return level;
+        }
+
+        @Nullable
+        public String getReplacedBy() {
+            return replacedBy;
         }
 
         @Override
@@ -106,17 +126,19 @@ public final class PropertyMetadata {
                 return false;
             }
             var that = (Deprecation) obj;
-            return Objects.equals(this.message, that.message);
+            return Objects.equals(this.message, that.message)
+                    && this.level == that.level
+                    && Objects.equals(this.replacedBy, that.replacedBy);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(message);
+            return Objects.hash(message, level, replacedBy);
         }
 
         @Override
         public String toString() {
-            return "Deprecation[" + "message=" + message + ']';
+            return "Deprecation[" + "message=" + message + ", level=" + level + ", replacedBy=" + replacedBy + ']';
         }
     }
 }

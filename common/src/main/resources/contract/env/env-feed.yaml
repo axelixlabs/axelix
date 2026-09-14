@@ -131,6 +131,20 @@ components:
           type: string
           description: The message explaining why the property is deprecated and what to use instead.
           x-axelix-introduced-in: 1.2.0
+        level:
+          description: The severity with which the deprecation is reported.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/DeprecationLevel'
+        replacedBy:
+          type: string
+          description: The name of the property that supersedes the deprecated one, when any.
+          x-axelix-introduced-in: 1.2.0
+    DeprecationLevel:
+      type: string
+      description: The severity with which a property deprecation is reported.
+      enum:
+        - WARNING
+        - ERROR
     InjectionPoint:
       type: object
       description: A point in the code where a property is injected via @Value.
