@@ -1,4 +1,3 @@
-# Fixture: a valid manifest with several release lines, all fields populated.
 platform: spring-boot
 lines:
   - line: 3.2.x

@@ -1,4 +1,3 @@
-# Fixture for SoftwareProjectsManifestLoaderTest. See observability.yaml.
 ecosystem: PERSISTENCE
 projects:
   - id: ehcache2

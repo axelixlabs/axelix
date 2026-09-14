@@ -1,5 +1,3 @@
-# Fixture for SoftwareProjectsManifestLoaderTest. The facts here are illustrative and the URLs are deliberately
-# unreachable - the real curated manifests live under axelix/dependencies.
 ecosystem: OBSERVABILITY
 projects:
   - id: spring-cloud-sleuth
