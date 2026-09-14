@@ -17,12 +17,14 @@
  */
 package com.axelixlabs.axelix.master.domain.ecosystem.projects;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 
 /**
- * The area of a running application a library belongs to. This is purely a presentation grouping - it carries no
- * judgement and does not participate in resolving the {@link SupportStatus}. At Axelix, we keep one manifest file per
- * ecosystem, which is what keeps the classification consistent across entries.
+ * The area {@link SoftwareProject} covers. This is purely a presentation grouping. As a result of this domain design,
+ * it is also assumed that every {@link Library} inside the {@link SoftwareProject} logically belongs to the same {@link Ecosystem}.
+ * In practise it may not always be the case, but this is the decision for now.
+ * <p>
+ * At Axelix, we keep one manifest file per ecosystem, which is what keeps the classification consistent across entries.
  *
  * @author Mikhail Polivakha
  */

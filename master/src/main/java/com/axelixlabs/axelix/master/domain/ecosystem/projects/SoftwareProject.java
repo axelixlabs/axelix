@@ -21,9 +21,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.Reference;
-import com.axelixlabs.axelix.master.domain.ecosystem.Succession;
-import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
 import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 
 /**
@@ -57,7 +54,7 @@ public record SoftwareProject(
         String summary,
         Set<Library> libraries,
         @Nullable Succession succession,
-        Reference reference) {
+        ProjectReference reference) {
 
     public SoftwareProject {
         if (libraries.isEmpty()) {
