@@ -352,6 +352,14 @@ public final class ApiPaths {
         public static final String PROTECTED_RESOURCE_METADATA = "/mcp-oauth2/.well-known/oauth-protected-resource";
     }
 
+    public static final class DependenciesApi {
+
+        /**
+         * Endpoint to retrieve the dependency analysis of a given application instance.
+         */
+        public static final String INSTANCE_ID = "/dependencies/{instanceId}";
+    }
+
     public static final class McpToolApi {
 
         /**

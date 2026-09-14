@@ -208,6 +208,10 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint DASHBOARD_READ_PERSISTENCE =
             register("dashboard:read-persistence", HttpMethod.GET, ApiPaths.DashboardApi.PERSISTENCE, null);
 
+    // Dependencies
+    public static final MasterWebEndpoint DEPENDENCIES_READ =
+            register("dependencies:read", HttpMethod.GET, ApiPaths.DependenciesApi.INSTANCE_ID, null);
+
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =
             register("mcp-tools:read", HttpMethod.GET, ApiPaths.McpToolApi.TOOLS_LIST, null);
