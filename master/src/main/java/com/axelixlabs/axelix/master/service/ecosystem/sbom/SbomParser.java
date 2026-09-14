@@ -30,9 +30,10 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
-
-import static com.axelixlabs.axelix.master.service.ecosystem.sbom.ParsedSbom.*;
-import static com.axelixlabs.axelix.master.service.ecosystem.sbom.SbomParser.CycloneDxDocument.*;
+import com.axelixlabs.axelix.master.service.ecosystem.sbom.ParsedSbom.ComponentsGraph;
+import com.axelixlabs.axelix.master.service.ecosystem.sbom.ParsedSbom.ResolvedSbomComponent;
+import com.axelixlabs.axelix.master.service.ecosystem.sbom.SbomParser.CycloneDxDocument.Component;
+import com.axelixlabs.axelix.master.service.ecosystem.sbom.SbomParser.CycloneDxDocument.Dependency;
 
 /**
  * Parses the CycloneDX SBOM a managed application serves into a {@link ParsedSbom}.
