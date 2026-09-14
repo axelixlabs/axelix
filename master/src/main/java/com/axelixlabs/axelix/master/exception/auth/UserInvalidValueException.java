@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.exception.auth;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
 
 /**

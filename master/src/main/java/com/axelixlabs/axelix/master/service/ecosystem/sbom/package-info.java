@@ -15,21 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.exception.auth;
+@NullMarked
+package com.axelixlabs.axelix.master.service.ecosystem.sbom;
 
-import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
-
-/**
- * Thrown when attempting to change the status of a user whose {@link UserOrigin} is not
- * {@link UserOrigin#LOCAL}.
- *
- * @author Nikita Kirillov
- */
-public class UserStatusChangeNotAllowedException extends RuntimeException {
-
-    public UserStatusChangeNotAllowedException(String id, UserOrigin origin) {
-        super(
-                "Cannot change status of user '%s': status changes are only supported for %s-origin users, but this user originates from %s"
-                        .formatted(id, UserOrigin.LOCAL, origin));
-    }
-}
+import org.jspecify.annotations.NullMarked;

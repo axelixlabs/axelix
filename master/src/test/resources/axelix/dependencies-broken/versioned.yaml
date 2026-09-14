@@ -1,4 +1,4 @@
-# Fixture: coordinates carry a version, which the catalog is deliberately version-free about.
+# Fixture: libraries carry a version, which the catalog is deliberately version-free about.
 ecosystem: OTHER
 libraries:
   - id: versioned

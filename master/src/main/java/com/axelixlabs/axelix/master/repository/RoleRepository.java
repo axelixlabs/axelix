@@ -25,7 +25,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.axelixlabs.axelix.master.domain.RoleEntity;
+import com.axelixlabs.axelix.master.domain.iam.RoleEntity;
 
 /**
  * Repository for {@link RoleEntity} aggregate.

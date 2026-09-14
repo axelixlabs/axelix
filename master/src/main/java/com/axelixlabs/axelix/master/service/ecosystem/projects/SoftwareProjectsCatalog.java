@@ -23,7 +23,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 
 /**
- * The catalog of the {@link SoftwareProject Software Projects} Axelix Master is aware about. Esstially acts as the
+ * The catalog of the {@link SoftwareProject Software Projects} Axelix Master is aware about. Essentially acts as the
  * central accessor to all known Software Projects.
  *
  * @author Mikhail Polivakha

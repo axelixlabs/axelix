@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Conditional;
 
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * Conditional annotation to activate certain parts of configuration only in case

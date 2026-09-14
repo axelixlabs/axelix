@@ -40,7 +40,7 @@ import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * The specific context provider for {@link org.junit.jupiter.api.ClassTemplate} annotations, that is used

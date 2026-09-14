@@ -47,8 +47,8 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

@@ -27,7 +27,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * Condition to activate certain parts of configuration only in case the given {@link OssRdbms} is active.

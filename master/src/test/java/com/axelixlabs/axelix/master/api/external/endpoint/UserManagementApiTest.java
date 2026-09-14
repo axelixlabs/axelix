@@ -34,9 +34,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;

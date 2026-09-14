@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * Composed annotation to demarcate the given integration test as the one, where all the test methods

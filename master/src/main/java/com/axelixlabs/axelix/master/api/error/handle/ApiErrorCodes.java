@@ -45,7 +45,10 @@ public enum ApiErrorCodes {
     EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS"),
     USER_NOT_FOUND("USER_NOT_FOUND"),
     USER_STATUS_CHANGE_NOT_ALLOWED("USER_STATUS_CHANGE_NOT_ALLOWED"),
-    PARTIALLY_UPDATED("PARTIALLY_UPDATED");
+    PARTIALLY_UPDATED("PARTIALLY_UPDATED"),
+
+    // Not found related error codes
+    SBOM_NOT_AVAILABLE("SBOM_NOT_AVAILABLE");
 
     /**
      * actual code that is sent from the master backend.

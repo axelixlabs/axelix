@@ -34,13 +34,13 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.Reference;
-import com.axelixlabs.axelix.master.domain.ecosystem.Succession;
-import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
 import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.ProjectReference;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.Succession;
+import com.axelixlabs.axelix.master.domain.ecosystem.projects.SupportStatus;
 
 /**
  * Reads every curated manifest off the classpath and flattens them into the entries a {@link SoftwareProjectsCatalog} is built
@@ -93,7 +93,7 @@ public class SoftwareProjectsManifestLoader {
             manifests = resourceResolver.getResources(locationPattern);
         } catch (IOException e) {
             throw new SoftwareProjectsCatalogException(
-                    "Failed to locate the library manifests at '%s'".formatted(locationPattern), e);
+                    "Failed to locate the software project manifests at '%s'".formatted(locationPattern), e);
         }
 
         Arrays.sort(manifests, BY_FILENAME);
@@ -112,14 +112,14 @@ public class SoftwareProjectsManifestLoader {
             return yamlMapper.readValue(source, SoftwareProjectManifest.class).toSoftwareProjects();
         } catch (IOException | JacksonException | IllegalArgumentException e) {
             throw new SoftwareProjectsCatalogException(
-                    "Failed to read the library manifest %s".formatted(manifest.getDescription()), e);
+                    "Failed to read the software projects manifest %s".formatted(manifest.getDescription()), e);
         }
     }
 
     /**
      * The on-disk shape of one curated manifest file. Manifest files are broken down into the
      *
-     * @param ecosystem the area every library in this file belongs to
+     * @param ecosystem the area every software project in this file belongs to
      * @param projects the curated entries
      *
      * @author Mikhail Polivakha
@@ -159,7 +159,7 @@ public class SoftwareProjectsManifestLoader {
                         summary,
                         coordinates.stream().map(Library::parse).collect(Collectors.toUnmodifiableSet()),
                         succession == null ? null : new Succession(succession.kind(), succession.value()),
-                        Reference.of(reference.label(), reference.url()));
+                        ProjectReference.of(reference.label(), reference.url()));
             }
         }
 

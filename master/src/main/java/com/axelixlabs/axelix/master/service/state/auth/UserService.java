@@ -26,9 +26,9 @@ import java.util.Set;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;

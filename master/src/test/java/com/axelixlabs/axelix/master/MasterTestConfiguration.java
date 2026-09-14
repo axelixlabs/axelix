@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.master.api.external.response.LicensingInfoResponse;
 import com.axelixlabs.axelix.master.autoconfiguration.database.ConditionalOnCommunityRdbms;
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 import com.axelixlabs.axelix.master.service.LicensingInfoResolver;
 
 /**

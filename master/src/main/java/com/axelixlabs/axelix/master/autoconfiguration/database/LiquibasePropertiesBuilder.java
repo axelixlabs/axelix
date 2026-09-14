@@ -23,7 +23,7 @@ import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * An abstraction that is capable to build the correct {@link LiquibaseProperties} depending on the database in use.

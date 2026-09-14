@@ -15,21 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.exception.auth;
+package com.axelixlabs.axelix.master.exception;
 
-import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
- * Thrown when attempting to change the status of a user whose {@link UserOrigin} is not
- * {@link UserOrigin#LOCAL}.
+ * Thrown when a managed instance is reachable but serves no dependency SBOM, which means the application was built
+ * without an Axelix build plugin. The UI renders a dedicated empty state for it, telling the user to rebuild with
+ * the plugin rather than suggesting the instance is broken.
  *
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class UserStatusChangeNotAllowedException extends RuntimeException {
+public class SbomNotAvailableException extends RuntimeException {
 
-    public UserStatusChangeNotAllowedException(String id, UserOrigin origin) {
+    public SbomNotAvailableException(InstanceId instanceId) {
         super(
-                "Cannot change status of user '%s': status changes are only supported for %s-origin users, but this user originates from %s"
-                        .formatted(id, UserOrigin.LOCAL, origin));
+                "The instance '%s' serves no dependency SBOM; the application was likely built without an Axelix build plugin"
+                        .formatted(instanceId));
     }
 }

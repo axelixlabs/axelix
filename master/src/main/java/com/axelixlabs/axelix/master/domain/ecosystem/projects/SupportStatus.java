@@ -17,15 +17,8 @@
  */
 package com.axelixlabs.axelix.master.domain.ecosystem.projects;
 
-import com.axelixlabs.axelix.master.service.ecosystem.projects.SoftwareProjectsCatalog;
-
 /**
- * What the authors of a project are still doing with it. This is the single question the curated catalog exists to
- * answer about every library a managed application resolves at runtime.
- * <p>
- * There is deliberately no {@code UNKNOWN} member. A library Axelix has nothing to say about is simply absent from
- * the catalog, which {@link SoftwareProjectsCatalog} reports as an empty
- * lookup. Folding "not curated" into the status would make the two indistinguishable to a caller.
+ * What the authors of a {@link SoftwareProject} are still doing with it.
  *
  * @author Mikhail Polivakha
  */

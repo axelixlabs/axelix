@@ -15,21 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.exception.auth;
-
-import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+package com.axelixlabs.axelix.master.service.ecosystem.sbom;
 
 /**
- * Thrown when attempting to change the status of a user whose {@link UserOrigin} is not
- * {@link UserOrigin#LOCAL}.
+ * Raised when the SBOM served by a managed application cannot be parsed. This points at a defect of the build plugin
+ * that generated the document, or at a document Axelix has no business reading - either way not something the caller
+ * can recover from.
  *
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class UserStatusChangeNotAllowedException extends RuntimeException {
+public class SbomParsingException extends RuntimeException {
 
-    public UserStatusChangeNotAllowedException(String id, UserOrigin origin) {
-        super(
-                "Cannot change status of user '%s': status changes are only supported for %s-origin users, but this user originates from %s"
-                        .formatted(id, UserOrigin.LOCAL, origin));
+    public SbomParsingException(String message) {
+        super(message);
+    }
+
+    public SbomParsingException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

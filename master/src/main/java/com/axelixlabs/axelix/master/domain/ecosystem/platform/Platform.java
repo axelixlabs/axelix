@@ -50,6 +50,9 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
         lines = List.copyOf(lines);
     }
 
+    // TODO:
+    //  right now, this method is capable to simply resolve the SemVer versions, which is fine for now,
+    //  but later we're probably going to introduce the OpenJDK support, so it will no longer work.
     /**
      * The release line a concrete version belongs to, matched by the {@code major.minor} prefix: version
      * {@code 3.2.4} belongs to line {@code 3.2.x}.
@@ -73,22 +76,19 @@ public record Platform(PlatformName name, List<PlatformReleaseLine> lines) {
     /**
      * @return the most recently released line of the platform
      */
-    public PlatformReleaseLine latestKnownLine() {
+    public PlatformReleaseLine latestKnownReleaseLine() {
         return lines.stream().max(BY_RELEASE_DATE).orElseThrow();
     }
 
     /**
-     * The line a team on this platform is expected to move to: the most recently released line that still receives
-     * OSS maintenance as of the given date, or the latest known line when every curated line has run out.
-     *
-     * @param today the date to judge against
+     * Returns the minimal known release line, that is still OSS supported for the given Platform.
      *
      * @return the line a team is expected to move to
      */
-    public PlatformReleaseLine supportedTargetLine(LocalDate today) {
+    public PlatformReleaseLine minimalOssSupportedReleaseLine() {
         return lines.stream()
-                .filter(line -> line.ossSupportedAt(today))
-                .max(BY_RELEASE_DATE)
-                .orElseGet(this::latestKnownLine);
+                .filter(line -> line.ossSupportedAt(LocalDate.now()))
+                .min(BY_RELEASE_DATE)
+                .orElseGet(this::latestKnownReleaseLine);
     }
 }

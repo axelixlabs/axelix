@@ -30,9 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
