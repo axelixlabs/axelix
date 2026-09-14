@@ -28,7 +28,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLin
  * @param version             the exact version the instance runs
  * @param line                the release line the version belongs to
  * @param latestKnownLine     the most recent release line Axelix knows about
- * @param supportedTargetLine the release line a team on this framework is expected to move to
+ * @param oldestSupportedLine the release line a team on this framework is expected to move to
  *
  * @author Mikhail Polivakha
  */
@@ -37,4 +37,4 @@ public record FrameworkPlatform(
         String version,
         PlatformReleaseLine line,
         PlatformReleaseLine latestKnownLine,
-        PlatformReleaseLine supportedTargetLine) {}
+        PlatformReleaseLine oldestSupportedLine) {}

@@ -1,0 +1,66 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "pkg:maven/com.axelixlabs/playground-app@1.0.0?type=jar",
+      "group": "com.axelixlabs",
+      "name": "playground-app",
+      "version": "1.0.0",
+      "purl": "pkg:maven/com.axelixlabs/playground-app@1.0.0?type=jar"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.springframework/spring-webmvc@6.1.5?type=jar",
+      "group": "org.springframework",
+      "name": "spring-webmvc",
+      "version": "6.1.5",
+      "purl": "pkg:maven/org.springframework/spring-webmvc@6.1.5?type=jar"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.springframework.cloud/spring-cloud-starter-sleuth@3.1.11?type=jar",
+      "group": "org.springframework.cloud",
+      "name": "spring-cloud-starter-sleuth",
+      "version": "3.1.11",
+      "purl": "pkg:maven/org.springframework.cloud/spring-cloud-starter-sleuth@3.1.11?type=jar"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.springframework/spring-core@6.1.5?type=jar",
+      "group": "org.springframework",
+      "name": "spring-core",
+      "version": "6.1.5",
+      "purl": "pkg:maven/org.springframework/spring-core@6.1.5?type=jar"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:maven/com.axelixlabs/playground-app@1.0.0?type=jar",
+      "dependsOn": [
+        "pkg:maven/org.springframework/spring-webmvc@6.1.5?type=jar",
+        "pkg:maven/org.springframework.cloud/spring-cloud-starter-sleuth@3.1.11?type=jar"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-webmvc@6.1.5?type=jar",
+      "dependsOn": [
+        "pkg:maven/org.springframework/spring-core@6.1.5?type=jar"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.springframework.cloud/spring-cloud-starter-sleuth@3.1.11?type=jar",
+      "dependsOn": [
+        "pkg:maven/org.springframework/spring-core@6.1.5?type=jar"
+      ]
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-core@6.1.5?type=jar",
+      "dependsOn": []
+    }
+  ]
+}
