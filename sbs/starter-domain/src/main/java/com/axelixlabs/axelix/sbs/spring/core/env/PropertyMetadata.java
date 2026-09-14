@@ -21,6 +21,8 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
+
 /**
  * Metadata for a Spring Boot property, including description and deprecation info.
  *
@@ -77,46 +79,5 @@ public final class PropertyMetadata {
     @Override
     public String toString() {
         return "PropertyMetadata[" + "description=" + description + ", " + "deprecation=" + deprecation + ']';
-    }
-
-    /**
-     * Deprecation metadata for a property.
-     */
-    public static final class Deprecation {
-
-        private final String message;
-
-        /**
-         * @param message explaining why the property is deprecated and, optionally, what should be used instead.
-         */
-        public Deprecation(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj == null || obj.getClass() != this.getClass()) {
-                return false;
-            }
-            var that = (Deprecation) obj;
-            return Objects.equals(this.message, that.message);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(message);
-        }
-
-        @Override
-        public String toString() {
-            return "Deprecation[" + "message=" + message + ']';
-        }
     }
 }
