@@ -3,7 +3,7 @@
 # Dates follow the upstream support policy (https://spring.io/projects/spring-boot#support). OSS support ends when
 # the line stops receiving open-source maintenance releases; commercial support is the extended window offered by
 # the upstream vendor.
-platform: Spring Boot
+platform: spring-boot
 lines:
   - line: 2.4.x
     releasedAt: 2020-11-12
