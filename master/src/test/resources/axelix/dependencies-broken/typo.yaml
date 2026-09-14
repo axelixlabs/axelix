@@ -1,6 +1,6 @@
 # Fixture: 'summry' is a typo for 'summary'. The loader must refuse it rather than drop the field.
 ecosystem: OTHER
-libraries:
+projects:
   - id: typo
     name: Typo
     status: ACTIVE

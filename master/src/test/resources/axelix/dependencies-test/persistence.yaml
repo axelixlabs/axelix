@@ -1,6 +1,6 @@
-# Fixture for LibraryManifestLoaderTest. See observability.yaml.
+# Fixture for SoftwareProjectsManifestLoaderTest. See observability.yaml.
 ecosystem: PERSISTENCE
-libraries:
+projects:
   - id: ehcache2
     name: Ehcache 2
     status: MAINTENANCE

@@ -65,7 +65,8 @@ class DefaultSoftwareProjectsCatalogTest {
                 .contains(sleuth);
         assertThat(subject.resolve(Library.of("org.springframework.cloud", "spring-cloud-sleuth-api")))
                 .contains(sleuth);
-        assertThat(subject.resolve(Library.of("io.micrometer", "micrometer-core"))).contains(micrometer);
+        assertThat(subject.resolve(Library.of("io.micrometer", "micrometer-core")))
+                .contains(micrometer);
     }
 
     @Test
