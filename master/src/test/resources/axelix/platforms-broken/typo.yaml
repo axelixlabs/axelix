@@ -1,0 +1,6 @@
+# Fixture: 'releasedt' is a typo for 'releasedAt'. The loader must refuse it rather than drop the field.
+platform: spring-boot
+lines:
+  - line: 3.2.x
+    releasedt: 2023-11-23
+    ossSupportEndsAt: 2024-12-31

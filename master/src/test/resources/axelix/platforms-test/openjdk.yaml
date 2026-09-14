@@ -1,0 +1,6 @@
+# Fixture: a minimal valid manifest. The single line omits 'commercialSupportEndsAt', which is optional.
+platform: openjdk
+lines:
+  - line: 21.0.x
+    releasedAt: 2023-09-19
+    ossSupportEndsAt: 2028-09-30
