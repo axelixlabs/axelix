@@ -15,14 +15,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.domain;
+package com.axelixlabs.axelix.master.domain.iam;
 
 /**
- * A specific insight feature discovered for the given service instance.
+ * Origin of a managed user account.
  *
- * @param name    the insight feature name
- * @param enabled the enabled state of the insight feature
- *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public record InsightFeature(String name, boolean enabled) {}
+public enum UserOrigin {
+    /**
+     * Account originated from an external OIDC/OAuth2 identity origin.
+     */
+    OIDC("OAUTH2/OIDC"),
+
+    /**
+     * Account created and managed locally within Axelix (e.g. via the Users Management API).
+     */
+    LOCAL("LOCAL");
+
+    /**
+     * Human-readable label of this origin, suitable for display in the UI.
+     */
+    private final String displayName;
+
+    UserOrigin(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+}

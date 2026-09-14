@@ -15,23 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.domain;
-
-import java.util.List;
+package com.axelixlabs.axelix.master.domain.iam;
 
 /**
- * HotSpot-specific insight groups.
+ * Origin of a role, i.e. where the role came from initially.
  *
- * @param projectLeyden    the Project Leyden insight features
- * @param gc               the garbage collection insight features
- * @param projectLilliput the Project Lilliput insight features
- *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public record HotSpot(
-        List<InsightFeature> projectLeyden, List<InsightFeature> gc, List<InsightFeature> projectLilliput) {
+public enum RoleOrigin {
+    /**
+     * Default role.
+     */
+    BUILT_IN,
 
-    public static HotSpot empty() {
-        return new HotSpot(List.of(), List.of(), List.of());
-    }
+    /**
+     * Role created by a user through the Axelix Master UI.
+     */
+    WEB_UI,
+
+    /**
+     * Role declared in a roles YAML manifest.
+     */
+    YAML
 }
