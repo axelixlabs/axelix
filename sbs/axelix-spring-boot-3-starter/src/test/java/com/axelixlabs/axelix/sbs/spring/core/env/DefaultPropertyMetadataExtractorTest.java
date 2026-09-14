@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.DeprecationLevel;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,6 +48,8 @@ class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest 
         assertThat(serverPortMetadata.getDeprecation()).isNotNull();
         assertThat(serverPortMetadata.getDeprecation().getMessage())
                 .isEqualTo("Just because. Deprecated in favor of new.prop.test.server.port property.");
+        assertThat(serverPortMetadata.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.ERROR);
+        assertThat(serverPortMetadata.getDeprecation().getReplacedBy()).isEqualTo("new.prop.test.server.port");
     }
 
     @Test
@@ -56,6 +60,8 @@ class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest 
         assertThat(metadataWithoutReason.getDescription()).isNull();
         assertThat(metadataWithoutReason.getDeprecation()).isNotNull();
         assertThat(metadataWithoutReason.getDeprecation().getMessage()).isEqualTo("Marked for deletion.");
+        assertThat(metadataWithoutReason.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.WARNING);
+        assertThat(metadataWithoutReason.getDeprecation().getReplacedBy()).isNull();
     }
 
     @Test
@@ -67,6 +73,9 @@ class DefaultPropertyMetadataExtractorTest extends AbstractEnvSharedContextTest 
         assertThat(metadataWithoutReplacament.getDeprecation()).isNotNull();
         assertThat(metadataWithoutReplacament.getDeprecation().getMessage())
                 .isEqualTo("Deprecated in favor of new.custom.test.without.reason.property property.");
+        assertThat(metadataWithoutReplacament.getDeprecation().getLevel()).isEqualTo(DeprecationLevel.WARNING);
+        assertThat(metadataWithoutReplacament.getDeprecation().getReplacedBy())
+                .isEqualTo("new.custom.test.without.reason.property");
     }
 
     @Test
