@@ -84,8 +84,8 @@ class DefaultPlatformCatalogTest {
     }
 
     private static Platform platform(PlatformName name) {
-        PlatformReleaseLine line = new PlatformReleaseLine(
-                "3.2.x", LocalDate.of(2023, 11, 23), LocalDate.of(2024, 12, 31), null);
+        PlatformReleaseLine line =
+                new PlatformReleaseLine("3.2.x", LocalDate.of(2023, 11, 23), LocalDate.of(2024, 12, 31), null);
 
         return new Platform(name, List.of(line));
     }

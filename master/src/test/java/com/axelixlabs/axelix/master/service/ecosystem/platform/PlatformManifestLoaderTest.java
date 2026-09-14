@@ -51,16 +51,24 @@ class PlatformManifestLoaderTest {
 
         Platform openJdk = platforms.get(0);
         assertThat(openJdk.name()).isEqualTo(PlatformName.OPEN_JDK);
-        assertThat(openJdk.lines()).containsExactly(new PlatformReleaseLine(
-                "21.0.x", LocalDate.of(2023, 9, 19), LocalDate.of(2028, 9, 30), null));
+        assertThat(openJdk.lines())
+                .containsExactly(
+                        new PlatformReleaseLine("21.0.x", LocalDate.of(2023, 9, 19), LocalDate.of(2028, 9, 30), null));
 
         Platform springBoot = platforms.get(1);
         assertThat(springBoot.name()).isEqualTo(PlatformName.SPRING_BOOT);
-        assertThat(springBoot.lines()).containsExactly(
-                new PlatformReleaseLine(
-                        "3.2.x", LocalDate.of(2023, 11, 23), LocalDate.of(2024, 12, 31), LocalDate.of(2025, 12, 31)),
-                new PlatformReleaseLine(
-                        "3.3.x", LocalDate.of(2024, 5, 23), LocalDate.of(2025, 6, 30), LocalDate.of(2026, 6, 30)));
+        assertThat(springBoot.lines())
+                .containsExactly(
+                        new PlatformReleaseLine(
+                                "3.2.x",
+                                LocalDate.of(2023, 11, 23),
+                                LocalDate.of(2024, 12, 31),
+                                LocalDate.of(2025, 12, 31)),
+                        new PlatformReleaseLine(
+                                "3.3.x",
+                                LocalDate.of(2024, 5, 23),
+                                LocalDate.of(2025, 6, 30),
+                                LocalDate.of(2026, 6, 30)));
     }
 
     @Test
@@ -97,7 +105,10 @@ class PlatformManifestLoaderTest {
         List<Platform> platforms = subject.load();
 
         // then
-        assertThat(platforms).map(Platform::name).contains(PlatformName.SPRING_BOOT).doesNotContain(PlatformName.OPEN_JDK);
+        assertThat(platforms)
+                .map(Platform::name)
+                .contains(PlatformName.SPRING_BOOT)
+                .doesNotContain(PlatformName.OPEN_JDK);
     }
 
     private static PlatformManifestLoader loaderOf(String locationPattern) {
