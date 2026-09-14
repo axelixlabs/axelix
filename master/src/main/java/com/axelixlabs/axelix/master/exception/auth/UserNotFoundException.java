@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.exception.auth;
 
+import java.util.Collection;
+
 /**
  * Exception thrown when a managed user cannot be found.
  *
@@ -26,5 +28,9 @@ public class UserNotFoundException extends RuntimeException {
 
     public UserNotFoundException(String id) {
         super("User with id '" + id + "' was not found");
+    }
+
+    public UserNotFoundException(Collection<String> ids) {
+        super("Some of the users with ids %s were not found".formatted(ids));
     }
 }

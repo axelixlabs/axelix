@@ -80,10 +80,14 @@ public class UserManagementApi {
     }
 
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
-    public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
+    public ResponseEntity<Void> deleteUsers(@RequestBody UserDeleteRequest request) {
+        try {
+            userService.deleteByIds(request.ids());
+            return ResponseEntity.noContent().build();
 
-        userService.deleteById(request.id());
-        return ResponseEntity.noContent().build();
+        } catch (UserInvalidValueException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
@@ -112,12 +116,13 @@ public class UserManagementApi {
     }
 
     @PutMapping(path = ApiPaths.UsersManagementApi.USERS_STATUS)
-    public ResponseEntity<Void> updateUserStatus(@RequestBody UserStatusUpdateRequest request) {
-        if (request.id() == null || request.id().isBlank() || request.status() == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Void> updateUsersStatus(@RequestBody UserStatusUpdateRequest request) {
+        try {
+            userService.updateStatusByIds(request.ids(), request.status());
+            return ResponseEntity.noContent().build();
 
-        userService.updateStatus(request.id(), request.status());
-        return ResponseEntity.noContent().build();
+        } catch (UserInvalidValueException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

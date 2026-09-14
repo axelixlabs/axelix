@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -114,7 +115,12 @@ class DefaultRoleServiceTest {
         @BeforeEach
         @AfterEach
         void cleanUsers() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+            List<String> ids =
+                    userRepository.findAll().stream().map(UserEntity::id).toList();
+
+            if (!ids.isEmpty()) {
+                userService.deleteByIds(ids);
+            }
         }
 
         @Test
@@ -181,7 +187,12 @@ class DefaultRoleServiceTest {
         @BeforeEach
         @AfterEach
         void cleanCustomRoles() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+            List<String> ids =
+                    userRepository.findAll().stream().map(UserEntity::id).toList();
+
+            if (!ids.isEmpty()) {
+                userService.deleteByIds(ids);
+            }
             jdbcClient.sql("DELETE FROM roles_parents").update();
             jdbcClient
                     .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")
@@ -295,7 +306,12 @@ class DefaultRoleServiceTest {
         @BeforeEach
         @AfterEach
         void cleanCustomRoles() {
-            userRepository.findAll().forEach(user -> userService.deleteById(user.id()));
+            List<String> ids =
+                    userRepository.findAll().stream().map(UserEntity::id).toList();
+
+            if (!ids.isEmpty()) {
+                userService.deleteByIds(ids);
+            }
             jdbcClient.sql("DELETE FROM roles_parents").update();
             jdbcClient
                     .sql("DELETE FROM roles_authorities WHERE role_id IN (SELECT id FROM roles WHERE role_origin <> ?)")

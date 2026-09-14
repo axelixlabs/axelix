@@ -112,11 +112,13 @@ public class AxelixMasterApiClient {
                 .findFirst();
     }
 
-    public void updateUserStatus(String userId, String status) {
+    public void updateUsersStatus(List<String> userIds, String status) {
+        String ids = userIds.stream().map("\"%s\""::formatted).collect(Collectors.joining(", "));
+
         requestSpec()
                 .body("""
-                        {"id": "%s", "status": "%s"}
-                        """.formatted(userId, status))
+                        {"ids": [%s], "status": "%s"}
+                        """.formatted(ids, status))
                 .put(EXTERNAL_API_BASE_PATH + "/users-management/status")
                 .then()
                 .statusCode(204);
