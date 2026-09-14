@@ -65,7 +65,8 @@ public enum PlatformName {
             }
         }
 
-        throw new IllegalArgumentException("Unrecognized framework provided in the framework manifest file: " + platform);
+        throw new IllegalArgumentException(
+                "Unrecognized framework provided in the framework manifest file: " + platform);
     }
 
     public String codeName() {

@@ -48,5 +48,5 @@ public record AnalyzedDependency(
      * @param library         the version-free library that represents the dependency itself
      * @param version         the version that was actually resolved
      */
-    public record Dependency(Library library, String version) { }
+    public record Dependency(Library library, String version) {}
 }

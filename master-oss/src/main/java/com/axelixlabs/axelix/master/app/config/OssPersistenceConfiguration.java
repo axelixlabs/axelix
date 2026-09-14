@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.master.autoconfiguration.database.LiquibasePropertiesBuilder;
-import com.axelixlabs.axelix.master.domain.database.OssRdbms;
+import com.axelixlabs.axelix.master.domain.OssRdbms;
 
 /**
  * Persistence-related configuration for the OSS distribution.

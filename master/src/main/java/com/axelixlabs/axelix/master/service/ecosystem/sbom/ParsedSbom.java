@@ -27,8 +27,9 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 
 /**
  * The parsed dependency SBOM of a managed application: the application itself, every softwareProject resolved onto its
@@ -44,7 +45,8 @@ public class ParsedSbom {
 
     ParsedSbom(String rootCoordinates, List<ResolvedSbomComponent> components, ComponentsGraph graph) {
         this.rootCoordinates = rootCoordinates;
-        this.componentsByRef = components.stream().collect(Collectors.toMap(ResolvedSbomComponent::bomRef, Function.identity()));
+        this.componentsByRef =
+                components.stream().collect(Collectors.toMap(ResolvedSbomComponent::bomRef, Function.identity()));
         this.graph = graph;
     }
 
