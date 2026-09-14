@@ -15,73 +15,51 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.ecosystem;
+package com.axelixlabs.axelix.master.service.ecosystem.projects;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
-import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 /**
- * The catalog held fully in memory and indexed by libraries. It is immutable once built, so it is safe to share
- * across requests.
- * <p>
- * The two uniqueness invariants of the curated data - one entry per id, one entry per artifact - are enforced here,
- * at construction, rather than at lookup. A catalog that violates them cannot be built at all, which turns a
- * curation mistake into a startup failure instead of a wrong verdict silently shown to a user.
+ * Default {@link SoftwareProjectsCatalog}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultLibraryCatalog implements LibraryCatalog {
+public class DefaultSoftwareProjectsCatalog implements SoftwareProjectsCatalog {
 
-    private final Map<SoftwareProjectId, SoftwareProject> byId;
-    private final Map<ArtifactCoordinates, SoftwareProject> byCoordinates;
+    private final Map<Library, SoftwareProject> cache;
 
     /**
-     * @param libraries the curated entries, typically the merged result of every manifest
-     *
-     * @throws LibraryCatalogException when two entries share an id, or when two entries claim the same artifact
+     * @throws SoftwareProjectsCatalogException in case of an error of loading the SoftwareProjects map.
      */
-    public DefaultLibraryCatalog(Collection<SoftwareProject> libraries) {
-        this.byId = new LinkedHashMap<>(libraries.size());
-        this.byCoordinates = new HashMap<>(libraries.size());
+    public DefaultSoftwareProjectsCatalog(SoftwareProjectsManifestLoader softwareProjectsManifestLoader) {
+        List<SoftwareProject> load = softwareProjectsManifestLoader.load();
 
-        for (SoftwareProject library : libraries) {
+        this.cache = new HashMap<>(load.size());
+
+        for (SoftwareProject library : load) {
             index(library);
         }
     }
 
-    private void index(SoftwareProject library) {
-        SoftwareProject duplicateId = byId.putIfAbsent(library.id(), library);
-
-        if (duplicateId != null) {
-            throw new LibraryCatalogException("Duplicate library id '%s', declared by both '%s' and '%s'"
-                    .formatted(library.id(), duplicateId.displayName(), library.displayName()));
-        }
-
-        for (ArtifactCoordinates coordinates : library.libraries()) {
-            SoftwareProject owner = byCoordinates.putIfAbsent(coordinates, library);
+    private void index(SoftwareProject project) {
+        for (Library library : project.libraries()) {
+            SoftwareProject owner = cache.putIfAbsent(library, project);
 
             if (owner != null) {
-                throw new LibraryCatalogException("Artifact '%s' is claimed by both '%s' and '%s'"
-                        .formatted(coordinates, owner.id(), library.id()));
+                throw new SoftwareProjectsCatalogException(
+                        "Artifact '%s' is claimed by both '%s' and '%s'".formatted(library, owner.id(), project.id()));
             }
         }
     }
 
     @Override
-    public Optional<SoftwareProject> find(ArtifactCoordinates coordinates) {
-        return Optional.ofNullable(byCoordinates.get(coordinates));
-    }
-
-    @Override
-    public Collection<SoftwareProject> all() {
-        return Collections.unmodifiableCollection(byId.values());
+    public Optional<SoftwareProject> resolve(Library library) {
+        return Optional.ofNullable(cache.get(library));
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.ecosystem;
+package com.axelixlabs.axelix.master.service.ecosystem.projects;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,24 +32,23 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.axelixlabs.axelix.master.domain.ecosystem.Reference;
 import com.axelixlabs.axelix.master.domain.ecosystem.Succession;
 import com.axelixlabs.axelix.master.domain.ecosystem.SupportStatus;
-import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.Ecosystem;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
 
 /**
- * Reads every curated manifest off the classpath and flattens them into the entries a {@link LibraryCatalog} is built
+ * Reads every curated manifest off the classpath and flattens them into the entries a {@link SoftwareProjectsCatalog} is built
  * from.
  * <p>
  * The pattern is a {@code classpath*:} one on purpose, so that a distribution can contribute additional manifests
  * from its own jar without this class knowing about it. Files are read in filename order so that a duplicate
- * reported by {@link DefaultLibraryCatalog} always names the same two entries, whatever order the classpath happens
+ * reported by {@link DefaultSoftwareProjectsCatalog} always names the same two entries, whatever order the classpath happens
  * to hand them over in.
  * <p>
  * Unknown properties are rejected rather than ignored. The manifests are data Axelix authors by hand, and a
@@ -57,9 +56,9 @@ import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProjectId;
  *
  * @author Mikhail Polivakha
  */
-public class LibraryManifestLoader {
+public class SoftwareProjectsManifestLoader {
 
-    static final String DEFAULT_LOCATION_PATTERN = "classpath*:axelix/dependencies/*.yaml";
+    public static final String DEFAULT_LOCATION_PATTERN = "classpath*:axelix/dependencies/*.yaml";
 
     private static final Comparator<Resource> BY_FILENAME =
             Comparator.comparing(resource -> String.valueOf(resource.getFilename()));
@@ -68,15 +67,11 @@ public class LibraryManifestLoader {
     private final ObjectMapper yamlMapper;
     private final String locationPattern;
 
-    public LibraryManifestLoader() {
-        this(new PathMatchingResourcePatternResolver(), DEFAULT_LOCATION_PATTERN);
-    }
-
     /**
      * @param resourceResolver the resolver the manifests are looked up through
      * @param locationPattern  the Ant-style pattern the manifests are located by
      */
-    public LibraryManifestLoader(ResourcePatternResolver resourceResolver, String locationPattern) {
+    public SoftwareProjectsManifestLoader(ResourcePatternResolver resourceResolver, String locationPattern) {
         this.resourceResolver = resourceResolver;
         this.locationPattern = locationPattern;
         this.yamlMapper = YAMLMapper.builder()
@@ -89,7 +84,7 @@ public class LibraryManifestLoader {
      *
      * @return the curated entries of all manifests, concatenated in filename order
      *
-     * @throws LibraryCatalogException when a manifest cannot be located, read or parsed
+     * @throws SoftwareProjectsCatalogException when a manifest cannot be located, read or parsed
      */
     public List<SoftwareProject> load() {
         Resource[] manifests;
@@ -97,7 +92,7 @@ public class LibraryManifestLoader {
         try {
             manifests = resourceResolver.getResources(locationPattern);
         } catch (IOException e) {
-            throw new LibraryCatalogException(
+            throw new SoftwareProjectsCatalogException(
                     "Failed to locate the library manifests at '%s'".formatted(locationPattern), e);
         }
 
@@ -114,28 +109,27 @@ public class LibraryManifestLoader {
 
     private List<SoftwareProject> read(Resource manifest) {
         try (InputStream source = manifest.getInputStream()) {
-            return yamlMapper.readValue(source, LibraryManifest.class).toLibraries();
+            return yamlMapper.readValue(source, SoftwareProjectManifest.class).toSoftwareProjects();
         } catch (IOException | JacksonException | IllegalArgumentException e) {
-            throw new LibraryCatalogException(
+            throw new SoftwareProjectsCatalogException(
                     "Failed to read the library manifest %s".formatted(manifest.getDescription()), e);
         }
     }
 
     /**
-     * The on-disk shape of one curated manifest file.
-     *
-     * The {@link Ecosystem} is declared once per file rather than on every entry. One file per ecosystem is what keeps
-     * the grouping consistent, and it removes a field that would otherwise be repeated identically on every entry.
+     * The on-disk shape of one curated manifest file. Manifest files are broken down into the
      *
      * @param ecosystem the area every library in this file belongs to
-     * @param libraries the curated entries
+     * @param projects the curated entries
      *
      * @author Mikhail Polivakha
      */
-    record LibraryManifest(Ecosystem ecosystem, List<Entry> libraries) {
+    record SoftwareProjectManifest(Ecosystem ecosystem, List<Entry> projects) {
 
-        List<SoftwareProject> toLibraries() {
-            return libraries.stream().map(entry -> entry.toLibrary(ecosystem)).toList();
+        List<SoftwareProject> toSoftwareProjects() {
+            return projects.stream()
+                    .map(entry -> entry.toSoftwareProject(ecosystem))
+                    .toList();
         }
 
         /**
@@ -156,14 +150,14 @@ public class LibraryManifestLoader {
                 @Nullable SuccessionEntry succession,
                 ReferenceEntry reference) {
 
-            SoftwareProject toLibrary(Ecosystem ecosystem) {
+            SoftwareProject toSoftwareProject(Ecosystem ecosystem) {
                 return new SoftwareProject(
                         SoftwareProjectId.of(id),
                         name,
                         ecosystem,
                         status,
                         summary,
-                        coordinates.stream().map(ArtifactCoordinates::parse).collect(Collectors.toUnmodifiableSet()),
+                        coordinates.stream().map(Library::parse).collect(Collectors.toUnmodifiableSet()),
                         succession == null ? null : new Succession(succession.kind(), succession.value()),
                         Reference.of(reference.label(), reference.url()));
             }

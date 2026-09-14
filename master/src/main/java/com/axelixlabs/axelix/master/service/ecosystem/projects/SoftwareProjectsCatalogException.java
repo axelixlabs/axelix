@@ -24,13 +24,13 @@ package com.axelixlabs.axelix.master.service.ecosystem.projects;
  *
  * @author Mikhail Polivakha
  */
-public class SoftwareProjectCatalogException extends RuntimeException {
+public class SoftwareProjectsCatalogException extends RuntimeException {
 
-    public SoftwareProjectCatalogException(String message) {
+    public SoftwareProjectsCatalogException(String message) {
         super(message);
     }
 
-    public SoftwareProjectCatalogException(String message, Throwable cause) {
+    public SoftwareProjectsCatalogException(String message, Throwable cause) {
         super(message, cause);
     }
 }

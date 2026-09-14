@@ -15,37 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.ecosystem;
+package com.axelixlabs.axelix.master.service.ecosystem.projects;
 
-import java.util.Collection;
 import java.util.Optional;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.libraries.ArtifactCoordinates;
+import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 import com.axelixlabs.axelix.master.domain.ecosystem.projects.SoftwareProject;
 
 /**
- * The read side of the curated catalog of known Java libraries. Given the libraries of a dependency a managed
- * application resolved at runtime, it answers what Axelix knows about the project behind it.
+ * The catalog of the {@link SoftwareProject Software Projects} Axelix Master is aware about. Esstially acts as the
+ * central accessor to all known Software Projects.
  *
  * @author Mikhail Polivakha
  */
-public interface LibraryCatalog {
+public interface SoftwareProjectsCatalog {
 
     /**
-     * Looks up the project that publishes the given artifact.
+     * Resolves the {@link SoftwareProject} by the provided {@link Library}.
      *
-     * @param coordinates the version-free libraries of a resolved dependency
+     * @param library the library to infer the {@link SoftwareProject} for.
      *
-     * @return the curated entry, or {@link Optional#empty()} when Axelix has nothing to say about this artifact.
-     *         An empty result is not a negative verdict - it only means the artifact is not curated.
+     * @return the curated Software Project, or {@link Optional#empty()} when Axelix Master is not capable to
+     *         infer the Software Project for the provided {@link Library}.
      */
-    Optional<SoftwareProject> find(ArtifactCoordinates coordinates);
-
-    /**
-     * Every curated entry, in the order the manifests declare them. Intended for administrative views and for the
-     * tests that assert the catalog as a whole, not for per-request lookups.
-     *
-     * @return an unmodifiable view of the whole catalog
-     */
-    Collection<SoftwareProject> all();
+    Optional<SoftwareProject> resolve(Library library);
 }
