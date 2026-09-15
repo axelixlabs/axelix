@@ -1,8 +1,17 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Начало работы
 
 Эта страница описывает рекомендуемый путь внедрения Axelix в организации: с каких окружений начинать, в каком порядке
-устанавливать компоненты и как безопасно дойти до production. Каждый шаг ссылается на подробную страницу конфигурации
-соответствующего компонента, поэтому воспринимайте эту страницу как карту, а страницы по ссылкам — как местность.
+устанавливать компоненты и как безопасно дойти до production. Каждый шаг даёт конкретные команды и минимальную
+конфигурацию, а за полным справочником отсылает к подробной странице конфигурации соответствующего компонента.
+
+:::note
+Сниппеты на этой странице используют версию `1.0.0` для наглядности. Проверьте [страницу
+релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
+свои команды.
+:::
 
 ## Axelix и ваши окружения
 
@@ -61,13 +70,69 @@ PostgreSQL или MySQL — SQLite хранит данные в локально
 для разных тестовых окружений). Подойдёт любой способ упаковки, выбирайте под свою инфраструктуру: [обычный
 JAR](./configuring-master.mdx#запуск-как-jar), [Docker](./configuring-master.mdx#запуск-с-docker), [Docker
 Compose](./configuring-master.mdx#запуск-с-docker-compose) или [Kubernetes с официальным Helm-чартом](./configuring-master.mdx#запуск-в-kubernetes).
+Минимальный запуск для каждого способа:
+
+<Tabs groupId="master-packaging">
+  <TabItem value="docker" label="Docker">
+
+Образ публикуется в GitHub Container Registry:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
+Docker](./configuring-master.mdx#запуск-с-docker), а вариант с Compose — в разделе [Запуск с Docker
+Compose](./configuring-master.mdx#запуск-с-docker-compose).
+
+  </TabItem>
+  <TabItem value="helm" label="Kubernetes (Helm)">
+
+Axelix поставляет официальный [Helm-чарт](https://github.com/axelixlabs/helm-charts):
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/helm-charts
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Свои переопределения — как минимум ключ подписи JWT, пароль суперадминистратора и подключение к базе — положите в
+`values.yaml`; [README чарта](https://github.com/axelixlabs/helm-charts) описывает каждое значение. Чарт также сам
+настраивает ServiceAccount и RBAC, необходимые для автообнаружения внутри кластера. См. [Запуск в
+Kubernetes](./configuring-master.mdx#запуск-в-kubernetes).
+
+  </TabItem>
+  <TabItem value="jar" label="JAR">
+
+Скачайте JAR Master со [страницы релизов](https://github.com/axelixlabs/axelix/releases) — UI уже включён в него — и
+запустите:
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar master.jar
+```
+
+Другие способы передать конфигурацию — см. [Запуск как JAR](./configuring-master.mdx#запуск-как-jar).
+
+  </TabItem>
+</Tabs>
+
+После этого Master доступен на `http://localhost:8080` (или за вашим Ingress в Kubernetes). Войдите под учётной
+записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
 
 Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл
 конфигурации, Spring Cloud Config Server или HashiCorp Vault — так что встроить его в существующий конвейер
 конфигурации не составит большого труда. См. [Передача свойств](./configuring-master.mdx#способы-задания-свойств).
 
-Для запуска Master обязательны два свойства: `axelix.master.auth.jwt.algorithm` и
-`axelix.master.auth.jwt.signing-key` — см. [Аутентификация —
+Два значения JWT из сниппетов запуска выше — единственные свойства, без которых Master не стартует:
+`axelix.master.auth.jwt.algorithm` и `axelix.master.auth.jwt.signing-key` — см. [Аутентификация —
 JWT](./configuring-master.mdx#аутентификация--jwt). С первого дня относитесь к ключу подписи бережно: это общий
 секрет, который позже будет предъявлять Master каждый управляемый сервис, поэтому сгенерируйте длинное случайное
 значение и храните его в менеджере секретов, а не в закоммиченном файле.
@@ -97,6 +162,58 @@ Central](https://central.sonatype.com/), так что их добавление
 build-плагина — см. [Совместимость и версионирование](../more/compatibility-and-versioning.mdx), где описано
 соответствие стартеров версиям Spring Boot и точные правила расхождения версий.
 
+Для сервиса на Spring Boot 4 изменения в сборке выглядят так (замените `4` на `2` или `3` в соответствии с мажорной
+версией Boot сервиса):
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "1.0.0"
+}
+
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+}
+```
+
+Поскольку плагин пока не опубликован на Gradle Plugin Portal, добавьте `mavenCentral()` в `pluginManagement` вашего
+`settings.gradle.kts` — см. [Конфигурация build-плагина](./configuring-build-plugin.mdx).
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>1.0.0</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>1.0.0</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+  </TabItem>
+</Tabs>
+
 Одного добавления зависимостей недостаточно. Кроме этого, каждому сервису нужны три элемента конфигурации, подробно
 описанные на [странице конфигурации стартера](./configuring-spring-boot-starter.mdx):
 
@@ -112,6 +229,53 @@ build-плагина — см. [Совместимость и версионир
   на ваш Master, как показано в разделе [Дайте Master найти
   сервис](./configuring-spring-boot-starter.mdx#дайте-master-найти-сервис). При автоматическом обнаружении на
   стороне Master в сервисе дополнительно настраивать нечего.
+
+Вместе минимальная конфигурация сервиса для первых двух пунктов выглядит так:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+</Tabs>
 
 Раскатывайте их сервис за сервисом. Как только сервис передеплоивается в тестовое окружение, он появляется в тестовом
 Master, и команда сразу может работать с ним через [UI](../ui-guide/dashboard.mdx) и MCP.
