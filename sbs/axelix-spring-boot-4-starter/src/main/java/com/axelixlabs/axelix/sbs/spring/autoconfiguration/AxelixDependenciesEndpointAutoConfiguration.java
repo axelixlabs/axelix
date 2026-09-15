@@ -30,6 +30,7 @@ import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixDependenciesEndpoint.class)
 public class AxelixDependenciesEndpointAutoConfiguration {
 
