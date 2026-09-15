@@ -23,6 +23,7 @@ management:
       exposure:
         include:
           - health
+          - info
           - axelix-property-management
           - axelix-profile-management
           - axelix-metadata
@@ -34,6 +35,9 @@ management:
           - axelix-caches
           - axelix-conditions
           - axelix-dependencies
+          - axelix-details
+          - axelix-scheduled-tasks
+          - axelix-feign
           - configprops
           - env
           - axelix-thread-dump

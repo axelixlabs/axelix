@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryCli
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixFeignEndpoint.class)
 @ConditionalOnClass({Feign.class, FeignClient.class})
 @ConditionalOnBean(FeignClientFactoryBean.class)
