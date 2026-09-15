@@ -74,6 +74,7 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
 @AutoConfiguration(
         after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class},
         afterName = "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration")
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnProperty(
         prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX,
         name = "enabled",
