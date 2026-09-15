@@ -1,0 +1,138 @@
+.Detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 16px 18px 45px;
+    background-color: var(--axelix-extra-light-grey);
+    border-top: 1px solid var(--axelix-light-grey);
+}
+
+.Section {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.SectionHeader {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.Label {
+    font-size: 11.5px;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.PathSummary {
+    color: var(--axelix-bold-grey);
+}
+
+.Path {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-x: auto;
+    padding: 12px 14px;
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.PathNode {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 26px;
+}
+
+.Guide {
+    font-size: 12px;
+    flex-shrink: 0;
+    color: var(--axelix-medium-grey);
+}
+
+.NodeId {
+    font-size: 12.5px;
+    white-space: nowrap;
+    color: var(--axelix-bold-grey);
+}
+
+.Emphasized {
+    font-weight: 700;
+    color: var(--axelix-primary-black);
+}
+
+.Tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border-radius: var(--axelix-border-radius-small);
+    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-light-grey);
+    border: 1px solid var(--axelix-medium-grey);
+}
+
+.RootTag {
+    color: var(--axelix-primary-green);
+    background-color: var(--axelix-primary-light-green);
+    border-color: var(--axelix-primary-green);
+}
+
+.Facts {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 14px 16px;
+    align-items: baseline;
+}
+
+.Prose {
+    /* TODO: Improve in future */
+    color: #344054;
+}
+
+.NoteValue {
+    font-size: 12.5px;
+    line-height: 1.5;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.Reference {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+}
+
+.ReferenceLink {
+    color: var(--axelix-primary-green);
+    overflow-wrap: anywhere;
+}
+
+.ReferenceLink:hover {
+    text-decoration: underline;
+}
+
+.ReferenceIcon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--axelix-primary-green);
+}
+
+@media (width <=720px) {
+    .Facts {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+}

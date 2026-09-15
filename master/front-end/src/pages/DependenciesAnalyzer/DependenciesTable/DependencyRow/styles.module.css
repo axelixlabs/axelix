@@ -1,0 +1,72 @@
+.MainWrapper {
+    border-bottom: 1px solid var(--axelix-light-grey);
+}
+
+.MainWrapper:last-child {
+    border-bottom: none;
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: var(--da-columns);
+    gap: 14px;
+    align-items: center;
+    background-color: var(--row-bg, var(--axelix-primary-white));
+    border-left: 3px solid var(--row-accent, transparent);
+}
+
+.Row:hover {
+    /* TODO: Improve in future */
+    background-color: #f9f9f9;
+}
+
+/* TODO: Improve in future */
+.Discontinued {
+    --row-accent: var(--signal-discontinued);
+    --row-bg: #fffbfa;
+}
+
+.Maintenance {
+    --row-accent: var(--signal-maintenance);
+    --row-bg: #fffdf7;
+}
+
+.Dependency {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.Coordinates {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.Project {
+    color: var(--axelix-bold-grey);
+    white-space: nowrap;
+}
+
+.Version {
+    justify-self: end;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.Scope {
+    justify-self: end;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--axelix-bold-grey);
+}
+
+.DirectScope {
+    color: var(--axelix-primary-black);
+}
+
+/* the detail brings its own padding/background, so drop the Accordion default */
+.Content {
+    padding: 0;
+}
