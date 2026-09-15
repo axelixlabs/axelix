@@ -182,22 +182,94 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 сборки](../build-plugin/configuration.mdx).
 :::
 
-## Откройте доступ к Axelix actuator-эндпоинтам
+## Actuator-эндпоинты
 
-По умолчанию Spring Boot скрывает пользовательские actuator-эндпоинты от веб-доступа. Добавьте Axelix-идентификаторы в
-`management.endpoints.web.exposure.include`, чтобы Master мог до них достучаться. `axelix-metadata` <span
-className={styles.required}>обязательное</span> — это эндпоинт, который Master опрашивает в первую очередь, чтобы
-убедиться, что сервис работает. Без него сервис не появится в Master, независимо от того, используете ли вы
-автоматическое обнаружение на стороне Master или саморегистрацию на стороне стартера. Остальные эндпоинты обеспечивают
-работу соответствующих функций в пользовательском интерфейсе.
+Ничего настраивать вручную не нужно. Стартер сам добавляет свои actuator-эндпоинты в
+`management.endpoints.web.exposure.include` при старте приложения, поэтому Master получает к ним доступ «из коробки».
 
-Оставьте в списке и `health`. Задание `management.endpoints.web.exposure.include` **заменяет** значение по умолчанию
-Spring Boot (`health`), а стартеру необходим бин `HealthEndpoint` — через него он читает состояние приложения и
-передаёт статус в Master в составе `axelix-metadata`. Если эндпоинт `health` не открыт нигде (ни через веб, ни через
-JMX), Spring Boot не создаст этот бин, и приложение не запустится.
+### Что открывает стартер
 
-Добавьте также нативный эндпоинт `info`: `axelix-details` активируется только тогда, когда доступен `info` (в силу просто разных
-исторических причин).
+Стартер выставляет следующие эндпоинты:
+
+<table>
+    <thead>
+    <tr>
+        <th>Эндпоинт</th>
+        <th>Назначение</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>axelix-metadata</code> <span className={styles.required}>обязательный</span></td>
+        <td>Метаданные сервиса; Master опрашивает его первым</td>
+    </tr>
+    <tr>
+        <td><code>axelix-details</code></td>
+        <td>Сводная информация об инстансе</td>
+    </tr>
+    <tr>
+        <td><code>axelix-beans</code></td>
+        <td>Бины контекста</td>
+    </tr>
+    <tr>
+        <td><code>axelix-caches</code></td>
+        <td>Кэши (при наличии <code>CacheManager</code>)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-conditions</code></td>
+        <td>Отчёт об условиях автоконфигурации</td>
+    </tr>
+    <tr>
+        <td><code>axelix-configprops</code></td>
+        <td><code>@ConfigurationProperties</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-env</code></td>
+        <td>Окружение и источники свойств</td>
+    </tr>
+    <tr>
+        <td><code>axelix-feign</code></td>
+        <td>Feign-клиенты (при наличии Feign в classpath)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-gc</code></td>
+        <td>Сборка мусора</td>
+    </tr>
+    <tr>
+        <td><code>axelix-heap-dump</code></td>
+        <td>Heap dump</td>
+    </tr>
+    <tr>
+        <td><code>axelix-loggers</code></td>
+        <td>Уровни логирования</td>
+    </tr>
+    <tr>
+        <td><code>axelix-metrics</code></td>
+        <td>Метрики</td>
+    </tr>
+    <tr>
+        <td><code>axelix-scheduled-tasks</code></td>
+        <td>Запланированные задачи</td>
+    </tr>
+    <tr>
+        <td><code>axelix-thread-dump</code></td>
+        <td>Thread dump</td>
+    </tr>
+    </tbody>
+</table>
+
+Эндпоинты, неприменимые к вашему сервису, остаются неактивными — стартер активирует каждый только при выполнении его
+предусловий (например, `axelix-feign` без Feign в classpath или `axelix-caches` без `CacheManager` не поднимаются).
+
+Стандартные эндпоинты `health` и `info` Axelix больше не требуются, поэтому стартер их не навязывает. Пока вы не задаёте
+`management.endpoints.web.exposure.include` сами, стартер сохраняет `health`, который Spring Boot открывает по
+умолчанию. Если же вы задаёте это свойство, открытыми будут только перечисленные вами эндпоинты плюс эндпоинты Axelix —
+добавьте `health` и `info` в список сами, когда они вам нужны.
+
+### Добавление собственных эндпоинтов
+
+Если вам нужны свои actuator-эндпоинты, просто перечислите **только их** — стартер **смёржит** ваш список со своим, а не
+заменит его.
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -208,38 +280,22 @@ management:
     web:
       exposure:
         include:
-          - health
-          - info
-          - axelix-metadata
-          - axelix-beans
-          - axelix-caches
-          - axelix-conditions
-          - axelix-configprops
-          - axelix-details
-          - axelix-env
-          - axelix-feign
-          - axelix-gc
-          - axelix-heap-dump
-          - axelix-loggers
-          - axelix-metrics
-          - axelix-scheduled-tasks
-          - axelix-thread-dump
-          - axelix-transactions-monitoring
+          - prometheus
 ```
 
   </TabItem>
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,info,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
+management.endpoints.web.exposure.include=prometheus
 ```
 
   </TabItem>
 </Tabs>
 
-`*` тоже работает, но большинство команд предпочитает курируемый список, чтобы случайно не открыть внутренние эндпоинты.
-Эндпоинты, не применимые к вашему сервису (`axelix-feign` без Feign в classpath, `axelix-caches` без `CacheManager`),
-остаются неактивными — стартер активирует каждый только при выполнении его предусловий.
+В результате будет выставлен `prometheus` и все эндпоинты Axelix.
+
+Значение `*` тоже поддерживается — тогда открывается всё, и стартер список не трогает.
 
 ## Экспорт метрик Axelix через Micrometer
 
