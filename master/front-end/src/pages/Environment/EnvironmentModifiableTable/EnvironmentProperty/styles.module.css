@@ -8,20 +8,19 @@
     background-color: var(--prop-surface);
     border-left: 3px solid transparent;
     transition: background-color 0.12s;
+
+    &:hover {
+        background-color: var(--prop-surface-soft);
+    }
 }
 
-.MainWrapper:hover {
-    background-color: var(--prop-surface-soft);
-}
-
-/* A deprecated property is marked where it occurs, rather than only being counted in the triage bar. */
 .FlaggedRow {
     background-color: var(--prop-danger-surface);
     border-left-color: var(--prop-danger);
-}
 
-.FlaggedRow:hover {
-    background-color: #fee4e2;
+    &:hover {
+        background-color: #fee4e2;
+    }
 }
 
 .SuppressedRow {
@@ -64,11 +63,11 @@
     transition:
         color 0.12s,
         background-color 0.12s;
-}
 
-.DeprecationChip:hover {
-    color: var(--prop-surface);
-    background-color: var(--prop-danger);
+    &:hover {
+        color: var(--prop-surface);
+        background-color: var(--prop-danger);
+    }
 }
 
 .ChipDot,
@@ -83,7 +82,7 @@
 .TooltipLabel {
     display: flex;
     align-items: center;
-    column-gap: 7px;
+    column-gap: 8px;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.06em;

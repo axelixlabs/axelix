@@ -46,11 +46,6 @@ interface IProps {
     onSelectedTagsChange: (triageTags: EPropertyTriageTag[]) => void;
 }
 
-/**
- * The triage bar: one chip per property category that tends to need attention, each carrying the
- * number of properties in it. Clicking a chip narrows the list down to that category, so that a
- * handful of deprecated or suppressed properties do not have to be found by eye among hundreds.
- */
 export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSelectedTagsChange }: IProps) => {
     const { t } = useTranslation();
 
@@ -72,30 +67,31 @@ export const EnvironmentTriageFilters = ({ propertySources, selectedTags, onSele
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            {availableTags.map(({ triageTag, count }) => {
-                const isSelected = selectedTags.includes(triageTag);
+        <>
+            <div className={styles.MainWrapper}>
+                {availableTags.map(({ triageTag, count }) => {
+                    const isSelected = selectedTags.includes(triageTag);
 
-                return (
-                    <button
-                        type="button"
-                        className={`${styles.Chip} ${TAG_STYLES[triageTag]} ${isSelected ? styles.Selected : ""}`}
-                        onClick={() => toggleTag(triageTag)}
-                        aria-pressed={isSelected}
-                        key={triageTag}
-                    >
-                        <span className={styles.Dot} />
-                        {t(`Environments.triageTags.${triageTag}`)}
-                        <span className={styles.Count}>{count}</span>
+                    return (
+                        <button
+                            type="button"
+                            className={`${styles.Chip} ${TAG_STYLES[triageTag]} ${isSelected ? styles.Selected : ""}`}
+                            onClick={() => toggleTag(triageTag)}
+                            key={triageTag}
+                        >
+                            <span className={styles.Dot} />
+                            {t(`Environments.triageTags.${triageTag}`)}
+                            <span className={styles.Count}>{count}</span>
+                        </button>
+                    );
+                })}
+
+                {selectedTags.length > 0 && (
+                    <button type="button" className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
+                        {t("Environments.clearFilters")}
                     </button>
-                );
-            })}
-
-            {selectedTags.length > 0 && (
-                <button type="button" className={styles.Clear} onClick={() => onSelectedTagsChange([])}>
-                    {t("Environments.clearFilters")}
-                </button>
-            )}
-        </div>
+                )}
+            </div>
+        </>
     );
 };

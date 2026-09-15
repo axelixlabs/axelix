@@ -1,7 +1,7 @@
 .MainWrapper {
     display: flex;
     flex-direction: column;
-    row-gap: 7px;
+    row-gap: 8px;
     min-width: 0;
 }
 
@@ -22,7 +22,7 @@
     background-color: var(--prop-surface-soft);
     border: 1px solid var(--prop-border-soft);
     border-top: 3px solid #e4e7ec;
-    border-radius: 8px;
+    border-radius: var(--axelix-border-radius-large);
 }
 
 .WinningCell {
@@ -60,7 +60,7 @@
     white-space: nowrap;
     color: var(--prop-accent-strong);
     background-color: var(--prop-accent-surface);
-    border-radius: 3px;
+    border-radius:  var(--axelix-border-radius-small);
 }
 
 .Value {

@@ -1,0 +1,66 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 14px;
+    width: 100%;
+    min-width: 0;
+}
+
+.TitleWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    min-width: 0;
+}
+
+.Title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--prop-text);
+    overflow-wrap: anywhere;
+}
+
+.TooltipName {
+    font-size: 11.5px;
+    color: var(--prop-text-dim);
+    overflow-wrap: anywhere;
+}
+
+.InfoTrigger {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--prop-text-dim);
+    cursor: help;
+    transition: color 0.15s;
+
+    &:hover {
+        color: var(--prop-text);
+    }
+}
+
+.Counters {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    flex-shrink: 0;
+}
+
+.FlaggedCounter {
+    padding: 2px 7px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--prop-danger);
+    background-color: var(--prop-danger-surface);
+    border: 1px solid var(--prop-danger-border);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.PropertiesCounter {
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--prop-text-faint);
+}

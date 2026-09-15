@@ -28,42 +28,39 @@ interface IProps {
     chain: IPropertyOccurrence[];
 }
 
-/**
- * Shows which property sources define a property and which of the values actually wins. The first
- * occurrence is the effective one; every following occurrence is struck through, because Spring
- * resolves the property from the highest precedence source that defines it and never looks further.
- */
 export const EnvironmentPrecedenceChain = ({ chain }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.Cells}>
-                {chain.map(({ propertySourceName, value }, index) => {
-                    const isWinning = index === 0;
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.Cells}>
+                    {chain.map(({ propertySourceName, value }, index) => {
+                        const isWinning = index === 0;
 
-                    return (
-                        <div
-                            className={`${styles.Cell} ${isWinning ? styles.WinningCell : ""}`}
-                            key={`${propertySourceName}-${index}`}
-                        >
-                            <div className={styles.CellHeader}>
-                                <span className={styles.SourceName}>{propertySourceName}</span>
-                                {isWinning && <span className={styles.WinsBadge}>{t("Environments.wins")}</span>}
+                        return (
+                            <div
+                                className={`${styles.Cell} ${isWinning ? styles.WinningCell : ""}`}
+                                key={`${propertySourceName}-${index}`}
+                            >
+                                <div className={styles.CellHeader}>
+                                    <span className={styles.SourceName}>{propertySourceName}</span>
+                                    {isWinning && <span className={styles.WinsBadge}>{t("Environments.wins")}</span>}
+                                </div>
+                                <span className={styles.Value} title={value}>
+                                    {value}
+                                </span>
                             </div>
-                            <span className={styles.Value} title={value}>
-                                {value}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
 
-            <div className={styles.Rail}>
-                <span>{t("Environments.highestPrecedence")}</span>
-                <span className={styles.RailLine} />
-                <span>{t("Environments.lowestPrecedence")}</span>
+                <div className={styles.Rail}>
+                    <span>{t("Environments.highestPrecedence")}</span>
+                    <span className={styles.RailLine} />
+                    <span>{t("Environments.lowestPrecedence")}</span>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

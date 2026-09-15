@@ -4,29 +4,6 @@
     row-gap: 14px;
 }
 
-.DetailRow {
-    display: grid;
-    grid-template-columns: 170px minmax(0, 1fr);
-    align-items: baseline;
-    column-gap: 16px;
-}
-
-.DetailLabel {
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--prop-text-faint);
-}
-
-.DetailValue {
-    min-width: 0;
-    font-size: 13px;
-    line-height: 1.55;
-    color: var(--prop-text-muted);
-    text-wrap: pretty;
-}
-
 .BeanName {
     font-size: 12.5px;
     overflow-wrap: anywhere;
@@ -35,7 +12,7 @@
 .InjectionPointWrapper {
     display: flex;
     align-items: baseline;
-    column-gap: 7px;
+    column-gap: 8px;
 }
 
 .InjectionPointWrapper:not(:last-child) {

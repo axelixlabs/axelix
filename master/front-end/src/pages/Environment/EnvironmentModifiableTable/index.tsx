@@ -15,16 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
-import { InfoIcon } from "@/assets";
-import { Accordion, HintTooltip } from "@/components";
-import { precedenceChainOf, splitProperties } from "@/helpers";
+import { Accordion } from "@/components";
+import { splitProperties } from "@/helpers";
 import type { IEnvironmentPropertySource, TPrecedenceIndex } from "@/models";
 
-import { EnvironmentPropertyDetails } from "../EnvironmentPropertyDetails";
-
-import { EnvironmentProperty } from "./EnvironmentProperty";
+import { EnvironmentPropertiesAccordionBody } from "./EnvironmentPropertiesAccordionBody";
+import { EnvironmentPropertiesAccordionHeader } from "./EnvironmentPropertiesAccordionHeader";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -41,12 +37,8 @@ interface IProps {
 }
 
 export const EnvironmentModifiableTable = ({ propertySource, precedenceIndex }: IProps) => {
-    const { t } = useTranslation();
-
-    const { name, properties, description } = propertySource;
+    const { properties } = propertySource;
     const [withDropDown, withoutDropDown] = splitProperties(properties, precedenceIndex);
-
-    const deprecatedCount = properties.filter(({ deprecation }) => deprecation).length;
 
     const allProperties = [
         ...withDropDown.map((property) => ({
@@ -63,67 +55,17 @@ export const EnvironmentModifiableTable = ({ propertySource, precedenceIndex }: 
         <div className={styles.Panel}>
             <Accordion
                 header={
-                    <div className={styles.PanelHeaderInner}>
-                        <span className={styles.PanelTitleGroup}>
-                            <span className={styles.PanelTitle}>{name}</span>
-                            {description && (
-                                <HintTooltip
-                                    placement="bottomLeft"
-                                    content={
-                                        <>
-                                            <span className={styles.TooltipName}>{name}</span>
-                                            <span>{description}</span>
-                                        </>
-                                    }
-                                >
-                                    <span className={styles.InfoTrigger}>
-                                        <InfoIcon color="currentColor" />
-                                    </span>
-                                </HintTooltip>
-                            )}
-                        </span>
-
-                        <span className={styles.PanelCounters}>
-                            {deprecatedCount > 0 && (
-                                <span className={styles.FlaggedCounter}>
-                                    {t("Environments.flaggedCount", { value: deprecatedCount })}
-                                </span>
-                            )}
-                            <span className={styles.PropertiesCounter}>
-                                {t("Environments.propertiesCount", { value: properties.length })}
-                            </span>
-                        </span>
-                    </div>
+                    <EnvironmentPropertiesAccordionHeader
+                        properties={propertySource.properties}
+                        propertySource={propertySource}
+                    />
                 }
                 wrapperStyles={styles.PanelAccordion}
                 headerStyles={styles.PanelHeader}
                 contentStyles={styles.PanelBody}
                 accordionExpanded
             >
-                {allProperties.length === 0 ? (
-                    <div className={styles.EmptySource}>{t("Environments.noPropertiesInSource")}</div>
-                ) : (
-                    allProperties.map(({ property, hasDropdown }) => {
-                        if (hasDropdown) {
-                            return (
-                                <Accordion
-                                    header={<EnvironmentProperty property={property} />}
-                                    wrapperStyles={styles.RowAccordion}
-                                    headerStyles={styles.RowHeader}
-                                    contentStyles={styles.RowBody}
-                                    key={property.name}
-                                >
-                                    <EnvironmentPropertyDetails
-                                        property={property}
-                                        precedenceChain={precedenceChainOf(precedenceIndex, property.name)}
-                                    />
-                                </Accordion>
-                            );
-                        }
-
-                        return <EnvironmentProperty property={property} caretPlaceholder key={property.name} />;
-                    })
-                )}
+                <EnvironmentPropertiesAccordionBody allProperties={allProperties} precedenceIndex={precedenceIndex} />
             </Accordion>
         </div>
     );

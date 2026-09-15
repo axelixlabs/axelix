@@ -52,35 +52,36 @@ export const EnvironmentProperty = ({ property, caretPlaceholder }: IProps) => {
         .join(" ");
 
     return (
-        <div className={rowStyles}>
-            {/* Holds the caret gutter open; the caret itself is drawn by the surrounding Accordion. */}
-            <span className={styles.CaretCell} />
+        <>
+            <div className={rowStyles}>
+                <span className={styles.CaretCell} />
 
-            <div className={styles.KeyChunk}>
-                <span className={styles.Key}>{name}</span>
-                <Copy text={name} />
-                {deprecation && (
-                    <HintTooltip
-                        placement="bottomLeft"
-                        content={
-                            <>
-                                <span className={styles.TooltipLabel}>
-                                    <span className={styles.TooltipDot} />
-                                    {t("Environments.deprecated")}
-                                </span>
-                                <span>{deprecation.message}</span>
-                            </>
-                        }
-                    >
-                        <span className={styles.DeprecationChip}>
-                            <span className={styles.ChipDot} />
-                            {t("Environments.deprecated")}
-                        </span>
-                    </HintTooltip>
-                )}
+                <div className={styles.KeyChunk}>
+                    <span className={styles.Key}>{name}</span>
+                    <Copy text={name} />
+                    {deprecation && (
+                        <HintTooltip
+                            placement="bottomLeft"
+                            content={
+                                <>
+                                    <span className={styles.TooltipLabel}>
+                                        <span className={styles.TooltipDot} />
+                                        {t("Environments.deprecated")}
+                                    </span>
+                                    <span>{deprecation.message}</span>
+                                </>
+                            }
+                        >
+                            <span className={styles.DeprecationChip}>
+                                <span className={styles.ChipDot} />
+                                {t("Environments.deprecated")}
+                            </span>
+                        </HintTooltip>
+                    )}
+                </div>
+
+                <EnvironmentPropertyValue property={property} />
             </div>
-
-            <EnvironmentPropertyValue property={property} />
-        </div>
+        </>
     );
 };

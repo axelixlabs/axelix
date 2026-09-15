@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "@/components";
@@ -23,10 +23,9 @@ import { buildAutoCompleteOptions, buildPrecedenceIndex, filterPropertySources, 
 import type { EPropertyTriageTag, IEnvironmentPropertySource } from "@/models";
 
 import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
-import { EnvironmentProfiles } from "../EnvironmentProfiles";
-import { EnvironmentTriageFilters } from "../EnvironmentTriageFilters";
-import pageStyles from "../styles.module.css";
 
+import { EnvironmentProfiles } from "./EnvironmentProfiles";
+import { EnvironmentTriageFilters } from "./EnvironmentTriageFilters";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -47,14 +46,12 @@ export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
     const [search, setSearch] = useState<string>("");
     const [triageTags, setTriageTags] = useState<EPropertyTriageTag[]>([]);
 
-    const isFiltered = !!search || triageTags.length > 0;
+    const isFiltered = Boolean(search) || triageTags.length > 0;
     const effectivePropertySources = isFiltered
         ? filterPropertySources(propertySources, search, triageTags)
         : propertySources;
 
-    // Built from the full list on purpose: a chain assembled from the filtered subset would hide the
-    // very sources that explain which value wins.
-    const precedenceIndex = useMemo(() => buildPrecedenceIndex(propertySources), [propertySources]);
+    const precedenceIndex = buildPrecedenceIndex(propertySources);
 
     const totalPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(propertySources);
     const filteredPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(effectivePropertySources);
@@ -65,17 +62,16 @@ export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
 
     return (
         <>
-            <div className={styles.Toolbar}>
+            <div className={styles.ToolbarWrapper}>
                 <div className={styles.ToolbarRow}>
                     {profiles.length !== 0 && <EnvironmentProfiles activeProfiles={profiles} />}
-                    <div className={styles.SearchSlot}>
-                        <PageSearch
-                            addonAfter={addonAfter}
-                            setSearch={setSearch}
-                            autocompleteOptions={autocompleteOptions}
-                            removeBottomGutter
-                        />
-                    </div>
+                    <PageSearch
+                        addonAfter={addonAfter}
+                        setSearch={setSearch}
+                        autocompleteOptions={autocompleteOptions}
+                        searchWrapperClassName={styles.SearchWrapper}
+                        removeBottomGutter
+                    />
                 </div>
 
                 <EnvironmentTriageFilters
@@ -85,7 +81,7 @@ export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
                 />
             </div>
 
-            <div className={pageStyles.Groups}>
+            <div className={styles.ContentWrapper}>
                 {effectivePropertySources.length === 0 ? (
                     <div className={styles.NoResults}>{t("Environments.noMatchingProperties")}</div>
                 ) : (

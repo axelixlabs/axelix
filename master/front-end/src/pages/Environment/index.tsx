@@ -24,16 +24,17 @@ import { type IEnvironmentResponseBody, StatefulRequest } from "@/models";
 import { getEnvironmentData } from "@/services";
 
 import { EnvironmentTables } from "./EnvironmentTables";
-import styles from "./styles.module.css";
 
 const Environment = () => {
     const { instanceId } = useParams();
 
     const [environment, setEnvironment] = useState(StatefulRequest.loading<IEnvironmentResponseBody>());
 
-    const fetchEnvironment = (instanceId: string) => fetchData(setEnvironment, () => getEnvironmentData(instanceId));
+    const fetchEnvironment = (instanceId: string): void => {
+        fetchData(setEnvironment, () => getEnvironmentData(instanceId));
+    };
 
-    // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
+    // TODO: So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
     useEffect(() => {
         if (instanceId) {
             fetchEnvironment(instanceId);
@@ -48,14 +49,14 @@ const Environment = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const respBody = environment.response!;
-    const eventualProfiles = [...respBody.defaultProfiles, ...respBody.activeProfiles];
-    const propertySources = respBody.propertySources;
+    const responseBody = environment.response!;
+    const eventualProfiles = [...responseBody.defaultProfiles, ...responseBody.activeProfiles];
+    const propertySources = responseBody.propertySources;
 
     return (
-        <div className={styles.Page}>
+        <>
             <EnvironmentTables propertySources={propertySources} profiles={eventualProfiles} />
-        </div>
+        </>
     );
 };
 
