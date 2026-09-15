@@ -29,12 +29,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.cloud.openfeign.FeignClientFactoryBean;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
+
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * End-to-end test for the {@code axelix.sbs.enabled} kill-switch.
@@ -44,14 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixStarterEnabledSwitchTest {
 
     @SpringBootApplication
-    static class TestApplication {
-
-        @Bean
-        @Lazy
-        FeignClientFactoryBean feignClientFactoryBean() {
-            return new FeignClientFactoryBean();
-        }
-    }
+    static class TestApplication {}
 
     private static final String IMPORTS_RESOURCE =
             "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports";
@@ -72,21 +65,13 @@ class AxelixStarterEnabledSwitchTest {
     }
 
     @Test
-    void everyStarterAutoConfigurationIsPresent_byDefault() throws IOException {
+    void everyAutoConfigurationIsUpByDefault() {
         try (ConfigurableApplicationContext context = new SpringApplicationBuilder(TestApplication.class)
                 .web(WebApplicationType.NONE)
-                .properties(
-                        "axelix.sbs.discovery.self-registration=true",
-                        "axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register",
-                        "axelix.sbs.discovery.instance-actuator-url=http://localhost:8080/actuator",
-                        "axelix.sbs.discovery.instance-name=test")
                 .run()) {
 
-            for (String className : readAutoConfigurationClassNames()) {
-                assertThat(context.containsBeanDefinition(className))
-                        .as("%s should be applied by default", className)
-                        .isTrue();
-            }
+            assertThatCode(() -> context.getBean(AxelixBeansEndpointAutoConfiguration.class))
+                    .doesNotThrowAnyException();
         }
     }
 

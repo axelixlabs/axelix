@@ -17,68 +17,36 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 /**
- * Verifies that every auto-configuration in {@code AutoConfiguration.imports} is annotated with
+ * Verifies that every auto-configuration contributed by this starter is annotated with
  * {@link ConditionalOnAxelixStarterEnabled}.
  *
  * @author Nikita Kirillov
  */
 class ConditionalOnAxelixStarterEnabledCoverageTest {
 
-    private static final String IMPORTS_RESOURCE =
-            "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports";
+    private static final JavaClasses AUTOCONFIGURATION_CLASSES = new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("com.axelixlabs.axelix.sbs.spring.autoconfiguration");
 
     @Test
-    void everyAutoConfigurationCarriesTheKillSwitchAnnotation() throws IOException, ClassNotFoundException {
-        List<String> autoConfigurationClassNames = readAutoConfigurationClassNames();
-        assertThat(autoConfigurationClassNames).isNotEmpty();
-
-        List<String> uncovered = new ArrayList<>();
-        for (String className : autoConfigurationClassNames) {
-            Class<?> autoConfigurationClass = Class.forName(className);
-            if (!AnnotatedElementUtils.hasAnnotation(autoConfigurationClass, ConditionalOnAxelixStarterEnabled.class)) {
-                uncovered.add(className);
-            }
-        }
-
-        assertThat(uncovered)
-                .as(
-                        "every class listed in %s must be annotated with @%s, or axelix.sbs.enabled=false "
-                                + "won't actually disable it",
-                        IMPORTS_RESOURCE, ConditionalOnAxelixStarterEnabled.class.getSimpleName())
-                .isEmpty();
-    }
-
-    private List<String> readAutoConfigurationClassNames() throws IOException {
-        List<String> classNames = new ArrayList<>();
-        try (InputStream stream = getClass().getClassLoader().getResourceAsStream(IMPORTS_RESOURCE)) {
-            assertThat(stream)
-                    .as("%s must exist on the test classpath", IMPORTS_RESOURCE)
-                    .isNotNull();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String trimmed = line.trim();
-                    if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
-                        classNames.add(trimmed);
-                    }
-                }
-            }
-        }
-        return classNames;
+    void everyAutoConfigurationCarriesTheKillSwitchAnnotation() {
+        classes()
+                .that()
+                .areAnnotatedWith(AutoConfiguration.class)
+                .should()
+                .beMetaAnnotatedWith(ConditionalOnAxelixStarterEnabled.class)
+                .because("axelix.sbs.enabled=false won't actually disable an auto-configuration without it")
+                .allowEmptyShould(false)
+                .check(AUTOCONFIGURATION_CLASSES);
     }
 }
