@@ -184,12 +184,6 @@ Or, with Maven:
 </plugin>
 ```
 
-Finally, expose the Axelix actuator endpoints so Master can reach them:
-
-```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
-```
-
 The full setup (sharing the JWT signing key with Master, self-registration, sanitizing sensitive
 property values) is documented in
 [Configuring the Spring Boot Starter](docs/docs/setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
