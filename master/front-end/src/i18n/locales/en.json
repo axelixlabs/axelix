@@ -69,11 +69,29 @@
     },
     "Environments": {
         "activeProfiles": "Profiles:",
-        "primaryProperty": "Primary property value",
+        "primaryProperty": "Active",
+        "primaryPropertyHint": "This is the value the application resolves for this property",
+        "suppressedProperty": "Suppressed",
+        "suppressedPropertyHint": "A property source of a higher precedence defines this property as well, so this value never takes effect",
         "deprecated": "Deprecated",
         "description": "Description",
         "configProps": "Configuration Properties",
-        "injectedIn": "Injected in"
+        "injectedIn": "Injected in",
+        "profilesCount": "Profiles: {{value}}",
+        "profilesPrecedenceHint": "Listed in precedence order, lowest first — a profile activated later overrides the ones before it.",
+        "propertiesCount": "Properties: {{value}}",
+        "flaggedCount": "{{value}} flagged",
+        "clearFilters": "Clear",
+        "triageTags": {
+            "DEPRECATED": "Deprecated",
+            "SUPPRESSED": "Suppressed"
+        },
+        "definedInSources": "Defined in {{value}} sources",
+        "wins": "Wins",
+        "highestPrecedence": "Highest precedence",
+        "lowestPrecedence": "Lowest",
+        "noMatchingProperties": "No properties match the current search and filters.",
+        "noPropertiesInSource": "This property source defines no properties."
     },
     "Loggers": {
         "loggers": "Loggers",

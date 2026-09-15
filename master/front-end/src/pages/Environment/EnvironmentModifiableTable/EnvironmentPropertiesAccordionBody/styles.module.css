@@ -1,0 +1,28 @@
+
+.EmptySource {
+    padding: 24px 16px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--prop-text-faint);
+}
+
+.RowAccordion.RowAccordion {
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.RowHeader.RowHeader {
+    padding: 0;
+    background-color: transparent;
+}
+
+.RowHeader.RowHeader::before {
+    left: 21px;
+    width: 11px;
+    height: 11px;
+}
+
+.RowBody.RowBody {
+    padding: 14px 16px 16px 45px;
+    background-color: #fbfcfd;
+    border-top: 1px solid var(--prop-border-faint);
+}

@@ -18,7 +18,6 @@
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { CrownIcon } from "@/assets";
 import type { IEnvProperty } from "@/models";
 
 import styles from "./styles.module.css";
@@ -30,21 +29,44 @@ interface IProps {
     property: IEnvProperty;
 }
 
+/*
+ * Both marks are inlined rather than added to the shared icon set: they exist only to tint with the
+ * badge they sit in, which `currentColor` on a local node gives for free.
+ */
+const ActiveMark = () => (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2">
+        <path d="M3 8.6 6.2 11.8 13 5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const SuppressedMark = () => (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M2.4 8s2.2-4 5.6-4 5.6 4 5.6 4-2.2 4-5.6 4S2.4 8 2.4 8z" strokeLinecap="round" />
+        <path d="M3 13 13 3" strokeLinecap="round" />
+    </svg>
+);
+
 export const EnvironmentPropertyValue = ({ property }: IProps) => {
     const { value, isPrimary } = property;
 
     const { t } = useTranslation();
 
+    const statusKey = isPrimary ? "primaryProperty" : "suppressedProperty";
+
     return (
         <>
-            <div className={styles.MainWrapper}>
-                <span className={styles.Value} title={value}>
-                    {value}
-                </span>
-                <Tooltip title={t("Environments.primaryProperty")}>
-                    <CrownIcon className={`${styles.PrimaryIcon} ${!isPrimary ? styles.IconPlaceholder : ""}`} />
+            <span className={`${styles.Value} ${!isPrimary ? styles.SuppressedValue : ""}`} title={value}>
+                {value}
+            </span>
+
+            <span className={styles.StatusCell}>
+                <Tooltip title={t(`Environments.${statusKey}Hint`)}>
+                    <span className={`${styles.Status} ${isPrimary ? styles.Active : styles.Suppressed}`}>
+                        {isPrimary ? <ActiveMark /> : <SuppressedMark />}
+                        {t(`Environments.${statusKey}`)}
+                    </span>
                 </Tooltip>
-            </div>
+            </span>
         </>
     );
 };
