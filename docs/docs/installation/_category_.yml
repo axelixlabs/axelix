@@ -19,4 +19,4 @@ link:
   type: doc
   # id     : the doc identifier (folder-relative path without `.md`).
   #          Required when `type: doc`.
-  id: installation/configuring-master
+  id: installation/getting-started
