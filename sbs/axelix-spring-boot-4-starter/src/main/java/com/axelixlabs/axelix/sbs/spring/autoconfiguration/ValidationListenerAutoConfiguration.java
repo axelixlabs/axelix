@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 public class ValidationListenerAutoConfiguration {
 
     @Bean

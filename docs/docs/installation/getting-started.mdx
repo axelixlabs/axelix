@@ -1,0 +1,309 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Getting Started
+
+This page describes the recommended way to roll Axelix out across an organization: which environments to start with,
+in what order to install the components, and how to reach production safely. Each step gives the concrete commands
+and the minimal configuration, and links to the detailed configuration page for the full reference.
+
+:::note
+The snippets on this page pin version `1.0.0` for illustration. Check the [Releases
+page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
+commands.
+:::
+
+## Axelix and your environments
+
+A typical software development lifecycle spans several environments. Whatever your exact names for them — dev,
+sandbox, QA, UAT, staging — every environment falls into one of two classes: **production** and **non-production**.
+
+So the first question teams usually ask: is Axelix Master supposed to run in production? **Yes.** Master is designed
+to run both in production and in test environments — from the performance, security, and fault-tolerance points of
+view. Running Master in production is an established practice, not an off-label use.
+
+However, we strongly recommend keeping the production deployment of Axelix separate from the deployment that manages
+your test environments. In other words: do not run a single Master that manages every environment. The reasons:
+
+1. **Access control differs.** The RBAC configuration on a test environment almost certainly does not match
+   production. The list of people allowed to change log levels, toggle caches, or take a heap dump in production is
+   much shorter than on staging. See [Roles and
+   authorities](../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities).
+2. **Network rules differ.** The rules governing who can reach the Master UI and the Master MCP server are typically
+   far stricter in production than in test environments.
+3. **Policies will differ.** The Axelix Enterprise policies, currently in development, are also expected to be
+   environment-specific.
+
+:::tip
+Each Master deployment can state which environment it serves through the `axelix.master.environment` property (for
+example `production` or `staging`). Today this label only feeds [structured
+logging](../setting-up-master-ui/configuring-master/configuring-master.mdx#structured-logging), but setting it from
+day one keeps your deployments self-describing.
+:::
+
+With that separation in mind, the adoption path goes test-first. As a result, by the time Axelix reaches production,
+both the configuration and your team's habits are already proven.
+
+## Step 1 — Prepare the database
+
+Master needs a relational database. Out of the box it ships with embedded [SQLite](https://www.sqlite.org/) and the
+default `jdbc:sqlite:axelix.db` URL, so a first run needs **no database configuration at all**. That default is there
+to get you up and running quickly.
+
+If you are past playing around and want real value from the installation, pick an engine from the supported list:
+**PostgreSQL**, **MySQL**, or **SQLite**. For anything beyond a single-node trial, choose PostgreSQL or MySQL —
+SQLite stores data in a local file, so it does not survive container restarts without a mounted volume and cannot
+back multiple Master replicas. We plan to expand the list of supported engines in future releases.
+
+Provision the database and a user with schema-migration privileges, because Master applies its schema itself:
+[Liquibase](https://www.liquibase.com/) runs on every startup, and you never run migrations by hand — see [Database
+Migrations](../setting-up-master-ui/migrations/migrations.mdx). The connection is configured through three properties
+described in the [Database](./configuring-master.mdx#database) section.
+
+Once the database is ready, move on.
+
+## Step 2 — Install Master on a test environment
+
+Install Master on a test environment first (or several of them, if you keep separate Axelix deployments per test
+environment). Any packaging works, so pick whatever fits your infrastructure: [a plain
+JAR](./configuring-master.mdx#run-as-a-jar), [Docker](./configuring-master.mdx#run-with-docker), [Docker
+Compose](./configuring-master.mdx#run-with-docker-compose), or [Kubernetes with the first-party Helm
+chart](./configuring-master.mdx#run-on-kubernetes). The minimal launch for each:
+
+<Tabs groupId="master-packaging">
+  <TabItem value="docker" label="Docker">
+
+The image is published to GitHub Container Registry:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+See [Run with Docker](./configuring-master.mdx#run-with-docker) for supplying the database connection and the rest of
+the configuration, and [Run with Docker Compose](./configuring-master.mdx#run-with-docker-compose) for the Compose
+variant.
+
+  </TabItem>
+  <TabItem value="helm" label="Kubernetes (Helm)">
+
+Axelix ships a first-party [Helm chart](https://github.com/axelixlabs/helm-charts):
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/helm-charts
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Put your overrides — at minimum the JWT signing key, the super-admin password, and the database connection — into
+`values.yaml`; the chart's
+[README](https://github.com/axelixlabs/helm-charts) documents every value. The chart also wires the ServiceAccount and
+RBAC required for in-cluster autodiscovery. See [Run on
+Kubernetes](./configuring-master.mdx#run-on-kubernetes).
+
+  </TabItem>
+  <TabItem value="jar" label="JAR">
+
+Download the Master JAR from the [Releases page](https://github.com/axelixlabs/axelix/releases) — it already bundles
+the UI — and start it:
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar master.jar
+```
+
+See [Run as a JAR](./configuring-master.mdx#run-as-a-jar) for the other ways to pass configuration.
+
+  </TabItem>
+</Tabs>
+
+Master is then reachable at `http://localhost:8080` (or behind your Ingress on Kubernetes). Sign in with the
+[super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account.
+
+Then configure it. Master accepts configuration from many sources — environment variables, an external config file, a
+Spring Cloud Config Server, or HashiCorp Vault — so fitting it into your existing configuration pipeline should not
+be a big deal. See [Supplying properties](./configuring-master.mdx#supplying-properties).
+
+The two JWT values in the launch snippets above are the only properties Master requires to start:
+`axelix.master.auth.jwt.algorithm` and `axelix.master.auth.jwt.signing-key` — see [Authentication —
+JWT](./configuring-master.mdx#authentication--jwt). Treat the signing key with care from day one: it is the shared
+secret every managed service will later present to Master, so generate a long random value and keep it in your secret
+manager rather than in a checked-in file.
+
+Beyond the database connection and the signing key, two decisions are worth making consciously at this step:
+
+- **Discovery mode.** With
+  [auto-discovery](./configuring-master.mdx#discovery--auto-discovery), Master scans its Kubernetes environment and
+  probes the services it finds. With
+  [self-registration](./configuring-master.mdx#discovery--self-registration), each service posts heartbeats to Master
+  instead. The two modes can be combined — for example, auto-discovery for in-cluster services plus self-registration
+  for services Master cannot scan.
+- **Sign-in and RBAC.** For small teams, [local users](../setting-up-master-ui/authentication/authentication.mdx#local-users)
+  — where Master stores user accounts in its own database — will probably be enough. For large organizations,
+  [OAuth2 / OIDC](../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc) against your identity
+  provider is usually the better option. Either way, the bootstrap
+  [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account gets you into the UI
+  on day one.
+
+## Step 3 — Add the starter and the build plugin to your services
+
+Next, gradually add the client-side components to the services you want Master to manage. There are two of them, and
+both are required: the [Axelix Spring Boot starter](./configuring-spring-boot-starter.mdx) matching the service's
+Spring Boot major version, and the [Axelix build plugin](./configuring-build-plugin.mdx) for Maven or Gradle. Both
+are published on [Maven Central](https://central.sonatype.com/), so adding them is an ordinary dependency change — no
+private repositories involved. Axelix is versioned in lockstep, so use the same Axelix version for Master, the
+starters, and the build plugin — see [Compatibility & Versioning](../more/compatibility-and-versioning.mdx) for the
+starter-to-Boot mapping and the exact drift rules.
+
+For a Spring Boot 4 service, the build changes look like this (replace the `4` with `2` or `3` to match the service's
+Boot major version):
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "1.0.0"
+}
+
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+}
+```
+
+Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` to `pluginManagement` in your
+`settings.gradle.kts` — see [Configuring the build plugin](./configuring-build-plugin.mdx).
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>1.0.0</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>1.0.0</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+  </TabItem>
+</Tabs>
+
+Adding the dependencies alone is not enough. In addition, each service needs three pieces of configuration, all
+described in detail on the [starter configuration page](./configuring-spring-boot-starter.mdx):
+
+- **Expose the Axelix actuator endpoints** through `management.endpoints.web.exposure.include`. The
+  `axelix-metadata` endpoint is the one Master probes to detect the instance, so without it the service never
+  appears, regardless of the discovery mode. See [Expose the Axelix actuator
+  endpoints](./configuring-spring-boot-starter.mdx#expose-the-axelix-actuator-endpoints).
+- **Set the shared JWT signing key** from step 2 under `axelix.sbs.auth.jwt.*`. A key mismatch between Master and
+  the service is the most common cause of `401` responses — see [Share the JWT signing key with
+  Master](./configuring-spring-boot-starter.mdx#share-the-jwt-signing-key-with-master) and
+  [Troubleshooting](../more/troubleshooting.mdx).
+- **Configure discovery — only if you chose self-registration.** Point the `axelix.sbs.discovery.*` properties at
+  your Master, as shown in [Let Master find the
+  instance](./configuring-spring-boot-starter.mdx#let-master-find-the-instance). With Master-side auto-discovery,
+  there is nothing extra to configure in the service.
+
+Put together, the minimal service configuration for the first two items:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+</Tabs>
+
+Roll them out service by service. As each service redeploys to a test environment, it shows up in the test Master,
+and the team can start using the [UI](../ui-guide/dashboard.mdx) and MCP against it right away.
+
+One production-related detail is worth planning for. Services usually promote the same artifact from test toward
+production, so the starter reaches production before Master does. If such a service runs with self-registration
+enabled, its starter will keep trying to register against a Master that does not exist yet. For those services, set
+`axelix.sbs.enabled=false` in the production configuration to keep the starter dormant — see [Disabling the
+starter](./configuring-spring-boot-starter.mdx#disabling-the-starter).
+
+## Step 4 — Install Master in production
+
+Finally, when the test rollout has proven itself, bring Axelix to production. This is a repeat of steps 1 and 2, as a
+**separate deployment**: its own database, production-grade RBAC, and the stricter network access rules to the UI and
+the MCP server that production demands.
+
+Once the production Master is up, remove any temporary `axelix.sbs.enabled=false` overrides from step 3 so the
+production instances register and become visible.
+
+## Related
+
+- [What is Master?](../setting-up-master-ui/what-is-master.mdx) — background on what Master does with the services it
+  manages.
+- [Configuring Master](./configuring-master.mdx) — every Master property, packaging option, and configuration source.
+- [Configuring Spring Boot Starter](./configuring-spring-boot-starter.mdx) — wiring a service up in detail.
+- [Configuring the build plugin](./configuring-build-plugin.mdx) — the second required client-side component.
+- [Authentication](../setting-up-master-ui/authentication/authentication.mdx) — sign-in options, roles, and
+  authorities.
+- [Compatibility & Versioning](../more/compatibility-and-versioning.mdx) — which starter matches which Spring Boot
+  and Java version, and how component versions stay compatible with each other.
+- [Troubleshooting](../more/troubleshooting.mdx) — the most common installation problems (`401` responses, wrong
+  starter module, a service that never registers) and their fixes.

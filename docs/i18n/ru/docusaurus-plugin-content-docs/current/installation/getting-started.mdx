@@ -1,0 +1,309 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Начало работы
+
+Эта страница описывает рекомендуемый путь внедрения Axelix в организации: с каких окружений начинать, в каком порядке
+устанавливать компоненты и как безопасно дойти до production. Каждый шаг даёт конкретные команды и минимальную
+конфигурацию, а за полным справочником отсылает к подробной странице конфигурации соответствующего компонента.
+
+:::note
+Сниппеты на этой странице используют версию `1.0.0` для наглядности. Проверьте [страницу
+релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
+свои команды.
+:::
+
+## Axelix и ваши окружения
+
+Типичный жизненный цикл разработки ПО проходит через несколько окружений. Как бы они у вас ни назывались — dev,
+sandbox, QA, UAT, staging — каждое окружение относится к одному из двух классов: **production** и **non-production**.
+
+Поэтому первый вопрос, который обычно задают команды: должен ли Axelix Master работать в production? **Да.** Master
+спроектирован для работы и в production, и в тестовых окружениях — с точки зрения производительности, безопасности и
+отказоустойчивости. Запуск Master в production — устоявшаяся практика, а не использование не по назначению.
+
+Тем не менее мы настоятельно рекомендуем держать production-развёртывание Axelix отдельно от развёртывания,
+обслуживающего тестовые окружения. Иными словами: не запускайте один Master, который управляет всеми окружениями
+сразу. Причины:
+
+1. **Разный контроль доступа.** Конфигурация RBAC на тестовом окружении почти наверняка не совпадает с production.
+   Список людей, которым позволено менять уровни логирования, переключать кэши или снимать heap dump в production,
+   куда короче, чем на staging. См. [Роли и
+   полномочия](../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
+2. **Разные сетевые правила.** Правила доступа к UI Master и к MCP-серверу Master в production, как правило, куда
+   строже, чем в тестовых окружениях.
+3. **Разные политики.** Политики Axelix Enterprise, которые сейчас находятся в разработке, также, как ожидается,
+   будут зависеть от окружения.
+
+:::tip
+Каждое развёртывание Master может указывать, какое окружение оно обслуживает, через свойство
+`axelix.master.environment` (например, `production` или `staging`). Сегодня эта метка используется только в
+[структурированном логировании](../setting-up-master-ui/configuring-master/configuring-master.mdx#структурированное-логирование),
+но, задав её с первого дня, вы делаете свои развёртывания самоописываемыми.
+:::
+
+С учётом этого разделения путь внедрения начинается с тестовых окружений. В результате к моменту, когда Axelix
+доберётся до production, и конфигурация, и привычки команды уже будут проверены.
+
+## Шаг 1 — Подготовьте базу данных
+
+Master нужна реляционная база данных. Из коробки он поставляется со встроенной [SQLite](https://www.sqlite.org/) и
+URL по умолчанию `jdbc:sqlite:axelix.db`, так что первый запуск **вообще не требует настройки базы данных**. Это
+значение по умолчанию существует, чтобы вы могли быстро начать.
+
+Если же вы уже не просто играетесь, а хотите получить от установки реальную пользу, выберите движок из
+поддерживаемого списка: **PostgreSQL**, **MySQL** или **SQLite**. Для чего-либо серьёзнее одноузловой пробы выбирайте
+PostgreSQL или MySQL — SQLite хранит данные в локальном файле, поэтому не переживает перезапуск контейнера без
+примонтированного тома и не может обслуживать несколько реплик Master. Мы планируем расширять список поддерживаемых
+движков в будущих релизах.
+
+Подготовьте базу и пользователя с правами на миграции схемы, потому что Master применяет свою схему сам:
+[Liquibase](https://www.liquibase.com/) запускается при каждом старте, и вручную миграции вы не выполняете никогда —
+см. [Миграции базы данных](../setting-up-master-ui/migrations/migrations.mdx). Подключение настраивается тремя
+свойствами, описанными в разделе [База данных](./configuring-master.mdx#база-данных).
+
+Когда база готова, двигайтесь дальше.
+
+## Шаг 2 — Установите Master на тестовом окружении
+
+Сначала установите Master на тестовом окружении (или на нескольких, если вы держите отдельные развёртывания Axelix
+для разных тестовых окружений). Подойдёт любой способ упаковки, выбирайте под свою инфраструктуру: [обычный
+JAR](./configuring-master.mdx#запуск-как-jar), [Docker](./configuring-master.mdx#запуск-с-docker), [Docker
+Compose](./configuring-master.mdx#запуск-с-docker-compose) или [Kubernetes с официальным Helm-чартом](./configuring-master.mdx#запуск-в-kubernetes).
+Минимальный запуск для каждого способа:
+
+<Tabs groupId="master-packaging">
+  <TabItem value="docker" label="Docker">
+
+Образ публикуется в GitHub Container Registry:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
+  -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
+  ghcr.io/axelixlabs/axelix:1.0.0
+```
+
+Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
+Docker](./configuring-master.mdx#запуск-с-docker), а вариант с Compose — в разделе [Запуск с Docker
+Compose](./configuring-master.mdx#запуск-с-docker-compose).
+
+  </TabItem>
+  <TabItem value="helm" label="Kubernetes (Helm)">
+
+Axelix поставляет официальный [Helm-чарт](https://github.com/axelixlabs/helm-charts):
+
+```bash
+helm repo add axelix https://axelixlabs.github.io/helm-charts
+helm repo update
+helm install axelix axelix/axelix \
+  --namespace axelix --create-namespace \
+  --values values.yaml
+```
+
+Свои переопределения — как минимум ключ подписи JWT, пароль суперадминистратора и подключение к базе — положите в
+`values.yaml`; [README чарта](https://github.com/axelixlabs/helm-charts) описывает каждое значение. Чарт также сам
+настраивает ServiceAccount и RBAC, необходимые для автообнаружения внутри кластера. См. [Запуск в
+Kubernetes](./configuring-master.mdx#запуск-в-kubernetes).
+
+  </TabItem>
+  <TabItem value="jar" label="JAR">
+
+Скачайте JAR Master со [страницы релизов](https://github.com/axelixlabs/axelix/releases) — UI уже включён в него — и
+запустите:
+
+```bash
+export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
+export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
+
+java -jar master.jar
+```
+
+Другие способы передать конфигурацию — см. [Запуск как JAR](./configuring-master.mdx#запуск-как-jar).
+
+  </TabItem>
+</Tabs>
+
+После этого Master доступен на `http://localhost:8080` (или за вашим Ingress в Kubernetes). Войдите под учётной
+записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
+
+Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл
+конфигурации, Spring Cloud Config Server или HashiCorp Vault — так что встроить его в существующий конвейер
+конфигурации не составит большого труда. См. [Передача свойств](./configuring-master.mdx#способы-задания-свойств).
+
+Два значения JWT из сниппетов запуска выше — единственные свойства, без которых Master не стартует:
+`axelix.master.auth.jwt.algorithm` и `axelix.master.auth.jwt.signing-key` — см. [Аутентификация —
+JWT](./configuring-master.mdx#аутентификация--jwt). С первого дня относитесь к ключу подписи бережно: это общий
+секрет, который позже будет предъявлять Master каждый управляемый сервис, поэтому сгенерируйте длинное случайное
+значение и храните его в менеджере секретов, а не в закоммиченном файле.
+
+Помимо подключения к базе и ключа подписи, на этом шаге стоит осознанно принять два решения:
+
+- **Режим обнаружения.** При [автоматическом
+  обнаружении](./configuring-master.mdx#обнаружение--автообнаружение) Master сканирует своё Kubernetes-окружение и сам
+  опрашивает найденные сервисы. При [саморегистрации](./configuring-master.mdx#обнаружение--саморегистрация) каждый
+  сервис, наоборот, отправляет heartbeat-сигналы в Master. Режимы можно совмещать — например, автоматическое
+  обнаружение для сервисов внутри кластера плюс саморегистрация для сервисов, которые Master просканировать не может.
+- **Вход и RBAC.** Небольшим командам, скорее всего, хватит [локальных
+  пользователей](../setting-up-master-ui/authentication/authentication.mdx#локальные-пользователи) — когда Master хранит учётные
+  записи в собственной базе. Крупным организациям обычно лучше подойдёт
+  [OAuth2 / OIDC](../setting-up-master-ui/authentication/authentication.mdx#oauth2--oidc) через ваш провайдер
+  идентификации. В любом случае стартовая учётная запись
+  [super-admin](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор) откроет вам UI в первый же
+  день.
+
+## Шаг 3 — Добавьте стартер и build-плагин в свои сервисы
+
+Дальше постепенно добавляйте клиентские компоненты в сервисы, которыми Master должен управлять. Их два, и нужны оба:
+[стартер Axelix Spring Boot](./configuring-spring-boot-starter.mdx), соответствующий мажорной версии Spring Boot
+сервиса, и [build-плагин Axelix](./configuring-build-plugin.mdx) для Maven или Gradle. Оба опубликованы в [Maven
+Central](https://central.sonatype.com/), так что их добавление — обычное изменение зависимостей, без приватных
+репозиториев. Axelix версионируется синхронно: используйте одну и ту же версию Axelix для Master, стартеров и
+build-плагина — см. [Совместимость и версионирование](../more/compatibility-and-versioning.mdx), где описано
+соответствие стартеров версиям Spring Boot и точные правила расхождения версий.
+
+Для сервиса на Spring Boot 4 изменения в сборке выглядят так (замените `4` на `2` или `3` в соответствии с мажорной
+версией Boot сервиса):
+
+<Tabs groupId="build-tool">
+  <TabItem value="gradle-kotlin" label="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+plugins {
+    id("com.axelixlabs.axelix") version "1.0.0"
+}
+
+dependencies {
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+}
+```
+
+Поскольку плагин пока не опубликован на Gradle Plugin Portal, добавьте `mavenCentral()` в `pluginManagement` вашего
+`settings.gradle.kts` — см. [Конфигурация build-плагина](./configuring-build-plugin.mdx).
+
+  </TabItem>
+  <TabItem value="maven" label="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.axelixlabs</groupId>
+    <artifactId>axelix-spring-boot-4-starter</artifactId>
+    <version>1.0.0</version>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.axelixlabs</groupId>
+      <artifactId>axelix-maven-plugin</artifactId>
+      <version>1.0.0</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>axelix-generate-project-info</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+  </TabItem>
+</Tabs>
+
+Одного добавления зависимостей недостаточно. Кроме этого, каждому сервису нужны три элемента конфигурации, подробно
+описанные на [странице конфигурации стартера](./configuring-spring-boot-starter.mdx):
+
+- **Откройте доступ к Axelix actuator-эндпоинтам** через `management.endpoints.web.exposure.include`. Именно
+  эндпоинт `axelix-metadata` Master опрашивает, чтобы обнаружить сервис, поэтому без него сервис не появится ни при
+  каком режиме обнаружения. См. [Откройте доступ к Axelix
+  actuator-эндпоинтам](./configuring-spring-boot-starter.mdx#откройте-доступ-к-axelix-actuator-эндпоинтам).
+- **Задайте общий ключ подписи JWT** из шага 2 в свойствах `axelix.sbs.auth.jwt.*`. Несовпадение ключей между
+  Master и сервисом — самая частая причина ответов `401` — см. [Поделитесь JWT-ключом подписи с
+  Master](./configuring-spring-boot-starter.mdx#поделитесь-jwt-ключом-подписи-с-master) и [Решение
+  проблем](../more/troubleshooting.mdx).
+- **Настройте обнаружение — только если вы выбрали саморегистрацию.** Направьте свойства `axelix.sbs.discovery.*`
+  на ваш Master, как показано в разделе [Дайте Master найти
+  сервис](./configuring-spring-boot-starter.mdx#дайте-master-найти-сервис). При автоматическом обнаружении на
+  стороне Master в сервисе дополнительно настраивать нечего.
+
+Вместе минимальная конфигурация сервиса для первых двух пунктов выглядит так:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+</Tabs>
+
+Раскатывайте их сервис за сервисом. Как только сервис передеплоивается в тестовое окружение, он появляется в тестовом
+Master, и команда сразу может работать с ним через [UI](../ui-guide/dashboard.mdx) и MCP.
+
+Одну деталь, связанную с production, стоит спланировать заранее. Сервисы обычно продвигают один и тот же артефакт из
+тестовых окружений в production, поэтому стартер попадает в production раньше, чем Master. Если такой сервис работает
+с включённой саморегистрацией, его стартер будет пытаться зарегистрироваться в Master, которого ещё не существует.
+Для таких сервисов установите `axelix.sbs.enabled=false` в production-конфигурации, чтобы стартер оставался спящим —
+см. [Отключение стартера](./configuring-spring-boot-starter.mdx#отключение-стартера).
+
+## Шаг 4 — Установите Master в production
+
+Наконец, когда тестовое внедрение себя показало, переносите Axelix в production. Это повторение шагов 1 и 2 в виде
+**отдельного развёртывания**: собственная база данных, production-уровень RBAC и те более строгие сетевые правила
+доступа к UI и MCP-серверу, которых требует production.
+
+Когда production Master поднят, уберите временные переопределения `axelix.sbs.enabled=false` из шага 3, чтобы
+production-экземпляры зарегистрировались и стали видны.
+
+## См. также
+
+- [Что такое Master?](../setting-up-master-ui/what-is-master.mdx) — что Master делает с сервисами, которыми
+  управляет.
+- [Конфигурация Master](./configuring-master.mdx) — все свойства Master, варианты упаковки и источники конфигурации.
+- [Конфигурация Spring Boot стартера](./configuring-spring-boot-starter.mdx) — подробное подключение сервиса.
+- [Конфигурация build-плагина](./configuring-build-plugin.mdx) — второй обязательный клиентский компонент.
+- [Аутентификация](../setting-up-master-ui/authentication/authentication.mdx) — способы входа, роли и полномочия.
+- [Совместимость и версионирование](../more/compatibility-and-versioning.mdx) — какой стартер соответствует какой
+  версии Spring Boot и Java и как версии компонентов остаются совместимыми друг с другом.
+- [Решение проблем](../more/troubleshooting.mdx) — самые частые проблемы установки (ответы `401`, неправильный
+  модуль стартера, сервис, который так и не регистрируется) и их устранение.

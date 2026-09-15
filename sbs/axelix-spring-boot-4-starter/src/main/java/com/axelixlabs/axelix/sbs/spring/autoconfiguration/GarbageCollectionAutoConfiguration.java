@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnClass(name = "com.sun.management.DiagnosticCommandMBean")
 public class GarbageCollectionAutoConfiguration {
 

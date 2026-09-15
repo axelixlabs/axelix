@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { UpcomingReleaseNotice } from '@site/src/components';
 import styles from './styles.module.css';
 
 # Configuring Spring Boot Starter
@@ -403,6 +404,54 @@ The standard Spring Boot Actuator masking switches — `management.endpoint.env.
 ## Configuration reference
 
 Every starter property lives under the `axelix.sbs.*` namespace.
+
+### Disabling the starter
+
+<UpcomingReleaseNotice />
+
+`axelix.sbs.enabled` is the global switch for the whole starter. It is `true` by default, so adding the dependency is
+enough to activate everything described on this page. Set it to `false` and every Axelix auto-configuration backs off:
+no Axelix actuator endpoints, no JWT authorization filter, no self-registration heartbeats, no Micrometer meters, and
+no transaction monitoring. The application then starts as if the starter were not on the classpath, while the
+dependency itself stays in the build.
+
+Reach for this switch when you want Axelix off in a specific environment — for example locally or in a test profile —
+without maintaining a separate dependency set. It is also a quick way to rule the starter out while troubleshooting
+startup issues.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    enabled: false
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.enabled=false
+```
+
+  </TabItem>
+</Tabs>
+
+The property is read once, during startup. As a result, changing it requires a restart of the application.
+
+:::note
+With the starter disabled, Master loses sight of the instance: autodiscovery probes to `/actuator/axelix-metadata`
+fail, and self-registration heartbeats stop, so the instance disappears from the UI and from MCP responses.
+:::
+
+<div className={styles.SharedTable}>
+
+| Property             | Default | Description                                                                                                                                                       |
+|----------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.enabled` | `true`  | Global switch for the whole starter. Set to `false` to make every Axelix auto-configuration back off. Behaves identically on the Spring Boot 2, 3, and 4 starters. |
+
+</div>
 
 ### Authentication — JWT
 

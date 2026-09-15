@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeanRenamingProcessor;
  * @author Vyacheslav Yanin
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 public class AxelixCoreNamingAutoConfiguration {
 
     @Bean
