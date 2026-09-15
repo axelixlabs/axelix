@@ -1,0 +1,45 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--axelix-light-grey);
+}
+
+.Tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 0 9px;
+    margin-bottom: -1px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--axelix-bold-grey);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        border-color 0.15s,
+        color 0.15s;
+}
+
+.Tab:hover {
+    color: var(--axelix-primary-black);
+}
+
+.ActiveTab {
+    font-weight: 700;
+    color: var(--axelix-primary-black);
+    border-bottom-color: var(--axelix-primary-green);
+}
+
+.Count {
+    color: var(--axelix-medium-grey);
+    font-variant-numeric: tabular-nums;
+}
+
+.ActiveTab .Count {
+    color: var(--axelix-primary-green);
+}
