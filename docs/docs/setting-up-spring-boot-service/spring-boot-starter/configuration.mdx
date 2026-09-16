@@ -186,6 +186,11 @@ Spring Boot hides custom actuator endpoints from web exposure by default. Add th
 without it the instance will not appear in Master, regardless of whether you use Master-side autodiscovery or
 starter-side self-registration. The rest of the endpoints power the corresponding features in the UI.
 
+Keep `health` in the list too. Setting `management.endpoints.web.exposure.include` **replaces** Spring Boot's default
+(`health`), and the starter requires the `HealthEndpoint` bean — it reads the application's health through it and
+reports the status to Master as part of `axelix-metadata`. If the `health` endpoint is not exposed anywhere (web or
+JMX), Spring Boot does not create that bean and the application fails to start.
+
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
 
@@ -195,6 +200,7 @@ management:
     web:
       exposure:
         include:
+          - health
           - axelix-metadata
           - axelix-beans
           - axelix-caches

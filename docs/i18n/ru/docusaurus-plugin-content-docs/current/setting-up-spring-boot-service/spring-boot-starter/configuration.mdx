@@ -191,6 +191,11 @@ className={styles.required}>обязательное</span> — это эндп�
 автоматическое обнаружение на стороне Master или саморегистрацию на стороне стартера. Остальные эндпоинты обеспечивают
 работу соответствующих функций в пользовательском интерфейсе.
 
+Оставьте в списке и `health`. Задание `management.endpoints.web.exposure.include` **заменяет** значение по умолчанию
+Spring Boot (`health`), а стартеру необходим бин `HealthEndpoint` — через него он читает состояние приложения и
+передаёт статус в Master в составе `axelix-metadata`. Если эндпоинт `health` не открыт нигде (ни через веб, ни через
+JMX), Spring Boot не создаст этот бин, и приложение не запустится.
+
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
 
@@ -200,6 +205,7 @@ management:
     web:
       exposure:
         include:
+          - health
           - axelix-metadata
           - axelix-beans
           - axelix-caches
