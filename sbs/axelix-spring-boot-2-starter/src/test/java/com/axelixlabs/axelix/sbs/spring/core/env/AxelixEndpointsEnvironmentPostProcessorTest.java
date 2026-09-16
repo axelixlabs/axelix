@@ -38,8 +38,6 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
     private final AxelixEndpointsEnvironmentPostProcessor processor = new AxelixEndpointsEnvironmentPostProcessor();
     private static final String PROPERTY_NAME = "management.endpoints.web.exposure.include";
     private static final List<String> ENDPOINTS = List.of(
-            "info",
-            "health",
             "axelix-metadata",
             "axelix-beans",
             "axelix-caches",
@@ -61,7 +59,7 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
         StandardEnvironment env = new StandardEnvironment();
 
         processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(PROPERTY_NAME)).isEqualTo(String.join(",", ENDPOINTS));
+        assertThat(env.getProperty(PROPERTY_NAME)).isEqualTo("health," + String.join(",", ENDPOINTS));
     }
 
     @Test

@@ -41,8 +41,6 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
 
     private static final String PROPERTY = "management.endpoints.web.exposure.include";
     private static final List<String> ENDPOINTS_TO_EXPOSE = List.of(
-            "info",
-            "health",
             "axelix-metadata",
             "axelix-beans",
             "axelix-caches",
@@ -71,6 +69,11 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
 
         Set<String> merged = new LinkedHashSet<>();
         current.stream().map(String::strip).filter(s -> !s.isEmpty()).forEach(merged::add);
+
+        if (merged.isEmpty() && !environment.containsProperty(PROPERTY)) {
+            // our override replaces Spring Boot's default exposure ("health"); keep it unless the user opted out
+            merged.add("health");
+        }
 
         merged.addAll(ENDPOINTS_TO_EXPOSE);
         environment
