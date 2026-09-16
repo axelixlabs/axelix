@@ -71,6 +71,26 @@ public final class TestInstanceFactory {
                 DEFAULT_URL);
     }
 
+    public static Instance create(
+            String id, String groupId, String artifactId, String springBoot, String springFramework) {
+        return new Instance(
+                InstanceId.of(id),
+                ApplicationId.of(groupId, artifactId),
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                "25",
+                springBoot,
+                springFramework,
+                null,
+                "BellSoft",
+                "df027cf",
+                Instant.now(),
+                Instant.now(),
+                DEFAULT_STATUS,
+                new MemoryUsage(1000L),
+                DEFAULT_URL);
+    }
+
     public static Instance create(String id, @Nullable Instant instant) {
         return createInstanceWithHeartbeat(id, instant);
     }

@@ -316,6 +316,21 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_PERSISTENCE, viewer.getActor());
     }
 
+    @Test
+    void shouldReturnSpringPortfolioDashboard() {
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/spring-portfolio", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).node("applicationsTotal").isEqualTo(1);
+        assertThatJson(response.getBody()).node("springBoot.platform").isEqualTo("SPRING_BOOT");
+        assertThatJson(response.getBody()).node("springFramework.platform").isEqualTo("SPRING_FRAMEWORK");
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_SPRING_PORTFOLIO, viewer.getActor());
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.DASHBOARD_READ, "/api/external/dashboard"));

@@ -15,22 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service;
+package com.axelixlabs.axelix.master.service.ecosystem;
 
-import com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
 
 /**
- * Service that collects information necessary for dashboard rendering.
+ * Aggregates the fleet's Spring Boot / Spring Framework version portfolio.
  *
- * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-public interface DashboardService {
+public interface SpringPortfolioService {
 
     /**
-     * It is intentional that here we return the DTO from the API layer inside the service layer.
-     * As of time of writing this code, there is not that much reasoning to split the model returned
-     * by the service layer from the {@link DashboardResponse} DTO returned from the UI layer.
-     * @return the {@link DashboardResponse}.
+     * @return the fleet-wide Spring version portfolio, computed from the currently registered instances
      */
-    DashboardResponse getDashboardInfo();
+    SpringPortfolioResponse getSpringPortfolio();
 }

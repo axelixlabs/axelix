@@ -149,6 +149,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the aggregated persistence problems (N + 1, in-memory pagination) across the ecosystem.
          */
         public static final String PERSISTENCE = "/dashboard/persistence";
+
+        /**
+         * Endpoint to retrieve the fleet-wide Spring Boot / Spring Framework version portfolio.
+         */
+        public static final String SPRING_PORTFOLIO = "/dashboard/spring-portfolio";
     }
 
     public static final class LoggersApi {

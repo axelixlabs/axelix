@@ -50,7 +50,12 @@ public enum PlatformName {
     /**
      * Spring Boot as the Platform.
      */
-    SPRING_BOOT("spring-boot");
+    SPRING_BOOT("spring-boot"),
+
+    /**
+     * Spring Framework as the Platform.
+     */
+    SPRING_FRAMEWORK("spring-framework");
 
     private final String codeName;
 
