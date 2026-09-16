@@ -196,6 +196,9 @@ Spring Boot (`health`), а стартеру необходим бин `HealthEnd
 передаёт статус в Master в составе `axelix-metadata`. Если эндпоинт `health` не открыт нигде (ни через веб, ни через
 JMX), Spring Boot не создаст этот бин, и приложение не запустится.
 
+Добавьте также нативный эндпоинт `info`: `axelix-details` активируется только тогда, когда доступен `info` (в силу просто разных
+исторических причин).
+
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
 
@@ -206,6 +209,7 @@ management:
       exposure:
         include:
           - health
+          - info
           - axelix-metadata
           - axelix-beans
           - axelix-caches
@@ -227,7 +231,7 @@ management:
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
+management.endpoints.web.exposure.include=health,info,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
 ```
 
   </TabItem>

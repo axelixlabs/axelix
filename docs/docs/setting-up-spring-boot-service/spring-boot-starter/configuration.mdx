@@ -191,6 +191,9 @@ Keep `health` in the list too. Setting `management.endpoints.web.exposure.includ
 reports the status to Master as part of `axelix-metadata`. If the `health` endpoint is not exposed anywhere (web or
 JMX), Spring Boot does not create that bean and the application fails to start.
 
+Add the native `info` endpoint as well: `axelix-details` activates only when `info` is available (Because of some legacy
+that we used to have).
+
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
 
@@ -201,6 +204,7 @@ management:
       exposure:
         include:
           - health
+          - info
           - axelix-metadata
           - axelix-beans
           - axelix-caches
@@ -221,7 +225,7 @@ management:
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+management.endpoints.web.exposure.include=health,info,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
 ```
 
   </TabItem>
