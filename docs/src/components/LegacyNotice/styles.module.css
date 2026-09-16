@@ -1,0 +1,48 @@
+.Notice {
+    /* Accent for the "legacy" marker. Amber reads as "check whether this applies to you",
+       next to the green "shipped" and purple "future" accents of the sibling notices. */
+    --legacy-accent: #a35c12;
+
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: -4px 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--axelix-border);
+    font-size: 0.85rem;
+    color: var(--axelix-fg-subtle);
+}
+
+:global(html[data-theme='dark']) .Notice {
+    --legacy-accent: #e0a962;
+}
+
+.Label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--legacy-accent);
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--legacy-accent);
+}
+
+.Separator {
+    color: var(--axelix-border-strong);
+}
+
+/* The skip sentence makes this detail longer than its siblings' — let it wrap. */
+.Detail {
+    flex: 1;
+    line-height: 1.55;
+}
+
+.Version {
+    font-weight: 700;
+    color: var(--legacy-accent);
+}

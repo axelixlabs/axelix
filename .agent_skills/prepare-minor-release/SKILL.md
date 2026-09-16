@@ -15,7 +15,8 @@ version is not stated, derive it from `axelixVersion` in the root `gradle.proper
 confirm it with the user before editing anything.
 
 1. **Pre-release housekeeping** — version, playgrounds.
-2. **Release notes draft** — diff against the previous minor tag.
+2. **Release notes draft & docs truth audit** — diff against the previous minor tag, and verify the docs
+   still tell the truth for the new version.
 3. **Post-release housekeeping** — move `master` to the next minor's `-SNAPSHOT`, swap the docs notices.
 
 ## Hard boundaries
@@ -94,6 +95,35 @@ them so the developer edits instead of starting from scratch.
 4. **Write the draft** to `release-notes-vX.Y.0.md` in the repository root. It is a working file for the
    developer: it stays **untracked** and must not slip into the housekeeping commit — say so explicitly, and
    never `git add` it. The developer publishes the final text against the `vX.Y.0` tag manually.
+
+### Docs truth audit — mandatory, never skip
+
+The same `vPREV..master` diff that feeds the notes also invalidates documentation: a behavior change makes
+some pages describe how Axelix *used to* work. Shipping the release with those pages untouched misinforms
+users, so this audit is a **required** part of every release preparation. Run it every time Phase 2 runs —
+even when the user only asked for release notes, and even when the diff looks trivially small.
+
+1. Go through **every** change collected in step 2, not only the ones that made it into the notes.
+   **Noteworthy changes** and **Breaking changes** are the prime suspects, but a **New feature** can also
+   supersede a documented manual procedure.
+2. For each change, hunt `docs/docs/` for statements the change invalidates: grep for the affected property
+   names, endpoints, class names, and UI wording, and skim the pages of the affected component. You are
+   looking for text that was true on `vPREV` but is no longer true on `master`.
+3. For every stale spot found, you **must** propose a treatment — silently leaving it is not an option:
+   - If a whole section describes behavior that from `X.Y.0` on is no longer required or was replaced
+     (e.g. a manual step the release now automates), keep the section for users on older versions and mark
+     it with `<LegacyNotice version="X.Y.0" />` directly under its heading (imported from
+     `@site/src/components`, sibling of the Released/Upcoming notices). `X.Y.0` is the release being cut —
+     the first version where the section stops applying.
+   - If the text is simply wrong going forward (changed default, renamed property, different behavior),
+     propose a rewrite of the text itself so it correctly informs users about the change.
+   - Every touched English page has a Russian mirror under
+     `docs/i18n/ru/docusaurus-plugin-content-docs/current/` — treat both, or the docs CI build fails on the
+     `ru` locale.
+4. Report the findings as a list (code change → affected page/section → suggested treatment), get the
+   user's agreement, and apply the edits as working-tree changes only — like everything else in this skill,
+   the user commits. If the audit finds nothing stale, say explicitly that it ran and came back clean;
+   never leave it implicit.
 
 ## Phase 3 — Post-release housekeeping
 
