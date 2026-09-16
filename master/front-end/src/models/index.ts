@@ -20,6 +20,7 @@ export * from "./interfaces/dashboard/dashboardOverview";
 export * from "./interfaces/dashboard/dashboardJava";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";
+export * from "./interfaces/dependencies";
 export * from "./interfaces/entitiesMap";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
@@ -49,6 +50,7 @@ export * from "./types/antd";
 export * from "./types/auth";
 
 export * from "./enums/transactional";
+export * from "./enums/dependencies";
 export * from "./enums/environments";
 export * from "./enums/entitiesMap";
 export * from "./enums/conditions";

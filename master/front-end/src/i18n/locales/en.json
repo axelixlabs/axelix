@@ -104,6 +104,7 @@
         "scheduledTasks": "Scheduled Tasks",
         "conditions": "Conditions",
         "loggers": "Loggers",
+        "dependenciesAnalyzer": "Dependencies Analyzer",
         "mappings": "Mappings",
         "caches": "Caches",
         "transactionControl" : "Transaction Control",
@@ -463,6 +464,79 @@
         "clean": {
             "title": "No mapping problems",
             "description": "All {{count}} mapped entities are clean — no eager fetching, no List-backed @ManyToMany, no dangerous cascades, and no unidirectional @OneToMany."
+        }
+    },
+    "DependenciesAnalyzer": {
+        "platform": {
+            "caption": "{{platform}} maintenance window",
+            "source": "Read from the running JVM · {{date}}",
+            "runningLine": "Running the {{line}} line · latest line known to Axelix is {{latest}}",
+            "today": "Today",
+            "released": "Released {{date}}",
+            "ossEnded": "OSS ended {{date}}",
+            "ossEnds": "OSS ends {{date}}",
+            "commercial": "Commercial to {{date}}",
+            "consequence": "Consequence",
+            "outOfOssFor": "Out of OSS for",
+            "supportedTarget": "Supported target",
+            "targetValue": "{{line}} · OSS to {{date}}"
+        },
+        "platformStatus": {
+            "OSS_SUPPORTED": "Within OSS maintenance",
+            "OUT_OF_OSS_MAINTENANCE": "Out of OSS maintenance"
+        },
+        "consequences": {
+            "OSS_SUPPORTED": "This line still receives OSS releases, security patches included.",
+            "OUT_OF_OSS_MAINTENANCE": "No further OSS releases, including security patches. CVEs in this line are fixed only under a commercial subscription."
+        },
+        "duration": {
+            "years_one": "{{count}} year",
+            "years_other": "{{count}} years",
+            "months_one": "{{count}} month",
+            "months_other": "{{count}} months",
+            "lessThanAMonth": "less than a month"
+        },
+        "feed": {
+            "caption": "Resolved dependencies",
+            "clear": "Clear"
+        },
+        "ecosystems": {
+            "ALL": "All",
+            "SPRING": "Spring",
+            "PERSISTENCE": "Persistence",
+            "SERIALIZATION": "Serialization",
+            "LOGGING": "Logging",
+            "OBSERVABILITY": "Observability",
+            "RESILIENCE": "Resilience",
+            "OTHER": "Other"
+        },
+        "signals": {
+            "DISCONTINUED": "Discontinued",
+            "MAINTENANCE": "Maintenance mode"
+        },
+        "columns": {
+            "dependency": "Dependency",
+            "version": "Version",
+            "scope": "Scope"
+        },
+        "scope": {
+            "direct": "Direct",
+            "transitive": "Transitive"
+        },
+        "notes": {
+            "SUPERSEDED_BY": "Superseded by",
+            "MIGRATION_NOTE": "Migration note"
+        },
+        "detail": {
+            "resolutionPath": "Resolution path from the root",
+            "declaredDirectly": "Declared directly in the build file",
+            "levelsBelowRoot_one": "{{count}} level below the root",
+            "levelsBelowRoot_other": "{{count}} levels below the root",
+            "thisApplication": "This application",
+            "resolvedHere": "Resolved here",
+            "projectStatus": "Project status",
+            "detectedFrom": "Detected from",
+            "reference": "Reference"
         }
     },
     "Users": {
