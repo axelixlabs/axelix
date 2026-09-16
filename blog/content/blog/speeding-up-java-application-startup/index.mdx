@@ -1,0 +1,416 @@
+---
+title: "Speeding Up Java Application Startup with AOT Cache"
+date: 2026-08-29
+authors: ["Sergey Cherkasov"]
+tags: ["Java", "Project Layden", "AOT Cache"]
+heroImagePath: /posts/axelix-git-branching-model/preview.png
+description: "How we built the AOT Cache into the Docker image, why we ran training and assembly as separate steps, and what 22% off the time to readiness actually cost us."
+metaDescription: "How JDK 25 AOT Cache cut Axelix Master startup from 9.5 to 7.4 seconds: training and assembly inside a Docker build, a comparison with AppCDS, and the build-time and image-size trade-offs."
+---
+
+
+Hi, my name is Sergey. I’m a developer at Axelixlabs working on the Open-Source [Axelix](https://github.com/axelixlabs/axelix).
+
+As the project grew, the number of external contributors increased, and with it, the number of changes that needed to be
+checked regularly. That’s why our team planned to implement nightly E2E tests: they were supposed to build and deploy
+the application, and then verify its operation with different databases, authorization modes, discovery mechanisms,
+and other configurations.
+
+Each combination required a separate run of Axelix Master. We expected that the existing startup time would add to
+the duration of each task in the test matrix, so we decided to optimize it even before implementing the nightly E2E tests.
+
+We decided to optimize the entire process in stages, and the first thing we decided to tackle was the application launch.
+To do this, I implemented AOT Cache and tested how significant an improvement we could achieve from it.
+
+In this article, I’ll explain why we chose AOT Cache, how we integrated it into the app’s build and launch process,
+why we opted for a two-step integration approach, what limitations we encountered, and how well the results matched our
+expectations. I’ll also compare the app’s startup time in the base configuration, with AppCDS, and with AOT Cache.
+
+## How a Java Application Starts
+Before moving on to optimization, let’s examine what the JVM does during application startup and which part of this
+process is affected by the AOT Cache.
+
+Our project uses Eclipse Temurin 25 - an OpenJDK distribution with the HotSpot JVM. Therefore, the following discussion
+will focus specifically on launching the HotSpot JVM.
+
+When we execute the command `java` a process is launched and JVM initialization begins. HotSpot checks the passed
+arguments, determines the available system resources, configures memory and other runtime components. Early on,
+the JVM also attempts to load a compatible CDS archive or a specified AOT cache, if they are configured.
+To understand how the AOT cache works, let’s take a look at how classes are processed. To execute Java code,
+the JVM must load, link, and initialize the necessary classes.
+
+### Class Loading
+During [class loading](https://docs.oracle.com/javase/specs/jvms/se25/html/jvms-5.html#jvms-5.3), the JVM performs
+several actions:
+1. It locates the binary representation of the class or interface. This is typically stored in `.class` - file inside
+a JAR archive.
+2. Parses the found representation and verifies that it is in the correct format.
+3. Creates an internal representation of the class in the JVM’s method area. In HotSpot, the metadata for loaded classes
+is primarily stored in [metaspace](https://wiki.openjdk.org/spaces/HotSpot/pages/56526266/Metaspace).
+
+Classes are typically loaded lazily - when they are first needed by the application. Even a small Java application can
+load hundreds of classes, while a Spring Boot application can load thousands or tens of thousands.
+
+### Class linking
+After loading, [class linking](https://docs.oracle.com/javase/specs/jvms/se25/html/jvms-5.html#jvms-5.4) begins.
+It involves three main operations:
+
+- [Verification](https://docs.oracle.com/javase/specs/jvms/se23/html/jvms-5.html#jvms-5.4.1) - the JVM checks the
+structural correctness of the class and ensures that its bytecode complies with the specification requirements.
+- [Preparation](https://docs.oracle.com/javase/specs/jvms/se23/html/jvms-5.html#jvms-5.4.2) - the JVM creates the
+class’s static fields and assigns default values to them . For example, a field of type `int` is assigned the value `0`.
+- [Resolutio](https://docs.oracle.com/javase/specs/jvms/se23/html/jvms-5.html#jvms-5.4.3)n - symbolic references from
+the constant pool are converted into specific references to classes, fields, and methods that will be used by JVM
+instructions.
+
+These operations are not necessarily performed strictly sequentially. Verification and preparation must be completed
+before class initialization, while resolution can be performed lazily - immediately upon the first use of a specific
+symbolic reference.
+
+### Class Initialization
+During [class initialization](https://docs.oracle.com/javase/specs/jvms/se25/html/jvms-5.html#jvms-5.5), the JVM assigns
+values from the attributes to the static fields `ConstantValue` and, if necessary, executes the method without arguments `void <clinit>` , generated by the compiler only if the class has static initializers or fields.
+
+Initialization can be triggered by creating an instance of the class using the `new`, by accessing one of its static
+fields, or by calling a method, for example `getstatic`, `putstatic` or `invokestatic` , using reflection, initializing
+a subclass, and other actions. Before initialization, the class must be loaded, verified, and prepared.
+
+After the initial class has been prepared, the JVM [calls the main()](https://docs.oracle.com/javase/specs/jvms/se25/html/jvms-5.html#jvms-5.2) .
+But for Spring Boot - application, this does not yet mean that startup is complete.
+
+Calling `SpringApplication.run()`  initiates the creation `ApplicationContext`, processing configuration and
+auto-configuration, the registration and creation of beans, the injection of dependencies, and the launch of the
+embedded web server (e.g., Tomcat). Only after the necessary steps are completed does the application become ready
+to accept requests.
+
+Thus, the total startup time for a Spring Boot application consists of at least two major parts:
+1. JVM startup and loading the necessary classes;
+2. initialization of the application itself and the Spring context.
+
+AOT Cache does not eliminate all the work performed by Spring Boot. Its main purpose is to reduce repetitive JVM
+operations related to reading, parsing, loading, and linking classes.
+
+During a normal startup, a significant portion of this work is performed repeatedly. The familiar AppCDS allows you to
+store pre-processed application classes in an archive. The AOT Cache, introduced in [JDK 24](https://openjdk.org/jeps/483),
+builds on this approach and allows you to store classes in a state where they are already loaded and linked.
+
+On subsequent runs, HotSpot can immediately use the prepared data from the cache instead of re executing some of these
+operations. It is precisely this part of the process that we decided to optimize.
+
+## AppCDS and AOT Cache: What’s the Difference?
+Before comparing AppCDS and AOT Cache, it’s important to clarify that these are not two completely independent
+technologies. AOT Cache builds on the ideas and uses the infrastructure of CDS, but allows more work—which is typically
+performed directly during application launch.
+
+### AppCDS
+The CDS mechanism first appeared in JDK 5 (back in 2004) and originally allowed pre-processed classes from the Java
+platform itself to be stored in an archive. [JEP 310](https://openjdk.org/jeps/310), implemented in JDK 10, extended
+this mechanism to application and library classes—thus giving rise to AppCDS, or Application Class-Data Sharing.
+
+During a normal startup, HotSpot must locate classes in the classpath, read them, and unpack them from JAR files, parse
+the structure of `.class` files, create internal metadata, and execute verification. AppCDS allows you to perform part
+of this work in advance and save the result in a archive with the extension`.jsa`.
+
+On subsequent runs, the JVM loads the archive into memory and retrieves the preprocessed class metadata from it. This
+does not mean that classes no longer go through the loading lifecycle: AppCDS speeds up this process, but does not
+eliminate it entirely.
+
+### AOT Cache
+[The AOT Cache](https://openjdk.org/jeps/483) was introduced in JDK 24 as a result of [Project Leyden](https://openjdk.org/projects/leyden/).
+It builds upon CDS and allows classes to be cached after the JVM has read, parsed, loaded, and linked them.
+
+To create the AOT cache, a training run of the application is performed. During this run, the JVM collects information
+about the classes used by the application. Then, based on this data, a cache file with the extension `.aot`.
+On subsequent runs, HotSpot can use the cached class states instead of re-executing parts of the loading and linking
+operations.
+
+In JDK 25, the capabilities of the AOT Cache were expanded with the [Ahead-of-Time Method Profiling](https://openjdk.org/jeps/515) mechanism. Now, profiles of frequently executed methods can be included in the cache. Thanks to this, the JIT compiler receives information about “hot” methods as soon as the application starts and can begin compiling them earlier. Therefore, the AOT Cache is capable of improving not only startup time but also the time it takes for the application to reach peak performance.
+
+The main differences can be summarized as follows:
+
+| Feature             | AppCDS                                                                          | AOT Cache                                                                         |
+| ------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Included in OpenJDK | JDK 10                                                                          | JDK 24                                                                            |
+| Artifact format     | CDS archive `.jsa`                                                              | AOT cache `.aot`                                                                  |
+| What is saved       | Preprocessed metadata for application classes and libraries                     | Classes in a loaded and linked state, as well as other AOT data                   |
+| Main purpose        | To speed up class loading and reduce startup time                               | Shifting more of the workload from application launch to the cache creation phase |
+| Preparation         | Creating a list of classes and a CDS archive or dynamically creating an archive | Training run and subsequent AOT Cache creation                                    |
+
+The main difference lies in the depth of preprocessing. AppCDS stores processed class data and accelerates their
+subsequent loading. The AOT Cache goes a step further: it stores classes in a more prepared state and, in JDK 25, also
+provides the JIT compiler with method profiles.
+
+Since our project was already using Java 25, AOT Cache seemed more promising option. We expected it to reduce class
+processing time and speed up the application's launch to optimal performance, thereby reducing the development cycle
+time. The next step was to test this hypothesis in practice.
+
+## Creating and Enabling the AOT Cache
+The AOT Cache lifecycle consists of three phases:
+1. **Training**—running the application under a typical load and collecting information in the AOT Configuration.
+2. **Assembly**—creating `.aot` file based on the collected configuration.
+3. **Production** - Run the application with the pre-built AOT cache.
+
+In JDK 25, the cache can be created in two ways: explicitly run **training** and **assembly** as separate commands,
+or have the JVM automatically perform **assembly** after the training run.
+
+### Running training and assembly separately
+First, the application is launched in `record`:
+```shell
+java \
+  -XX:AOTMode=record \
+  -XX:AOTConfiguration=app.aotconfig \
+  -cp "<classpath>" \
+  <main-class>
+```
+
+During this run, the JVM collects information about the application's behavior and writes it to file `app.aotconfig`.
+
+Then, based on the configuration, an AOT cache is created:
+```shell
+java \
+  -XX:AOTMode=create \
+  -XX:AOTConfiguration=app.aotconfig \
+  -XX:AOTCache=app.aot \
+  -cp "<classpath>"
+```
+
+The application does not run during the assembly phase. The JVM reads data from `app.aotconfig` and creates a file
+`app.aot` containing the prepared AOT artifacts.
+
+After that, you can enable the cache during a normal startup:
+```shell
+java \
+  -XX:AOTCache=app.aot \
+  -cp "<classpath>" \
+  <main-class>
+```
+
+This separate approach allows you to manage the training and assembly stages independently. For each stage, you can
+specify its own JVM parameters and resource limits, and if necessary, - run them in different CI jobs or Docker stages.
+For example, as described in [JEP 514](https://openjdk.org/jeps/514#Manually-orchestrating-training-and-cache-creation),
+**training** can be performed on a small cloud instance, while **assembly** can be performed on a more powerful machine
+with additional computing resources. However, compatibility must be maintained between stages regarding the JDK version,
+operating system, architecture, and application classpath - the relevant requirements are listed in [JEP 483](https://openjdk.org/jeps/483#Consistency-of-training-and-subsequent-runs).
+
+### Automatic AOT Cache Creation in JDK 25
+[JEP 514](https://openjdk.org/jeps/514) added the ability to create an AOT cache with a single command in JDK 25.
+Instead of a separate to run in `record` mode and `create` it is sufficient to run the application with the `- XX:AOTCacheOutput`:
+
+```shell
+java \
+  -XX:AOTCacheOutput=app.aot \
+  -cp "<classpath>" \
+  <main-class>
+```
+
+From the user's perspective, cache creation now takes place in a single step. Internally, process, the JVM still
+executes two phases. First, training takes place: the application starts, and the JVM collects information into an
+intermediate AOT Configuration file. After the training run completes, a second JVM process starts automatically,
+which performs assembly and creates `app.aot`.
+
+The intermediate configuration file is created and deleted automatically, so there is no need to manage it manually.
+
+The finished cache is loaded separately when the application is launched in production:
+
+```shell
+java \
+  -XX:AOTCache=app.aot \
+  -cp "<classpath>" \
+  <main-class>
+```
+
+Thus, JDK 25 simplifies the creation of the AOT cache:
+
+```
+JDK 24: record → create → finished cache
+JDK 25: AOTCache → finished cache
+```
+
+A production launch with `-XX:AOTCache` is performed separately in both cases. By default, the `-XX:AOTMode=auto`
+mode is used. If the cache is compatible with the application and the environment, the JVM will load it. If the cache
+cannot be used, the application will continue to run without AOT- optimizations. And `-XX:AOTMode=on` it is useful for
+testing builds and diagnosing integration issues. Since in this mode, the JVM will terminate with an error if the cache
+is missing, incompatible with the application, or cannot be loaded.
+
+The commands described above illustrate the general mechanism of how the AOT Cache works. However, integrating them into
+a real Spring Boot project required us to consider the application’s packaging method, the classpath structure,
+the Docker image creation process, and the resources available during the build. Next, we’ll look at the approach we
+chose for Axelix and how we integrated it into the application’s build and runtime.
+
+## Integration into the Build and Runtime
+In our case, I decided to run the training and assembly stages separately. Since the application is distributed as a
+Docker image, it was convenient to perform both stages directly during the build process and then copy the prepared
+application and the finished AOT cache into the final image. Another advantage of this approach is that it works well
+with our limited resources, according to [JEP 514](https://openjdk.org/jeps/514#Manually-orchestrating-training-and-cache-creation),
+a single-step process can require twice as much memory.
+
+To create the cache, a separate stage was added to the Dockerfile `training`:
+
+```shell
+FROM eclipse-temurin:25-jre-alpine AS training
+
+WORKDIR /application
+
+COPY /build/libs/master-unified.jar master.jar
+```
+
+First, run the application in `record`:
+
+```shell
+RUN java \
+    -XX:AOTMode=record \
+    -XX:AOTConfiguration=app.aotconf \
+    -Dspring.main.web-application-type=none \
+    -Dspring.context.exit=onRefresh \
+    -jar /application/master.jar
+```
+
+During this startup, the JVM collects information about the loaded classes and writes it to `app.aotconf`.
+
+Training takes place during image build, when the application does not have access to the entire external infrastructure
+is unavailable to the application. Therefore, automatic service discovery is disabled, and Spring Boot starts without a
+web server. Using the `spring.context.exit=onRefresh` we terminate the JVM after the context is refreshed, which allows
+us to proceed to the next step of the build.
+
+Next, we create an AOT Cache from the resulting configuration:
+
+```shell
+RUN java \
+    -XX:AOTMode=create \
+    -XX:AOTConfiguration=app.aotconf \
+    -XX:AOTCache=app.aot \
+    -jar /application/master.jar
+```
+
+The application is not restarted during assembly. The JVM reads data from `app.aotconf` and creates the final file
+`app.aot`.
+
+In the final stage, copy the application and the cache you created:
+```shell
+FROM eclipse-temurin:25-jre-alpine AS final
+
+WORKDIR /application
+
+COPY --from=training /application/master.jar ./
+COPY --from=training /application/app.aot ./
+```
+
+When launching the application, enable the cache using the `-XX:AOTCache`:
+
+```shell
+ENTRYPOINT exec java \
+    -XX:AOTCache=app.aot \
+    -cp master.jar \
+    org.springframework.boot.loader.launch.JarLauncher
+```
+
+Since the mode `AOTMode` is not explicitly specified, the JVM uses the value `auto`.
+
+To avoid incompatibility, training and production run on the same Eclipse Temurin base image, and the application is
+located at the same absolute path. The cache itself is recreated with every application build.
+
+As a result, creating the AOT cache has become part of the Docker image build process and requires no additional steps
+during deployment. The cost of this integration is two additional build steps and an increase in the size of the final
+image.
+
+## Results and Charts
+After integration, we needed to verify how much the AOT Cache actually speeds up Axelix startup and what additional
+overheads arose from using it.
+
+For the current configuration with a **fat jar**, I compared three options:
+1. a standard launch of Java 25 with the CDS archive, which the JDK loads by default.
+2. Launching with a dynamic AppCDS.
+3. Launching with AOT Cache.
+
+### Measurement Methodology
+All measurements took into account a real-world development environment and were conducted inside a Docker container
+running Eclipse Temurin 25.0.3. The container was allocated four physical cores and 1 GB of memory. The same heap size
+was used for all configurations:
+
+```shell
+-Xms512m
+-Xmx512m
+-XX:ActiveProcessorCount=4
+```
+
+The JVM selected Serial GC because the container was limited to one gigabyte of memory. The same garbage collector was
+used in all compared runs.
+
+The primary metric was the time from process startup `docker run` to the first HTTP 200 response per request `GET /`.
+Requests were sent at 5-millisecond intervals.
+
+A standard Java 25 launch with the default CDS was used as the baseline. The built-in was not disabled.
+
+### Time to application readiness
+The following results were obtained for the current fat JAR:
+
+![Axelix Master time to readiness](/posts/speeding-up-java-application-startup/axelix-master-time-to-readiness.png)
+
+As we can see, the AOT Cache reduced the median time to application readiness from 9.5 to 7.4 seconds. The absolute gain
+was 2,130 milliseconds, and the relative gain was 22.4%.
+
+AppCDS also sped up startup, but its result was less impressive: the time was reduced by approximately 10%. Compared to
+AppCDS, using the AOT Cache further reduced startup time by approximately 1.1 seconds, or 13.5%.
+
+The time to create the container itself was about 203 milliseconds. It is included in all results and was not subtracted
+separately, since it is part of the actual `docker run` is also development process.
+
+### Checking the cache connection
+By default `AOTMode=auto` allows the process to continue without the cache if it turns out to be
+incompatible. Therefore, before taking measurements, we separately tested the artifacts in fail-fast-mode:
+
+```shell
+-XX:AOTMode=on
+```
+
+The AOT cache loaded successfully, and the application completed the test run.
+
+Additionally, we enabled class loading logging:
+
+```shell
+-Xlog:class+load=info
+```
+
+Test results:
+
+![Class Loading by Configuration](/posts/speeding-up-java-application-startup/class-loading-by-configuration.png)
+
+Although the proportion of classes in AppCDS turned out to be slightly higher, AOT Cache launched the application faster.
+This is consistent with the difference in technologies: AOT Cache keeps classes in a more prepared state and offloads
+more work to the assembly than AppCDS.
+
+### Optimization Cost
+Creating the AOT Cache added about 16 seconds to the Docker image build:
+
+![Additional Build Step Time](/posts/speeding-up-java-application-startup/additional-build-step-time.png)
+
+The size of the AOT cache itself for the fat JAR was 93.9 MB. The size of the Docker image increased:
+
+![Docker Image Size](/posts/speeding-up-java-application-startup/docker-image-size.png)
+
+The difference was 95.8 MB, or approximately 31%. Thus, the main trade-off was not an increase in RAM consumption, but
+rather the growth in the size of the Docker image and the time required to build it.
+
+I expected that the prepared Docker image would be run multiple times with different configurations, so we treated the
+additional 16 seconds of build time as a one-time cost for creating the image.
+
+A single run with the AOT Cache was approximately 2.1 seconds faster. Consequently, in terms of total computation time,
+the cost of preparing the cache should have paid for itself after about eight runs of the same image.
+
+## Conclusion
+In the current production configuration, AOT Cache reduced the time to readiness for Axelix Master from 9.5
+to 7.4 seconds—a reduction of approximately 22%. AppCDS also provided a speedup, but only reduced the startup time
+to 8.5 seconds. AOT Cache proved to be approximately 1.1 seconds faster than AppCDS.
+
+This came at the cost of increasing the Docker image size by approximately 96 MB and adding 16 seconds to build
+the cache during the build process.
+
+Thus, AOT Cache accomplished its intended task: even before implementing nightly E2E tests, we managed to reduce
+the Axelix Master startup time by 22%. However, the result specifically refers to the time it takes for the application
+to be ready, not to the duration of the subsequent test run as a whole.
+
+For production deployments and other scenarios in which a single prepared image is launched multiple times,
+this trade-off seems justified. In scenarios involving a single launch, however, the additional time required to build
+the cache may, on the contrary, outweigh the gains achieved.
+
+Thank you for your time! Sergey
