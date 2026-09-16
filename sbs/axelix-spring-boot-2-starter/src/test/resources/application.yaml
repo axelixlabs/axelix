@@ -23,7 +23,6 @@ management:
       exposure:
         include:
           - health
-          - info
           - axelix-property-management
           - axelix-profile-management
           - axelix-metadata
