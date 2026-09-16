@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -100,14 +102,14 @@ public class AxelixMetadataEndpointAutoConfiguration {
 
     @Bean
     public BasicRegistrationMetadataAssembler serviceMetadataAssembler(
-            HealthEndpoint healthEndpoint,
+            ObjectProvider<HealthEndpoint> healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             AxelixInfoProperties axelixInfoProperties,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         return new DefaultBasicRegistrationMetadataAssembler(
-                () -> getCurrentHealth(healthEndpoint),
+                () -> getCurrentHealth(healthEndpoint.getIfAvailable()),
                 axelixVersionDiscoverer,
                 libraryInformationProvider,
                 insightsInfoProvider,
@@ -120,7 +122,11 @@ public class AxelixMetadataEndpointAutoConfiguration {
         return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
     }
 
-    private BasicRegistrationMetadata.HealthStatus getCurrentHealth(HealthEndpoint healthEndpoint) {
+    private BasicRegistrationMetadata.HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {
+        if (healthEndpoint == null) {
+            return BasicRegistrationMetadata.HealthStatus.UP;
+        }
+
         Status status = healthEndpoint.health().getStatus();
 
         if (status == Status.UP) {
