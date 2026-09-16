@@ -21,6 +21,7 @@ export * from "./dashboard/dashboardJava";
 export * from "./instanceSiderMenu";
 export * from "./scheduledTasks";
 export * from "./transactional";
+export * from "./dependencies";
 export * from "./entitiesMap";
 export * from "./configProps";
 export * from "./environment";

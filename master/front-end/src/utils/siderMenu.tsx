@@ -23,6 +23,7 @@ import {
     CachesIcon,
     ConditionsIcon,
     ConfigPropsIcon,
+    DependenciesIcon,
     DetailsIcon,
     EntitiesMapIcon,
     EnvironmentIcon,
@@ -64,6 +65,11 @@ export const getInstanceItems = (instanceId: string, t: TFunction): AntdMenuItem
             path: `${basePath}/loggers`,
             icon: <LoggersIcon />,
             label: t("Sider.loggers"),
+        },
+        {
+            path: `${basePath}/dependencies`,
+            icon: <DependenciesIcon />,
+            label: t("Sider.dependenciesAnalyzer"),
         },
     ];
 

@@ -22,6 +22,7 @@ export * from "./dashboard/dashboardOverview";
 export * from "./dashboard/dashboardJava";
 export * from "./scheduledTasks";
 export * from "./transactional";
+export * from "./dependencies";
 export * from "./environment";
 export * from "./configProps";
 export * from "./threadDump";
