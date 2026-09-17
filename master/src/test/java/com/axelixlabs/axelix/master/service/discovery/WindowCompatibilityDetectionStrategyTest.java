@@ -28,24 +28,24 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link MajorVersionCompatibilityDetectionStrategy}.
+ * Unit tests for {@link WindowCompatibilityDetectionStrategy}.
  *
  * @author Mikhail Polivakha
  */
-class MajorVersionCompatibilityDetectionStrategyTest {
+class WindowCompatibilityDetectionStrategyTest {
 
-    private MajorVersionCompatibilityDetectionStrategy subject;
+    private WindowCompatibilityDetectionStrategy subject;
 
     @BeforeEach
     void setUp() {
         // given.
-        AxelixVersionDiscoverer masterVersionDiscoverer = () -> "1.0.0-SNAPSHOT";
-        subject = new MajorVersionCompatibilityDetectionStrategy(masterVersionDiscoverer);
+        AxelixVersionDiscoverer masterVersionDiscoverer = () -> "1.5.0";
+        subject = new WindowCompatibilityDetectionStrategy(masterVersionDiscoverer);
     }
 
     @ParameterizedTest
     @MethodSource("compatibleStarterVersions")
-    void shouldTreatStarterAsCompatibleWhenMajorVersionMatches(String starterVersion) {
+    void shouldTreatStarterAsCompatibleWhenInsideTheWindow(String starterVersion) {
         // when.
         boolean compatible = subject.isCompatible(starterVersion);
 
@@ -55,7 +55,7 @@ class MajorVersionCompatibilityDetectionStrategyTest {
 
     @ParameterizedTest
     @MethodSource("incompatibleStarterVersions")
-    void shouldTreatStarterAsIncompatibleWhenMajorVersionDiffers(String starterVersion) {
+    void shouldTreatStarterAsIncompatibleWhenOutsideTheWindow(String starterVersion) {
         // when.
         boolean compatible = subject.isCompatible(starterVersion);
 
@@ -64,10 +64,10 @@ class MajorVersionCompatibilityDetectionStrategyTest {
     }
 
     private static Stream<String> compatibleStarterVersions() {
-        return Stream.of("1.0.0-SNAPSHOT", "1.5.0", "1.0.0-RELEASE");
+        return Stream.of("1.5.0", "1.5.0", "1.5.3", "1.4.0", "1.3.9", "1.2.0", "1.2.1");
     }
 
     private static Stream<String> incompatibleStarterVersions() {
-        return Stream.of("2.0.0-BAD-VERSION", "2.0.0", "0.9.0", "10.0.0");
+        return Stream.of("1.1.0", "1.0.0", "1.6.0", "1.6.0-SNAPSHOT", "2.5.0", "0.9.0", "not-a-version");
     }
 }

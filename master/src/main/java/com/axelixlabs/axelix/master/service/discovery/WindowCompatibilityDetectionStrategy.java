@@ -23,27 +23,36 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
 
 /**
- * {@link CompatibilityDetectionStrategy} that considers the provided version of the starter being
- * compatible by looking at the major version solely.
+ * {@link CompatibilityDetectionStrategy} that enforces the compatibility window: Axelix Master
+ * supports starters from the last {@value #WINDOW_SIZE} minor releases, counting its own. A starter
+ * is considered incompatible when its major version differs from the Master's one, when it is newer
+ * than the Master, or when it is older than the Master by more than {@value #WINDOW_SIZE} minus one
+ * minor releases.
+ *
+ * <p>Only the major and minor components take part in the comparison: patch versions and qualifiers
+ * (like {@code -SNAPSHOT}) are irrelevant to the window.
  *
  * @author Mikhail Polivakha
  */
 @Component
-public class MajorVersionCompatibilityDetectionStrategy implements CompatibilityDetectionStrategy {
+public class WindowCompatibilityDetectionStrategy implements CompatibilityDetectionStrategy {
+
+    private static final int WINDOW_SIZE = 4;
 
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
 
-    public MajorVersionCompatibilityDetectionStrategy(AxelixVersionDiscoverer axelixVersionDiscoverer) {
+    public WindowCompatibilityDetectionStrategy(AxelixVersionDiscoverer axelixVersionDiscoverer) {
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
     }
 
     @Override
     public boolean isCompatible(String starterVersion) {
-        int masterMajor =
-                SemanticVersion.parse(axelixVersionDiscoverer.getVersion()).major();
+        SemanticVersion master = SemanticVersion.parse(axelixVersionDiscoverer.getVersion());
 
         return SemanticVersion.tryParse(starterVersion)
-                .filter(starter -> starter.major() == masterMajor)
+                .filter(starter -> starter.major() == master.major())
+                .filter(starter -> starter.minor() <= master.minor())
+                .filter(starter -> master.minor() - starter.minor() < WINDOW_SIZE)
                 .isPresent();
     }
 }

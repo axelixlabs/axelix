@@ -235,6 +235,27 @@ public class HeartBeatApiTest {
         assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
     }
 
+    @Test
+    void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
+        // given.
+        String requestWithIncompatibleStarter =
+                JSON_REQUEST.replace("\"version\": \"1.0.0-SNAPSHOT\"", "\"version\": \"1.99.0\"");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register",
+                        defaultJsonEntity(requestWithIncompatibleStarter),
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
+    }
+
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidTokens")
     void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate) {
