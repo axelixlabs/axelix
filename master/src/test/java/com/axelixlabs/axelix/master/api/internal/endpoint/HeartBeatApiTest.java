@@ -190,6 +190,7 @@ public class HeartBeatApiTest {
                     .isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
             assertThat(instance.name()).isEqualTo("petclinic");
             assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+            assertThat(instance.starterVersion()).isEqualTo("1.0.0-SNAPSHOT");
             assertThat(instance.javaVersion()).isEqualTo("25");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
             assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");

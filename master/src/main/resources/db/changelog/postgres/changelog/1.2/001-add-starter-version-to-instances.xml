@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    The instances table holds soft state only: every managed service re-registers itself on the next
+    heartbeat, so the rows are safe to drop instead of backfilling the new mandatory column.
+  -->
+  <changeSet id="1.2-001-1-postgres-add-starter-version-to-instances" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="instances" columnName="starter_version"/>
+      </not>
+    </preConditions>
+
+    <delete tableName="instances"/>
+
+    <addColumn tableName="instances">
+      <column name="starter_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

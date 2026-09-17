@@ -24,4 +24,5 @@
   <include file="db/changelog/mysql/changelog/1.1/010-migrate-user-roles-to-users-roles.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/012-add-oidc-subject-to-users.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/001-add-starter-version-to-instances.xml"/>
 </databaseChangeLog>

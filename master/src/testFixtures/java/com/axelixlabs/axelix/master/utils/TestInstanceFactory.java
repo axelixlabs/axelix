@@ -37,6 +37,8 @@ public final class TestInstanceFactory {
 
     private static final String DEFAULT_URL = "http://example.com";
 
+    private static final String DEFAULT_STARTER_VERSION = "1.0.0-SNAPSHOT";
+
     private static final ApplicationId DEFAULT_APPLICATION_ID =
             ApplicationId.of("com.axelixlabs", "test-object-factory-app");
 
@@ -58,6 +60,7 @@ public final class TestInstanceFactory {
                 applicationId,
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
+                DEFAULT_STARTER_VERSION,
                 "25",
                 "3.5.2",
                 "6.0.2",
@@ -73,6 +76,26 @@ public final class TestInstanceFactory {
 
     public static Instance create(String id, @Nullable Instant instant) {
         return createInstanceWithHeartbeat(id, instant);
+    }
+
+    public static Instance withStarterVersion(String id, String starterVersion) {
+        return new Instance(
+                InstanceId.of(id),
+                DEFAULT_APPLICATION_ID,
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                starterVersion,
+                "25",
+                "3.5.2",
+                "6.0.2",
+                null,
+                "BellSoft",
+                "df027cf",
+                Instant.now(),
+                Instant.now(),
+                DEFAULT_STATUS,
+                new MemoryUsage(1000L),
+                DEFAULT_URL);
     }
 
     public static Instance withName(String id, String name) {
@@ -119,6 +142,7 @@ public final class TestInstanceFactory {
                 DEFAULT_APPLICATION_ID,
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
+                DEFAULT_STARTER_VERSION,
                 java,
                 springBoot,
                 springFramework,
@@ -142,6 +166,7 @@ public final class TestInstanceFactory {
                 DEFAULT_APPLICATION_ID,
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
+                DEFAULT_STARTER_VERSION,
                 "25",
                 "3.5.2",
                 "6.0.2",
@@ -170,6 +195,7 @@ public final class TestInstanceFactory {
                 DEFAULT_APPLICATION_ID,
                 name,
                 "1.2.3-classifer-test",
+                DEFAULT_STARTER_VERSION,
                 java,
                 springBoot,
                 springFramework,
