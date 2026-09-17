@@ -46,7 +46,6 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
 
     private static final String PROPERTY = "management.endpoints.web.exposure.include";
     private static final String BASE_PACKAGE = "com.axelixlabs.axelix.sbs";
-    private static final String AXELIX_ENDPOINT_ID_PREFIX = "axelix-";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -87,7 +86,7 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
                         .getAnnotations()
                         .get(Endpoint.class)
                         .getString("id"))
-                .filter(id -> id.startsWith(AXELIX_ENDPOINT_ID_PREFIX))
+                .filter(id -> id.startsWith("axelix-"))
                 .sorted()
                 .collect(Collectors.toList());
     }
