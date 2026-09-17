@@ -37,22 +37,23 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
 
     private final AxelixEndpointsEnvironmentPostProcessor processor = new AxelixEndpointsEnvironmentPostProcessor();
     private static final String PROPERTY_NAME = "management.endpoints.web.exposure.include";
+    // the ids of all @Endpoint/@RestControllerEndpoint classes in this starter, in the sorted order
+    // the post-processor emits them
     private static final List<String> ENDPOINTS = List.of(
-            "axelix-metadata",
             "axelix-beans",
             "axelix-caches",
             "axelix-conditions",
             "axelix-configprops",
+            "axelix-dependencies",
             "axelix-details",
             "axelix-env",
-            "axelix-feign",
             "axelix-gc",
             "axelix-heap-dump",
             "axelix-loggers",
+            "axelix-metadata",
             "axelix-metrics",
             "axelix-scheduled-tasks",
-            "axelix-thread-dump",
-            "axelix-dependencies");
+            "axelix-thread-dump");
 
     @Test
     void whenUserNotExposeAnyEndpoints() {

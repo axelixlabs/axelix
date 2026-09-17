@@ -22,15 +22,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 /**
  * Exposes default Axelix endpoints
@@ -40,22 +45,8 @@ import org.springframework.core.env.MapPropertySource;
 public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     private static final String PROPERTY = "management.endpoints.web.exposure.include";
-    private static final List<String> ENDPOINTS_TO_EXPOSE = List.of(
-            "axelix-metadata",
-            "axelix-beans",
-            "axelix-caches",
-            "axelix-conditions",
-            "axelix-configprops",
-            "axelix-details",
-            "axelix-env",
-            "axelix-feign",
-            "axelix-gc",
-            "axelix-heap-dump",
-            "axelix-loggers",
-            "axelix-metrics",
-            "axelix-scheduled-tasks",
-            "axelix-thread-dump",
-            "axelix-dependencies");
+    private static final String BASE_PACKAGE = "com.axelixlabs.axelix.sbs";
+    private static final String AXELIX_ENDPOINT_ID_PREFIX = "axelix-";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -75,10 +66,30 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
             merged.add("health");
         }
 
-        merged.addAll(ENDPOINTS_TO_EXPOSE);
+        merged.addAll(discoverAxelixEndpointIds(environment));
         environment
                 .getPropertySources()
                 .addFirst(new MapPropertySource("axelix", Map.of(PROPERTY, String.join(",", merged))));
+    }
+
+    /**
+     * Discovers the ids of Axelix actuator endpoints by scanning the starter's classes for
+     * {@link Endpoint @Endpoint} — directly present or as a meta-annotation ({@code @RestControllerEndpoint#id}
+     * aliases {@code @Endpoint#id}), so the endpoint declarations stay the single source of truth.
+     */
+    private static List<String> discoverAxelixEndpointIds(ConfigurableEnvironment environment) {
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false, environment);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(Endpoint.class));
+        return scanner.findCandidateComponents(BASE_PACKAGE).stream()
+                .map(candidate -> ((AnnotatedBeanDefinition) candidate)
+                        .getMetadata()
+                        .getAnnotations()
+                        .get(Endpoint.class)
+                        .getString("id"))
+                .filter(id -> id.startsWith(AXELIX_ENDPOINT_ID_PREFIX))
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Override
