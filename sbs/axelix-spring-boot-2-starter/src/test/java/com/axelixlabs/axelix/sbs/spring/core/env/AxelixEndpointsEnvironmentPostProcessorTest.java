@@ -17,9 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.SpringApplication;
@@ -36,9 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class AxelixEndpointsEnvironmentPostProcessorTest {
 
-    private final AxelixEndpointsEnvironmentPostProcessor processor = new AxelixEndpointsEnvironmentPostProcessor();
-    // the ids of all @Endpoint/@RestControllerEndpoint classes in this starter, in the sorted order
-    // the post-processor emits them
+    // the ids of all @Endpoint/@RestControllerEndpoint classes in this starter
     private static final List<String> ENDPOINTS = List.of(
             "axelix-beans",
             "axelix-caches",
@@ -55,12 +55,19 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
             "axelix-scheduled-tasks",
             "axelix-thread-dump");
 
+    private AxelixEndpointsEnvironmentPostProcessor subject;
+
+    @BeforeEach
+    void setUp() {
+        subject = new AxelixEndpointsEnvironmentPostProcessor();
+    }
+
     @Test
     void whenUserNotExposeAnyEndpoints() {
         StandardEnvironment env = new StandardEnvironment();
 
-        processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(INCLUDED_PROPERTY)).isEqualTo(String.join(",", ENDPOINTS));
+        subject.postProcessEnvironment(env, new SpringApplication());
+        assertThat(env.getProperty(INCLUDED_PROPERTY).split(",")).containsExactlyInAnyOrderElementsOf(ENDPOINTS);
     }
 
     @Test
@@ -71,9 +78,11 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
                 Map.of(INCLUDED_PROPERTY, List.of("test-endpoint", "test-endpoint1"));
         env.getPropertySources().addFirst(new MapPropertySource("defaultProperties", userProvidedEndpoints));
 
-        processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(INCLUDED_PROPERTY))
-                .isEqualTo("test-endpoint,test-endpoint1," + String.join(",", ENDPOINTS));
+        subject.postProcessEnvironment(env, new SpringApplication());
+
+        List<String> expected = new ArrayList<>(List.of("test-endpoint", "test-endpoint1"));
+        expected.addAll(ENDPOINTS);
+        assertThat(env.getProperty(INCLUDED_PROPERTY).split(",")).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
@@ -83,7 +92,7 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
         Map<String, Object> userProvidedEndpoints = Map.of(INCLUDED_PROPERTY, "*");
         env.getPropertySources().addFirst(new MapPropertySource("defaultProperties", userProvidedEndpoints));
 
-        processor.postProcessEnvironment(env, new SpringApplication());
+        subject.postProcessEnvironment(env, new SpringApplication());
         assertThat(env.getProperty(INCLUDED_PROPERTY)).isEqualTo("*");
         assertThat(env.getPropertySources().contains("axelix")).isFalse();
     }
