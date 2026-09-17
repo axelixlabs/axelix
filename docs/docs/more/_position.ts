@@ -6,6 +6,7 @@ const pages = [
   'glossary',
   'why-not-spring-boot-admin',
   'compatibility-and-versioning',
+  'upgrading',
   'troubleshooting',
 ].map((id) => `${prefix}/${id}`);
 

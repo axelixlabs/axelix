@@ -1,0 +1,91 @@
+# Upgrading Axelix
+
+Axelix is [released in lockstep](./compatibility-and-versioning.mdx) — every release publishes all components under
+one version. But a real fleet never **upgrades** in lockstep: the platform team upgrades **Axelix Master** in one go,
+while dozens of services carry the **starter** and the **build plugin** as ordinary dependencies and bump them whenever
+their teams get to it. This page describes the procedure that makes that reality safe and predictable.
+
+:::info[Since Axelix 1.1]
+The upgrade policy outlined below was introduced in **Axelix 1.1** and applies to that release and everything above. Note,
+that this upgrade policy covers the upgrades of **minor releases within a single Axelix major**. Each major version migration
+has the dedicated migration guide.
+:::
+
+## The compatibility window
+
+The whole procedure rests on one guarantee:
+
+> **Axelix Master supports starters from the last 4 minor releases, counting its own.**
+
+For example, Master `1.5.x` supports services running starters `1.2.x` through `1.5.x`. A service on starter `1.1.x`
+is **outside the window** of Master `1.5.x` and is no longer guaranteed to work with it.
+
+This is a **guaranteed minimum**: we may support a wider range in practice, but we promise at least these 4 minors,
+and we will not narrow the window within a major version.
+
+Two rules follow from the window:
+
+- **Master goes first.** The window points backwards: a newer Master supports older starters, never the other way
+  around. Do not run a starter whose version is newer than your Master.
+- **Starter and plugin move together.** Within a single service, the starter and the build plugin must share the same
+  `major.minor` version — bump them in the same change. The window applies between **Master and your services**, not
+  inside a service.
+
+## The upgrade procedure
+
+### 1. Find out how far you can upgrade
+
+Open **Administration → Upgrading** in the Master UI. It shows the highest Master version you can upgrade to without
+pushing any service out of the compatibility window — computed from the oldest starter version Master has observed
+across your fleet.
+
+Because the window is pure arithmetic, Master computes this verdict **entirely locally**: no calls to any release
+page, no internet access needed. It works the same in air-gapped environments.
+
+The page also lists the services that hold the verdict back — the ones running the oldest starters — so you know
+exactly which teams to nudge if you want to upgrade further.
+
+### 2. Upgrade Axelix Master
+
+Upgrade Master on every environment — dev first, then staging, then production. Master is a standalone deployment
+(JAR, Docker image, or Helm chart), so this step is entirely in the platform team's hands and touches no service.
+
+Your services keep working throughout: they are inside the window, that is the whole point of step 1.
+
+### 3. Let the teams bump their services
+
+Now hand the task down to the service teams: bump the **starter** and the **plugin** to the new version — both to the
+same version, in the same change — and redeploy. For a typical service this is a dependency version bump and nothing
+else.
+
+This is not an accident but a **deliberate design rule** we follow: Axelix Master is the **smart** side, and the
+client-side components — the starter and the plugin — are kept **as dumb as possible**. All the interpretation and
+the heavy logic live in Master; the client components merely collect and ship raw data. That is what keeps a service
+upgrade quick and simple - ideally, we try to have very littly configuration options in Axelix client components.
+
+Teams do this **independently and at their own pace**. The window is their time budget: with 4 minors guaranteed, a
+service can skip a couple of Master upgrades before it must catch up.
+
+### 4. Watch the fleet catch up
+
+The **Upgrading** page shows the distribution of starter versions across the fleet. After a Master upgrade, watch it
+shift toward the new version — and see at a glance which services lag behind, including services created from stale
+templates that ship an old starter version.
+
+## Services that fall behind
+
+A Master upgrade is **never blocked** by lagging services — the decision always stays with the platform team. The
+trade-off is stated upfront: before you upgrade, the **Upgrading** page lists exactly which services would fall out
+of the compatibility window if you went past the safe verdict — so you know precisely what an upgrade costs and whom
+to talk to.
+
+Be aware of what that cost is: a service whose starter is outside the window is **no longer supported at all**. It
+will disappear from the Master UI and stay invisible until its starter is upgraded back into the window. The warning
+happens **before** the upgrade, not after — once you have upgraded past a service, nothing in the UI will remind you
+it exists.
+
+## Major version upgrades
+
+The compatibility window is defined **within a major version**. Every major release ships with a dedicated migration
+guide that spells out the upgrade path from the previous major — including which final minors of the previous major
+the new Master can still talk to during the transition.
