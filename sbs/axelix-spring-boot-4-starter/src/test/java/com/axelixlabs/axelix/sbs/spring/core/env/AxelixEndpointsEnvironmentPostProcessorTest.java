@@ -61,7 +61,7 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
         StandardEnvironment env = new StandardEnvironment();
 
         processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(PROPERTY_NAME)).isEqualTo("health," + String.join(",", ENDPOINTS));
+        assertThat(env.getProperty(PROPERTY_NAME)).isEqualTo(String.join(",", ENDPOINTS));
     }
 
     @Test

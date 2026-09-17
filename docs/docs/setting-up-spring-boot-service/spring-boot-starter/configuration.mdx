@@ -263,10 +263,10 @@ Endpoints that don't apply to your application stay inert — the starter activa
 are met (for example, `axelix-feign` without Feign on the classpath or `axelix-caches` without a `CacheManager` never
 come up).
 
-The native `health` and `info` endpoints are no longer required by Axelix, so the starter does not force them. As long
-as you don't set `management.endpoints.web.exposure.include` yourself, the starter keeps `health`, which Spring Boot
-exposes by default. If you do set the property, only the endpoints you list plus the Axelix ones are exposed — add
-`health` and `info` to the list yourself when you need them.
+The native `health` and `info` endpoints are no longer required by Axelix, so the starter never exposes them on its
+own. Only the endpoints you list in `management.endpoints.web.exposure.include` plus the Axelix ones are exposed — add
+`health` and `info` to the list yourself when you need them, including the `health` endpoint that Spring Boot would
+otherwise expose by default.
 
 ### Adding your own endpoints
 
