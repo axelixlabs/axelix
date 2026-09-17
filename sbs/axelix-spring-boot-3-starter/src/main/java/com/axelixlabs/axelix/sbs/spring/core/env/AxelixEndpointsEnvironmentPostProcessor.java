@@ -45,7 +45,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     private static final String PROPERTY = "management.endpoints.web.exposure.include";
-    private static final String BASE_PACKAGE = "com.axelixlabs.axelix.sbs";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -80,7 +79,7 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
         ClassPathScanningCandidateComponentProvider scanner =
                 new ClassPathScanningCandidateComponentProvider(false, environment);
         scanner.addIncludeFilter(new AnnotationTypeFilter(Endpoint.class));
-        return scanner.findCandidateComponents(BASE_PACKAGE).stream()
+        return scanner.findCandidateComponents("com.axelixlabs.axelix.sbs").stream()
                 .map(candidate -> ((AnnotatedBeanDefinition) candidate)
                         .getMetadata()
                         .getAnnotations()
