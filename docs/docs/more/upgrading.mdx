@@ -52,7 +52,9 @@ exactly which teams to nudge if you want to upgrade further.
 ### 2. Upgrade Axelix Master
 
 Upgrade Master on every environment — dev first, then staging, then production. Master is a standalone deployment
-(JAR, Docker image, or Helm chart), so this step is entirely in the platform team's hands and touches no service.
+(JAR, Docker image, or Helm chart), so this step is entirely in the platform team's hands and touches no service. The
+mechanics of this step — stopping, backing up, rolling forward, and rolling back — are described in
+[Upgrading Axelix Master itself](#upgrading-axelix-master-itself) below.
 
 Your services keep working throughout: they are inside the window, that is the whole point of step 1.
 
@@ -65,7 +67,7 @@ else.
 This is not an accident but a **deliberate design rule** we follow: Axelix Master is the **smart** side, and the
 client-side components — the starter and the plugin — are kept **as dumb as possible**. All the interpretation and
 the heavy logic live in Master; the client components merely collect and ship raw data. That is what keeps a service
-upgrade quick and simple - ideally, we try to have very littly configuration options in Axelix client components.
+upgrade quick and simple - ideally, we try to have very few configuration options in Axelix client components.
 
 Teams do this **independently and at their own pace**. The window is their time budget: with 4 minors guaranteed, a
 service can skip a couple of Master upgrades before it must catch up.
@@ -75,6 +77,88 @@ service can skip a couple of Master upgrades before it must catch up.
 The **Upgrading** page shows the distribution of starter versions across the fleet. After a Master upgrade, watch it
 shift toward the new version — and see at a glance which services lag behind, including services created from stale
 templates that ship an old starter version.
+
+## Upgrading Axelix Master itself
+
+Master upgrades are **forward-only**: you only ever move to a newer version, and there is deliberately no downgrade
+procedure. This is the standard model for stateful control planes, and the reason is the database. Master owns one,
+[schema migrations](../setting-up-master-ui/migrations/migrations.mdx) apply to it automatically on startup, and we
+design those migrations to be **simple, not reversible** — a migration that reshapes a table can usually be undone
+only by throwing data away. So instead of pretending downgrades work, we invest in a reliable way back: a **database
+backup taken during the upgrade**, restored if things go wrong.
+
+Forward-only does **not** mean one minor at a time. Upgrading from any older version to any newer version **within
+one major** is supported in a single hop — going from `1.1` straight to `1.4` is fine. On startup the new Master
+finds every migration your database has not seen yet and applies the whole chain in order; whether that chain spans
+one minor or three makes no difference. The only exception is crossing a **major** version boundary: each major
+release ships its own dedicated migration guide — follow that instead of this procedure.
+
+One more thing to know before the steps: this is a **stop-the-world** procedure. It begins with stopping the running
+Master, so there is a short **downtime window** — typically a few minutes — during which the Master UI and API are
+unavailable. Your services, however, never notice it.
+
+### What happens to your services during the downtime
+
+Nothing — by design. The starter inside each service reports to Master **periodically**, as a heartbeat, not once at
+startup. While Master is down, heartbeats simply go unanswered: the service keeps serving its own traffic, buffers
+nothing, and retries on its normal schedule. Once the new Master is up, the very next heartbeat of every service
+re-registers it from scratch, so the whole fleet reassembles itself within one heartbeat interval. That is why the
+steps below never mention your services: no coordination with service teams, no draining, and no restarts are
+needed — from a service's point of view a Master upgrade is indistinguishable from a brief network hiccup.
+
+### Step by step
+
+1. **Stop the running Master.** However your installation runs it — a Kubernetes Deployment, a container, a plain
+   JAR — bring it fully down. This is where the downtime window opens.
+
+2. **Back up the database.** Use the regular tooling of your engine: a dump for **PostgreSQL** or **MySQL**, a copy
+   of the database file for **SQLite**. Take the backup **after** stopping Master — with nothing writing to the
+   database, the snapshot is guaranteed to be consistent. Do not skip this step even for a routine-looking upgrade:
+   this backup **is** the rollback procedure.
+
+3. **Start the new Master version.** On startup it applies all pending
+   [database migrations](../setting-up-master-ui/migrations/migrations.mdx) automatically and then starts serving
+   traffic. Give it time to finish — do not restart or kill Master while migrations are being applied.
+
+4. **Verify.** The UI is reachable and reports the new version, and within one heartbeat interval your services
+   reappear on their own. If the fleet looks complete, services have re-registered themselves successfully, then
+   you can assume the Axelix Master upgrade is done.
+
+### Rolling back
+
+If for any reason the new version misbehaves, the way back is the backup from step 2:
+
+1. Stop the new Master.
+2. Restore the database from the backup.
+3. Start the version you upgraded from.
+
+Everything written to the database between the backup and the rollback is lost — and for Master that loss is negligible,
+**by design**.
+
+The service registry is **self-healing**: it rebuilds from heartbeats within one interval. What does *not*
+self-heal — users, roles, settings — rarely changes inside a window that short. Do remember that a rollback is a
+stopgap, not a destination: forward-only means the long-term path always leads upwards, so if an upgrade failed for
+you, please [open an issue](https://github.com/axelixlabs/axelix/issues) — the actual fix will arrive as a newer
+version.
+
+### Invariants
+
+- **Never run two different Master versions against the same database at the same time.** The new version reshapes
+  the schema the moment it starts, and the old version is not built to survive that reshaping — keeping old code
+  compatible with future schemas is precisely the complexity forward-only lets us avoid. On Kubernetes this means
+  the Master Deployment must use the `Recreate` strategy: the default `RollingUpdate` briefly runs the old and the
+  new pod side by side — even with a single replica — and that overlap lands exactly on the moment migrations are
+  being applied.
+
+- **A short Master downtime is expected.** We deliberately do not promise zero-downtime Master upgrades: that would
+  require reversible, multi-phase migrations and a highly-available Master, and we prefer to keep both the product
+  and this procedure simple. Only the Master UI and API are down during the window; your services keep running
+  untouched.
+
+- **One Master replica at a time.** Master is currently designed as a single-instance application: its background
+  jobs — discovery polling, evicting dead instances — and its in-memory caches all assume exactly one Master is
+  running. Several replicas would duplicate that work and race with each other. A highly-available, multi-replica
+  Master is on the roadmap.
 
 ## Services that fall behind
 
