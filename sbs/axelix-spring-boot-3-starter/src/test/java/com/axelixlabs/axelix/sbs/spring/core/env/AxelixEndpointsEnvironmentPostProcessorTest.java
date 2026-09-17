@@ -26,6 +26,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
+import static com.axelixlabs.axelix.sbs.spring.core.env.AxelixEndpointsEnvironmentPostProcessor.INCLUDED_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -36,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixEndpointsEnvironmentPostProcessorTest {
 
     private final AxelixEndpointsEnvironmentPostProcessor processor = new AxelixEndpointsEnvironmentPostProcessor();
-    private static final String PROPERTY_NAME = "management.endpoints.web.exposure.include";
     // the ids of all @Endpoint/@RestControllerEndpoint classes in this starter, in the sorted order
     // the post-processor emits them
     private static final List<String> ENDPOINTS = List.of(
@@ -61,18 +61,31 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
         StandardEnvironment env = new StandardEnvironment();
 
         processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(PROPERTY_NAME)).isEqualTo(String.join(",", ENDPOINTS));
+        assertThat(env.getProperty(INCLUDED_PROPERTY)).isEqualTo(String.join(",", ENDPOINTS));
     }
 
     @Test
     void whenUserExposedHisOwnEndpoints() {
         StandardEnvironment env = new StandardEnvironment();
 
-        Map<String, Object> userProvidedEndpoints = Map.of(PROPERTY_NAME, List.of("test-endpoint", "test-endpoint1"));
+        Map<String, Object> userProvidedEndpoints =
+                Map.of(INCLUDED_PROPERTY, List.of("test-endpoint", "test-endpoint1"));
         env.getPropertySources().addFirst(new MapPropertySource("defaultProperties", userProvidedEndpoints));
 
         processor.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(PROPERTY_NAME))
+        assertThat(env.getProperty(INCLUDED_PROPERTY))
                 .isEqualTo("test-endpoint,test-endpoint1," + String.join(",", ENDPOINTS));
+    }
+
+    @Test
+    void whenUserExposedAllEndpoints() {
+        StandardEnvironment env = new StandardEnvironment();
+
+        Map<String, Object> userProvidedEndpoints = Map.of(INCLUDED_PROPERTY, "*");
+        env.getPropertySources().addFirst(new MapPropertySource("defaultProperties", userProvidedEndpoints));
+
+        processor.postProcessEnvironment(env, new SpringApplication());
+        assertThat(env.getProperty(INCLUDED_PROPERTY)).isEqualTo("*");
+        assertThat(env.getPropertySources().contains("axelix")).isFalse();
     }
 }

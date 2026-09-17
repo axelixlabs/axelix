@@ -44,12 +44,12 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
  */
 public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    private static final String PROPERTY = "management.endpoints.web.exposure.include";
+    public static final String INCLUDED_PROPERTY = "management.endpoints.web.exposure.include";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Set<String> current = Binder.get(environment)
-                .bind(PROPERTY, Bindable.setOf(String.class))
+                .bind(INCLUDED_PROPERTY, Bindable.setOf(String.class))
                 .orElse(Collections.emptySet());
 
         if (current.contains("*")) {
@@ -62,7 +62,7 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
         merged.addAll(discoverAxelixEndpointIds(environment));
         environment
                 .getPropertySources()
-                .addFirst(new MapPropertySource("axelix", Map.of(PROPERTY, String.join(",", merged))));
+                .addFirst(new MapPropertySource("axelix", Map.of(INCLUDED_PROPERTY, String.join(",", merged))));
     }
 
     /**
