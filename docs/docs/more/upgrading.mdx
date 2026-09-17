@@ -17,8 +17,12 @@ The whole procedure rests on one guarantee:
 
 > **Axelix Master supports starters from the last 4 minor releases, counting its own.**
 
-For example, Master `1.5.x` supports services running starters `1.2.x` through `1.5.x`. A service on starter `1.1.x`
-is **outside the window** of Master `1.5.x` and is no longer guaranteed to work with it.
+For example, Master `1.4.x` supports services running starters `1.1.x` through `1.4.x`. A service on starter `1.0.x`
+is **outside the window** of Master `1.4.x` and is no longer guaranteed to work with it:
+
+![Axelix compatibility window](/img/more/axelix-compatibility-window.png) ***Master `1.4` supports services whose
+starter falls within the `1.1`–`1.4` window. The service still on starter `1.0` is outside the window and is no
+longer supported.***
 
 This is a **guaranteed minimum**: we may support a wider range in practice, but we promise at least these 4 minors,
 and we will not narrow the window within a major version.
