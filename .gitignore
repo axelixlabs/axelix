@@ -5,6 +5,8 @@ build/
 !**/src/test/**/build/
 playgrounds/**/src/main/target/
 playgrounds/**/src/main/build/
+playgrounds/**/target/
+playgrounds/**/build/
 **/providers
 
 ### Axelix ###
