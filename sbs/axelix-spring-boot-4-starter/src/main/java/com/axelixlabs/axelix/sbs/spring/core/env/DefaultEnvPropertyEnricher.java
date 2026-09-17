@@ -34,7 +34,6 @@ import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
@@ -132,7 +131,9 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             Optional.ofNullable(metadata)
                                     .map(PropertyMetadata::getDescription)
                                     .orElse(null),
-                            buildFromMetadata(metadata),
+                            Optional.ofNullable(metadata)
+                                    .map(PropertyMetadata::getDeprecation)
+                                    .orElse(null),
                             injectionPoints);
                 })
                 .toList();
@@ -140,15 +141,6 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
         PropertySourceDisplayData displayData = PropertySourceDescription.resolveDisplayData(source.getName());
 
         return new PropertySource(displayData.displayName(), displayData.description(), enrichedProperties);
-    }
-
-    @Nullable
-    private Deprecation buildFromMetadata(@Nullable PropertyMetadata propertyMetadata) {
-        if (propertyMetadata == null || propertyMetadata.getDeprecation() == null) {
-            return null;
-        }
-
-        return new Deprecation(propertyMetadata.getDeprecation().getMessage());
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {

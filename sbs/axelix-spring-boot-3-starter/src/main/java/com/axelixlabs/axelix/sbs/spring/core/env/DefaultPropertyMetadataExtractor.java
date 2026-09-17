@@ -39,7 +39,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.DeprecationLevel;
 
 /**
  * Default implementation of {@link PropertyMetadataExtractor} that loads metadata from Spring Boot
@@ -52,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
  * @since 04.12.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtractor {
 
@@ -144,6 +146,7 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         boolean deprecated = false;
         String reason = null;
         String replacement = null;
+        DeprecationLevel level = DeprecationLevel.WARNING;
 
         String description = extractTextOrNull(propertyNode, "description");
 
@@ -157,6 +160,9 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
                 deprecated = true;
                 reason = extractTextOrNull(deprecationNode, "reason");
                 replacement = extractTextOrNull(deprecationNode, "replacement");
+                level = "error".equalsIgnoreCase(extractTextOrNull(deprecationNode, "level"))
+                        ? DeprecationLevel.ERROR
+                        : DeprecationLevel.WARNING;
             }
         }
 
@@ -166,7 +172,7 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
 
         if (deprecated) {
             String message = buildDeprecationMessage(reason, replacement);
-            return new PropertyMetadata(description, new Deprecation(message));
+            return new PropertyMetadata(description, new Deprecation(message, level, replacement));
         }
 
         return new PropertyMetadata(description, null);

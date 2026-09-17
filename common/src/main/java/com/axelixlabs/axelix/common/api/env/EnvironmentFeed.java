@@ -302,18 +302,39 @@ public final class EnvironmentFeed {
 
         private final String message;
 
+        private final DeprecationLevel level;
+
+        @Nullable
+        private final String replacedBy;
+
         /**
          * Creates a new Deprecation.
          *
          * @param message explaining why the property is deprecated and, optionally, what should be used instead.
+         * @param level the severity of the deprecation.
+         * @param replacedBy the name of the property that is supposed to replace the deprecated one.
          */
         @JsonCreator
-        public Deprecation(@JsonProperty("message") String message) {
+        public Deprecation(
+                @JsonProperty("message") String message,
+                @JsonProperty("level") DeprecationLevel level,
+                @JsonProperty("replacedBy") @Nullable String replacedBy) {
             this.message = message;
+            this.level = level;
+            this.replacedBy = replacedBy;
         }
 
         public String getMessage() {
             return message;
+        }
+
+        public DeprecationLevel getLevel() {
+            return level;
+        }
+
+        @Nullable
+        public String getReplacedBy() {
+            return replacedBy;
         }
 
         @Override
@@ -325,18 +346,31 @@ public final class EnvironmentFeed {
                 return false;
             }
             Deprecation that = (Deprecation) o;
-            return Objects.equals(message, that.message);
+            return Objects.equals(message, that.message)
+                    && level == that.level
+                    && Objects.equals(replacedBy, that.replacedBy);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(message);
+            return Objects.hash(message, level, replacedBy);
         }
 
         @Override
         public String toString() {
-            return "Deprecation{" + "message='" + message + '\'' + '}';
+            return "Deprecation{" + "message='"
+                    + message + '\'' + ", level="
+                    + level + ", replacedBy='"
+                    + replacedBy + '\'' + '}';
         }
+    }
+
+    /**
+     * Enumerates the severity levels that a property deprecation can be reported with.
+     */
+    public enum DeprecationLevel {
+        WARNING,
+        ERROR
     }
 
     /**

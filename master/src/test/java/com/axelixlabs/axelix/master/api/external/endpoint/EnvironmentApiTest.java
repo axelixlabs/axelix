@@ -115,7 +115,9 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "message": "Deprecated in favor of logging.file.path property."
+                      "message": "Deprecated in favor of logging.file.path property.",
+                      "level": "ERROR",
+                      "replacedBy": "logging.file.path"
                   },
                   "injectionPoints": null
                 }
@@ -217,7 +219,9 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "message": "Deprecated in favor of logging.file.path property."
+                      "message": "Deprecated in favor of logging.file.path property.",
+                      "level": "ERROR",
+                      "replacedBy": "logging.file.path"
                   },
                   "injectionPoints": null
                 }
