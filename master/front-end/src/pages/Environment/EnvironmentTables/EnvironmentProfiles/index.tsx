@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 
 import { ProfileIcon } from "@/assets";
 
+import { EnvironmentProfilesData } from "./EnvironmentProfilesData";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -35,36 +36,13 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
 
     const [open, setOpen] = useState<boolean>(false);
 
-    const content = (
-        <div className={styles.Dropdown}>
-            <div className={styles.DropdownHeader}>
-                <div className={styles.DropdownTitle}>{t("Environments.activeProfiles")}</div>
-                <div className={styles.DropdownHint}>{t("Environments.profilesPrecedenceHint")}</div>
-            </div>
-
-            {activeProfiles.map((activeProfile, index) => {
-                const isLastProfile = index === activeProfiles.length - 1;
-
-                return (
-                    <div
-                        className={`${styles.ProfileRow} ${isLastProfile ? styles.HighestPrecedenceProfile : ""}`}
-                        key={activeProfile}
-                    >
-                        <span className={styles.ProfileOrder}>{index + 1}</span>
-                        <span className={styles.ProfileName}>{activeProfile}</span>
-                    </div>
-                );
-            })}
-        </div>
-    );
-
     return (
         <Popover
-            content={content}
             trigger="click"
             placement="bottomLeft"
             onOpenChange={setOpen}
             styles={{ container: { padding: 0 } }}
+            content={<EnvironmentProfilesData activeProfiles={activeProfiles} />}
         >
             <button type="button" className={`${styles.Trigger} ${open ? styles.TriggerOpen : ""}`}>
                 <ProfileIcon className={styles.TriggerIcon} />

@@ -21,8 +21,11 @@ import { Link, useParams } from "react-router";
 import { LinkIcon } from "@/assets";
 import { StyledLink } from "@/components";
 import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "@/helpers";
-import type { IEnvProperty } from "@/models";
+import type { IEnvProperty, IPropertyOccurrence } from "@/models";
 
+import { EnvironmentPrecedenceChain } from "../EnvironmentPrecedenceChain";
+
+import { EnvironmentPropertyDetailRow } from "./EnvironmentPropertyDetailRow";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -30,9 +33,14 @@ interface IProps {
      * Single property
      */
     property: IEnvProperty;
+
+    /**
+     * Every occurrence of this property across all the property sources, highest precedence first
+     */
+    precedenceChain: IPropertyOccurrence[];
 }
 
-export const EnvironmentPropertyDetails = ({ property }: IProps) => {
+export const EnvironmentPropertyDetails = ({ property, precedenceChain }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
@@ -42,47 +50,49 @@ export const EnvironmentPropertyDetails = ({ property }: IProps) => {
         <>
             <div className={styles.AccordionBody}>
                 {deprecation && (
-                    <>
-                        <div>{t(`Environments.deprecated`)}:</div>
-                        <div className={styles.Value}>{deprecation.message}</div>
-                    </>
+                    <EnvironmentPropertyDetailRow label={t("Environments.deprecated")}>
+                        {deprecation.message}
+                    </EnvironmentPropertyDetailRow>
                 )}
 
                 {description && (
-                    <>
-                        <div>{t(`Environments.description`)}:</div>
-                        <div className={styles.Value}>{description}</div>
-                    </>
+                    <EnvironmentPropertyDetailRow label={t("Environments.description")}>
+                        {description}
+                    </EnvironmentPropertyDetailRow>
                 )}
 
                 {configPropsBeanName && (
-                    <>
-                        <div>{t(`Environments.configProps`)}:</div>
+                    <EnvironmentPropertyDetailRow label={t("Environments.configProps")}>
                         <StyledLink
                             href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
                         >
-                            {configPropsBeanName}
+                            <span className={styles.BeanName}>{configPropsBeanName}</span>
                         </StyledLink>
-                    </>
+                    </EnvironmentPropertyDetailRow>
                 )}
 
                 {injectionPoints && (
-                    <>
-                        <div>{t(`Environments.injectedIn`)}:</div>
-                        <div>
-                            {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
-                                <div className={`${styles.Value} ${styles.InjectionPointWrapper}`} key={beanName}>
-                                    <span>{beanName} </span>
-                                    <Link
-                                        to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
-                                        className={styles.LinkIcon}
-                                    >
-                                        <LinkIcon />
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    </>
+                    <EnvironmentPropertyDetailRow label={t("Environments.injectedIn")}>
+                        {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
+                            <div className={styles.InjectionPointWrapper} key={beanName}>
+                                <span className={styles.BeanName}>{beanName}</span>
+                                <Link
+                                    to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
+                                    className={styles.LinkIcon}
+                                >
+                                    <LinkIcon />
+                                </Link>
+                            </div>
+                        ))}
+                    </EnvironmentPropertyDetailRow>
+                )}
+
+                {precedenceChain.length > 1 && (
+                    <EnvironmentPropertyDetailRow
+                        label={t("Environments.definedInSources", { value: precedenceChain.length })}
+                    >
+                        <EnvironmentPrecedenceChain chain={precedenceChain} />
+                    </EnvironmentPropertyDetailRow>
                 )}
             </div>
         </>
