@@ -46,14 +46,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskDisableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -287,8 +287,9 @@ class AxelixScheduledTasksEndpointTest {
     void shouldModifyCronExpression_testCronTask() {
         String newCronExpression = "*/5 * * * * *";
 
-        ScheduledTaskCronExpressionModifyRequest request =
-                new ScheduledTaskCronExpressionModifyRequest(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
+        ScheduledTaskCronExpressionModifyRequest request = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger(CRON_TASK_ID_FOR_MODIFY)
+                .cronExpression(newCronExpression);
 
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
@@ -328,8 +329,9 @@ class AxelixScheduledTasksEndpointTest {
     void shouldModifyInterval_testFixedDelay() {
         Long newInterval = 555555L;
 
-        ScheduledTaskIntervalModifyRequest request =
-                new ScheduledTaskIntervalModifyRequest(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
+        ScheduledTaskIntervalModifyRequest request = new ScheduledTaskIntervalModifyRequest()
+                .trigger(FIXED_DELAY_TASK_ID_FOR_MODIFY)
+                .interval(newInterval);
 
         ResponseEntity<Void> response = restTemplate
                 .asAdmin()
@@ -365,8 +367,9 @@ class AxelixScheduledTasksEndpointTest {
     void shouldModifyInterval_testFixedRate() {
         Long newInterval = 777777L;
 
-        ScheduledTaskIntervalModifyRequest request =
-                new ScheduledTaskIntervalModifyRequest(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
+        ScheduledTaskIntervalModifyRequest request = new ScheduledTaskIntervalModifyRequest()
+                .trigger(FIXED_RATE_TASK_ID_FOR_MODIFY)
+                .interval(newInterval);
 
         ResponseEntity<Void> response = restTemplate
                 .asEditor()

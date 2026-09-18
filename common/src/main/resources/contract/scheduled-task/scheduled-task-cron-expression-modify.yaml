@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-cron-expression-modify
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-cron-expression-modify'
+    operation. This operation changes the cron expression of a cron-based scheduled task of the
+    Spring Boot app.
+  x-axelix-introduced-in: 1.0.0
+  x-last-updated-in: 1.0.0
+paths:
+  /actuator/axelix-scheduled-tasks/modify/cron-expression:
+    post:
+      operationId: modifyScheduledTaskCronExpression
+      summary: Changes the cron expression of a scheduled task of the service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskCronExpressionModifyRequest'
+      responses:
+        '204':
+          description: The cron expression was changed.
+        '400':
+          description: >-
+            No scheduled task with the given trigger exists, it is not a cron-based task, or the
+            cron expression is invalid.
+components:
+  schemas:
+    ScheduledTaskCronExpressionModifyRequest:
+      type: object
+      description: A request to change the cron expression of a scheduled task.
+      required:
+        - trigger
+        - cronExpression
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to modify.
+        cronExpression:
+          type: string
+          description: The new cron expression to be assigned.

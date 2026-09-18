@@ -42,13 +42,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -360,8 +360,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldModifyCronExpressionScheduledTask() {
         // given.
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         var editor = restTemplate.asEditor();
@@ -420,8 +421,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @DisplayName("Should return 400 Bad Request for invalid cron expression")
     void shouldReturnBadRequest_OnModifyCronExpressionWithInvalidExpression(String invalidCronExpression) {
         // given.
-        var requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", invalidCronExpression);
+        var requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression(invalidCronExpression);
 
         // and.
         String expectedResponse = """
@@ -449,8 +451,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldModifyIntervalScheduledTask() {
 
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         var editor = restTemplate.asEditor();
@@ -558,8 +561,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnModifyCronExpression() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -578,8 +582,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyCronExpression() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -599,8 +604,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnModifyInterval() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -619,8 +625,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyInterval() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         ResponseEntity<Void> response = restTemplate
