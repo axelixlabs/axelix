@@ -41,3 +41,54 @@ projects:
     reference:
       label: simpleclient migration guide
       url: https://prometheus.github.io/client_java/migration/simpleclient/
+
+  - id: micrometer
+    name: Micrometer
+    status: ACTIVE
+    summary: >-
+      Actively developed. The metrics and tracing facade Spring Boot builds its observability on,
+      including the vendor registries and the tracing bridges that replaced Spring Cloud Sleuth.
+    coordinates:
+      - io.micrometer:context-propagation
+      - io.micrometer:micrometer-commons
+      - io.micrometer:micrometer-core
+      - io.micrometer:micrometer-jakarta9
+      - io.micrometer:micrometer-java11
+      - io.micrometer:micrometer-java21
+      - io.micrometer:micrometer-jetty11
+      - io.micrometer:micrometer-jetty12
+      - io.micrometer:micrometer-observation
+      - io.micrometer:micrometer-observation-test
+      - io.micrometer:micrometer-registry-appoptics
+      - io.micrometer:micrometer-registry-atlas
+      - io.micrometer:micrometer-registry-azure-monitor
+      - io.micrometer:micrometer-registry-cloudwatch2
+      - io.micrometer:micrometer-registry-datadog
+      - io.micrometer:micrometer-registry-dynatrace
+      - io.micrometer:micrometer-registry-elastic
+      - io.micrometer:micrometer-registry-ganglia
+      - io.micrometer:micrometer-registry-graphite
+      - io.micrometer:micrometer-registry-health
+      - io.micrometer:micrometer-registry-humio
+      - io.micrometer:micrometer-registry-influx
+      - io.micrometer:micrometer-registry-jmx
+      - io.micrometer:micrometer-registry-kairos
+      - io.micrometer:micrometer-registry-new-relic
+      - io.micrometer:micrometer-registry-opentsdb
+      - io.micrometer:micrometer-registry-otlp
+      - io.micrometer:micrometer-registry-prometheus
+      - io.micrometer:micrometer-registry-prometheus-simpleclient
+      - io.micrometer:micrometer-registry-signalfx
+      - io.micrometer:micrometer-registry-stackdriver
+      - io.micrometer:micrometer-registry-statsd
+      - io.micrometer:micrometer-registry-wavefront
+      - io.micrometer:micrometer-test
+      - io.micrometer:micrometer-tracing
+      - io.micrometer:micrometer-tracing-bridge-brave
+      - io.micrometer:micrometer-tracing-bridge-otel
+      - io.micrometer:micrometer-tracing-integration-test
+      - io.micrometer:micrometer-tracing-reporter-wavefront
+      - io.micrometer:micrometer-tracing-test
+    reference:
+      label: Micrometer
+      url: https://micrometer.io/

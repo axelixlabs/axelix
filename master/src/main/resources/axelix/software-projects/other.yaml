@@ -41,3 +41,69 @@ projects:
     reference:
       label: Apache Commons Pool
       url: https://commons.apache.org/proper/commons-pool/
+
+  - id: reactor
+    name: Project Reactor
+    status: ACTIVE
+    summary: >-
+      Actively developed. The reactive foundation of the Spring portfolio; Reactor Netty is the
+      default WebFlux runtime.
+    coordinates:
+      - io.projectreactor.addons:reactor-adapter
+      - io.projectreactor.addons:reactor-extra
+      - io.projectreactor.addons:reactor-pool
+      - io.projectreactor.addons:reactor-pool-micrometer
+      - io.projectreactor.kotlin:reactor-kotlin-extensions
+      - io.projectreactor.netty:reactor-netty
+      - io.projectreactor.netty:reactor-netty-core
+      - io.projectreactor.netty:reactor-netty-http
+      - io.projectreactor.netty:reactor-netty-http-brave
+      - io.projectreactor.netty:reactor-netty-quic
+      - io.projectreactor:reactor-core
+      - io.projectreactor:reactor-core-micrometer
+      - io.projectreactor:reactor-test
+      - io.projectreactor:reactor-tools
+    reference:
+      label: Project Reactor
+      url: https://projectreactor.io/
+
+  - id: rxjava3
+    name: RxJava 3
+    status: ACTIVE
+    summary: >-
+      The 3.x line is actively developed; the earlier 1.x and 2.x lines are end-of-life.
+    coordinates:
+      - io.reactivex.rxjava3:rxjava
+    reference:
+      label: RxJava on GitHub
+      url: https://github.com/ReactiveX/RxJava
+
+  - id: rxjava2
+    name: RxJava 2
+    status: SUNSET
+    summary: >-
+      End-of-life since February 28, 2021: no further development, support, maintenance or
+      updates of any kind.
+    coordinates:
+      - io.reactivex.rxjava2:rxjava
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.reactivex.rxjava3:rxjava
+    reference:
+      label: RxJava on GitHub
+      url: https://github.com/ReactiveX/RxJava
+
+  - id: rxjava1
+    name: RxJava 1
+    status: SUNSET
+    summary: >-
+      End-of-life since March 31, 2018: no further development, support, maintenance or
+      updates of any kind.
+    coordinates:
+      - io.reactivex:rxjava
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.reactivex.rxjava3:rxjava
+    reference:
+      label: RxJava on GitHub
+      url: https://github.com/ReactiveX/RxJava
