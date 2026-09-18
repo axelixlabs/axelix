@@ -1,0 +1,26 @@
+openapi: 3.1.0
+info:
+  title: logger-level-reset
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'logger-level-reset' operation.
+    This operation resets the logging level of a single logger of the Spring Boot app back to
+    the level it had before it was changed through Axelix.
+  x-axelix-introduced-in: 1.0.0
+paths:
+  /actuator/axelix-loggers/logger/{name}/reset:
+    post:
+      operationId: resetLogLevelByLoggerName
+      summary: Resets the logging level of a single logger of the service to its original value.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The name of the logger to reset the level of.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The logging level was reset.
+        '400':
+          description: No logger with the given name exists, or its level was never changed.

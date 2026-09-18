@@ -7,7 +7,6 @@ info:
     This operation changes the execution interval of a fixed-rate or fixed-delay scheduled task
     of the Spring Boot app.
   x-axelix-introduced-in: 1.0.0
-  x-last-updated-in: 1.0.0
 paths:
   /actuator/axelix-scheduled-tasks/modify/interval:
     post:
@@ -36,7 +35,9 @@ components:
         trigger:
           type: string
           description: The identifier of the scheduled task to modify.
+          x-axelix-introduced-in: 1.0.0
         interval:
           type: integer
           format: int64
           description: The new execution interval, in milliseconds.
+          x-axelix-introduced-in: 1.0.0

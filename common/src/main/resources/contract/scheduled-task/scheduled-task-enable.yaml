@@ -6,7 +6,6 @@ info:
     The Axelix Master <-> starter contract of the 'scheduled-task-enable' operation.
     This operation enables a previously disabled scheduled task of the Spring Boot app.
   x-axelix-introduced-in: 1.0.0
-  x-last-updated-in: 1.0.0
 paths:
   /actuator/axelix-scheduled-tasks/enable:
     post:
@@ -34,3 +33,4 @@ components:
         trigger:
           type: string
           description: The identifier of the scheduled task to enable.
+          x-axelix-introduced-in: 1.0.0

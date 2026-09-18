@@ -166,6 +166,10 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
                 "useJspecify" to "true",
             ))
 
+            doFirst {
+                contract.ContractDocuments.validate(document)
+            }
+
             // The generator offers no option to suppress the @Generated annotation, so it is
             // dropped right after the generation, freeing the module from a javax.annotation-api
             // dependency.

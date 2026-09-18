@@ -4,6 +4,12 @@ plugins {
 
 repositories {
     gradlePluginPortal()
+    mavenCentral()
+}
+
+dependencies {
+    // Used by the contract document validation, see contract/ContractDocuments.kt
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
 }
 
 

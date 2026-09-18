@@ -7,7 +7,6 @@ info:
     This operation changes the logging level of a logger group of the Spring Boot app,
     either permanently or for a limited amount of time.
   x-axelix-introduced-in: 1.0.0
-  x-last-updated-in: 1.0.0
 paths:
   /actuator/axelix-loggers/group/{name}/change-level:
     post:
@@ -42,6 +41,7 @@ components:
         configuredLevel:
           type: string
           description: The new logging level to apply.
+          x-axelix-introduced-in: 1.0.0
         ttlSeconds:
           type: integer
           format: int64
@@ -49,3 +49,4 @@ components:
           description: >-
             The number of seconds after which the loggers of the group revert to their original
             level. When absent, the change is permanent.
+          x-axelix-introduced-in: 1.0.0
