@@ -37,7 +37,10 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
 @Component
 public class WindowCompatibilityDetectionStrategy implements CompatibilityDetectionStrategy {
 
-    private static final int WINDOW_SIZE = 4;
+    /**
+     * The number of minor releases (counting the Master's own) whose starters the Master supports.
+     */
+    public static final int WINDOW_SIZE = 4;
 
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
 

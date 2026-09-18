@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 
 /**
  * Custom actuator endpoint that provides information about {@link Scheduled @Scheduled} tasks.

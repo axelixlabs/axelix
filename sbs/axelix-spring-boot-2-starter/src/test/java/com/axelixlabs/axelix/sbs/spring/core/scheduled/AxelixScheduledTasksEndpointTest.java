@@ -47,11 +47,11 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -388,7 +388,8 @@ class AxelixScheduledTasksEndpointTest {
     @Test
     void shouldExecuteWithDisableTask_testFixedDelay() {
         forceDisableTask(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
-        ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
+        ScheduledTaskExecuteRequest request =
+                new ScheduledTaskExecuteRequest().trigger(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
@@ -405,7 +406,7 @@ class AxelixScheduledTasksEndpointTest {
 
     @Test
     void shouldExecuteTask_testFixedRate() {
-        ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_RATE_TASK_ID_FOR_EXECUTE);
+        ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest().trigger(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate
                 .asEditor()

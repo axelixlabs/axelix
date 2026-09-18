@@ -1,3 +1,4 @@
+import net.ltgt.gradle.errorprone.errorprone
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -5,6 +6,7 @@ plugins {
     id("shared")
     id("java-test-fixtures")
     kotlin("jvm") version "2.4.10"
+    id("org.openapi.generator") version "7.25.0"
 }
 
 val springBootTestPlatformVersion = "2.7.18"
@@ -14,6 +16,12 @@ val jsonUnitAssertJVersion = "2.40.1"
 dependencies {
     // Self
     api(project(":common"))
+
+    // Compile: the generated contract classes carry Jackson annotations, which is the only piece
+    // of Jackson we allow in this module: the annotations are honored by both Jackson 2 (Spring
+    // Boot 2/3 starters) and Jackson 3 (Spring Boot 4 starter), and the compileOnly scope leaks
+    // nothing onto the user's classpath.
+    compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.13.5")
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
@@ -33,6 +41,63 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.release = 11
     options.compilerArgs.add("-parameters")
+}
+
+// The wire classes of the Axelix Master <-> starter contracts are generated from the OpenAPI
+// documents in :common, so that the yaml document stays the single source of truth of every
+// contract.
+openApiGenerate {
+    generatorName.set("java")
+    library.set("resttemplate")
+    inputSpec.set("$rootDir/common/src/main/resources/axelix/contracts/scheduled-tasks.yaml")
+    outputDir.set(layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath)
+    modelPackage.set("com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask")
+    globalProperties.set(mapOf("models" to "", "modelDocs" to "false", "modelTests" to "false"))
+    configOptions.set(mapOf(
+        "hideGenerationTimestamp" to "true",
+        "openApiNullable" to "false",
+        "serializationLibrary" to "jackson",
+        "useBeanValidation" to "false",
+        "annotationLibrary" to "none",
+        "useJspecify" to "true",
+    ))
+}
+
+// The generator offers no option to suppress the @Generated annotation, so it is dropped right
+// after the generation, freeing the module from a javax.annotation-api dependency.
+val generatedContractSources = layout.buildDirectory.dir("generated/openapi/src/main/java")
+
+tasks.openApiGenerate {
+    // A local copy: referencing the script-level property from doLast would capture the whole
+    // script object, which the configuration cache cannot serialize.
+    val rewriteRoot = generatedContractSources
+    doLast {
+        rewriteRoot.get().asFile.walkTopDown().filter { it.extension == "java" }.forEach { source ->
+            source.writeText(source.readText()
+                .lineSequence().filterNot { it.startsWith("@javax.annotation.Generated") }.joinToString("\n"))
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            // builtBy carries the task dependency to every consumer of the source set, including
+            // the sourcesJar of the starters this module is shaded into.
+            srcDir(files(generatedContractSources).builtBy(tasks.openApiGenerate))
+        }
+    }
+}
+
+// The generated contract classes are not held to the in-house code quality standards.
+tasks.named<JavaCompile>("compileJava") {
+    options.errorprone {
+        option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.sbs.spring.core.contract(\\..*)?")
+    }
+}
+
+tasks.withType<Pmd>().configureEach {
+    exclude("**/contract/**")
 }
 
 testing {

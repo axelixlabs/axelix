@@ -1,0 +1,42 @@
+# The Axelix Master <-> starter contract of the 'scheduled-tasks' feature.
+#
+# 'info.version' is the Axelix version of the last non-additive contract change and MUST be bumped
+# in the same change set as the schema. 'info.x-axelix-introduced-in' is the Axelix version whose
+# starter first backed the feature. 'info.title' is the feature id, which is also the route slug
+# of the corresponding SPA page.
+#
+# The Java request/response classes are GENERATED from this document on both sides of the wire
+# (the 'openApiGenerate' task of the ':master' and ':sbs:starter-domain' modules): never write
+# them by hand.
+openapi: 3.1.0
+info:
+  title: scheduled-tasks
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+paths:
+  /actuator/axelix-scheduled-tasks/execute:
+    post:
+      operationId: executeScheduledTask
+      summary: Forcibly executes a scheduled task of the service, out of its regular schedule.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskExecuteRequest'
+      responses:
+        '204':
+          description: The task was submitted for execution.
+        '400':
+          description: No scheduled task with the given trigger exists.
+components:
+  schemas:
+    ScheduledTaskExecuteRequest:
+      type: object
+      description: A request to forcibly execute a scheduled task.
+      required:
+        - trigger
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to run now.

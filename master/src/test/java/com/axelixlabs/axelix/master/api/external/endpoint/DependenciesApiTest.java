@@ -102,7 +102,28 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
             "version": "3.1.11"
           },
           "resolutionPath": [ "org.springframework.cloud:spring-cloud-starter-sleuth:3.1.11" ],
-          "softwareProject": null
+          "softwareProject": {
+            "id": { "value": "spring-cloud-sleuth" },
+            "displayName": "Spring Cloud Sleuth",
+            "ecosystem": "OBSERVABILITY",
+            "status": "SUNSET",
+            "summary": "Discontinued after the 3.1.x line and moved to the Spring attic. Tracing moved into Micrometer Tracing, which Spring Boot autoconfigures from 3.0 onward.",
+            "libraries": [
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-starter-sleuth" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-api" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-autoconfigure" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-instrumentation" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-brave" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-zipkin" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-sleuth-core" },
+              { "groupId": "org.springframework.cloud", "artifactId": "spring-cloud-starter-zipkin" }
+            ],
+            "succession": { "kind": "SUPERSEDED_BY", "value": "io.micrometer:micrometer-tracing" },
+            "reference": {
+              "label": "Spring Cloud Sleuth in the attic",
+              "url": "https://github.com/spring-attic/spring-cloud-sleuth"
+            }
+          }
         },
         {
           "dependency": {
