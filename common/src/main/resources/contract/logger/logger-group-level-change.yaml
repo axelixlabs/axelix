@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: logger-group-level-change
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'logger-group-level-change' operation.
+    This operation changes the logging level of a logger group of the Spring Boot app,
+    either permanently or for a limited amount of time.
+  x-axelix-introduced-in: 1.0.0
+  x-last-updated-in: 1.0.0
+paths:
+  /actuator/axelix-loggers/group/{name}/change-level:
+    post:
+      operationId: changeLogLevelByGroupName
+      summary: Changes the logging level of a logger group of the service.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The name of the logger group to change the level of.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupLogLevelChangeRequest'
+      responses:
+        '204':
+          description: The logging level was changed.
+        '400':
+          description: No logger group with the given name exists, or the level is unknown.
+components:
+  schemas:
+    GroupLogLevelChangeRequest:
+      type: object
+      description: A request to change the logging level of a logger group.
+      required:
+        - configuredLevel
+      properties:
+        configuredLevel:
+          type: string
+          description: The new logging level to apply.
+        ttlSeconds:
+          type: integer
+          format: int64
+          minimum: 1
+          description: >-
+            The number of seconds after which the loggers of the group revert to their original
+            level. When absent, the change is permanent.

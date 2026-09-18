@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
@@ -331,7 +332,7 @@ public class LoggersMcpServerTools {
         HttpPayload payload = HttpPayload.json(
                 Map.of("name", groupName),
                 jacksonMessageSerializationStrategy.serialize(
-                        new LogLevelChangeRequest().configuredLevel(loggerLevel)));
+                        new GroupLogLevelChangeRequest().configuredLevel(loggerLevel)));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 

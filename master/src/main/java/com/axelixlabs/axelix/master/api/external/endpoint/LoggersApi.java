@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
+import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
@@ -118,7 +119,7 @@ public class LoggersApi {
     public void setLoggingLevelByGroupName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("groupName") String groupName,
-            @RequestBody LogLevelChangeRequest request) {
+            @RequestBody GroupLogLevelChangeRequest request) {
 
         HttpPayload payload =
                 HttpPayload.json(Map.of("name", groupName), jacksonMessageSerializationStrategy.serialize(request));

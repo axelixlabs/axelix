@@ -43,7 +43,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.api.external.request.loggers.LogLevelLoggerBulkChangeRequest;
-import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -135,7 +135,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     @Test
     void shouldSetLoggingLevelByGroupName() {
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest().configuredLevel("INFO");
+        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
 
         // when.
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
@@ -215,7 +215,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     void shouldReturnInternalServerError_WhenInvokedOnUnknownInstance() {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest().configuredLevel("INFO");
+        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
         registry.reload(TestInstanceFactory.create(instanceId));
 
         // when.
@@ -257,7 +257,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     void shouldReturnBadRequestForUnregisteredInstance_OnGroupName() {
         String instanceId = "unregistered-loggers-group-instance";
         String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest().configuredLevel("INFO");
+        GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
 
         // when.
         ResponseEntity<String> response = restTemplate
