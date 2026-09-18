@@ -404,8 +404,8 @@ To turn the feature on, set `axelix.master.discovery.auto.enabled=true` (default
 currently the only supported discovery platform.
 
 When Master runs **inside** the cluster as a pod, the Kubernetes connection settings (`kube-apiserver-url`,
-`sa-token-path`, `ca-cert-path`) default to in-pod values and need no override, The starter side just has to expose
-`axelix-metadata` and share the JWT signing key. When Master runs **outside** the cluster, point those three to the
+`sa-token-path`, `ca-cert-path`) default to in-pod values and need no override, The starter side just has to share the JWT signing key —
+the starter exposes `axelix-metadata` by itself. When Master runs **outside** the cluster, point those three to the
 external API URL, a token file with the required RBAC, and the cluster CA path. Use `filters.namespaces` and
 `filters.labels` to scope the scan.
 

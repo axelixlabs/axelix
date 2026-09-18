@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { LegacyNotice, UpcomingReleaseNotice } from '@site/src/components';
 import styles from './styles.module.css';
 
 # Configuring Spring Boot Starter
@@ -8,8 +8,8 @@ import styles from './styles.module.css';
 This page shows how to wire the Axelix Spring Boot Starter into a [Spring Boot](https://spring.io/) application so
 [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) can discover it, read its state, and act on it — both from
 the UI and through Master's bundled MCP (Model Context Protocol) server, which exposes the same data to AI agents. Pick
-the starter module matching your Boot major version, expose the Axelix actuator endpoints, share the JWT signing key
-with Master, and tell Master where to find the instance.
+the starter module matching your Boot major version, expose the Axelix actuator endpoints (automatic as of Axelix
+1.2.0), share the JWT signing key with Master, and tell Master where to find the instance.
 
 ## Before you start
 
@@ -179,20 +179,101 @@ the Axelix build plugin?](../build-plugin/what-is-build-plugin.mdx) and [Configu
 plugin](../build-plugin/configuration.mdx).
 :::
 
-## Expose the Axelix actuator endpoints
+## Actuator endpoints
 
-Spring Boot hides custom actuator endpoints from web exposure by default. Add the Axelix IDs to
-`management.endpoints.web.exposure.include` so Master can reach them. The `axelix-metadata` endpoint is the one the Master probes first to confirm the instance is alive —
-without it the instance will not appear in Master, regardless of whether you use Master-side autodiscovery or
-starter-side self-registration. The rest of the endpoints power the corresponding features in the UI.
+Starting with Axelix **1.2.0** there is nothing to configure by hand: on application startup the starter adds its own
+actuator endpoints to `management.endpoints.web.exposure.include`, so Master can reach them out of the box. On older
+versions the starter does not do this, and the endpoints must be listed manually — see [Exposing the endpoints on
+Axelix below 1.2.0](#exposing-the-endpoints-on-axelix-below-120).
 
-Keep `health` in the list too. Setting `management.endpoints.web.exposure.include` **replaces** Spring Boot's default
-(`health`), and the starter requires the `HealthEndpoint` bean — it reads the application's health through it and
-reports the status to Master as part of `axelix-metadata`. If the `health` endpoint is not exposed anywhere (web or
-JMX), Spring Boot does not create that bean and the application fails to start.
+### What the starter exposes
 
-Add the native `info` endpoint as well: `axelix-details` activates only when `info` is available (Because of some legacy
-that we used to have).
+The starter exposes the following endpoints:
+
+<table>
+    <thead>
+    <tr>
+        <th>Endpoint</th>
+        <th>Purpose</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>axelix-metadata</code> <span className={styles.required}>required</span></td>
+        <td>Service metadata; the one Master probes first</td>
+    </tr>
+    <tr>
+        <td><code>axelix-details</code></td>
+        <td>Summary information about the instance</td>
+    </tr>
+    <tr>
+        <td><code>axelix-beans</code></td>
+        <td>Context beans</td>
+    </tr>
+    <tr>
+        <td><code>axelix-caches</code></td>
+        <td>Caches (when a <code>CacheManager</code> is present)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-conditions</code></td>
+        <td>Auto-configuration conditions report</td>
+    </tr>
+    <tr>
+        <td><code>axelix-configprops</code></td>
+        <td><code>@ConfigurationProperties</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-env</code></td>
+        <td>Environment and property sources</td>
+    </tr>
+    <tr>
+        <td><code>axelix-feign</code></td>
+        <td>Feign clients (when Feign is on the classpath)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-gc</code></td>
+        <td>Garbage collection</td>
+    </tr>
+    <tr>
+        <td><code>axelix-heap-dump</code></td>
+        <td>Heap dump</td>
+    </tr>
+    <tr>
+        <td><code>axelix-loggers</code></td>
+        <td>Logging levels</td>
+    </tr>
+    <tr>
+        <td><code>axelix-metrics</code></td>
+        <td>Metrics</td>
+    </tr>
+    <tr>
+        <td><code>axelix-scheduled-tasks</code></td>
+        <td>Scheduled tasks</td>
+    </tr>
+    <tr>
+        <td><code>axelix-thread-dump</code></td>
+        <td>Thread dump</td>
+    </tr>
+    <tr>
+        <td><code>axelix-dependencies</code></td>
+        <td>Dependency SBOM</td>
+    </tr>
+    </tbody>
+</table>
+
+Endpoints that don't apply to your application stay inert — the starter activates each one only when its prerequisites
+are met (for example, `axelix-feign` without Feign on the classpath or `axelix-caches` without a `CacheManager` never
+come up).
+
+As of Axelix **1.2.0** the native `health` and `info` endpoints are no longer required, so the starter never exposes
+them on its own (before 1.2.0 Axelix depended on them, and the starter force-exposed both). Only the endpoints you
+list in `management.endpoints.web.exposure.include` plus the Axelix ones are exposed — add `health` and `info` to the
+list yourself when you need them, including the `health` endpoint that Spring Boot would otherwise expose by default.
+
+### Adding your own endpoints
+
+If you need your own actuator endpoints, just list **only them** — the starter **merges** your list with its own instead
+of replacing it.
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -203,8 +284,42 @@ management:
     web:
       exposure:
         include:
-          - health
-          - info
+          - prometheus
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=prometheus
+```
+
+  </TabItem>
+</Tabs>
+
+The result is that `prometheus` and all the Axelix endpoints are exposed.
+
+The `*` value is supported too — everything gets exposed and the starter leaves the list alone.
+
+### Exposing the endpoints on Axelix below 1.2.0
+
+<LegacyNotice version="1.2.0" />
+
+Starters older than 1.2.0 do not add their endpoints to the exposure list themselves, so every Axelix endpoint you
+want Master to read has to be listed in `management.endpoints.web.exposure.include` by hand. At minimum expose
+`axelix-metadata` — without it the instance never appears in Master — and in practice the whole set, so every UI
+section has data to show. The `health` and `info` endpoints are force-exposed by those starter versions on their own,
+so you do not need to list them:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
           - axelix-metadata
           - axelix-beans
           - axelix-caches
@@ -225,15 +340,11 @@ management:
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,info,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
 ```
 
   </TabItem>
 </Tabs>
-
-`*` works too, but most teams prefer a curated list so internal endpoints aren't accidentally surfaced. Endpoints that
-don't apply to your application (`axelix-feign` without Feign on the classpath, `axelix-caches` without a
-`CacheManager`) stay inert — the starter activates each one only when its prerequisites are met.
 
 ## Export Axelix metrics through Micrometer
 

@@ -1,3 +1,5 @@
+import { LegacyNotice } from '@site/src/components';
+
 # Troubleshooting
 
 This page describes the most common issues that occur during Axelix installation and configuration.
@@ -94,13 +96,19 @@ the same value goes on Master and on every instance, since this is a symmetric H
 
 ```properties
 server.port=9444
-management.endpoints.web.exposure.include=axelix-metadata
 axelix.sbs.auth.jwt.algorithm=HMAC256
 axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
 axelix.sbs.discovery.self-registration=true
 axelix.sbs.discovery.instance-name=your-application-name
 axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
 axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register
+```
+
+On Axelix versions below 1.2.0 (exclusive), one more property is required — older starters do not expose their
+endpoints themselves, and without `axelix-metadata` Master cannot probe the instance:
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata
 ```
 
 Finally, start Master itself as a JAR with the **same** algorithm and signing key:
@@ -123,6 +131,13 @@ Never reuse the signing key above, or any example key from this page, in a real 
 
 ## 4. Some Sidebar Sections Stay Empty After Registration
 
+<LegacyNotice
+  version="1.2.0"
+  reason={<>If you are on Axelix 1.2.0 or later, none of this is required: the starter registers its custom actuator
+    endpoints by itself, and Axelix no longer requires the <code>health</code>/<code>info</code> endpoints to be
+    enabled — it works perfectly well without them. No configuration is needed here.</>}
+/>
+
 ### Symptom
 
 The instance appears in Master and its status looks healthy, but some sidebar sections - Beans, Caches, Loggers, and
@@ -140,7 +155,6 @@ in `management.endpoints.web.exposure.include` simply has nothing to read from.
 
 ### The Solution:
 
-Add the missing endpoint IDs to `management.endpoints.web.exposure.include` on the managed service - see [Expose the
-Axelix actuator
-endpoints](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#expose-the-axelix-actuator-endpoints)
+Add the missing endpoint IDs to `management.endpoints.web.exposure.include` on the managed service - see [What the starter
+exposes](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#what-the-starter-exposes)
 for the full list.

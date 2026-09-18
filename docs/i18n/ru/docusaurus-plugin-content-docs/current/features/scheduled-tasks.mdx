@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice } from '@site/src/components';
 
 # Запланированные задачи
 На странице **Запланированные задачи** можно получить доступ ко всем задачам, помеченным `@Scheduled` в сервисе Spring
@@ -98,7 +99,14 @@ src="/img/feature/icons/switch-off-icon.png" alt="switch-off-icon" width="32" he
 Запланированные задачи также может инспектировать ИИ-агент через MCP — см. [Каталог
 MCP-инструментов](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
 
-## Свойства
+## Включите Нужный Actuator Ендпоинт
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-scheduled-tasks`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек

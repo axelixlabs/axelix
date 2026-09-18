@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice } from '@site/src/components';
 
 # Детали
 
@@ -83,7 +84,14 @@ Axelix Master.
 | **Версия**          | Версия операционной системы   | `5.15.0`, `2022`          |
 | **Архитектура CPU** | Архитектура процессора        | `amd64`, `arm64`          |
 
-## Свойства
+## Включите Нужный Actuator Ендпоинт
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-details`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в

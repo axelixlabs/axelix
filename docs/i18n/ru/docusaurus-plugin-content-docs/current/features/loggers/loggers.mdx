@@ -4,6 +4,7 @@ import {LoggersTable} from './LoggersTable';
 import {LoggersTableReset} from './LoggersTableReset';
 import {TargetThemeIcon} from './TargetThemeIcon';
 import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
+import { LegacyNotice } from '@site/src/components';
 
 # Логгеры
 
@@ -68,7 +69,14 @@ import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 отдельного логгера — также доступны ИИ-агентам через MCP. См. [Каталог
 MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
 
-## Свойства
+## Включите Нужный Actuator Ендпоинт
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-loggers`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
