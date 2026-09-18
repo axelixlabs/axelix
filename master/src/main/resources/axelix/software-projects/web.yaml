@@ -1,0 +1,37 @@
+ecosystem: WEB
+projects:
+  - id: httpcomponents-4
+    name: Apache HttpComponents 4.x
+    status: MAINTENANCE
+    summary: >-
+      The 4.x series receives fixes for major defects and security issues only, and the async/NIO
+      parts of it are already at end of life. The project strongly encourages migrating to
+      HttpClient 5.x.
+    coordinates:
+      - org.apache.httpcomponents:httpclient
+      - org.apache.httpcomponents:httpmime
+      - org.apache.httpcomponents:httpcore
+      - org.apache.httpcomponents:httpcore-nio
+      - org.apache.httpcomponents:httpasyncclient
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.apache.httpcomponents.client5:httpclient5
+    reference:
+      label: HttpComponents support status
+      url: https://hc.apache.org/status.html
+
+  - id: httpcomponents-5
+    name: Apache HttpComponents 5.x
+    status: ACTIVE
+    summary: Actively developed and supported, with HTTP/2 support. The successor of the 4.x series.
+    coordinates:
+      - org.apache.httpcomponents.client5:httpclient5
+      - org.apache.httpcomponents.client5:httpclient5-cache
+      - org.apache.httpcomponents.client5:httpclient5-fluent
+      - org.apache.httpcomponents.client5:httpclient5-observation
+      - org.apache.httpcomponents.core5:httpcore5
+      - org.apache.httpcomponents.core5:httpcore5-h2
+      - org.apache.httpcomponents.core5:httpcore5-reactive
+    reference:
+      label: HttpComponents support status
+      url: https://hc.apache.org/status.html

@@ -1,0 +1,16 @@
+ecosystem: TESTING
+projects:
+  - id: junit4
+    name: JUnit 4
+    status: MAINTENANCE
+    summary: >-
+      Officially in maintenance mode: only critical bugs and security issues are fixed, all other
+      issues and pull requests are declined. Ongoing development happens in JUnit 5.
+    coordinates:
+      - junit:junit
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.junit.jupiter:junit-jupiter
+    reference:
+      label: JUnit 4 maintenance notice
+      url: https://github.com/junit-team/junit4

@@ -1,0 +1,16 @@
+ecosystem: SERIALIZATION
+projects:
+  - id: gson
+    name: Gson
+    status: MAINTENANCE
+    summary: >-
+      Google states Gson is in maintenance mode: existing bugs are fixed, but large new features
+      will likely not be added.
+    coordinates:
+      - com.google.code.gson:gson
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Gson keeps working and receiving fixes; Jackson is the common choice for new development
+    reference:
+      label: Gson maintenance-mode notice
+      url: https://github.com/google/gson
