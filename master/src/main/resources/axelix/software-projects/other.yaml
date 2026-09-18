@@ -1,2 +1,18 @@
 ecosystem: OTHER
-projects: []
+projects:
+  - id: spring-statemachine
+    name: Spring Statemachine
+    status: SUNSET
+    summary: >-
+      Discontinued and moved to the Spring attic. The repository is archived and no further
+      releases of any kind are expected.
+    coordinates:
+      - org.springframework.statemachine:spring-statemachine-core
+      - org.springframework.statemachine:spring-statemachine-starter
+      - org.springframework.statemachine:spring-statemachine-autoconfigure
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: No successor project exists; replacing it means adopting another state machine library or hand-rolled state handling
+    reference:
+      label: Spring Statemachine in the attic
+      url: https://github.com/spring-attic/spring-statemachine
