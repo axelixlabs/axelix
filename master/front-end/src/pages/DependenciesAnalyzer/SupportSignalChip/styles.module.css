@@ -1,0 +1,55 @@
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 3px 9px;
+    white-space: nowrap;
+    font-weight: 700;
+    border-radius: 999px;
+    border: 1px solid var(--chip-border);
+    color: var(--chip-color);
+    background-color: var(--chip-bg);
+    cursor: help;
+}
+
+.Dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background-color: var(--chip-color);
+    /* background-color: red; */
+}
+
+.Discontinued {
+    --chip-color: var(--signal-discontinued);
+    --chip-bg: var(--signal-discontinued-bg);
+    --chip-border: var(--signal-discontinued-border);
+}
+
+.Maintenance {
+    --chip-color: var(--signal-maintenance);
+    --chip-bg: var(--signal-maintenance-bg);
+    --chip-border: var(--signal-maintenance-border);
+}
+
+.HintHeader {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.HintDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.HintTitle {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}

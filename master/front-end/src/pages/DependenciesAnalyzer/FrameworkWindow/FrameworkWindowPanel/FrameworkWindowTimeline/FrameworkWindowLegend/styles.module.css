@@ -1,0 +1,29 @@
+.Legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    color: var(--axelix-bold-grey);
+}
+
+.LegendItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.LegendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.OssDot {
+    background-color: var(--axelix-primary-green);
+}
+
+.CommercialDot {
+    background-color: var(--axelix-primary-orange);
+}

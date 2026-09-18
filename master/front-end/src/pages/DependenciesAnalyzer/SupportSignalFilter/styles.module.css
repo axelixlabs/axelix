@@ -1,0 +1,82 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* TODO: Fix in future */
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-weight: 600;
+    border-radius: 7px;
+    border: 1px solid var(--axelix-medium-grey);
+    background-color: var(--axelix-primary-white);
+    color: var(--axelix-bold-grey);
+    cursor: pointer;
+    user-select: none;
+    transition:
+        border-color 0.15s,
+        color 0.15s,
+        background-color 0.15s;
+}
+
+
+/* TODO: Fix in future */
+.ChipDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background-color: var(--dot-color);
+}
+
+/* TODO: Improve in future */
+.Discontinued {
+    --dot-color: var(--signal-discontinued);
+}
+
+.Maintenance {
+    --dot-color: var(--signal-maintenance);
+}
+
+.ActiveChip {
+    color: var(--dot-color);
+    border-color: var(--dot-color);
+
+    /* TODO: Improve in future */
+    background-color: color-mix(in srgb, var(--dot-color) 10%, var(--axelix-primary-white));
+}
+
+.Count {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 1px 5px;
+    border-radius: var(--axelix-border-radius-small);
+    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-light-grey);
+}
+
+.ActiveChip .Count {
+    color: var(--dot-color);
+    background-color: var(--axelix-primary-white);
+}
+
+.Clear {
+    /* TODO: Improve in future */
+    padding: 6px 4px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--axelix-bold-grey);
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--axelix-primary-black);
+    }
+}

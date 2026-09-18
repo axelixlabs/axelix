@@ -1,0 +1,34 @@
+.MainWrapper {
+    /* TODO: Improve in future */
+    --signal-discontinued: #b42318;
+    --signal-discontinued-bg: #fef3f2;
+    --signal-discontinued-border: #fecdca;
+    --signal-maintenance: #b54708;
+    --signal-maintenance-bg: #fffaeb;
+    --signal-maintenance-border: #fec84b;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.Feed {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.Caption {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.Toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}

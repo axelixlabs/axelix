@@ -1,0 +1,50 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 14px 16px;
+    align-items: baseline;
+
+    @media (width <=720px) {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.Prose {
+    color: var(--axelix-bold-grey);
+}
+
+.Label {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.NoteValue {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.Reference {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ReferenceLink {
+    color: var(--axelix-primary-green);
+    overflow-wrap: anywhere;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.ReferenceIcon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    color: var(--axelix-primary-green);
+}

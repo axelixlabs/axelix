@@ -1,0 +1,24 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.Caption {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.CaptionLabel {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.CaptionSource {
+    color: var(--axelix-bold-grey);
+}
