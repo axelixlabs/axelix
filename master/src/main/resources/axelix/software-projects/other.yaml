@@ -16,3 +16,18 @@ projects:
     reference:
       label: Spring Statemachine in the attic
       url: https://github.com/spring-attic/spring-statemachine
+
+  - id: commons-pool1
+    name: Apache Commons Pool 1
+    status: SUNSET
+    summary: >-
+      The 1.x line has not seen a release since 1.6 in 2013. Development continues only in Commons
+      Pool 2, which lives under different coordinates.
+    coordinates:
+      - commons-pool:commons-pool
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.apache.commons:commons-pool2
+    reference:
+      label: Apache Commons Pool
+      url: https://commons.apache.org/proper/commons-pool/

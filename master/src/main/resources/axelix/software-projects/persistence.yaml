@@ -247,3 +247,18 @@ projects:
     reference:
       label: Ehcache 2 archived repository
       url: https://github.com/ehcache/ehcache2
+
+  - id: influxdb-java
+    name: InfluxDB Java Client (influxdb-java)
+    status: MAINTENANCE
+    summary: >-
+      The community-maintained client for InfluxDB 1.x. For InfluxDB 2.x the vendor points users to
+      the separate influxdb-client-java library.
+    coordinates:
+      - org.influxdb:influxdb-java
+    succession:
+      kind: SUPERSEDED_BY
+      value: com.influxdb:influxdb-client-java
+    reference:
+      label: influxdb-java on GitHub
+      url: https://github.com/influxdata/influxdb-java

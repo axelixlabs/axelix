@@ -1,0 +1,100 @@
+ecosystem: MESSAGING
+projects:
+  - id: apache-kafka
+    name: Apache Kafka
+    status: ACTIVE
+    summary: Actively developed by the Apache Kafka project.
+    coordinates:
+      - org.apache.kafka:kafka-clients
+      - org.apache.kafka:kafka-streams
+      - org.apache.kafka:kafka-streams-scala_2.13
+      - org.apache.kafka:kafka-streams-test-utils
+      - org.apache.kafka:kafka-metadata
+      - org.apache.kafka:kafka-raft
+      - org.apache.kafka:kafka-server
+      - org.apache.kafka:kafka-server-common
+      - org.apache.kafka:kafka-shell
+      - org.apache.kafka:kafka-storage
+      - org.apache.kafka:kafka-storage-api
+      - org.apache.kafka:kafka-tools
+      - org.apache.kafka:kafka_2.13
+      - org.apache.kafka:connect
+      - org.apache.kafka:connect-api
+      - org.apache.kafka:connect-basic-auth-extension
+      - org.apache.kafka:connect-file
+      - org.apache.kafka:connect-json
+      - org.apache.kafka:connect-mirror
+      - org.apache.kafka:connect-mirror-client
+      - org.apache.kafka:connect-runtime
+      - org.apache.kafka:connect-transforms
+      - org.apache.kafka:generator
+      - org.apache.kafka:trogdor
+    reference:
+      label: Apache Kafka
+      url: https://kafka.apache.org/
+
+  - id: rabbitmq-java-clients
+    name: RabbitMQ Java Clients
+    status: ACTIVE
+    summary: >-
+      The Java clients for RabbitMQ, actively developed by the RabbitMQ team: the AMQP 0-9-1 client
+      and the Streams client.
+    coordinates:
+      - com.rabbitmq:amqp-client
+      - com.rabbitmq:stream-client
+    reference:
+      label: RabbitMQ client libraries
+      url: https://www.rabbitmq.com/client-libraries
+
+  - id: spring-kafka
+    name: Spring for Apache Kafka
+    status: ACTIVE
+    summary: Actively developed as part of the Spring portfolio.
+    coordinates:
+      - org.springframework.kafka:spring-kafka
+      - org.springframework.kafka:spring-kafka-test
+    reference:
+      label: Spring for Apache Kafka
+      url: https://spring.io/projects/spring-kafka
+
+  - id: spring-amqp
+    name: Spring AMQP
+    status: ACTIVE
+    summary: Actively developed as part of the Spring portfolio.
+    coordinates:
+      - org.springframework.amqp:spring-amqp
+      - org.springframework.amqp:spring-rabbit
+      - org.springframework.amqp:spring-rabbit-stream
+      - org.springframework.amqp:spring-rabbit-test
+      - org.springframework.amqp:spring-rabbit-junit
+    reference:
+      label: Spring AMQP
+      url: https://spring.io/projects/spring-amqp
+
+  - id: activemq-classic
+    name: Apache ActiveMQ Classic
+    status: ACTIVE
+    summary: >-
+      Actively developed. The original ActiveMQ broker line; ActiveMQ Artemis is the project's
+      next-generation broker developed alongside it.
+    coordinates:
+      - org.apache.activemq:activemq-client
+      - org.apache.activemq:activemq-broker
+      - org.apache.activemq:activemq-spring
+      - org.apache.activemq:activemq-console
+    reference:
+      label: Apache ActiveMQ
+      url: https://activemq.apache.org/
+
+  - id: activemq-artemis
+    name: Apache ActiveMQ Artemis
+    status: ACTIVE
+    summary: Actively developed. The next-generation ActiveMQ broker.
+    coordinates:
+      - org.apache.activemq:artemis-core-client
+      - org.apache.activemq:artemis-jakarta-client
+      - org.apache.activemq:artemis-jms-client
+      - org.apache.activemq:artemis-server
+    reference:
+      label: Apache ActiveMQ Artemis
+      url: https://activemq.apache.org/components/artemis/
