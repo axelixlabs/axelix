@@ -44,10 +44,10 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -337,8 +337,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @ParameterizedTest
     @MethodSource("managementScheduledTask")
     void shouldEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         var editor = restTemplate.asEditor();
@@ -515,8 +515,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -537,8 +537,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableSingleScheduledTask(
             String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<String> response = restTemplate

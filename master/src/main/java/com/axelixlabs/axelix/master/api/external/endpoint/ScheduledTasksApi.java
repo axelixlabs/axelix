@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -36,6 +35,8 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskDisableRequest;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
@@ -69,14 +70,14 @@ public class ScheduledTasksApi {
 
     @PostMapping(path = ApiPaths.ScheduledTasksApi.ENABLE_TASK)
     public void enableSingleScheduledTask(
-            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
+            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskEnableRequest request) {
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_SCHEDULED_TASK, payload);
     }
 
     @PostMapping(path = ApiPaths.ScheduledTasksApi.DISABLE_TASK)
     public void disableSingleScheduledTask(
-            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
+            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskDisableRequest request) {
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.DISABLE_SCHEDULED_TASK, payload);
     }

@@ -30,7 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskDisableRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 
 /**
@@ -59,7 +60,7 @@ public class AxelixScheduledTasksEndpoint {
     }
 
     @PostMapping("/enable")
-    public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskToggleRequest request) {
+    public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskEnableRequest request) {
         try {
             taskService.enableTask(request.getTrigger());
             return ResponseEntity.noContent().build();
@@ -71,7 +72,7 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/disable")
     public ResponseEntity<Void> disableTask(
-            @RequestBody ScheduledTaskToggleRequest request,
+            @RequestBody ScheduledTaskDisableRequest request,
             @RequestParam(value = "force", defaultValue = "false") boolean force) {
         try {
             taskService.disableTask(request.getTrigger(), force);

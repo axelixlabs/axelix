@@ -48,10 +48,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskDisableRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskEnableRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
@@ -534,7 +535,7 @@ class AxelixScheduledTasksEndpointTest {
     void negativeAuthTests() {}
 
     private void enableScheduledTask(String target) {
-        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target);
+        ScheduledTaskEnableRequest request = new ScheduledTaskEnableRequest().trigger(target);
 
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
@@ -544,7 +545,7 @@ class AxelixScheduledTasksEndpointTest {
     }
 
     private void forceDisableTask(String targetScheduledTask) {
-        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask);
+        ScheduledTaskDisableRequest request = new ScheduledTaskDisableRequest().trigger(targetScheduledTask);
 
         ResponseEntity<Void> response = restTemplate
                 .asAdmin()
