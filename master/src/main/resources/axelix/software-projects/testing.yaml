@@ -14,3 +14,126 @@ projects:
     reference:
       label: JUnit 4 maintenance notice
       url: https://github.com/junit-team/junit4
+
+  - id: junit-framework
+    name: JUnit Framework (JUnit 5+)
+    status: ACTIVE
+    summary: >-
+      Actively developed. The modern JUnit generation - the Jupiter API on top of the JUnit
+      Platform - and the successor of JUnit 4; the current line is 6.x.
+    coordinates:
+      - org.junit.jupiter:junit-jupiter
+      - org.junit.jupiter:junit-jupiter-api
+      - org.junit.jupiter:junit-jupiter-engine
+      - org.junit.jupiter:junit-jupiter-migrationsupport
+      - org.junit.jupiter:junit-jupiter-params
+      - org.junit.platform:junit-platform-commons
+      - org.junit.platform:junit-platform-console
+      - org.junit.platform:junit-platform-engine
+      - org.junit.platform:junit-platform-launcher
+      - org.junit.platform:junit-platform-reporting
+      - org.junit.platform:junit-platform-suite
+      - org.junit.platform:junit-platform-suite-api
+      - org.junit.platform:junit-platform-suite-engine
+      - org.junit.platform:junit-platform-testkit
+      - org.junit.vintage:junit-vintage-engine
+    reference:
+      label: JUnit Framework
+      url: https://junit.org/
+
+  - id: mockito
+    name: Mockito
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.mockito:mockito-core
+      - org.mockito:mockito-android
+      - org.mockito:mockito-errorprone
+      - org.mockito:mockito-junit-jupiter
+      - org.mockito:mockito-proxy
+      - org.mockito:mockito-subclass
+    reference:
+      label: Mockito
+      url: https://site.mockito.org/
+
+  - id: assertj
+    name: AssertJ
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.assertj:assertj-core
+      - org.assertj:assertj-guava
+    reference:
+      label: AssertJ
+      url: https://assertj.github.io/doc/
+
+  - id: testcontainers
+    name: Testcontainers
+    status: ACTIVE
+    summary: Actively developed by AtomicJar/Docker.
+    coordinates:
+      - org.testcontainers:testcontainers
+      - org.testcontainers:testcontainers-activemq
+      - org.testcontainers:testcontainers-azure
+      - org.testcontainers:testcontainers-cassandra
+      - org.testcontainers:testcontainers-chromadb
+      - org.testcontainers:testcontainers-clickhouse
+      - org.testcontainers:testcontainers-cockroachdb
+      - org.testcontainers:testcontainers-consul
+      - org.testcontainers:testcontainers-couchbase
+      - org.testcontainers:testcontainers-cratedb
+      - org.testcontainers:testcontainers-database-commons
+      - org.testcontainers:testcontainers-databend
+      - org.testcontainers:testcontainers-db2
+      - org.testcontainers:testcontainers-elasticsearch
+      - org.testcontainers:testcontainers-gcloud
+      - org.testcontainers:testcontainers-grafana
+      - org.testcontainers:testcontainers-hivemq
+      - org.testcontainers:testcontainers-influxdb
+      - org.testcontainers:testcontainers-jdbc
+      - org.testcontainers:testcontainers-junit-jupiter
+      - org.testcontainers:testcontainers-k3s
+      - org.testcontainers:testcontainers-k6
+      - org.testcontainers:testcontainers-kafka
+      - org.testcontainers:testcontainers-ldap
+      - org.testcontainers:testcontainers-localstack
+      - org.testcontainers:testcontainers-mariadb
+      - org.testcontainers:testcontainers-milvus
+      - org.testcontainers:testcontainers-minio
+      - org.testcontainers:testcontainers-mockserver
+      - org.testcontainers:testcontainers-mongodb
+      - org.testcontainers:testcontainers-mssqlserver
+      - org.testcontainers:testcontainers-mysql
+      - org.testcontainers:testcontainers-neo4j
+      - org.testcontainers:testcontainers-nginx
+      - org.testcontainers:testcontainers-oceanbase
+      - org.testcontainers:testcontainers-ollama
+      - org.testcontainers:testcontainers-openfga
+      - org.testcontainers:testcontainers-oracle-free
+      - org.testcontainers:testcontainers-oracle-xe
+      - org.testcontainers:testcontainers-orientdb
+      - org.testcontainers:testcontainers-pinecone
+      - org.testcontainers:testcontainers-postgresql
+      - org.testcontainers:testcontainers-presto
+      - org.testcontainers:testcontainers-pulsar
+      - org.testcontainers:testcontainers-qdrant
+      - org.testcontainers:testcontainers-questdb
+      - org.testcontainers:testcontainers-r2dbc
+      - org.testcontainers:testcontainers-rabbitmq
+      - org.testcontainers:testcontainers-redpanda
+      - org.testcontainers:testcontainers-scylladb
+      - org.testcontainers:testcontainers-selenium
+      - org.testcontainers:testcontainers-solace
+      - org.testcontainers:testcontainers-solr
+      - org.testcontainers:testcontainers-spock
+      - org.testcontainers:testcontainers-tidb
+      - org.testcontainers:testcontainers-timeplus
+      - org.testcontainers:testcontainers-toxiproxy
+      - org.testcontainers:testcontainers-trino
+      - org.testcontainers:testcontainers-typesense
+      - org.testcontainers:testcontainers-vault
+      - org.testcontainers:testcontainers-weaviate
+      - org.testcontainers:testcontainers-yugabytedb
+    reference:
+      label: Testcontainers
+      url: https://testcontainers.com/

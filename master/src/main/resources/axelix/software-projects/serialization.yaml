@@ -14,3 +14,178 @@ projects:
     reference:
       label: Gson maintenance-mode notice
       url: https://github.com/google/gson
+
+  - id: jackson2
+    name: Jackson 2
+    status: ACTIVE
+    summary: >-
+      The previous major Jackson generation, per the authors still actively maintained and the
+      most widely adopted one. New development happens in Jackson 3 (the tools.jackson group),
+      which is recommended for new projects.
+    coordinates:
+      - com.fasterxml.jackson.core:jackson-annotations
+      - com.fasterxml.jackson.core:jackson-core
+      - com.fasterxml.jackson.core:jackson-databind
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-avro
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-cbor
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-csv
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-ion
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-properties
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-protobuf
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-smile
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-toml
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-xml
+      - com.fasterxml.jackson.dataformat:jackson-dataformat-yaml
+      - com.fasterxml.jackson.datatype:jackson-datatype-eclipse-collections
+      - com.fasterxml.jackson.datatype:jackson-datatype-guava
+      - com.fasterxml.jackson.datatype:jackson-datatype-hibernate4
+      - com.fasterxml.jackson.datatype:jackson-datatype-hibernate5
+      - com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta
+      - com.fasterxml.jackson.datatype:jackson-datatype-hibernate6
+      - com.fasterxml.jackson.datatype:jackson-datatype-hibernate7
+      - com.fasterxml.jackson.datatype:jackson-datatype-hppc
+      - com.fasterxml.jackson.datatype:jackson-datatype-jakarta-jsonp
+      - com.fasterxml.jackson.datatype:jackson-datatype-javax-money
+      - com.fasterxml.jackson.datatype:jackson-datatype-jaxrs
+      - com.fasterxml.jackson.datatype:jackson-datatype-jdk8
+      - com.fasterxml.jackson.datatype:jackson-datatype-joda
+      - com.fasterxml.jackson.datatype:jackson-datatype-joda-money
+      - com.fasterxml.jackson.datatype:jackson-datatype-json-org
+      - com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+      - com.fasterxml.jackson.datatype:jackson-datatype-jsr353
+      - com.fasterxml.jackson.datatype:jackson-datatype-moneta
+      - com.fasterxml.jackson.datatype:jackson-datatype-pcollections
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-base
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-cbor-provider
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-smile-provider
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-xml-provider
+      - com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-yaml-provider
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-base
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-cbor-provider
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-smile-provider
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider
+      - com.fasterxml.jackson.jaxrs:jackson-jaxrs-yaml-provider
+      - com.fasterxml.jackson.jr:jackson-jr-all
+      - com.fasterxml.jackson.jr:jackson-jr-annotation-support
+      - com.fasterxml.jackson.jr:jackson-jr-extension-javatime
+      - com.fasterxml.jackson.jr:jackson-jr-objects
+      - com.fasterxml.jackson.jr:jackson-jr-retrofit2
+      - com.fasterxml.jackson.jr:jackson-jr-stree
+      - com.fasterxml.jackson.module:jackson-module-afterburner
+      - com.fasterxml.jackson.module:jackson-module-android-record
+      - com.fasterxml.jackson.module:jackson-module-blackbird
+      - com.fasterxml.jackson.module:jackson-module-guice
+      - com.fasterxml.jackson.module:jackson-module-guice7
+      - com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations
+      - com.fasterxml.jackson.module:jackson-module-jaxb-annotations
+      - com.fasterxml.jackson.module:jackson-module-jsonSchema
+      - com.fasterxml.jackson.module:jackson-module-jsonSchema-jakarta
+      - com.fasterxml.jackson.module:jackson-module-kotlin
+      - com.fasterxml.jackson.module:jackson-module-mrbean
+      - com.fasterxml.jackson.module:jackson-module-no-ctor-deser
+      - com.fasterxml.jackson.module:jackson-module-osgi
+      - com.fasterxml.jackson.module:jackson-module-parameter-names
+      - com.fasterxml.jackson.module:jackson-module-paranamer
+      - com.fasterxml.jackson.module:jackson-module-scala_2.11
+      - com.fasterxml.jackson.module:jackson-module-scala_2.12
+      - com.fasterxml.jackson.module:jackson-module-scala_2.13
+      - com.fasterxml.jackson.module:jackson-module-scala_3
+    reference:
+      label: Jackson project overview
+      url: https://github.com/FasterXML/jackson
+
+  - id: jackson3
+    name: Jackson 3
+    status: ACTIVE
+    summary: >-
+      Actively developed. The current major Jackson generation under the tools.jackson group,
+      recommended for new projects, and the generation Spring Boot 4 autoconfigures. Reuses the
+      2.x jackson-annotations artifact.
+    coordinates:
+      - tools.jackson.core:jackson-core
+      - tools.jackson.core:jackson-databind
+      - tools.jackson.dataformat:jackson-dataformat-avro
+      - tools.jackson.dataformat:jackson-dataformat-cbor
+      - tools.jackson.dataformat:jackson-dataformat-csv
+      - tools.jackson.dataformat:jackson-dataformat-ion
+      - tools.jackson.dataformat:jackson-dataformat-properties
+      - tools.jackson.dataformat:jackson-dataformat-protobuf
+      - tools.jackson.dataformat:jackson-dataformat-smile
+      - tools.jackson.dataformat:jackson-dataformat-toml
+      - tools.jackson.dataformat:jackson-dataformat-xml
+      - tools.jackson.dataformat:jackson-dataformat-yaml
+      - tools.jackson.datatype:jackson-datatype-eclipse-collections
+      - tools.jackson.datatype:jackson-datatype-guava
+      - tools.jackson.datatype:jackson-datatype-hibernate4
+      - tools.jackson.datatype:jackson-datatype-hibernate5
+      - tools.jackson.datatype:jackson-datatype-hibernate5-jakarta
+      - tools.jackson.datatype:jackson-datatype-hibernate6
+      - tools.jackson.datatype:jackson-datatype-hibernate7
+      - tools.jackson.datatype:jackson-datatype-hppc
+      - tools.jackson.datatype:jackson-datatype-jakarta-jsonp
+      - tools.jackson.datatype:jackson-datatype-javax-money
+      - tools.jackson.datatype:jackson-datatype-jaxrs
+      - tools.jackson.datatype:jackson-datatype-joda
+      - tools.jackson.datatype:jackson-datatype-joda-money
+      - tools.jackson.datatype:jackson-datatype-json-org
+      - tools.jackson.datatype:jackson-datatype-jsr353
+      - tools.jackson.datatype:jackson-datatype-moneta
+      - tools.jackson.datatype:jackson-datatype-pcollections
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-base
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-cbor-provider
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-json-provider
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-smile-provider
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-xml-provider
+      - tools.jackson.jakarta.rs:jackson-jakarta-rs-yaml-provider
+      - tools.jackson.jaxrs:jackson-jaxrs-base
+      - tools.jackson.jaxrs:jackson-jaxrs-cbor-provider
+      - tools.jackson.jaxrs:jackson-jaxrs-json-provider
+      - tools.jackson.jaxrs:jackson-jaxrs-smile-provider
+      - tools.jackson.jaxrs:jackson-jaxrs-xml-provider
+      - tools.jackson.jaxrs:jackson-jaxrs-yaml-provider
+      - tools.jackson.jr:jackson-jr-all
+      - tools.jackson.jr:jackson-jr-annotation-support
+      - tools.jackson.jr:jackson-jr-extension-javatime
+      - tools.jackson.jr:jackson-jr-objects
+      - tools.jackson.jr:jackson-jr-retrofit2
+      - tools.jackson.jr:jackson-jr-stree
+      - tools.jackson.module:jackson-module-afterburner
+      - tools.jackson.module:jackson-module-android-record
+      - tools.jackson.module:jackson-module-blackbird
+      - tools.jackson.module:jackson-module-guice
+      - tools.jackson.module:jackson-module-guice7
+      - tools.jackson.module:jackson-module-jakarta-xmlbind-annotations
+      - tools.jackson.module:jackson-module-jaxb-annotations
+      - tools.jackson.module:jackson-module-jsonSchema
+      - tools.jackson.module:jackson-module-jsonSchema-jakarta
+      - tools.jackson.module:jackson-module-kotlin
+      - tools.jackson.module:jackson-module-mrbean
+      - tools.jackson.module:jackson-module-no-ctor-deser
+      - tools.jackson.module:jackson-module-osgi
+      - tools.jackson.module:jackson-module-scala_2.12
+      - tools.jackson.module:jackson-module-scala_2.13
+      - tools.jackson.module:jackson-module-scala_3
+    reference:
+      label: Jackson project overview
+      url: https://github.com/FasterXML/jackson
+
+  - id: jackson1
+    name: Jackson 1
+    status: SUNSET
+    summary: >-
+      The org.codehaus.jackson generation is deprecated and no versions are released anymore.
+      Jackson 2 and 3 live under different coordinates and can co-exist with it, so migration is
+      incremental.
+    coordinates:
+      - org.codehaus.jackson:jackson-core-asl
+      - org.codehaus.jackson:jackson-mapper-asl
+      - org.codehaus.jackson:jackson-jaxrs
+      - org.codehaus.jackson:jackson-xc
+    succession:
+      kind: SUPERSEDED_BY
+      value: tools.jackson.core:jackson-databind
+    reference:
+      label: Jackson project overview
+      url: https://github.com/FasterXML/jackson
