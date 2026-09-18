@@ -193,6 +193,9 @@ public final class EnvironmentFeed {
         @Nullable
         private final List<InjectionPoint> injectionPoints;
 
+        @Nullable
+        private final DangerousValue dangerousValue;
+
         /**
          * Creates a new Property.
          *
@@ -207,6 +210,7 @@ public final class EnvironmentFeed {
          *                            property is not considered deprecated. If not {@code null},
          *                            then the property is considered deprecated.
          * @param injectionPoints     the injection points where this property is used.
+         * @param dangerousValue      our verdict on the value, {@code null} when we consider it fine.
          */
         @JsonCreator
         public Property(
@@ -216,7 +220,8 @@ public final class EnvironmentFeed {
                 @JsonProperty("configPropsBeanName") @Nullable String configPropsBeanName,
                 @JsonProperty("description") @Nullable String description,
                 @JsonProperty("deprecation") @Nullable Deprecation deprecation,
-                @JsonProperty("injectionPoints") @Nullable List<InjectionPoint> injectionPoints) {
+                @JsonProperty("injectionPoints") @Nullable List<InjectionPoint> injectionPoints,
+                @JsonProperty("dangerousValue") @Nullable DangerousValue dangerousValue) {
             this.name = name;
             this.value = value;
             this.isPrimary = isPrimary;
@@ -224,6 +229,7 @@ public final class EnvironmentFeed {
             this.description = description;
             this.deprecation = deprecation;
             this.injectionPoints = injectionPoints;
+            this.dangerousValue = dangerousValue;
         }
 
         public String getName() {
@@ -259,6 +265,11 @@ public final class EnvironmentFeed {
             return injectionPoints;
         }
 
+        @Nullable
+        public DangerousValue getDangerousValue() {
+            return dangerousValue;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -274,12 +285,21 @@ public final class EnvironmentFeed {
                     && Objects.equals(configPropsBeanName, property.configPropsBeanName)
                     && Objects.equals(description, property.description)
                     && Objects.equals(deprecation, property.deprecation)
-                    && Objects.equals(injectionPoints, property.injectionPoints);
+                    && Objects.equals(injectionPoints, property.injectionPoints)
+                    && Objects.equals(dangerousValue, property.dangerousValue);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, value, isPrimary, configPropsBeanName, description, deprecation, injectionPoints);
+            return Objects.hash(
+                    name,
+                    value,
+                    isPrimary,
+                    configPropsBeanName,
+                    description,
+                    deprecation,
+                    injectionPoints,
+                    dangerousValue);
         }
 
         @Override
@@ -291,7 +311,8 @@ public final class EnvironmentFeed {
                     + configPropsBeanName + '\'' + ", description='"
                     + description + '\'' + ", deprecation="
                     + deprecation + ", injectionPoints="
-                    + injectionPoints + '}';
+                    + injectionPoints + ", dangerousValue="
+                    + dangerousValue + '}';
         }
     }
 
@@ -336,6 +357,65 @@ public final class EnvironmentFeed {
         @Override
         public String toString() {
             return "Deprecation{" + "message='" + message + '\'' + '}';
+        }
+    }
+
+    /**
+     * DTO that encapsulates our verdict on the value the property is set to being dangerous.
+     */
+    public static final class DangerousValue {
+
+        private final String rationale;
+
+        @Nullable
+        private final String alternativeExample;
+
+        /**
+         * Creates a new DangerousValue.
+         *
+         * @param rationale          explaining why the value is considered dangerous.
+         * @param alternativeExample an example of what the property may be set to instead, not a prescription.
+         */
+        @JsonCreator
+        public DangerousValue(
+                @JsonProperty("rationale") String rationale,
+                @JsonProperty("alternativeExample") @Nullable String alternativeExample) {
+            this.rationale = rationale;
+            this.alternativeExample = alternativeExample;
+        }
+
+        public String getRationale() {
+            return rationale;
+        }
+
+        @Nullable
+        public String getAlternativeExample() {
+            return alternativeExample;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            DangerousValue that = (DangerousValue) o;
+            return Objects.equals(rationale, that.rationale)
+                    && Objects.equals(alternativeExample, that.alternativeExample);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rationale, alternativeExample);
+        }
+
+        @Override
+        public String toString() {
+            return "DangerousValue{" + "rationale='"
+                    + rationale + '\'' + ", alternativeExample='"
+                    + alternativeExample + '\'' + '}';
         }
     }
 
