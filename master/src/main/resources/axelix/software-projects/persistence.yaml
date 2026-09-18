@@ -209,10 +209,11 @@ projects:
 
   - id: jtds
     name: jTDS
-    status: SUNSET
+    status: DORMANT
     summary: >-
-      The last release, 1.3.1, was published in 2014 and the project has been inactive since.
-      Microsoft's own SQL Server driver is the maintained way to reach the same databases.
+      The last release, 1.3.1, was published in 2014 and the project has been inactive since,
+      although it was never formally discontinued. Microsoft's own SQL Server driver is the
+      maintained way to reach the same databases.
     coordinates:
       - net.sourceforge.jtds:jtds
     succession:
@@ -520,3 +521,71 @@ projects:
     reference:
       label: oracle-r2dbc on GitHub
       url: https://github.com/oracle/oracle-r2dbc
+
+  - id: jooq
+    name: jOOQ
+    status: ACTIVE
+    summary: >-
+      Actively developed by Data Geekery.
+    coordinates:
+      - org.jooq:jooq
+      - org.jooq:jooq-beans-extensions
+      - org.jooq:jooq-checker
+      - org.jooq:jooq-codegen
+      - org.jooq:jooq-codegen-gradle
+      - org.jooq:jooq-codegen-maven
+      - org.jooq:jooq-jackson-extensions
+      - org.jooq:jooq-jackson3-extensions
+      - org.jooq:jooq-jpa-extensions
+      - org.jooq:jooq-kotlin
+      - org.jooq:jooq-kotlin-coroutines
+      - org.jooq:jooq-meta
+      - org.jooq:jooq-meta-extensions
+      - org.jooq:jooq-meta-extensions-hibernate
+      - org.jooq:jooq-meta-extensions-liquibase
+      - org.jooq:jooq-meta-kotlin
+      - org.jooq:jooq-migrations
+      - org.jooq:jooq-migrations-maven
+      - org.jooq:jooq-postgres-extensions
+      - org.jooq:jooq-reactor-extensions
+      - org.jooq:jooq-scala_3.5
+      - org.jooq:jooq-xtend
+    reference:
+      label: jOOQ
+      url: https://www.jooq.org/
+
+  - id: querydsl
+    name: QueryDSL
+    status: DORMANT
+    summary: >-
+      Releases have stalled: the latest, 5.1.0, dates to January 2024, although the repository
+      still sees occasional activity.
+    coordinates:
+      - com.querydsl:codegen-utils
+      - com.querydsl:querydsl-apt
+      - com.querydsl:querydsl-codegen
+      - com.querydsl:querydsl-collections
+      - com.querydsl:querydsl-core
+      - com.querydsl:querydsl-guava
+      - com.querydsl:querydsl-hibernate-search
+      - com.querydsl:querydsl-jdo
+      - com.querydsl:querydsl-jpa
+      - com.querydsl:querydsl-jpa-codegen
+      - com.querydsl:querydsl-kotlin
+      - com.querydsl:querydsl-kotlin-codegen
+      - com.querydsl:querydsl-lucene3
+      - com.querydsl:querydsl-lucene4
+      - com.querydsl:querydsl-lucene5
+      - com.querydsl:querydsl-mongodb
+      - com.querydsl:querydsl-scala
+      - com.querydsl:querydsl-spatial
+      - com.querydsl:querydsl-sql
+      - com.querydsl:querydsl-sql-codegen
+      - com.querydsl:querydsl-sql-spatial
+      - com.querydsl:querydsl-sql-spring
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: The community OpenFeign QueryDSL fork (io.github.openfeign.querydsl) continues releasing; jOOQ or the JPA Criteria API are the common alternatives
+    reference:
+      label: QueryDSL on GitHub
+      url: https://github.com/querydsl/querydsl

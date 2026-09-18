@@ -19,10 +19,11 @@ projects:
 
   - id: commons-pool1
     name: Apache Commons Pool 1
-    status: SUNSET
+    status: DORMANT
     summary: >-
-      The 1.x line has not seen a release since 1.6 in 2013. Development continues only in Commons
-      Pool 2, which lives under different coordinates.
+      The 1.x line has not seen a release since 1.6 in 2013, although it was never formally
+      discontinued. Development continues only in Commons Pool 2, which lives under different
+      coordinates.
     coordinates:
       - commons-pool:commons-pool
     succession:
