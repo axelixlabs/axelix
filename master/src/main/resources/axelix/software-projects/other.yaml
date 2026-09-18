@@ -31,3 +31,13 @@ projects:
     reference:
       label: Apache Commons Pool
       url: https://commons.apache.org/proper/commons-pool/
+
+  - id: commons-pool2
+    name: Apache Commons Pool 2
+    status: ACTIVE
+    summary: Actively maintained by the Apache Commons project. The successor line of Commons Pool 1.
+    coordinates:
+      - org.apache.commons:commons-pool2
+    reference:
+      label: Apache Commons Pool
+      url: https://commons.apache.org/proper/commons-pool/

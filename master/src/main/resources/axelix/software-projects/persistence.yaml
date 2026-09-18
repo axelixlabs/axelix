@@ -262,3 +262,94 @@ projects:
     reference:
       label: influxdb-java on GitHub
       url: https://github.com/influxdata/influxdb-java
+
+  - id: caffeine
+    name: Caffeine
+    status: ACTIVE
+    summary: Actively developed. The in-process caching library Spring's cache abstraction defaults to.
+    coordinates:
+      - com.github.ben-manes.caffeine:caffeine
+      - com.github.ben-manes.caffeine:guava
+      - com.github.ben-manes.caffeine:jcache
+      - com.github.ben-manes.caffeine:simulator
+    reference:
+      label: Caffeine on GitHub
+      url: https://github.com/ben-manes/caffeine
+
+  - id: ehcache3
+    name: Ehcache 3
+    status: ACTIVE
+    summary: Actively developed. The current Ehcache line, under different coordinates than the closed 2.x one.
+    coordinates:
+      - org.ehcache:ehcache
+      - org.ehcache:ehcache-clustered
+      - org.ehcache:ehcache-transactions
+    reference:
+      label: Ehcache
+      url: https://www.ehcache.org/
+
+  - id: hazelcast
+    name: Hazelcast
+    status: ACTIVE
+    summary: Actively developed by Hazelcast Inc.
+    coordinates:
+      - com.hazelcast:hazelcast
+      - com.hazelcast:hazelcast-spring
+    reference:
+      label: Hazelcast
+      url: https://github.com/hazelcast/hazelcast
+
+  - id: lettuce
+    name: Lettuce
+    status: ACTIVE
+    summary: >-
+      Actively developed under the Redis organization. The Redis client Spring Data Redis uses by
+      default.
+    coordinates:
+      - io.lettuce:lettuce-core
+    reference:
+      label: Lettuce on GitHub
+      url: https://github.com/redis/lettuce
+
+  - id: jedis
+    name: Jedis
+    status: ACTIVE
+    summary: Actively developed under the Redis organization.
+    coordinates:
+      - redis.clients:jedis
+    reference:
+      label: Jedis on GitHub
+      url: https://github.com/redis/jedis
+
+  - id: commons-dbcp2
+    name: Apache Commons DBCP 2
+    status: ACTIVE
+    summary: Actively maintained by the Apache Commons project.
+    coordinates:
+      - org.apache.commons:commons-dbcp2
+    reference:
+      label: Apache Commons DBCP
+      url: https://commons.apache.org/proper/commons-dbcp/
+
+  - id: tomcat-jdbc-pool
+    name: Tomcat JDBC Pool
+    status: ACTIVE
+    summary: The JDBC connection pool of the Apache Tomcat project, maintained as part of Tomcat.
+    coordinates:
+      - org.apache.tomcat:tomcat-jdbc
+    reference:
+      label: Tomcat JDBC pool documentation
+      url: https://tomcat.apache.org/tomcat-11.0-doc/jdbc-pool.html
+
+  - id: vibur-dbcp
+    name: Vibur DBCP
+    status: ACTIVE
+    summary: >-
+      Developed by a single maintainer on a slow cadence - roughly one release a year, the latest
+      being 26.0 in January 2025.
+    coordinates:
+      - org.vibur:vibur-dbcp
+      - org.vibur:vibur-object-pool
+    reference:
+      label: Vibur DBCP
+      url: https://github.com/vibur/vibur-dbcp
