@@ -10,6 +10,9 @@ repositories {
 dependencies {
     // Used by the contract document validation, see contract/ContractDocuments.kt
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+
+    // Applied by the 'contracts' convention plugin, see contracts.gradle.kts
+    implementation("org.openapitools:openapi-generator-gradle-plugin:7.25.0")
 }
 
 

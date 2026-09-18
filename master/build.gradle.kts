@@ -7,7 +7,7 @@ plugins {
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
-    id("org.openapi.generator") version "7.25.0"
+    id("contracts")
 }
 
 val springBootVersion = "4.1.0"
@@ -137,62 +137,8 @@ tasks.processResources {
     exclude("application-local.yaml")
 }
 
-// The wire classes of the Axelix Master <-> starter contracts are generated from the OpenAPI
-// documents in :common, so that the yaml document stays the single source of truth of every
-// contract. Every document describes exactly one operation and gets its own generation task; the
-// model package is derived from the feature directory the document lives in.
-val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { include("**/*.yaml") }
-    .sortedBy { it.absolutePath }
-    .map { document ->
-        val featurePackage = document.parentFile.name.replace("-", "")
-        val operation = document.nameWithoutExtension
-        val outputRoot = layout.buildDirectory.dir("generated/openapi/$operation").get().asFile
-
-        val generate = tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>(
-            "openApiGenerate" + operation.split('-').joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }) {
-
-            generatorName.set("java")
-            library.set("resttemplate")
-            inputSpec.set(document.absolutePath)
-            outputDir.set(outputRoot.absolutePath)
-            modelPackage.set("com.axelixlabs.axelix.master.contract.$featurePackage")
-            globalProperties.set(mapOf("models" to "", "modelDocs" to "false", "modelTests" to "false"))
-            configOptions.set(mapOf(
-                "hideGenerationTimestamp" to "true",
-                "openApiNullable" to "false",
-                "serializationLibrary" to "jackson",
-                "useBeanValidation" to "false",
-                "annotationLibrary" to "none",
-                "useJspecify" to "true",
-            ))
-
-            doFirst {
-                contract.ContractDocuments.validate(document)
-            }
-
-            // The generator offers no option to suppress the @Generated annotation, so it is
-            // dropped right after the generation, freeing the module from a javax.annotation-api
-            // dependency.
-            val rewriteRoot = outputRoot.resolve("src/main/java")
-            doLast {
-                rewriteRoot.walkTopDown().filter { it.extension == "java" }.forEach { source ->
-                    source.writeText(source.readText()
-                        .lineSequence().filterNot { it.startsWith("@javax.annotation.Generated") }.joinToString("\n"))
-                }
-            }
-        }
-
-        // builtBy carries the task dependency to every consumer of the source set, so no compile
-        // task needs an explicit dependsOn.
-        files(outputRoot.resolve("src/main/java")).builtBy(generate)
-    }
-
-sourceSets {
-    main {
-        java {
-            contractSources.forEach { srcDir(it) }
-        }
-    }
+contracts {
+    modelBasePackage.set("com.axelixlabs.axelix.master.contract")
 }
 
 // The generated contract classes cannot pass NullAway: a required property is non-null under
@@ -202,10 +148,6 @@ tasks.named<JavaCompile>("compileJava") {
     options.errorprone {
         option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.master.contract(\\..*)?")
     }
-}
-
-tasks.withType<Pmd>().configureEach {
-    exclude("**/contract/**")
 }
 
 axelix {
