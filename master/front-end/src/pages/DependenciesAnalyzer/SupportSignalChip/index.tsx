@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { HintTooltip } from "@/components";
-import type { IDependencySupportSignal } from "@/models";
+import { ESupportStatus, type ISoftwareProject } from "@/models";
 import { supportSignalClassToken, supportSignalColor, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -27,38 +27,43 @@ interface IProps {
     /**
      * The signal the curated project registry raised about the dependency.
      */
-    signal: IDependencySupportSignal;
+    signal: ISoftwareProject;
 }
 
-/**
- * The signal a flagged dependency carries in the feed. Hovering it reveals why the project carries the signal and
- * what that was read from.
- */
 export const SupportSignalChip = ({ signal }: IProps) => {
     const { t } = useTranslation();
 
+    if (signal.status === ESupportStatus.ACTIVE) {
+        return null;
+    }
+
+
     return (
-        <HintTooltip
-            content={
-                <>
-                    <div className={styles.HintHeader}>
-                        <span className={styles.HintDot} style={{ backgroundColor: supportSignalColor[signal.kind] }} />
-                        <span className={styles.HintTitle} style={{ color: supportSignalColor[signal.kind] }}>
-                            {t(supportSignalLabelKey[signal.kind])}
-                        </span>
-                    </div>
-                    <div>{signal.reason}</div>
-                    <div className={styles.Evidence}>
-                        <span className={styles.EvidenceLabel}>{t("DependenciesAnalyzer.detail.detectedFrom")}</span>
-                        <span className={styles.EvidenceValue}>{signal.evidence}</span>
-                    </div>
-                </>
-            }
-        >
-            <span className={`TextUltraSmall ${styles.Chip} ${styles[supportSignalClassToken[signal.kind]]}`}>
-                <span className={styles.Dot} />
-                {t(supportSignalLabelKey[signal.kind])}
-            </span>
-        </HintTooltip>
+        <>
+            <HintTooltip
+                content={
+                    <>
+                        <div className={styles.HintHeader}>
+                            <span
+                                className={styles.HintDot}
+                                style={{ backgroundColor: supportSignalColor[signal.status] }}
+                            />
+                            <span className={styles.HintTitle} style={{ color: supportSignalColor[signal.status] }}>
+                                {t(supportSignalLabelKey[signal.status])}
+                            </span>
+
+                            <div>
+                                {signal.summary}
+                            </div>
+                        </div>
+                    </>
+                }
+            >
+                <span className={`TextUltraSmall ${styles.Chip} ${styles[supportSignalClassToken[signal.status]]}`}>
+                    <span className={styles.Dot} />
+                    {t(supportSignalLabelKey[signal.status])}
+                </span>
+            </HintTooltip>
+        </>
     );
 };

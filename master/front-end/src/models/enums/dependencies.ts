@@ -20,9 +20,10 @@
  * What a curated project registry states about the project behind a resolved dependency. A dependency without a
  * signal is simply a project nothing is flagged about, it is not a statement that the project is healthy.
  */
-export enum ESupportSignal {
-    DISCONTINUED = "DISCONTINUED",
+export enum ESupportStatus {
+    ACTIVE = "ACTIVE",
     MAINTENANCE = "MAINTENANCE",
+    SUNSET = "SUNSET",
 }
 
 /**
@@ -41,7 +42,7 @@ export enum EDependencyEcosystem {
 /**
  * Where the platform version an instance runs sits on the upstream OSS maintenance window.
  */
-export enum EPlatformSupportStatus {
+export enum EFrameworkSupportStatus {
     OSS_SUPPORTED = "OSS_SUPPORTED",
     OUT_OF_OSS_MAINTENANCE = "OUT_OF_OSS_MAINTENANCE",
 }

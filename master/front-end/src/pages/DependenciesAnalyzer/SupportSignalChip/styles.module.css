@@ -19,6 +19,7 @@
     border-radius: 2px;
     flex-shrink: 0;
     background-color: var(--chip-color);
+    /* background-color: red; */
 }
 
 .Discontinued {
@@ -51,28 +52,4 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-}
-
-.Evidence {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-top: 2px;
-    padding-top: 8px;
-
-    /* the tooltip surface is dark, so the rule has to be a translucent white rather than a grey token */
-    border-top: 1px solid rgb(255 255 255 / 12%);
-}
-
-.EvidenceLabel {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--axelix-bold-grey);
-}
-
-.EvidenceValue {
-    font-size: 12px;
-    overflow-wrap: anywhere;
 }

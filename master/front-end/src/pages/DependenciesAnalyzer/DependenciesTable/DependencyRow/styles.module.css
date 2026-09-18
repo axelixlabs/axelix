@@ -1,23 +1,23 @@
 .MainWrapper {
-    border-bottom: 1px solid var(--axelix-light-grey);
-}
+    border-bottom: 1px solid var(--axelix-medium-grey);
 
-.MainWrapper:last-child {
-    border-bottom: none;
+    &:last-child {
+        border-bottom: none;
+    }
 }
 
 .Row {
     display: grid;
     grid-template-columns: var(--da-columns);
-    gap: 14px;
+    gap: 16px;
     align-items: center;
     background-color: var(--row-bg, var(--axelix-primary-white));
     border-left: 3px solid var(--row-accent, transparent);
-}
 
-.Row:hover {
-    /* TODO: Improve in future */
-    background-color: #f9f9f9;
+    &:hover {
+        /* TODO: Improve in future */
+        background-color: #f9f9f9;
+    }
 }
 
 /* TODO: Improve in future */
@@ -34,7 +34,7 @@
 .Dependency {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
     flex-wrap: wrap;
     min-width: 0;
 }
@@ -49,16 +49,14 @@
     white-space: nowrap;
 }
 
-.Version {
+.Version,
+.Scope {
     justify-self: end;
     font-weight: 600;
     white-space: nowrap;
 }
 
 .Scope {
-    justify-self: end;
-    font-weight: 600;
-    white-space: nowrap;
     color: var(--axelix-bold-grey);
 }
 
@@ -66,7 +64,6 @@
     color: var(--axelix-primary-black);
 }
 
-/* the detail brings its own padding/background, so drop the Accordion default */
 .Content {
     padding: 0;
 }

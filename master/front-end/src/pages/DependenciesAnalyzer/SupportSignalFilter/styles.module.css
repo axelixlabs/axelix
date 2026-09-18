@@ -1,10 +1,11 @@
 .MainWrapper {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
+/* TODO: Fix in future */
 .Chip {
     display: inline-flex;
     align-items: center;
@@ -24,6 +25,8 @@
         background-color 0.15s;
 }
 
+
+/* TODO: Fix in future */
 .ChipDot {
     width: 7px;
     height: 7px;
@@ -50,12 +53,12 @@
 }
 
 .Count {
-    font-weight: 700;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
     padding: 1px 5px;
     border-radius: var(--axelix-border-radius-small);
     color: var(--axelix-bold-grey);
-    background-color: var(--axelix-extra-light-grey);
+    background-color: var(--axelix-light-grey);
 }
 
 .ActiveChip .Count {
@@ -64,6 +67,7 @@
 }
 
 .Clear {
+    /* TODO: Improve in future */
     padding: 6px 4px;
     font: inherit;
     font-weight: 600;
@@ -71,8 +75,8 @@
     background: none;
     border: none;
     cursor: pointer;
-}
 
-.Clear:hover {
-    color: var(--axelix-primary-black);
+    &:hover {
+        color: var(--axelix-primary-black);
+    }
 }

@@ -469,8 +469,8 @@
         }
     },
     "DependenciesAnalyzer": {
-        "platform": {
-            "caption": "Окно поддержки {{platform}}",
+        "framework": {
+            "caption": "Окно поддержки {{framework}}",
             "source": "Считано из работающей JVM · {{date}}",
             "runningLine": "Используется линия {{line}} · последняя известная Axelix линия — {{latest}}",
             "today": "Сегодня",
@@ -483,7 +483,7 @@
             "supportedTarget": "Поддерживаемая цель",
             "targetValue": "{{line}} · OSS до {{date}}"
         },
-        "platformStatus": {
+        "frameworkStatus": {
             "OSS_SUPPORTED": "В рамках OSS-поддержки",
             "OUT_OF_OSS_MAINTENANCE": "Вне OSS-поддержки"
         },
@@ -517,7 +517,7 @@
             "OTHER": "Прочее"
         },
         "signals": {
-            "DISCONTINUED": "Прекращён",
+            "SUNSET": "Sunset",
             "MAINTENANCE": "Режим поддержки"
         },
         "columns": {

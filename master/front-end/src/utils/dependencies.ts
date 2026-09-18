@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EDependencyEcosystem, EDependencyNote, EPlatformSupportStatus, ESupportSignal } from "@/models";
+import { EDependencyEcosystem, EDependencyNote, EFrameworkSupportStatus, ESupportStatus } from "@/models";
 
 /**
  * The support signals in the order they should be presented across the page.
  */
-export const SUPPORT_SIGNAL_ORDER: ESupportSignal[] = [ESupportSignal.DISCONTINUED, ESupportSignal.MAINTENANCE];
+export const SUPPORT_STATUS_ORDER: ESupportStatus[] = [ESupportStatus.SUNSET, ESupportStatus.MAINTENANCE];
 
 /**
  * The ecosystems in the order their tabs should be presented, after the leading "All" tab.
@@ -38,26 +38,29 @@ export const DEPENDENCY_ECOSYSTEM_ORDER: EDependencyEcosystem[] = [
 /**
  * The i18n key of the short label of a support signal.
  */
-export const supportSignalLabelKey: Record<ESupportSignal, string> = {
-    [ESupportSignal.DISCONTINUED]: "DependenciesAnalyzer.signals.DISCONTINUED",
-    [ESupportSignal.MAINTENANCE]: "DependenciesAnalyzer.signals.MAINTENANCE",
+export const supportSignalLabelKey: Record<Exclude<ESupportStatus, ESupportStatus.ACTIVE>, string> = {
+    [ESupportStatus.MAINTENANCE]: "DependenciesAnalyzer.signals.MAINTENANCE",
+    [ESupportStatus.SUNSET]: "DependenciesAnalyzer.signals.SUNSET",
 };
 
 /**
  * The CSS-module class token (from the chip / row styles) used to color a support signal.
  */
-export const supportSignalClassToken: Record<ESupportSignal, "Discontinued" | "Maintenance"> = {
-    [ESupportSignal.DISCONTINUED]: "Discontinued",
-    [ESupportSignal.MAINTENANCE]: "Maintenance",
+export const supportSignalClassToken: Record<
+    Exclude<ESupportStatus, ESupportStatus.ACTIVE>,
+    "Sunset" | "Maintenance"
+> = {
+    [ESupportStatus.SUNSET]: "Sunset",
+    [ESupportStatus.MAINTENANCE]: "Maintenance",
 };
 
 /**
  * The accent color of a support signal. Mirrors the {@code --signal-*} CSS variables and is used where those
  * variables are out of scope, e.g. inside a tooltip that is portaled outside the page wrapper.
  */
-export const supportSignalColor: Record<ESupportSignal, string> = {
-    [ESupportSignal.DISCONTINUED]: "#b42318",
-    [ESupportSignal.MAINTENANCE]: "#b54708",
+export const supportSignalColor: Record<Exclude<ESupportStatus, ESupportStatus.ACTIVE>, string> = {
+    [ESupportStatus.SUNSET]: "#b42318",
+    [ESupportStatus.MAINTENANCE]: "#b54708",
 };
 
 /**
@@ -84,17 +87,17 @@ export const dependencyNoteLabelKey: Record<EDependencyNote, string> = {
 /**
  * The i18n key of the badge shown for a platform support status.
  */
-export const platformSupportStatusLabelKey: Record<EPlatformSupportStatus, string> = {
-    [EPlatformSupportStatus.OSS_SUPPORTED]: "DependenciesAnalyzer.platformStatus.OSS_SUPPORTED",
-    [EPlatformSupportStatus.OUT_OF_OSS_MAINTENANCE]: "DependenciesAnalyzer.platformStatus.OUT_OF_OSS_MAINTENANCE",
+export const frameworkSupportStatusLabelKey: Record<EFrameworkSupportStatus, string> = {
+    [EFrameworkSupportStatus.OSS_SUPPORTED]: "DependenciesAnalyzer.frameworkStatus.OSS_SUPPORTED",
+    [EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE]: "DependenciesAnalyzer.frameworkStatus.OUT_OF_OSS_MAINTENANCE",
 };
 
 /**
  * The i18n key of the "what this means for you" prose shown next to a platform support status.
  */
-export const platformSupportConsequenceKey: Record<EPlatformSupportStatus, string> = {
-    [EPlatformSupportStatus.OSS_SUPPORTED]: "DependenciesAnalyzer.consequences.OSS_SUPPORTED",
-    [EPlatformSupportStatus.OUT_OF_OSS_MAINTENANCE]: "DependenciesAnalyzer.consequences.OUT_OF_OSS_MAINTENANCE",
+export const frameworkSupportConsequenceKey: Record<EFrameworkSupportStatus, string> = {
+    [EFrameworkSupportStatus.OSS_SUPPORTED]: "DependenciesAnalyzer.consequences.OSS_SUPPORTED",
+    [EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE]: "DependenciesAnalyzer.consequences.OUT_OF_OSS_MAINTENANCE",
 };
 
 /**

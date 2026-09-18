@@ -17,7 +17,7 @@
  */
 import dayjs from "dayjs";
 
-import type { EDependencyEcosystem, ESupportSignal, IPlatformSupportWindow, IResolvedDependency } from "@/models";
+import type { EDependencyEcosystem, ESupportStatus, IFrameworkSupportWindow, IResolvedDependency } from "@/models";
 
 /**
  * A single hop of the chain leading from the root application down to a resolved dependency.
@@ -87,19 +87,24 @@ export const matchesDependencyFilters = (
     dependency: IResolvedDependency,
     search: string,
     ecosystem: EDependencyEcosystem | null,
-    signals: ESupportSignal[],
+    signals: ESupportStatus[],
 ): boolean => {
     const formattedSearch = search.trim();
 
-    if (formattedSearch && !relax(`${dependency.coordinates} ${dependency.project}`).includes(relax(formattedSearch))) {
+    const coordinates = `${dependency.dependency.library.groupId}:${dependency.dependency.library.artifactId}`;
+
+    if (formattedSearch && !relax(coordinates).includes(relax(formattedSearch))) {
         return false;
     }
 
-    if (ecosystem !== null && dependency.ecosystem !== ecosystem) {
+    if (ecosystem !== null && dependency.softwareProject?.ecosystem !== ecosystem) {
         return false;
     }
 
-    if (signals.length > 0 && (dependency.signal === null || !signals.includes(dependency.signal.kind))) {
+    if (
+        signals.length > 0 &&
+        (dependency.softwareProject === null || !signals.includes(dependency.softwareProject.status))
+    ) {
         return false;
     }
 
@@ -113,7 +118,7 @@ export const filterDependencies = (
     dependencies: IResolvedDependency[],
     search: string,
     ecosystem: EDependencyEcosystem | null,
-    signals: ESupportSignal[],
+    signals: ESupportStatus[],
 ): IResolvedDependency[] => {
     return dependencies.filter((dependency) => matchesDependencyFilters(dependency, search, ecosystem, signals));
 };
@@ -137,10 +142,10 @@ export const buildResolutionPath = (rootCoordinates: string, dependency: IResolv
  * Measures out the maintenance window bar: how much of it the line spent under OSS maintenance, how much it spends
  * under commercial support only, and where today falls. A line without commercial support is entirely OSS.
  */
-export const buildSupportTimeline = (platform: IPlatformSupportWindow): ISupportTimeline => {
-    const released = dayjs(platform.releasedAt).valueOf();
-    const ossEnd = dayjs(platform.ossSupportEndsAt).valueOf();
-    const end = platform.commercialSupportEndsAt ? dayjs(platform.commercialSupportEndsAt).valueOf() : ossEnd;
+export const buildSupportTimeline = (platform: IFrameworkSupportWindow): ISupportTimeline => {
+    const released = dayjs(platform.line.releasedAt).valueOf();
+    const ossEnd = dayjs(platform.line.ossSupportEndsAt).valueOf();
+    const end = platform.line.commercialSupportEndsAt ? dayjs(platform.line.commercialSupportEndsAt).valueOf() : ossEnd;
     const span = end - released;
 
     if (span <= 0) {

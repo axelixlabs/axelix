@@ -15,12 +15,12 @@
 .Feed {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
 .Caption {
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-weight: 600;
+    letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--axelix-bold-grey);
 }
@@ -28,7 +28,7 @@
 .Toolbar {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--axelix-light-grey);
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }

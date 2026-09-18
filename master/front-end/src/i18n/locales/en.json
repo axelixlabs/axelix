@@ -467,8 +467,8 @@
         }
     },
     "DependenciesAnalyzer": {
-        "platform": {
-            "caption": "{{platform}} maintenance window",
+        "framework": {
+            "caption": "{{framework}} maintenance window",
             "source": "Read from the running JVM · {{date}}",
             "runningLine": "Running the {{line}} line · latest line known to Axelix is {{latest}}",
             "today": "Today",
@@ -481,7 +481,7 @@
             "supportedTarget": "Supported target",
             "targetValue": "{{line}} · OSS to {{date}}"
         },
-        "platformStatus": {
+        "frameworkStatus": {
             "OSS_SUPPORTED": "Within OSS maintenance",
             "OUT_OF_OSS_MAINTENANCE": "Out of OSS maintenance"
         },
@@ -511,8 +511,8 @@
             "OTHER": "Other"
         },
         "signals": {
-            "DISCONTINUED": "Discontinued",
-            "MAINTENANCE": "Maintenance mode"
+            "MAINTENANCE": "Maintenance mode",
+            "SUNSET": "Sunset"
         },
         "columns": {
             "dependency": "Dependency",
