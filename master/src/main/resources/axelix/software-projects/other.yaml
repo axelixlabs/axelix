@@ -218,3 +218,108 @@ projects:
     reference:
       label: Quartz Scheduler
       url: https://github.com/quartz-scheduler/quartz
+
+  - id: byte-buddy
+    name: Byte Buddy
+    status: ACTIVE
+    summary: >-
+      Actively developed. The bytecode generation library underneath Mockito, Hibernate and
+      many agents.
+    coordinates:
+      - net.bytebuddy:byte-buddy
+      - net.bytebuddy:byte-buddy-agent
+    reference:
+      label: Byte Buddy
+      url: https://bytebuddy.net/
+
+  - id: commons-lang3
+    name: Apache Commons Lang 3
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the Apache Commons project.
+    coordinates:
+      - org.apache.commons:commons-lang3
+    reference:
+      label: Apache Commons Lang
+      url: https://commons.apache.org/proper/commons-lang/
+
+  - id: commons-codec
+    name: Apache Commons Codec
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the Apache Commons project.
+    coordinates:
+      - commons-codec:commons-codec
+    reference:
+      label: Apache Commons Codec
+      url: https://commons.apache.org/proper/commons-codec/
+
+  - id: classmate
+    name: ClassMate
+    status: ACTIVE
+    summary: >-
+      Actively maintained by FasterXML. Arrives transitively through Hibernate Validator.
+    coordinates:
+      - com.fasterxml:classmate
+    reference:
+      label: ClassMate on GitHub
+      url: https://github.com/FasterXML/java-classmate
+
+  - id: jspecify
+    name: JSpecify
+    status: ACTIVE
+    summary: >-
+      Actively developed. The cross-vendor nullness annotations Spring Framework 7 adopted.
+    coordinates:
+      - org.jspecify:jspecify
+    reference:
+      label: JSpecify
+      url: https://jspecify.dev/
+
+  - id: angus-mail
+    name: Eclipse Angus Mail
+    status: ACTIVE
+    summary: >-
+      Actively maintained under Eclipse EE4J. The implementation of Jakarta Mail.
+    coordinates:
+      - org.eclipse.angus:angus-core
+      - org.eclipse.angus:angus-mail
+      - org.eclipse.angus:dsn
+      - org.eclipse.angus:gimap
+      - org.eclipse.angus:imap
+      - org.eclipse.angus:jakarta.mail
+      - org.eclipse.angus:logging-mailhandler
+      - org.eclipse.angus:pop3
+      - org.eclipse.angus:smtp
+    reference:
+      label: Eclipse Angus Mail
+      url: https://eclipse-ee4j.github.io/angus-mail/
+
+  - id: janino
+    name: Janino
+    status: SUNSET
+    summary: >-
+      The repository was archived in 2026 and the last release, 3.1.12, dates to February 2024.
+      Still arrives transitively through Logback's conditional configuration support.
+    coordinates:
+      - org.codehaus.janino:janino
+      - org.codehaus.janino:commons-compiler
+      - org.codehaus.janino:commons-compiler-jdk
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: No drop-in replacement exists; the JDK Compiler API or Eclipse ECJ cover runtime code-compilation needs
+    reference:
+      label: Archived Janino repository
+      url: https://github.com/janino-compiler/janino
+
+  - id: sendgrid-java
+    name: SendGrid Java
+    status: ACTIVE
+    summary: >-
+      Maintained by Twilio; the stable 4.x line moves slowly while 5.0 has been in release
+      candidates since 2024.
+    coordinates:
+      - com.sendgrid:sendgrid-java
+    reference:
+      label: sendgrid-java on GitHub
+      url: https://github.com/sendgrid/sendgrid-java

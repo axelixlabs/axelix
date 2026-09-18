@@ -63,3 +63,15 @@ projects:
     reference:
       label: Log4j 1 end-of-life announcement
       url: https://logging.apache.org/log4j/1.x/
+
+  - id: commons-logging
+    name: Apache Commons Logging
+    status: ACTIVE
+    summary: >-
+      Revived: after roughly a decade without releases the 1.3.x line resumed in 2023 and is
+      maintained again. Many applications still route it onto SLF4J via jcl-over-slf4j.
+    coordinates:
+      - commons-logging:commons-logging
+    reference:
+      label: Apache Commons Logging
+      url: https://commons.apache.org/proper/commons-logging/

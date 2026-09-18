@@ -213,3 +213,105 @@ projects:
     reference:
       label: SnakeYAML
       url: https://bitbucket.org/snakeyaml/snakeyaml
+
+  - id: jdom2
+    name: JDOM 2
+    status: DORMANT
+    summary: >-
+      Quiet for years: the last release, 2.0.6.1, dates to December 2021 and the repository has
+      seen no commits since April 2024, although the project was never formally discontinued.
+    coordinates:
+      - org.jdom:jdom2
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: JDOM keeps working; the JDK's built-in DOM/StAX APIs or dom4j are the common alternatives
+    reference:
+      label: JDOM on GitHub
+      url: https://github.com/hunterhacker/jdom
+
+  - id: nekohtml
+    name: NekoHTML
+    status: DORMANT
+    summary: >-
+      Silent since the 1.9.22 release in 2015, although never formally discontinued. The
+      HtmlUnit project maintains a fork under its own coordinates.
+    coordinates:
+      - net.sourceforge.nekohtml:nekohtml
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.htmlunit:neko-htmlunit
+    reference:
+      label: NekoHTML on SourceForge
+      url: https://sourceforge.net/projects/nekohtml/
+
+  - id: wsdl4j
+    name: WSDL4J
+    status: DORMANT
+    summary: >-
+      Silent since the 1.6.3 release, although never formally discontinued. A relic of the
+      legacy SOAP stack that still arrives transitively through it.
+    coordinates:
+      - wsdl4j:wsdl4j
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Modern SOAP stacks such as Apache CXF ship their own WSDL handling
+    reference:
+      label: WSDL4J on SourceForge
+      url: https://sourceforge.net/projects/wsdl4j/
+
+  - id: jaxen
+    name: Jaxen
+    status: ACTIVE
+    summary: >-
+      Actively maintained.
+    coordinates:
+      - jaxen:jaxen
+    reference:
+      label: Jaxen on GitHub
+      url: https://github.com/jaxen-xpath/jaxen
+
+  - id: json-smart
+    name: JSON-smart
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Arrives in most applications transitively through Jayway JsonPath.
+    coordinates:
+      - net.minidev:json-smart
+    reference:
+      label: json-smart on GitHub
+      url: https://github.com/netplex/json-smart-v2
+
+  - id: eclipse-jaxb
+    name: Eclipse Implementation of JAXB
+    status: ACTIVE
+    summary: >-
+      Actively maintained under Eclipse EE4J. The reference implementation of Jakarta XML
+      Binding, also republished under the legacy com.sun.xml.bind coordinates.
+    coordinates:
+      - org.glassfish.jaxb:codemodel
+      - org.glassfish.jaxb:jaxb-core
+      - org.glassfish.jaxb:jaxb-jxc
+      - org.glassfish.jaxb:jaxb-runtime
+      - org.glassfish.jaxb:jaxb-xjc
+      - org.glassfish.jaxb:txw2
+      - org.glassfish.jaxb:xsom
+      - com.sun.xml.bind:jaxb-core
+      - com.sun.xml.bind:jaxb-impl
+      - com.sun.xml.bind:jaxb-jxc
+      - com.sun.xml.bind:jaxb-osgi
+      - com.sun.xml.bind:jaxb-xjc
+    reference:
+      label: Eclipse Implementation of JAXB
+      url: https://eclipse-ee4j.github.io/jaxb-ri/
+
+  - id: yasson
+    name: Eclipse Yasson
+    status: ACTIVE
+    summary: >-
+      Actively maintained under Eclipse EE4J. The reference implementation of Jakarta JSON
+      Binding.
+    coordinates:
+      - org.eclipse:yasson
+    reference:
+      label: Eclipse Yasson
+      url: https://github.com/eclipse-ee4j/yasson

@@ -419,3 +419,39 @@ projects:
     reference:
       label: gRPC
       url: https://grpc.io/
+
+  - id: jmustache
+    name: JMustache
+    status: ACTIVE
+    summary: >-
+      The repository is actively committed to, but nothing has been released since 1.16 in
+      December 2023.
+    coordinates:
+      - com.samskivert:jmustache
+    reference:
+      label: JMustache on GitHub
+      url: https://github.com/samskivert/jmustache
+
+  - id: webjars-locators
+    name: WebJars Locators
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the WebJars project. Spring Boot 3.4+ resolves WebJars through
+      the lighter webjars-locator-lite.
+    coordinates:
+      - org.webjars:webjars-locator-core
+      - org.webjars:webjars-locator-lite
+    reference:
+      label: WebJars
+      url: https://www.webjars.org/
+
+  - id: graphql-java
+    name: GraphQL Java
+    status: ACTIVE
+    summary: >-
+      Actively developed. The GraphQL engine underneath Spring for GraphQL.
+    coordinates:
+      - com.graphql-java:graphql-java
+    reference:
+      label: GraphQL Java
+      url: https://www.graphql-java.com/
