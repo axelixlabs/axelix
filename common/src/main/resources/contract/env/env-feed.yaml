@@ -121,6 +121,27 @@ components:
           items:
             $ref: '#/components/schemas/InjectionPoint'
           x-axelix-introduced-in: 1.2.0
+        dangerousValue:
+          description: >-
+            Our verdict on the property's value being dangerous in production, present only when the
+            value is considered dangerous.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/DangerousValue'
+    DangerousValue:
+      type: object
+      description: The verdict that a property's value is considered dangerous in production.
+      required:
+        - rationale
+      properties:
+        rationale:
+          type: string
+          description: The explanation of why the value is considered dangerous.
+          x-axelix-introduced-in: 1.2.0
+        alternativeExample:
+          type: string
+          description: >-
+            An example of what the property may be set to instead, when any. Not a prescription.
+          x-axelix-introduced-in: 1.2.0
     Deprecation:
       type: object
       description: The deprecation information of a property.

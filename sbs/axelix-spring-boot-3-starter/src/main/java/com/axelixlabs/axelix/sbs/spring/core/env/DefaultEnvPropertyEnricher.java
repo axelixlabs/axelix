@@ -34,6 +34,7 @@ import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.DangerousValue;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.Deprecation;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
@@ -124,6 +125,9 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                     List<InjectionPoint> injectionPoints =
                             valueInjectionTracker.getInjectionPointsForProperty(normalizedName);
 
+                    DangerousProperty dangerousProperty =
+                            isPrimary ? DangerousProperty.resolve(normalizedName, effectiveValue(propertyName)) : null;
+
                     return new Property()
                             .name(propertyName)
                             .value(stringValue)
@@ -133,7 +137,8 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                                     .map(PropertyMetadata::getDescription)
                                     .orElse(null))
                             .deprecation(buildFromMetadata(metadata))
-                            .injectionPoints(injectionPoints);
+                            .injectionPoints(injectionPoints)
+                            .dangerousValue(buildDangerousValue(dangerousProperty));
                 })
                 .toList();
 
@@ -156,6 +161,26 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                 .message(deprecation.getMessage())
                 .level(deprecation.getLevel())
                 .replacedBy(deprecation.getReplacedBy());
+    }
+
+    @Nullable
+    private DangerousValue buildDangerousValue(@Nullable DangerousProperty dangerousProperty) {
+        if (dangerousProperty == null) {
+            return null;
+        }
+
+        return new DangerousValue()
+                .rationale(dangerousProperty.getRationale())
+                .alternativeExample(dangerousProperty.getAlternativeExample());
+    }
+
+    @Nullable
+    private String effectiveValue(String propertyName) {
+        try {
+            return environment.getProperty(propertyName);
+        } catch (IllegalArgumentException unresolvablePlaceholder) {
+            return null;
+        }
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
