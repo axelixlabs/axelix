@@ -601,3 +601,99 @@ projects:
     reference:
       label: QueryDSL on GitHub
       url: https://github.com/querydsl/querydsl
+
+  - id: infinispan
+    name: Infinispan
+    status: ACTIVE
+    summary: >-
+      Actively developed by Red Hat.
+    coordinates:
+      - org.infinispan.protostream:protostream
+      - org.infinispan.protostream:protostream-processor
+      - org.infinispan.protostream:protostream-types
+      - org.infinispan:infinispan-anchored-keys
+      - org.infinispan:infinispan-api
+      - org.infinispan:infinispan-cachestore-jdbc
+      - org.infinispan:infinispan-cachestore-jdbc-common
+      - org.infinispan:infinispan-cachestore-remote
+      - org.infinispan:infinispan-cachestore-rocksdb
+      - org.infinispan:infinispan-cachestore-sql
+      - org.infinispan:infinispan-cdi-common
+      - org.infinispan:infinispan-cdi-embedded
+      - org.infinispan:infinispan-cdi-remote
+      - org.infinispan:infinispan-checkstyle
+      - org.infinispan:infinispan-cli-client
+      - org.infinispan:infinispan-client-hotrod
+      - org.infinispan:infinispan-client-rest
+      - org.infinispan:infinispan-clustered-counter
+      - org.infinispan:infinispan-clustered-lock
+      - org.infinispan:infinispan-commons
+      - org.infinispan:infinispan-commons-graalvm
+      - org.infinispan:infinispan-commons-spi
+      - org.infinispan:infinispan-component-annotations
+      - org.infinispan:infinispan-component-processor
+      - org.infinispan:infinispan-console
+      - org.infinispan:infinispan-core
+      - org.infinispan:infinispan-core-graalvm
+      - org.infinispan:infinispan-counter-api
+      - org.infinispan:infinispan-hibernate-cache-commons
+      - org.infinispan:infinispan-hibernate-cache-spi
+      - org.infinispan:infinispan-hibernate-cache-v66
+      - org.infinispan:infinispan-jboss-marshalling
+      - org.infinispan:infinispan-jcache
+      - org.infinispan:infinispan-jcache-commons
+      - org.infinispan:infinispan-jcache-remote
+      - org.infinispan:infinispan-key-value-store-client
+      - org.infinispan:infinispan-logging-annotations
+      - org.infinispan:infinispan-logging-processor
+      - org.infinispan:infinispan-multimap
+      - org.infinispan:infinispan-query
+      - org.infinispan:infinispan-scripting
+      - org.infinispan:infinispan-server-core
+      - org.infinispan:infinispan-server-hotrod
+      - org.infinispan:infinispan-server-memcached
+      - org.infinispan:infinispan-server-resp
+      - org.infinispan:infinispan-server-rest
+      - org.infinispan:infinispan-server-router
+      - org.infinispan:infinispan-server-runtime
+      - org.infinispan:infinispan-server-testdriver-core
+      - org.infinispan:infinispan-server-testdriver-junit5
+      - org.infinispan:infinispan-spring-boot3-starter-embedded
+      - org.infinispan:infinispan-spring-boot3-starter-remote
+      - org.infinispan:infinispan-spring-boot4-starter-embedded
+      - org.infinispan:infinispan-spring-boot4-starter-remote
+      - org.infinispan:infinispan-spring-common
+      - org.infinispan:infinispan-spring-embedded
+      - org.infinispan:infinispan-spring-remote
+      - org.infinispan:infinispan-spring6-embedded
+      - org.infinispan:infinispan-spring6-remote
+      - org.infinispan:infinispan-spring7-embedded
+      - org.infinispan:infinispan-spring7-remote
+      - org.infinispan:infinispan-tasks
+      - org.infinispan:infinispan-tasks-api
+      - org.infinispan:infinispan-testing
+      - org.infinispan:infinispan-tools
+      - org.infinispan:testcontainers-infinispan
+    reference:
+      label: Infinispan
+      url: https://infinispan.org/
+
+  - id: cache2k
+    name: cache2k
+    status: DORMANT
+    summary: >-
+      No release since 2.6.1.Final in February 2022; the repository has seen only sporadic
+      activity since, and the project was never formally discontinued.
+    coordinates:
+      - org.cache2k:cache2k-api
+      - org.cache2k:cache2k-config
+      - org.cache2k:cache2k-core
+      - org.cache2k:cache2k-jcache
+      - org.cache2k:cache2k-micrometer
+      - org.cache2k:cache2k-spring
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Caffeine is the common actively developed in-process cache to move to
+    reference:
+      label: cache2k on GitHub
+      url: https://github.com/cache2k/cache2k

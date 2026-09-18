@@ -16,3 +16,14 @@ projects:
     reference:
       label: Spring Security OAuth in the attic
       url: https://github.com/spring-attic/spring-security-oauth
+
+  - id: unboundid-ldapsdk
+    name: UnboundID LDAP SDK
+    status: ACTIVE
+    summary: >-
+      Actively developed by Ping Identity.
+    coordinates:
+      - com.unboundid:unboundid-ldapsdk
+    reference:
+      label: UnboundID LDAP SDK
+      url: https://github.com/pingidentity/ldapsdk

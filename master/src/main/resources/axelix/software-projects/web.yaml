@@ -376,3 +376,46 @@ projects:
     reference:
       label: Apache FreeMarker
       url: https://freemarker.apache.org/
+
+  - id: grpc
+    name: gRPC Java
+    status: ACTIVE
+    summary: >-
+      Actively developed by Google and the gRPC community.
+    coordinates:
+      - io.grpc:grpc-all
+      - io.grpc:grpc-alts
+      - io.grpc:grpc-api
+      - io.grpc:grpc-auth
+      - io.grpc:grpc-benchmarks
+      - io.grpc:grpc-census
+      - io.grpc:grpc-context
+      - io.grpc:grpc-context-override-opentelemetry
+      - io.grpc:grpc-core
+      - io.grpc:grpc-gcp-csm-observability
+      - io.grpc:grpc-gcp-observability
+      - io.grpc:grpc-googleapis
+      - io.grpc:grpc-grpclb
+      - io.grpc:grpc-inprocess
+      - io.grpc:grpc-interop-testing
+      - io.grpc:grpc-kotlin-stub
+      - io.grpc:grpc-netty
+      - io.grpc:grpc-netty-shaded
+      - io.grpc:grpc-okhttp
+      - io.grpc:grpc-opentelemetry
+      - io.grpc:grpc-protobuf
+      - io.grpc:grpc-protobuf-lite
+      - io.grpc:grpc-rls
+      - io.grpc:grpc-s2a
+      - io.grpc:grpc-services
+      - io.grpc:grpc-servlet
+      - io.grpc:grpc-servlet-jakarta
+      - io.grpc:grpc-stub
+      - io.grpc:grpc-testing
+      - io.grpc:grpc-testing-proto
+      - io.grpc:grpc-util
+      - io.grpc:grpc-xds
+      - io.grpc:protoc-gen-grpc-java
+    reference:
+      label: gRPC
+      url: https://grpc.io/

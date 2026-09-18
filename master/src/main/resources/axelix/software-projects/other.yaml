@@ -108,3 +108,113 @@ projects:
     reference:
       label: RxJava on GitHub
       url: https://github.com/ReactiveX/RxJava
+
+  - id: kotlin
+    name: Kotlin
+    status: ACTIVE
+    summary: >-
+      Actively developed by JetBrains.
+    coordinates:
+      - org.jetbrains.kotlin:kotlin-compiler
+      - org.jetbrains.kotlin:kotlin-compiler-embeddable
+      - org.jetbrains.kotlin:kotlin-daemon-client
+      - org.jetbrains.kotlin:kotlin-main-kts
+      - org.jetbrains.kotlin:kotlin-osgi-bundle
+      - org.jetbrains.kotlin:kotlin-reflect
+      - org.jetbrains.kotlin:kotlin-script-runtime
+      - org.jetbrains.kotlin:kotlin-scripting-common
+      - org.jetbrains.kotlin:kotlin-scripting-ide-services
+      - org.jetbrains.kotlin:kotlin-scripting-jvm
+      - org.jetbrains.kotlin:kotlin-scripting-jvm-host
+      - org.jetbrains.kotlin:kotlin-stdlib
+      - org.jetbrains.kotlin:kotlin-stdlib-common
+      - org.jetbrains.kotlin:kotlin-stdlib-jdk7
+      - org.jetbrains.kotlin:kotlin-stdlib-jdk8
+      - org.jetbrains.kotlin:kotlin-stdlib-js
+      - org.jetbrains.kotlin:kotlin-test
+      - org.jetbrains.kotlin:kotlin-test-annotations-common
+      - org.jetbrains.kotlin:kotlin-test-common
+      - org.jetbrains.kotlin:kotlin-test-js
+      - org.jetbrains.kotlin:kotlin-test-junit
+      - org.jetbrains.kotlin:kotlin-test-junit5
+      - org.jetbrains.kotlin:kotlin-test-testng
+    reference:
+      label: Kotlin
+      url: https://kotlinlang.org/
+
+  - id: apache-groovy
+    name: Apache Groovy
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Apache Groovy project.
+    coordinates:
+      - org.apache.groovy:groovy
+      - org.apache.groovy:groovy-ant
+      - org.apache.groovy:groovy-astbuilder
+      - org.apache.groovy:groovy-cli-commons
+      - org.apache.groovy:groovy-cli-picocli
+      - org.apache.groovy:groovy-console
+      - org.apache.groovy:groovy-contracts
+      - org.apache.groovy:groovy-datetime
+      - org.apache.groovy:groovy-dateutil
+      - org.apache.groovy:groovy-docgenerator
+      - org.apache.groovy:groovy-ginq
+      - org.apache.groovy:groovy-groovydoc
+      - org.apache.groovy:groovy-groovysh
+      - org.apache.groovy:groovy-jmx
+      - org.apache.groovy:groovy-json
+      - org.apache.groovy:groovy-jsr223
+      - org.apache.groovy:groovy-macro
+      - org.apache.groovy:groovy-macro-library
+      - org.apache.groovy:groovy-nio
+      - org.apache.groovy:groovy-servlet
+      - org.apache.groovy:groovy-sql
+      - org.apache.groovy:groovy-swing
+      - org.apache.groovy:groovy-templates
+      - org.apache.groovy:groovy-test
+      - org.apache.groovy:groovy-test-junit5
+      - org.apache.groovy:groovy-testng
+      - org.apache.groovy:groovy-toml
+      - org.apache.groovy:groovy-typecheckers
+      - org.apache.groovy:groovy-xml
+      - org.apache.groovy:groovy-yaml
+    reference:
+      label: Apache Groovy
+      url: https://groovy-lang.org/
+
+  - id: lombok
+    name: Project Lombok
+    status: ACTIVE
+    summary: >-
+      Actively developed.
+    coordinates:
+      - org.projectlombok:lombok
+    reference:
+      label: Project Lombok
+      url: https://projectlombok.org/
+
+  - id: aspectj
+    name: AspectJ
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the Eclipse AspectJ project.
+    coordinates:
+      - org.aspectj:aspectjrt
+      - org.aspectj:aspectjweaver
+      - org.aspectj:aspectjtools
+    reference:
+      label: Eclipse AspectJ
+      url: https://eclipse.dev/aspectj/
+
+  - id: quartz
+    name: Quartz Scheduler
+    status: ACTIVE
+    summary: >-
+      Actively maintained; after a quiet stretch in the late 2010s the project picked back up
+      and releases regularly again.
+    coordinates:
+      - org.quartz-scheduler:quartz
+      - org.quartz-scheduler:quartz-jobs
+    reference:
+      label: Quartz Scheduler
+      url: https://github.com/quartz-scheduler/quartz

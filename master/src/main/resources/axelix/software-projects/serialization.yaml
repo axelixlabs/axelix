@@ -189,3 +189,27 @@ projects:
     reference:
       label: Jackson project overview
       url: https://github.com/FasterXML/jackson
+
+  - id: protobuf
+    name: Protocol Buffers
+    status: ACTIVE
+    summary: >-
+      Actively developed by Google.
+    coordinates:
+      - com.google.protobuf:protobuf-java
+      - com.google.protobuf:protobuf-java-util
+      - com.google.protobuf:protobuf-kotlin
+    reference:
+      label: Protocol Buffers
+      url: https://protobuf.dev/
+
+  - id: snakeyaml
+    name: SnakeYAML
+    status: ACTIVE
+    summary: >-
+      Actively maintained.
+    coordinates:
+      - org.yaml:snakeyaml
+    reference:
+      label: SnakeYAML
+      url: https://bitbucket.org/snakeyaml/snakeyaml

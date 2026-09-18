@@ -92,3 +92,64 @@ projects:
     reference:
       label: Micrometer
       url: https://micrometer.io/
+
+  - id: zipkin-brave
+    name: OpenZipkin Brave
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the OpenZipkin community: the Brave instrumentation library and
+      the Zipkin reporters it publishes spans through.
+    coordinates:
+      - io.zipkin.brave:brave
+      - io.zipkin.brave:brave-context-jfr
+      - io.zipkin.brave:brave-context-log4j12
+      - io.zipkin.brave:brave-context-log4j2
+      - io.zipkin.brave:brave-context-slf4j
+      - io.zipkin.brave:brave-instrumentation-dubbo
+      - io.zipkin.brave:brave-instrumentation-grpc
+      - io.zipkin.brave:brave-instrumentation-http
+      - io.zipkin.brave:brave-instrumentation-http-tests
+      - io.zipkin.brave:brave-instrumentation-http-tests-jakarta
+      - io.zipkin.brave:brave-instrumentation-httpasyncclient
+      - io.zipkin.brave:brave-instrumentation-httpclient
+      - io.zipkin.brave:brave-instrumentation-httpclient5
+      - io.zipkin.brave:brave-instrumentation-jakarta-jms
+      - io.zipkin.brave:brave-instrumentation-jaxrs2
+      - io.zipkin.brave:brave-instrumentation-jdbi3
+      - io.zipkin.brave:brave-instrumentation-jersey-server
+      - io.zipkin.brave:brave-instrumentation-jersey-server-jakarta
+      - io.zipkin.brave:brave-instrumentation-jms
+      - io.zipkin.brave:brave-instrumentation-jms-jakarta
+      - io.zipkin.brave:brave-instrumentation-kafka-clients
+      - io.zipkin.brave:brave-instrumentation-kafka-streams
+      - io.zipkin.brave:brave-instrumentation-messaging
+      - io.zipkin.brave:brave-instrumentation-mongodb
+      - io.zipkin.brave:brave-instrumentation-mysql
+      - io.zipkin.brave:brave-instrumentation-mysql6
+      - io.zipkin.brave:brave-instrumentation-mysql8
+      - io.zipkin.brave:brave-instrumentation-netty-codec-http
+      - io.zipkin.brave:brave-instrumentation-okhttp3
+      - io.zipkin.brave:brave-instrumentation-rocketmq-client
+      - io.zipkin.brave:brave-instrumentation-rpc
+      - io.zipkin.brave:brave-instrumentation-servlet
+      - io.zipkin.brave:brave-instrumentation-servlet-jakarta
+      - io.zipkin.brave:brave-instrumentation-spring-rabbit
+      - io.zipkin.brave:brave-instrumentation-spring-web
+      - io.zipkin.brave:brave-instrumentation-spring-webmvc
+      - io.zipkin.brave:brave-instrumentation-vertx-web
+      - io.zipkin.brave:brave-spring-beans
+      - io.zipkin.brave:brave-tests
+      - io.zipkin.reporter2:zipkin-reporter
+      - io.zipkin.reporter2:zipkin-reporter-brave
+      - io.zipkin.reporter2:zipkin-reporter-metrics-micrometer
+      - io.zipkin.reporter2:zipkin-reporter-spring-beans
+      - io.zipkin.reporter2:zipkin-sender-activemq-client
+      - io.zipkin.reporter2:zipkin-sender-amqp-client
+      - io.zipkin.reporter2:zipkin-sender-kafka
+      - io.zipkin.reporter2:zipkin-sender-libthrift
+      - io.zipkin.reporter2:zipkin-sender-okhttp3
+      - io.zipkin.reporter2:zipkin-sender-pulsar-client
+      - io.zipkin.reporter2:zipkin-sender-urlconnection
+    reference:
+      label: OpenZipkin
+      url: https://zipkin.io/
