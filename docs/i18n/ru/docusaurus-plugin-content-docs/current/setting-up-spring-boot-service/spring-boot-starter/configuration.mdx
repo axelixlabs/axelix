@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { LegacyNotice, UpcomingReleaseNotice } from '@site/src/components';
 import styles from './styles.module.css';
 
 # Настройка Spring Boot Starter
@@ -9,8 +9,8 @@ import styles from './styles.module.css';
 чтобы [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) мог обнаруживать его, считывать его состояние и
 взаимодействовать с ним — как через пользовательский интерфейс, так и через встроенный в Master сервер MCP (Model
 Context Protocol), который предоставляет те же данные агентам искусственного интеллекта. Выберите модуль стартера,
-соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам, поделитесь с Master ключом для
-подписи JWT и укажите Master, где найти сервис.
+соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам (начиная с Axelix 1.2.0 это
+происходит автоматически), поделитесь с Master ключом для подписи JWT и укажите Master, где найти сервис.
 
 ## Прежде чем вы начнёте
 
@@ -184,8 +184,10 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 
 ## Actuator-эндпоинты
 
-Ничего настраивать вручную не нужно. Стартер сам добавляет свои actuator-эндпоинты в
+Начиная с Axelix **1.2.0** ничего настраивать вручную не нужно: стартер сам добавляет свои actuator-эндпоинты в
 `management.endpoints.web.exposure.include` при старте приложения, поэтому Master получает к ним доступ «из коробки».
+На более старых версиях стартер этого не делает, и эндпоинты нужно перечислить вручную — см. [Открытие эндпоинтов на
+Axelix ниже 1.2.0](#открытие-эндпоинтов-на-axelix-ниже-120).
 
 ### Что открывает стартер
 
@@ -265,10 +267,10 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 Эндпоинты, неприменимые к вашему сервису, остаются неактивными — стартер активирует каждый только при выполнении его
 предусловий (например, `axelix-feign` без Feign в classpath или `axelix-caches` без `CacheManager` не поднимаются).
 
-Стандартные эндпоинты `health` и `info` Axelix больше не требуются, поэтому стартер сам их не открывает. Открытыми
-будут только эндпоинты, перечисленные вами в `management.endpoints.web.exposure.include`, плюс эндпоинты Axelix —
-добавьте `health` и `info` в список сами, когда они вам нужны, в том числе `health`, который Spring Boot иначе открыл
-бы по умолчанию.
+Начиная с Axelix **1.2.0** стандартные эндпоинты `health` и `info` больше не требуются, поэтому стартер сам их не
+открывает (до 1.2.0 Axelix зависел от них, и стартер принудительно открывал оба). Открытыми будут только эндпоинты,
+перечисленные вами в `management.endpoints.web.exposure.include`, плюс эндпоинты Axelix — добавьте `health` и `info` в
+список сами, когда они вам нужны, в том числе `health`, который Spring Boot иначе открыл бы по умолчанию.
 
 ### Добавление собственных эндпоинтов
 
@@ -300,6 +302,51 @@ management.endpoints.web.exposure.include=prometheus
 В результате будет выставлен `prometheus` и все эндпоинты Axelix.
 
 Значение `*` тоже поддерживается — тогда открывается всё, и стартер список не трогает.
+
+### Открытие эндпоинтов на Axelix ниже 1.2.0
+
+<LegacyNotice version="1.2.0" />
+
+Стартеры старше 1.2.0 не добавляют свои эндпоинты в список открытых самостоятельно, поэтому каждый эндпоинт Axelix,
+который должен читать Master, нужно перечислить в `management.endpoints.web.exposure.include` вручную. Как минимум
+откройте `axelix-metadata` — без него инстанс никогда не появится в Master, — а на практике весь набор, чтобы у
+каждого раздела UI были данные. Эндпоинты `health` и `info` эти версии стартера открывают принудительно сами, так что
+их перечислять не нужно:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </TabItem>
+</Tabs>
 
 ## Экспорт метрик Axelix через Micrometer
 

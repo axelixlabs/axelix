@@ -213,13 +213,13 @@ Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` 
   </TabItem>
 </Tabs>
 
-Adding the dependencies alone is not enough. In addition, each service needs three pieces of configuration, all
-described in detail on the [starter configuration page](./configuring-spring-boot-starter.mdx):
+Adding the dependencies alone is not enough. In addition, each service needs two pieces of configuration, all
+described in detail on the [starter configuration page](./configuring-spring-boot-starter.mdx). On Axelix **1.2.0 and
+later** the actuator endpoints themselves need nothing here: the starter adds them to
+`management.endpoints.web.exposure.include` automatically — see [Actuator
+endpoints](./configuring-spring-boot-starter.mdx#actuator-endpoints). On older versions exposing them is a third,
+mandatory piece of configuration — see the note below the snippets.
 
-- **Expose the Axelix actuator endpoints** through `management.endpoints.web.exposure.include`. The
-  `axelix-metadata` endpoint is the one Master probes to detect the instance, so without it the service never
-  appears, regardless of the discovery mode. See [Expose the Axelix actuator
-  endpoints](./configuring-spring-boot-starter.mdx#expose-the-axelix-actuator-endpoints).
 - **Set the shared JWT signing key** from step 2 under `axelix.sbs.auth.jwt.*`. A key mismatch between Master and
   the service is the most common cause of `401` responses — see [Share the JWT signing key with
   Master](./configuring-spring-boot-starter.mdx#share-the-jwt-signing-key-with-master) and
@@ -229,7 +229,35 @@ described in detail on the [starter configuration page](./configuring-spring-boo
   instance](./configuring-spring-boot-starter.mdx#let-master-find-the-instance). With Master-side auto-discovery,
   there is nothing extra to configure in the service.
 
-Put together, the minimal service configuration for the first two items:
+Put together, the minimal service configuration:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+</Tabs>
+
+:::note[On Axelix below 1.2.0]
+Starters older than 1.2.0 do not add their endpoints to `management.endpoints.web.exposure.include` themselves, so on
+those versions the endpoint list is part of the minimal configuration too. The `axelix-metadata` endpoint is the one
+Master probes to detect the instance, so without it the service never appears, regardless of the discovery mode:
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -254,13 +282,6 @@ management:
           - axelix-metrics
           - axelix-scheduled-tasks
           - axelix-thread-dump
-
-axelix:
-  sbs:
-    auth:
-      jwt:
-        algorithm: HMAC512
-        signing-key: ${AXELIX_JWT_SIGNING_KEY}
 ```
 
   </TabItem>
@@ -268,13 +289,11 @@ axelix:
 
 ```properties
 management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
-
-axelix.sbs.auth.jwt.algorithm=HMAC512
-axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
 ```
 
   </TabItem>
 </Tabs>
+:::
 
 Roll them out service by service. As each service redeploys to a test environment, it shows up in the test Master,
 and the team can start using the [UI](../ui-guide/dashboard.mdx) and MCP against it right away.

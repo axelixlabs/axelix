@@ -1,6 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { LegacyNotice, UpcomingReleaseNotice } from '@site/src/components';
 import styles from './styles.module.css';
 
 # Configuring Spring Boot Starter
@@ -8,8 +8,8 @@ import styles from './styles.module.css';
 This page shows how to wire the Axelix Spring Boot Starter into a [Spring Boot](https://spring.io/) application so
 [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) can discover it, read its state, and act on it — both from
 the UI and through Master's bundled MCP (Model Context Protocol) server, which exposes the same data to AI agents. Pick
-the starter module matching your Boot major version, expose the Axelix actuator endpoints, share the JWT signing key
-with Master, and tell Master where to find the instance.
+the starter module matching your Boot major version, expose the Axelix actuator endpoints (automatic as of Axelix
+1.2.0), share the JWT signing key with Master, and tell Master where to find the instance.
 
 ## Before you start
 
@@ -181,8 +181,10 @@ plugin](../build-plugin/configuration.mdx).
 
 ## Actuator endpoints
 
-There is nothing to configure by hand. On application startup the starter adds its own actuator endpoints to
-`management.endpoints.web.exposure.include`, so Master can reach them out of the box.
+Starting with Axelix **1.2.0** there is nothing to configure by hand: on application startup the starter adds its own
+actuator endpoints to `management.endpoints.web.exposure.include`, so Master can reach them out of the box. On older
+versions the starter does not do this, and the endpoints must be listed manually — see [Exposing the endpoints on
+Axelix below 1.2.0](#exposing-the-endpoints-on-axelix-below-120).
 
 ### What the starter exposes
 
@@ -263,10 +265,10 @@ Endpoints that don't apply to your application stay inert — the starter activa
 are met (for example, `axelix-feign` without Feign on the classpath or `axelix-caches` without a `CacheManager` never
 come up).
 
-The native `health` and `info` endpoints are no longer required by Axelix, so the starter never exposes them on its
-own. Only the endpoints you list in `management.endpoints.web.exposure.include` plus the Axelix ones are exposed — add
-`health` and `info` to the list yourself when you need them, including the `health` endpoint that Spring Boot would
-otherwise expose by default.
+As of Axelix **1.2.0** the native `health` and `info` endpoints are no longer required, so the starter never exposes
+them on its own (before 1.2.0 Axelix depended on them, and the starter force-exposed both). Only the endpoints you
+list in `management.endpoints.web.exposure.include` plus the Axelix ones are exposed — add `health` and `info` to the
+list yourself when you need them, including the `health` endpoint that Spring Boot would otherwise expose by default.
 
 ### Adding your own endpoints
 
@@ -298,6 +300,51 @@ management.endpoints.web.exposure.include=prometheus
 The result is that `prometheus` and all the Axelix endpoints are exposed.
 
 The `*` value is supported too — everything gets exposed and the starter leaves the list alone.
+
+### Exposing the endpoints on Axelix below 1.2.0
+
+<LegacyNotice version="1.2.0" />
+
+Starters older than 1.2.0 do not add their endpoints to the exposure list themselves, so every Axelix endpoint you
+want Master to read has to be listed in `management.endpoints.web.exposure.include` by hand. At minimum expose
+`axelix-metadata` — without it the instance never appears in Master — and in practice the whole set, so every UI
+section has data to show. The `health` and `info` endpoints are force-exposed by those starter versions on their own,
+so you do not need to list them:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - axelix-metadata
+          - axelix-beans
+          - axelix-caches
+          - axelix-conditions
+          - axelix-configprops
+          - axelix-details
+          - axelix-env
+          - axelix-feign
+          - axelix-gc
+          - axelix-heap-dump
+          - axelix-loggers
+          - axelix-metrics
+          - axelix-scheduled-tasks
+          - axelix-thread-dump
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+```
+
+  </TabItem>
+</Tabs>
 
 ## Export Axelix metrics through Micrometer
 

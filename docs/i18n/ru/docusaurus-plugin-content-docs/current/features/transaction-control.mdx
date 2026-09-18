@@ -59,32 +59,15 @@ APM-инструмент не требуется.
 
 ## Свойства
 
-Страница работает поверх actuator-эндпоинта `axelix-transactions-monitoring`, который добавляет Axelix Spring Boot
-Starter. Она доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и
-сопутствующих настроек см. в разделе [Настройка Spring Boot
-Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
+Страница не опирается на отдельный actuator-эндпоинт. Axelix Spring Boot Starter агрегирует данные о транзакциях на
+JVM и отправляет их в Master как часть регистрационных метаданных инстанса — того же ответа, который отдаёт эндпоинт
+`axelix-metadata`, уже опрашиваемый Master. Пока `axelix-metadata` открыт (см. [Настройка Spring Boot
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)), страница работает без каких-либо
+дополнительных эндпоинтов.
 
-<Tabs groupId="spring-config">
-  <TabItem value="properties" label="application.properties">
-
-```properties
-management.endpoints.web.exposure.include=axelix-transactions-monitoring
-```
-
-  </TabItem>
-  <TabItem value="yaml" label="application.yaml">
-
-```yaml
-management:
-  endpoints:
-    web:
-      exposure:
-        include:
-          - axelix-transactions-monitoring
-```
-
-  </TabItem>
-</Tabs>
+Мониторинг транзакций включён по умолчанию. Чтобы полностью его выключить, установите
+`axelix.sbs.transaction.monitoring.enabled=false` — подробности см. в разделе [Мониторинг
+транзакций](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#мониторинг-транзакций).
 
 ## См. также
 

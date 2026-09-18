@@ -21,6 +21,7 @@ const DETAIL: Record<string, string> = {
 
 /**
  * Localized skip sentence that follows the version, keyed by locale. Falls back to English.
+ * Only rendered when no `reason` is given — a reason ends with its own "skip" conclusion.
  */
 const SKIP: Record<string, string> = {
     en: 'On later versions, skip this section.',
@@ -30,6 +31,13 @@ const SKIP: Record<string, string> = {
 type LegacyNoticeProps = {
     /** Release version starting from which the section no longer applies, e.g. "1.2.0". */
     version: string;
+    /**
+     * Explains why the section below is obsolete. Rendered as a muted aside under the metadata
+     * line, hung with it on a shared left rail, so it reads as a caveat about the section rather
+     * than the section's first paragraph. Localize it at the call site — the page is already
+     * locale-specific.
+     */
+    reason?: ReactNode;
 };
 
 /**
@@ -38,7 +46,7 @@ type LegacyNoticeProps = {
  * `<LegacyNotice version="1.2.0" />` → prose. Third state of the `ReleasedInNotice` /
  * `UpcomingReleaseNotice` family; the label follows the current documentation locale.
  */
-export const LegacyNotice = ({ version }: LegacyNoticeProps): ReactNode => {
+export const LegacyNotice = ({ version, reason }: LegacyNoticeProps): ReactNode => {
     const {
         i18n: { currentLocale },
     } = useDocusaurusContext();
@@ -47,12 +55,8 @@ export const LegacyNotice = ({ version }: LegacyNoticeProps): ReactNode => {
     const detail = DETAIL[currentLocale] ?? DETAIL.en;
     const skip = SKIP[currentLocale] ?? SKIP.en;
 
-    return (
-        <div
-            className={styles.Notice}
-            role="note"
-            aria-label={`${label} — ${detail} ${version}. ${skip}`}
-        >
+    const line = (
+        <div className={styles.Line}>
             <span className={styles.Label}>
                 <span className={styles.Dot} aria-hidden="true" />
                 {label}
@@ -61,8 +65,35 @@ export const LegacyNotice = ({ version }: LegacyNoticeProps): ReactNode => {
                 |
             </span>
             <span className={styles.Detail}>
-                {detail}: <span className={styles.Version}>{version}</span>. {skip}
+                {detail}: <span className={styles.Version}>{version}</span>.
+                {reason == null && <> {skip}</>}
             </span>
+        </div>
+    );
+
+    if (reason == null) {
+        return (
+            <div
+                className={styles.Notice}
+                role="note"
+                aria-label={`${label} — ${detail} ${version}. ${skip}`}
+            >
+                {line}
+            </div>
+        );
+    }
+
+    return (
+        <div
+            className={styles.NoticeWithReason}
+            role="note"
+            aria-label={`${label} — ${detail} ${version}.`}
+        >
+            <span className={styles.Rail} aria-hidden="true" />
+            <div className={styles.Body}>
+                {line}
+                <p className={styles.Reason}>{reason}</p>
+            </div>
         </div>
     );
 };

@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice } from '@site/src/components';
 
 # Условия
 
@@ -57,7 +58,14 @@ style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), чтобы вы мо
 Отчёт об автоконфигурации также доступен ИИ-агентам через MCP. См. [Каталог
 MCP-инструментов](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
 
-## Свойства
+## Включите Нужный Actuator Ендпоинт
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-conditions`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек

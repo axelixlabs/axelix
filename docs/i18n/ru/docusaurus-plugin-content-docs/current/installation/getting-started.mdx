@@ -214,13 +214,13 @@ dependencies {
   </TabItem>
 </Tabs>
 
-Одного добавления зависимостей недостаточно. Кроме этого, каждому сервису нужны три элемента конфигурации, подробно
-описанные на [странице конфигурации стартера](./configuring-spring-boot-starter.mdx):
+Одного добавления зависимостей недостаточно. Кроме этого, каждому сервису нужны два элемента конфигурации, подробно
+описанные на [странице конфигурации стартера](./configuring-spring-boot-starter.mdx). На Axelix **1.2.0 и новее**
+сами Axelix actuator-эндпоинты здесь настраивать не нужно: стартер сам добавляет их в
+`management.endpoints.web.exposure.include` — см.
+[Actuator-эндпоинты](./configuring-spring-boot-starter.mdx#actuator-эндпоинты). На более старых версиях их нужно
+открыть вручную — это третий, обязательный элемент конфигурации, см. примечание после сниппетов ниже.
 
-- **Откройте доступ к Axelix actuator-эндпоинтам** через `management.endpoints.web.exposure.include`. Именно
-  эндпоинт `axelix-metadata` Master опрашивает, чтобы обнаружить сервис, поэтому без него сервис не появится ни при
-  каком режиме обнаружения. См. [Откройте доступ к Axelix
-  actuator-эндпоинтам](./configuring-spring-boot-starter.mdx#откройте-доступ-к-axelix-actuator-эндпоинтам).
 - **Задайте общий ключ подписи JWT** из шага 2 в свойствах `axelix.sbs.auth.jwt.*`. Несовпадение ключей между
   Master и сервисом — самая частая причина ответов `401` — см. [Поделитесь JWT-ключом подписи с
   Master](./configuring-spring-boot-starter.mdx#поделитесь-jwt-ключом-подписи-с-master) и [Решение
@@ -230,7 +230,36 @@ dependencies {
   сервис](./configuring-spring-boot-starter.mdx#дайте-master-найти-сервис). При автоматическом обнаружении на
   стороне Master в сервисе дополнительно настраивать нечего.
 
-Вместе минимальная конфигурация сервиса для первых двух пунктов выглядит так:
+Вместе минимальная конфигурация сервиса выглядит так:
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signing-key: ${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.auth.jwt.algorithm=HMAC512
+axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
+```
+
+  </TabItem>
+</Tabs>
+
+:::note[На Axelix ниже 1.2.0]
+Стартеры старше 1.2.0 не добавляют свои эндпоинты в `management.endpoints.web.exposure.include` самостоятельно,
+поэтому на этих версиях список эндпоинтов — тоже часть минимальной конфигурации. Эндпоинт `axelix-metadata` — тот,
+который Master опрашивает, чтобы обнаружить инстанс, поэтому без него сервис никогда не появится, независимо от
+режима обнаружения:
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -255,13 +284,6 @@ management:
           - axelix-metrics
           - axelix-scheduled-tasks
           - axelix-thread-dump
-
-axelix:
-  sbs:
-    auth:
-      jwt:
-        algorithm: HMAC512
-        signing-key: ${AXELIX_JWT_SIGNING_KEY}
 ```
 
   </TabItem>
@@ -269,13 +291,11 @@ axelix:
 
 ```properties
 management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
-
-axelix.sbs.auth.jwt.algorithm=HMAC512
-axelix.sbs.auth.jwt.signing-key=${AXELIX_JWT_SIGNING_KEY}
 ```
 
   </TabItem>
 </Tabs>
+:::
 
 Раскатывайте их сервис за сервисом. Как только сервис передеплоивается в тестовое окружение, он появляется в тестовом
 Master, и команда сразу может работать с ним через [UI](../ui-guide/dashboard.mdx) и MCP.
