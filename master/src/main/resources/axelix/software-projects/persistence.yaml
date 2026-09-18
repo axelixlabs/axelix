@@ -231,3 +231,19 @@ projects:
     reference:
       label: Jaybird releases
       url: https://github.com/FirebirdSQL/jaybird/releases
+
+  - id: ehcache2
+    name: Ehcache 2
+    status: SUNSET
+    summary: >-
+      The 2.x line is finished and its repository is archived; no further releases are expected.
+      Development moved to Ehcache 3 under the org.ehcache group.
+    coordinates:
+      - net.sf.ehcache:ehcache
+      - net.sf.ehcache:ehcache-core
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: The Ehcache 3 API (org.ehcache:ehcache) is not drop-in compatible, so replacing it is a migration, not a version bump
+    reference:
+      label: Ehcache 2 archived repository
+      url: https://github.com/ehcache/ehcache2

@@ -35,3 +35,41 @@ projects:
     reference:
       label: HttpComponents support status
       url: https://hc.apache.org/status.html
+
+  - id: netflix-ribbon
+    name: Netflix Ribbon
+    status: MAINTENANCE
+    summary: >-
+      Netflix placed Ribbon in maintenance mode, and Spring Cloud removed its Ribbon integration in
+      the 2020.0 release. Spring Cloud LoadBalancer is the replacement for client-side load
+      balancing.
+    coordinates:
+      - com.netflix.ribbon:ribbon
+      - com.netflix.ribbon:ribbon-core
+      - com.netflix.ribbon:ribbon-loadbalancer
+      - com.netflix.ribbon:ribbon-httpclient
+      - org.springframework.cloud:spring-cloud-starter-netflix-ribbon
+      - org.springframework.cloud:spring-cloud-netflix-ribbon
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.cloud:spring-cloud-starter-loadbalancer
+    reference:
+      label: Ribbon maintenance-mode notice
+      url: https://github.com/Netflix/ribbon
+
+  - id: spring-cloud-netflix-zuul
+    name: Spring Cloud Netflix Zuul
+    status: SUNSET
+    summary: >-
+      Removed from Spring Cloud in the 2020.0 release. Netflix continues Zuul 2 on its own, but the
+      Spring integration only ever covered Zuul 1 and ended with it; Spring Cloud Gateway is the
+      replacement.
+    coordinates:
+      - org.springframework.cloud:spring-cloud-starter-netflix-zuul
+      - org.springframework.cloud:spring-cloud-netflix-zuul
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.cloud:spring-cloud-starter-gateway
+    reference:
+      label: Spring Cloud 2020.0 release notes
+      url: https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2020.0-Release-Notes

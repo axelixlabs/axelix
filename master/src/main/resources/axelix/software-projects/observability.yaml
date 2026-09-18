@@ -21,3 +21,23 @@ projects:
     reference:
       label: Spring Cloud Sleuth in the attic
       url: https://github.com/spring-attic/spring-cloud-sleuth
+
+  - id: prometheus-simpleclient
+    name: Prometheus Java Client 0.x (simpleclient)
+    status: MAINTENANCE
+    summary: >-
+      The 0.x simpleclient generation is legacy: development moved to the rewritten 1.x
+      prometheus-metrics client, and the last simpleclient release line is 0.16.x.
+    coordinates:
+      - io.prometheus:simpleclient
+      - io.prometheus:simpleclient_common
+      - io.prometheus:simpleclient_hotspot
+      - io.prometheus:simpleclient_httpserver
+      - io.prometheus:simpleclient_pushgateway
+      - io.prometheus:simpleclient_servlet
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.prometheus:prometheus-metrics-core
+    reference:
+      label: simpleclient migration guide
+      url: https://prometheus.github.io/client_java/migration/simpleclient/

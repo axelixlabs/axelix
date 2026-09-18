@@ -1,0 +1,18 @@
+ecosystem: SECURITY
+projects:
+  - id: spring-security-oauth
+    name: Spring Security OAuth
+    status: SUNSET
+    summary: >-
+      Reached end of life in 2022 and moved to the Spring attic. Its OAuth 2.0 client and resource
+      server support was rebuilt inside Spring Security itself, and the authorization server became
+      the separate Spring Authorization Server project.
+    coordinates:
+      - org.springframework.security.oauth:spring-security-oauth2
+      - org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.security:spring-security-oauth2-client
+    reference:
+      label: Spring Security OAuth in the attic
+      url: https://github.com/spring-attic/spring-security-oauth
