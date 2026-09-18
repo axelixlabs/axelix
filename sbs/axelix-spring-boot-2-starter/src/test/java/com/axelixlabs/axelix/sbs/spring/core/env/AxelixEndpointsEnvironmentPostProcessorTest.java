@@ -67,7 +67,10 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
         StandardEnvironment env = new StandardEnvironment();
 
         subject.postProcessEnvironment(env, new SpringApplication());
-        assertThat(env.getProperty(INCLUDED_PROPERTY).split(",")).containsExactlyInAnyOrderElementsOf(ENDPOINTS);
+
+        List<String> expected = new ArrayList<>(List.of("health"));
+        expected.addAll(ENDPOINTS);
+        assertThat(env.getProperty(INCLUDED_PROPERTY).split(",")).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test

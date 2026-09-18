@@ -57,6 +57,11 @@ public class AxelixEndpointsEnvironmentPostProcessor implements EnvironmentPostP
         }
 
         Set<String> merged = new LinkedHashSet<>();
+        if (current.isEmpty()) {
+            // the property is unset, so keep Spring Boot's default exposure ("health"),
+            // which the property source added below would otherwise override
+            merged.add("health");
+        }
         current.stream().map(String::strip).filter(s -> !s.isEmpty()).forEach(merged::add);
 
         merged.addAll(discoverAxelixEndpointIds(environment));
