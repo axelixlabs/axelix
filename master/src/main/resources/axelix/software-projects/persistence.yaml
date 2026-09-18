@@ -102,3 +102,132 @@ projects:
     reference:
       label: PostgreSQL JDBC Driver
       url: https://jdbc.postgresql.org/
+
+  - id: mysql-connector-j
+    name: MySQL Connector/J
+    status: ACTIVE
+    summary: Actively developed by Oracle alongside the MySQL server.
+    coordinates:
+      - com.mysql:mysql-connector-j
+    reference:
+      label: MySQL Connector/J releases
+      url: https://github.com/mysql/mysql-connector-j
+
+  - id: mariadb-connector-j
+    name: MariaDB Connector/J
+    status: ACTIVE
+    summary: Actively developed by MariaDB Corporation.
+    coordinates:
+      - org.mariadb.jdbc:mariadb-java-client
+    reference:
+      label: MariaDB Connector/J releases
+      url: https://github.com/mariadb-corporation/mariadb-connector-j/releases
+
+  - id: mssql-jdbc
+    name: Microsoft JDBC Driver for SQL Server
+    status: ACTIVE
+    summary: Actively developed by Microsoft.
+    coordinates:
+      - com.microsoft.sqlserver:mssql-jdbc
+    reference:
+      label: mssql-jdbc releases
+      url: https://github.com/microsoft/mssql-jdbc/releases
+
+  - id: oracle-jdbc
+    name: Oracle Database JDBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by Oracle alongside the Oracle Database. Covers the ojdbc drivers, the UCP
+      connection pool and the companion jars they pull in.
+    coordinates:
+      - com.oracle.database.jdbc:ojdbc11
+      - com.oracle.database.jdbc:ojdbc11-production
+      - com.oracle.database.jdbc:ojdbc17
+      - com.oracle.database.jdbc:ojdbc17-production
+      - com.oracle.database.jdbc:ojdbc8
+      - com.oracle.database.jdbc:ojdbc8-production
+      - com.oracle.database.jdbc:rsi
+      - com.oracle.database.jdbc:ucp
+      - com.oracle.database.jdbc:ucp11
+      - com.oracle.database.jdbc:ucp17
+      - com.oracle.database.ha:ons
+      - com.oracle.database.ha:simplefan
+      - com.oracle.database.nls:orai18n
+      - com.oracle.database.security:oraclepki
+      - com.oracle.database.xml:xdb
+      - com.oracle.database.xml:xmlparserv2
+    reference:
+      label: Oracle JDBC downloads
+      url: https://www.oracle.com/database/technologies/appdev/jdbc.html
+
+  - id: db2-jcc
+    name: IBM Db2 JCC Driver
+    status: ACTIVE
+    summary: Actively developed by IBM alongside Db2.
+    coordinates:
+      - com.ibm.db2:jcc
+    reference:
+      label: Db2 JDBC driver versions
+      url: https://www.ibm.com/support/pages/db2-jdbc-driver-versions-and-downloads
+
+  - id: sqlite-jdbc
+    name: SQLite JDBC Driver
+    status: ACTIVE
+    summary: Actively developed by the Xerial project.
+    coordinates:
+      - org.xerial:sqlite-jdbc
+    reference:
+      label: sqlite-jdbc releases
+      url: https://github.com/xerial/sqlite-jdbc/releases
+
+  - id: apache-derby
+    name: Apache Derby
+    status: ACTIVE
+    summary: >-
+      Developed by the Apache DB project. Releases are infrequent, but the project has not been moved
+      to the attic.
+    coordinates:
+      - org.apache.derby:derby
+      - org.apache.derby:derbyclient
+      - org.apache.derby:derbynet
+      - org.apache.derby:derbyoptionaltools
+      - org.apache.derby:derbyshared
+      - org.apache.derby:derbytools
+    reference:
+      label: Apache Derby
+      url: https://db.apache.org/derby/
+
+  - id: hsqldb
+    name: HSQLDB
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.hsqldb:hsqldb
+    reference:
+      label: HSQLDB
+      url: https://hsqldb.org/
+
+  - id: jtds
+    name: jTDS
+    status: SUNSET
+    summary: >-
+      The last release, 1.3.1, was published in 2014 and the project has been inactive since.
+      Microsoft's own SQL Server driver is the maintained way to reach the same databases.
+    coordinates:
+      - net.sourceforge.jtds:jtds
+    succession:
+      kind: SUPERSEDED_BY
+      value: com.microsoft.sqlserver:mssql-jdbc
+    reference:
+      label: jTDS on SourceForge
+      url: https://sourceforge.net/projects/jtds/
+
+  - id: jaybird
+    name: Jaybird
+    status: ACTIVE
+    summary: The JDBC driver for Firebird, actively developed by the Firebird project.
+    coordinates:
+      - org.firebirdsql.jdbc:jaybird
+    reference:
+      label: Jaybird releases
+      url: https://github.com/FirebirdSQL/jaybird/releases
