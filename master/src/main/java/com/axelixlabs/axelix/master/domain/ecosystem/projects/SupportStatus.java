@@ -36,6 +36,14 @@ public enum SupportStatus {
     MAINTENANCE,
 
     /**
+     * The project shows no signs of life - no releases for an extended period - but its authors have declared
+     * nothing: no maintenance notice, no end-of-life announcement, no archived repository. Unlike the other
+     * statuses this one records what Axelix observes rather than what the authors said, and the distinction
+     * matters: a dormant project may wake up again, or may already be dead in all but name.
+     */
+    DORMANT,
+
+    /**
      * The project is finished. No releases of any kind are expected, security fixes included.
      */
     SUNSET

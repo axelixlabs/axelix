@@ -182,10 +182,10 @@ projects:
 
   - id: apache-derby
     name: Apache Derby
-    status: ACTIVE
+    status: DORMANT
     summary: >-
-      Developed by the Apache DB project. Releases are infrequent, but the project has not been moved
-      to the attic.
+      The last release, 10.17.1.0, dates to November 2023. The repository still sees occasional
+      activity and the project has not been moved to the attic, but nothing has shipped for years.
     coordinates:
       - org.apache.derby:derby
       - org.apache.derby:derbyclient
@@ -193,6 +193,9 @@ projects:
       - org.apache.derby:derbyoptionaltools
       - org.apache.derby:derbyshared
       - org.apache.derby:derbytools
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: For embedded use, H2 and HSQLDB are the common actively maintained alternatives
     reference:
       label: Apache Derby
       url: https://db.apache.org/derby/
@@ -200,7 +203,9 @@ projects:
   - id: hsqldb
     name: HSQLDB
     status: ACTIVE
-    summary: Actively developed.
+    summary: >-
+      Developed on a slow but historically steady cadence; the latest release, 2.7.4, dates to
+      November 2024.
     coordinates:
       - org.hsqldb:hsqldb
     reference:
@@ -344,13 +349,16 @@ projects:
 
   - id: vibur-dbcp
     name: Vibur DBCP
-    status: ACTIVE
+    status: DORMANT
     summary: >-
-      Developed by a single maintainer on a slow cadence - roughly one release a year, the latest
-      being 26.0 in January 2025.
+      Developed by a single maintainer, historically at roughly one release a year, but quiet since
+      the 26.0 release in January 2025 with no commits since.
     coordinates:
       - org.vibur:vibur-dbcp
       - org.vibur:vibur-object-pool
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: HikariCP is the de facto standard connection pool to move to
     reference:
       label: Vibur DBCP
       url: https://github.com/vibur/vibur-dbcp
@@ -513,11 +521,15 @@ projects:
 
   - id: oracle-r2dbc
     name: Oracle R2DBC Driver
-    status: ACTIVE
+    status: DORMANT
     summary: >-
-      Actively developed by Oracle.
+      Quiet since late 2024: the last release, 1.3.0, dates to November 2024 and the repository has
+      seen no commits since December 2024, although Oracle has declared nothing.
     coordinates:
       - com.oracle.database.r2dbc:oracle-r2dbc
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: No alternative R2DBC driver for Oracle Database exists; the Oracle JDBC driver remains actively maintained
     reference:
       label: oracle-r2dbc on GitHub
       url: https://github.com/oracle/oracle-r2dbc

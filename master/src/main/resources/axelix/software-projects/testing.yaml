@@ -154,13 +154,17 @@ projects:
 
   - id: hamcrest
     name: Hamcrest
-    status: ACTIVE
+    status: DORMANT
     summary: >-
-      Maintained on a slow cadence; the latest major release, 3.0, was published in August 2024.
+      Quiet since early 2025: the latest release, 3.0, dates to August 2024 and the repository has
+      seen no commits since February 2025, although the project was never formally discontinued.
     coordinates:
       - org.hamcrest:hamcrest
       - org.hamcrest:hamcrest-core
       - org.hamcrest:hamcrest-library
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Hamcrest keeps working and remains embedded in the JUnit ecosystem; AssertJ is the common actively developed alternative
     reference:
       label: Hamcrest
       url: https://hamcrest.org/JavaHamcrest/
@@ -215,11 +219,15 @@ projects:
 
   - id: jsonassert
     name: JSONassert
-    status: ACTIVE
+    status: DORMANT
     summary: >-
-      Maintained on a slow cadence by Skyscreamer.
+      Shows no signs of life: the last release, 1.5.3, and the last commit both date to July 2024,
+      although the project was never formally discontinued.
     coordinates:
       - org.skyscreamer:jsonassert
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: JSONassert keeps working; JsonUnit and AssertJ's JSON support are the common actively developed alternatives
     reference:
       label: JSONassert
       url: https://github.com/skyscreamer/JSONassert
