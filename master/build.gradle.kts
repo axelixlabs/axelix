@@ -183,7 +183,9 @@ sourceSets {
     }
 }
 
-// The generated contract classes are not held to the in-house code quality standards.
+// The generated contract classes cannot pass NullAway: a required property is non-null under
+// JSpecify, yet the generator emits a Jackson-friendly no-arg constructor that leaves its field
+// uninitialized.
 tasks.named<JavaCompile>("compileJava") {
     options.errorprone {
         option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.master.contract(\\..*)?")
