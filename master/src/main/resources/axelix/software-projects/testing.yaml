@@ -70,9 +70,73 @@ projects:
   - id: testcontainers
     name: Testcontainers
     status: ACTIVE
-    summary: Actively developed by AtomicJar/Docker.
+    summary: >-
+      Actively developed by AtomicJar/Docker. Testcontainers 2.x renamed every module to a
+      testcontainers-* artifact id; the 1.x line publishes the same modules without the prefix,
+      so both naming generations are listed.
     coordinates:
       - org.testcontainers:testcontainers
+      - org.testcontainers:activemq
+      - org.testcontainers:azure
+      - org.testcontainers:cassandra
+      - org.testcontainers:chromadb
+      - org.testcontainers:clickhouse
+      - org.testcontainers:cockroachdb
+      - org.testcontainers:consul
+      - org.testcontainers:couchbase
+      - org.testcontainers:cratedb
+      - org.testcontainers:database-commons
+      - org.testcontainers:databend
+      - org.testcontainers:db2
+      - org.testcontainers:elasticsearch
+      - org.testcontainers:gcloud
+      - org.testcontainers:grafana
+      - org.testcontainers:hivemq
+      - org.testcontainers:influxdb
+      - org.testcontainers:jdbc
+      - org.testcontainers:junit-jupiter
+      - org.testcontainers:k3s
+      - org.testcontainers:k6
+      - org.testcontainers:kafka
+      - org.testcontainers:ldap
+      - org.testcontainers:localstack
+      - org.testcontainers:mariadb
+      - org.testcontainers:milvus
+      - org.testcontainers:minio
+      - org.testcontainers:mockserver
+      - org.testcontainers:mongodb
+      - org.testcontainers:mssqlserver
+      - org.testcontainers:mysql
+      - org.testcontainers:neo4j
+      - org.testcontainers:nginx
+      - org.testcontainers:oceanbase
+      - org.testcontainers:ollama
+      - org.testcontainers:openfga
+      - org.testcontainers:oracle-free
+      - org.testcontainers:oracle-xe
+      - org.testcontainers:orientdb
+      - org.testcontainers:pinecone
+      - org.testcontainers:postgresql
+      - org.testcontainers:presto
+      - org.testcontainers:pulsar
+      - org.testcontainers:qdrant
+      - org.testcontainers:questdb
+      - org.testcontainers:r2dbc
+      - org.testcontainers:rabbitmq
+      - org.testcontainers:redpanda
+      - org.testcontainers:scylladb
+      - org.testcontainers:selenium
+      - org.testcontainers:solace
+      - org.testcontainers:solr
+      - org.testcontainers:spock
+      - org.testcontainers:tidb
+      - org.testcontainers:timeplus
+      - org.testcontainers:toxiproxy
+      - org.testcontainers:trino
+      - org.testcontainers:typesense
+      - org.testcontainers:vault
+      - org.testcontainers:weaviate
+      - org.testcontainers:yugabytedb
       - org.testcontainers:testcontainers-activemq
       - org.testcontainers:testcontainers-azure
       - org.testcontainers:testcontainers-cassandra
@@ -255,3 +319,54 @@ projects:
     reference:
       label: HtmlUnit
       url: https://www.htmlunit.org/
+  - id: duct-tape
+    name: Duct Tape
+    status: SUNSET
+    summary: >-
+      The repository was archived in 2021; the last release was 1.0.8 in 2019. Still shipped as a
+      Testcontainers 1.x dependency for retry utilities.
+    coordinates:
+      - org.rnorth.duct-tape:duct-tape
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Testcontainers 1.x still ships it; no successor exists.
+    reference:
+      label: duct-tape repository (archived)
+      url: https://github.com/rnorth/duct-tape
+
+  - id: opentest4j
+    name: OpenTest4J
+    status: ACTIVE
+    summary: >-
+      Maintained by the JUnit team with ongoing repository activity, though no release has shipped
+      since 1.3.0 in July 2023. The common assertion-error protocol underneath JUnit 5.
+    coordinates:
+      - org.opentest4j:opentest4j
+    reference:
+      label: OpenTest4J
+      url: https://github.com/ota4j-team/opentest4j
+
+  - id: apiguardian
+    name: API Guardian
+    status: ACTIVE
+    summary: >-
+      Maintained by the JUnit team with ongoing repository activity, though no release has shipped
+      since 1.1.2 in 2021. Provides the @API status annotations used across the JUnit 5 artifacts.
+    coordinates:
+      - org.apiguardian:apiguardian-api
+    reference:
+      label: API Guardian
+      url: https://github.com/apiguardian-team/apiguardian
+
+  - id: objenesis
+    name: Objenesis
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Instantiates objects without constructors; arrives transitively through
+      Mockito.
+    coordinates:
+      - org.objenesis:objenesis
+    reference:
+      label: Objenesis
+      url: https://objenesis.org/
+

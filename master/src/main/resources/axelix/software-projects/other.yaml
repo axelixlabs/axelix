@@ -280,8 +280,12 @@ projects:
     name: Eclipse Angus Mail
     status: ACTIVE
     summary: >-
-      Actively maintained under Eclipse EE4J. The implementation of Jakarta Mail.
+      Actively maintained under Eclipse EE4J. The implementation of Jakarta Mail, previously
+      published under the legacy com.sun.mail coordinates.
     coordinates:
+      - com.sun.mail:jakarta.mail
+      - com.sun.mail:javax.mail
+      - org.eclipse.angus:angus-activation
       - org.eclipse.angus:angus-core
       - org.eclipse.angus:angus-mail
       - org.eclipse.angus:dsn
@@ -323,3 +327,252 @@ projects:
     reference:
       label: sendgrid-java on GitHub
       url: https://github.com/sendgrid/sendgrid-java
+  - id: mapstruct
+    name: MapStruct
+    status: ACTIVE
+    summary: >-
+      Actively developed. Compile-time code generator for type-safe bean mappings.
+    coordinates:
+      - org.mapstruct:mapstruct
+      - org.mapstruct:mapstruct-processor
+    reference:
+      label: MapStruct
+      url: https://mapstruct.org/
+
+  - id: hibernate-validator
+    name: Hibernate Validator
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Hibernate team. The reference implementation of Jakarta Bean
+      Validation that Spring Boot autoconfigures for the validation starter.
+    coordinates:
+      - org.hibernate.validator:hibernate-validator
+      - org.hibernate.validator:hibernate-validator-annotation-processor
+    reference:
+      label: Hibernate Validator
+      url: https://hibernate.org/validator/
+
+  - id: commons-io
+    name: Apache Commons IO
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Apache Commons project.
+    coordinates:
+      - commons-io:commons-io
+    reference:
+      label: Apache Commons IO
+      url: https://commons.apache.org/proper/commons-io/
+
+  - id: commons-compress
+    name: Apache Commons Compress
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Apache Commons project.
+    coordinates:
+      - org.apache.commons:commons-compress
+    reference:
+      label: Apache Commons Compress
+      url: https://commons.apache.org/proper/commons-compress/
+
+  - id: asm
+    name: ASM
+    status: ACTIVE
+    summary: >-
+      Actively developed by the OW2 consortium. The bytecode manipulation library underneath much of
+      the Java tooling ecosystem.
+    coordinates:
+      - org.ow2.asm:asm
+      - org.ow2.asm:asm-analysis
+      - org.ow2.asm:asm-commons
+      - org.ow2.asm:asm-tree
+      - org.ow2.asm:asm-util
+    reference:
+      label: ASM
+      url: https://asm.ow2.io/
+
+  - id: antlr4
+    name: ANTLR 4
+    status: ACTIVE
+    summary: >-
+      Repository commits are ongoing though no release has shipped since 4.13.2 in August 2024. The
+      runtime arrives transitively through the HQL parser of Hibernate ORM.
+    coordinates:
+      - org.antlr:antlr4
+      - org.antlr:antlr4-runtime
+    reference:
+      label: ANTLR
+      url: https://www.antlr.org/
+
+  - id: jna
+    name: Java Native Access
+    status: ACTIVE
+    summary: >-
+      Actively developed. Native library access used transitively by Testcontainers and many other
+      tools.
+    coordinates:
+      - net.java.dev.jna:jna
+      - net.java.dev.jna:jna-platform
+    reference:
+      label: JNA
+      url: https://github.com/java-native-access/jna
+
+  - id: docker-java
+    name: docker-java
+    status: ACTIVE
+    summary: >-
+      Actively developed. The Docker client library underneath Testcontainers and Spring Boot Docker
+      Compose support.
+    coordinates:
+      - com.github.docker-java:docker-java
+      - com.github.docker-java:docker-java-api
+      - com.github.docker-java:docker-java-core
+      - com.github.docker-java:docker-java-transport
+      - com.github.docker-java:docker-java-transport-httpclient5
+      - com.github.docker-java:docker-java-transport-zerodep
+    reference:
+      label: docker-java
+      url: https://github.com/docker-java/docker-java
+
+  - id: jandex
+    name: Jandex
+    status: ACTIVE
+    summary: >-
+      Actively developed under SmallRye. Annotation indexer used by Hibernate ORM and Quarkus; the
+      legacy org.jboss coordinates are listed for older dependency trees.
+    coordinates:
+      - io.smallrye:jandex
+      - org.jboss:jandex
+    reference:
+      label: SmallRye Jandex
+      url: https://smallrye.io/jandex/
+
+  - id: jboss-logging
+    name: JBoss Logging
+    status: ACTIVE
+    summary: >-
+      Actively maintained by Red Hat. The logging facade Hibernate projects log through.
+    coordinates:
+      - org.jboss.logging:jboss-logging
+    reference:
+      label: JBoss Logging
+      url: https://github.com/jboss-logging/jboss-logging
+
+  - id: checker-framework
+    name: Checker Framework
+    status: ACTIVE
+    summary: >-
+      Actively developed. Its checker-qual annotations arrive transitively through Guava, Caffeine
+      and others.
+    coordinates:
+      - org.checkerframework:checker-qual
+      - org.checkerframework:checker
+    reference:
+      label: Checker Framework
+      url: https://checkerframework.org/
+
+  - id: error-prone
+    name: Error Prone
+    status: ACTIVE
+    summary: >-
+      Actively developed by Google. Its annotations arrive transitively through Guava and other
+      Google libraries.
+    coordinates:
+      - com.google.errorprone:error_prone_annotations
+    reference:
+      label: Error Prone
+      url: https://errorprone.info/
+
+  - id: jetbrains-annotations
+    name: JetBrains Java Annotations
+    status: ACTIVE
+    summary: >-
+      Actively developed by JetBrains. Nullability and contract annotations that arrive transitively
+      with many Kotlin-adjacent libraries.
+    coordinates:
+      - org.jetbrains:annotations
+    reference:
+      label: JetBrains Java Annotations
+      url: https://github.com/JetBrains/java-annotations
+
+  - id: jcip-annotations
+    name: JCIP Annotations (ASL2 repackage)
+    status: DORMANT
+    summary: >-
+      The Apache-licensed repackaging of the Java Concurrency in Practice annotations has not seen a
+      release since 2013 and no repository commits since April 2024, with nothing declared by its
+      author. Arrives transitively through Nimbus JOSE + JWT.
+    coordinates:
+      - com.github.stephenc.jcip:jcip-annotations
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: The annotations are finished by design; no successor exists.
+    reference:
+      label: jcip-annotations
+      url: https://github.com/stephenc/jcip-annotations
+
+  - id: lz4-java
+    name: LZ4 Java
+    status: SUNSET
+    summary: >-
+      The repository was archived in November 2025 immediately after the final 1.8.1 release. Still
+      shipped transitively by Apache Kafka clients for LZ4 compression.
+    coordinates:
+      - org.lz4:lz4-java
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Kafka still ships it; no maintained drop-in successor exists.
+    reference:
+      label: lz4-java repository (archived)
+      url: https://github.com/lz4/lz4-java
+
+  - id: snappy-java
+    name: Snappy Java
+    status: ACTIVE
+    summary: >-
+      Actively maintained by Xerial. Snappy compression bindings shipped transitively by Apache
+      Kafka clients.
+    coordinates:
+      - org.xerial.snappy:snappy-java
+    reference:
+      label: snappy-java
+      url: https://github.com/xerial/snappy-java
+
+  - id: zstd-jni
+    name: Zstd JNI
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Zstandard compression bindings shipped transitively by Apache Kafka
+      clients.
+    coordinates:
+      - com.github.luben:zstd-jni
+    reference:
+      label: zstd-jni
+      url: https://github.com/luben/zstd-jni
+
+  - id: antlr2
+    name: ANTLR 2
+    status: DORMANT
+    summary: >-
+      The classic ANTLR generation last released as 2.7.7 in 2006, with nothing declared by the
+      authors. Still arrives transitively in Spring Boot 2 applications through Hibernate ORM 5.
+    coordinates:
+      - antlr:antlr
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.antlr:antlr4-runtime
+    reference:
+      label: ANTLR
+      url: https://www.antlr.org/
+
+  - id: javassist
+    name: Javassist
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Bytecode manipulation library that arrives transitively in Spring Boot 2
+      applications through Hibernate ORM 5.
+    coordinates:
+      - org.javassist:javassist
+    reference:
+      label: Javassist
+      url: https://github.com/jboss-javassist/javassist
+

@@ -277,6 +277,7 @@ projects:
       Actively maintained. Arrives in most applications transitively through Jayway JsonPath.
     coordinates:
       - net.minidev:json-smart
+      - net.minidev:accessors-smart
     reference:
       label: json-smart on GitHub
       url: https://github.com/netplex/json-smart-v2
@@ -294,6 +295,7 @@ projects:
       - org.glassfish.jaxb:jaxb-runtime
       - org.glassfish.jaxb:jaxb-xjc
       - org.glassfish.jaxb:txw2
+      - com.sun.istack:istack-commons-runtime
       - org.glassfish.jaxb:xsom
       - com.sun.xml.bind:jaxb-core
       - com.sun.xml.bind:jaxb-impl
@@ -315,3 +317,39 @@ projects:
     reference:
       label: Eclipse Yasson
       url: https://github.com/eclipse-ee4j/yasson
+  - id: attoparser
+    name: attoparser
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the Thymeleaf author. The HTML/XML parser underneath the Thymeleaf
+      template engine.
+    coordinates:
+      - org.attoparser:attoparser
+    reference:
+      label: attoparser
+      url: https://www.attoparser.org/
+
+  - id: unbescape
+    name: Unbescape
+    status: ACTIVE
+    summary: >-
+      Maintained by the Thymeleaf author with occasional repository commits, though no release has
+      shipped since 1.1.6 in 2018. The escaping library underneath the Thymeleaf template engine.
+    coordinates:
+      - org.unbescape:unbescape
+    reference:
+      label: Unbescape
+      url: https://www.unbescape.org/
+
+  - id: dom4j
+    name: dom4j
+    status: ACTIVE
+    summary: >-
+      Maintained at a slow cadence: 2.2.0 shipped in June 2025 after several quiet years. XML
+      library that arrives transitively in Spring Boot 2 applications through Hibernate ORM 5.
+    coordinates:
+      - org.dom4j:dom4j
+    reference:
+      label: dom4j
+      url: https://github.com/dom4j/dom4j
+

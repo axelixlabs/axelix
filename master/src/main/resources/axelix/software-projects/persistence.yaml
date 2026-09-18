@@ -33,6 +33,9 @@ projects:
       - org.hibernate.orm:hibernate-spatial
       - org.hibernate.orm:hibernate-testing
       - org.hibernate.orm:hibernate-vector
+      - org.hibernate:hibernate-core
+      - org.hibernate.common:hibernate-commons-annotations
+      - org.hibernate.models:hibernate-models
     reference:
       label: Hibernate ORM releases
       url: https://hibernate.org/orm/releases/

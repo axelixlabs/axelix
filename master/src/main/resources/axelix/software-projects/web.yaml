@@ -455,3 +455,37 @@ projects:
     reference:
       label: GraphQL Java
       url: https://www.graphql-java.com/
+  - id: springdoc-openapi
+    name: springdoc-openapi
+    status: ACTIVE
+    summary: >-
+      Actively developed. Generates OpenAPI descriptions and serves Swagger UI for Spring Boot
+      applications.
+    coordinates:
+      - org.springdoc:springdoc-openapi-starter-common
+      - org.springdoc:springdoc-openapi-starter-webmvc-api
+      - org.springdoc:springdoc-openapi-starter-webmvc-ui
+      - org.springdoc:springdoc-openapi-starter-webflux-api
+      - org.springdoc:springdoc-openapi-starter-webflux-ui
+    reference:
+      label: springdoc-openapi
+      url: https://springdoc.org/
+
+  - id: swagger
+    name: Swagger Core & UI
+    status: ACTIVE
+    summary: >-
+      Actively developed by SmartBear. The OpenAPI model and annotation library plus the Swagger UI
+      webjar, usually arriving transitively through springdoc-openapi.
+    coordinates:
+      - io.swagger.core.v3:swagger-annotations
+      - io.swagger.core.v3:swagger-annotations-jakarta
+      - io.swagger.core.v3:swagger-core
+      - io.swagger.core.v3:swagger-core-jakarta
+      - io.swagger.core.v3:swagger-models
+      - io.swagger.core.v3:swagger-models-jakarta
+      - org.webjars:swagger-ui
+    reference:
+      label: Swagger
+      url: https://swagger.io/
+

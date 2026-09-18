@@ -35,6 +35,9 @@ projects:
       - io.prometheus:simpleclient_httpserver
       - io.prometheus:simpleclient_pushgateway
       - io.prometheus:simpleclient_servlet
+      - io.prometheus:simpleclient_tracer_common
+      - io.prometheus:simpleclient_tracer_otel
+      - io.prometheus:simpleclient_tracer_otel_agent
     succession:
       kind: SUPERSEDED_BY
       value: io.prometheus:prometheus-metrics-core
@@ -153,3 +156,52 @@ projects:
     reference:
       label: OpenZipkin
       url: https://zipkin.io/
+  - id: prometheus-java-client
+    name: Prometheus Java Client
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Prometheus project. The current 1.x client generation under the
+      prometheus-metrics-* artifacts; the legacy 0.x simpleclient generation is a separate entry.
+    coordinates:
+      - io.prometheus:prometheus-metrics-config
+      - io.prometheus:prometheus-metrics-core
+      - io.prometheus:prometheus-metrics-exposition-formats
+      - io.prometheus:prometheus-metrics-exposition-formats-no-protobuf
+      - io.prometheus:prometheus-metrics-exposition-textformats
+      - io.prometheus:prometheus-metrics-model
+      - io.prometheus:prometheus-metrics-tracer-common
+      - io.prometheus:prometheus-metrics-tracer-initializer
+    reference:
+      label: Prometheus Java client
+      url: https://github.com/prometheus/client_java
+
+  - id: hdrhistogram
+    name: HdrHistogram
+    status: DORMANT
+    summary: >-
+      No release since 2.2.2 in May 2024 and no repository commits since June 2024, with nothing
+      declared by the authors. Still shipped transitively by Micrometer for percentile histograms.
+    coordinates:
+      - org.hdrhistogram:HdrHistogram
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Micrometer still depends on it; no successor exists.
+    reference:
+      label: HdrHistogram
+      url: https://github.com/HdrHistogram/HdrHistogram
+
+  - id: latencyutils
+    name: LatencyUtils
+    status: DORMANT
+    summary: >-
+      No release since 2.0.3 in 2015 and no repository commits since May 2024, with nothing declared
+      by the authors. Arrives transitively through the pause detection support in Micrometer.
+    coordinates:
+      - org.latencyutils:LatencyUtils
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Micrometer still depends on it; no successor exists.
+    reference:
+      label: LatencyUtils
+      url: https://github.com/LatencyUtils/LatencyUtils
+
