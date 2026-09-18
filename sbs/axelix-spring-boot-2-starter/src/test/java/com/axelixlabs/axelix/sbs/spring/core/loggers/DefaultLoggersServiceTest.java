@@ -29,8 +29,8 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
 
-import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,7 +67,9 @@ class DefaultLoggersServiceTest {
     @Test
     void shouldClearOverrideMetadataWhenResetAfterTemporaryChange() throws Exception {
         // given.
-        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest("DEBUG", 30L));
+        subject.changeLogLevelByLoggerName(
+                LOGGER_NAME,
+                new LogLevelChangeRequest().configuredLevel("DEBUG").ttlSeconds(30L));
 
         SingleLoggerProfile beforeReset = subject.getSingleLogger(LOGGER_NAME);
         assertThat(beforeReset.getTemporaryLevelInitiatedAt()).isNotNull();
@@ -88,7 +90,9 @@ class DefaultLoggersServiceTest {
     @Test
     void shouldExtendTemporaryOverrideWhenNewChangeHasLongerDuration() throws Exception {
         // given.
-        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest("DEBUG", 30L));
+        subject.changeLogLevelByLoggerName(
+                LOGGER_NAME,
+                new LogLevelChangeRequest().configuredLevel("DEBUG").ttlSeconds(30L));
 
         SingleLoggerProfile firstOverride = subject.getSingleLogger(LOGGER_NAME);
         Instant firstInitiatedAt = Instant.parse(firstOverride.getTemporaryLevelInitiatedAt());
@@ -96,7 +100,9 @@ class DefaultLoggersServiceTest {
 
         // when.
         Instant beforeSecondChange = Instant.now();
-        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest("TRACE", 60L));
+        subject.changeLogLevelByLoggerName(
+                LOGGER_NAME,
+                new LogLevelChangeRequest().configuredLevel("TRACE").ttlSeconds(60L));
         Instant afterSecondChange = Instant.now();
 
         // then.
@@ -120,7 +126,9 @@ class DefaultLoggersServiceTest {
     @Test
     void shouldConvertTemporaryOverrideToPermanentWhenNewChangeHasNoDuration() throws Exception {
         // given.
-        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest("DEBUG", 30L));
+        subject.changeLogLevelByLoggerName(
+                LOGGER_NAME,
+                new LogLevelChangeRequest().configuredLevel("DEBUG").ttlSeconds(30L));
 
         SingleLoggerProfile temporaryOverride = subject.getSingleLogger(LOGGER_NAME);
         Instant temporaryInitiatedAt = Instant.parse(temporaryOverride.getTemporaryLevelInitiatedAt());
@@ -128,7 +136,7 @@ class DefaultLoggersServiceTest {
 
         // when.
         Instant beforePermanentChange = Instant.now();
-        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest("TRACE", null));
+        subject.changeLogLevelByLoggerName(LOGGER_NAME, new LogLevelChangeRequest().configuredLevel("TRACE"));
         Instant afterPermanentChange = Instant.now();
 
         // then.

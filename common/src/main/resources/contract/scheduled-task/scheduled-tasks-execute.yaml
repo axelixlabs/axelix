@@ -1,18 +1,12 @@
-# The Axelix Master <-> starter contract of the 'scheduled-tasks' feature.
-#
-# 'info.version' is the Axelix version of the last non-additive contract change and MUST be bumped
-# in the same change set as the schema. 'info.x-axelix-introduced-in' is the Axelix version whose
-# starter first backed the feature. 'info.title' is the feature id, which is also the route slug
-# of the corresponding SPA page.
-#
-# The Java request/response classes are GENERATED from this document on both sides of the wire
-# (the 'openApiGenerate' task of the ':master' and ':sbs:starter-domain' modules): never write
-# them by hand.
 openapi: 3.1.0
 info:
-  title: scheduled-tasks
+  title: scheduled-task-execute
   version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-execute' feature.
+    This feature allows to execute the arbitrary scheduled task inside the Spring Boot app.
   x-axelix-introduced-in: 1.0.0
+  x-last-updated-in: 1.0.0
 paths:
   /actuator/axelix-scheduled-tasks/execute:
     post:
