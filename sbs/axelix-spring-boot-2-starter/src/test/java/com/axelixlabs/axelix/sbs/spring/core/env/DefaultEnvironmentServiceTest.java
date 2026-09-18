@@ -59,7 +59,12 @@ class DefaultEnvironmentServiceTest {
             new ThreadLocalSecurityContextExecutor();
 
     @SpringBootTest
-    @TestPropertySource(properties = {"management.endpoint.env.keys-to-sanitize= "})
+    @TestPropertySource(
+            properties = {
+                "management.endpoint.env.keys-to-sanitize= ",
+                "spring.jpa.show-sql=true",
+                "server.error.includeStacktrace=always"
+            })
     @Nested
     @Import(TestConfigWithAllPropertiesSanitized.class)
     class WithoutExplicitSanitizationProperties {
@@ -101,6 +106,98 @@ class DefaultEnvironmentServiceTest {
 
             assertThat(values).doesNotContain("******");
             assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
+        }
+
+        @Test
+        void shouldReportTheDangerousPropertyValue() {
+            // when.
+            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(null), securityContext);
+
+            // then.
+            Property ddlAuto = findPrimaryProperty(environmentFeed, "spring.jpa.hibernate.ddl-auto");
+
+            assertThat(ddlAuto.getValue()).isEqualTo("create");
+            assertThat(ddlAuto.getDangerousValue()).isNotNull();
+            assertThat(ddlAuto.getDangerousValue().getRationale())
+                    .isEqualTo(DangerousProperty.DDL_AUTO_CREATE.getRationale());
+            assertThat(ddlAuto.getDangerousValue().getAlternativeExample()).isEqualTo("validate");
+        }
+
+        @Test
+        void shouldNotReportAnythingForThePropertyWithAHarmlessValue() {
+            // when.
+            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(null), securityContext);
+
+            // then.
+            Property driverClassName = findPrimaryProperty(environmentFeed, "spring.datasource.driver-class-name");
+
+            assertThat(driverClassName.getDangerousValue()).isNull();
+        }
+
+        @Test
+        void shouldReportTheDangerousValueForThePropertySpelledInCamelCase() {
+            // when.
+            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(null), securityContext);
+
+            // then.
+            Property includeStacktrace = findPrimaryProperty(environmentFeed, "server.error.includeStacktrace");
+
+            assertThat(includeStacktrace.getDangerousValue()).isNotNull();
+            assertThat(includeStacktrace.getDangerousValue().getRationale())
+                    .isEqualTo(DangerousProperty.INCLUDE_STACKTRACE_ALWAYS.getRationale());
+        }
+
+        @Test
+        void shouldReportTheDangerousValueEvenWhenTheValueItselfIsSanitized() {
+            // when.
+            User user = fromAuthorities();
+            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(null), securityContext);
+
+            // then.
+            Property ddlAuto = findPrimaryProperty(environmentFeed, "spring.jpa.hibernate.ddl-auto");
+
+            assertThat(ddlAuto.getValue()).isEqualTo("******");
+            assertThat(ddlAuto.getDangerousValue()).isNotNull();
+            assertThat(ddlAuto.getDangerousValue().getRationale())
+                    .isEqualTo(DangerousProperty.DDL_AUTO_CREATE.getRationale());
+        }
+
+        @Test
+        void shouldReportTheDangerousValueOnlyForThePrimaryOccurrenceOfTheProperty() {
+            // when.
+            User user = fromAuthorities(OssAuthority.ENV_VALUES_READ);
+            SecurityContext securityContext = new DefaultSecurityContext(user, "testToken");
+            EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                    () -> environmentService.getEnvironmentFeed(null), securityContext);
+
+            // then. The very same property is declared both in application.yaml and in the test property source,
+            // but only the one that actually wins is worth reporting.
+            List<Property> showSql = findProperties(environmentFeed, "spring.jpa.show-sql");
+
+            assertThat(showSql).hasSizeGreaterThan(1);
+
+            assertThat(showSql)
+                    .filteredOn(Property::isPrimary)
+                    .singleElement()
+                    .satisfies(
+                            property -> assertThat(property.getDangerousValue()).isNotNull());
+
+            assertThat(showSql)
+                    .filteredOn(property -> !property.isPrimary())
+                    .isNotEmpty()
+                    .allSatisfy(
+                            property -> assertThat(property.getDangerousValue()).isNull());
         }
     }
 
@@ -191,5 +288,19 @@ class DefaultEnvironmentServiceTest {
         public void setTags(Map<String, String> tags) {
             this.tags = tags;
         }
+    }
+
+    private static Property findPrimaryProperty(EnvironmentFeed environmentFeed, String propertyName) {
+        return findProperties(environmentFeed, propertyName).stream()
+                .filter(Property::isPrimary)
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private static List<Property> findProperties(EnvironmentFeed environmentFeed, String propertyName) {
+        return environmentFeed.getPropertySources().stream()
+                .flatMap(propertySource -> propertySource.getProperties().stream())
+                .filter(property -> property.getName().equals(propertyName))
+                .collect(Collectors.toList());
     }
 }

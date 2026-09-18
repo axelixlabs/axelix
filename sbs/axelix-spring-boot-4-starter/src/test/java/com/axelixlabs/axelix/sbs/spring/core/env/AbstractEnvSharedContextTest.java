@@ -63,6 +63,10 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
             // DefaultEnvironmentServiceTest (explicit sanitization scenario)
             "axelix.prop.test.tags.forSanitization=toBeSanitized",
             "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized",
+            // DefaultEnvironmentServiceTest (shadowed dangerous value scenario, same value as application.yaml)
+            "spring.jpa.show-sql=true",
+            // DefaultEnvironmentServiceTest (camel case spelling scenario)
+            "server.error.includeStacktrace=always",
             // AxelixEnvironmentEndpointTest
             "axelix.env.test.prop1=fromTestSource",
             "axelix.env.test.toBeSanitized=shouldBeSanitized",
