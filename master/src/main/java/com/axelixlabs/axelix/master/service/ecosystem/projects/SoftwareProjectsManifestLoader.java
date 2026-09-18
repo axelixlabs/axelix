@@ -58,7 +58,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.projects.SupportStatus;
  */
 public class SoftwareProjectsManifestLoader {
 
-    public static final String DEFAULT_LOCATION_PATTERN = "classpath*:axelix/dependencies/*.yaml";
+    public static final String DEFAULT_LOCATION_PATTERN = "classpath*:axelix/software-projects/*.yaml";
 
     private static final Comparator<Resource> BY_FILENAME =
             Comparator.comparing(resource -> String.valueOf(resource.getFilename()));

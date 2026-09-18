@@ -1,0 +1,104 @@
+ecosystem: PERSISTENCE
+projects:
+  - id: hikaricp
+    name: HikariCP
+    status: ACTIVE
+    summary: >-
+      Actively developed. The JDBC connection pool Spring Boot autoconfigures by default.
+    coordinates:
+      - com.zaxxer:HikariCP
+    reference:
+      label: HikariCP on GitHub
+      url: https://github.com/brettwooldridge/HikariCP
+
+  - id: hibernate-orm
+    name: Hibernate ORM
+    status: ACTIVE
+    summary: >-
+      Actively developed. The JPA provider Spring Boot autoconfigures by default for spring-data-jpa
+      applications.
+    coordinates:
+      - org.hibernate.orm:hibernate-agroal
+      - org.hibernate.orm:hibernate-ant
+      - org.hibernate.orm:hibernate-c3p0
+      - org.hibernate.orm:hibernate-community-dialects
+      - org.hibernate.orm:hibernate-core
+      - org.hibernate.orm:hibernate-envers
+      - org.hibernate.orm:hibernate-graalvm
+      - org.hibernate.orm:hibernate-hikaricp
+      - org.hibernate.orm:hibernate-jcache
+      - org.hibernate.orm:hibernate-micrometer
+      - org.hibernate.orm:hibernate-processor
+      - org.hibernate.orm:hibernate-scan-jandex
+      - org.hibernate.orm:hibernate-spatial
+      - org.hibernate.orm:hibernate-testing
+      - org.hibernate.orm:hibernate-vector
+    reference:
+      label: Hibernate ORM releases
+      url: https://hibernate.org/orm/releases/
+
+  - id: flyway
+    name: Flyway
+    status: ACTIVE
+    summary: >-
+      Actively developed by Redgate. Since Flyway 10, support for individual databases ships as
+      separate flyway-database-* modules on top of flyway-core.
+    coordinates:
+      - org.flywaydb:flyway-command-test-connection
+      - org.flywaydb:flyway-commandline
+      - org.flywaydb:flyway-core
+      - org.flywaydb:flyway-database-cassandra
+      - org.flywaydb:flyway-database-db2
+      - org.flywaydb:flyway-database-derby
+      - org.flywaydb:flyway-database-hsqldb
+      - org.flywaydb:flyway-database-informix
+      - org.flywaydb:flyway-database-nc-couchbase
+      - org.flywaydb:flyway-database-nc-mongodb
+      - org.flywaydb:flyway-database-oracle
+      - org.flywaydb:flyway-database-postgresql
+      - org.flywaydb:flyway-database-redshift
+      - org.flywaydb:flyway-database-saphana
+      - org.flywaydb:flyway-database-snowflake
+      - org.flywaydb:flyway-database-sybasease
+      - org.flywaydb:flyway-firebird
+      - org.flywaydb:flyway-gcp-bigquery
+      - org.flywaydb:flyway-gcp-spanner
+      - org.flywaydb:flyway-mysql
+      - org.flywaydb:flyway-singlestore
+      - org.flywaydb:flyway-sqlserver
+    reference:
+      label: Flyway releases
+      url: https://github.com/flyway/flyway/releases
+
+  - id: liquibase
+    name: Liquibase
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.liquibase:liquibase-cdi
+      - org.liquibase:liquibase-core
+    reference:
+      label: Liquibase releases
+      url: https://github.com/liquibase/liquibase/releases
+
+  - id: h2
+    name: H2 Database
+    status: ACTIVE
+    summary: >-
+      Actively developed. The embedded database Spring Boot picks up automatically for local
+      development and tests.
+    coordinates:
+      - com.h2database:h2
+    reference:
+      label: H2 releases
+      url: https://github.com/h2database/h2database/releases
+
+  - id: postgresql-jdbc
+    name: PostgreSQL JDBC Driver
+    status: ACTIVE
+    summary: Actively developed by the pgjdbc team.
+    coordinates:
+      - org.postgresql:postgresql
+    reference:
+      label: PostgreSQL JDBC Driver
+      url: https://jdbc.postgresql.org/
