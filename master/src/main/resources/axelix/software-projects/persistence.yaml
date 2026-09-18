@@ -353,3 +353,170 @@ projects:
     reference:
       label: Vibur DBCP
       url: https://github.com/vibur/vibur-dbcp
+
+  - id: mongodb-java-driver
+    name: MongoDB Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by MongoDB Inc.
+    coordinates:
+      - org.mongodb.scala:mongo-scala-bson_2.11
+      - org.mongodb.scala:mongo-scala-bson_2.12
+      - org.mongodb.scala:mongo-scala-bson_2.13
+      - org.mongodb.scala:mongo-scala-bson_3
+      - org.mongodb.scala:mongo-scala-driver_2.11
+      - org.mongodb.scala:mongo-scala-driver_2.12
+      - org.mongodb.scala:mongo-scala-driver_2.13
+      - org.mongodb.scala:mongo-scala-driver_3
+      - org.mongodb:bson
+      - org.mongodb:bson-kotlin
+      - org.mongodb:bson-kotlinx
+      - org.mongodb:bson-record-codec
+      - org.mongodb:mongodb-crypt
+      - org.mongodb:mongodb-driver-core
+      - org.mongodb:mongodb-driver-kotlin-coroutine
+      - org.mongodb:mongodb-driver-kotlin-extensions
+      - org.mongodb:mongodb-driver-kotlin-sync
+      - org.mongodb:mongodb-driver-reactivestreams
+      - org.mongodb:mongodb-driver-sync
+    reference:
+      label: MongoDB Java drivers
+      url: https://www.mongodb.com/docs/drivers/java-drivers/
+
+  - id: cassandra-java-driver
+    name: Apache Cassandra Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed. Originally the DataStax driver under the com.datastax.oss group,
+      donated to the Apache Cassandra project and republished under org.apache.cassandra.
+    coordinates:
+      - com.datastax.oss:java-driver-core
+      - com.datastax.oss:java-driver-mapper-runtime
+      - com.datastax.oss:java-driver-query-builder
+      - com.datastax.oss:native-protocol
+      - org.apache.cassandra:java-driver-core
+      - org.apache.cassandra:java-driver-core-shaded
+      - org.apache.cassandra:java-driver-guava-shaded
+      - org.apache.cassandra:java-driver-mapper-processor
+      - org.apache.cassandra:java-driver-mapper-runtime
+      - org.apache.cassandra:java-driver-metrics-micrometer
+      - org.apache.cassandra:java-driver-metrics-microprofile
+      - org.apache.cassandra:java-driver-query-builder
+      - org.apache.cassandra:java-driver-test-infra
+    reference:
+      label: Apache Cassandra Java Driver
+      url: https://github.com/apache/cassandra-java-driver
+
+  - id: neo4j-java-driver
+    name: Neo4j Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by Neo4j.
+    coordinates:
+      - org.neo4j.driver:neo4j-java-driver
+      - org.neo4j.driver:neo4j-java-driver-all
+      - org.neo4j.driver:neo4j-java-driver-observation-metrics
+      - org.neo4j.driver:neo4j-java-driver-observation-micrometer
+    reference:
+      label: Neo4j Java Driver
+      url: https://github.com/neo4j/neo4j-java-driver
+
+  - id: couchbase-java-client
+    name: Couchbase Java SDK
+    status: ACTIVE
+    summary: >-
+      Actively developed by Couchbase.
+    coordinates:
+      - com.couchbase.client:java-client
+      - com.couchbase.client:core-io
+    reference:
+      label: Couchbase JVM clients
+      url: https://github.com/couchbase/couchbase-jvm-clients
+
+  - id: elasticsearch-java
+    name: Elasticsearch Java Client
+    status: ACTIVE
+    summary: >-
+      Actively developed by Elastic.
+    coordinates:
+      - co.elastic.clients:elasticsearch-java
+      - co.elastic.clients:elasticsearch-rest5-client
+    reference:
+      label: Elasticsearch Java Client
+      url: https://github.com/elastic/elasticsearch-java
+
+  - id: r2dbc
+    name: R2DBC
+    status: ACTIVE
+    summary: >-
+      The reactive relational database connectivity specification and the modules the R2DBC
+      project maintains itself: the SPI, the pool, the proxy and the H2 and SQL Server drivers.
+    coordinates:
+      - io.r2dbc:r2dbc-spi
+      - io.r2dbc:r2dbc-pool
+      - io.r2dbc:r2dbc-proxy
+      - io.r2dbc:r2dbc-h2
+      - io.r2dbc:r2dbc-mssql
+    reference:
+      label: R2DBC
+      url: https://r2dbc.io/
+
+  - id: r2dbc-postgresql
+    name: PostgreSQL R2DBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by the pgjdbc team alongside the JDBC driver.
+    coordinates:
+      - org.postgresql:r2dbc-postgresql
+    reference:
+      label: r2dbc-postgresql on GitHub
+      url: https://github.com/pgjdbc/r2dbc-postgresql
+
+  - id: r2dbc-mysql-asyncer
+    name: MySQL R2DBC Driver (asyncer)
+    status: ACTIVE
+    summary: >-
+      The actively developed community continuation of the abandoned dev.miku MySQL R2DBC
+      driver, and the one Spring Boot manages.
+    coordinates:
+      - io.asyncer:r2dbc-mysql
+    reference:
+      label: r2dbc-mysql on GitHub
+      url: https://github.com/asyncer-io/r2dbc-mysql
+
+  - id: r2dbc-mysql-miku
+    name: MySQL R2DBC Driver (dev.miku)
+    status: SUNSET
+    summary: >-
+      Abandoned: the last release, 0.8.2, was published in 2020 and the repository is archived.
+      Development continued in the community fork under the io.asyncer group.
+    coordinates:
+      - dev.miku:r2dbc-mysql
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.asyncer:r2dbc-mysql
+    reference:
+      label: Archived dev.miku repository
+      url: https://github.com/mirromutth/r2dbc-mysql
+
+  - id: r2dbc-mariadb
+    name: MariaDB R2DBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by MariaDB Corporation.
+    coordinates:
+      - org.mariadb:r2dbc-mariadb
+    reference:
+      label: mariadb-connector-r2dbc on GitHub
+      url: https://github.com/mariadb-corporation/mariadb-connector-r2dbc
+
+  - id: oracle-r2dbc
+    name: Oracle R2DBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by Oracle.
+    coordinates:
+      - com.oracle.database.r2dbc:oracle-r2dbc
+    reference:
+      label: oracle-r2dbc on GitHub
+      url: https://github.com/oracle/oracle-r2dbc
