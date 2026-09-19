@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
-import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
