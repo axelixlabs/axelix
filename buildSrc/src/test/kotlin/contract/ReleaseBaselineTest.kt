@@ -1,5 +1,6 @@
 package contract
 
+import contract.invariants.stateful.ReleaseBaseline
 import java.io.File
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent

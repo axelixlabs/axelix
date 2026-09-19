@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateful
 
 import contract.ContractDocument
 
@@ -7,7 +7,7 @@ import contract.ContractDocument
  * and the working tree, as opposed to a [contract.invariants.stateless.StatelessContractInvariant] that judges the working tree
  * document alone.
  *
- * Called statefull, because it performs the check of invaraints between two versions of [ContractDocument], so
+ * Called statefull, because it performs the check of invaraints between two versions of [contract.ContractDocument], so
  * it needs the baseline for comaparison.
  *
  * @author Mikhail Polivakha

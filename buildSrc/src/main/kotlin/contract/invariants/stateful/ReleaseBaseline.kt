@@ -1,11 +1,13 @@
-package contract
+package contract.invariants.stateful
 
-import java.io.File
+import contract.ContractDocument
+import contract.Version
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.treewalk.TreeWalk
+import java.io.File
 
 /**
  * The latest release of Axelix the repository knows of, i.e. the greatest vX.Y.Z tag. The

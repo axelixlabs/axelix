@@ -7,7 +7,7 @@ import contract.ContractDocument
  * It is called "stateless" because it checks the invariants within the current version
  * of the contract as it is in isolation. It's execution is, by nature, idempotent.
  *
- * @see contract.invariants.StatefulContractInvariant
+ * @see contract.invariants.stateful.StatefulContractInvariant
  * @author Mikhail Polivakha
  */
 fun interface StatelessContractInvariant {
