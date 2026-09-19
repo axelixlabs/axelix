@@ -28,7 +28,8 @@ val nettyVersion = "4.2.17.Final"
 val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
 val httpcore5Version = "5.4.3"
-val bcprovVersion = "1.81.1"
+val httpclient5Version = "5.6.3"
+val bcprovVersion = "1.84"
 val jacksonDatabindVersion = "3.1.5"
 
 dependencies {
@@ -51,6 +52,7 @@ dependencies {
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
         implementation("org.apache.httpcomponents.core5:httpcore5:$httpcore5Version")
         implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
+        implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
         implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
         implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
