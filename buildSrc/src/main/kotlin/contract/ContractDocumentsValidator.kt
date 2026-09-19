@@ -22,10 +22,10 @@ object ContractDocumentsValidator {
     /**
      * Verified that the contract documents aligns with the backward compabilitiby guarnatees.
      */
-    fun validate(document: File, currentVersion: String) {
-        val current = parseVersion(currentVersion)
+    fun validate(document: File, currentVersionString: String) {
+        val currentVersion = parseVersion(currentVersionString)
             ?: throw GradleException(
-                "The project version '$currentVersion' is not of the expected x.y.z[-QUALIFIER] form")
+                "The project version '$currentVersionString' is not of the expected x.y.z[-QUALIFIER] form")
 
         val root = YAMLMapper().readTree(document)
         val problems = mutableListOf<String>()
@@ -34,11 +34,11 @@ object ContractDocumentsValidator {
         if (info.path(SERVER).asText("") !in SERVER_SIDES) {
             problems += "the 'info' block must declare '$SERVER' as one of $SERVER_SIDES"
         }
-        validateMarkers(info, "the 'info' block", current, problems)
+        validateMarkers(info, "the 'info' block", currentVersion, problems)
 
         root.path("components").path("schemas").properties().forEach { (schemaName, schema) ->
             schema.path("properties").properties().forEach { (propertyName, property) ->
-                validateMarkers(property, "the property '$schemaName.$propertyName'", current, problems)
+                validateMarkers(property, "the property '$schemaName.$propertyName'", currentVersion, problems)
             }
         }
 
@@ -52,6 +52,8 @@ object ContractDocumentsValidator {
     private fun validateMarkers(
         node: JsonNode, location: String, current: Version, problems: MutableList<String>) {
 
+        // both on the top-level 'info' block and on per-property level blocks we must have the marker
+        // when the property was introduced.
         if (node.path(INTRODUCED_IN).isMissingNode) {
             problems += "$location is missing '$INTRODUCED_IN'"
         }
@@ -59,6 +61,7 @@ object ContractDocumentsValidator {
         val introduced = validateVersionMarker(node, INTRODUCED_IN, location, current, problems)
         val deprecated = validateVersionMarker(node, DEPRECATED_IN, location, current, problems)
 
+        // if property is deprecated, it must be deprecated strictly AFTER it was introduced. Otherwise it does not make sense.
         if (introduced != null && deprecated != null && deprecated <= introduced) {
             problems += ("$location has '$DEPRECATED_IN: $deprecated' that is not strictly later "
                 + "than '$INTRODUCED_IN: $introduced'")
@@ -83,7 +86,8 @@ object ContractDocumentsValidator {
             return null
         }
 
-        // Make sure that version that is provided is not
+        // Make sure that version that is specified in the yaml contract is not in the future.
+        // Version must be either smaller (already released), or eausl to current (unreleased version)
         if (version.copy(patch = 0) > current.copy(patch = 0)) {
             problems += ("$location has '$marker: $version' that is ahead of the version "
                 + "currently being built ($current)")

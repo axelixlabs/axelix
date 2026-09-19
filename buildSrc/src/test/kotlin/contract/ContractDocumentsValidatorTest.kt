@@ -1,0 +1,94 @@
+package contract
+
+import java.io.File
+import org.gradle.api.GradleException
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Test
+
+/**
+ * Unit tests for {@link ContractDocumentsValidator}.
+ *
+ * @author Mikhail Polivakha
+ */
+class ContractDocumentsValidatorTest {
+
+    companion object {
+        private const val CURRENT_VERSION = "1.2.0-SNAPSHOT"
+    }
+
+    @Test
+    fun `a compliant document passes`() {
+        ContractDocumentsValidator.validate(document("compliant.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a deprecation strictly later than the introduction passes`() {
+        ContractDocumentsValidator.validate(
+            document("deprecation-strictly-later-than-introduction.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a marker equal to the version being built passes`() {
+        ContractDocumentsValidator.validate(
+            document("marker-equal-to-current-version.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a missing server marker fails`() {
+        expectProblem(
+            "missing-server.yaml",
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+    }
+
+    @Test
+    fun `an unknown server side fails`() {
+        expectProblem(
+            "unknown-server.yaml",
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+    }
+
+    @Test
+    fun `a property without an introduction marker fails`() {
+        expectProblem(
+            "property-missing-introduction.yaml",
+            "the property 'LogLevelChangeRequest.configuredLevel' is missing 'x-axelix-introduced-in'")
+    }
+
+    @Test
+    fun `a malformed version marker fails`() {
+        expectProblem(
+            "malformed-marker.yaml",
+            "the 'info' block has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
+    }
+
+    @Test
+    fun `a marker ahead of the version being built fails`() {
+        expectProblem(
+            "marker-ahead-of-current-version.yaml",
+            "the property 'LogLevelChangeRequest.configuredLevel' has 'x-axelix-introduced-in: 1.3.0' "
+                + "that is ahead of the version currently being built (1.2.0)")
+    }
+
+    @Test
+    fun `a deprecation in the release that introduced the property fails`() {
+        expectProblem(
+            "deprecation-in-introduction-release.yaml",
+            "the property 'LogLevelChangeRequest.configuredLevel' has 'x-axelix-deprecated-in: 1.0.0' "
+                + "that is not strictly later than 'x-axelix-introduced-in: 1.0.0'")
+    }
+
+    private fun expectProblem(documentName: String, expectedProblem: String) {
+        try {
+            ContractDocumentsValidator.validate(document(documentName), CURRENT_VERSION)
+            fail<Unit>("The validation was expected to fail with: $expectedProblem")
+        } catch (expected: GradleException) {
+            assertTrue(expected.message!!.contains(expectedProblem)) {
+                "The failure does not mention '$expectedProblem':\n${expected.message}"
+            }
+        }
+    }
+
+    private fun document(name: String): File =
+        File(javaClass.getResource("/contract/$name")!!.toURI())
+}
