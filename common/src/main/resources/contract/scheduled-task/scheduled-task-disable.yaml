@@ -7,6 +7,7 @@ info:
     This operation disables a scheduled task of the Spring Boot app, so that it is no longer
     executed on its regular schedule.
   x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
 paths:
   /actuator/axelix-scheduled-tasks/disable:
     post:

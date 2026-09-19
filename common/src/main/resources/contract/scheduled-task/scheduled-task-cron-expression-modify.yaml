@@ -7,6 +7,7 @@ info:
     operation. This operation changes the cron expression of a cron-based scheduled task of the
     Spring Boot app.
   x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
 paths:
   /actuator/axelix-scheduled-tasks/modify/cron-expression:
     post:

@@ -7,6 +7,7 @@ info:
     This operation changes the execution interval of a fixed-rate or fixed-delay scheduled task
     of the Spring Boot app.
   x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
 paths:
   /actuator/axelix-scheduled-tasks/modify/interval:
     post:

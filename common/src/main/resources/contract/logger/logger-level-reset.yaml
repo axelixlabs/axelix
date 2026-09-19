@@ -7,6 +7,7 @@ info:
     This operation resets the logging level of a single logger of the Spring Boot app back to
     the level it had before it was changed through Axelix.
   x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
 paths:
   /actuator/axelix-loggers/logger/{name}/reset:
     post:

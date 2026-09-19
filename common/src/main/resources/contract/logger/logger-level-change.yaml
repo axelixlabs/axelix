@@ -7,6 +7,7 @@ info:
     This operation changes the logging level of a single logger of the Spring Boot app,
     either permanently or for a limited amount of time.
   x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
 paths:
   /actuator/axelix-loggers/logger/{name}/change-level:
     post:
