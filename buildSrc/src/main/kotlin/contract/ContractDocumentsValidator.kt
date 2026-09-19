@@ -1,5 +1,6 @@
 package contract
 
+import contract.invariants.stateful.DeprecationMarkerMustOnlyAppearInTheCurrentRelease
 import contract.invariants.stateful.IntroductionMarkerMustNeverChange
 import contract.invariants.stateful.NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease
 import contract.invariants.stateful.ReleaseBaseline
@@ -35,6 +36,7 @@ object ContractDocumentsValidator {
     private val STATEFUL_INVARIANTS: List<StatefulContractInvariant> = listOf(
         NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease,
         IntroductionMarkerMustNeverChange,
+        DeprecationMarkerMustOnlyAppearInTheCurrentRelease,
     )
 
     /**
