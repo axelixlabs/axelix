@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import styles from './styles.module.css';
-import { UpcomingReleaseNotice } from '@site/src/components';
+import { ReleasedInNotice } from '@site/src/components';
 
 # Configuring Master
 
@@ -73,7 +73,7 @@ anything sensitive into the logs.
 
 ### Pointing Master at a config file
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 The three sources above cover most setups, but it is often the case that you would want to supply a configuration to the Axelix Master
 from the external YAML pr properties file, for example from a file mounted into a container at a custom path.
@@ -111,7 +111,7 @@ docker run --rm -p 8080:8080 \
 
 ### Loading configuration from a Spring Cloud Config Server
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 If you already run a [Spring Cloud Config Server](https://docs.spring.io/spring-cloud-config/reference/server.html) to
 centralise configuration across your fleet, Master can pull its own settings from it too. Master acts as a Spring Cloud
@@ -151,9 +151,147 @@ refuses to boot rather than starting with incomplete configuration. While the fe
 never contacts a server and boots normally.
 :::
 
+### Loading configuration from HashiCorp Vault
+
+<ReleasedInNotice version="1.1.0" />
+
+If your organisation keeps secrets in [HashiCorp Vault](https://developer.hashicorp.com/vault), Master can read its own
+configuration from there too. On startup Master fetches a secret from Vault's
+[KV secrets engine](https://developer.hashicorp.com/vault/docs/secrets/kv) and merges every key of that secret into its
+configuration, exactly as if those keys were written in a config file. Any `axelix.master.*` property on this page can
+therefore live in Vault. The usual split is to store the sensitive subset there — say, `axelix.master.database.password`
+and `axelix.master.auth.jwt.signing-key` — and keep everything else in an ordinary config file.
+
+The feature is off by default. Turn it on with `axelix.master.external-config.spring-cloud-vault.enabled=true` and point
+Master at your Vault server with the `uri` property. With the default settings Master reads the secret stored at
+`secret/axelix`: the `secret` KV mount plus Master's own application name. Version 2 of the KV engine is expected — the
+default for any mount created by a current Vault. Seeding a configuration value therefore looks like this:
+
+```bash
+vault kv put secret/axelix \
+  axelix.master.database.password=a-strong-password \
+  axelix.master.auth.jwt.signing-key=cSuGCTNSJUW7yobufJTZ4C7BScamq2Yz
+```
+
+<div className={styles.ConfigTable}>
+
+| Property                                                                | Default       | Description                                                                                                                              |
+|-------------------------------------------------------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.enabled`              | `false`       | Load configuration from HashiCorp Vault on startup.                                                                                       |
+| `axelix.master.external-config.spring-cloud-vault.uri`                  | empty         | Base URL of the Vault server, for example `http://vault:8200`. Required when `enabled=true`.                                              |
+| `axelix.master.external-config.spring-cloud-vault.authentication`       | `TOKEN`       | Authentication method. `TOKEN`, `APPROLE`, and `KUBERNETES` are covered below.                                                            |
+| `axelix.master.external-config.spring-cloud-vault.fail-fast`            | `true`        | Refuse to start when Vault cannot be reached, instead of booting with incomplete configuration.                                           |
+| `axelix.master.external-config.spring-cloud-vault.kv.enabled`           | `true`        | Read secrets from the KV secrets engine.                                                                                                  |
+| `axelix.master.external-config.spring-cloud-vault.kv.backend`           | `secret`      | Mount path of the KV secrets engine.                                                                                                      |
+| `axelix.master.external-config.spring-cloud-vault.kv.application-name`  | `axelix`      | Name of the secret Master reads under the mount — `secret/axelix` with the defaults.                                                      |
+| `axelix.master.external-config.spring-cloud-vault.kv.default-context`   | `application` | A shared secret read in addition to the application one (`secret/application` with the defaults), for settings common to several applications. |
+| `axelix.master.external-config.spring-cloud-vault.kv.profile-separator` | `/`           | Separator between the application name and a Spring profile in profile-specific secret paths.                                             |
+
+</div>
+
+Under the hood Master acts as a [Spring Cloud Vault](https://docs.spring.io/spring-cloud-vault/reference/) client. As a
+result, the whole Spring Cloud Vault connection surface is available under the same
+`axelix.master.external-config.spring-cloud-vault.*` prefix: TLS trust material under `ssl.*`, `namespace` for Vault
+Enterprise, connection and read timeouts, and further authentication methods beyond the three below. The table above
+lists only the properties most setups touch.
+
+Vault is read **once, at startup**. A changed secret takes effect on the next Master restart, and only the static KV
+engine is consulted — dynamic secrets engines, such as short-lived database credentials, are not part of this feature.
+
+#### Authenticating with a static token
+
+`TOKEN` is the default method, so supplying a Vault token is all it takes. This is the quickest way to try the feature
+on a developer machine. A long-lived static token, however, is exactly the kind of credential Vault exists to eliminate,
+so in production prefer [AppRole](#authenticating-with-approle) or [Kubernetes](#authenticating-with-kubernetes) below.
+
+<div className={styles.ConfigTable}>
+
+| Property                                                  | Default | Description                                                          |
+|-----------------------------------------------------------|---------|------------------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.token`  | empty   | Static Vault token Master authenticates with. Required for `TOKEN`.  |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://localhost:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
+  -jar master.jar
+```
+
+#### Authenticating with AppRole
+
+[AppRole](https://developer.hashicorp.com/vault/docs/auth/approle) is the machine-to-machine method for environments
+without a platform identity: virtual machines, bare metal, Docker Compose. Master presents a `role-id`/`secret-id` pair,
+and Vault exchanges it for a short-lived token scoped to the role's policy.
+
+<div className={styles.ConfigTable}>
+
+| Property                                                               | Default   | Description                                                  |
+|------------------------------------------------------------------------|-----------|----------------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.app-role.role-id`    | empty     | The RoleID of the AppRole Master logs in with.               |
+| `axelix.master.external-config.spring-cloud-vault.app-role.secret-id`  | empty     | The SecretID paired with `role-id`.                          |
+| `axelix.master.external-config.spring-cloud-vault.app-role.role`       | empty     | Role name, optional, used for pull mode.                     |
+| `axelix.master.external-config.spring-cloud-vault.app-role.app-role-path` | `approle` | Mount path of the AppRole authentication backend.         |
+
+</div>
+
+```bash
+java \
+  -Daxelix.master.external-config.spring-cloud-vault.enabled=true \
+  -Daxelix.master.external-config.spring-cloud-vault.uri=http://vault:8200 \
+  -Daxelix.master.external-config.spring-cloud-vault.authentication=APPROLE \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.role-id=5f3420cd-2c65-4a0e-87f4-b525b8e26a54 \
+  -Daxelix.master.external-config.spring-cloud-vault.app-role.secret-id=f8e77c67-40b6-49aa-a548-e50c62a765b3 \
+  -jar master.jar
+```
+
+The `secret-id` is itself a secret, so on container platforms pass it as an environment variable
+(`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_APPROLE_SECRETID`) rather than a `-D` flag.
+
+#### Authenticating with Kubernetes
+
+On Kubernetes, the [Kubernetes auth method](https://developer.hashicorp.com/vault/docs/auth/kubernetes) is the setup we
+recommend: Master authenticates with the service-account token its pod already carries, so no static credential exists
+in the first place. On the Vault side, create a role in the Kubernetes auth backend and bind it to Master's service
+account. On the Master side, name that role:
+
+<div className={styles.ConfigTable}>
+
+| Property                                                                                 | Default                                                | Description                                            |
+|-------------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------------------------------|
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.role`                        | empty                                                  | Vault role the login is attempted against. Required.   |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.kubernetes-path`             | `kubernetes`                                           | Mount path of the Kubernetes authentication backend.   |
+| `axelix.master.external-config.spring-cloud-vault.kubernetes.service-account-token-file`  | `/var/run/secrets/kubernetes.io/serviceaccount/token`  | Path to the pod's service-account token file.          |
+
+</div>
+
+```yaml
+env:
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_ENABLED
+    value: "true"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_URI
+    value: "http://vault.vault.svc:8200"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_AUTHENTICATION
+    value: "KUBERNETES"
+  - name: AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_KUBERNETES_ROLE
+    value: "axelix-master"
+```
+
+Like the sibling sections above, all of these properties decide *where* configuration is read from, so they must be
+known before that reading starts: supply them as JVM system properties or environment variables, never as keys inside a
+Vault secret.
+
+:::warning
+When the feature is enabled, Master starts in fail-fast mode. If Vault cannot be reached at startup, Master refuses to
+boot rather than starting with incomplete configuration. While the feature stays off (the default), Master never
+contacts Vault and boots normally.
+:::
+
 ### General
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 <div className={styles.ConfigTable}>
 
@@ -266,8 +404,8 @@ To turn the feature on, set `axelix.master.discovery.auto.enabled=true` (default
 currently the only supported discovery platform.
 
 When Master runs **inside** the cluster as a pod, the Kubernetes connection settings (`kube-apiserver-url`,
-`sa-token-path`, `ca-cert-path`) default to in-pod values and need no override, The starter side just has to expose
-`axelix-metadata` and share the JWT signing key. When Master runs **outside** the cluster, point those three to the
+`sa-token-path`, `ca-cert-path`) default to in-pod values and need no override, The starter side just has to share the JWT signing key —
+the starter exposes `axelix-metadata` by itself. When Master runs **outside** the cluster, point those three to the
 external API URL, a token file with the required RBAC, and the cluster CA path. Use `filters.namespaces` and
 `filters.labels` to scope the scan.
 
@@ -323,7 +461,7 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 
 ### Structured logging
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 By default, Master logs plain text to the console (i.e. the process stdout). Set `axelix.master.logging.json.enabled=true`
 to switch to [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/8.11/ecs-reference.html) (ECS) structured JSON
@@ -342,7 +480,7 @@ when logs are shipped to an aggregator such as Elasticsearch or a similar ECS-aw
 
 #### Prometheus
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master exposes a Prometheus scrape endpoint once you turn it on with `axelix.master.metrics.prometheus.enabled=true`.
 It responds at `/api/actuator/prometheus` and does not require authentication.
@@ -393,7 +531,7 @@ axelix:
 
 #### OTLP
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Master can push its own JVM, HTTP, database-pool, and other Micrometer metrics to an OTLP-compatible collector over
 HTTP/protobuf. This exports metrics produced by Master itself, not metrics read from services connected through an
@@ -472,7 +610,7 @@ java \
 ```
 
 #### External config file
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Keep the same settings in a YAML or properties file and point Master at it with `axelix.master.config.location`; see
 [Pointing Master at a config file](#pointing-master-at-a-config-file) for the accepted location shapes.
@@ -565,7 +703,7 @@ docker run --rm -p 8080:8080 \
 ```
 
 #### External config file
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 You can also supply configuration via an external config file. Mount a YAML or properties file into the container and point Master at it with
 `axelix.master.config.location` (see [Pointing Master at a config file](#pointing-master-at-a-config-file)). Keep
@@ -655,7 +793,7 @@ local testing. Put Master behind a TLS-terminating proxy and flip it to `true` f
 
 ### Supplying configuration via a mounted file
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.1.0" />
 
 Instead of listing every non-secret setting under `environment`, you can mount a YAML or properties file into the
 `master` service and point Master at it with `axelix.master.config.location` (see [Pointing Master at a config

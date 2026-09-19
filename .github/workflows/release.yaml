@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      
+
       - name: Prepare Windows runner
         if: ${{ runner.os == 'Windows' }}
         run: |
@@ -91,32 +91,97 @@ jobs:
       - name: Running Security Check
         uses: ./.github/actions/security-check
 
+  master-e2e-tests:
+    uses: ./.github/workflows/nightly-master-e2e.yaml
+    secrets: inherit
+
+  playground-compatibility-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-25
+        with:
+          distribution: 'liberica'
+          java-version: '25'
+
+      - name: Set up JDK 17 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-17
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+
+      - name: Set up JDK 21 for Playgrounds
+        uses: actions/setup-java@v5.6.0
+        id: setup-java-21
+        with:
+          java-version: '21'
+          distribution: 'liberica'
+
+      - name: Grant execution access to the wrapper
+        run: chmod +x gradlew
+
+      - name: Build every playground project
+        env:
+          JAVA_17_HOME: ${{ steps.setup-java-17.outputs.path }}
+          JAVA_21_HOME: ${{ steps.setup-java-21.outputs.path }}
+          JAVA_25_HOME: ${{ steps.setup-java-25.outputs.path }}
+        run: make build-playground
+
   release-artifacts:
-    needs: [security-check, starter-compatibility-tests]
+    needs:
+      [
+        security-check,
+        starter-compatibility-tests,
+        master-e2e-tests,
+        playground-compatibility-tests,
+      ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
     steps:
-      # Initial checkout without submodules so that the local composite actions are available.
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Resolve release version from gradle.properties
+        id: version
+        uses: ./.github/actions/read-axelix-version
+        with:
+          file: gradle.properties
+          # A release must be a released X.Y.Z (no SNAPSHOT). Major, minor and patch releases are all
+          # cut in lockstep from this single fleet-wide version.
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
+      - name: Export release version to the job env
         run: |
-          RELEASE_TAG=$(grep '^axelixVersion=' gradle.properties | cut -d'=' -f2)
-          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
-          echo "VITE_APP_VERSION=$RELEASE_TAG" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+          echo "VITE_APP_VERSION=${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+
+      - name: Determine whether this release is the latest
+        # A patch release cut on an older minor line (e.g. 1.0.5 after 1.1.0 shipped) must not
+        # move the 'latest' image tag. The fleet release tags pushed by this pipeline are the
+        # source of truth for what has been released so far; the tag for the version being
+        # released right now is only pushed at the end of this job, hence RELEASE_TAG itself
+        # is added to the comparison explicitly.
+        run: |
+          highest="$(printf '%s\n' "${RELEASE_TAG}" $(git tag --list 'v[0-9]*' | sed 's/^v//') | sort -V | tail -n 1)"
+          echo "IS_LATEST_RELEASE=$([ "${highest}" = "${RELEASE_TAG}" ] && echo true || echo false)" >> "$GITHUB_ENV"
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
-      - name: Initialize enterprise submodule
-        uses: ./.github/actions/enterprise-submodule
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.6.0
@@ -124,11 +189,21 @@ jobs:
           distribution: 'liberica'
           java-version: '25'
 
-      # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
-      # and to create the release build from scratch. With the enterprise submodule present, this builds the
-      # unified (OSS + Enterprise) distribution.
-      - name: Build
-        run: ./gradlew clean build sourcesJar javadocJar
+      - name: Build and test the fleet
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build sourcesJar javadocJar
+
+      - name: Publish Maven Artifacts to Maven Central
+        # The OSS artifacts, stated explicitly — the starters and the plugins. Signing (GPG) and the
+        # OSSRH promote step run inside the Gradle build.
+        run: >-
+          ./gradlew
+          :sbs:axelix-spring-boot-2-starter:publish
+          :sbs:axelix-spring-boot-3-starter:publish
+          :sbs:axelix-spring-boot-4-starter:publish
+          :plugins:axelix-gradle-plugin:publish
+          :plugins:axelix-maven-plugin:publish
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
@@ -136,9 +211,6 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
-      # ====================================================================================
-      # Artifacts Publication, after all builds, linters, tests, and Docker pushes succeed.
-      # ====================================================================================
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v4
         with:
@@ -146,28 +218,26 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push the Master OSS image
         run: |
+          ./gradlew :master-oss:bootJar
+          image="${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix"
+          tags=(--tag "${image}:${RELEASE_TAG}")
+          if [ "${IS_LATEST_RELEASE}" = "true" ]; then
+            tags+=(--tag "${image}:latest")
+          fi
           docker build \
             --platform linux/amd64,linux/arm64 \
-            --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} \
-            --file Dockerfile \
+            "${tags[@]}" \
+            --file master-oss/Dockerfile \
             --push \
-            .
+            master-oss
 
       - name: Docker logout from GitHub Container Registry
+        if: always()
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
-      - name: Publish to Maven Central
-        run: ./gradlew publish
-
-      - name: Create and push release tag
+      - name: Create and push the fleet release tag
         run: |
-          git tag "v${RELEASE_TAG}"
-          git push origin "v${RELEASE_TAG}"
-
-      - name: Create release tag in the Enterprise version
-        run: |
-          cd axelix-enterprise
           git tag "v${RELEASE_TAG}"
           git push origin "v${RELEASE_TAG}"

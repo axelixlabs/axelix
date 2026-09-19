@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice, UpcomingReleaseNotice } from '@site/src/components';
 import styles from './styles.module.css';
 
 # Настройка Spring Boot Starter
@@ -8,8 +9,8 @@ import styles from './styles.module.css';
 чтобы [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) мог обнаруживать его, считывать его состояние и
 взаимодействовать с ним — как через пользовательский интерфейс, так и через встроенный в Master сервер MCP (Model
 Context Protocol), который предоставляет те же данные агентам искусственного интеллекта. Выберите модуль стартера,
-соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам, поделитесь с Master ключом для
-подписи JWT и укажите Master, где найти сервис.
+соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам (начиная с Axelix 1.2.0 это
+происходит автоматически), поделитесь с Master ключом для подписи JWT и укажите Master, где найти сервис.
 
 ## Прежде чем вы начнёте
 
@@ -181,14 +182,136 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 сборки](../build-plugin/configuration.mdx).
 :::
 
-## Откройте доступ к Axelix actuator-эндпоинтам
+## Actuator-эндпоинты
 
-По умолчанию Spring Boot скрывает пользовательские actuator-эндпоинты от веб-доступа. Добавьте Axelix-идентификаторы в
-`management.endpoints.web.exposure.include`, чтобы Master мог до них достучаться. `axelix-metadata` <span
-className={styles.required}>обязательное</span> — это эндпоинт, который Master опрашивает в первую очередь, чтобы
-убедиться, что сервис работает. Без него сервис не появится в Master, независимо от того, используете ли вы
-автоматическое обнаружение на стороне Master или саморегистрацию на стороне стартера. Остальные эндпоинты обеспечивают
-работу соответствующих функций в пользовательском интерфейсе.
+Начиная с Axelix **1.2.0** ничего настраивать вручную не нужно: стартер сам добавляет свои actuator-эндпоинты в
+`management.endpoints.web.exposure.include` при старте приложения, поэтому Master получает к ним доступ «из коробки».
+На более старых версиях стартер этого не делает, и эндпоинты нужно перечислить вручную — см. [Открытие эндпоинтов на
+Axelix ниже 1.2.0](#открытие-эндпоинтов-на-axelix-ниже-120).
+
+### Что открывает стартер
+
+Стартер выставляет следующие эндпоинты:
+
+<table>
+    <thead>
+    <tr>
+        <th>Эндпоинт</th>
+        <th>Назначение</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>axelix-metadata</code> <span className={styles.required}>обязательный</span></td>
+        <td>Метаданные сервиса; Master опрашивает его первым</td>
+    </tr>
+    <tr>
+        <td><code>axelix-details</code></td>
+        <td>Сводная информация об инстансе</td>
+    </tr>
+    <tr>
+        <td><code>axelix-beans</code></td>
+        <td>Бины контекста</td>
+    </tr>
+    <tr>
+        <td><code>axelix-caches</code></td>
+        <td>Кэши (при наличии <code>CacheManager</code>)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-conditions</code></td>
+        <td>Отчёт об условиях автоконфигурации</td>
+    </tr>
+    <tr>
+        <td><code>axelix-configprops</code></td>
+        <td><code>@ConfigurationProperties</code></td>
+    </tr>
+    <tr>
+        <td><code>axelix-env</code></td>
+        <td>Окружение и источники свойств</td>
+    </tr>
+    <tr>
+        <td><code>axelix-feign</code></td>
+        <td>Feign-клиенты (при наличии Feign в classpath)</td>
+    </tr>
+    <tr>
+        <td><code>axelix-gc</code></td>
+        <td>Сборка мусора</td>
+    </tr>
+    <tr>
+        <td><code>axelix-heap-dump</code></td>
+        <td>Heap dump</td>
+    </tr>
+    <tr>
+        <td><code>axelix-loggers</code></td>
+        <td>Уровни логирования</td>
+    </tr>
+    <tr>
+        <td><code>axelix-metrics</code></td>
+        <td>Метрики</td>
+    </tr>
+    <tr>
+        <td><code>axelix-scheduled-tasks</code></td>
+        <td>Запланированные задачи</td>
+    </tr>
+    <tr>
+        <td><code>axelix-thread-dump</code></td>
+        <td>Thread dump</td>
+    </tr>
+    <tr>
+        <td><code>axelix-dependencies</code></td>
+        <td>SBOM зависимостей</td>
+    </tr>
+    </tbody>
+</table>
+
+Эндпоинты, неприменимые к вашему сервису, остаются неактивными — стартер активирует каждый только при выполнении его
+предусловий (например, `axelix-feign` без Feign в classpath или `axelix-caches` без `CacheManager` не поднимаются).
+
+Начиная с Axelix **1.2.0** стандартные эндпоинты `health` и `info` больше не требуются, поэтому стартер сам их не
+открывает (до 1.2.0 Axelix зависел от них, и стартер принудительно открывал оба). Открытыми будут только эндпоинты,
+перечисленные вами в `management.endpoints.web.exposure.include`, плюс эндпоинты Axelix — добавьте `health` и `info` в
+список сами, когда они вам нужны, в том числе `health`, который Spring Boot иначе открыл бы по умолчанию.
+
+### Добавление собственных эндпоинтов
+
+Если вам нужны свои actuator-эндпоинты, просто перечислите **только их** — стартер **смёржит** ваш список со своим, а не
+заменит его.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - prometheus
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+management.endpoints.web.exposure.include=prometheus
+```
+
+  </TabItem>
+</Tabs>
+
+В результате будет выставлен `prometheus` и все эндпоинты Axelix.
+
+Значение `*` тоже поддерживается — тогда открывается всё, и стартер список не трогает.
+
+### Открытие эндпоинтов на Axelix ниже 1.2.0
+
+<LegacyNotice version="1.2.0" />
+
+Стартеры старше 1.2.0 не добавляют свои эндпоинты в список открытых самостоятельно, поэтому каждый эндпоинт Axelix,
+который должен читать Master, нужно перечислить в `management.endpoints.web.exposure.include` вручную. Как минимум
+откройте `axelix-metadata` — без него инстанс никогда не появится в Master, — а на практике весь набор, чтобы у
+каждого раздела UI были данные. Эндпоинты `health` и `info` эти версии стартера открывают принудительно сами, так что
+их перечислять не нужно:
 
 <Tabs groupId="spring-config">
   <TabItem value="yaml" label="application.yaml">
@@ -213,22 +336,17 @@ management:
           - axelix-metrics
           - axelix-scheduled-tasks
           - axelix-thread-dump
-          - axelix-transactions-monitoring
 ```
 
   </TabItem>
   <TabItem value="properties" label="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump,axelix-transactions-monitoring
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
 ```
 
   </TabItem>
 </Tabs>
-
-`*` тоже работает, но большинство команд предпочитает курируемый список, чтобы случайно не открыть внутренние эндпоинты.
-Эндпоинты, не применимые к вашему сервису (`axelix-feign` без Feign в classpath, `axelix-caches` без `CacheManager`),
-остаются неактивными — стартер активирует каждый только при выполнении его предусловий.
 
 ## Экспорт метрик Axelix через Micrometer
 
@@ -410,6 +528,55 @@ axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
 ## Справочник по конфигурации
 
 Все свойства стартера живут в пространстве имён `axelix.sbs.*`.
+
+### Отключение стартера
+
+<UpcomingReleaseNotice />
+
+`axelix.sbs.enabled` — глобальный переключатель всего стартера. По умолчанию он равен `true`, то есть достаточно
+добавить зависимость, чтобы активировать всё описанное на этой странице. Установите его в `false` — и каждая
+автоконфигурация Axelix отключится: не будет ни Axelix actuator-эндпоинтов, ни фильтра JWT-авторизации, ни
+heartbeat-сигналов саморегистрации, ни метрик Micrometer, ни мониторинга транзакций. Приложение запустится так, как
+будто стартера нет в classpath, при этом сама зависимость остаётся в сборке.
+
+Этот переключатель пригодится, когда нужно выключить Axelix в конкретном окружении — например, локально или в тестовом
+профиле — не поддерживая отдельный набор зависимостей. Кроме того, это быстрый способ исключить стартер из подозреваемых
+при диагностике проблем на старте приложения.
+
+<Tabs groupId="spring-config">
+  <TabItem value="yaml" label="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    enabled: false
+```
+
+  </TabItem>
+  <TabItem value="properties" label="application.properties">
+
+```properties
+axelix.sbs.enabled=false
+```
+
+  </TabItem>
+</Tabs>
+
+Свойство читается один раз — при старте. Поэтому, чтобы изменение вступило в силу, приложение нужно перезапустить.
+
+:::note
+При выключенном стартере Master теряет сервис из виду: запросы автоматического обнаружения к
+`/actuator/axelix-metadata` перестают отвечать, heartbeat-сигналы саморегистрации прекращаются, и сервис исчезает из UI
+и из ответов MCP.
+:::
+
+<div className={styles.SharedTable}>
+
+| Свойство             | По умолчанию | Описание                                                                                                                                                                                    |
+|----------------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.enabled` | `true`       | Глобальный переключатель всего стартера. Установите в `false`, чтобы отключить каждую автоконфигурацию Axelix. Ведёт себя одинаково в стартерах для Spring Boot 2, 3 и 4. |
+
+</div>
 
 ### Аутентификация — JWT
 

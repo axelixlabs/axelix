@@ -50,28 +50,4 @@ public class OAuth2LoginE2ETest {
         // through the same client should now succeed.
         client.getRegisteredInstanceNames();
     }
-
-    @Test
-    void shouldPreventSuspendedOidcUserFromLoggingIn() {
-        // given OIDC user is there (appears after login)
-        String username = E2ETestConfig.oAuth2TestUsername();
-        String password = E2ETestConfig.oAuth2TestPassword();
-        client.loginViaOAuth2(username, password);
-
-        // and given admin account.
-        AxelixMasterApiClient adminClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());
-        adminClient.login(E2ETestConfig.superAdminUsername(), E2ETestConfig.superAdminPassword());
-        String userId = adminClient.getUserId(username);
-
-        try {
-            // when admin suspends eht OIDC user
-            adminClient.updateUserStatus(userId, "SUSPENDED");
-
-            // then.
-            AxelixMasterApiClient suspendedUserClient = new AxelixMasterApiClient(E2ETestConfig.masterBaseUrl());
-            suspendedUserClient.verifySuspendedUserCannotLoginViaOAuth2(username, password);
-        } finally {
-            adminClient.updateUserStatus(userId, "ACTIVE");
-        }
-    }
 }

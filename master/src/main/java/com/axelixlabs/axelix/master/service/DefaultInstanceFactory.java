@@ -62,6 +62,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 resolveApplicationId(instanceId, metadata),
                 instanceName,
                 metadata.getServiceVersion(),
+                metadata.getVersion(),
                 metadata.getSoftwareVersions().getJava(),
                 metadata.getSoftwareVersions().getSpringBoot(),
                 metadata.getSoftwareVersions().getSpringFramework(),

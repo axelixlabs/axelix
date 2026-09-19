@@ -30,6 +30,14 @@ public final class ApiPaths {
 
     private ApiPaths() {}
 
+    public static final class SettingsApi {
+
+        /**
+         * Endpoint to retrieve the master settings (authentication options, MCP availability, licensing).
+         */
+        public static final String SETTINGS = "/settings";
+    }
+
     public static final class UsersApi {
 
         public static final String LOGIN = "/users/login";
@@ -342,6 +350,14 @@ public final class ApiPaths {
          * OAuth2 Protected Resource Metadata endpoint.
          */
         public static final String PROTECTED_RESOURCE_METADATA = "/mcp-oauth2/.well-known/oauth-protected-resource";
+    }
+
+    public static final class DependenciesApi {
+
+        /**
+         * Endpoint to retrieve the dependency analysis of a given application instance.
+         */
+        public static final String INSTANCE_ID = "/dependencies/{instanceId}";
     }
 
     public static final class McpToolApi {

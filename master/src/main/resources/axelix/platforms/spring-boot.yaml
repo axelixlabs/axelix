@@ -1,0 +1,55 @@
+# The curated support policy of Spring Boot: every release line Axelix knows about and its maintenance window.
+#
+# Dates follow the upstream support policy (https://spring.io/projects/spring-boot#support). OSS support ends when
+# the line stops receiving open-source maintenance releases; commercial support is the extended window offered by
+# the upstream vendor.
+platform: spring-boot
+lines:
+  - line: 2.4.x
+    releasedAt: 2020-11-12
+    ossSupportEndsAt: 2021-11-18
+    commercialSupportEndsAt: 2023-02-23
+  - line: 2.5.x
+    releasedAt: 2021-05-20
+    ossSupportEndsAt: 2022-05-19
+    commercialSupportEndsAt: 2023-08-24
+  - line: 2.6.x
+    releasedAt: 2021-11-17
+    ossSupportEndsAt: 2022-11-24
+    commercialSupportEndsAt: 2024-02-24
+  - line: 2.7.x
+    releasedAt: 2022-05-19
+    ossSupportEndsAt: 2023-06-30
+    commercialSupportEndsAt: 2029-06-30
+  - line: 3.0.x
+    releasedAt: 2022-11-24
+    ossSupportEndsAt: 2023-12-31
+    commercialSupportEndsAt: 2024-12-31
+  - line: 3.1.x
+    releasedAt: 2023-05-18
+    ossSupportEndsAt: 2024-06-30
+    commercialSupportEndsAt: 2025-06-30
+  - line: 3.2.x
+    releasedAt: 2023-11-23
+    ossSupportEndsAt: 2024-12-31
+    commercialSupportEndsAt: 2025-12-31
+  - line: 3.3.x
+    releasedAt: 2024-05-23
+    ossSupportEndsAt: 2025-06-30
+    commercialSupportEndsAt: 2026-06-30
+  - line: 3.4.x
+    releasedAt: 2024-11-21
+    ossSupportEndsAt: 2025-12-31
+    commercialSupportEndsAt: 2026-12-31
+  - line: 3.5.x
+    releasedAt: 2025-05-22
+    ossSupportEndsAt: 2026-06-30
+    commercialSupportEndsAt: 2032-06-30
+  - line: 4.0.x
+    releasedAt: 2025-11-20
+    ossSupportEndsAt: 2026-12-31
+    commercialSupportEndsAt: 2027-12-31
+  - line: 4.1.x
+    releasedAt: 2026-06-30
+    ossSupportEndsAt: 2027-07-31
+    commercialSupportEndsAt: 2028-07-31

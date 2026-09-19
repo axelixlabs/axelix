@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-enable
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-enable' operation.
+    This operation enables a previously disabled scheduled task of the Spring Boot app.
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-scheduled-tasks/enable:
+    post:
+      operationId: enableScheduledTask
+      summary: Enables a previously disabled scheduled task of the service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskEnableRequest'
+      responses:
+        '204':
+          description: The task was enabled.
+        '400':
+          description: No scheduled task with the given trigger exists.
+components:
+  schemas:
+    ScheduledTaskEnableRequest:
+      type: object
+      description: A request to enable a scheduled task.
+      required:
+        - trigger
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to enable.
+          x-axelix-introduced-in: 1.0.0

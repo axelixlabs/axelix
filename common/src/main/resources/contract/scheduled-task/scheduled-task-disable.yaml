@@ -1,0 +1,48 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-disable
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-disable' operation.
+    This operation disables a scheduled task of the Spring Boot app, so that it is no longer
+    executed on its regular schedule.
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-scheduled-tasks/disable:
+    post:
+      operationId: disableScheduledTask
+      summary: Disables a scheduled task of the service.
+      parameters:
+        - name: force
+          in: query
+          required: false
+          description: >-
+            When true, the currently running execution of the task is interrupted; otherwise the
+            task finishes its current execution and is only excluded from the future schedule.
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskDisableRequest'
+      responses:
+        '204':
+          description: The task was disabled.
+        '400':
+          description: No scheduled task with the given trigger exists.
+components:
+  schemas:
+    ScheduledTaskDisableRequest:
+      type: object
+      description: A request to disable a scheduled task.
+      required:
+        - trigger
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to disable.
+          x-axelix-introduced-in: 1.0.0

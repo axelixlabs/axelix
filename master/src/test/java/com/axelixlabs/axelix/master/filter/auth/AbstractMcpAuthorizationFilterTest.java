@@ -217,7 +217,8 @@ abstract class AbstractMcpAuthorizationFilterTest {
 
             userService.createLocal(
                     username, null, null, "test-email@example.com", null, null, password, TestRoles.VIEWER.getName());
-            String userId = userService.findUserByUsername(username).orElseThrow().id();
+            String userId =
+                    userService.findUserByUsername(username).orElseThrow().id();
 
             // and.
             registerInstanceForBeansTool(activeInstanceId);

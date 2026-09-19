@@ -3,6 +3,7 @@
 const prefix = 'installation';
 
 const pages: string[] = [
+  'getting-started',
   'configuring-master',
   'configuring-spring-boot-starter',
   'configuring-build-plugin'

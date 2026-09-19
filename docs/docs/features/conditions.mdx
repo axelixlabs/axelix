@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice } from '@site/src/components';
 
 # Conditions
 
@@ -56,7 +57,14 @@ matches page as presented in Axelix UI***
 The auto-configuration report is also exposed to AI agents through MCP. See the [MCP Tools
 catalog](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
 
-## Properties
+## Enable Dedicated Actuator Endpoint
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>If you are on Axelix 1.2.0 or later, none of this is required: the starter registers its custom actuator
+    endpoints by itself, and Axelix no longer requires the <code>health</code>/<code>info</code> endpoints to be
+    enabled — it works perfectly well without them. No configuration is needed here.</>}
+/>
 
 The page is backed by the `axelix-conditions` actuator endpoint contributed by the Axelix Spring Boot Starter. Expose it
 through the standard Spring Boot Actuator properties — see [Configuring Spring Boot

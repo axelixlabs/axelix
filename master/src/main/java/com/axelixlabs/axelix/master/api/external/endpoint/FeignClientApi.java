@@ -17,23 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -42,10 +34,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  *
  * @author Sergey Cherkasov
  */
-@Tag(
-        name = "Feign Client API",
-        description =
-                "The Feign endpoint provides information about the Spring Cloud OpenFeign components of the application.")
 @ExternalApiRestController
 public class FeignClientApi {
 
@@ -55,13 +43,6 @@ public class FeignClientApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(summary = "Returns feign client feed for the given instance.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = FeignIntegration.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.FeignClientApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getFeignClientFeed(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(

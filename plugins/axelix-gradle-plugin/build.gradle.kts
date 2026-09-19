@@ -9,11 +9,16 @@ repositories {
 }
 
 // The plugin targets Java 11 at minimum so it can run inside legacy Gradle (5.x) daemons.
-
-// The functional tests run under both the build JDK (modern Gradle) and a Java 11 toolchain
-// (legacy Gradle via the legacyGradleTest task), so the test classes must be Java 11 bytecode too.
-tasks.withType<JavaCompile> {
+tasks.compileJava {
     options.release = 11
+}
+
+// The functional tests only ever run on JVMs this build pins itself (see the test tasks below), so
+// unlike the plugin they can use newer language features - most notably text blocks for the inline
+// Gradle scripts. Java 17 is the ceiling, not the build JDK: TestKit runs the Gradle-under-test
+// daemon on the same JVM as the tests, and Gradle 7.6.4 (legacyGradleTest) supports Java 19 at most.
+tasks.compileTestJava {
+    options.release = 17
 }
 
 gradlePlugin {
@@ -29,25 +34,34 @@ gradlePlugin {
 val jgitVersion = "6.10.1.202505221210-r"
 val junitBomVersion = "5.14.4"
 val assertjVersion = "3.27.7"
-
+val jsonUnitVersion = "4.1.1"
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
+    implementation("org.cyclonedx:cyclonedx-core-java:13.2.0")
 
     testImplementation(platform("org.junit:junit-bom:${junitBomVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitVersion}")
     testImplementation(gradleTestKit())
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 val currentJvmGradleVersions = listOf("9.5.1")
 val gradle810Versions = listOf("8.10.2")
-val legacyGradleVersions = listOf("5.0", "6.9", "7.6.4")
+// The plugin itself supports Gradle 5.0+, but the functional tests can only run against 7.6+.
+// cyclonedx-core-java (used to generate the dependency SBOM) drags in a multi-release Jackson jar,
+// and GradleRunner.withPluginClasspath() injects the plugin classpath by re-jarring every entry -
+// something TestKit could not do for a multi-release jar until Gradle 7.6. Older Gradle versions
+// therefore fail at TestKit startup with "Failed to create Jar file ... jackson-core-*.jar", so
+// they are excluded from the matrix. This is a test-harness limitation only: real consumers on
+// Gradle 5.x/6.x resolve the published plugin normally and are unaffected.
+val legacyGradleVersions = listOf("7.6.4")
 
-// No single JVM can launch the whole supported Gradle range: Gradle 5-7 require Java <= 11, Gradle
-// 8.10.2 bundles a Groovy that can't compile build scripts on JDKs newer than it was released for
-// (e.g. fails with "Unsupported class file major version" on JDK 25), and Gradle 9 requires Java
-// >= 17. The matrix is therefore split across test tasks bucketed by the JDK each Gradle version
+// No single JVM can launch the whole supported Gradle range: Gradle 7.6 requires Java <= 19,
+// Gradle 8.10.2 bundles a Groovy that can't compile build scripts on JDKs newer than it was
+// released for (e.g. fails with "Unsupported class file major version" on JDK 25), and Gradle 9
+// requires Java >= 17. The matrix is therefore split across test tasks bucketed by the JDK each Gradle version
 // can run on, each pinned via a toolchain so results don't depend on whatever JDK happens to be on
 // PATH/JAVA_HOME wherever the outer build is invoked from (console, CI, an IDE's own Gradle JVM,
 // etc.) - the Gradle versions themselves are the behavioural axis.
@@ -76,7 +90,7 @@ val gradle810Test by tasks.registering(Test::class) {
 }
 
 val legacyGradleTest by tasks.registering(Test::class) {
-    description = "Runs the functional tests against legacy Gradle versions on a Java 11 toolchain."
+    description = "Runs the functional tests against legacy Gradle versions on a Java 17 toolchain."
     group = "verification"
     useJUnitPlatform()
 
@@ -84,8 +98,10 @@ val legacyGradleTest by tasks.registering(Test::class) {
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
 
+    // 17, not the build JDK: Gradle 7.6.4 supports Java 19 at most, and 17 is the highest LTS
+    // below that (it also matches the test classes' bytecode level).
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
     systemProperty("axelix.test.gradle.versions", legacyGradleVersions.joinToString(separator = ","))
     shouldRunAfter(tasks.test)

@@ -39,10 +39,10 @@ import com.axelixlabs.axelix.master.service.auth.intercept.web.OnWebSuccessfulRe
 public class CapturingIamWebInterceptor
         implements OnWebAuthenticationFailure, OnWebAccessDenied, OnWebSuccessfulResult {
 
-    private @Nullable MasterWebEndpoint authenticationFailureEndpoint;
-    private @Nullable MasterWebEndpoint accessDeniedEndpoint;
-    private @Nullable MasterWebEndpoint successfulEndpoint;
-    private @Nullable User actor;
+    private volatile @Nullable MasterWebEndpoint authenticationFailureEndpoint;
+    private volatile @Nullable MasterWebEndpoint accessDeniedEndpoint;
+    private volatile @Nullable MasterWebEndpoint successfulEndpoint;
+    private volatile @Nullable User actor;
 
     @Override
     public void onAuthenticationFailure(MasterWebEndpoint target, HttpServletRequest request) {

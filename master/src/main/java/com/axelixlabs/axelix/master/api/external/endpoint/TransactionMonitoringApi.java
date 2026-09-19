@@ -19,10 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Optional;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
@@ -51,15 +45,6 @@ public class TransactionMonitoringApi {
         this.historicalApplicationSnapshotService = historicalApplicationSnapshotService;
     }
 
-    @DefaultApiResponse(summary = "Returns transactional persistence insights for the given instance.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PersistenceInsights.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     public PersistenceInsights getTransactionFeed(@PathVariable("instanceId") String instanceId) {
         InstanceId id = InstanceId.of(instanceId);

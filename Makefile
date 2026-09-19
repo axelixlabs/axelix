@@ -3,7 +3,7 @@
         build-spring-petclinic-maven-sb-2 build-notification-service-gradle-sb-2 \
         build-feature-service-maven-sb-3 build-spring-petclinic-gradle-sb-3 \
         build-spring-petclinic-maven-sb-4 publish-plugins \
-        publish-gradle-plugin publish-maven-plugin
+        publish-gradle-plugin publish-maven-plugin master-oss master-oss-image
 
 BUILD_SB2             ?= true
 BUILD_SB3             ?= true
@@ -38,6 +38,12 @@ publish-local:
 build:
 	@echo "=== Running Backend Build ==="
 	./gradlew build
+
+master-oss:
+	./gradlew master-oss:build
+
+master-oss-image: master-oss
+	docker build -t master-oss:local -f master-oss/Dockerfile master-oss
 
 re-build:
 	@echo "=== Running Backend Build ==="

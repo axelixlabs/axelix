@@ -22,7 +22,8 @@ import { Outlet } from "react-router";
 import { AccessProvider } from "@/components";
 
 import { AdminHeader } from "./AdminHeader";
-import { LicenseStatusAlert } from "./LicenseStatusAlert";
+// License key entry is moving to the Enterprise distro; banner temporarily disabled.
+// import { LicenseStatusAlert } from "./LicenseStatusAlert";
 import { InstanceSiderMenu } from "./siders";
 import styles from "./styles.module.css";
 
@@ -55,7 +56,8 @@ export const MainLayout = ({ hideSider, siderContent = <InstanceSiderMenu /> }: 
 
                 <Layout className={styles.ContentLayout}>
                     <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
-                        <LicenseStatusAlert hideSider={hideSider} />
+                        {/* License key entry is moving to the Enterprise distro; banner temporarily disabled. */}
+                        {/* <LicenseStatusAlert hideSider={hideSider} /> */}
                         <Outlet />
                     </Content>
                 </Layout>

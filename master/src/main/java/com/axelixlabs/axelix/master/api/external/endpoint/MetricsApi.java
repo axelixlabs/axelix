@@ -21,21 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.MultiValueQueryParameter;
@@ -43,8 +34,6 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.QueryParameter;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -54,7 +43,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 19.11.2025
  * @author Nikita Kirillov
  */
-@Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
 @ExternalApiRestController
 public class MetricsApi {
 
@@ -64,15 +52,6 @@ public class MetricsApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(summary = "Returns all possible metrics that exists inside the given instance")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = MetricsGroupsFeed.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.MetricsApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getMetricGroups(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
@@ -80,17 +59,6 @@ public class MetricsApi {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
-    @DefaultApiResponse(summary = "Returns a single metric profile inside the given instance")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = MetricProfile.class)))
-    @InstanceIdParameter
-    @Parameter(name = "metric", description = "The name of the metric to fetch profile for", required = true)
-    @Parameter(
-            name = "tag",
-            description = "Tag to filter the metric by. Multiple tags can be provided. Format: key:value",
-            array = @ArraySchema(schema = @Schema(type = "string", example = "area:nonheap")))
     @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
     public ResponseEntity<byte[]> getSingleMetric(
             @PathVariable("instanceId") String instanceId,

@@ -28,7 +28,7 @@ import com.sun.net.httpserver.HttpHandler;
 /**
  * Default handler for {@link PrometheusMetricsAutoConfiguration}'s {@code prometheusHttpServer}
  * bean: responds {@code 404} to any path not explicitly registered (e.g. {@code /} or
- * {@code /-/healthy} once its own handler is disabled), instead of the library's own default
+ * {@code /-/healthy} once its own handler is disabled), instead of the Prometheus's own default
  * handler, which answers {@code 200} on any unmatched path.
  *
  * @author Dmitry Mazurov

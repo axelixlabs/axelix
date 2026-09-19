@@ -39,10 +39,10 @@ import com.axelixlabs.axelix.master.service.auth.intercept.mcp.OnMcpSuccessfulRe
 public class CapturingIamMcpInterceptor
         implements OnMcpAccessDenied, OnMcpAuthenticationFailure, OnMcpSuccessfulResult {
 
-    private @Nullable McpEndpoint authenticationFailureEndpoint;
-    private @Nullable McpEndpoint accessDeniedEndpoint;
-    private @Nullable McpEndpoint successfulEndpoint;
-    private @Nullable User actor;
+    private volatile @Nullable McpEndpoint authenticationFailureEndpoint;
+    private volatile @Nullable McpEndpoint accessDeniedEndpoint;
+    private volatile @Nullable McpEndpoint successfulEndpoint;
+    private volatile @Nullable User actor;
 
     @Override
     public void onAccessDenied(McpEndpoint target, HttpServletRequest request, User user) {

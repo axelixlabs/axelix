@@ -8,6 +8,7 @@ on:
       - 'common/**'
       - 'master/**'
       - '!master/front-end/**'
+      - 'master-oss/**'
       - 'plugins/**'
       - 'sbs/**'
 

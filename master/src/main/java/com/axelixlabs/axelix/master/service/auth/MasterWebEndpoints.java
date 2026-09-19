@@ -47,6 +47,10 @@ public final class MasterWebEndpoints {
 
     // spotless:off
 
+    // Settings
+    public static final MasterWebEndpoint SETTINGS_READ =
+            register("settings", HttpMethod.GET, ApiPaths.SettingsApi.SETTINGS, null);
+
     // Beans
     public static final MasterWebEndpoint BEANS_READ =
             register("beans:read", HttpMethod.GET, ApiPaths.BeansApi.FEED, null);
@@ -203,6 +207,10 @@ public final class MasterWebEndpoints {
             register("dashboard:read-spring-framework", HttpMethod.GET, ApiPaths.DashboardApi.SPRING_FRAMEWORK, null);
     public static final MasterWebEndpoint DASHBOARD_READ_PERSISTENCE =
             register("dashboard:read-persistence", HttpMethod.GET, ApiPaths.DashboardApi.PERSISTENCE, null);
+
+    // Dependencies
+    public static final MasterWebEndpoint DEPENDENCIES_READ =
+            register("dependencies:read", HttpMethod.GET, ApiPaths.DependenciesApi.INSTANCE_ID, null);
 
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =

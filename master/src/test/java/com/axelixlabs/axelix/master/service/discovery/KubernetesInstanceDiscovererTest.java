@@ -122,7 +122,7 @@ class KubernetesInstanceDiscovererTest {
         @Bean
         public CompatibilityDetectionStrategy compatibilityDetectionStrategy(
                 AxelixVersionDiscoverer axelixVersionDiscoverer) {
-            return new MajorVersionCompatibilityDetectionStrategy(axelixVersionDiscoverer);
+            return new WindowCompatibilityDetectionStrategy(axelixVersionDiscoverer);
         }
 
         @Bean
@@ -216,7 +216,7 @@ class KubernetesInstanceDiscovererTest {
     }
 
     @Test
-    void shouldRegisterInstanceWhenOnlyMinorVersionDiffers() {
+    void shouldNotRegisterInstanceWhenStarterIsNewerThanMaster() {
         String serviceId = UUID.randomUUID().toString();
         String instanceId = UUID.randomUUID().toString();
 
@@ -258,9 +258,7 @@ class KubernetesInstanceDiscovererTest {
 
         Set<DiscoveredInstanceProfile> profiles = subject.discover();
 
-        assertThat(profiles)
-                .extracting(profile -> profile.instance().id().instanceId())
-                .containsOnly(instanceId);
+        assertThat(profiles).isEmpty();
     }
 
     @Test

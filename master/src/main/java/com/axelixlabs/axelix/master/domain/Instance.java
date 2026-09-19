@@ -32,6 +32,7 @@ import org.springframework.data.relational.core.mapping.Table;
  *                                all the instances of the same application. Mandatory.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
+ * @param starterVersion          Version of the Axelix starter used inside the service
  * @param javaVersion             Version of the Java Platform used inside the service
  * @param springBootVersion       Version of the Spring Boot used inside the service
  * @param springFrameworkVersion  Version of the Spring Framework used inside the service
@@ -50,6 +51,7 @@ public record Instance(
         @Embedded.Empty ApplicationId applicationId,
         String name,
         String serviceVersion,
+        String starterVersion,
         String javaVersion,
         String springBootVersion,
         String springFrameworkVersion,
@@ -68,6 +70,7 @@ public record Instance(
                 this.applicationId,
                 this.name,
                 this.serviceVersion,
+                this.starterVersion,
                 this.javaVersion,
                 this.springBootVersion,
                 this.springFrameworkVersion,

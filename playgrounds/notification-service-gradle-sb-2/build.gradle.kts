@@ -3,14 +3,24 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("commons-io:commons-io:2.22.0")
+        classpath("org.apache.commons:commons-lang3:3.20.0")
+    }
+}
+
 plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.spring") version "2.2.20"
     id("org.springframework.boot") version "2.7.18"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.0.0"
-    id("org.cyclonedx.bom") version "2.3.1"
-    id("com.axelixlabs.axelix") version "1.0.0"
+    id("org.cyclonedx.bom") version "3.4.1"
+    id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
 }
 
 group = "com.sivalabs.ft"
@@ -49,7 +59,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.1.0-SNAPSHOT") {
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.0-SNAPSHOT") {
         isChanging = true
     }
     implementation("org.springframework.boot:spring-boot-starter-actuator")

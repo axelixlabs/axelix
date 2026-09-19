@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class, AxelixMetricsPublisherAutoConfiguration.class})
+@ConditionalOnAxelixStarterEnabled
 @ConditionalOnAvailableEndpoint(endpoint = AxelixCachesEndpoint.class)
 public class AxelixCachesEndpointAutoConfiguration {
 

@@ -1,0 +1,201 @@
+ecosystem: MESSAGING
+projects:
+  - id: apache-kafka
+    name: Apache Kafka
+    status: ACTIVE
+    summary: Actively developed by the Apache Kafka project.
+    coordinates:
+      - org.apache.kafka:kafka-clients
+      - org.apache.kafka:kafka-streams
+      - org.apache.kafka:kafka-streams-scala_2.13
+      - org.apache.kafka:kafka-streams-test-utils
+      - org.apache.kafka:kafka-metadata
+      - org.apache.kafka:kafka-raft
+      - org.apache.kafka:kafka-server
+      - org.apache.kafka:kafka-server-common
+      - org.apache.kafka:kafka-shell
+      - org.apache.kafka:kafka-storage
+      - org.apache.kafka:kafka-storage-api
+      - org.apache.kafka:kafka-tools
+      - org.apache.kafka:kafka_2.13
+      - org.apache.kafka:connect
+      - org.apache.kafka:connect-api
+      - org.apache.kafka:connect-basic-auth-extension
+      - org.apache.kafka:connect-file
+      - org.apache.kafka:connect-json
+      - org.apache.kafka:connect-mirror
+      - org.apache.kafka:connect-mirror-client
+      - org.apache.kafka:connect-runtime
+      - org.apache.kafka:connect-transforms
+      - org.apache.kafka:generator
+      - org.apache.kafka:trogdor
+    reference:
+      label: Apache Kafka
+      url: https://kafka.apache.org/
+
+  - id: rabbitmq-java-clients
+    name: RabbitMQ Java Clients
+    status: ACTIVE
+    summary: >-
+      The Java clients for RabbitMQ, actively developed by the RabbitMQ team: the AMQP 0-9-1 client
+      and the Streams client.
+    coordinates:
+      - com.rabbitmq:amqp-client
+      - com.rabbitmq:stream-client
+    reference:
+      label: RabbitMQ client libraries
+      url: https://www.rabbitmq.com/client-libraries
+
+  - id: spring-kafka
+    name: Spring for Apache Kafka
+    status: ACTIVE
+    summary: Actively developed as part of the Spring portfolio.
+    coordinates:
+      - org.springframework.kafka:spring-kafka
+      - org.springframework.kafka:spring-kafka-test
+    reference:
+      label: Spring for Apache Kafka
+      url: https://spring.io/projects/spring-kafka
+
+  - id: spring-amqp
+    name: Spring AMQP
+    status: ACTIVE
+    summary: Actively developed as part of the Spring portfolio.
+    coordinates:
+      - org.springframework.amqp:spring-amqp
+      - org.springframework.amqp:spring-rabbit
+      - org.springframework.amqp:spring-rabbit-stream
+      - org.springframework.amqp:spring-rabbit-test
+      - org.springframework.amqp:spring-rabbit-junit
+    reference:
+      label: Spring AMQP
+      url: https://spring.io/projects/spring-amqp
+
+  - id: activemq-classic
+    name: Apache ActiveMQ Classic
+    status: ACTIVE
+    summary: >-
+      Actively developed. The original ActiveMQ broker line; ActiveMQ Artemis is the project's
+      next-generation broker developed alongside it.
+    coordinates:
+      - org.apache.activemq:activemq-client
+      - org.apache.activemq:activemq-broker
+      - org.apache.activemq:activemq-spring
+      - org.apache.activemq:activemq-console
+    reference:
+      label: Apache ActiveMQ
+      url: https://activemq.apache.org/
+
+  - id: activemq-artemis
+    name: Apache ActiveMQ Artemis
+    status: ACTIVE
+    summary: Actively developed. The next-generation ActiveMQ broker.
+    coordinates:
+      - org.apache.activemq:artemis-core-client
+      - org.apache.activemq:artemis-jakarta-client
+      - org.apache.activemq:artemis-jms-client
+      - org.apache.activemq:artemis-server
+    reference:
+      label: Apache ActiveMQ Artemis
+      url: https://activemq.apache.org/components/artemis/
+
+  - id: apache-pulsar
+    name: Apache Pulsar
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Apache Pulsar project.
+    coordinates:
+      - org.apache.pulsar:bouncy-castle-bc
+      - org.apache.pulsar:bouncy-castle-bcfips
+      - org.apache.pulsar:jclouds-shaded
+      - org.apache.pulsar:managed-ledger
+      - org.apache.pulsar:pulsar
+      - org.apache.pulsar:pulsar-broker
+      - org.apache.pulsar:pulsar-broker-auth-athenz
+      - org.apache.pulsar:pulsar-broker-auth-oidc
+      - org.apache.pulsar:pulsar-broker-auth-sasl
+      - org.apache.pulsar:pulsar-broker-common
+      - org.apache.pulsar:pulsar-cli-utils
+      - org.apache.pulsar:pulsar-client
+      - org.apache.pulsar:pulsar-client-admin
+      - org.apache.pulsar:pulsar-client-admin-api
+      - org.apache.pulsar:pulsar-client-admin-original
+      - org.apache.pulsar:pulsar-client-all
+      - org.apache.pulsar:pulsar-client-api
+      - org.apache.pulsar:pulsar-client-auth-athenz
+      - org.apache.pulsar:pulsar-client-auth-sasl
+      - org.apache.pulsar:pulsar-client-messagecrypto-bc
+      - org.apache.pulsar:pulsar-client-original
+      - org.apache.pulsar:pulsar-client-tools
+      - org.apache.pulsar:pulsar-client-tools-api
+      - org.apache.pulsar:pulsar-common
+      - org.apache.pulsar:pulsar-config-validation
+      - org.apache.pulsar:pulsar-functions
+      - org.apache.pulsar:pulsar-functions-api
+      - org.apache.pulsar:pulsar-functions-instance
+      - org.apache.pulsar:pulsar-functions-local-runner
+      - org.apache.pulsar:pulsar-functions-local-runner-original
+      - org.apache.pulsar:pulsar-functions-proto
+      - org.apache.pulsar:pulsar-functions-runtime
+      - org.apache.pulsar:pulsar-functions-runtime-all
+      - org.apache.pulsar:pulsar-functions-secrets
+      - org.apache.pulsar:pulsar-functions-utils
+      - org.apache.pulsar:pulsar-functions-worker
+      - org.apache.pulsar:pulsar-io
+      - org.apache.pulsar:pulsar-io-aerospike
+      - org.apache.pulsar:pulsar-io-alluxio
+      - org.apache.pulsar:pulsar-io-aws
+      - org.apache.pulsar:pulsar-io-batch-data-generator
+      - org.apache.pulsar:pulsar-io-batch-discovery-triggerers
+      - org.apache.pulsar:pulsar-io-canal
+      - org.apache.pulsar:pulsar-io-cassandra
+      - org.apache.pulsar:pulsar-io-common
+      - org.apache.pulsar:pulsar-io-core
+      - org.apache.pulsar:pulsar-io-data-generator
+      - org.apache.pulsar:pulsar-io-debezium
+      - org.apache.pulsar:pulsar-io-debezium-core
+      - org.apache.pulsar:pulsar-io-debezium-mongodb
+      - org.apache.pulsar:pulsar-io-debezium-mssql
+      - org.apache.pulsar:pulsar-io-debezium-mysql
+      - org.apache.pulsar:pulsar-io-debezium-oracle
+      - org.apache.pulsar:pulsar-io-debezium-postgres
+      - org.apache.pulsar:pulsar-io-dynamodb
+      - org.apache.pulsar:pulsar-io-elastic-search
+      - org.apache.pulsar:pulsar-io-file
+      - org.apache.pulsar:pulsar-io-hbase
+      - org.apache.pulsar:pulsar-io-hdfs3
+      - org.apache.pulsar:pulsar-io-http
+      - org.apache.pulsar:pulsar-io-influxdb
+      - org.apache.pulsar:pulsar-io-jdbc
+      - org.apache.pulsar:pulsar-io-jdbc-clickhouse
+      - org.apache.pulsar:pulsar-io-jdbc-core
+      - org.apache.pulsar:pulsar-io-jdbc-mariadb
+      - org.apache.pulsar:pulsar-io-jdbc-openmldb
+      - org.apache.pulsar:pulsar-io-jdbc-postgres
+      - org.apache.pulsar:pulsar-io-jdbc-sqlite
+      - org.apache.pulsar:pulsar-io-kafka
+      - org.apache.pulsar:pulsar-io-kafka-connect-adaptor
+      - org.apache.pulsar:pulsar-io-kafka-connect-adaptor-nar
+      - org.apache.pulsar:pulsar-io-kinesis
+      - org.apache.pulsar:pulsar-io-mongo
+      - org.apache.pulsar:pulsar-io-netty
+      - org.apache.pulsar:pulsar-io-nsq
+      - org.apache.pulsar:pulsar-io-rabbitmq
+      - org.apache.pulsar:pulsar-io-redis
+      - org.apache.pulsar:pulsar-io-solr
+      - org.apache.pulsar:pulsar-metadata
+      - org.apache.pulsar:pulsar-package-bookkeeper-storage
+      - org.apache.pulsar:pulsar-package-core
+      - org.apache.pulsar:pulsar-package-filesystem-storage
+      - org.apache.pulsar:pulsar-package-management
+      - org.apache.pulsar:pulsar-proxy
+      - org.apache.pulsar:pulsar-testclient
+      - org.apache.pulsar:pulsar-transaction-common
+      - org.apache.pulsar:pulsar-transaction-coordinator
+      - org.apache.pulsar:pulsar-websocket
+      - org.apache.pulsar:structured-event-log
+      - org.apache.pulsar:tiered-storage-file-system
+      - org.apache.pulsar:tiered-storage-jcloud
+    reference:
+      label: Apache Pulsar
+      url: https://pulsar.apache.org/

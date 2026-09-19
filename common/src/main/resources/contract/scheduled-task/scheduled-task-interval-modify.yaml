@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-interval-modify
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-interval-modify' operation.
+    This operation changes the execution interval of a fixed-rate or fixed-delay scheduled task
+    of the Spring Boot app.
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-scheduled-tasks/modify/interval:
+    post:
+      operationId: modifyScheduledTaskInterval
+      summary: Changes the execution interval of a scheduled task of the service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskIntervalModifyRequest'
+      responses:
+        '204':
+          description: The interval was changed.
+        '400':
+          description: No scheduled task with the given trigger exists, or it is not an interval-based task.
+components:
+  schemas:
+    ScheduledTaskIntervalModifyRequest:
+      type: object
+      description: A request to change the execution interval of a scheduled task.
+      required:
+        - trigger
+        - interval
+      properties:
+        trigger:
+          type: string
+          description: The identifier of the scheduled task to modify.
+          x-axelix-introduced-in: 1.0.0
+        interval:
+          type: integer
+          format: int64
+          description: The new execution interval, in milliseconds.
+          x-axelix-introduced-in: 1.0.0

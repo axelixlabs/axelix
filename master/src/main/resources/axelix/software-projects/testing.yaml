@@ -1,0 +1,372 @@
+ecosystem: TESTING
+projects:
+  - id: junit4
+    name: JUnit 4
+    status: MAINTENANCE
+    summary: >-
+      Officially in maintenance mode: only critical bugs and security issues are fixed, all other
+      issues and pull requests are declined. Ongoing development happens in JUnit 5.
+    coordinates:
+      - junit:junit
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.junit.jupiter:junit-jupiter
+    reference:
+      label: JUnit 4 maintenance notice
+      url: https://github.com/junit-team/junit4
+
+  - id: junit-framework
+    name: JUnit Framework (JUnit 5+)
+    status: ACTIVE
+    summary: >-
+      Actively developed. The modern JUnit generation - the Jupiter API on top of the JUnit
+      Platform - and the successor of JUnit 4; the current line is 6.x.
+    coordinates:
+      - org.junit.jupiter:junit-jupiter
+      - org.junit.jupiter:junit-jupiter-api
+      - org.junit.jupiter:junit-jupiter-engine
+      - org.junit.jupiter:junit-jupiter-migrationsupport
+      - org.junit.jupiter:junit-jupiter-params
+      - org.junit.platform:junit-platform-commons
+      - org.junit.platform:junit-platform-console
+      - org.junit.platform:junit-platform-engine
+      - org.junit.platform:junit-platform-launcher
+      - org.junit.platform:junit-platform-reporting
+      - org.junit.platform:junit-platform-suite
+      - org.junit.platform:junit-platform-suite-api
+      - org.junit.platform:junit-platform-suite-engine
+      - org.junit.platform:junit-platform-testkit
+      - org.junit.vintage:junit-vintage-engine
+    reference:
+      label: JUnit Framework
+      url: https://junit.org/
+
+  - id: mockito
+    name: Mockito
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.mockito:mockito-core
+      - org.mockito:mockito-android
+      - org.mockito:mockito-errorprone
+      - org.mockito:mockito-junit-jupiter
+      - org.mockito:mockito-proxy
+      - org.mockito:mockito-subclass
+    reference:
+      label: Mockito
+      url: https://site.mockito.org/
+
+  - id: assertj
+    name: AssertJ
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.assertj:assertj-core
+      - org.assertj:assertj-guava
+    reference:
+      label: AssertJ
+      url: https://assertj.github.io/doc/
+
+  - id: testcontainers
+    name: Testcontainers
+    status: ACTIVE
+    summary: >-
+      Actively developed by AtomicJar/Docker. Testcontainers 2.x renamed every module to a
+      testcontainers-* artifact id; the 1.x line publishes the same modules without the prefix,
+      so both naming generations are listed.
+    coordinates:
+      - org.testcontainers:testcontainers
+      - org.testcontainers:activemq
+      - org.testcontainers:azure
+      - org.testcontainers:cassandra
+      - org.testcontainers:chromadb
+      - org.testcontainers:clickhouse
+      - org.testcontainers:cockroachdb
+      - org.testcontainers:consul
+      - org.testcontainers:couchbase
+      - org.testcontainers:cratedb
+      - org.testcontainers:database-commons
+      - org.testcontainers:databend
+      - org.testcontainers:db2
+      - org.testcontainers:elasticsearch
+      - org.testcontainers:gcloud
+      - org.testcontainers:grafana
+      - org.testcontainers:hivemq
+      - org.testcontainers:influxdb
+      - org.testcontainers:jdbc
+      - org.testcontainers:junit-jupiter
+      - org.testcontainers:k3s
+      - org.testcontainers:k6
+      - org.testcontainers:kafka
+      - org.testcontainers:ldap
+      - org.testcontainers:localstack
+      - org.testcontainers:mariadb
+      - org.testcontainers:milvus
+      - org.testcontainers:minio
+      - org.testcontainers:mockserver
+      - org.testcontainers:mongodb
+      - org.testcontainers:mssqlserver
+      - org.testcontainers:mysql
+      - org.testcontainers:neo4j
+      - org.testcontainers:nginx
+      - org.testcontainers:oceanbase
+      - org.testcontainers:ollama
+      - org.testcontainers:openfga
+      - org.testcontainers:oracle-free
+      - org.testcontainers:oracle-xe
+      - org.testcontainers:orientdb
+      - org.testcontainers:pinecone
+      - org.testcontainers:postgresql
+      - org.testcontainers:presto
+      - org.testcontainers:pulsar
+      - org.testcontainers:qdrant
+      - org.testcontainers:questdb
+      - org.testcontainers:r2dbc
+      - org.testcontainers:rabbitmq
+      - org.testcontainers:redpanda
+      - org.testcontainers:scylladb
+      - org.testcontainers:selenium
+      - org.testcontainers:solace
+      - org.testcontainers:solr
+      - org.testcontainers:spock
+      - org.testcontainers:tidb
+      - org.testcontainers:timeplus
+      - org.testcontainers:toxiproxy
+      - org.testcontainers:trino
+      - org.testcontainers:typesense
+      - org.testcontainers:vault
+      - org.testcontainers:weaviate
+      - org.testcontainers:yugabytedb
+      - org.testcontainers:testcontainers-activemq
+      - org.testcontainers:testcontainers-azure
+      - org.testcontainers:testcontainers-cassandra
+      - org.testcontainers:testcontainers-chromadb
+      - org.testcontainers:testcontainers-clickhouse
+      - org.testcontainers:testcontainers-cockroachdb
+      - org.testcontainers:testcontainers-consul
+      - org.testcontainers:testcontainers-couchbase
+      - org.testcontainers:testcontainers-cratedb
+      - org.testcontainers:testcontainers-database-commons
+      - org.testcontainers:testcontainers-databend
+      - org.testcontainers:testcontainers-db2
+      - org.testcontainers:testcontainers-elasticsearch
+      - org.testcontainers:testcontainers-gcloud
+      - org.testcontainers:testcontainers-grafana
+      - org.testcontainers:testcontainers-hivemq
+      - org.testcontainers:testcontainers-influxdb
+      - org.testcontainers:testcontainers-jdbc
+      - org.testcontainers:testcontainers-junit-jupiter
+      - org.testcontainers:testcontainers-k3s
+      - org.testcontainers:testcontainers-k6
+      - org.testcontainers:testcontainers-kafka
+      - org.testcontainers:testcontainers-ldap
+      - org.testcontainers:testcontainers-localstack
+      - org.testcontainers:testcontainers-mariadb
+      - org.testcontainers:testcontainers-milvus
+      - org.testcontainers:testcontainers-minio
+      - org.testcontainers:testcontainers-mockserver
+      - org.testcontainers:testcontainers-mongodb
+      - org.testcontainers:testcontainers-mssqlserver
+      - org.testcontainers:testcontainers-mysql
+      - org.testcontainers:testcontainers-neo4j
+      - org.testcontainers:testcontainers-nginx
+      - org.testcontainers:testcontainers-oceanbase
+      - org.testcontainers:testcontainers-ollama
+      - org.testcontainers:testcontainers-openfga
+      - org.testcontainers:testcontainers-oracle-free
+      - org.testcontainers:testcontainers-oracle-xe
+      - org.testcontainers:testcontainers-orientdb
+      - org.testcontainers:testcontainers-pinecone
+      - org.testcontainers:testcontainers-postgresql
+      - org.testcontainers:testcontainers-presto
+      - org.testcontainers:testcontainers-pulsar
+      - org.testcontainers:testcontainers-qdrant
+      - org.testcontainers:testcontainers-questdb
+      - org.testcontainers:testcontainers-r2dbc
+      - org.testcontainers:testcontainers-rabbitmq
+      - org.testcontainers:testcontainers-redpanda
+      - org.testcontainers:testcontainers-scylladb
+      - org.testcontainers:testcontainers-selenium
+      - org.testcontainers:testcontainers-solace
+      - org.testcontainers:testcontainers-solr
+      - org.testcontainers:testcontainers-spock
+      - org.testcontainers:testcontainers-tidb
+      - org.testcontainers:testcontainers-timeplus
+      - org.testcontainers:testcontainers-toxiproxy
+      - org.testcontainers:testcontainers-trino
+      - org.testcontainers:testcontainers-typesense
+      - org.testcontainers:testcontainers-vault
+      - org.testcontainers:testcontainers-weaviate
+      - org.testcontainers:testcontainers-yugabytedb
+    reference:
+      label: Testcontainers
+      url: https://testcontainers.com/
+
+  - id: awaitility
+    name: Awaitility
+    status: ACTIVE
+    summary: >-
+      Actively maintained.
+    coordinates:
+      - org.awaitility:awaitility
+      - org.awaitility:awaitility-groovy
+      - org.awaitility:awaitility-kotlin
+      - org.awaitility:awaitility-scala
+    reference:
+      label: Awaitility
+      url: https://github.com/awaitility/awaitility
+
+  - id: hamcrest
+    name: Hamcrest
+    status: DORMANT
+    summary: >-
+      Quiet since early 2025: the latest release, 3.0, dates to August 2024 and the repository has
+      seen no commits since February 2025, although the project was never formally discontinued.
+    coordinates:
+      - org.hamcrest:hamcrest
+      - org.hamcrest:hamcrest-core
+      - org.hamcrest:hamcrest-library
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Hamcrest keeps working and remains embedded in the JUnit ecosystem; AssertJ is the common actively developed alternative
+    reference:
+      label: Hamcrest
+      url: https://hamcrest.org/JavaHamcrest/
+
+  - id: xmlunit
+    name: XMLUnit
+    status: ACTIVE
+    summary: >-
+      Actively maintained.
+    coordinates:
+      - org.xmlunit:xmlunit-assertj
+      - org.xmlunit:xmlunit-assertj3
+      - org.xmlunit:xmlunit-core
+      - org.xmlunit:xmlunit-jakarta-jaxb-impl
+      - org.xmlunit:xmlunit-legacy
+      - org.xmlunit:xmlunit-matchers
+      - org.xmlunit:xmlunit-placeholders
+    reference:
+      label: XMLUnit
+      url: https://www.xmlunit.org/
+
+  - id: selenium
+    name: Selenium
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Selenium project.
+    coordinates:
+      - org.seleniumhq.selenium:htmlunit3-driver
+      - org.seleniumhq.selenium:selenium-api
+      - org.seleniumhq.selenium:selenium-chrome-driver
+      - org.seleniumhq.selenium:selenium-chromium-driver
+      - org.seleniumhq.selenium:selenium-devtools-v145
+      - org.seleniumhq.selenium:selenium-devtools-v146
+      - org.seleniumhq.selenium:selenium-devtools-v147
+      - org.seleniumhq.selenium:selenium-edge-driver
+      - org.seleniumhq.selenium:selenium-firefox-driver
+      - org.seleniumhq.selenium:selenium-grid
+      - org.seleniumhq.selenium:selenium-http
+      - org.seleniumhq.selenium:selenium-ie-driver
+      - org.seleniumhq.selenium:selenium-java
+      - org.seleniumhq.selenium:selenium-json
+      - org.seleniumhq.selenium:selenium-manager
+      - org.seleniumhq.selenium:selenium-node-kubernetes
+      - org.seleniumhq.selenium:selenium-remote-driver
+      - org.seleniumhq.selenium:selenium-safari-driver
+      - org.seleniumhq.selenium:selenium-session-map-jdbc
+      - org.seleniumhq.selenium:selenium-session-map-redis
+      - org.seleniumhq.selenium:selenium-support
+    reference:
+      label: Selenium
+      url: https://www.selenium.dev/
+
+  - id: jsonassert
+    name: JSONassert
+    status: DORMANT
+    summary: >-
+      Shows no signs of life: the last release, 1.5.3, and the last commit both date to July 2024,
+      although the project was never formally discontinued.
+    coordinates:
+      - org.skyscreamer:jsonassert
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: JSONassert keeps working; JsonUnit and AssertJ's JSON support are the common actively developed alternatives
+    reference:
+      label: JSONassert
+      url: https://github.com/skyscreamer/JSONassert
+
+  - id: json-path
+    name: Jayway JsonPath
+    status: ACTIVE
+    summary: >-
+      Maintained on a slow cadence.
+    coordinates:
+      - com.jayway.jsonpath:json-path
+      - com.jayway.jsonpath:json-path-assert
+    reference:
+      label: JsonPath
+      url: https://github.com/json-path/JsonPath
+
+  - id: htmlunit
+    name: HtmlUnit
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Since version 3, published under org.htmlunit instead of
+      net.sourceforge.htmlunit.
+    coordinates:
+      - org.htmlunit:htmlunit
+    reference:
+      label: HtmlUnit
+      url: https://www.htmlunit.org/
+  - id: duct-tape
+    name: Duct Tape
+    status: SUNSET
+    summary: >-
+      The repository was archived in 2021; the last release was 1.0.8 in 2019. Still shipped as a
+      Testcontainers 1.x dependency for retry utilities.
+    coordinates:
+      - org.rnorth.duct-tape:duct-tape
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Testcontainers 1.x still ships it; no successor exists.
+    reference:
+      label: duct-tape repository (archived)
+      url: https://github.com/rnorth/duct-tape
+
+  - id: opentest4j
+    name: OpenTest4J
+    status: ACTIVE
+    summary: >-
+      Maintained by the JUnit team with ongoing repository activity, though no release has shipped
+      since 1.3.0 in July 2023. The common assertion-error protocol underneath JUnit 5.
+    coordinates:
+      - org.opentest4j:opentest4j
+    reference:
+      label: OpenTest4J
+      url: https://github.com/ota4j-team/opentest4j
+
+  - id: apiguardian
+    name: API Guardian
+    status: ACTIVE
+    summary: >-
+      Maintained by the JUnit team with ongoing repository activity, though no release has shipped
+      since 1.1.2 in 2021. Provides the @API status annotations used across the JUnit 5 artifacts.
+    coordinates:
+      - org.apiguardian:apiguardian-api
+    reference:
+      label: API Guardian
+      url: https://github.com/apiguardian-team/apiguardian
+
+  - id: objenesis
+    name: Objenesis
+    status: ACTIVE
+    summary: >-
+      Actively maintained. Instantiates objects without constructors; arrives transitively through
+      Mockito.
+    coordinates:
+      - org.objenesis:objenesis
+    reference:
+      label: Objenesis
+      url: https://objenesis.org/
+

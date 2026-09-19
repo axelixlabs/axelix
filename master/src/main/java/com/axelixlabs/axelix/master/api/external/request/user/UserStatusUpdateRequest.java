@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.user;
 
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 
 /**
  * Request payload to change a managed user's status.

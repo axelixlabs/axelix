@@ -50,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
  * @since 22.07.2025
  */
 @AutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class, ValidationListenerAutoConfiguration.class})
+@ConditionalOnAxelixStarterEnabled
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
 

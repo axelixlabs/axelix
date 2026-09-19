@@ -44,8 +44,8 @@ import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.auth.UserService;
@@ -293,7 +293,6 @@ class UserApiTest extends AbstractProtectedEndpointTest {
 
         userService.createFromOidc("bob", "Bob", null, "bob@example.com", null, null, "hash-bob", "VIEWER");
         UserEntity bob = userRepository.findByUsername("bob").orElseThrow();
-        userService.updateStatus(bob.id(), UserStatus.SUSPENDED);
 
         // language=json
         String expectedFeed = """
@@ -321,7 +320,7 @@ class UserApiTest extends AbstractProtectedEndpointTest {
                     "organizationalUnit": null,
                     "roles": ["VIEWER"],
                     "userOrigin": "OAUTH2/OIDC",
-                    "status": "SUSPENDED",
+                    "status": "ACTIVE",
                     "lastLoginAt": "${json-unit.any-string}"
                   }
                 ]

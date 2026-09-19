@@ -1,11 +1,13 @@
+import net.ltgt.gradle.errorprone.errorprone
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.kotlin.dsl.axelix
 
 plugins {
-    id("shared")
+    id("master-runtime")
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
+    id("contracts")
 }
 
 val springBootVersion = "4.1.0"
@@ -13,7 +15,6 @@ val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0"
 
 // Not Managed by Spring BOM
-val springDocSwaggerVersion = "3.0.3"
 val sqliteVersion = "3.53.2.1"
 val nimbusJoseJwt = "10.9.1"
 val jmesPathVersion = "0.6.0"
@@ -23,9 +24,12 @@ val prometheusMetricsVersion = "1.7.0"
 
 // Explicitly specified versions for security reasons (i.e. using some specific patch versions)
 val postgresqlVersion = "42.7.13"
-val nettyVersion = "4.2.16.Final"
-val tomcatVersion = "11.0.24"
+val nettyVersion = "4.2.17.Final"
+val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
+val httpcore5Version = "5.4.3"
+val bcprovVersion = "1.81.1"
+val jacksonDatabindVersion = "3.1.5"
 
 dependencies {
     // Self
@@ -45,6 +49,10 @@ dependencies {
         implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-el:$tomcatVersion")
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
+        implementation("org.apache.httpcomponents.core5:httpcore5:$httpcore5Version")
+        implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
+        implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
+        implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
 
     // Boot Starters
@@ -59,10 +67,10 @@ dependencies {
     api("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.springframework.security:spring-security-crypto")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
     api("org.slf4j:slf4j-api")
     api("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // TODO:
@@ -97,6 +105,7 @@ dependencies {
 
     testFixturesApi("org.testcontainers:testcontainers-postgresql")
     testFixturesApi("org.testcontainers:testcontainers-mysql")
+    testFixturesApi("org.testcontainers:testcontainers-vault")
     testFixturesApi("org.testcontainers:testcontainers-junit-jupiter")
     testFixturesApi("com.squareup.okhttp3:mockwebserver")
     testFixturesApi("com.squareup.okhttp3:okhttp")
@@ -111,12 +120,6 @@ dependencies {
 configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-api")
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
 }
 
 tasks.processResources {
@@ -134,9 +137,17 @@ tasks.processResources {
     exclude("application-local.yaml")
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-parameters")
-    options.release = 25
+contracts {
+    modelBasePackage.set("com.axelixlabs.axelix.master.contract")
+}
+
+// The generated contract classes cannot pass NullAway: a required property is non-null under
+// JSpecify, yet the generator emits a Jackson-friendly no-arg constructor that leaves its field
+// uninitialized.
+tasks.named<JavaCompile>("compileJava") {
+    options.errorprone {
+        option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.master.contract(\\..*)?")
+    }
 }
 
 axelix {

@@ -190,6 +190,7 @@ public class HeartBeatApiTest {
                     .isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
             assertThat(instance.name()).isEqualTo("petclinic");
             assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+            assertThat(instance.starterVersion()).isEqualTo("1.0.0-SNAPSHOT");
             assertThat(instance.javaVersion()).isEqualTo("25");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
             assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
@@ -233,6 +234,27 @@ public class HeartBeatApiTest {
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+    }
+
+    @Test
+    void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
+        // given.
+        String requestWithIncompatibleStarter =
+                JSON_REQUEST.replace("\"version\": \"1.0.0-SNAPSHOT\"", "\"version\": \"1.99.0\"");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register",
+                        defaultJsonEntity(requestWithIncompatibleStarter),
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
     }
 
     @ParameterizedTest(name = "{0}")

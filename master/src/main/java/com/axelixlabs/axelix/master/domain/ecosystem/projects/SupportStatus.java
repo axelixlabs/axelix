@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.master.domain.ecosystem.projects;
+
+/**
+ * What the authors of a {@link SoftwareProject} are still doing with it.
+ *
+ * @author Mikhail Polivakha
+ */
+public enum SupportStatus {
+
+    /**
+     * The project is actively developed: features still land and fixes are released on a normal cadence.
+     */
+    ACTIVE,
+
+    /**
+     * The project is in maintenance mode. Feature development has stopped and releases happen only for critical
+     * fixes. Existing applications keep working, but building anything further on it is a decision to revisit.
+     */
+    MAINTENANCE,
+
+    /**
+     * The project shows no signs of life - no releases for an extended period - but its authors have declared
+     * nothing: no maintenance notice, no end-of-life announcement, no archived repository. Unlike the other
+     * statuses this one records what Axelix observes rather than what the authors said, and the distinction
+     * matters: a dormant project may wake up again, or may already be dead in all but name.
+     */
+    DORMANT,
+
+    /**
+     * The project is finished. No releases of any kind are expected, security fixes included.
+     */
+    SUNSET
+}

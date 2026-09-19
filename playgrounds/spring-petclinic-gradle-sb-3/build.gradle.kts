@@ -1,13 +1,23 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("commons-io:commons-io:2.22.0")
+    classpath("org.apache.commons:commons-lang3:3.20.0")
+  }
+}
+
 plugins {
   java
   checkstyle
   id("org.springframework.boot") version "3.5.0"
   id("io.spring.dependency-management") version "1.1.7"
   id("org.graalvm.buildtools.native") version "0.10.6"
-  id("org.cyclonedx.bom") version "2.3.1"
+  id("org.cyclonedx.bom") version "3.4.1"
   id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
-  id("com.axelixlabs.axelix") version "1.0.0"
+  id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
 }
 
 group = "org.springframework.samples"
@@ -41,7 +51,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0-SNAPSHOT") {
+  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.0-SNAPSHOT") {
     isChanging = true
   }
   implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -82,6 +92,7 @@ checkstyle {
 tasks.named<Checkstyle>("checkstyleNohttp") {
   configDirectory.set(project.file("src/checkstyle"))
   configFile = file("src/checkstyle/nohttp-checkstyle.xml")
+  notCompatibleWithConfigurationCache("The NoHTTP Checkstyle task captures the project model.")
 }
 
 tasks.wrapper {

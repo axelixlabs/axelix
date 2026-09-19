@@ -1,0 +1,6 @@
+# Fixture: 'quarkus' is not a platform Axelix curates (for now!). The loader must refuse the manifest.
+platform: quarkus
+lines:
+  - line: 3.15.x
+    releasedAt: 2024-09-11
+    ossSupportEndsAt: 2025-09-30

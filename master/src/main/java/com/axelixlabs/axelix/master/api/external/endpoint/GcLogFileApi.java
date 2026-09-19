@@ -17,11 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +26,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
@@ -50,7 +41,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
-@Tag(name = "GC Log File API", description = "API for managing GC logging and retrieving GC logs")
 @ExternalApiRestController
 public class GcLogFileApi {
 
@@ -63,32 +53,12 @@ public class GcLogFileApi {
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
-    @DefaultApiResponse(
-            summary = "Get GC log file for the given instance",
-            description = "Returns GC log file as plain text")
-    @ApiResponse(
-            description = "GC log file content",
-            responseCode = "200",
-            content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
-    @ApiResponse(
-            description = "GC logging not enabled",
-            responseCode = "404",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleApiError.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.GcLogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource getGcLogFile(@PathVariable("instanceId") String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_GC_LOG_FILE, NoHttpPayload.INSTANCE);
     }
 
-    @DefaultApiResponse(
-            summary = "Get GC logging status",
-            description = "Returns current GC logging status for the instance")
-    @ApiResponse(
-            description = "GC logging status",
-            responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = GcLogStatus.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.GcLogFileApi.STATUS_GC_LOGGING)
     public ResponseEntity<byte[]> getStatus(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
@@ -97,19 +67,11 @@ public class GcLogFileApi {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
-    @DefaultApiResponse(
-            summary = "Trigger garbage collection",
-            description = "Manually triggers garbage collection on the target instance")
-    @ApiResponse(description = "GC triggered successfully", responseCode = "200")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.GcLogFileApi.TRIGGER_GC)
     public void triggerGc(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.GC_TRIGGER, NoHttpPayload.INSTANCE);
     }
 
-    @DefaultApiResponse(summary = "Enable GC logging", description = "Enables GC logging with specified log level")
-    @ApiResponse(description = "GC logging enabled successfully", responseCode = "200")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING)
     public void enableGcLogging(
             @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
@@ -117,9 +79,6 @@ public class GcLogFileApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_GC_LOGGING, httpPayload);
     }
 
-    @DefaultApiResponse(summary = "Disable GC logging", description = "Disables GC logging for the instance")
-    @ApiResponse(description = "GC logging disabled successfully", responseCode = "200")
-    @InstanceIdParameter
     @PostMapping(path = ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING)
     public void disableGcLogging(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invokeNoValue(

@@ -25,7 +25,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
-import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.OAuth2AuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;

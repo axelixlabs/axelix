@@ -83,9 +83,14 @@ runs:
     - name: Set up Docker
       uses: docker/setup-docker-action@v5
 
+    - name: Build Master OSS boot JAR
+      shell: bash
+      run: ./gradlew :master-oss:bootJar
+
     - name: Build Docker Image
       shell: bash
-      run: docker build --tag axelix-local:security-scan --file Dockerfile .
+      # Build context is master-oss/ so the OSS Dockerfile's `COPY build/libs/master.jar` resolves.
+      run: docker build --tag axelix-local:security-scan --file master-oss/Dockerfile master-oss
 
     - name: Scan Docker Image (OS + Java JARs)
       uses: aquasecurity/trivy-action@v0.36.0

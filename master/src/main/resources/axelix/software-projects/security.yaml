@@ -1,0 +1,57 @@
+ecosystem: SECURITY
+projects:
+  - id: spring-security-oauth
+    name: Spring Security OAuth
+    status: SUNSET
+    summary: >-
+      Reached end of life in 2022 and moved to the Spring attic. Its OAuth 2.0 client and resource
+      server support was rebuilt inside Spring Security itself, and the authorization server became
+      the separate Spring Authorization Server project.
+    coordinates:
+      - org.springframework.security.oauth:spring-security-oauth2
+      - org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.security:spring-security-oauth2-client
+    reference:
+      label: Spring Security OAuth in the attic
+      url: https://github.com/spring-attic/spring-security-oauth
+
+  - id: unboundid-ldapsdk
+    name: UnboundID LDAP SDK
+    status: ACTIVE
+    summary: >-
+      Actively developed by Ping Identity.
+    coordinates:
+      - com.unboundid:unboundid-ldapsdk
+    reference:
+      label: UnboundID LDAP SDK
+      url: https://github.com/pingidentity/ldapsdk
+  - id: jjwt
+    name: JJWT
+    status: ACTIVE
+    summary: >-
+      Actively developed. A widely used library for creating and verifying JSON Web Tokens on the
+      JVM.
+    coordinates:
+      - io.jsonwebtoken:jjwt-api
+      - io.jsonwebtoken:jjwt-impl
+      - io.jsonwebtoken:jjwt-jackson
+      - io.jsonwebtoken:jjwt-gson
+    reference:
+      label: JJWT
+      url: https://github.com/jwtk/jjwt
+
+  - id: nimbus-jose-jwt
+    name: Nimbus JOSE + JWT
+    status: ACTIVE
+    summary: >-
+      Actively developed by Connect2id. The JOSE/JWT library Spring Security uses for OAuth 2.0
+      resource servers, together with the companion OAuth 2.0 / OpenID Connect SDK.
+    coordinates:
+      - com.nimbusds:nimbus-jose-jwt
+      - com.nimbusds:oauth2-oidc-sdk
+    reference:
+      label: Nimbus JOSE + JWT
+      url: https://connect2id.com/products/nimbus-jose-jwt
+

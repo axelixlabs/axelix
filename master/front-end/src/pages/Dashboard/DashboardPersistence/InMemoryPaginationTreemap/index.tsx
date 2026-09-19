@@ -58,7 +58,7 @@ export const InMemoryPaginationTreemap = ({ inMemoryPaginationEntries }: IProps)
         },
         {
             label: t("Dashboard.Persistence.statSecondLabel"),
-            value: `${maxCounter.appName}`,
+            value: `${maxCounter ? maxCounter.appName : "All Clear!"}`,
             color: "#7c3aed",
         },
     ];

@@ -19,28 +19,18 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
-import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -49,7 +39,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  *
  * @author Sergey Cherkasov
  */
-@Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @ExternalApiRestController
 public class CachesReadApi {
 
@@ -59,12 +48,6 @@ public class CachesReadApi {
         this.endpointInvoker = endpointInvoker;
     }
 
-    @DefaultApiResponse(summary = "Returns details of the application's caches.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CachesFeed.class)))
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getAllCaches(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
@@ -73,17 +56,6 @@ public class CachesReadApi {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
-    @DefaultApiResponse(summary = "Returns details of the requested cache by its name and cache manager name.")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SingleCache.class)))
-    @Parameter(name = "cacheName", description = "The name of the cache to find", required = true)
-    @Parameter(
-            name = "cacheManager",
-            description = "The name of the cache manager where the cache with the given 'cacheName' resides",
-            required = true)
-    @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.CACHE_NAME)
     public ResponseEntity<byte[]> getCacheByNameWithQueryParameter(
             @PathVariable("instanceId") String instanceId,

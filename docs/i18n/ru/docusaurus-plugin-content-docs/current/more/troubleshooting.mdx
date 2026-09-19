@@ -1,3 +1,5 @@
+import { LegacyNotice } from '@site/src/components';
+
 # Часто встречающиеся проблемы
 
 На этой странице описаны наиболее часто встречающиеся проблемы, возникающие при установке и настройке Axelix.
@@ -95,13 +97,19 @@ Axelix?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx
 
 ```properties
 server.port=9444
-management.endpoints.web.exposure.include=axelix-metadata
 axelix.sbs.auth.jwt.algorithm=HMAC256
 axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
 axelix.sbs.discovery.self-registration=true
 axelix.sbs.discovery.instance-name=your-application-name
 axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
 axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register
+```
+
+На версиях Axelix ниже 1.2.0 (не включительно) нужно ещё одно свойство — старые стартеры не открывают свои эндпоинты
+самостоятельно, а без `axelix-metadata` Master не сможет опросить инстанс:
+
+```properties
+management.endpoints.web.exposure.include=axelix-metadata
 ```
 
 Наконец, запустите сам Master как JAR с **тем же** алгоритмом и ключом подписи:
@@ -125,6 +133,13 @@ JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#запу�
 
 ## 4. Некоторые разделы сайдбара остаются пустыми после регистрации
 
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
+
 ### Симптом
 
 Инстанс появляется в Master, и его статус выглядит здоровым, но некоторые разделы сайдбара - Beans, Caches, Loggers и
@@ -143,5 +158,5 @@ Spring Boot по умолчанию скрывает кастомные actuator
 ### Решение
 
 Добавьте недостающие ID эндпоинтов в `management.endpoints.web.exposure.include` на стороне управляемого сервиса -
-полный список см. в разделе [Откройте доступ к Axelix
-actuator-эндпоинтам](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#откройте-доступ-к-axelix-actuator-эндпоинтам).
+полный список см. в разделе [Что открывает
+стартер](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#что-открывает-стартер).

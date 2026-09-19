@@ -1,0 +1,10 @@
+platform: spring-boot
+lines:
+  - line: 3.2.x
+    releasedAt: 2023-11-23
+    ossSupportEndsAt: 2024-12-31
+    commercialSupportEndsAt: 2025-12-31
+  - line: 3.3.x
+    releasedAt: 2024-05-23
+    ossSupportEndsAt: 2025-06-30
+    commercialSupportEndsAt: 2026-06-30

@@ -1,5 +1,6 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { LegacyNotice } from '@site/src/components';
 
 # Сборщик мусора
 
@@ -63,7 +64,14 @@ GC-логирование выключено по умолчанию. Пока �
               └─ временная метка (ISO-8601 с таймзоной)
 ```
 
-## Свойства
+## Включите Нужный Actuator Ендпоинт
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-gc`, который добавляет Axelix Spring Boot Starter. Откройте его
 через стандартные свойства Spring Boot Actuator — полный список эндпоинтов Axelix и сопутствующие настройки см. в

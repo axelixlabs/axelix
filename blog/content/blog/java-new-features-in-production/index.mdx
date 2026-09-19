@@ -1,0 +1,510 @@
+---
+title: "New Java Features Are Not Just for Interviews. Two Real-World Use Cases from Axelix"
+date: 2026-09-16
+authors: ["Mikhail Polivakha"]
+tags: ["Software Design"]
+heroImagePath: /posts/java-new-features-in-production/preview.png
+description: "Do modern Java features belong in production, or only in interviews and conference talks? Two real-world examples from Axelix show how ScopedValue and sealed interfaces encode application invariants and make incorrect code harder to write."
+metaDescription: "See how Axelix uses Java ScopedValue to propagate security context and sealed interfaces to protect domain invariants in real-world production code."
+---
+
+# New Java Features Are Not Just for Interviews. Two Real-World Use Cases from Axelix
+
+Hey everyone! Mikhail Polivakha here, technical lead of the [Axelix project](https://github.com/axelixlabs/axelix).
+
+Java moved to a six-month release cycle quite a while ago. Every six months, we get a new version, read about the latest JEPs, and watch conference talks. Then we go back to work and continue writing roughly the same code we were writing five years ago.
+
+And that is not necessarily a bad thing, by the way. Bringing a new feature into production merely because it is new is not exactly the most brilliant engineering strategy. Moreover, many applications are still running on Java 17, while Java 11 is alive and well in some places.
+
+But this raises a natural question:
+
+> Do new Java features have a place in ordinary, real-world applications? Not in a presentation, not in a toy pet project, but in code that solves an actual problem?
+
+Yes, they do.
+
+In this article, I will examine two examples from the open-source Axelix codebase:
+
+1. How we use `ScopedValue` to pass a security context from an HTTP filter deep into the transport layer.
+2. Why one of our interfaces became `sealed`, and not for pattern matching or an exhaustive `switch`.
+
+At first glance, these examples seem completely unrelated. One is about execution context, while the other is about the overall domain design. But they actually share one common idea: **a good language feature lets us turn an agreement between developers into a constraint enforced by the platform itself**.
+
+Well then, let's get started.
+
+## A Little Context About Axelix
+
+So that the code below does not look like a collection of random classes, let me first say a few words about the architecture.
+
+[Axelix](https://github.com/axelixlabs/axelix) is the Open Source product that helps to debug problems in Spring Boot applications and also detects common issues and inefficiencies in them. In simplified terms, the system consists of two parts:
+
+- Axelix Master aggregates information, handles the RBAC and provides a UI and a built-in MCP server.
+- Spring Boot starters, together with a small Build Plugin, are installed in the monitored applications and provide Master with the necessary data and operations.
+
+When a user invokes an operation through the UI or an AI Agent, Master sometimes has to contact the starter of a particular application. For example, it may request the environment state, retrieve information about beans, or clear a cache.
+
+And this is where a security-related requirement comes into play: **Master has to pass the starter the authorization token associated with the security context in which the operation is being executed**.
+
+The token appears fairly high up, inside a servlet filter. It is needed much further down, in the transport layer where the outgoing HTTP request is built.
+
+Of course, we could add a `SecurityContext` parameter to every method between these two points. Then to five more methods. Then to ten. And six months later, we would discover that half of the application is busy with the fascinating task of moving a token from one argument to another.
+
+Although that works too, we wanted to find a better solution.
+
+## Use Case One. Passing Context Through `ThreadLocal`
+
+Historically, the standard solution to this kind of problem in Java has been `ThreadLocal`. Spring Security, for example, used to work this way.
+
+The idea is very simple:
+
+```java
+private static final ThreadLocal<SecurityContext> CONTEXT = new ThreadLocal<>();
+
+void runWithinContext(Runnable action, SecurityContext context) {
+    SecurityContext previous = CONTEXT.get();
+    try {
+        CONTEXT.set(context);
+        action.run();
+    } finally {
+        if (previous == null) {
+            CONTEXT.remove();
+        } else {
+            CONTEXT.set(previous);
+        }
+    }
+}
+```
+
+Code running further down the call stack in the same thread can call `CONTEXT.get()` and obtain the required value. There is no need to pass the parameter through every intermediate method.
+
+So where is the problem?
+
+### `ThreadLocal` Gives Us More Capabilities Than We Need
+
+The first and fairly well-known problem with `ThreadLocal` is that any code with a reference to it can call not only `get()`, but also `set()` or `remove()`. In other words, a `ThreadLocal` is essentially shared mutable state, and **experienced engineers know that this is a torpedo lodged in the side of our "ship"**.
+
+The calling code stores the context of the authenticated user, but some distant callee can theoretically replace that context. Some tasks genuinely require this kind of mutability. In our case, however, the data flows strictly in one direction:
+
+1. The filter authenticates the user.
+2. The filter creates a `SecurityContext`.
+3. The code further down only reads that context.
+
+Nothing further down the stack should change the user's identity. We do not merely have no need for this capability, but **it effectively represents a security breach!** Suppose, for example, that some third-party implementation of an SPI interface can mess with the `SecurityContext`. That would be a serious problem.
+
+But `ThreadLocal` has another issue. The lifetime of a value in a `ThreadLocal` is not constrained by the structure of the code. We are responsible for calling `remove()`, usually in a `finally` block. Why is that a problem?
+
+Imagine that, for whatever reason, and the exact reason does not matter, we fail to clear the user's identity from the `ThreadLocal` after processing an HTTP request. We then receive another request that happens to run on the same thread from the pool. For now, let's leave virtual threads and the thread-per-task execution model aside, since that is a separate topic altogether. The security context from one request may now leak into another request.
+
+Now imagine that the `SecurityContext` left in the pool belonged to a user with the `ADMIN` role, which allows them not only to read application properties but also to view sensitive values. By default, Axelix has its own policy for handling sensitive values. These values are configured through separate properties, and only an `ADMIN` is allowed to read them. By leaving a user with the `ADMIN` role in our `SecurityContext`, we may effectively allow someone without that role to see secrets through either the UI or the MCP server.
+
+Of course, a careful developer will write a `try/finally`. They will cover the code with tests. They will leave a comment. But if the correctness of the solution depends entirely on every future developer remembering an important comment, that is far from the strongest guarantee.
+
+## `ScopedValue`. Not Storage, but a Bounded Execution Scope
+
+In Java 25, `ScopedValue` was finalized. It solves a narrower problem than `ThreadLocal`: it allows a value to be passed down the call chain for the duration of a particular operation.
+
+The key difference lies in the model itself. A `ThreadLocal` resembles a mutable box attached to a thread. A `ScopedValue` describes the binding of a value within a dynamic execution scope.
+
+This is how we use it to pass the [`SecurityContext` in Axelix Master](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/service/auth/ScopedValueSecurityContextExecutor.java):
+
+```java
+private static final ScopedValue<SecurityContext> SECURITY_CONTEXT =
+        ScopedValue.newInstance();
+
+public <V, T extends Exception> V callWithinSecurityContext(
+        ThrowingCallable<V, T> callable,
+        SecurityContext securityContext) throws T {
+
+    return ScopedValue
+            .where(SECURITY_CONTEXT, securityContext)
+            .call(callable::call);
+}
+```
+
+The `where(...).call(...)` invocation means approximately the following:
+
+> Execute this callback so that, within its dynamic scope, this `ScopedValue` is bound to this `SecurityContext`.
+
+When the callback finishes, the binding disappears automatically. It does not matter whether execution completes normally or throws an exception, because `ScopedValue` is designed to handle that case as well.
+
+Reading the context looks like this:
+
+```java
+public Optional<SecurityContext> getSecurityContext() {
+    if (SECURITY_CONTEXT.isBound()) {
+        return Optional.of(SECURITY_CONTEXT.get());
+    }
+    return Optional.empty();
+}
+```
+
+Notice that `ScopedValue` itself has no `set` method. Code further down can read the binding, but it cannot simply replace its value. If the same `ScopedValue` needs to be temporarily bound to a different value, a new nested scope is created. Once that scope ends, the previous binding becomes visible again.
+
+In other words, the semantics we need are already expressed in the API:
+
+- the value moves down the call stack;
+- the binding exists only within a particular operation;
+- a callee cannot mutate the binding;
+- leaving the scope reliably restores the previous state.
+
+This is exactly the kind of case where a new Java feature does not merely save a few lines involving `finally`, but **makes the correct model apparent from the code itself**.
+
+## How It Works in a Real Request
+
+Now let's put the whole flow together.
+
+For a regular UI request handled by [`ExternalApiCookieAuthorizationFilter`](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/filter/auth/ExternalApiCookieAuthorizationFilter.java), we obtain a JWT from a cookie, decode the user, and execute the remaining filter chain inside the security context:
+
+```java
+securityContextExecutor.runWithinSecurityContext(
+        () -> filterChain.doFilter(request, response),
+        new DefaultSecurityContext(user, token)
+);
+```
+
+For an MCP invocation, the IAM flow is similar but slightly different. You can [see the source code here](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/filter/auth/McpAuthorizationFilter.java) if you are interested. I will not spend time on it now.
+
+The regular application logic then runs inside the filter chain. It may pass through controllers, services, and other abstractions. They do not need the token at all, so we do not pollute their APIs with it.
+
+The context is finally read in [`AbstractEndpointProber`](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/service/transport/AbstractEndpointProber.java), immediately before sending the request to the starter:
+
+```java
+SecurityContext securityContext = securityContextExecutor
+        .getSecurityContext()
+        .orElseThrow(() -> new IllegalStateException(
+                "Security Context is expected to be bound"));
+
+builder.header(
+        HttpHeaders.AUTHORIZATION,
+        AuthenticationSchemes.BEARER.prefix() + securityContext.token()
+);
+```
+
+Once request processing finishes, the binding is removed, and the token can no longer be obtained through this `ScopedValue`. Pretty neat!
+
+## Some Limitations of `ScopedValue`
+
+I think it is only fair to mention a few limitations of this API. Overall, they are quite acceptable for us at the moment.
+
+### The Binding Is Tied to a Thread
+
+`ScopedValue` is not automatically propagated to an arbitrary `CompletableFuture`, executor task, or asynchronous servlet operation.
+
+The current Axelix code works because proxying the request to the starter, where the binding is read and the `Authorization` header is set, happens synchronously inside the filter chain on the same thread. Child tasks can inherit a binding through `StructuredTaskScope`, but in Java 25 that is still a Preview API.
+
+If you place a value in a `ScopedValue` and then submit a task to some random thread pool, you cannot expect the value to be available there.
+
+### The Binding Is Immutable, but the Object Might Not Be
+
+`ScopedValue` does not allow the binding itself to be replaced. But if you put a mutable object inside it, its fields can still be changed using ordinary methods. This issue is not specific to `ScopedValue`. It also applies to `ThreadLocal` and a number of other APIs. Consider this example:
+
+```java
+ScopedValue<List<String>> VALUE = ScopedValue.newInstance();
+```
+
+The binding of the list itself is stable here. Nevertheless, nothing prevents someone from calling `VALUE.get().add(...)`, so the mutability question remains. Again, this problem is not unique to `ScopedValue`, but it is worth keeping in mind.
+
+### It Is Not a Universal Replacement for Parameters
+
+Generally speaking, a value can be passed to a method either explicitly, through its signature, or implicitly, through contexts of this kind. From a code maintainability perspective, if a value is an important part of a method's contract, an ordinary parameter is almost always better. In that case, **the API contract is clearly visible in the signature**.
+
+You do not end up in a situation where the interface says this:
+
+```java
+public interface EndpointProber<O> {
+
+    O invoke(HttpPayload payload);
+}
+```
+
+while the implementation is actually doing something like this under the hood:
+
+```java
+public class DefaultEndpointProber<O> implements EndpointProber<O> {
+
+    // Declared somewhere else, in another class
+    private static final ScopedValue<InstanceId> TARGET_INSTANCE =
+            ScopedValue.newInstance();
+
+    @Override
+    public O invoke(HttpPayload payload) {
+        String accessToken = TARGET_INSTANCE.orElseGet(payload.getToken());
+
+        return probe(instanceId, payload);
+    }
+}
+```
+
+The code above is deceptive because the caller may think they have passed the token to use for the invocation, while in reality some other token source takes precedence. Again, this is not a problem specific to `ScopedValue`. I simply thought it was worth highlighting. Experienced engineers most likely know this already.
+
+In general, `ScopedValue` and `ThreadLocal` are especially useful for context that is needed far down the call stack but is unrelated to most of the intermediate methods:
+
+- security context;
+- tracing context;
+- tenant-id context;
+- request metadata.
+
+In other words, the need for one-way context propagation must come first. Only then should `ScopedValue` enter the picture.
+
+### A Small Conclusion
+
+Use `ScopedValue` when a value should only travel down the call chain and should live no longer than one bounded operation.
+
+If you need arbitrary mutation, integration with legacy code, or support for an older Java version, `ThreadLocal` is not going anywhere. Just make sure to encapsulate the `set` and `remove` operations properly.
+
+## Use Case Two. What Do `sealed` Interfaces Have to Do with It?
+
+Now let's move on to a completely different problem. Or, as will soon become clear, perhaps not entirely different.
+
+I want to warn you right away that **the solution below is somewhat debatable, and I explain why later**. I am describing it largely to share our experience and hear what other people think in the comments. Nevertheless, this is exactly what we did.
+
+Axelix Master has a built-in MCP server. An AI Agent can invoke MCP tools, including both read operations and potentially dangerous operations, such as clearing a cache. As part of RBAC, we obviously need to check access rights for operations of this kind as well.
+
+Different MCP endpoints require different authorities. In simplified terms, Axelix Master has a structure like this:
+
+```java
+private static final Map<McpEndpoint, Authority> MAPPING;
+
+static {
+    MAPPING = new HashMap<>(2);
+    MAPPING.put(McpEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
+    MAPPING.put(McpEndpoints.CLEAR_SPECIFIC_CACHE, OssAuthority.CACHES_CLEAR);
+   // and so on.
+}
+```
+
+When we receive a JSON-RPC request to invoke an MCP tool, we parse the request and turn the string name of the MCP endpoint that the caller tried to invoke into an `McpEndpoint` object. We then use that object as a `Map` key and obtain the required authority.
+
+_Why use it as a key?_ Because it makes sense from the domain perspective: invoking a particular operation within the MCP server requires a particular authority. Having this kind of mapping seems to be quite right.
+
+_Could we simply use a `String` as the key?_ Technically, yes, but that would introduce its own inconveniences given our implementation and class structure. I will not go into those details now.
+
+Suppose that `McpEndpoint` is an interface. At this point, an experienced engineer reaches for the Colt on their belt!
+
+```java
+public interface McpEndpoint {
+    String name();
+}
+```
+
+It is just an interface. What could possibly go wrong?
+
+## A Potentially Mutable `HashMap` Key. A Time Bomb
+
+Why did the experienced engineer reach for the Colt? Because, broadly speaking, `McpEndpoint` is an interface, and we do not know what its implementations might look like. Keys in a `Map` should be immutable, which is a [widely known fact](https://stackoverflow.com/questions/34060994/why-are-keys-immutable-in-java).
+
+Imagine that someone implements the open interface like this:
+
+```java
+final class MutableMcpEndpoint implements McpEndpoint {
+
+    private String name;
+
+    MutableMcpEndpoint(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    void rename(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof MutableMcpEndpoint endpoint
+                && Objects.equals(name, endpoint.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+}
+```
+
+Now let's put this endpoint into a `HashMap` and then change its name:
+
+```java
+var endpoint = new MutableMcpEndpoint("clearAllCaches");
+var mapping = new HashMap<McpEndpoint, Authority>();
+
+mapping.put(endpoint, OssAuthority.CACHES_CLEAR);
+endpoint.rename("clearSomethingElse");
+
+Authority authority = mapping.get(endpoint); // surprise!
+```
+
+During `put`, the `HashMap` selected a bucket based on the old `hashCode`. After `rename`, the object returns a different `hashCode`, but it is still physically located in the old bucket. A lookup may fail to find a key that is literally present inside the very same `Map`.
+
+As a result, we could end up in a situation where we simply fail to detect that a particular `McpEndpoint` requires an `Authority` for its execution. **That is yet another security breach!**
+
+Of course, we could write the following in the Javadoc:
+
+> All implementations of `McpEndpoint` must be immutable and have stable `equals` and `hashCode` implementations.
+
+But once again, correctness would depend on a comment.
+
+## `sealed` Is Not Just for `switch`
+
+Sealed classes and interfaces were finalized as a language feature back in [Java 17](https://openjdk.org/jeps/409). They are usually explained using a closed hierarchy of shapes:
+
+```java
+sealed interface Shape permits Circle, Rectangle {
+}
+```
+
+The compiler then knows the complete set of alternatives and can verify exhaustive pattern matching. This is useful, but it is far from the only use case.
+
+If you think about it, the very nature of a sealed type as a language feature means that we do not merely know, but **have control over every possible implementation of the interface**. That control can cover different properties, including, importantly for us, **the enforcement of immutability!**
+
+This is what [`McpEndpoint` in Axelix](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/mcp/McpEndpoint.java) looks like:
+
+```java
+public sealed interface McpEndpoint permits DefaultMcpEndpoint {
+
+    String name();
+}
+```
+
+The only permitted implementation is a [`record`](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/mcp/DefaultMcpEndpoint.java):
+
+```java
+public record DefaultMcpEndpoint(String name) implements McpEndpoint {
+}
+```
+
+What does this combination give us?
+
+1. Arbitrary code cannot add an unknown implementation of `McpEndpoint`.
+2. As I said earlier, we control all permitted implementations.
+3. The current implementation is a `record`, so its components cannot be reassigned after creation.
+4. Its only component is a `String`, which is itself immutable.
+5. The record generates component-based `equals` and `hashCode` implementations, based here on the stable `name` component.
+
+As a result, every `McpEndpoint` that can currently be placed into the `Map` has the key semantics we need.
+
+And this is an important, though not entirely obvious, use case for a sealed interface: **we close the hierarchy because the algorithm relies on the properties of every implementation**.
+
+It is fair to say that we are effectively relying on an implementation property while working with a contract, which is a violation of SOLID. **That is all true**.
+
+Nevertheless, sealed types are, by their very nature, designed around knowing the complete set of implementations in advance and doing things such as exhaustive `switch` statements. Strictly speaking, that also violates SOLID because we rely on implementations instead of working purely with an abstraction. There is room for a productive discussion here.
+
+## Why Not Use an `enum`?
+
+That is a natural question. If the set of MCP endpoints is fixed, why not simply do this:
+
+```java
+enum McpEndpoint {
+    CLEAR_ALL_CACHES("clearAllCaches"),
+    CLEAR_SPECIFIC_CACHE("clearSpecificCacheEntity"),
+
+    // and so on...
+    ;
+
+    private final String toolName;
+
+    McpEndpoint(String toolName) {
+        this.toolName = toolName;
+    }
+
+    String toolName() {
+        return toolName;
+    }
+}
+```
+
+This is a perfectly valid alternative. Moreover, for a permanently fixed set of endpoints, an `enum` would provide an even stronger guarantee: not only the implementations but also **the instances** themselves would form a closed set.
+
+So why might the interface still make sense? Because for us enums are too inflexible and, in particular, cannot be extended. Different Axelix Master distributions may have different `McpEndpoint` instances, while an enum could not be extended to accommodate them.
+
+Nevertheless, always remember that **extensibility is not free. Leave an extension point only where you genuinely need one.**
+
+It is also important to remember that the sealed model does not guarantee:
+
+- unique endpoint names;
+- registration of every new endpoint in all `Map` mappings of this kind;
+- correctness of the authority mapping itself.
+
+Did you add a new constant and forget to register it in one of the resolvers? `javac` will not save you here. That requires different data models and tests.
+
+In our particular case, `sealed` solves one particular problem. And that is fine. We should not expect a language feature to wash the dishes and deploy a release in-between.
+
+In other words, this is a balance between extensibility and immutability.
+
+## What These Two Features Have in Common
+
+Now let's return to the beginning of the article.
+
+`ScopedValue` and a `sealed interface` look like completely different Java features:
+
+- `ScopedValue` works with the execution context.
+- A `sealed interface` works with the type system.
+
+But in our two use cases, they solve the same engineering problem: **they reduce the set of valid program states**.
+
+With `ScopedValue`, we say:
+
+> A value can be bound to a `ScopedValue` only for a bounded period of time. Code further down can read it but cannot arbitrarily overwrite it.
+
+With a `sealed interface`:
+
+> The abstraction is available throughout the application, but only types under our control can implement it.
+
+This fits well with the overall direction of the platform that Java architects call [`Integrity by Default`](https://openjdk.org/jeps/8305968): correct and safe behavior should be the default, while a dangerous exception should require an explicit decision.
+
+In my opinion, this is exactly how new language features should be evaluated. Not by the number of lines they allow us to remove, and not by how elegant they look in a conference talk. The real question is:
+
+> Which invariant of my application does this feature allow me to express and protect?
+
+If there is no answer, perhaps you do not need the feature yet. If there is an answer, then it is no longer a toy.
+
+## Practical Recommendations
+
+Let's sum things up.
+
+### When to Consider `ScopedValue`
+
+Use `ScopedValue` if:
+
+1. Data only travels down the call chain.
+2. Intermediate methods should not have to accept it as a parameter.
+3. A callee should not replace the binding.
+4. The lifetime of the data matches a bounded operation.
+
+Keep using an ordinary parameter if the dependency is an important part of the method's contract. Keep using `ThreadLocal` if you need mutation, legacy integration, or support for an older Java version.
+
+### When to Consider `sealed`
+
+Use a sealed class or interface if:
+
+1. The abstraction must be broadly visible.
+2. The set of implementations must remain under the author's control.
+3. The code relies on the properties of all permitted implementations.
+
+### The Invariant Comes First, Then the Feature
+
+Do not go looking for somewhere to put a `ScopedValue`, sealed class, record pattern, or virtual thread merely because you can. As everyone knows, we never do that, right? Right...?
+
+First, identify an actual constraint in the system:
+
+- this context must not leak beyond the request boundary;
+- this binding must not be changed from below;
+- this hierarchy must not be extended by unknown types;
+- this object must have stable value semantics.
+
+Only then should you choose the language feature that expresses that constraint.
+
+## Closing Thoughts
+
+New Java features really are used in real-world applications. But their value does not appear when we replace old syntax with new syntax. It appears when an entire class of incorrect programs becomes harder to write or impossible to compile.
+
+In Axelix, `ScopedValue` gave the security context a bounded lifetime and safe propagation down the call stack. A `sealed interface` allowed us to keep the domain abstraction public while retaining control over the semantics of its implementations and still permitting new `McpEndpoint` instances to be created.
+
+Both features reduced the room for error. And that, in my opinion, is one of the main things we want from a programming language.
+
+The source code is open, so you can [inspect all the examples directly in the Axelix repository](https://github.com/axelixlabs/axelix).
+
+Take care!

@@ -17,14 +17,10 @@
  */
 package com.axelixlabs.axelix.master.api.external.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * Response for cron expression syntax validation.
  *
  * @param valid indicates whether cron expression is valid
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskCronExpressionValidationResponse(
-        @Schema(description = "Indicates whether cron expression is valid", example = "true")
-        boolean valid) {}
+public record ScheduledTaskCronExpressionValidationResponse(boolean valid) {}

@@ -1,3 +1,4 @@
+import net.ltgt.gradle.errorprone.errorprone
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -5,6 +6,7 @@ plugins {
     id("shared")
     id("java-test-fixtures")
     kotlin("jvm") version "2.4.10"
+    id("contracts")
 }
 
 val springBootTestPlatformVersion = "2.7.18"
@@ -14,6 +16,12 @@ val jsonUnitAssertJVersion = "2.40.1"
 dependencies {
     // Self
     api(project(":common"))
+
+    // Compile: the generated contract classes carry Jackson annotations, which is the only piece
+    // of Jackson we allow in this module: the annotations are honored by both Jackson 2 (Spring
+    // Boot 2/3 starters) and Jackson 3 (Spring Boot 4 starter), and the compileOnly scope leaks
+    // nothing onto the user's classpath.
+    compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.13.5")
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
@@ -33,6 +41,19 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.release = 11
     options.compilerArgs.add("-parameters")
+}
+
+contracts {
+    modelBasePackage.set("com.axelixlabs.axelix.sbs.spring.core.contract")
+}
+
+// The generated contract classes cannot pass NullAway: a required property is non-null under
+// JSpecify, yet the generator emits a Jackson-friendly no-arg constructor that leaves its field
+// uninitialized.
+tasks.named<JavaCompile>("compileJava") {
+    options.errorprone {
+        option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.sbs.spring.core.contract(\\..*)?")
+    }
 }
 
 testing {

@@ -37,13 +37,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.SuperAdminConfigurationProperties;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.domain.UserOrigin;
-import com.axelixlabs.axelix.master.domain.UserStatus;
+import com.axelixlabs.axelix.master.domain.iam.UserEntity;
+import com.axelixlabs.axelix.master.domain.iam.UserOrigin;
+import com.axelixlabs.axelix.master.domain.iam.UserStatus;
 import com.axelixlabs.axelix.master.exception.auth.EmailAlreadyExistsException;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.exception.auth.UserStatusChangeNotAllowedException;
 import com.axelixlabs.axelix.master.exception.auth.UsernameAlreadyExistsException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
 
@@ -52,6 +53,7 @@ import com.axelixlabs.axelix.master.repository.UserRepository;
  *
  * @author Sergey Cherkasov
  * @author Vyacheslav Yanin
+ * @author Nikita Kirillov
  */
 @Service
 @NullMarked
@@ -198,8 +200,10 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void updateStatus(String id, UserStatus status) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        if (user.userOrigin() != UserOrigin.LOCAL) {
+            throw new UserStatusChangeNotAllowedException(id, user.userOrigin());
         }
 
         userRepository.updateStatus(id, status);

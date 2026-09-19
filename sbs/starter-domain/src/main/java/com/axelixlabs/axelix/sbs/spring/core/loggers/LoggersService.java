@@ -17,10 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
-import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
 import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.GroupLogLevelChangeRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LogLevelChangeRequest;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 
@@ -67,7 +68,7 @@ public interface LoggersService {
      * @throws LoggerNotFoundException in case the logger group with the given name cannot be found.
      * @throws LogLevelNotFoundException in case the log level specified in request cannot be found.
      */
-    void changeLogLevelByGroupName(String groupName, LogLevelChangeRequest changeRequest)
+    void changeLogLevelByGroupName(String groupName, GroupLogLevelChangeRequest changeRequest)
             throws LoggerNotFoundException, LogLevelNotFoundException;
 
     /**

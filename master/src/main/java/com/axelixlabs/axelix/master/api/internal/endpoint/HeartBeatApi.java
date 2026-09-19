@@ -19,11 +19,11 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -42,7 +43,6 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  *
  * @author Sergey Cherkasov
  */
-@Hidden
 @InternalApiRestController
 @ConditionalOnProperty(
         prefix = "axelix.master.discovery.self-registration",
@@ -57,20 +57,33 @@ public class HeartBeatApi {
     private final InstanceFactory instanceFactory;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
+    private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
 
     public HeartBeatApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
+        this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
     }
 
     @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
+
+        String starterVersion = request.getBasicRegistrationMetadata().getVersion();
+
+        if (!compatibilityDetectionStrategy.isCompatible(starterVersion)) {
+            log.warn(
+                    "Rejecting self-registration request from '{}': its Axelix starter version '{}' is not supported by this Axelix Master",
+                    request.getInstanceName(),
+                    starterVersion);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
 
         try {
             Instance instance = instanceFactory.createInstance(

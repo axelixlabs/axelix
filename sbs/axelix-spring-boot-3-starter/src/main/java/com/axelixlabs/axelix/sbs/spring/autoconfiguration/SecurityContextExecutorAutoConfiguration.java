@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExec
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
 public class SecurityContextExecutorAutoConfiguration {
 
     @Bean
