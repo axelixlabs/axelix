@@ -6,7 +6,11 @@ info:
     The Axelix Master <-> starter contract of the 'scheduled-task-disable' operation.
     This operation disables a scheduled task of the Spring Boot app, so that it is no longer
     executed on its regular schedule.
-  x-axelix-introduced-in: 1.0.0
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
   x-axelix-server: starter
 paths:
   /actuator/axelix-scheduled-tasks/disable:
@@ -45,4 +49,4 @@ components:
         trigger:
           type: string
           description: The identifier of the scheduled task to disable.
-          x-axelix-introduced-in: 1.0.0
+          x-axelix-introduced-in: 1.2.0

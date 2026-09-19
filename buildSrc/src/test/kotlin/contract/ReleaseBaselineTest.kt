@@ -17,7 +17,6 @@ import org.junit.jupiter.api.io.TempDir
 class ReleaseBaselineTest {
 
     companion object {
-        private const val CURRENT_VERSION = "1.2.0-SNAPSHOT"
         private const val CONTRACT_PATH = "common/src/main/resources/contract/logger/logger-level-change.yaml"
 
         private val COMMITTER = PersonIdent("test", "test@axelix.io")
