@@ -1,4 +1,4 @@
-import contract.ContractDocuments
+import contract.ContractDocumentsValidator
 import contract.ContractsExtension
 import org.gradle.api.plugins.quality.Pmd
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
@@ -19,6 +19,9 @@ val contracts = extensions.create<ContractsExtension>("contracts")
 val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { include("**/*.yaml") }
     .sortedBy { it.absolutePath }
     .map { document ->
+        // A local, so that the doFirst closure below captures a plain String instead of a
+        // reference to the whole script object, which the configuration cache cannot serialize.
+        val currentVersion = version.toString()
         val featurePackage = document.parentFile.name.replace("-", "")
         val operation = document.nameWithoutExtension
         val outputRoot = layout.buildDirectory.dir("generated/openapi/$operation").get().asFile
@@ -42,7 +45,7 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             ))
 
             doFirst {
-                ContractDocuments.validate(document)
+                ContractDocumentsValidator.validate(document, currentVersion)
             }
 
             // The generator offers no option to suppress the @Generated annotation, so it is
