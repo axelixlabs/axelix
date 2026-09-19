@@ -37,6 +37,16 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
     }
 
     /**
+     * Every operation the document describes, e.g. "POST /actuator/axelix-loggers", regardless
+     * of the one-operation rule the invariants enforce on top of this list.
+     */
+    val operations: List<String> = root.path("paths").properties().flatMap { (path, pathItem) ->
+        pathItem.properties()
+            .filter { (key, _) -> key in HTTP_METHODS }
+            .map { (method, _) -> "${method.uppercase()} $path" }
+    }
+
+    /**
      * The names of the schemas that **travel in a payload produced by the starter**.
      *
      * 1. Responses when the starter answers the call
@@ -111,6 +121,9 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
         const val SERVER = "x-axelix-server"
 
         val SERVER_SIDES = setOf("starter", "master")
+
+        private val HTTP_METHODS =
+            setOf("get", "put", "post", "delete", "options", "head", "patch", "trace")
 
         /**
          * The compatibility window is 4 minors including the current one, so an action gated on

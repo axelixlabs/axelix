@@ -3,6 +3,7 @@ package contract
 import contract.invariants.ContractInvariant
 import contract.invariants.DeprecatedIsRemovedAfterTheWindow
 import contract.invariants.DeprecationFollowsIntroduction
+import contract.invariants.DocumentDescribesOneOperation
 import contract.invariants.IntroductionIsDeclared
 import contract.invariants.MarkersAreWellFormed
 import contract.invariants.RequiredHonoursTheWindow
@@ -18,6 +19,7 @@ import org.gradle.api.GradleException
 object ContractDocumentsValidator {
 
     private val INVARIANTS: List<ContractInvariant> = listOf(
+        DocumentDescribesOneOperation,
         ServerIsDeclared,
         IntroductionIsDeclared,
         MarkersAreWellFormed,

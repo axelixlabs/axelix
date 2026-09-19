@@ -105,6 +105,21 @@ class ContractDocumentsValidatorTest {
             currentVersion = "1.4.0-SNAPSHOT")
     }
 
+    @Test
+    fun `a document with two operations fails`() {
+        expectProblem(
+            "two-operations.yaml",
+            "the document must describe exactly one operation, but describes 2: "
+                + "GET /actuator/axelix-loggers, POST /actuator/axelix-loggers/logger/{name}/reset")
+    }
+
+    @Test
+    fun `a document without operations fails`() {
+        expectProblem(
+            "no-operations.yaml",
+            "the document must describe exactly one operation, but describes none")
+    }
+
     private fun expectProblem(
         documentName: String, expectedProblem: String, currentVersion: String = CURRENT_VERSION) {
         try {
