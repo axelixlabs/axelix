@@ -3,6 +3,7 @@ package contract
 import contract.invariants.stateful.DeprecationMarkerMustOnlyAppearInTheCurrentRelease
 import contract.invariants.stateful.IntroductionMarkerMustNeverChange
 import contract.invariants.stateful.NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease
+import contract.invariants.stateful.PropertyTypeAndFormatMustNeverChange
 import contract.invariants.stateful.ReleaseBaseline
 import contract.invariants.stateful.StatefulContractInvariant
 import contract.invariants.stateless.DeprecatedIsRemovedAfterTheWindow
@@ -37,6 +38,7 @@ object ContractDocumentsValidator {
         NewPartsMustBeMarkedAsIntroducedInTheCurrentRelease,
         IntroductionMarkerMustNeverChange,
         DeprecationMarkerMustOnlyAppearInTheCurrentRelease,
+        PropertyTypeAndFormatMustNeverChange,
     )
 
     /**
