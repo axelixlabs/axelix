@@ -17,8 +17,11 @@
  */
 package com.axelixlabs.axelix.master.utils.auth;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+
+import org.awaitility.core.ThrowingRunnable;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +44,7 @@ import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -129,30 +133,47 @@ public abstract class AbstractProtectedEndpointTest {
     public record TestableMasterWebEndpoint(MasterWebEndpoint target, String url) {}
 
     protected void assertSuccessfulCallback(MasterWebEndpoint expectedTarget, User expectedActor) {
-        assertThat(capturingIamWebInterceptor.successfulEndpoint())
-                .isNotNull()
-                .extracting(MasterWebEndpoint::operationCode)
-                .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamWebInterceptor.actor().getUsername()).isEqualTo(expectedActor.getUsername());
-        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
-        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+        awaitCallback(() -> {
+            assertThat(capturingIamWebInterceptor.successfulEndpoint())
+                    .isNotNull()
+                    .extracting(MasterWebEndpoint::operationCode)
+                    .isEqualTo(expectedTarget.operationCode());
+            assertThat(capturingIamWebInterceptor.actor().getUsername()).isEqualTo(expectedActor.getUsername());
+            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+            assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+        });
     }
 
     protected void assertAuthenticationFailure(MasterWebEndpoint expectedTarget) {
-        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint())
-                .isNotNull()
-                .extracting(MasterWebEndpoint::operationCode)
-                .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
-        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+        awaitCallback(() -> {
+            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint())
+                    .isNotNull()
+                    .extracting(MasterWebEndpoint::operationCode)
+                    .isEqualTo(expectedTarget.operationCode());
+            assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
+            assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+        });
     }
 
     protected void assertAccessDenied(MasterWebEndpoint expectedTarget) {
-        assertThat(capturingIamWebInterceptor.accessDeniedEndpoint())
-                .isNotNull()
-                .extracting(MasterWebEndpoint::operationCode)
-                .isEqualTo(expectedTarget.operationCode());
-        assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
-        assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+        awaitCallback(() -> {
+            assertThat(capturingIamWebInterceptor.accessDeniedEndpoint())
+                    .isNotNull()
+                    .extracting(MasterWebEndpoint::operationCode)
+                    .isEqualTo(expectedTarget.operationCode());
+            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+            assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+        });
+    }
+
+    /**
+     * The IAM callbacks are invoked by the auth filter only after {@code filterChain.doFilter(..)} returns,
+     * while Spring MVC flushes the response body to the client earlier, inside the chain. The test thread may
+     * therefore observe the HTTP response before the server thread has recorded the callback in
+     * {@link CapturingIamWebInterceptor}, so a one-shot assertion on the captured state is racy. Polling with
+     * Awaitility until the assertions hold closes that window.
+     */
+    private void awaitCallback(ThrowingRunnable assertions) {
+        await().pollDelay(Duration.ZERO).atMost(Duration.ofSeconds(5)).untilAsserted(assertions);
     }
 }
