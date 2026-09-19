@@ -20,6 +20,12 @@ object ContractDocumentsValidator {
     private val VERSION_FORMAT = Regex("""(\d+)\.(\d+)\.(\d+)""")
 
     /**
+     * The compatibility window is 4 minors including the current one, so an action gated on a
+     * marker becomes legal once the current minor is ahead of the marker by this much.
+     */
+    private const val WINDOW_MINORS = 3
+
+    /**
      * Verified that the contract documents aligns with the backward compabilitiby guarnatees.
      */
     fun validate(document: File, currentVersionString: String) {
@@ -31,14 +37,42 @@ object ContractDocumentsValidator {
         val problems = mutableListOf<String>()
 
         val info = root.path("info")
-        if (info.path(SERVER).asText("") !in SERVER_SIDES) {
+        val server = info.path(SERVER).asText("")
+        if (server !in SERVER_SIDES) {
             problems += "the 'info' block must declare '$SERVER' as one of $SERVER_SIDES"
         }
-        validateMarkers(info, "the 'info' block", currentVersion, problems)
+        val infoMarkers = validateMarkers(info, "the 'info' block", currentVersion, problems)
+
+        if (infoMarkers.deprecated != null && windowPassed(infoMarkers.deprecated, currentVersion)) {
+            problems += ("the operation was deprecated in ${infoMarkers.deprecated} and the "
+                + "compatibility window has passed: remove the document")
+        }
+
+        val starterProduced = if (server in SERVER_SIDES) starterProducedSchemas(root, server) else emptySet()
 
         root.path("components").path("schemas").properties().forEach { (schemaName, schema) ->
+            val required = schema.path("required").map { name -> name.asText() }.toSet()
+
             schema.path("properties").properties().forEach { (propertyName, property) ->
-                validateMarkers(property, "the property '$schemaName.$propertyName'", currentVersion, problems)
+                val location = "the property '$schemaName.$propertyName'"
+                val markers = validateMarkers(property, location, currentVersion, problems)
+
+                // A property added to a starter-produced payload after the birth of the feature
+                // is not sent by the older starters within the compatibility window, so the
+                // Master cannot rely on its presence until the window has passed.
+                if (schemaName in starterProduced && propertyName in required
+                    && markers.introduced != null && infoMarkers.introduced != null
+                    && markers.introduced > infoMarkers.introduced
+                    && !windowPassed(markers.introduced, currentVersion)) {
+                    problems += ("$location cannot be 'required' yet: starters older than "
+                        + "${markers.introduced} do not send it and only leave the compatibility "
+                        + "window in ${markers.introduced.major}.${markers.introduced.minor + WINDOW_MINORS}")
+                }
+
+                if (markers.deprecated != null && windowPassed(markers.deprecated, currentVersion)) {
+                    problems += ("$location was deprecated in ${markers.deprecated} and the "
+                        + "compatibility window has passed: remove it from the contract")
+                }
             }
         }
 
@@ -50,7 +84,7 @@ object ContractDocumentsValidator {
     }
 
     private fun validateMarkers(
-        node: JsonNode, location: String, current: Version, problems: MutableList<String>) {
+        node: JsonNode, location: String, current: Version, problems: MutableList<String>): Markers {
 
         // both on the top-level 'info' block and on per-property level blocks we must have the marker
         // when the property was introduced.
@@ -66,7 +100,42 @@ object ContractDocumentsValidator {
             problems += ("$location has '$DEPRECATED_IN: $deprecated' that is not strictly later "
                 + "than '$INTRODUCED_IN: $introduced'")
         }
+        return Markers(introduced, deprecated)
     }
+
+    /**
+     * The names of the schemas that travel in a payload produced by the starter: the responses
+     * when the starter answers the call, the request bodies when the Master does. Schemas
+     * referenced by the properties of a produced schema travel in the same payload.
+     */
+    private fun starterProducedSchemas(root: JsonNode, server: String): Set<String> {
+        val produced = mutableSetOf<String>()
+        root.path("paths").properties().forEach { (_, path) ->
+            path.properties().forEach { (_, operation) ->
+                val starterSide =
+                    if (server == "starter") operation.path("responses") else operation.path("requestBody")
+                starterSide.findValues("\$ref").forEach { reference ->
+                    produced += reference.asText().substringAfterLast('/')
+                }
+            }
+        }
+
+        val schemas = root.path("components").path("schemas")
+        val queue = ArrayDeque(produced)
+        while (queue.isNotEmpty()) {
+            schemas.path(queue.removeFirst()).findValues("\$ref").forEach { reference ->
+                val name = reference.asText().substringAfterLast('/')
+                if (produced.add(name)) {
+                    queue += name
+                }
+            }
+        }
+        return produced
+    }
+
+    private fun windowPassed(marker: Version, current: Version): Boolean =
+        current.major > marker.major
+            || (current.major == marker.major && current.minor - marker.minor >= WINDOW_MINORS)
 
     /**
      * Returns the parsed marker, or null when it is absent or malformed (the latter is reported).
@@ -100,6 +169,8 @@ object ContractDocumentsValidator {
         val (major, minor, patch) = match.destructured
         return Version(major.toInt(), minor.toInt(), patch.toInt())
     }
+
+    private data class Markers(val introduced: Version?, val deprecated: Version?)
 
     private data class Version(val major: Int, val minor: Int, val patch: Int) : Comparable<Version> {
 

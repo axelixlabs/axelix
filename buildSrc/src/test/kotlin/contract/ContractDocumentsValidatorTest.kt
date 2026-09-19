@@ -78,9 +78,37 @@ class ContractDocumentsValidatorTest {
                 + "that is not strictly later than 'x-axelix-introduced-in: 1.0.0'")
     }
 
-    private fun expectProblem(documentName: String, expectedProblem: String) {
+    @Test
+    fun `a late required property of a starter-produced payload fails within the window`() {
+        expectProblem(
+            "premature-required.yaml",
+            "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
+                + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
+    }
+
+    @Test
+    fun `a late required property of a starter-produced payload passes once the window elapsed`() {
+        ContractDocumentsValidator.validate(document("required-after-window.yaml"), "1.5.0-SNAPSHOT")
+    }
+
+    @Test
+    fun `a late required property of a master-produced payload passes right away`() {
+        ContractDocumentsValidator.validate(document("master-produced-late-required.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
+    fun `a deprecated property that outlived the compatibility window fails`() {
+        expectProblem(
+            "overdue-deprecation.yaml",
+            "the property 'LogLevelChangeRequest.ttlSeconds' was deprecated in 1.1.0 and the "
+                + "compatibility window has passed: remove it from the contract",
+            currentVersion = "1.4.0-SNAPSHOT")
+    }
+
+    private fun expectProblem(
+        documentName: String, expectedProblem: String, currentVersion: String = CURRENT_VERSION) {
         try {
-            ContractDocumentsValidator.validate(document(documentName), CURRENT_VERSION)
+            ContractDocumentsValidator.validate(document(documentName), currentVersion)
             fail<Unit>("The validation was expected to fail with: $expectedProblem")
         } catch (expected: GradleException) {
             assertTrue(expected.message!!.contains(expectedProblem)) {

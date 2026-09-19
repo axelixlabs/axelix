@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: loggers-list
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-loggers:
+    get:
+      operationId: getLoggers
+      responses:
+        '200':
+          description: The loggers of the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggersReply'
+components:
+  schemas:
+    LoggersReply:
+      type: object
+      required:
+        - loggers
+        - effectiveLevel
+      properties:
+        loggers:
+          type: string
+          x-axelix-introduced-in: 1.0.0
+        effectiveLevel:
+          type: string
+          # Introduced in 1.2.0 and validated against 1.5.0-SNAPSHOT: every starter within the
+          # compatibility window (1.2-1.5) sends it, so 'required' is legal by now.
+          x-axelix-introduced-in: 1.2.0
