@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.SERVER
@@ -10,7 +10,7 @@ import contract.ContractDocument.Companion.SERVER_SIDES
  *
  * @author Mikhail Polivakha
  */
-object ServerIsDeclared : ContractInvariant {
+object ServerIsDeclared : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
         if (document.server in SERVER_SIDES) emptyList()

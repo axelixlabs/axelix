@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 
@@ -9,7 +9,7 @@ import contract.ContractDocument
  *
  * @author Mikhail Polivakha
  */
-object DocumentDescribesOneOperation : ContractInvariant {
+object DocumentDescribesOneOperation : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
         when {

@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.DEPRECATED_IN
@@ -13,7 +13,7 @@ import contract.Version
  *
  * @author Mikhail Polivakha
  */
-object MarkersAreWellFormed : ContractInvariant {
+object MarkersAreWellFormed : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
         document.markedParts.flatMap { part ->

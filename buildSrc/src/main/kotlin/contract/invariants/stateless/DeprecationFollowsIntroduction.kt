@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.DEPRECATED_IN
@@ -11,7 +11,7 @@ import contract.ContractDocument.Companion.INTRODUCED_IN
  *
  * @author Mikhail Polivakha
  */
-object DeprecationFollowsIntroduction : ContractInvariant {
+object DeprecationFollowsIntroduction : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
         document.markedParts.mapNotNull { part ->

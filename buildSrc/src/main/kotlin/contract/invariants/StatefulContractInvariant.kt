@@ -4,7 +4,7 @@ import contract.ContractDocument
 
 /**
  * A single micro-invariant on the evolution of a contract document between the latest release
- * and the working tree, as opposed to a [ContractInvariant] that judges the working tree
+ * and the working tree, as opposed to a [contract.invariants.stateless.StatelessContractInvariant] that judges the working tree
  * document alone.
  *
  * Called statefull, because it performs the check of invaraints between two versions of [ContractDocument], so

@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.INTRODUCED_IN
@@ -13,7 +13,7 @@ import contract.ContractDocument.Companion.WINDOW_MINORS
  *
  * @author Mikhail Polivakha
  */
-object RequiredHonoursTheWindow : ContractInvariant {
+object RequiredHonoursTheWindow : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> {
         val featureIntroduced = document.markerVersion(document.info, INTRODUCED_IN)

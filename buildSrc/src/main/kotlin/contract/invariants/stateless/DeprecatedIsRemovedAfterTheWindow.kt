@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.DEPRECATED_IN
@@ -10,7 +10,7 @@ import contract.ContractDocument.Companion.DEPRECATED_IN
  *
  * @author Mikhail Polivakha
  */
-object DeprecatedIsRemovedAfterTheWindow : ContractInvariant {
+object DeprecatedIsRemovedAfterTheWindow : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> {
         val problems = mutableListOf<String>()

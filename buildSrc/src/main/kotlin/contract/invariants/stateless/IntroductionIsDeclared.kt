@@ -1,4 +1,4 @@
-package contract.invariants
+package contract.invariants.stateless
 
 import contract.ContractDocument
 import contract.ContractDocument.Companion.INTRODUCED_IN
@@ -11,7 +11,7 @@ import contract.ContractDocument.Companion.INTRODUCED_IN
  *
  * @author Mikhail Polivakha
  */
-object IntroductionIsDeclared : ContractInvariant {
+object IntroductionIsDeclared : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
         document.markedParts
