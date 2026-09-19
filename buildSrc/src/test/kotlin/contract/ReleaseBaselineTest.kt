@@ -65,7 +65,7 @@ class ReleaseBaselineTest {
             .find(repoRoot)!!
             .contract(repoRoot.resolve(CONTRACT_PATH))!!
         assertEquals("starter", released.server)
-        assertEquals(Version.parse("v1.1.0"), released.axelixVersion)
+        assertEquals(Version(1, 1, 0), released.axelixVersion)
     }
 
     @Test
