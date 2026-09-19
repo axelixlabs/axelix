@@ -30,9 +30,9 @@ object MarkersAreWellFormed : ContractInvariant {
             ?: return "${part.location} has '$marker: $raw' that is not of the x.y.z form"
 
         // Markers carry no patch-level meaning, so only major.minor is compared.
-        if (version.copy(patch = 0) > document.currentVersion.copy(patch = 0)) {
+        if (version.copy(patch = 0) > document.currentAxelixVersion.copy(patch = 0)) {
             return ("${part.location} has '$marker: $version' that is ahead of the version "
-                + "currently being built (${document.currentVersion})")
+                + "currently being built (${document.currentAxelixVersion})")
         }
         return null
     }

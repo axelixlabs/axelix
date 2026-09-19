@@ -1,5 +1,6 @@
 import contract.ContractDocumentsValidator
 import contract.ContractsExtension
+import contract.ReleaseBaseline
 import org.gradle.api.plugins.quality.Pmd
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
@@ -19,9 +20,10 @@ val contracts = extensions.create<ContractsExtension>("contracts")
 val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { include("**/*.yaml") }
     .sortedBy { it.absolutePath }
     .map { document ->
-        // A local, so that the doFirst closure below captures a plain String instead of a
+        // We re-define some local variables here, so that the doFirst closure below captures plain values instead of a
         // reference to the whole script object, which the configuration cache cannot serialize.
         val currentVersion = version.toString()
+        val repoRoot = rootDir
         val featurePackage = document.parentFile.name.replace("-", "")
         val operation = document.nameWithoutExtension
         val outputRoot = layout.buildDirectory.dir("generated/openapi/$operation").get().asFile
@@ -45,7 +47,13 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             ))
 
             doFirst {
-                ContractDocumentsValidator.validate(document, currentVersion)
+                val baseline = ReleaseBaseline.find(repoRoot)
+                if (baseline == null) {
+                    logger.warn(
+                        "No release tag (vX.Y.Z) is reachable in $repoRoot: the stateful "
+                            + "contract checks of ${document.name} are skipped")
+                }
+                ContractDocumentsValidator.validate(document, currentVersion, baseline)
             }
 
             // The generator offers no option to suppress the @Generated annotation, so it is

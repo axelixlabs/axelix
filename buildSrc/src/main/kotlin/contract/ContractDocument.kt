@@ -10,7 +10,7 @@ import org.gradle.api.GradleException
  *
  * @author Mikhail Polivakha
  */
-class ContractDocument private constructor(private val root: JsonNode, val currentVersion: Version) {
+class ContractDocument private constructor(private val root: JsonNode, val currentAxelixVersion: Version) {
 
     val info: JsonNode = root.path("info")
 
@@ -102,9 +102,9 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
      * will change in the future.
      */
     fun windowPassed(marker: Version): Boolean =
-        currentVersion.major > marker.major
-            || (currentVersion.major == marker.major
-                && currentVersion.minor - marker.minor >= WINDOW_MINORS)
+        currentAxelixVersion.major > marker.major
+            || (currentAxelixVersion.major == marker.major
+                && currentAxelixVersion.minor - marker.minor >= WINDOW_MINORS)
 
     data class MarkedPart(val location: String, val node: JsonNode)
 
@@ -131,11 +131,17 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
          */
         const val WINDOW_MINORS = 3
 
-        fun parse(document: File, currentVersion: String): ContractDocument =
+        fun parse(document: File, currentAxelixVersion: String): ContractDocument =
+            of(YAMLMapper().readTree(document), currentAxelixVersion)
+
+        fun parse(document: ByteArray, currentAxelixVersion: String): ContractDocument =
+            of(YAMLMapper().readTree(document), currentAxelixVersion)
+
+        private fun of(root: JsonNode, currentAxelixVersion: String): ContractDocument =
             ContractDocument(
-                YAMLMapper().readTree(document),
-                Version.parse(currentVersion)
+                root,
+                Version.parse(currentAxelixVersion)
                     ?: throw GradleException(
-                        "The project version '$currentVersion' is not of the expected x.y.z[-QUALIFIER] form"))
+                        "The project version '$currentAxelixVersion' is not of the expected x.y.z[-QUALIFIER] form"))
     }
 }

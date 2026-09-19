@@ -8,6 +8,7 @@ import contract.invariants.IntroductionIsDeclared
 import contract.invariants.MarkersAreWellFormed
 import contract.invariants.RequiredHonoursTheWindow
 import contract.invariants.ServerIsDeclared
+import contract.invariants.StatefulContractInvariant
 import java.io.File
 import org.gradle.api.GradleException
 
@@ -28,13 +29,23 @@ object ContractDocumentsValidator {
         DeprecatedIsRemovedAfterTheWindow,
     )
 
+    private val STATEFUL_INVARIANTS: List<StatefulContractInvariant> = listOf(
+    )
+
     /**
      * Verifies that the contract document complies with the backward compatibility guarantees.
      */
-    fun validate(document: File, currentVersion: String) {
-        val parsed = ContractDocument.parse(document, currentVersion)
+    fun validate(document: File, currentAxelixVersion: String, baseline: ReleaseBaseline? = null) {
+        val currentContract = ContractDocument.parse(document, currentAxelixVersion)
 
-        val problems = INVARIANTS.flatMap { invariant -> invariant.check(parsed) }
+        // stateless checks for the current contract
+        val problems = INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
+
+        if (baseline != null) {
+            val releasedContract = baseline.contract(document, currentAxelixVersion)
+            problems += STATEFUL_INVARIANTS.flatMap { invariant -> invariant.check(releasedContract, currentContract) }
+        }
+
         if (problems.isNotEmpty()) {
             throw GradleException(
                 "The contract document ${document.name} is invalid:\n"
