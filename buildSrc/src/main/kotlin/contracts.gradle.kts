@@ -1,6 +1,6 @@
 import contract.ContractDocumentsValidator
 import contract.ContractsExtension
-import contract.ReleaseBaseline
+import contract.invariants.stateful.ReleaseBaseline
 import org.gradle.api.plugins.quality.Pmd
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 

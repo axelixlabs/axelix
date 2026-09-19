@@ -23,15 +23,15 @@ class ReleaseBaseline private constructor(private val repoRoot: File, val versio
 
     /**
      * The released counterpart of the given working tree contract document, or null when the
-     * document did not exist at the release, i.e. the operation is being born right now.
+     * document did not exist at the release, i.e. the operation was created after the latest known release.
      */
-    fun contract(document: File, currentVersion: String): ContractDocument? =
+    fun contract(document: File): ContractDocument? =
         open(repoRoot).use { repository ->
             val path = document.relativeTo(repoRoot).invariantSeparatorsPath
-            val release = RevWalk(repository).use { walk -> walk.parseCommit(repository.resolve(tag)) }
+            val baselineCommit = RevWalk(repository).use { walk -> walk.parseCommit(repository.resolve(tag)) }
 
-            TreeWalk.forPath(repository, path, release.tree)?.use { blob ->
-                ContractDocument.parse(repository.open(blob.getObjectId(0)).bytes, currentVersion)
+            TreeWalk.forPath(repository, path, baselineCommit.tree)?.use { previousContract ->
+                ContractDocument.parse(repository.open(previousContract.getObjectId(0)).bytes, version)
             }
         }
 

@@ -8,9 +8,12 @@ import org.gradle.api.GradleException
 /**
  * A parsed contract of the single operation between Axelix Master & starters.
  *
+ * @param axelixVersion version of Axelix, when the given document was actaul
+ * @param root the [JsonNode] that represents the root of the YAML document to be inspected
+ *
  * @author Mikhail Polivakha
  */
-class ContractDocument private constructor(private val root: JsonNode, val currentAxelixVersion: Version) {
+class ContractDocument private constructor(private val root: JsonNode, val axelixVersion: Version) {
 
     val info: JsonNode = root.path("info")
 
@@ -87,9 +90,7 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
         node.path(marker).takeUnless { value -> value.isMissingNode }?.asText()
 
     /**
-     * The parsed value of the marker, or null when it is absent or malformed. A malformed marker
-     * is only ever reported by [invariants.MarkersAreWellFormed], every other invariant silently
-     * treats it as absent to not pile duplicated problems on a single typo.
+     * The parsed value of the custom marker, or null when it is absent or malformed.
      */
     fun markerVersion(node: JsonNode, marker: String): Version? =
         marker(node, marker)?.let(Version::parse)
@@ -102,9 +103,9 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
      * will change in the future.
      */
     fun windowPassed(marker: Version): Boolean =
-        currentAxelixVersion.major > marker.major
-            || (currentAxelixVersion.major == marker.major
-                && currentAxelixVersion.minor - marker.minor >= WINDOW_MINORS)
+        axelixVersion.major > marker.major
+            || (axelixVersion.major == marker.major
+                && axelixVersion.minor - marker.minor >= WINDOW_MINORS)
 
     data class MarkedPart(val location: String, val node: JsonNode)
 
@@ -134,8 +135,8 @@ class ContractDocument private constructor(private val root: JsonNode, val curre
         fun parse(document: File, currentAxelixVersion: String): ContractDocument =
             of(YAMLMapper().readTree(document), currentAxelixVersion)
 
-        fun parse(document: ByteArray, currentAxelixVersion: String): ContractDocument =
-            of(YAMLMapper().readTree(document), currentAxelixVersion)
+        fun parse(document: ByteArray, currentAxelixVersion: Version): ContractDocument =
+            ContractDocument(YAMLMapper().readTree(document), currentAxelixVersion)
 
         private fun of(root: JsonNode, currentAxelixVersion: String): ContractDocument =
             ContractDocument(

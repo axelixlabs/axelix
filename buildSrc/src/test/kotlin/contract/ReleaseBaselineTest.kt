@@ -62,9 +62,11 @@ class ReleaseBaselineTest {
             commit(git, "developed")
         }
 
-        val released = ReleaseBaseline.find(repoRoot)!!
-            .contract(repoRoot.resolve(CONTRACT_PATH), CURRENT_VERSION)!!
+        val released = ReleaseBaseline
+            .find(repoRoot)!!
+            .contract(repoRoot.resolve(CONTRACT_PATH))!!
         assertEquals("starter", released.server)
+        assertEquals(Version.parse("v1.1.0"), released.axelixVersion)
     }
 
     @Test
@@ -77,7 +79,7 @@ class ReleaseBaselineTest {
         }
 
         val baseline = ReleaseBaseline.find(repoRoot)!!
-        assertNull(baseline.contract(repoRoot.resolve(CONTRACT_PATH), CURRENT_VERSION))
+        assertNull(baseline.contract(repoRoot.resolve(CONTRACT_PATH)))
     }
 
     private fun contract(server: String) {

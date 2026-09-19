@@ -1,14 +1,15 @@
 package contract
 
-import contract.invariants.ContractInvariant
-import contract.invariants.DeprecatedIsRemovedAfterTheWindow
-import contract.invariants.DeprecationFollowsIntroduction
-import contract.invariants.DocumentDescribesOneOperation
-import contract.invariants.IntroductionIsDeclared
-import contract.invariants.MarkersAreWellFormed
-import contract.invariants.RequiredHonoursTheWindow
-import contract.invariants.ServerIsDeclared
-import contract.invariants.StatefulContractInvariant
+import contract.invariants.stateful.ReleaseBaseline
+import contract.invariants.stateful.StatefulContractInvariant
+import contract.invariants.stateless.DeprecatedIsRemovedAfterTheWindow
+import contract.invariants.stateless.DeprecationFollowsIntroduction
+import contract.invariants.stateless.DocumentDescribesOneOperation
+import contract.invariants.stateless.IntroductionIsDeclared
+import contract.invariants.stateless.MarkersAreWellFormed
+import contract.invariants.stateless.RequiredHonoursTheWindow
+import contract.invariants.stateless.ServerIsDeclared
+import contract.invariants.stateless.StatelessContractInvariant
 import java.io.File
 import org.gradle.api.GradleException
 
@@ -19,7 +20,7 @@ import org.gradle.api.GradleException
  */
 object ContractDocumentsValidator {
 
-    private val INVARIANTS: List<ContractInvariant> = listOf(
+    private val INVARIANTS: List<StatelessContractInvariant> = listOf(
         DocumentDescribesOneOperation,
         ServerIsDeclared,
         IntroductionIsDeclared,
@@ -42,7 +43,7 @@ object ContractDocumentsValidator {
         val problems = INVARIANTS.flatMap { invariant -> invariant.check(currentContract) }.toMutableList()
 
         if (baseline != null) {
-            val releasedContract = baseline.contract(document, currentAxelixVersion)
+            val releasedContract = baseline.contract(document)
             problems += STATEFUL_INVARIANTS.flatMap { invariant -> invariant.check(releasedContract, currentContract) }
         }
 
