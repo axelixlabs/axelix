@@ -20,7 +20,7 @@ class PropertyTypeAndFormatMustNeverChangeTest {
     @Test
     fun `unchanged types and formats pass`() {
         val problems = PropertyTypeAndFormatMustNeverChange
-            .check(baseline(), current("deprecation-retained.yaml"))
+            .check(baseline(), current("unchanged.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -28,7 +28,7 @@ class PropertyTypeAndFormatMustNeverChangeTest {
     @Test
     fun `a born document is not judged`() {
         val problems = PropertyTypeAndFormatMustNeverChange
-            .check(null, current("born-document-introduced-now.yaml"))
+            .check(null, current("born-document.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -73,11 +73,12 @@ class PropertyTypeAndFormatMustNeverChangeTest {
     }
 
     private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline-with-deprecation.yaml"), RELEASED_VERSION)
+        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
 
     private fun current(name: String): ContractDocument =
         ContractDocument.parse(document(name), CURRENT_VERSION)
 
     private fun document(name: String): File =
-        File(javaClass.getResource("/contract/stateful/$name")!!.toURI())
+        File(javaClass.getResource(
+            "/contract/stateful/${javaClass.simpleName.removeSuffix("Test")}/$name")!!.toURI())
 }

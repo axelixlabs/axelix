@@ -20,7 +20,7 @@ class IntroductionMarkerMustNeverChangeTest {
     @Test
     fun `unchanged introduction markers pass, a new property is not judged`() {
         val problems = IntroductionMarkerMustNeverChange
-            .check(baseline(), current("new-property-introduced-now.yaml"))
+            .check(baseline(), current("markers-unchanged.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -28,7 +28,7 @@ class IntroductionMarkerMustNeverChangeTest {
     @Test
     fun `a born document is not judged`() {
         val problems = IntroductionMarkerMustNeverChange
-            .check(null, current("born-document-introduced-now.yaml"))
+            .check(null, current("born-document.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -66,5 +66,6 @@ class IntroductionMarkerMustNeverChangeTest {
         ContractDocument.parse(document(name), CURRENT_VERSION)
 
     private fun document(name: String): File =
-        File(javaClass.getResource("/contract/stateful/$name")!!.toURI())
+        File(javaClass.getResource(
+            "/contract/stateful/${javaClass.simpleName.removeSuffix("Test")}/$name")!!.toURI())
 }

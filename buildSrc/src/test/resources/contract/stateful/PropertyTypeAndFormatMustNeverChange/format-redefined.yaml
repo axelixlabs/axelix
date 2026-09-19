@@ -25,12 +25,11 @@ components:
         - configuredLevel
       properties:
         configuredLevel:
-          # INVALID: the released baseline declares this property as a string, and a released
-          # property must never be redefined in place
-          type: integer
+          type: string
           x-axelix-introduced-in: 1.0.0
         ttlSeconds:
           type: integer
-          format: int64
+          # INVALID: the released baseline declares this property as int64, and a released
+          # property must never be redefined in place
+          format: int32
           x-axelix-introduced-in: 1.0.0
-          x-axelix-deprecated-in: 1.1.0

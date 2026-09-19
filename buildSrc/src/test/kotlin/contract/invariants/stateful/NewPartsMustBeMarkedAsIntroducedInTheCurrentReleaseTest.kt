@@ -66,5 +66,6 @@ class NewPartsMustBeMarkedAsIntroducedInTheCurrentReleaseTest {
         ContractDocument.parse(document(name), CURRENT_VERSION)
 
     private fun document(name: String): File =
-        File(javaClass.getResource("/contract/stateful/$name")!!.toURI())
+        File(javaClass.getResource(
+            "/contract/stateful/${javaClass.simpleName.removeSuffix("Test")}/$name")!!.toURI())
 }

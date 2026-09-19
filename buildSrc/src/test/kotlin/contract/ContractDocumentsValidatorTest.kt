@@ -25,47 +25,47 @@ class ContractDocumentsValidatorTest {
     @Test
     fun `a deprecation strictly later than the introduction passes`() {
         ContractDocumentsValidator.validate(
-            document("deprecation-strictly-later-than-introduction.yaml"), CURRENT_VERSION)
+            document("stateless/DeprecationFollowsIntroduction/deprecation-strictly-later-than-introduction.yaml"), CURRENT_VERSION)
     }
 
     @Test
     fun `a marker equal to the version being built passes`() {
         ContractDocumentsValidator.validate(
-            document("marker-equal-to-current-version.yaml"), CURRENT_VERSION)
+            document("stateless/MarkersAreWellFormed/marker-equal-to-current-version.yaml"), CURRENT_VERSION)
     }
 
     @Test
     fun `a missing server marker fails`() {
         expectProblem(
-            "missing-server.yaml",
+            "stateless/ServerIsDeclared/missing-server.yaml",
             "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
     }
 
     @Test
     fun `an unknown server side fails`() {
         expectProblem(
-            "unknown-server.yaml",
+            "stateless/ServerIsDeclared/unknown-server.yaml",
             "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
     }
 
     @Test
     fun `a property without an introduction marker fails`() {
         expectProblem(
-            "property-missing-introduction.yaml",
+            "stateless/IntroductionIsDeclared/property-missing-introduction.yaml",
             "the property 'LogLevelChangeRequest.configuredLevel' is missing 'x-axelix-introduced-in'")
     }
 
     @Test
     fun `a malformed version marker fails`() {
         expectProblem(
-            "malformed-marker.yaml",
+            "stateless/MarkersAreWellFormed/malformed-marker.yaml",
             "the 'info' block has 'x-axelix-introduced-in: 1.0' that is not of the x.y.z form")
     }
 
     @Test
     fun `a marker ahead of the version being built fails`() {
         expectProblem(
-            "marker-ahead-of-current-version.yaml",
+            "stateless/MarkersAreWellFormed/marker-ahead-of-current-version.yaml",
             "the property 'LogLevelChangeRequest.configuredLevel' has 'x-axelix-introduced-in: 1.3.0' "
                 + "that is ahead of the version currently being built (1.2.0)")
     }
@@ -73,7 +73,7 @@ class ContractDocumentsValidatorTest {
     @Test
     fun `a deprecation in the release that introduced the property fails`() {
         expectProblem(
-            "deprecation-in-introduction-release.yaml",
+            "stateless/DeprecationFollowsIntroduction/deprecation-in-introduction-release.yaml",
             "the property 'LogLevelChangeRequest.configuredLevel' has 'x-axelix-deprecated-in: 1.0.0' "
                 + "that is not strictly later than 'x-axelix-introduced-in: 1.0.0'")
     }
@@ -81,25 +81,25 @@ class ContractDocumentsValidatorTest {
     @Test
     fun `a late required property of a starter-produced payload fails within the window`() {
         expectProblem(
-            "premature-required.yaml",
+            "stateless/RequiredHonoursTheWindow/premature-required.yaml",
             "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
                 + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
     }
 
     @Test
     fun `a late required property of a starter-produced payload passes once the window elapsed`() {
-        ContractDocumentsValidator.validate(document("required-after-window.yaml"), "1.5.0-SNAPSHOT")
+        ContractDocumentsValidator.validate(document("stateless/RequiredHonoursTheWindow/required-after-window.yaml"), "1.5.0-SNAPSHOT")
     }
 
     @Test
     fun `a late required property of a master-produced payload passes right away`() {
-        ContractDocumentsValidator.validate(document("master-produced-late-required.yaml"), CURRENT_VERSION)
+        ContractDocumentsValidator.validate(document("stateless/RequiredHonoursTheWindow/master-produced-late-required.yaml"), CURRENT_VERSION)
     }
 
     @Test
     fun `a deprecated property that outlived the compatibility window fails`() {
         expectProblem(
-            "overdue-deprecation.yaml",
+            "stateless/DeprecatedIsRemovedAfterTheWindow/overdue-deprecation.yaml",
             "the property 'LogLevelChangeRequest.ttlSeconds' was deprecated in 1.1.0 and the "
                 + "compatibility window has passed: remove it from the contract",
             currentVersion = "1.4.0-SNAPSHOT")
@@ -108,7 +108,7 @@ class ContractDocumentsValidatorTest {
     @Test
     fun `a document with two operations fails`() {
         expectProblem(
-            "two-operations.yaml",
+            "stateless/DocumentDescribesOneOperation/two-operations.yaml",
             "the document must describe exactly one operation, but describes 2: "
                 + "GET /actuator/axelix-loggers, POST /actuator/axelix-loggers/logger/{name}/reset")
     }
@@ -116,7 +116,7 @@ class ContractDocumentsValidatorTest {
     @Test
     fun `a document without operations fails`() {
         expectProblem(
-            "no-operations.yaml",
+            "stateless/DocumentDescribesOneOperation/no-operations.yaml",
             "the document must describe exactly one operation, but describes none")
     }
 

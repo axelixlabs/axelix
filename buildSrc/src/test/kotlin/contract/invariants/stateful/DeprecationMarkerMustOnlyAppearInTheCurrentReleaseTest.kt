@@ -36,7 +36,7 @@ class DeprecationMarkerMustOnlyAppearInTheCurrentReleaseTest {
     @Test
     fun `a born document is not judged`() {
         val problems = DeprecationMarkerMustOnlyAppearInTheCurrentRelease
-            .check(null, current("born-document-introduced-now.yaml"))
+            .check(null, current("born-document.yaml"))
 
         assertEquals(emptyList<String>(), problems)
     }
@@ -68,11 +68,12 @@ class DeprecationMarkerMustOnlyAppearInTheCurrentReleaseTest {
     }
 
     private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline-with-deprecation.yaml"), RELEASED_VERSION)
+        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
 
     private fun current(name: String): ContractDocument =
         ContractDocument.parse(document(name), CURRENT_VERSION)
 
     private fun document(name: String): File =
-        File(javaClass.getResource("/contract/stateful/$name")!!.toURI())
+        File(javaClass.getResource(
+            "/contract/stateful/${javaClass.simpleName.removeSuffix("Test")}/$name")!!.toURI())
 }

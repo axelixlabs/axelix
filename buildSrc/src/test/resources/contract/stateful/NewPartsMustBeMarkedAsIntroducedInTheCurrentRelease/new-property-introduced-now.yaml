@@ -27,9 +27,7 @@ components:
         configuredLevel:
           type: string
           x-axelix-introduced-in: 1.0.0
-        # INVALID: the released baseline declares this property with 'format: int64', and
-        # dropping the format is a redefinition just like changing it
         ttlSeconds:
           type: integer
-          x-axelix-introduced-in: 1.0.0
-          x-axelix-deprecated-in: 1.1.0
+          format: int64
+          x-axelix-introduced-in: 1.2.0
