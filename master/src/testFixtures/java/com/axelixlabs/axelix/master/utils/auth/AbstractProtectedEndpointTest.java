@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.awaitility.core.ThrowingRunnable;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -139,7 +138,8 @@ public abstract class AbstractProtectedEndpointTest {
                     .extracting(MasterWebEndpoint::operationCode)
                     .isEqualTo(expectedTarget.operationCode());
             assertThat(capturingIamWebInterceptor.actor().getUsername()).isEqualTo(expectedActor.getUsername());
-            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint())
+                    .isNull();
             assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         });
     }
@@ -161,7 +161,8 @@ public abstract class AbstractProtectedEndpointTest {
                     .isNotNull()
                     .extracting(MasterWebEndpoint::operationCode)
                     .isEqualTo(expectedTarget.operationCode());
-            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
+            assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint())
+                    .isNull();
             assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
         });
     }
