@@ -283,6 +283,25 @@
             "subtitle": "Ecosystem-wide Spring Framework insights · Open Session in View",
             "osivChartTitle": "Open Session in View (OSIV)",
             "osivChartSubtitle": "Enabled services coverage"
+        },
+        "SpringPortfolio": {
+            "title": "Spring Portfolio",
+            "subtitle": "Versions in use across the estate, against the published OSS maintenance schedule",
+            "applications": "Applications",
+            "ossOk": "OSS ✓",
+            "ossNo": "OSS ✕",
+            "supportedHint": "community releases continue",
+            "unsupportedHint": "window has closed",
+            "generation": "Software component generation",
+            "onSupportedLine": "{{supported}} of {{total}} applications on an OSS supported line",
+            "detectedAtRuntime": "Detected at runtime across {{total}} applications",
+            "ladderTitle": "OSS maintenance window · lines in use",
+            "ladderHint": "Relying on the schedules published by the Spring team",
+            "line": "Line",
+            "ossEnds": "OSS ends",
+            "apps": "Apps",
+            "legendSupported": "OSS supported — the community publishes fixes for this line",
+            "legendUnsupported": "Not OSS supported — no community releases after this date"
         }
     },
     "About": {

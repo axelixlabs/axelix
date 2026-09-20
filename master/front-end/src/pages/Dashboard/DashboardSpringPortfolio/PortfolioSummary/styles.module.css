@@ -1,0 +1,92 @@
+.Summary {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 12px 20px;
+    box-shadow: var(--axelix-box-shadow-light);
+    flex-shrink: 0;
+}
+
+.TotalBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+}
+
+.TotalCount {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.TotalLabel {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.Breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding-left: 20px;
+    border-left: 1px solid var(--axelix-light-grey);
+}
+
+.BreakdownRow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.SupportedCount,
+.UnsupportedCount {
+    font-size: 15px;
+    font-weight: 700;
+    min-width: 20px;
+}
+
+.SupportedCount {
+    color: var(--axelix-primary-green);
+}
+
+.UnsupportedCount {
+    color: var(--axelix-primary-red);
+}
+
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: var(--axelix-border-radius-small);
+    padding: 1px 7px;
+    white-space: nowrap;
+}
+
+.ChipOk {
+    color: var(--axelix-primary-green);
+    background-color: var(--axelix-primary-light-green);
+    border: 1px solid var(--axelix-primary-green);
+}
+
+.ChipNo {
+    color: var(--axelix-primary-red);
+    background-color: var(--axelix-primary-light-red);
+    border: 1px solid var(--axelix-primary-red);
+}
+
+.BreakdownHint {
+    font-size: 11.5px;
+    color: var(--axelix-bold-grey);
+    white-space: nowrap;
+}
