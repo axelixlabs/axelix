@@ -269,19 +269,6 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
-    void enable_shouldEnableCacheManager() {
-        Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
-
-        // when.
-        testRestTemplate.asAdmin().postForObject(path(ENABLE_CACHE_MANAGER, "/disable"), defaultEntity(), Void.class);
-        testRestTemplate.asEditor().postForObject(path(ENABLE_CACHE_MANAGER, "/enable"), defaultEntity(), Void.class);
-        cache.put("key", "value");
-
-        // then.
-        assertThat(cache.get("key")).isNotNull();
-    }
-
-    @Test
     void enable_shouldEnableOnlySpecificCache() {
         Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
 
@@ -453,7 +440,7 @@ class AxelixCachesEndpointTest {
 
     private static Stream<Arguments> nonExistentManagerPaths() {
         return Stream.of(
-                Arguments.of("nonExistentManager", "/enable"), Arguments.of("/nonExistentManager", "/disable"));
+                Arguments.of("/nonExistentManager", "/disable"));
     }
 
     @ParameterizedTest

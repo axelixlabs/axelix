@@ -61,8 +61,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_CACHE =
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/disable", HttpMethod.POST);
-    public static final ActuatorEndpoint ENABLE_CACHE_MANAGER =
-            endpoint("/axelix-caches/{cacheManagerName}/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_CACHES_MANAGER =
             endpoint("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
 

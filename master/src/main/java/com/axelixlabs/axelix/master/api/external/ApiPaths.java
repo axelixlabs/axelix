@@ -246,11 +246,6 @@ public final class ApiPaths {
         public static final String DISABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable";
 
         /**
-         * Endpoint to enable all caches in a cache manager.
-         */
-        public static final String ENABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/enable";
-
-        /**
          * Endpoint to disable all caches in a cache manager.
          */
         public static final String DISABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/disable";

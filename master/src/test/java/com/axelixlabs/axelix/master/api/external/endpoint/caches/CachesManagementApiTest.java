@@ -33,6 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -93,8 +94,6 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
                     return new MockResponse().setResponseCode(200);
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/vets/disable")) {
                     return new MockResponse().setResponseCode(200);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/enable")) {
-                    return new MockResponse().setResponseCode(200);
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/disable")) {
                     return new MockResponse().setResponseCode(200);
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/enable-all-cache")) {
@@ -132,24 +131,19 @@ class CachesManagementApiTest extends AbstractProtectedEndpointTest {
                 editor.getActor());
     }
 
-    @ParameterizedTest
-    @MethodSource("cacheOperations")
-    void shouldEnableOrDisableCacheManager(String cacheStatus) {
+    @Test
+    void shouldDisableCacheManager() {
         // when.
         IdentityAwareTestRestTemplate editor = restTemplate.asEditor();
         ResponseEntity<Void> response = editor.postForEntity(
-                "/api/external/caches/{instanceId}/{cacheManagerName}/" + cacheStatus,
+                "/api/external/caches/{instanceId}/{cacheManagerName}/disable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertSuccessfulCallback(
-                cacheStatus.equals("enable")
-                        ? MasterWebEndpoints.CACHE_MANAGER_ENABLE
-                        : MasterWebEndpoints.CACHE_MANAGER_DISABLE,
-                editor.getActor());
+        assertSuccessfulCallback(MasterWebEndpoints.CACHE_MANAGER_DISABLE, editor.getActor());
     }
 
     @ParameterizedTest

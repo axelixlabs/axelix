@@ -124,12 +124,6 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
-    public DiscardingAbstractEndpointProber enableCacheManagerEndpointProver() {
-        return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.ENABLE_CACHE_MANAGER, securityContextExecutor);
-    }
-
-    @Bean
     public ProxyingEndpointProber getSingleCacheEndpointProver() {
         return new ProxyingEndpointProber(
                 instanceRegistry, ActuatorEndpoints.GET_SINGLE_CACHE, securityContextExecutor);

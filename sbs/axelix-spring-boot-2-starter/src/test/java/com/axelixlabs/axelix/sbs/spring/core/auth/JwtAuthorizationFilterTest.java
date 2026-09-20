@@ -176,7 +176,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
@@ -201,7 +200,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
@@ -266,7 +264,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST));
     }

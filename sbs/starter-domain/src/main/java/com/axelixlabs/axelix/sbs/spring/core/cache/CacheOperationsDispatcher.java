@@ -78,15 +78,6 @@ public interface CacheOperationsDispatcher {
     void clearAll() throws CacheManagerNotFoundException;
 
     /**
-     * Enables all caches in the specified cache manager by name.
-     * This activates caching operations for all caches in the given cache manager.
-     *
-     * @param cacheManagerName the name of the cache manager to enable.
-     * @throws CacheManagerNotFoundException in case the requested CacheManager is not found.
-     */
-    void enableCacheManager(String cacheManagerName) throws CacheManagerNotFoundException;
-
-    /**
      * Disables all caches in the specified cache manager by name.
      * This deactivates caching operations for all caches in the given cache manager.
      * <p>

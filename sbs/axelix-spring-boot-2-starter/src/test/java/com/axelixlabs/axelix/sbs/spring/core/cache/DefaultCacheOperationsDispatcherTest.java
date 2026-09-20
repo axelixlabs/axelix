@@ -138,21 +138,6 @@ class DefaultCacheOperationsDispatcherTest {
     }
 
     @Test
-    void enableCacheManager_shouldEnableSpecificManager() {
-        Cache cache = cacheManager1.getCache(TEST_CACHE_1);
-
-        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
-
-        cache.put("key", "value");
-        assertThat(cache.get("key")).isNull();
-
-        dispatcher.enableCacheManager(TEST_CACHE_MANAGER_1);
-
-        cache.put("key2", "value2");
-        assertThat(cache.get("key2")).isNotNull();
-    }
-
-    @Test
     void disableCache_shouldDisableSpecificCache() {
         Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
 
@@ -325,12 +310,6 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isFalse();
-
-        // and also when.
-        dispatcher.enableCacheManager(cacheManagerName);
-
-        // then.
-        assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isTrue();
     }
 
     @Test
@@ -379,13 +358,6 @@ class DefaultCacheOperationsDispatcherTest {
     void shouldReturnNull_ForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.get("nonExistentManager", TEST_CACHE_1))
                 .isInstanceOf(CacheManagerNotFoundException.class);
-    }
-
-    @Test
-    void enableCacheManager_shouldThrowExceptionForNonExistentManager() {
-        assertThatThrownBy(() -> dispatcher.enableCacheManager("nonExistentManager"))
-                .isInstanceOf(CacheManagerNotFoundException.class)
-                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
