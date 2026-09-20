@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
+import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -318,6 +320,12 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
     @Test
     void shouldReturnSpringPortfolioDashboard() {
+        // given a couple of applications with a persisted historical snapshot. The portfolio is aggregated from
+        // the latest snapshot per service, not from the live instances table.
+        historicalApplicationSnapshotService.reloadCurrentStateBulk(List.of(
+                metadata("com.example", "service-a", GarbageCollector.G1),
+                metadata("com.example", "service-b", GarbageCollector.ZGC)));
+
         // when.
         IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
         ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/spring-portfolio", String.class);
@@ -325,9 +333,9 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).node("applicationsTotal").isEqualTo(1);
-        assertThatJson(response.getBody()).node("springBoot.platform").isEqualTo("SPRING_BOOT");
-        assertThatJson(response.getBody()).node("springFramework.platform").isEqualTo("SPRING_FRAMEWORK");
+        assertThatJson(response.getBody()).node("applicationsTotal").isEqualTo(2);
+        assertThatJson(response.getBody()).node("springBoot.platform").isEqualTo(PlatformName.SPRING_BOOT.name());
+        assertThatJson(response.getBody()).node("springFramework.platform").isEqualTo(PlatformName.SPRING_FRAMEWORK.name());
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_SPRING_PORTFOLIO, viewer.getActor());
     }
 
