@@ -61,22 +61,22 @@ public class DefaultSpringPortfolioService implements SpringPortfolioService {
         List<Instance> applications = getApplications();
 
         LocalDate today = LocalDate.now();
-        Optional<Platform> springBoot = platformCatalog.find(PlatformName.SPRING_BOOT);
-        Optional<Platform> springFramework = platformCatalog.find(PlatformName.SPRING_FRAMEWORK);
+        Platform springBoot = platformCatalog.find(PlatformName.SPRING_BOOT);
+        Platform springFramework = platformCatalog.find(PlatformName.SPRING_FRAMEWORK);
 
         int applicationsTotal = applications.size();
 
         int fullyOssSupported = (int) applications.stream()
-                .filter(app -> isFullyOssSupported(app, springBoot.orElse(null), springFramework.orElse(null), today))
+                .filter(app -> isFullyOssSupported(app, springBoot, springFramework, today))
                 .count();
 
         List<PlatformReleaseLine> bootLines = applications.stream()
-                .map(app -> springBoot.flatMap(platform -> platform.lineOf(app.springBootVersion())))
+                .map(app -> springBoot.lineOf(app.springBootVersion()))
                 .flatMap(Optional::stream)
                 .toList();
 
         List<PlatformReleaseLine> frameworkLines = applications.stream()
-                .map(app -> springFramework.flatMap(platform -> platform.lineOf(app.springFrameworkVersion())))
+                .map(app -> springFramework.lineOf(app.springFrameworkVersion()))
                 .flatMap(Optional::stream)
                 .toList();
 
@@ -109,13 +109,11 @@ public class DefaultSpringPortfolioService implements SpringPortfolioService {
     }
 
     private boolean isFullyOssSupported(
-            Instance app, @Nullable Platform springBoot, @Nullable Platform springFramework, LocalDate today) {
+            Instance app, Platform springBoot, Platform springFramework, LocalDate today) {
 
-        Optional<PlatformReleaseLine> bootLine =
-                springBoot == null ? Optional.empty() : springBoot.lineOf(app.springBootVersion());
+        Optional<PlatformReleaseLine> bootLine = springBoot.lineOf(app.springBootVersion());
 
-        Optional<PlatformReleaseLine> frameworkLine =
-                springFramework == null ? Optional.empty() : springFramework.lineOf(app.springFrameworkVersion());
+        Optional<PlatformReleaseLine> frameworkLine = springFramework.lineOf(app.springFrameworkVersion());
 
         return bootLine.map(line -> line.ossSupportedAt(today)).orElse(false)
                 && frameworkLine.map(line -> line.ossSupportedAt(today)).orElse(false);
