@@ -1,0 +1,7 @@
+node_modules
+.next
+.source
+dist
+*.log
+package-lock.json
+Дизайн документации

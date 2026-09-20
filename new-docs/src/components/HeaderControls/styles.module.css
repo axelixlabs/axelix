@@ -1,0 +1,21 @@
+.ThemeSwitch {
+    height: 34px;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 9px;
+    background-color: var(--color-fd-card);
+}
+
+.ThemeSwitch > svg {
+    width: 30px;
+    height: 28px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    fill: none;
+}
+
+.ThemeSwitch > :global(.bg-fd-accent) {
+    background-color: color-mix(in srgb, var(--color-fd-primary) 10%, transparent);
+    color: var(--color-fd-primary);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+}
