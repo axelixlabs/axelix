@@ -26,7 +26,12 @@ import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 
-import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledCronTask;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledCustomTask;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledFixedDelayTask;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledFixedRateTask;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ScheduledTaskRunnable;
+import com.axelixlabs.axelix.sbs.spring.core.contract.scheduledtask.ServiceScheduledTasks;
 
 /**
  * Default implementation of {@link ScheduledTasksAssembler}.
@@ -45,22 +50,26 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
 
     @Override
     public ServiceScheduledTasks assemble() {
-        List<ServiceScheduledTasks.CronTask> cron = new ArrayList<>();
-        List<ServiceScheduledTasks.FixedDelayTask> fixedDelay = new ArrayList<>();
-        List<ServiceScheduledTasks.FixedRateTask> fixedRate = new ArrayList<>();
-        List<ServiceScheduledTasks.CustomTask> custom = new ArrayList<>();
+        List<ScheduledCronTask> cron = new ArrayList<>();
+        List<ScheduledFixedDelayTask> fixedDelay = new ArrayList<>();
+        List<ScheduledFixedRateTask> fixedRate = new ArrayList<>();
+        List<ScheduledCustomTask> custom = new ArrayList<>();
 
         registry.getAll().forEach(task -> assembleScheduledTasks(task, cron, fixedDelay, fixedRate, custom));
 
-        return new ServiceScheduledTasks(cron, fixedDelay, fixedRate, custom);
+        return new ServiceScheduledTasks()
+                .cron(cron)
+                .fixedDelay(fixedDelay)
+                .fixedRate(fixedRate)
+                .custom(custom);
     }
 
     private void assembleScheduledTasks(
             ManagedScheduledTask managedScheduledTask,
-            List<ServiceScheduledTasks.CronTask> cron,
-            List<ServiceScheduledTasks.FixedDelayTask> fixedDelay,
-            List<ServiceScheduledTasks.FixedRateTask> fixedRate,
-            List<ServiceScheduledTasks.CustomTask> custom) {
+            List<ScheduledCronTask> cron,
+            List<ScheduledFixedDelayTask> fixedDelay,
+            List<ScheduledFixedRateTask> fixedRate,
+            List<ScheduledCustomTask> custom) {
 
         Task task = managedScheduledTask.getScheduledTask().getTask();
 
@@ -75,53 +84,44 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler, 
         }
     }
 
-    private ServiceScheduledTasks.CronTask assembleCronTask(CronTask task, ManagedScheduledTask managedScheduledTask) {
+    private ScheduledCronTask assembleCronTask(CronTask task, ManagedScheduledTask managedScheduledTask) {
         String target = managedScheduledTask.getRunnable().toString();
 
-        return new ServiceScheduledTasks.CronTask(
-                new ServiceScheduledTasks.Runnable(target),
-                task.getExpression(),
-                null,
-                null,
-                managedScheduledTask.isEnabled());
+        return new ScheduledCronTask()
+                .runnable(new ScheduledTaskRunnable().target(target))
+                .expression(task.getExpression())
+                .enabled(managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.FixedRateTask assembleFixedRateTask(
+    private ScheduledFixedRateTask assembleFixedRateTask(
             FixedRateTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
-        return new ServiceScheduledTasks.FixedRateTask(
-                new ServiceScheduledTasks.Runnable(target),
-                task.getIntervalDuration().toMillis(),
-                task.getInitialDelayDuration().toMillis(),
-                null,
-                null,
-                managedScheduledTask.isEnabled());
+        return new ScheduledFixedRateTask()
+                .runnable(new ScheduledTaskRunnable().target(target))
+                .interval(task.getIntervalDuration().toMillis())
+                .initialDelay(task.getInitialDelayDuration().toMillis())
+                .enabled(managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.FixedDelayTask assembleFixedDelayMap(
+    private ScheduledFixedDelayTask assembleFixedDelayMap(
             FixedDelayTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
-        return new ServiceScheduledTasks.FixedDelayTask(
-                new ServiceScheduledTasks.Runnable(target),
-                task.getIntervalDuration().toMillis(),
-                task.getInitialDelayDuration().toMillis(),
-                null,
-                null,
-                managedScheduledTask.isEnabled());
+        return new ScheduledFixedDelayTask()
+                .runnable(new ScheduledTaskRunnable().target(target))
+                .interval(task.getIntervalDuration().toMillis())
+                .initialDelay(task.getInitialDelayDuration().toMillis())
+                .enabled(managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.CustomTask assembleCustomMap(
-            TriggerTask task, ManagedScheduledTask managedScheduledTask) {
+    private ScheduledCustomTask assembleCustomMap(TriggerTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
-        return new ServiceScheduledTasks.CustomTask(
-                new ServiceScheduledTasks.Runnable(target),
-                task.getTrigger().toString(),
-                null,
-                null,
-                managedScheduledTask.isEnabled());
+        return new ScheduledCustomTask()
+                .runnable(new ScheduledTaskRunnable().target(target))
+                .trigger(task.getTrigger().toString())
+                .enabled(managedScheduledTask.isEnabled());
     }
 
     @Override

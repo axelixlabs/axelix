@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: scheduled-task-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'scheduled-task-feed' operation.
+    This operation lists every scheduled task of the Spring Boot app, grouped by the kind of
+    trigger that drives it (cron, fixed-delay, fixed-rate or a custom trigger), so that Axelix
+    Master can render the scheduled tasks overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-scheduled-tasks:
+    get:
+      operationId: getScheduledTasks
+      summary: Lists all scheduled tasks of the service, grouped by their trigger kind.
+      responses:
+        '200':
+          description: The feed of the service's scheduled tasks.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceScheduledTasks'
+components:
+  schemas:
+    ServiceScheduledTasks:
+      type: object
+      description: The overview of all scheduled tasks of the service, grouped by trigger kind.
+      required:
+        - cron
+        - fixedDelay
+        - fixedRate
+        - custom
+      properties:
+        cron:
+          type: array
+          description: The tasks driven by a cron expression.
+          items:
+            $ref: '#/components/schemas/ScheduledCronTask'
+          x-axelix-introduced-in: 1.2.0
+        fixedDelay:
+          type: array
+          description: The tasks re-scheduled a fixed delay after the previous execution finishes.
+          items:
+            $ref: '#/components/schemas/ScheduledFixedDelayTask'
+          x-axelix-introduced-in: 1.2.0
+        fixedRate:
+          type: array
+          description: The tasks re-scheduled at a fixed rate measured from the previous execution start.
+          items:
+            $ref: '#/components/schemas/ScheduledFixedRateTask'
+          x-axelix-introduced-in: 1.2.0
+        custom:
+          type: array
+          description: The tasks driven by a custom user-supplied trigger.
+          items:
+            $ref: '#/components/schemas/ScheduledCustomTask'
+          x-axelix-introduced-in: 1.2.0
+    ScheduledCronTask:
+      type: object
+      description: A scheduled task driven by a cron expression.
+      required:
+        - runnable
+        - expression
+        - enabled
+      properties:
+        runnable:
+          description: The target that is executed when the task fires.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskRunnable'
+        expression:
+          type: string
+          description: The cron expression that drives the task.
+          x-axelix-introduced-in: 1.2.0
+        nextExecution:
+          description: The next scheduled execution of the task, when known.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskNextExecution'
+        lastExecution:
+          description: The most recent execution of the task, when it has run at least once.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskLastExecution'
+        enabled:
+          type: boolean
+          description: Whether the task is currently enabled.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledFixedDelayTask:
+      type: object
+      description: A scheduled task re-scheduled a fixed delay after the previous execution finishes.
+      required:
+        - runnable
+        - interval
+        - initialDelay
+        - enabled
+      properties:
+        runnable:
+          description: The target that is executed when the task fires.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskRunnable'
+        interval:
+          type: integer
+          format: int64
+          description: The delay, in milliseconds, between the end of one execution and the start of the next.
+          x-axelix-introduced-in: 1.2.0
+        initialDelay:
+          type: integer
+          format: int64
+          description: The delay, in milliseconds, before the first execution.
+          x-axelix-introduced-in: 1.2.0
+        nextExecution:
+          description: The next scheduled execution of the task, when known.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskNextExecution'
+        lastExecution:
+          description: The most recent execution of the task, when it has run at least once.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskLastExecution'
+        enabled:
+          type: boolean
+          description: Whether the task is currently enabled.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledFixedRateTask:
+      type: object
+      description: A scheduled task re-scheduled at a fixed rate measured from the previous execution start.
+      required:
+        - runnable
+        - interval
+        - initialDelay
+        - enabled
+      properties:
+        runnable:
+          description: The target that is executed when the task fires.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskRunnable'
+        interval:
+          type: integer
+          format: int64
+          description: The interval, in milliseconds, between the start of one execution and the start of the next.
+          x-axelix-introduced-in: 1.2.0
+        initialDelay:
+          type: integer
+          format: int64
+          description: The delay, in milliseconds, before the first execution.
+          x-axelix-introduced-in: 1.2.0
+        nextExecution:
+          description: The next scheduled execution of the task, when known.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskNextExecution'
+        lastExecution:
+          description: The most recent execution of the task, when it has run at least once.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskLastExecution'
+        enabled:
+          type: boolean
+          description: Whether the task is currently enabled.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledCustomTask:
+      type: object
+      description: A scheduled task driven by a custom user-supplied trigger.
+      required:
+        - runnable
+        - trigger
+        - enabled
+      properties:
+        runnable:
+          description: The target that is executed when the task fires.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskRunnable'
+        trigger:
+          type: string
+          description: The string representation of the custom trigger that drives the task.
+          x-axelix-introduced-in: 1.2.0
+        nextExecution:
+          description: The next scheduled execution of the task, when known.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskNextExecution'
+        lastExecution:
+          description: The most recent execution of the task, when it has run at least once.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskLastExecution'
+        enabled:
+          type: boolean
+          description: Whether the task is currently enabled.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledTaskRunnable:
+      type: object
+      description: The target that a scheduled task executes.
+      required:
+        - target
+      properties:
+        target:
+          type: string
+          description: The string representation of the executed target.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledTaskNextExecution:
+      type: object
+      description: The next planned execution of a scheduled task.
+      required:
+        - time
+      properties:
+        time:
+          type: string
+          description: The ISO-8601 timestamp of the next planned execution.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledTaskLastExecution:
+      type: object
+      description: The most recent execution of a scheduled task.
+      required:
+        - status
+        - time
+      properties:
+        status:
+          type: string
+          description: The outcome of the last execution (e.g. STARTED, SUCCESS, ERROR).
+          x-axelix-introduced-in: 1.2.0
+        time:
+          type: string
+          description: The ISO-8601 timestamp of the last execution.
+          x-axelix-introduced-in: 1.2.0
+        exception:
+          description: The exception that failed the last execution, when it ended in error.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ScheduledTaskExecutionException'
+    ScheduledTaskExecutionException:
+      type: object
+      description: The exception that failed a scheduled task execution.
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The fully-qualified class name of the thrown exception.
+          x-axelix-introduced-in: 1.2.0
+        message:
+          type: string
+          description: The message of the thrown exception.
+          x-axelix-introduced-in: 1.2.0
