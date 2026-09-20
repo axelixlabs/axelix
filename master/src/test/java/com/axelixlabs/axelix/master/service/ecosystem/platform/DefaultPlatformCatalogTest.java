@@ -55,20 +55,8 @@ class DefaultPlatformCatalogTest {
         DefaultPlatformCatalog subject = new DefaultPlatformCatalog(platformManifestLoader);
 
         // then
-        assertThat(subject.find(PlatformName.SPRING_BOOT)).contains(springBoot);
-        assertThat(subject.find(PlatformName.OPEN_JDK)).contains(openJdk);
-    }
-
-    @Test
-    void returnsEmptyOptionalForPlatformAbsentInManifests() {
-        // given
-        when(platformManifestLoader.load()).thenReturn(List.of(platform(PlatformName.SPRING_BOOT)));
-
-        // when
-        DefaultPlatformCatalog subject = new DefaultPlatformCatalog(platformManifestLoader);
-
-        // then
-        assertThat(subject.find(PlatformName.OPEN_JDK)).isEmpty();
+        assertThat(subject.find(PlatformName.SPRING_BOOT)).isEqualTo(springBoot);
+        assertThat(subject.find(PlatformName.OPEN_JDK)).isEqualTo(openJdk);
     }
 
     @Test

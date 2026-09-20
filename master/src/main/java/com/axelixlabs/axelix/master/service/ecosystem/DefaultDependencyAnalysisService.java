@@ -19,17 +19,18 @@ package com.axelixlabs.axelix.master.service.ecosystem;
 
 import java.time.Instant;
 import java.util.List;
-
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.response.dependencies.AnalyzedDependency;
+import com.axelixlabs.axelix.master.api.external.response.dependencies.AppFrameworkInfo;
 import com.axelixlabs.axelix.master.api.external.response.dependencies.DependencyAnalysisResponse;
-import com.axelixlabs.axelix.master.api.external.response.dependencies.FrameworkPlatform;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
+import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLine;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.exception.SbomNotAvailableException;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformCatalog;
@@ -90,16 +91,16 @@ public class DefaultDependencyAnalysisService implements DependencyAnalysisServi
                 sbom.rootCoordinates(), Instant.now(), platformWindowOf(instance), dependencies);
     }
 
-    private @Nullable FrameworkPlatform platformWindowOf(Instance instance) {
-        return platformCatalog
-                .find(PlatformName.SPRING_BOOT)
-                .flatMap(platform -> platform.lineOf(instance.springBootVersion())
-                        .map(line -> new FrameworkPlatform(
-                                platform.name(),
-                                instance.springBootVersion(),
-                                line,
-                                platform.latestKnownReleaseLine(),
-                                platform.minimalOssSupportedReleaseLine())))
-                .orElse(null);
+    private AppFrameworkInfo platformWindowOf(Instance instance) {
+        Platform springBoot = platformCatalog.find(PlatformName.SPRING_BOOT);
+
+        Optional<PlatformReleaseLine> releaseLine = springBoot.lineOf(instance.springBootVersion());
+
+        return new AppFrameworkInfo(
+                springBoot.name().name(),
+                instance.springBootVersion(),
+                releaseLine.orElse(null),
+                springBoot.latestKnownReleaseLine(),
+                springBoot.minimalOssSupportedReleaseLine());
     }
 }

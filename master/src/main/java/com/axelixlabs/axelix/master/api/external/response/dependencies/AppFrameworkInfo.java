@@ -17,24 +17,26 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.dependencies;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
-import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLine;
 
 /**
- * The {@link Platform} that represents the Framework being used
+ * The {@link Platform} that represents the Framework being used in the particulat app.
  *
- * @param name                the name of the framework, e.g. {@code Spring Boot}
- * @param version             the exact version the instance runs
- * @param line                the release line the version belongs to
- * @param latestKnownLine     the most recent release line Axelix knows about
- * @param oldestSupportedLine the release line a team on this framework is expected to move to
+ * @param name                the name of the framework, e.g. {@code Spring Boot}.
+ * @param version             the exact version of the framework the app runs.
+ * @param line                the release line the version belongs to. Might be null if Axelix Master does
+ *                            not know this release line of the framework.
+ * @param latestKnownLine     the most recent framework release line Axelix knows about.
+ * @param oldestSupportedLine the oldest framework release line that is still supported.
  *
  * @author Mikhail Polivakha
  */
-public record FrameworkPlatform(
-        PlatformName name,
+public record AppFrameworkInfo(
+        String name,
         String version,
-        PlatformReleaseLine line,
+        @Nullable PlatformReleaseLine line,
         PlatformReleaseLine latestKnownLine,
         PlatformReleaseLine oldestSupportedLine) {}

@@ -398,7 +398,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
     }
 
     @Nested
-    class GetSpringFrameworkDashboard {
+    class GetSpringAppFrameworkInfoDashboard {
 
         @Test
         void shouldAggregateSpringFrameworkFeaturesAdoptionAcrossServices() {

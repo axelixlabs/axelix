@@ -439,8 +439,7 @@ class AxelixCachesEndpointTest {
     }
 
     private static Stream<Arguments> nonExistentManagerPaths() {
-        return Stream.of(
-                Arguments.of("/nonExistentManager", "/disable"));
+        return Stream.of(Arguments.of("/nonExistentManager", "/disable"));
     }
 
     @ParameterizedTest

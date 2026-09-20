@@ -55,7 +55,10 @@ public class DefaultPlatformCatalog implements PlatformCatalog {
     }
 
     @Override
-    public Optional<Platform> find(PlatformName platformName) {
-        return Optional.ofNullable(cache.get(platformName));
+    public Platform find(PlatformName platformName) {
+        return Optional.ofNullable(cache.get(platformName))
+                .orElseThrow(() -> new IllegalStateException(
+                        "The request platform '%s' is unknown to Axelix Master. That should not be the case, report to maintainers."
+                                .formatted(platformName)));
     }
 }

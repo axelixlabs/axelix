@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service.ecosystem.platform;
 
-import java.util.Optional;
-
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 
@@ -33,7 +31,10 @@ public interface PlatformCatalog {
     /**
      * @param platformName the name of the platform.
      *
-     * @return the curated policy of the platform, or empty when the platform is not curated
+     * @throws IllegalStateException in case the platform is not found. The platforms exist as the pre-condition,
+     *         and they represent a set with the well-known values. So any requested platform must be found.
+     *
+     * @return the curated policy of the platform
      */
-    Optional<Platform> find(PlatformName platformName);
+    Platform find(PlatformName platformName) throws IllegalStateException;
 }
