@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
-import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
-import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.sbs.spring.core.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersGroupProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.SingleLoggerProfile;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 

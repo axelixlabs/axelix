@@ -38,11 +38,13 @@ import org.springframework.boot.logging.LoggerGroup;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
 
-import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
-import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
-import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.sbs.spring.core.contract.logger.GroupLogLevelChangeRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersFeedGroup;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersFeedLogger;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.LoggersGroupProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.logger.SingleLoggerProfile;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LogLevelNotFoundException;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.exceptions.LoggerNotFoundException;
 import com.axelixlabs.axelix.sbs.spring.core.loggers.state.DefaultLoggerChange;
@@ -78,7 +80,10 @@ public class DefaultLoggersService implements LoggersService {
     public LoggersFeed getAllLoggers() {
         List<LoggerConfiguration> loggerConfigurations = loggingSystem.getLoggerConfigurations();
 
-        return new LoggersFeed(getLogLevels(), getLoggers(loggerConfigurations), getLoggerGroups());
+        return new LoggersFeed()
+                .levels(getLogLevels())
+                .loggers(getLoggers(loggerConfigurations))
+                .groups(getLoggerGroups());
     }
 
     @Override
@@ -189,24 +194,34 @@ public class DefaultLoggersService implements LoggersService {
                 .orElseThrow(() -> new LoggerNotFoundException(LOGGER_GROUP_NOT_FOUND_MESSAGE.formatted(groupName)));
     }
 
-    private List<SingleLoggerProfile> getLoggers(List<LoggerConfiguration> loggerConfigurations) {
-        List<SingleLoggerProfile> loggers = new ArrayList<>(loggerConfigurations.size());
+    private List<LoggersFeedLogger> getLoggers(List<LoggerConfiguration> loggerConfigurations) {
+        List<LoggersFeedLogger> loggers = new ArrayList<>(loggerConfigurations.size());
 
         for (LoggerConfiguration loggerConfig : loggerConfigurations) {
-            loggers.add(convertToSingleLoggerProfile(loggerConfig));
+            SingleLoggerProfile profile = convertToSingleLoggerProfile(loggerConfig);
+            loggers.add(new LoggersFeedLogger()
+                    .name(profile.getName())
+                    .configuredLevel(profile.getConfiguredLevel())
+                    .effectiveLevel(profile.getEffectiveLevel())
+                    .fallbackLevel(profile.getFallbackLevel())
+                    .temporaryLevelInitiatedAt(profile.getTemporaryLevelInitiatedAt())
+                    .temporaryLevelRollsBackAt(profile.getTemporaryLevelRollsBackAt()));
         }
 
         return loggers;
     }
 
-    private List<LoggersGroupProfile> getLoggerGroups() {
-        List<LoggersGroupProfile> groups = new ArrayList<>();
+    private List<LoggersFeedGroup> getLoggerGroups() {
+        List<LoggersFeedGroup> groups = new ArrayList<>();
 
         loggerGroups.forEach((group) -> {
             LogLevel logLevel = group.getConfiguredLevel();
             String configuredLevel = logLevel != null ? logLevel.toString() : null;
 
-            groups.add(new LoggersGroupProfile(group.getName(), configuredLevel, group.getMembers()));
+            groups.add(new LoggersFeedGroup()
+                    .name(group.getName())
+                    .configuredLevel(configuredLevel)
+                    .members(group.getMembers()));
         });
 
         return groups;
@@ -219,19 +234,19 @@ public class DefaultLoggersService implements LoggersService {
         String loggerName = loggerConfiguration.getName();
         LoggerChange loggerChange = configuredLevelsCache.get(loggerName);
 
-        return new SingleLoggerProfile(
-                loggerName,
-                ofNullable(configuredLevel).map(Enum::name).orElse(null),
-                effectiveLevel.name(),
-                ofNullable(loggerChange)
+        return new SingleLoggerProfile()
+                .name(loggerName)
+                .configuredLevel(ofNullable(configuredLevel).map(Enum::name).orElse(null))
+                .effectiveLevel(effectiveLevel.name())
+                .fallbackLevel(ofNullable(loggerChange)
                         .map(LoggerChange::getInitialConfiguredLevel)
-                        .orElse(null),
-                ofNullable(loggerChange)
+                        .orElse(null))
+                .temporaryLevelInitiatedAt(ofNullable(loggerChange)
                         .map(LoggerChange::getInitiatedAt)
                         .map(it -> it.atOffset(ZoneOffset.UTC))
                         .map(FORMATTER::format)
-                        .orElse(null),
-                ofNullable(loggerChange)
+                        .orElse(null))
+                .temporaryLevelRollsBackAt(ofNullable(loggerChange)
                         .map(LoggerChange::getAutoRollsBackAt)
                         .map(it -> it.atOffset(ZoneOffset.UTC))
                         .map(FORMATTER::format)
@@ -243,7 +258,10 @@ public class DefaultLoggersService implements LoggersService {
 
         String configuredLevel = logLevel != null ? logLevel.name() : null;
 
-        return new LoggersGroupProfile(groupName, configuredLevel, loggerGroup.getMembers());
+        return new LoggersGroupProfile()
+                .name(groupName)
+                .configuredLevel(configuredLevel)
+                .members(loggerGroup.getMembers());
     }
 
     private LogLevel convertToLogLevel(String level) throws LogLevelNotFoundException {
