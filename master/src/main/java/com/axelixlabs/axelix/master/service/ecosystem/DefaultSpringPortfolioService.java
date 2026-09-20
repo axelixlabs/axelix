@@ -26,15 +26,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.Nullable;
-
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
-import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLine;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.ApplicationPlatformVersions;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformCatalog;
-import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse.MaintenanceWindowEntry;
 import static com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse.PlatformDistribution;
@@ -48,17 +46,18 @@ import static com.axelixlabs.axelix.master.api.external.response.dashboard.Sprin
  */
 public class DefaultSpringPortfolioService implements SpringPortfolioService {
 
-    private final InstanceRegistry instanceRegistry;
+    private final HistoricalApplicationSnapshotRepository snapshotRepository;
     private final PlatformCatalog platformCatalog;
 
-    public DefaultSpringPortfolioService(InstanceRegistry instanceRegistry, PlatformCatalog platformCatalog) {
-        this.instanceRegistry = instanceRegistry;
+    public DefaultSpringPortfolioService(
+            HistoricalApplicationSnapshotRepository snapshotRepository, PlatformCatalog platformCatalog) {
+        this.snapshotRepository = snapshotRepository;
         this.platformCatalog = platformCatalog;
     }
 
     @Override
     public SpringPortfolioResponse getSpringPortfolio() {
-        List<Instance> applications = getApplications();
+        List<ApplicationPlatformVersions> applications = snapshotRepository.findLatestPlatformVersionsPerService();
 
         LocalDate today = LocalDate.now();
         Platform springBoot = platformCatalog.find(PlatformName.SPRING_BOOT);
@@ -99,20 +98,10 @@ public class DefaultSpringPortfolioService implements SpringPortfolioService {
                 linesInUse);
     }
 
-    private List<Instance> getApplications() {
-        return instanceRegistry.getAll().stream()
-                .collect(Collectors.groupingBy(Instance::applicationId))
-                .values()
-                .stream()
-                .map(List::getFirst)
-                .toList();
-    }
-
     private boolean isFullyOssSupported(
-            Instance app, Platform springBoot, Platform springFramework, LocalDate today) {
+            ApplicationPlatformVersions app, Platform springBoot, Platform springFramework, LocalDate today) {
 
         Optional<PlatformReleaseLine> bootLine = springBoot.lineOf(app.springBootVersion());
-
         Optional<PlatformReleaseLine> frameworkLine = springFramework.lineOf(app.springFrameworkVersion());
 
         return bootLine.map(line -> line.ossSupportedAt(today)).orElse(false)
@@ -176,7 +165,8 @@ public class DefaultSpringPortfolioService implements SpringPortfolioService {
 
         long applicationsOnMajor = lines.stream().mapToLong(Map.Entry::getValue).sum();
 
-        return new PlatformMajorGroup(major, percentageOf(applicationsOnMajor, applicationsTotal), lineUsages);
+        return new PlatformMajorGroup(
+                major, applicationsOnMajor, percentageOf(applicationsOnMajor, applicationsTotal), lineUsages);
     }
 
     /**

@@ -18,24 +18,28 @@
 package com.axelixlabs.axelix.master.service.ecosystem;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
+import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLine;
-import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformCatalog;
-import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse.MaintenanceWindowEntry;
@@ -51,6 +55,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DatabaseMatrixTest
 class DefaultSpringPortfolioServiceTest {
+
+    private static final String GROUP_ID = "com.axelixlabs.test";
+
+    private static final LocalDate TODAY = LocalDate.now(ZoneOffset.UTC);
 
     private static final LocalDate FAR_PAST = LocalDate.of(2000, 1, 1);
     private static final LocalDate FAR_FUTURE = LocalDate.of(2099, 1, 1);
@@ -74,31 +82,32 @@ class DefaultSpringPortfolioServiceTest {
             PlatformName.SPRING_FRAMEWORK,
                     new Platform(PlatformName.SPRING_FRAMEWORK, List.of(FRAMEWORK_5_3, FRAMEWORK_6_1, FRAMEWORK_6_2)));
 
-    private static final PlatformCatalog PLATFORM_CATALOG = name -> Optional.ofNullable(PLATFORMS.get(name));
+    private static final PlatformCatalog PLATFORM_CATALOG = PLATFORMS::get;
 
     @Autowired
-    private InstanceRegistry instanceRegistry;
+    private HistoricalApplicationSnapshotRepository snapshotRepository;
 
     @Autowired
-    private InstanceRepository instanceRepository;
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     private DefaultSpringPortfolioService subject;
 
     @BeforeEach
     void setUp() {
-        instanceRepository.deleteAll();
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
 
-        subject = new DefaultSpringPortfolioService(instanceRegistry, PLATFORM_CATALOG);
+        subject = new DefaultSpringPortfolioService(snapshotRepository, PLATFORM_CATALOG);
     }
 
     @Test
     void aggregatesTheFleetAcrossApplicationsAndReleaseLines() {
         // given.
-        instanceRegistry.reload(TestInstanceFactory.create("a", "com.axelixlabs.test", "app-a", "3.5.2", "6.2.1"));
-        instanceRegistry.reload(TestInstanceFactory.create("b", "com.axelixlabs.test", "app-b", "3.4.1", "6.1.0"));
-        instanceRegistry.reload(TestInstanceFactory.create("c", "com.axelixlabs.test", "app-c", "2.7.0", "5.3.0"));
-        instanceRegistry.reload(TestInstanceFactory.create("d", "com.axelixlabs.test", "app-d", "1.0.0", "6.2.5"));
-        instanceRegistry.reload(TestInstanceFactory.create("e", "com.axelixlabs.test", "app-e", "3.5.0", "6.2.0"));
+        jdbcAggregateTemplate.insertAll(List.of(
+                snapshot("app-a", TODAY, "3.5.2", "6.2.1"),
+                snapshot("app-b", TODAY, "3.4.1", "6.1.0"),
+                snapshot("app-c", TODAY, "2.7.0", "5.3.0"),
+                snapshot("app-d", TODAY, "1.0.0", "6.2.5"),
+                snapshot("app-e", TODAY, "3.5.0", "6.2.0")));
 
         // when.
         SpringPortfolioResponse response = subject.getSpringPortfolio();
@@ -159,5 +168,39 @@ class DefaultSpringPortfolioServiceTest {
                         Tuple.tuple(PlatformName.SPRING_FRAMEWORK, "5.3.x", 1),
                         Tuple.tuple(PlatformName.SPRING_FRAMEWORK, "6.1.x", 1),
                         Tuple.tuple(PlatformName.SPRING_FRAMEWORK, "6.2.x", 3));
+    }
+
+    @Test
+    void countsEachServiceOnceUsingOnlyItsLatestSnapshot() {
+        // given a stale snapshot on old lines superseded by today's snapshot on current lines.
+        jdbcAggregateTemplate.insertAll(List.of(
+                snapshot("app-a", TODAY.minusDays(2), "2.7.0", "5.3.0"), snapshot("app-a", TODAY, "3.5.2", "6.2.1")));
+
+        // when.
+        SpringPortfolioResponse response = subject.getSpringPortfolio();
+
+        // then only the latest snapshot is counted, exactly once.
+        assertThat(response.applicationsTotal()).isEqualTo(1);
+        assertThat(response.springBoot().majors())
+                .flatExtracting(PlatformMajorGroup::lines)
+                .extracting(PlatformLineUsage::line, PlatformLineUsage::applicationCount)
+                .containsExactly(Tuple.tuple("3.5.x", 1));
+        assertThat(response.springFramework().majors())
+                .flatExtracting(PlatformMajorGroup::lines)
+                .extracting(PlatformLineUsage::line, PlatformLineUsage::applicationCount)
+                .containsExactly(Tuple.tuple("6.2.x", 1));
+    }
+
+    private static HistoricalApplicationSnapshot snapshot(
+            String artifactId, LocalDate date, String springBootVersion, String springFrameworkVersion) {
+        return new HistoricalApplicationSnapshot(
+                new SnapshotId(GROUP_ID, artifactId, date),
+                new Insights(
+                        new Insights.HotSpot(
+                                new Insights.HotSpot.ProjectLeyden(false, false),
+                                new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
+                                new Insights.HotSpot.ProjectLilliput(false)),
+                        new Insights.SpringFramework(false, springBootVersion, springFrameworkVersion),
+                        new PersistenceInsights(List.of())));
     }
 }

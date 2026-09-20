@@ -63,11 +63,13 @@ public record SpringPortfolioResponse(
     /**
      * One major generation of a platform , and the release lines within it that the fleet actually runs.
      *
-     * @param major                  the major generation
-     * @param applicationPercentage  the share of the fleet's applications on this major generation
-     * @param lines                  the release lines within this major generation that are in use, newest first
+     * @param major                  the major generation.
+     * @param applicationCount       total count of applications inside this major group.
+     * @param applicationPercentage  the share of the fleet's applications on this major generation.
+     * @param lines                  the release lines within this major generation that are in use, newest first.
      */
-    public record PlatformMajorGroup(String major, int applicationPercentage, List<PlatformLineUsage> lines) {}
+    public record PlatformMajorGroup(
+            String major, long applicationCount, int applicationPercentage, List<PlatformLineUsage> lines) {}
 
     /**
      * How many applications in the fleet run a given release line, and whether that line is still OSS supported.
