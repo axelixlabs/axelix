@@ -244,23 +244,6 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
-    void clear_shouldClearAllCaches() {
-        String key1 = "key1", key2 = "key2";
-        Cache cache1 = clearCacheManager.getCache(TEST_CACHE_1);
-        Cache cache2 = clearCacheManager.getCache(TEST_CACHE_2);
-        cache1.put(key1, "value1");
-        cache2.put(key2, "value2");
-
-        ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
-                .exchange(path(CLEAR_CACHE_MANAGER, "/clear-all"), HttpMethod.DELETE, null, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(cache1.get(key1)).isNull();
-        assertThat(cache2.get(key2)).isNull();
-    }
-
-    @Test
     void disable_onDisableAllCacheManager() {
         Cache cache1 = disableCacheManager.getCache(TEST_CACHE_1);
         Cache cache2 = disableCacheManager.getCache(TEST_CACHE_2);
@@ -466,16 +449,6 @@ class AxelixCachesEndpointTest {
     private static Stream<Arguments> nonExistentManagerPaths() {
         return Stream.of(
                 Arguments.of("nonExistentManager", "/enable"), Arguments.of("/nonExistentManager", "/disable"));
-    }
-
-    @Test
-    @Disabled // TODO: Uncomment once we solve the exception handling on the starter side
-    void clearAll_shouldReturnFalse_cacheManagerDoesNotExist() {
-        ResponseEntity<Void> response = testRestTemplate
-                .asEditor()
-                .exchange(path("/nonExistentManager/clear-all", ""), HttpMethod.DELETE, defaultEntity(), Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @ParameterizedTest

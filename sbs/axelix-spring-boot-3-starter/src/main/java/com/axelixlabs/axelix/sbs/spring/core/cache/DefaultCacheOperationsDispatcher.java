@@ -124,11 +124,6 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
     }
 
     @Override
-    public void clear(String cacheManagerName) {
-        execute(cacheManagerName, EnhancedCacheManager::clearAll);
-    }
-
-    @Override
     public void clearAll() throws CacheManagerNotFoundException {
         cacheManagers.forEach((cacheManagerName, cacheManager) -> cacheManager.clearAll());
     }

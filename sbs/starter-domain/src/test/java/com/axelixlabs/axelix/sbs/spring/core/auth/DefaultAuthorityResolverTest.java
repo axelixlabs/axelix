@@ -80,7 +80,6 @@ class DefaultAuthorityResolverTest {
                         OssAuthority.CACHES_CLEAR),
                 Arguments.of(
                         "/axelix-caches/cacheManager/cacheName/clear", HttpMethod.DELETE, OssAuthority.CACHES_CLEAR),
-                Arguments.of("/axelix-caches/cacheManager/clear-all", HttpMethod.DELETE, OssAuthority.CACHES_CLEAR),
 
                 // CACHES_TOGGLE
                 Arguments.of(

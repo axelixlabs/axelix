@@ -73,14 +73,6 @@ public interface CacheOperationsDispatcher {
     void clear(String cacheManagerName, String cacheName, Object key) throws CacheManagerNotFoundException;
 
     /**
-     * Clears all caches managed by the specified {@code CacheManager}.
-     *
-     * @param cacheManagerName the name (bean name) of the {@code CacheManager}
-     * @throws CacheManagerNotFoundException in case the requested CacheManager is not found.
-     */
-    void clear(String cacheManagerName) throws CacheManagerNotFoundException;
-
-    /**
      * Clears all cache managers in the application {@code CacheManager}.
      */
     void clearAll() throws CacheManagerNotFoundException;

@@ -331,7 +331,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
                 Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
@@ -346,7 +345,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
                 Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
@@ -365,7 +363,6 @@ class JwtAuthorizationFilterTest {
         return Stream.of(
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
                 Arguments.of(path("/disable"), HttpMethod.POST),
                 Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),

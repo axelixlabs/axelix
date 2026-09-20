@@ -125,23 +125,6 @@ class DefaultCacheOperationsDispatcherTest {
     }
 
     @Test
-    void clearAll_shouldClearAllCaches() {
-        // given.
-        String key1 = "key1", key2 = "key2";
-        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
-        Cache cache2 = cacheManager1.getCache(TEST_CACHE_2);
-        cache1.put(key1, "value1");
-        cache2.put(key2, "value2");
-
-        // when.
-        dispatcher.clear(TEST_CACHE_MANAGER_1);
-
-        // then.
-        assertThat(cache1.get(key1)).isNull();
-        assertThat(cache2.get(key2)).isNull();
-    }
-
-    @Test
     void disableCacheManager_shouldDisableSpecificManager() {
         Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
 

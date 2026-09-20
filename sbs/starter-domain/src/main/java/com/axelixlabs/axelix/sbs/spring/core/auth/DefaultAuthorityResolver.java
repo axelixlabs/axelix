@@ -58,7 +58,6 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         // CACHES_CLEAR
         map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, OssAuthority.CACHES_CLEAR);
         map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE, OssAuthority.CACHES_CLEAR);
-        map.put(ActuatorEndpoints.CLEAR_SINGLE_CACHE_MANAGER, OssAuthority.CACHES_CLEAR);
 
         // CACHES_TOGGLE
         map.put(ActuatorEndpoints.ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);

@@ -72,11 +72,6 @@ public class AxelixCachesEndpoint {
         }
     }
 
-    @DeleteMapping("/{cacheManagerName}/clear-all")
-    public void clearAll(@PathVariable String cacheManagerName) {
-        dispatcher.clear(cacheManagerName);
-    }
-
     @PostMapping("/{cacheManagerName}/enable")
     public void enableManager(@PathVariable String cacheManagerName) {
         dispatcher.enableCacheManager(cacheManagerName);
