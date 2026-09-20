@@ -196,7 +196,7 @@ class EntitiesMcpServerToolsTest {
                                 new Insights.HotSpot.ProjectLeyden(false, false),
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
-                        new Insights.SpringFramework(false),
+                        new Insights.SpringFramework(false, null, null),
                         new PersistenceInsights(List.of(), jpaEntities)));
     }
 }

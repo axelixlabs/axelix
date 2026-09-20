@@ -25,4 +25,5 @@
   <include relativeToChangelogFile="true" file="changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.1/012-add-oidc-subject-to-users.xml"/>
   <include relativeToChangelogFile="true" file="changelog/1.2/001-add-starter-version-to-instances.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/1.2/002-add-spring-versions-to-historical-application-snapshots.xml"/>
 </databaseChangeLog>

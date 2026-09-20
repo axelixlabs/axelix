@@ -32,16 +32,16 @@ import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.TransformedMetricValue;
 import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
-import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
-import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.HealthStatus;
-import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.MemoryUsage;
-import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.MemoryUsageMap;
-import static com.axelixlabs.axelix.master.api.external.response.DashboardResponse.Status;
+import static com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse.HealthStatus;
+import static com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse.MemoryUsage;
+import static com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse.MemoryUsageMap;
+import static com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse.Status;
 
 /**
  * Default implementation of {@link DashboardService}.

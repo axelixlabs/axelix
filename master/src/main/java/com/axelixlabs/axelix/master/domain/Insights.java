@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.domain;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 
@@ -71,6 +73,13 @@ public record Insights(
 
     /**
      * @param osivEnabled is OSIV enabled?
+     * @param springBootVersion the Spring Boot version the application ran on. Nullable, since snapshots
+     *        persisted before this column existed carry no version.
+     * @param springFrameworkVersion the Spring Framework version the application ran on. Nullable, since
+     *        snapshots persisted before this column existed carry no version.
      */
-    public record SpringFramework(boolean osivEnabled) {}
+    public record SpringFramework(
+            boolean osivEnabled,
+            @Column("spring_boot_version") @Nullable String springBootVersion,
+            @Column("spring_framework_version") @Nullable String springFrameworkVersion) {}
 }

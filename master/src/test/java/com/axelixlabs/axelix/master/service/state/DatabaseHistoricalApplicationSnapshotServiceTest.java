@@ -550,7 +550,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
                                         false, GarbageCollector.G1),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
-                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
                         persistenceInsights));
     }
 
@@ -570,7 +570,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
                                         false, garbageCollector),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
-                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
                         new PersistenceInsights(List.of())));
     }
 

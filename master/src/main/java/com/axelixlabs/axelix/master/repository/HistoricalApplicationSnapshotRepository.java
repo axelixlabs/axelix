@@ -156,6 +156,23 @@ public interface HistoricalApplicationSnapshotRepository
     HistoricalApplicationSnapshot findLatestApplicationSnapshot(
             @Param("groupId") String groupId, @Param("artifactId") String artifactId);
 
+    @Query("""
+            SELECT
+                s.spring_boot_version AS spring_boot_version,
+                s.spring_framework_version AS spring_framework_version
+            FROM historical_application_snapshots s
+            WHERE
+                s.date = (
+                    SELECT MAX(latest.date)
+                    FROM historical_application_snapshots latest
+                    WHERE latest.group_id = s.group_id
+                      AND latest.artifact_id = s.artifact_id
+                )
+                AND s.spring_boot_version IS NOT NULL
+                AND s.spring_framework_version IS NOT NULL
+            """)
+    List<ApplicationPlatformVersions> findLatestPlatformVersionsPerService();
+
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Java/JVM features.
      *
@@ -187,6 +204,14 @@ public interface HistoricalApplicationSnapshotRepository
      * @param persistenceInsights the persistence insights taken from the service's most recent snapshot.
      */
     record ServicePersistenceInsights(String artifactId, PersistenceInsights persistenceInsights) {}
+
+    /**
+     * The Spring Boot / Spring Framework versions of a single service, taken from its most recent snapshot.
+     *
+     * @param springBootVersion the Spring Boot version.
+     * @param springFrameworkVersion the Spring Framework version.
+     */
+    record ApplicationPlatformVersions(String springBootVersion, String springFrameworkVersion) {}
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.

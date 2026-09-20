@@ -21,8 +21,11 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
+import com.axelixlabs.axelix.master.service.ecosystem.DefaultSpringPortfolioService;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
+import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.DefaultPlatformCatalog;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformCatalog;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformManifestLoader;
@@ -79,5 +82,11 @@ public class EcosystemAutoConfiguration {
             InstanceRegistry instanceRegistry) {
         return new DefaultDependencyAnalysisService(
                 endpointInvoker, sbomParser, softwareProjectsCatalog, platformCatalog, instanceRegistry);
+    }
+
+    @Bean
+    public SpringPortfolioService springPortfolioService(
+            HistoricalApplicationSnapshotRepository snapshotRepository, PlatformCatalog platformCatalog) {
+        return new DefaultSpringPortfolioService(snapshotRepository, platformCatalog);
     }
 }

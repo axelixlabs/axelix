@@ -21,28 +21,34 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
+import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 /**
  * API for rendering the dashboard.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @ExternalApiRestController
 public class DashboardApi {
 
     private final DashboardService dashboardService;
+    private final SpringPortfolioService springPortfolioService;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
 
     public DashboardApi(
             DashboardService dashboardService,
+            SpringPortfolioService springPortfolioService,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService) {
         this.dashboardService = dashboardService;
+        this.springPortfolioService = springPortfolioService;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
     }
 
@@ -76,5 +82,13 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.PERSISTENCE)
     public PersistenceDashboardResponse getPersistenceDashboard() {
         return databaseHistoricalApplicationSnapshotService.getPersistenceDashboard();
+    }
+
+    /**
+     * Retrieve the fleet-wide Spring Boot / Spring Framework version portfolio.
+     */
+    @GetMapping(path = ApiPaths.DashboardApi.SPRING_PORTFOLIO)
+    public SpringPortfolioResponse getSpringPortfolio() {
+        return springPortfolioService.getSpringPortfolio();
     }
 }

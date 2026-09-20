@@ -21,9 +21,12 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.SoftwareVersions;
 import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
@@ -62,7 +65,7 @@ public class HistoricalApplicationSnapshotConverter {
 
         return new com.axelixlabs.axelix.master.domain.Insights(
                 fromHotSpot(insights.getHotSpot(), metadata.getGcInUse()),
-                fromSpringFramework(insights.getSpringFramework()),
+                fromSpringFramework(insights.getSpringFramework(), metadata.getSoftwareVersions()),
                 fromPersistenceInsights(insights.getPersistenceInsights()));
     }
 
@@ -98,8 +101,12 @@ public class HistoricalApplicationSnapshotConverter {
         return new ProjectLilliput(isFeatureEnabled(features, FeatureId.COMPACT_OBJECT_HEADERS));
     }
 
-    private SpringFramework fromSpringFramework(List<InsightFeature> features) {
-        return new SpringFramework(isFeatureEnabled(features, FeatureId.OSIV));
+    private SpringFramework fromSpringFramework(
+            List<InsightFeature> features, @Nullable SoftwareVersions softwareVersions) {
+        return new SpringFramework(
+                isFeatureEnabled(features, FeatureId.OSIV),
+                softwareVersions == null ? null : softwareVersions.getSpringBoot(),
+                softwareVersions == null ? null : softwareVersions.getSpringFramework());
     }
 
     private boolean isFeatureEnabled(List<InsightFeature> features, FeatureId featureId) {
@@ -120,7 +127,7 @@ public class HistoricalApplicationSnapshotConverter {
 
     private com.axelixlabs.axelix.master.domain.Insights defaultInsights() {
         return new com.axelixlabs.axelix.master.domain.Insights(
-                defaultHotSpot(), new SpringFramework(false), new PersistenceInsights(List.of()));
+                defaultHotSpot(), new SpringFramework(false, null, null), new PersistenceInsights(List.of()));
     }
 
     private HotSpot defaultHotSpot() {
