@@ -15,26 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringPortfolio";
-export * from "./dashboard/dashboardSpringFramework";
-export * from "./dashboard/dashboardPersistence";
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./settings";
-export * from "./license";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./MCP";
-export * from "./gc";
+import { apiFetch } from "@/api";
+
+export const getDashboardSpringPortfolioData = () => {
+    return apiFetch.get("/dashboard/spring-portfolio");
+};

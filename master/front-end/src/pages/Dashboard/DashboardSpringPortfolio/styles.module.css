@@ -1,0 +1,28 @@
+.Header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.HeaderText {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 260px;
+}
+
+.Subtitle {
+    color: var(--axelix-bold-grey);
+    margin-top: 5px;
+}
+
+.Cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}

@@ -267,6 +267,25 @@
             "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
             "osivChartTitle": "Open Session in View (OSIV)",
             "osivChartSubtitle": "Проблемы с производительностью"
+        },
+        "SpringPortfolio": {
+            "title": "Spring Portfolio",
+            "subtitle": "Используемые версии по всей экосистеме относительно опубликованного графика поддержки OSS",
+            "applications": "Приложения",
+            "ossOk": "OSS ✓",
+            "ossNo": "OSS ✕",
+            "supportedHint": "выпуск обновлений сообществом продолжается",
+            "unsupportedHint": "окно поддержки закрыто",
+            "generation": "Поколение программного компонента",
+            "onSupportedLine": "{{supported}} из {{total}} приложений на поддерживаемой OSS линии",
+            "detectedAtRuntime": "Обнаружено во время выполнения в {{total}} приложениях",
+            "ladderTitle": "Окно поддержки OSS · используемые линии",
+            "ladderHint": "На основе графиков, опубликованных командой Spring",
+            "line": "Линия",
+            "ossEnds": "Конец OSS",
+            "apps": "Прил.",
+            "legendSupported": "Поддерживается OSS — сообщество выпускает исправления для этой линии",
+            "legendUnsupported": "Не поддерживается OSS — после этой даты выпусков от сообщества нет"
         }
     },
     "About": {
