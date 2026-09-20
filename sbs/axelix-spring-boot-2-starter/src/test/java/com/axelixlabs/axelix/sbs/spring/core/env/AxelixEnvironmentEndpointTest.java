@@ -45,12 +45,13 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -127,7 +128,7 @@ class AxelixEnvironmentEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
                 .isNotEmpty()
-                .filteredOn(e -> e.getValue().isPrimary())
+                .filteredOn(e -> e.getValue().getIsPrimary())
                 .hasSize(1)
                 .first()
                 .extracting(e -> e.getValue().getValue())
@@ -268,7 +269,7 @@ class AxelixEnvironmentEndpointTest {
                         "Contains the 'server.port' property from 'application.*', which defines the web server port (8080 by default)."));
     }
 
-    private static List<Map.Entry<String, EnvironmentFeed.Property>> findPropertyAppearances(
+    private static List<Map.Entry<String, Property>> findPropertyAppearances(
             String propertyName, ResponseEntity<EnvironmentFeed> response) {
 
         return response.getBody().getPropertySources().stream()

@@ -1,0 +1,166 @@
+openapi: 3.1.0
+info:
+  title: env-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'env-feed' operation.
+    This operation returns an enriched view of the Spring Boot app's environment: the active and
+    default profiles and every property source with its properties (value, origin metadata,
+    deprecation and the injection points that consume each property), so that Axelix Master can
+    render the environment overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-env:
+    get:
+      operationId: getEnvironment
+      summary: Returns the enriched environment feed of the service.
+      parameters:
+        - name: pattern
+          in: query
+          required: false
+          description: An optional regular expression used to filter the returned property names.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The enriched environment feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentFeed'
+components:
+  schemas:
+    EnvironmentFeed:
+      type: object
+      description: The enriched environment overview of the service.
+      required:
+        - activeProfiles
+        - defaultProfiles
+        - propertySources
+      properties:
+        activeProfiles:
+          type: array
+          description: The currently active Spring profiles.
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        defaultProfiles:
+          type: array
+          description: The default Spring profiles.
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        propertySources:
+          type: array
+          description: The property sources of the environment, in precedence order.
+          items:
+            $ref: '#/components/schemas/PropertySource'
+          x-axelix-introduced-in: 1.2.0
+    PropertySource:
+      type: object
+      description: A single property source of the environment together with its properties.
+      required:
+        - name
+        - properties
+      properties:
+        name:
+          type: string
+          description: The name of the property source.
+          x-axelix-introduced-in: 1.2.0
+        description:
+          type: string
+          description: A human-readable description of the property source, when available.
+          x-axelix-introduced-in: 1.2.0
+        properties:
+          type: array
+          description: The properties contributed by this property source.
+          items:
+            $ref: '#/components/schemas/Property'
+          x-axelix-introduced-in: 1.2.0
+    Property:
+      type: object
+      description: A single property contributed by a property source.
+      required:
+        - name
+        - isPrimary
+      properties:
+        name:
+          type: string
+          description: The property name.
+          x-axelix-introduced-in: 1.2.0
+        value:
+          type: string
+          description: The string representation of the property's value, when shown.
+          x-axelix-introduced-in: 1.2.0
+        isPrimary:
+          type: boolean
+          description: >-
+            Whether this value takes precedence over the values of the same property from other
+            property sources.
+          x-axelix-introduced-in: 1.2.0
+        configPropsBeanName:
+          type: string
+          description: The name of the @ConfigurationProperties bean this property maps onto, when any.
+          x-axelix-introduced-in: 1.2.0
+        description:
+          type: string
+          description: The property description from the configuration metadata, when available.
+          x-axelix-introduced-in: 1.2.0
+        deprecation:
+          description: The deprecation information of the property, present only when it is deprecated.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/Deprecation'
+        injectionPoints:
+          type: array
+          description: The points in the code where this property is injected.
+          items:
+            $ref: '#/components/schemas/InjectionPoint'
+          x-axelix-introduced-in: 1.2.0
+    Deprecation:
+      type: object
+      description: The deprecation information of a property.
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The message explaining why the property is deprecated and what to use instead.
+          x-axelix-introduced-in: 1.2.0
+    InjectionPoint:
+      type: object
+      description: A point in the code where a property is injected via @Value.
+      required:
+        - beanName
+        - injectionType
+        - targetName
+        - propertyExpression
+      properties:
+        beanName:
+          type: string
+          description: The name of the Spring bean where the injection occurs.
+          x-axelix-introduced-in: 1.2.0
+        injectionType:
+          description: The kind of injection point.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/InjectionType'
+        targetName:
+          type: string
+          description: The field, method or parameter name that receives the injected value.
+          x-axelix-introduced-in: 1.2.0
+        propertyExpression:
+          type: string
+          description: The @Value expression used at the injection point (e.g. "${some.property:default}").
+          x-axelix-introduced-in: 1.2.0
+    InjectionType:
+      type: string
+      description: The kind of injection point where a @Value annotation is applied.
+      enum:
+        - FIELD
+        - METHOD
+        - CONSTRUCTOR_PARAMETER
+        - METHOD_PARAMETER

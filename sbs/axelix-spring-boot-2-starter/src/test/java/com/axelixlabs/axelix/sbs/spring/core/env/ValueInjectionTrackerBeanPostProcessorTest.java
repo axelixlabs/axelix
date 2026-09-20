@@ -33,8 +33,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

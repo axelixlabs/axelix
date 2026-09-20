@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.

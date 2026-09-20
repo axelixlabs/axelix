@@ -37,8 +37,8 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.ReflectionUtils;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionType;
 
 /**
  * Tracks all @Value injections in Spring beans.
@@ -152,7 +152,11 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
         for (String propertyName : propertyNames) {
             String normalizedName = propertyNameNormalizer.normalize(propertyName);
 
-            InjectionPoint injectionPoint = new InjectionPoint(beanName, injectionType, targetName, expression);
+            InjectionPoint injectionPoint = new InjectionPoint()
+                    .beanName(beanName)
+                    .injectionType(injectionType)
+                    .targetName(targetName)
+                    .propertyExpression(expression);
 
             propertyToInjectionPoints
                     .computeIfAbsent(normalizedName, k -> Collections.synchronizedList(new ArrayList<>()))

@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
-import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +44,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Transa
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -335,7 +334,9 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThatJson(response.getBody()).node("applicationsTotal").isEqualTo(2);
         assertThatJson(response.getBody()).node("springBoot.platform").isEqualTo(PlatformName.SPRING_BOOT.name());
-        assertThatJson(response.getBody()).node("springFramework.platform").isEqualTo(PlatformName.SPRING_FRAMEWORK.name());
+        assertThatJson(response.getBody())
+                .node("springFramework.platform")
+                .isEqualTo(PlatformName.SPRING_FRAMEWORK.name());
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_SPRING_PORTFOLIO, viewer.getActor());
     }
 
