@@ -31,12 +31,12 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;

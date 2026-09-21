@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 import com.axelixlabs.axelix.master.filter.ExceptionHandlingFilter;
@@ -40,7 +41,7 @@ public class AxelixAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixVersionDiscoverer axelixVersionDiscoverer() {
-        return new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties");
+        return new CachingAxelixVersionDiscoverer(new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties"));
     }
 
     @Bean
