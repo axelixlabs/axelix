@@ -62,7 +62,6 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         // CACHES_TOGGLE
         map.put(ActuatorEndpoints.ENABLE_CACHE, OssAuthority.CACHES_TOGGLE);
         map.put(ActuatorEndpoints.DISABLE_CACHE, OssAuthority.CACHES_TOGGLE);
-        map.put(ActuatorEndpoints.DISABLE_CACHES_MANAGER, OssAuthority.CACHES_TOGGLE);
 
         // GARBAGE_COLLECTOR
         map.put(ActuatorEndpoints.GC_TRIGGER, OssAuthority.GARBAGE_COLLECTOR);

@@ -69,21 +69,7 @@ public class CachesManagementApi {
                 createCachePayload(cacheManagerName, cacheName));
     }
 
-    @PostMapping(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER)
-    public void disableCacheManager(
-            @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
-
-        endpointInvoker.invokeNoValue(
-                InstanceId.of(instanceId),
-                ActuatorEndpoints.DISABLE_CACHES_MANAGER,
-                createCacheManagerPayload(cacheManagerName));
-    }
-
     private HttpPayload createCachePayload(String cacheManagerName, String cacheName) {
         return new DefaultHttpPayload(Map.of("cacheManagerName", cacheManagerName, "cacheName", cacheName));
-    }
-
-    private HttpPayload createCacheManagerPayload(String cacheManagerName) {
-        return new DefaultHttpPayload(Map.of("cacheManagerName", cacheManagerName));
     }
 }

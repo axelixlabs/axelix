@@ -72,11 +72,6 @@ public class AxelixCachesEndpoint {
         }
     }
 
-    @PostMapping("/{cacheManagerName}/disable")
-    public void disableManager(@PathVariable String cacheManagerName) {
-        dispatcher.disableCacheManager(cacheManagerName);
-    }
-
     @PostMapping("/{cacheManagerName}/{cacheName}/enable")
     public void enableCache(@PathVariable String cacheManagerName, @PathVariable String cacheName) {
         dispatcher.enableCache(cacheManagerName, cacheName);

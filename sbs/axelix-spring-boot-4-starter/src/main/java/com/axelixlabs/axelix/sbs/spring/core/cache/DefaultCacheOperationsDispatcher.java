@@ -129,11 +129,6 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
     }
 
     @Override
-    public void disableCacheManager(String cacheManagerName) {
-        execute(cacheManagerName, EnhancedCacheManager::disableAll);
-    }
-
-    @Override
     public void enableCache(String cacheManagerName, String cacheName) {
         execute(cacheManagerName, adapter -> adapter.enable(cacheName));
     }

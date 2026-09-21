@@ -248,27 +248,6 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
-    void disable_onDisableAllCacheManager() {
-        // given.
-        Cache cache1 = disableCacheManager.getCache(TEST_CACHE_1);
-        Cache cache2 = disableCacheManager.getCache(TEST_CACHE_2);
-        cache1.put("key1", "value1");
-        cache2.put("key2", "value2");
-
-        // when.
-        testRestTemplate.asEditor().postForObject(path(DISABLE_CACHE_MANAGER, "/disable"), defaultEntity(), Void.class);
-        cache1.put("key3", "value2");
-        cache2.put("key4", "value2");
-
-        // then.
-        assertThat(cache1.get("key1")).isNull();
-        assertThat(cache1.get("key3")).isNull();
-        assertThat(cache2.get("key2")).isNull();
-        assertThat(cache2.get("key4")).isNull();
-        assertThat(disableCacheManager.getCacheNames()).containsOnly(TEST_CACHE_1, TEST_CACHE_2);
-    }
-
-    @Test
     void enable_shouldEnableOnlySpecificCache() {
         Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
 
@@ -370,20 +349,6 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
-    void disable_shouldShowAllCachesDisabledWhenManagerIsDisabled() {
-        testRestTemplate.asEditor().postForObject(path(DISABLE_CACHE_MANAGER, "/disable"), defaultEntity(), Void.class);
-
-        ResponseEntity<CachesFeed> response = testRestTemplate.asEditor().getForEntity(rootPath(), CachesFeed.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        CacheManagerDto cacheManager = getCacheManager(response.getBody(), DISABLE_CACHE_MANAGER);
-
-        assertThat(cacheManager.getCaches())
-                .allSatisfy(cacheInfo -> assertThat(cacheInfo.isEnabled()).isFalse());
-    }
-
-    @Test
     void disable_shouldShowMixedEnabledStatusWhenSomeCachesAreDisabled() {
         testRestTemplate
                 .asEditor()
@@ -426,20 +391,6 @@ class AxelixCachesEndpointTest {
                 .postForEntity(path(DISABLE_CACHE_MANAGER, "/nonExistentCache/disable"), defaultEntity(), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @ParameterizedTest
-    @MethodSource("nonExistentManagerPaths")
-    void managerOperation_shouldThrowExceptionForNonExistentManager(String cacheManagerName, String relativePath) {
-        ResponseEntity<String> response = testRestTemplate
-                .asEditor()
-                .postForEntity(path(cacheManagerName, relativePath), defaultEntity(), String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    private static Stream<Arguments> nonExistentManagerPaths() {
-        return Stream.of(Arguments.of("/nonExistentManager", "/disable"));
     }
 
     @ParameterizedTest

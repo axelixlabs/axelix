@@ -94,7 +94,6 @@ class DefaultAuthorityResolverTest {
                         OssAuthority.CACHES_TOGGLE),
                 Arguments.of(
                         "/axelix-caches/cacheManager/cacheName/disable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/disable", HttpMethod.POST, OssAuthority.CACHES_TOGGLE),
 
                 // GC
                 Arguments.of("/axelix-gc/trigger", HttpMethod.POST, OssAuthority.GARBAGE_COLLECTOR),

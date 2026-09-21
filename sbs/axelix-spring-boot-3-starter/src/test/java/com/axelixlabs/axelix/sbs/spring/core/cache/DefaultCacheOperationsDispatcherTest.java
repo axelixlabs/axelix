@@ -125,19 +125,6 @@ class DefaultCacheOperationsDispatcherTest {
     }
 
     @Test
-    void disableCacheManager_shouldDisableSpecificManager() {
-        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
-
-        cache1.put("key1", "value1");
-        assertThat(cache1.get("key1")).isNotNull();
-
-        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
-
-        cache1.put("key2", "value2");
-        assertThat(cache1.get("key2")).isNull();
-    }
-
-    @Test
     void disableCache_shouldDisableSpecificCache() {
         Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
 
@@ -185,25 +172,6 @@ class DefaultCacheOperationsDispatcherTest {
     }
 
     @Test
-    void disableCacheManager_shouldNotAffectOtherManagers() {
-        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
-        Cache cache2 = cacheManager2.getCache(TEST_CACHE_2);
-
-        cache1.put("key1", "value1");
-        cache2.put("key2", "value2");
-        assertThat(cache1.get("key1")).isNotNull();
-        assertThat(cache2.get("key2")).isNotNull();
-
-        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
-
-        cache1.put("key3", "value3");
-        cache2.put("key4", "value4");
-
-        assertThat(cache1.get("key3")).isNull();
-        assertThat(cache2.get("key4")).isNotNull();
-    }
-
-    @Test
     void isCacheEnabled_shouldReturnTrueForEnabledCache() {
         assertThat(dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_1).isEnabled())
                 .isTrue();
@@ -234,34 +202,6 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isTrue();
-    }
-
-    @Test
-    void isCacheEnabled_shouldReturnFalseWhenCacheManagerDisabled() {
-        // given.
-        String cacheManagerName = TEST_CACHE_MANAGER_1;
-
-        // when.
-        dispatcher.disableCacheManager(cacheManagerName);
-
-        // then.
-        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_1).isEnabled()).isFalse();
-        assertThat(dispatcher.get(cacheManagerName, TEST_CACHE_2).isEnabled()).isFalse();
-    }
-
-    @Test
-    void isCacheEnabled_shouldReturnTrueWhenCacheManagerDisableEnable() {
-        // given.
-        String cacheManagerName = TEST_CACHE_MANAGER_1;
-        String cacheName = TEST_CACHE_1;
-
-        dispatcher.get(cacheManagerName, cacheName); // to initialize the cache
-
-        // when.
-        dispatcher.disableCacheManager(cacheManagerName);
-
-        // then.
-        assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isFalse();
     }
 
     @Test
@@ -358,13 +298,6 @@ class DefaultCacheOperationsDispatcherTest {
     void shouldReturnNull_ForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.get("nonExistentManager", TEST_CACHE_1))
                 .isInstanceOf(CacheManagerNotFoundException.class);
-    }
-
-    @Test
-    void disableCacheManager_shouldThrowExceptionForNonExistentManager() {
-        assertThatThrownBy(() -> dispatcher.disableCacheManager("nonExistentManager"))
-                .isInstanceOf(CacheManagerNotFoundException.class)
-                .hasMessageContaining("nonExistentManager");
     }
 
     @Test
