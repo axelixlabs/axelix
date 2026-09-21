@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jdbc.repository.query.Query;
@@ -31,6 +32,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Snapsho
  * Repository for the {@link HistoricalApplicationSnapshot} aggregate.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public interface HistoricalApplicationSnapshotRepository
         extends CrudRepository<HistoricalApplicationSnapshot, SnapshotId> {
@@ -139,6 +141,35 @@ public interface HistoricalApplicationSnapshotRepository
             """)
     List<ServicePersistenceInsights> findLatestPersistenceInsightsPerService();
 
+    /**
+     * Returns the latest starter version reported by every service seen at least once within the given window.
+     * For every service (identified by its {@code group_id} + {@code artifact_id}) only the most recent snapshot
+     * within the window is taken into account, so that a service is represented exactly once.
+     *
+     * @param since the earliest date (inclusive) a snapshot must fall on to be considered
+     *
+     * @return one row per service, holding its {@code groupId}, {@code artifactId}, latest {@code starterVersion}
+     *         and the {@code date} of that latest snapshot.
+     */
+    @Query("""
+            SELECT
+                s.group_id AS group_id,
+                s.artifact_id AS artifact_id,
+                s.starter_version AS starter_version,
+                s.date AS date
+            FROM historical_application_snapshots s
+            WHERE
+                s.date >= :since
+                AND s.date = (
+                    SELECT MAX(latest.date)
+                    FROM historical_application_snapshots latest
+                    WHERE latest.group_id = s.group_id
+                      AND latest.artifact_id = s.artifact_id
+                      AND latest.date >= :since
+                )
+            """)
+    List<LatestStarterVersion> findLatestStarterVersionsSince(@Param("since") LocalDate since);
+
     // Select * is generally a bad idea. Here, it does not cost that much, but still.
     @Query(value = """
         SELECT *
@@ -220,4 +251,14 @@ public interface HistoricalApplicationSnapshotRepository
      * @param osivEnabledCount how many services have OSIV enabled.
      */
     record SpringFrameworkInsightsAggregate(long totalServices, long osivEnabledCount) {}
+
+    /**
+     * The latest starter version reported by a single service within a time window.
+     *
+     * @param groupId        the group id of the service.
+     * @param artifactId     the artifact id of the service.
+     * @param starterVersion the Axelix starter version from the service's most recent snapshot in the window.
+     * @param date           the date of that most recent snapshot.
+     */
+    record LatestStarterVersion(String groupId, String artifactId, String starterVersion, LocalDate date) {}
 }

@@ -360,6 +360,15 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/dependencies/{instanceId}";
     }
 
+    public static final class UpgradesApi {
+
+        /**
+         * Endpoint to retrieve how far Axelix Master can be safely upgraded, given the starter versions
+         * currently in use across the fleet.
+         */
+        public static final String MAIN = "/upgrades";
+    }
+
     public static final class McpToolApi {
 
         /**
