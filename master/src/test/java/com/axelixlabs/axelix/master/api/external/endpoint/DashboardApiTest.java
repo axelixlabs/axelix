@@ -22,12 +22,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -167,7 +169,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     private DatabaseHistoricalApplicationSnapshotService historicalApplicationSnapshotService;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     @BeforeEach
     void prepare() {
@@ -346,8 +348,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     }
 
     private void deRegisterAll() {
-        jdbcTemplate.execute("DELETE FROM instances");
-        jdbcTemplate.execute("DELETE FROM historical_application_snapshots");
+        jdbcAggregateTemplate.deleteAll(Instance.class);
+        jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
     }
 
     private static BasicRegistrationMetadata metadata(
