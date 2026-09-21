@@ -1,0 +1,419 @@
+---
+title: "The Tragedy of Software Versioning"
+date: 2026-09-21
+authors: ["Mikhail Polivakha"]
+tags: ["Software Design"]
+heroImagePath: /posts/software-versioning/preview.png
+description: "Software versioning goes far beyond SemVer. A practical guide to CalVer, marketing versions, lockstep releases, pain indexes, and compatibility windows."
+metaDescription: "A practical guide to software versioning strategies: when to use CalVer, SemVer, marketing versions, lockstep releases, pain indexes, and compatibility windows."
+---
+
+> As we say, two of the most complicated problems in software are naming things and versioning software
+
+Thomas Wuerthinger, the GraalVM project lead, once said something along those lines in the corridors of Devoxx Belgium while explaining the details of [this much-discussed article](https://blogs.oracle.com/java/detaching-graalvm-from-the-java-ecosystem-train). It is not an exact quote, just a phrase meant to draw attention to the problem. And that problem is what we are going to discuss today.
+
+Hi everyone! My name is Mikhail Polivakha, and I am the technical lead of the Open Source [Axelix project](https://github.com/axelixlabs/axelix).
+
+I have wanted to write a short article about software versioning in general for quite a while because, in my view, the subject gets far less attention than it deserves. For many people, versioning begins and ends with SemVer, but the topic is much, much broader than it might seem.
+
+This article will be useful to technical leads and those aiming for a Staff Engineer position, because your software versioning strategy, its relationship to your release cycle, and the nature of your software updates are very, _very_ important product decisions. Getting them wrong will be costly. Should you use a Release Train? Should you work in lockstep? Do you need a Compatibility Window? Do you need a compatibility matrix? And so on.
+
+You may want to bookmark this article and return to it from time to time. Without further preamble, let us begin.
+
+## In the Beginning Was the Word
+
+Our software evolves. We add new capabilities, fix bugs, learn new things about the domain, and discover how users actually use the product. Even if a product is functionally complete, one day it will still need an update because of some zero-day CVE.
+
+As a result, we end up with different states of the same product. Yesterday a feature did not exist, today it does, and tomorrow an old API is marked as deprecated. We need a way to name each of these states precisely.
+
+That is what versions are for.
+
+But this is where things get interesting. There are actually a great many questions:
+
+1. What is a version, anyway? Is it a number, a string, or a sequence of characters?
+2. When should you release a new version?
+3. If the software consists of several independent parts, how do the versions of those parts relate to one another?
+
+In fact, the requirements for a version depend less on the programming language or build system than on **how the product reaches the user and who depends on it**.
+
+The version of a desktop application, the version of a Java library, and the version of a twenty-component APM platform like Dynatrace solve three different problems. You can try to apply one scheme to all of them mechanically. Is that a good idea? Let us find out.
+
+## A Relatively Simple Case: A Desktop Application
+
+Imagine a regular desktop application for an end user. Not an IDE with a vast plugin ecosystem, not an operating system, and not Excel, around which a company has built half of its processes. Just an application.
+
+Such a product, *as a rule*, has two important characteristics:
+
+#### 1. The primary consumption model is that the user interacts with the product rather than compiling their own code against its API.
+
+In that case, a backward-compatibility break often looks like this:
+
+> Yesterday I saw this button on this page, but today it is gone—it is on another page
+
+In other words, **the contract is often not between programs, but between the UI and the user's eyes**.
+
+#### 2. There is no large dependency graph of other libraries between the application and the user.
+
+Again, desktop applications vary. Some have many integrations with external systems—Excel, for example—but _"many"_ is a relative term, and every product is unique here.
+
+### CalVer. Common Case
+
+In the general case, [Calendar Versioning](https://calver.org/), or CalVer, works quite well. It is a version format in which the release date is encoded into the version in one way or another. For example, the CalVer version `2026.1` might mean the first release of 2026. JetBrains IDEs use a similar scheme.
+
+![CalVer](/posts/software-versioning/calver.png)
+
+One well-known example of software that follows CalVer is Canonical's Ubuntu. Ubuntu is released twice a year, in April and October, so its versions follow this format: `22.04` is the April release, while `22.10` is the October release.
+
+This is convenient for end users. The version number immediately answers a question they understand: **how recent is the release in front of me, and when did it come out?**
+
+Note that CalVer does not say that a product is stable or backward-compatible with anything. It communicates the release date. For consumer software, that is often enough and generally a good choice, because users simply do not have to assess the compatibility of individual libraries.
+
+### Marketing Version
+
+But there is a separate class of desktop software that releases relatively infrequently and treats each release as a major event. In those situations, **what matters is not so much when the product was released, but the very fact that a release happened at all**.
+
+For example, Microsoft quite successfully released Windows 7, 8, 10, and 11. This approach is often called [Marketing Versioning](https://wiki.apidesign.org/wiki/MarketingVersion), because its primary purpose is marketing—the ability to announce loudly:
+
+> Yesterday you had Windows 10, and now, after several years of development, Windows 11 is coming out!
+
+That release will be accompanied by an entire marketing campaign. It is not just another Ubuntu release.
+
+![Windows 10](/posts/software-versioning/windows_marketing_ver.png)
+
+For end users, it is easier to look at 10 and understand that it is less than 11 than it is to compare Ubuntu 22.04 with 24.10. Of course, Marketing Versioning is a very niche approach for major, foundational software products, but it is justified because, from a marketing perspective, people find a single number easier to understand and compare.
+
+Again, this does not mean that every desktop application must use CalVer or Marketing Versioning. My point is simpler: if the version number's main value to the user is distinguishing a recent release from an old one, and releases arrive relatively regularly, a calendar-based scheme solves the problem honestly. If you plan to release very rarely and treat each release as an event in its own right, Marketing Versioning may be worth considering.
+
+## When Others Begin to Depend on You
+
+Let us move on and change the situation slightly. We are developing a library rather than an application.
+
+The situation is fundamentally different here. The user does not merely run our product. They compile their code against it and use our classes, methods, annotations, and configuration properties. Our library becomes part of their program.
+
+Now the user is interested in more than how recent the release is. Before upgrading, they want to know:
+
+- whether compilation will break;
+- whether runtime behavior will change;
+- whether the configuration must be rewritten;
+- whether a patch can be accepted automatically through Dependabot;
+- how much time to budget for migration.
+
+### Semantic Versioning. The Cornerstone
+
+This is where the familiar [Semantic Versioning](https://semver.org/), or SemVer, enters the picture. Many projects follow its format:
+
+- Spring Boot
+- Quarkus
+- Jackson, and so on.
+
+Axelix follows it as well, but more on that later. In its classic form, a version has the format `MAJOR.MINOR.PATCH`:
+
+- `MAJOR` increases when a backward-incompatible change is made to the public API;
+- `MINOR` increases when backward-compatible functionality is added;
+- `PATCH` increases when a backward-compatible fix is made.
+
+A version may also have a qualifier, though this is optional. Here are a few widely known examples:
+
+- `Alpha`/`Beta` versions, such as `8.0.0.Alpha1`. Hibernate [adds qualifiers like these](https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core) for alpha and beta testing. We will not go into that now.
+- `Milestone` versions, such as `4.0.0-M1`. We will not explore the purpose of milestone releases either, but I do want to note that large projects such as Spring Boot and Axelix sometimes use them to gather early feedback.
+
+![The overall semver format](/posts/software-versioning/semver-format.png)
+
+For example, moving from `2.4.1` to `2.4.2` should be boring. Update the dependency, run the tests, and move on. But moving from `2.4.2` to `3.0.0` warns you in advance: folks, some work may be required here.
+
+That is the key value of SemVer. The version number becomes a cheap protocol between the maintainer and the user. You do not need to read the entire changelog just to estimate the scale of a migration. **The number itself provides an initial estimate of the migration's complexity**.
+
+### SemVer Requires a Public API
+
+There is a nuance that people sometimes forget.
+
+If you actually read the specification, SemVer is built around what it calls a "public API." The specification says so explicitly. This is logical: otherwise, it would be impossible to determine whether a change is backward-incompatible. And here is my question for you.
+
+What counts as the public API of a Spring Boot starter?
+
+Only its Java classes? What about configuration properties? Are bean names part of the contract? What about the format of an actuator endpoint? The order in which auto-configurations are discovered? The proxying strategies used by auto-configuration? As the saying goes:
+
+> _It all looked smooth on paper, but they forgot about the ravines_
+
+On paper, the rule "break the API, increase MAJOR" looks simple. But in a real framework, **the compatibility surface is enormous**.
+
+Sometimes even a critical bug fix in a patch release changes behavior that someone has already come to rely on. Sometimes a CVE cannot be fixed without tightening old rules. Sometimes a major upgrade to a transitive dependency breaks things for the user even though your own Java API has not changed at all.
+
+Experienced engineers need to remember that following pure SemVer is extremely difficult in practice. You are unlikely to sustain it over the long term in a complex product.
+
+It is therefore important to understand that **a three-number product version does not necessarily mean that the project follows strict SemVer**. And rather than make an unsupported claim, let us look at an example. For many people, it may be an eye-opener.
+
+## Spring Boot and the Pain Index
+
+Spring Boot is a very good example.
+
+Spring Boot uses the familiar `MAJOR.MINOR.PATCH` format, but [the project team states explicitly](https://github.com/spring-projects/spring-boot/wiki/Team-Practices) that strict Semantic Versioning is practically impossible for Boot. Otherwise, the major version would have to increase far too often.
+
+Instead, the version number is used as a kind of **expected pain index** for an upgrade:
+
+- a patch should be as close as possible to a drop-in replacement;
+- a minor release introduces new capabilities and usually requires little upgrade effort;
+- a major release is reserved for significant breaking changes where migration work is expected.
+
+This resembles SemVer, but it is not strict SemVer. **A Spring Boot minor release may contain incompatible changes**. Moreover, Boot manages the versions of a large number of third-party libraries, and upgrading Boot itself updates that entire set.
+
+My advice is this: the scheme above is viable, and if you are considering SemVer, take it seriously. On the whole, it fulfills the role SemVer was designed to fulfill: **letting users understand the scale of the changes relatively quickly—and roughly how painful the move will be—without diving into release notes, rebuilding things, and so on**.
+
+Strict SemVer simply prescribes: Major == backward-incompatible changes. In practice, the formula looks like this:
+
+- **Patch:** upgrade; everything will be fine.
+- **Minor:** you may have to put in a little effort, but it will probably be no big deal.
+- **Major:** you will definitely need to spend time on migration.
+
+Versioning exists for users, not users for versioning. If a strict scheme forces a mature framework to release `Spring Boot 47`, then perhaps that scheme does not describe the reality of that particular project very well.
+
+What matters is that the promise be stated explicitly. The user should understand that `3.4` -> `3.5` means:
+
+> "_Most likely_, the upgrade will be relatively straightforward."
+
+It does not mean a mathematical guarantee that there are no incompatible changes.
+
+So, friends, do not confuse SemVer's syntax with its semantics. You can put `1.2.3` on anything. It becomes valuable only when a project has explained the rules and genuinely tries to follow them.
+
+## What If the Product Has Multiple Components?
+
+Now let us add even more interesting details to the equation. A modern software platform rarely consists of a single artifact.
+
+Take any APM solution, such as Dynatrace or Datadog. They have a server and separate agents that collect information—different components. Take Kubernetes: it has a kubelet on every node, a Control Plane, and so on. **These are all different parts of a single product**.
+
+At Axelix, for example, we have:
+
+- build plugins for Maven and Gradle;
+- a Spring Boot starter;
+- Axelix Master as a standalone executable JAR;
+- a Docker image for Master;
+- a Helm chart.
+
+Importantly, all these "components" are generally distributed separately and may be owned by different teams. In our case, for example, the starter and plugins arrive in a service from Maven Central. They are simply Maven artifacts maintained by **a separate product team**.
+
+Axelix Master, meanwhile, is deployed by the platform/ops team. The Docker image and Helm chart even live in their own distribution channels.
+
+This architecture means that, technically, each component _can_ have an independent version and change at its own pace. For example, nothing may have changed in the starter while we fixed the UI in Master. Or, conversely, we may need to release a patch for a build plugin without touching the server.
+
+This leaves us with a choice between two strategies.
+
+### Independent Versioning
+
+Each component gets its own version:
+
+- Master `3.7.1`;
+- starter `2.4.0`;
+- Maven plugin `5.1.3`;
+- Helm chart `1.9.2`.
+
+From our perspective as maintainers, this is a clean and logical model. When one component changes, we increase only its version according to that _"Pain Index"_. There is no need to publish artifacts whose code has not changed. It makes life easier for us maintainers.
+
+![Various Versions](/posts/software-versioning/various_versions.png)
+
+But now the complexity has shifted to the user.
+
+Is starter `2.4` compatible with Master `3.7`? Which plugin does starter `2.4` need? Can chart `1.9` be used with image `3.7.1`? The result is a _"compatibility matrix"_ alongside the product—one that must be documented, tested, and continuously maintained.
+
+A very good example is the long-running saga between Spring Boot and Spring Cloud. Because they are technically separate projects with their own versioning strategies, they have a [Compatibility Matrix](https://spring.io/projects/spring-cloud) that tells you whether a particular Spring Cloud version can be used with a particular Spring Boot version.
+
+And here is the question: **is having a Compatibility Matrix inherently bad?** You are software users yourselves. Ask yourself: how enjoyable is it to figure out every time whether this version of component A is compatible with that version of component B? It is hardly the most pleasant way to spend your time.
+
+Independent versions make life easier for the release team, but increase the number of states the user sees. Users already have plenty to worry about, and the last thing they want is to search for which version of component A is compatible with a particular version of component B.
+
+### Lockstep Versioning
+
+The second strategy is called lockstep versioning. All components of a product are released under the same version.
+
+If we release Axelix `1.4.2`, then Master, the starter, plugins, image, and chart all receive version `1.4.2`. This strategy is used by modules within projects such as:
+
+- Spring Boot (actuator, autoconfigure, plugins, and so on)
+- React's core modules (react, react-dom, and so on)
+- Quarkus's core modules
+
+There is a very important distinction here. SemVer and CalVer answer the question, **how is the version number structured?** Lockstep answers a different question: **which components share that number?**
+
+So you can absolutely use SemVer together with lockstep. Or CalVer together with lockstep. These are not competing concepts. The advantages of lockstep are clear:
+
+#### 1. The user deals with a single product version.
+
+This is extremely convenient. You need to know only **one** version. When you ask a colleague:
+
+> "Which Spring Boot version does your microservice use?"
+
+You have to remember that Spring Boot is an umbrella for many modules, yet everyone answers `2.7` or `3.5`: people deal with a single version. **It is just ridiculously convenient**. Likewise, the question "Which version of Axelix do you use?" can be answered with `1.1`.
+
+#### 2. The compatible combination of components is obvious.
+
+Users understand that with Axelix Master version `1.1.0`, they can use Spring Boot Starter version `1.1.0` (in reality, it is a little more complicated; more on that below).
+
+#### 3. Documentation, examples, and release notes are tied to a single number.
+
+For platform products, these are very strong advantages. But there is no free lunch, of course: lockstep has significant problems of its own.
+
+## The Cost of Lockstep
+
+Experienced engineers know that lockstep is a rather controversial versioning strategy for related components. It has two classic problems.
+
+#### 1. A backward-incompatible change in one component formally affects the version of the entire product.
+
+In other words, as soon as you realize that component A needs a major version bump, another realization follows immediately: **the entire product needs a major version bump**.
+
+Suppose we break only the public API of the Maven plugin. If the project follows strict SemVer and all components move in lockstep, Master, the starter, the Docker image, and the Helm chart all need a major version bump even though none of them broke.
+
+This problem can be partially mitigated by following not SemVer in its strict sense, but specifically the Spring Boot team's interpretation of SemVer that I described above.
+
+#### 2. Patching one component results in a patch release of the entire set.
+
+Suppose a CVE exists only in a web dependency of Master. The starter does not have that dependency and has not changed at all. But in the lockstep model, the new product release will still be, for example, `1.4.3` for every artifact.
+
+This is convenient for users. For release engineering, it means additional work:
+
+- build all components;
+- run the shared pipeline;
+- publish several types of artifacts;
+- update the documentation in sync;
+- make sure no registry remains on the old version.
+
+In my experience, this too can be mitigated to a large extent.
+
+### Lockstep with Monorepos
+
+Lockstep works well **for monorepositories that use Trunk Based Development or GitHub Flow**. That is why lockstep was such a good fit for Spring Boot—a monorepo using GitHub Flow—and for Axelix—a monorepo using a slightly modified form of TBD, [which I covered in a separate article](https://habr.com/ru/companies/spring_aio/articles/1072386/). If a project is organized as a monorepo using TBD, lockstep often becomes not merely simpler, but the natural strategy.
+
+That is why, as my grandfather used to say, humanity's three most important discoveries are fire, the wheel, and the monorepository.
+
+There is one more problem that has no simple solution: **communication**. In practice, lockstep requires very smooth coordination among the teams developing the different components of your platform, because the entire platform is released under one version.
+
+But let me remind you that **Open Source is developed by small teams**. The core teams behind Open Source solutions are small!
+
+- Axelix: a core team of four people and dozens of external contributors
+- Spring Boot: a core team of, **at the moment**, roughly 5–7 people, plus dozens of external contributors
+
+And because the entire platform is generally developed by one small team, lockstep does not create much communication overhead for that team when coordinating changes, releases, and so on.
+
+So if your team is small, **you probably will not notice lockstep's communication overhead**. If you are developing a platform product, user convenience is often more important than the elegance of internal release processes, especially when those processes can be simplified through the structure of the codebase.
+
+Nevertheless, that is still not the whole story...
+
+## A Lockstep Release Does Not Mean a Lockstep Upgrade
+
+This is where we reach the most interesting part.
+
+You can release all components under version `1.4`, **but you cannot force an organization to upgrade them simultaneously**. For example, Axelix Master is controlled by the platform team. It can upgrade a single deployment in one evening; [the documentation describes a dedicated procedure for this](https://axelix.io/docs/ru/more/upgrading#%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B0%D0%BC%D0%BE%D0%B3%D0%BE-axelix-master).
+
+The starter and build plugin, however, live **in dozens or hundreds of services**. Every service has its own team, backlog, release window, and adventures.
+
+If moving Master from `1.3` to `1.4` requires a hundred services to be upgraded in the same minute, then the system formally uses lockstep versioning but, in practice, never gets upgraded at all. Such a system cannot realistically be upgraded—it is operationally impossible to make dozens of teams update the versions of various components simultaneously.
+
+In other words, as a Technical Leader or senior engineer, you need to think beyond how you will release versions, what those versions will look like, and how people will perceive them. **You must think in advance about how people will upgrade your product in their environments**.
+
+Let me share how we approached this in Axelix and how major projects handle it, using Kubernetes as an example.
+
+### Introducing Compatibility/Skew Window
+
+To solve this problem, you create what is known as a Compatibility Window. Do not confuse it with a Compatibility Matrix.
+
+Even the most nontrivial systems made up of multiple components have **a clear upgrade order**: first component A is upgraded, then component B.
+
+The component upgraded first can often be upgraded _relatively atomically_. In Axelix, for example, Master is always upgraded first. Updating it is fairly simple: you ask the platform team to perform the version upgrade in the evening.
+
+That first component—in our case, Master—must then guarantee a **rolling compatibility window**, often phrased as follows:
+
+> Master supports starters from the latest `N` releases (excluding patches), including its own release.
+
+![Compatibility Window in Axelix Master](/posts/software-versioning/compatibility-window-diagram-selection.png)
+
+For us, `N == 4` at the moment. Here is what that looks like in a concrete example:
+
+| Starter version | Supported by Master 1.4 |
+| --- | --- |
+| `1.4.x` | Yes |
+| `1.3.x` | Yes |
+| `1.2.x` | Yes |
+| `1.1.x` | Yes |
+| `1.0.x` | No |
+
+This is a compatibility window directed **backward**: a new Master understands old starters. You cannot run a starter that is newer than Master.
+
+### Existing Example. K8S Skew Policy
+
+A similar principle appears in the official Kubernetes [Version Skew Policy](https://kubernetes.io/releases/version-skew-policy/):
+
+- `kubelet` cannot be newer than `kube-apiserver`;
+- `kubelet` can be up to three minor versions older than `kube-apiserver`;
+- `kube-apiserver` is upgraded first, and only then can `kubelet` be upgraded gradually on individual nodes.
+
+For example, `kube-apiserver` version `1.37` supports `kubelet` versions `1.37`, `1.36`, `1.35`, and `1.34`. The logic is the same: first upgrade the centralized component atomically, then gradually bring the distributed components up to date.
+
+In practice, the "Skew Policy" is exactly that rolling window. It is fundamentally the same thing, simply expressed in different words.
+
+I hope the general logic is clear. In that case, the upgrade procedure looks like this:
+
+1. The platform team checks the oldest starter still present in the fleet.
+2. It upgrades Master first.
+3. Service teams independently upgrade the starter and build plugin.
+4. Gradually, the entire fleet converges on the new version.
+
+### Compatibility Window. Trade-Off
+
+Naturally, **this is a trade-off**.
+
+The larger `N` is, the more time users have to upgrade, but the harder your job becomes: you have to support a long tail of old APIs, and remember that all of this must also be tested in matrix builds.
+
+The smaller `N` is, the less time users have to upgrade and the less comfortable it is for them, but the easier your job becomes: you can aggressively drop old APIs.
+
+**Important advice:** if you are at the beginning of building a product, prioritize the ability to make aggressive upgrades while the product has not yet achieved widespread adoption or accumulated a huge number of users. **Over time, move `N` upward**.
+
+## Which Scheme Should You Choose?
+
+There are many more things I have not covered. Perhaps they deserve a separate article. But I think I have already thrown a great deal of information at you, and it is better to stop here before it all turns into a jumble.
+
+Let us summarize the practical takeaways.
+
+### If You Have a Consumer Application
+
+Ask yourself two questions:
+
+1. How often do you release? Is each release a major event for you, or is it a more-or-less routine process?
+2. How many external integration points do you have?
+
+In the general case, CalVer or Marketing Versioning will most often be the right choice for you.
+
+### If You Have a Library
+
+SemVer is a good starting point. But first, define the public API explicitly. Without that, the promise of backward compatibility will be extremely vague.
+
+In practice, you will probably come to realize over time that the public API surface is too large. In that case, look at Spring Boot's model and the _"Pain Index"_, and **describe your approach explicitly**. The worst situation is when users believe they are getting a guarantee that does not actually exist.
+
+### If You Have Several Closely Related Components
+
+Consider lockstep. It is especially useful if users perceive the product as a single whole and there are not many compatible combinations. Lockstep has procedural and communication problems of its own, but there are ways to ease those pains too.
+
+If you choose lockstep, **invest in release automation immediately**, because even a small patch to one component becomes a release of the entire set. Ideally, you will need a monorepo.
+
+### If You Have an Ecosystem of Independent Projects
+
+You will inevitably need to establish a rolling compatibility window across releases, because a large organization will not be able to upgrade your solution atomically. A situation is guaranteed to arise in which an older version of component A must work with a newer version of component B.
+
+The size of the compatibility window is a trade-off between your development speed and user convenience. That trade-off should be different at different stages of the product's evolution.
+
+## Closing Words
+
+A version is not merely a release counter. It is part of a product's public contract.
+
+A good version should help the user answer at least one important question:
+
+- how recent this release is;
+- how painful the upgrade will be;
+- whether the components are compatible;
+- which set of dependencies has been tested together;
+- how much time the team has left for migration.
+
+CalVer answers the question of time. SemVer tries to describe API compatibility. The "Pain Index" estimates upgrade complexity. Lockstep reduces the number of product versions.
+
+There is no need to choose the trendiest scheme. You need to choose a promise that matches the product's architecture and that your team is genuinely capable of keeping.
+
+Because the number `2.4.1` guarantees nothing by itself. The guarantee comes only from the discipline of a team that has explained what those numbers mean and followed its own rules for years.
+
+Best of luck, everyone!
+
