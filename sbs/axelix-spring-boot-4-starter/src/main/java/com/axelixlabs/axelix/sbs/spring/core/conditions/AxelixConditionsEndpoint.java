@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionsFeed;
 
 /**
  * Custom endpoint to expose Conditions information.

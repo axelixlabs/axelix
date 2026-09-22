@@ -48,10 +48,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
-import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheManagerDto;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
@@ -192,18 +192,18 @@ class AxelixCachesEndpointTest {
                         .filter(c -> TEST_CACHE_1.equals(c.getName()))
                         .findFirst())
                 .hasValueSatisfying(c -> {
-                    assertThat(c.isEnabled()).isTrue();
+                    assertThat(c.getEnabled()).isTrue();
                     assertThat(c.getTarget()).isNotNull();
-                    assertThat(c.isContainsStats()).isTrue();
+                    assertThat(c.getContainsStats()).isTrue();
                 });
 
         assertThat(cacheManager.getCaches().stream()
                         .filter(c -> TEST_CACHE_2.equals(c.getName()))
                         .findFirst())
                 .hasValueSatisfying(c -> {
-                    assertThat(c.isEnabled()).isTrue();
+                    assertThat(c.getEnabled()).isTrue();
                     assertThat(c.getTarget()).isNotNull();
-                    assertThat(c.isContainsStats()).isTrue();
+                    assertThat(c.getContainsStats()).isTrue();
                 });
     }
 
@@ -296,17 +296,17 @@ class AxelixCachesEndpointTest {
                 .filter(c -> TEST_CACHE_1.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(cache1Info.isEnabled()).isTrue();
+        assertThat(cache1Info.getEnabled()).isTrue();
         assertThat(cache1Info.getTarget()).isNotNull();
-        assertThat(cache1Info.isContainsStats()).isFalse();
+        assertThat(cache1Info.getContainsStats()).isFalse();
 
         CacheDto cache2Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(cache2Info.isEnabled()).isTrue();
+        assertThat(cache2Info.getEnabled()).isTrue();
         assertThat(cache2Info.getTarget()).isNotNull();
-        assertThat(cache2Info.isContainsStats()).isFalse();
+        assertThat(cache2Info.getContainsStats()).isFalse();
     }
 
     @Test
@@ -326,7 +326,7 @@ class AxelixCachesEndpointTest {
                         .filter(c -> TEST_CACHE_1.equals(c.getName()))
                         .findFirst()
                         .orElseThrow();
-        assertThat(disabledCache.isEnabled()).isFalse();
+        assertThat(disabledCache.getEnabled()).isFalse();
 
         testRestTemplate
                 .asAdmin()
@@ -341,7 +341,7 @@ class AxelixCachesEndpointTest {
                         .filter(c -> TEST_CACHE_1.equals(c.getName()))
                         .findFirst()
                         .orElseThrow();
-        assertThat(enabledCache.isEnabled()).isTrue();
+        assertThat(enabledCache.getEnabled()).isTrue();
     }
 
     @Test
@@ -360,13 +360,13 @@ class AxelixCachesEndpointTest {
                 .filter(c -> TEST_CACHE_1.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(cache1Info.isEnabled()).isFalse();
+        assertThat(cache1Info.getEnabled()).isFalse();
 
         CacheDto cache2Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(cache2Info.isEnabled()).isTrue();
+        assertThat(cache2Info.getEnabled()).isTrue();
     }
 
     // TODO: I'm not sure that this return 200 OK is the correct way of handling the non existent cache

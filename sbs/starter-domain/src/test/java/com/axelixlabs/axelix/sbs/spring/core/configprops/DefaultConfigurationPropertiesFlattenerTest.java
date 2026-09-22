@@ -26,7 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,10 +41,10 @@ class DefaultConfigurationPropertiesFlattenerTest {
 
     @ParameterizedTest
     @MethodSource("propertiesArgs")
-    void shouldFlatten(Map<String, Object> properties, List<KeyValue> expected) {
+    void shouldFlatten(Map<String, Object> properties, List<ConfigurationPropertiesEntry> expected) {
 
         // when.
-        List<KeyValue> result = flattener.flatten(properties);
+        List<ConfigurationPropertiesEntry> result = flattener.flatten(properties);
 
         // then.
         assertThat(result).containsExactlyElementsOf(expected);
@@ -78,13 +78,23 @@ class DefaultConfigurationPropertiesFlattenerTest {
                 Arguments.of(
                         nestedProperties,
                         List.of(
-                                new KeyValue("axelix.app.name", "axelix"),
-                                new KeyValue("axelix.app.server.host", "localhost"),
-                                new KeyValue("axelix.app.server.ports[0]", "8080"),
-                                new KeyValue("axelix.app.server.ports[1]", "8081"))),
+                                new ConfigurationPropertiesEntry()
+                                        .key("axelix.app.name")
+                                        .value("axelix"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("axelix.app.server.host")
+                                        .value("localhost"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("axelix.app.server.ports[0]")
+                                        .value("8080"),
+                                new ConfigurationPropertiesEntry()
+                                        .key("axelix.app.server.ports[1]")
+                                        .value("8081"))),
                 Arguments.of(
                         deepProperties,
-                        List.of(new KeyValue("axelix.app.server.ports[0].name.url[0].schema", "https"))));
+                        List.of(new ConfigurationPropertiesEntry()
+                                .key("axelix.app.server.ports[0].name.url[0].schema")
+                                .value("https"))));
     }
 
     @SuppressWarnings("unchecked")

@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}

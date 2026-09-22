@@ -1,0 +1,86 @@
+openapi: 3.1.0
+info:
+  title: configuration-properties-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'configuration-properties-feed' operation.
+    This operation lists every @ConfigurationProperties bean of the Spring Boot app together with
+    its prefix, flattened properties and the inputs they were bound from, so that Axelix Master can
+    render the configuration properties overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-configprops:
+    get:
+      operationId: getConfigurationProperties
+      summary: Lists all @ConfigurationProperties beans of the service.
+      responses:
+        '200':
+          description: The feed of @ConfigurationProperties beans.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationPropertiesFeed'
+components:
+  schemas:
+    ConfigurationPropertiesFeed:
+      type: object
+      description: The feed of @ConfigurationProperties beans used in the application.
+      required:
+        - beans
+      properties:
+        beans:
+          type: array
+          description: The unified list of beans that contains beans from one or more contexts.
+          items:
+            $ref: '#/components/schemas/ConfigurationPropertiesFeedBean'
+          x-axelix-introduced-in: 1.2.0
+    ConfigurationPropertiesFeedBean:
+      type: object
+      description: The profile of a given @ConfigurationProperties bean.
+      required:
+        - beanName
+        - prefix
+        - properties
+        - inputs
+      properties:
+        beanName:
+          type: string
+          description: The name of the bean.
+          x-axelix-introduced-in: 1.2.0
+        prefix:
+          type: string
+          description: The prefix applied to the names of the bean properties.
+          x-axelix-introduced-in: 1.2.0
+        properties:
+          type: array
+          description: The properties of the bean as name-value pairs.
+          items:
+            $ref: '#/components/schemas/ConfigurationPropertiesEntry'
+          x-axelix-introduced-in: 1.2.0
+        inputs:
+          type: array
+          description: >-
+            The origin and value of each configuration parameter, i.e. which value was applied and
+            from which source, to configure a specific property.
+          items:
+            $ref: '#/components/schemas/ConfigurationPropertiesEntry'
+          x-axelix-introduced-in: 1.2.0
+    ConfigurationPropertiesEntry:
+      type: object
+      description: An abstract key-value pair.
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          description: The flattened key, in the dot/bracket notation (e.g. 'servers[0].host').
+          x-axelix-introduced-in: 1.2.0
+        value:
+          type: string
+          description: The string representation of the value, or absent for an empty map or list.
+          x-axelix-introduced-in: 1.2.0

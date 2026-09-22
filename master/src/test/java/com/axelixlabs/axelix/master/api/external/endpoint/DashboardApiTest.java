@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +32,6 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
@@ -44,6 +42,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Transa
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;

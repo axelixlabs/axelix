@@ -27,9 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroup;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,29 +52,34 @@ public class DefaultServiceMetricsGroupsFeedAssemblerTest {
         assertThat(axelix.getGroupName()).isEqualTo("axelixMetrics");
         assertThat(axelix.getMetrics())
                 .containsOnly(
-                        new MetricDescription(
-                                "axelixMetrics.test.metric1",
-                                "Test metric belonging to the `axelixMetrics` group with a description"),
-                        new MetricDescription(
-                                "axelixMetrics.test.metric2",
-                                "Test metric belonging to the `axelixMetrics` group with a description"),
-                        new MetricDescription("axelixMetrics.test.metric3", null));
+                        new MetricDescription()
+                                .metricName("axelixMetrics.test.metric1")
+                                .description("Test metric belonging to the `axelixMetrics` group with a description"),
+                        new MetricDescription()
+                                .metricName("axelixMetrics.test.metric2")
+                                .description("Test metric belonging to the `axelixMetrics` group with a description"),
+                        new MetricDescription()
+                                .metricName("axelixMetrics.test.metric3")
+                                .description(null));
 
         MetricsGroup test = getMetricsGroup(metricsGroups, "testMetrics");
         assertThat(test.getGroupName()).isEqualTo("testMetrics");
         assertThat(test.getMetrics())
                 .containsOnly(
-                        new MetricDescription(
-                                "testMetrics.axelix.metric1",
-                                "Test metric belonging to the `testMetrics` group with a description"),
-                        new MetricDescription("testMetrics.axelix.metric2", null));
+                        new MetricDescription()
+                                .metricName("testMetrics.axelix.metric1")
+                                .description("Test metric belonging to the `testMetrics` group with a description"),
+                        new MetricDescription()
+                                .metricName("testMetrics.axelix.metric2")
+                                .description(null));
 
         MetricsGroup other = getMetricsGroup(metricsGroups, "Others");
         assertThat(other.getGroupName()).isEqualTo("Others");
         assertThat(other.getMetrics())
-                .contains(new MetricDescription(
-                        "standalone",
-                        "Test metric belonging to the 'Others' group without a prefix and with a description"));
+                .contains(new MetricDescription()
+                        .metricName("standalone")
+                        .description(
+                                "Test metric belonging to the 'Others' group without a prefix and with a description"));
     }
 
     private MetricsGroup getMetricsGroup(MetricsGroupsFeed response, String groupName) {

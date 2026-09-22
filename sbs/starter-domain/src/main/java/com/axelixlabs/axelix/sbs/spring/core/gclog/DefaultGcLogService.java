@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
@@ -267,7 +267,7 @@ public class DefaultGcLogService implements GcLogService {
             }
         }
 
-        return new GcLogStatus(gcSelectorFound, highestLevel, getAvailableLevels());
+        return new GcLogStatus().enabled(gcSelectorFound).level(highestLevel).availableLevels(getAvailableLevels());
     }
 
     /**

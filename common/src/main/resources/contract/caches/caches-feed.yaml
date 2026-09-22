@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: caches-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'caches-feed' operation.
+    This operation lists every cache manager of the Spring Boot app together with its caches, so
+    that Axelix Master can render the caches overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-caches:
+    get:
+      operationId: getAllCaches
+      summary: Lists all cache managers of the service together with their caches.
+      responses:
+        '200':
+          description: The feed of cache managers and their caches.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CachesFeed'
+components:
+  schemas:
+    CachesFeed:
+      type: object
+      description: The response of the caches actuator endpoint that contains all cache managers of the application.
+      required:
+        - cacheManagers
+      properties:
+        cacheManagers:
+          type: array
+          description: The list of cache managers in the application.
+          items:
+            $ref: '#/components/schemas/CacheManagerDto'
+          x-axelix-introduced-in: 1.2.0
+    CacheManagerDto:
+      type: object
+      description: A cache manager together with all the caches inside it.
+      required:
+        - name
+        - caches
+      properties:
+        name:
+          type: string
+          description: The name of the cache manager.
+          x-axelix-introduced-in: 1.2.0
+        caches:
+          type: array
+          description: The caches inside the given cache manager.
+          items:
+            $ref: '#/components/schemas/CacheDto'
+          x-axelix-introduced-in: 1.2.0
+    CacheDto:
+      type: object
+      description: A cache inside the cache manager.
+      required:
+        - name
+        - target
+        - enabled
+        - containsStats
+      properties:
+        name:
+          type: string
+          description: The cache name.
+          x-axelix-introduced-in: 1.2.0
+        target:
+          type: string
+          description: The fully qualified name of the native cache.
+          x-axelix-introduced-in: 1.2.0
+        enabled:
+          type: boolean
+          description: Whether the cache is enabled (true) or disabled (false).
+          x-axelix-introduced-in: 1.2.0
+        containsStats:
+          type: boolean
+          description: True if the cache contains either hits or misses, otherwise false.
+          x-axelix-introduced-in: 1.2.0

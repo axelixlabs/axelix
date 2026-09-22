@@ -35,8 +35,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
@@ -45,6 +43,8 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
@@ -82,7 +82,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
                     .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
+                    .map(ConfigurationPropertiesEntry::getValue)
                     .collect(Collectors.toSet());
 
             // TODO: Well, the "null" sanitization policy is not something that we currently have control over.
@@ -103,7 +103,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
                     .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
+                    .map(ConfigurationPropertiesEntry::getValue)
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
@@ -135,13 +135,14 @@ public class DefaultConfigurationPropertiesServiceTest {
             Map<String, String> sanitizedProperties = configProps.getBeans().stream()
                     .flatMap(bean -> bean.getProperties().stream())
                     .filter(prop -> "******".equals(prop.getValue()))
-                    .collect(Collectors.toMap(KeyValue::getKey, KeyValue::getValue));
+                    .collect(Collectors.toMap(
+                            ConfigurationPropertiesEntry::getKey, ConfigurationPropertiesEntry::getValue));
 
             assertThat(sanitizedProperties)
                     .containsOnlyKeys("tags.forSanitization", "tags.FOR_SANITIZATION")
                     .containsValues("******", "******");
 
-            List<KeyValue> nonSanitizedProps = configProps.getBeans().stream()
+            List<ConfigurationPropertiesEntry> nonSanitizedProps = configProps.getBeans().stream()
                     .flatMap(bean -> bean.getProperties().stream())
                     .filter(prop -> !"******".equals(prop.getValue()))
                     .filter(prop -> prop.getValue() != null)
@@ -163,7 +164,7 @@ public class DefaultConfigurationPropertiesServiceTest {
             // then.
             Set<@Nullable String> values = configProps.getBeans().stream()
                     .flatMap(bean -> bean.getProperties().stream())
-                    .map(KeyValue::getValue)
+                    .map(ConfigurationPropertiesEntry::getValue)
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");

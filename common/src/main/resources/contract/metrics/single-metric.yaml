@@ -1,0 +1,95 @@
+openapi: 3.1.0
+info:
+  title: single-metric
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'single-metric' operation.
+    This operation returns the profile (base unit, measurements and valid tag combinations) of a
+    single metric of the Spring Boot app, addressed by its name.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-metrics/{metricName}:
+    get:
+      operationId: getSingleMetric
+      summary: Returns the profile of a single metric of the service.
+      parameters:
+        - name: metricName
+          in: path
+          required: true
+          description: The name of the metric to read.
+          schema:
+            type: string
+        - name: tag
+          in: query
+          required: false
+          description: >-
+            An optional tag filter in the 'key:value' form. May be repeated to filter by several tags.
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: The profile of the requested metric.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricProfile'
+components:
+  schemas:
+    MetricProfile:
+      type: object
+      description: >-
+        The metric profile as returned by the Actuator API. Micrometer's Statistic values (MAX,
+        TOTAL etc.) are intentionally not included, since they might be computed for the given
+        array of measurements. Other values do not concern Axelix as of now.
+      required:
+        - name
+        - baseUnit
+        - measurements
+        - validTagCombinations
+      properties:
+        name:
+          type: string
+          description: The name of the given metric.
+          x-axelix-introduced-in: 1.2.0
+        description:
+          type: string
+          description: The description of the given metric.
+          x-axelix-introduced-in: 1.2.0
+        baseUnit:
+          type: string
+          description: >-
+            The base unit of the measurement values. Memory values may be transformed to a more
+            readable unit, in which case this is the display name of the transformed unit.
+          x-axelix-introduced-in: 1.2.0
+        measurements:
+          type: array
+          description: The array of actual measurements of the given metric.
+          items:
+            $ref: '#/components/schemas/MetricProfileMeasurement'
+          x-axelix-introduced-in: 1.2.0
+        validTagCombinations:
+          type: array
+          description: The valid combinations of tags for this metric.
+          items:
+            type: object
+            additionalProperties:
+              type: string
+          x-axelix-introduced-in: 1.2.0
+    MetricProfileMeasurement:
+      type: object
+      description: A single metric value, measured at a particular point in time.
+      required:
+        - value
+      properties:
+        value:
+          type: number
+          format: double
+          description: The value of the given metric.
+          x-axelix-introduced-in: 1.2.0

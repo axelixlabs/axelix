@@ -32,8 +32,8 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.Deprecation;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
@@ -171,7 +171,10 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private void applyPrefixAndProperty(
-            String prefix, List<KeyValue> properties, Map<String, String> configPropsMapping, String beanName) {
+            String prefix,
+            List<ConfigurationPropertiesEntry> properties,
+            Map<String, String> configPropsMapping,
+            String beanName) {
         for (var property : properties) {
             String fullProperty = propertyNameNormalizer.normalize(prefix + property.getKey());
             configPropsMapping.put(fullProperty, beanName);

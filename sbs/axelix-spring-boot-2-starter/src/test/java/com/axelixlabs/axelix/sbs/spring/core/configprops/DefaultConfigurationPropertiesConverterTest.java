@@ -34,8 +34,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -91,17 +91,36 @@ public class DefaultConfigurationPropertiesConverterTest {
                     // properties
                     assertThat(bean.getProperties())
                             .containsOnly(
-                                    new KeyValue("tags.environment", "test"),
-                                    new KeyValue("tags.version", "1.0.0"),
-                                    new KeyValue("enabledContexts[0]", "user-service"),
-                                    new KeyValue("enabledContexts[1]", "payment-service"),
-                                    new KeyValue("httpClient.requests[0].name", "user-api"),
-                                    new KeyValue("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                                    new KeyValue("httpClient.requests[0].methods[0].type", "GET"),
-                                    new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                                    new KeyValue(
-                                            "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                                    new KeyValue("httpClient.requests[0].methods[1].type", "POST"));
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.environment")
+                                            .value("test"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.version")
+                                            .value("1.0.0"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("enabledContexts[0]")
+                                            .value("user-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("enabledContexts[1]")
+                                            .value("payment-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].name")
+                                            .value("user-api"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].baseUrl")
+                                            .value("https://api.users.example.com/v1"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].type")
+                                            .value("GET"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].retries[0].count")
+                                            .value("3"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].retries[0].parameters.timeout")
+                                            .value("5000"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[1].type")
+                                            .value("POST"));
 
                     // inputs
                     assertThat(bean.getInputs())

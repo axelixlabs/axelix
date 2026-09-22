@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
 
 /**
  * Dispatcher interface for executing cache operations across different CacheManagers.

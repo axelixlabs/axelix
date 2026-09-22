@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
  * Service for retrieving configuration properties.
