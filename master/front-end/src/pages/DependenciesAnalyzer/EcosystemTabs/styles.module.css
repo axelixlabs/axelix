@@ -3,18 +3,21 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--axelix-light-grey);
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }
 
 .Tab {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 0 0 9px;
-    margin-bottom: -1px;
+    gap: 8px;
+    padding-bottom: 8px;
+
+    /* TODO: Remove in future */
     font: inherit;
     font-weight: 600;
     color: var(--axelix-bold-grey);
+
+    /* TODO: Remove in future */
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
@@ -23,10 +26,10 @@
     transition:
         border-color 0.15s,
         color 0.15s;
-}
 
-.Tab:hover {
-    color: var(--axelix-primary-black);
+    &:hover {
+        color: var(--axelix-primary-black);
+    }
 }
 
 .ActiveTab {

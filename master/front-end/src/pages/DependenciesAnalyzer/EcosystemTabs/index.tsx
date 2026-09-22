@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { matchesDependencyFilters } from "@/helpers";
-import type { EDependencyEcosystem, ESupportSignal, IResolvedDependency } from "@/models";
+import type { EDependencyEcosystem, ESupportStatus, IResolvedDependency } from "@/models";
 import { DEPENDENCY_ECOSYSTEM_ORDER, dependencyEcosystemLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -34,10 +34,7 @@ interface IProps {
      */
     search: string;
 
-    /**
-     * The currently active support-signal filters, which the tab counters take into account.
-     */
-    activeSignals: ESupportSignal[];
+    activeStatuses: ESupportStatus[];
 
     /**
      * The selected ecosystem, or null for the leading "All" tab.
@@ -50,14 +47,15 @@ interface IProps {
     onPick: (ecosystem: EDependencyEcosystem | null) => void;
 }
 
-export const EcosystemTabs = ({ dependencies, search, activeSignals, activeEcosystem, onPick }: IProps) => {
+/* TODO: Consider using antd tabs in the future */
+export const EcosystemTabs = ({ dependencies, search, activeStatuses, activeEcosystem, onPick }: IProps) => {
     const { t } = useTranslation();
 
     const tabs = [null, ...DEPENDENCY_ECOSYSTEM_ORDER]
         .map((ecosystem) => ({
             ecosystem,
             count: dependencies.filter((dependency) =>
-                matchesDependencyFilters(dependency, search, ecosystem, activeSignals),
+                matchesDependencyFilters(dependency, search, ecosystem, activeStatuses),
             ).length,
         }))
         .filter((tab) => tab.ecosystem === null || tab.count > 0);
@@ -65,20 +63,20 @@ export const EcosystemTabs = ({ dependencies, search, activeSignals, activeEcosy
     return (
         <>
             <div className={`TextSmall ${styles.MainWrapper}`}>
-                {tabs.map((tab) => {
-                    const active = tab.ecosystem === activeEcosystem;
+                {tabs.map(({ ecosystem, count }) => {
+                    const active = ecosystem === activeEcosystem;
 
                     return (
                         <button
-                            key={tab.ecosystem ?? "ALL"}
+                            key={ecosystem ?? "ALL"}
                             type="button"
-                            onClick={() => onPick(tab.ecosystem)}
+                            onClick={() => onPick(ecosystem)}
                             className={`${styles.Tab} ${active ? styles.ActiveTab : ""}`}
                         >
-                            {tab.ecosystem === null
+                            {ecosystem === null
                                 ? t("DependenciesAnalyzer.ecosystems.ALL")
-                                : t(dependencyEcosystemLabelKey[tab.ecosystem])}
-                            <span className={`TextUltraSmall ${styles.Count}`}>{tab.count}</span>
+                                : t(dependencyEcosystemLabelKey[ecosystem])}
+                            <span className={`TextUltraSmall ${styles.Count}`}>{count}</span>
                         </button>
                     );
                 })}

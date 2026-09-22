@@ -7,7 +7,7 @@
     --da-columns: minmax(0, 1fr) 110px 120px;
 
     min-width: 750px;
-    border: 1px solid var(--axelix-light-grey);
+    border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
     background-color: var(--axelix-primary-white);
@@ -16,14 +16,12 @@
 .HeaderRow {
     display: grid;
     grid-template-columns: var(--da-columns);
-    gap: 14px;
+    gap: 16px;
     align-items: center;
-
-    /* left padding matches the row arrow inset so columns line up */
     padding: 12px 20px 12px 45px;
     background-color: var(--axelix-primary-light-green);
     border-bottom: 1px solid var(--axelix-light-grey);
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     color: var(--axelix-bold-grey);
 }

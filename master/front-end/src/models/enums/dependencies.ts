@@ -20,9 +20,11 @@
  * What a curated project registry states about the project behind a resolved dependency. A dependency without a
  * signal is simply a project nothing is flagged about, it is not a statement that the project is healthy.
  */
-export enum ESupportSignal {
-    DISCONTINUED = "DISCONTINUED",
+export enum ESupportStatus {
+    ACTIVE = "ACTIVE",
     MAINTENANCE = "MAINTENANCE",
+    SUNSET = "SUNSET",
+    DORMANT = "DORMANT",
 }
 
 /**
@@ -41,17 +43,7 @@ export enum EDependencyEcosystem {
 /**
  * Where the platform version an instance runs sits on the upstream OSS maintenance window.
  */
-export enum EPlatformSupportStatus {
+export enum EFrameworkSupportStatus {
     OSS_SUPPORTED = "OSS_SUPPORTED",
     OUT_OF_OSS_MAINTENANCE = "OUT_OF_OSS_MAINTENANCE",
-}
-
-/**
- * The kind of the migration note attached to a dependency, which decides how the note is labelled. A project with a
- * drop-in replacement is {@code SUPERSEDED_BY}, one where replacing it is an architectural choice is
- * {@code MIGRATION_NOTE}.
- */
-export enum EDependencyNote {
-    SUPERSEDED_BY = "SUPERSEDED_BY",
-    MIGRATION_NOTE = "MIGRATION_NOTE",
 }

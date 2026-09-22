@@ -18,9 +18,8 @@
 import { useTranslation } from "react-i18next";
 
 import { Accordion } from "@/components";
-import { isDirectDependency } from "@/helpers";
-import type { IResolvedDependency } from "@/models";
-import { supportSignalClassToken } from "@/utils";
+import { getDependencyCoordinates, isDirectDependency } from "@/helpers";
+import { ESupportStatus, type IResolvedDependency } from "@/models";
 
 import { SupportSignalChip } from "../../SupportSignalChip";
 
@@ -44,28 +43,38 @@ export const DependencyRow = ({ dependency, rootCoordinates }: IProps) => {
     const { t } = useTranslation();
 
     const direct = isDirectDependency(dependency);
-    const signalToken = dependency.signal ? styles[supportSignalClassToken[dependency.signal.kind]] : "";
+
+    const softwareProject =
+        dependency.softwareProject && dependency.softwareProject.status !== ESupportStatus.ACTIVE
+            ? dependency.softwareProject
+            : null;
 
     return (
-        <Accordion
-            wrapperStyles={`${styles.MainWrapper} ${signalToken}`}
-            headerStyles={styles.Row}
-            contentStyles={styles.Content}
-            header={
-                <>
-                    <div className={styles.Dependency}>
-                        <span className={`TextSmall ${styles.Coordinates}`}>{dependency.coordinates}</span>
-                        <span className={`TextUltraSmall ${styles.Project}`}>{dependency.project}</span>
-                        {dependency.signal && <SupportSignalChip signal={dependency.signal} />}
-                    </div>
-                    <span className={`TextSmall ${styles.Version}`}>{dependency.version}</span>
-                    <span className={`TextUltraSmall ${styles.Scope} ${direct ? styles.DirectScope : ""}`}>
-                        {t(direct ? "DependenciesAnalyzer.scope.direct" : "DependenciesAnalyzer.scope.transitive")}
-                    </span>
-                </>
-            }
-        >
-            <DependencyDetail dependency={dependency} rootCoordinates={rootCoordinates} />
-        </Accordion>
+        <>
+            <Accordion
+                wrapperStyles={`${softwareProject ? styles[softwareProject.status] : ""}`}
+                headerStyles={styles.Row}
+                contentStyles={styles.Content}
+                header={
+                    <>
+                        <div className={styles.Dependency}>
+                            <span className={`TextSmall ${styles.Coordinates}`}>
+                                {getDependencyCoordinates(dependency)}
+                            </span>
+                            <span className={`TextUltraSmall ${styles.Project}`}>
+                                {dependency.softwareProject?.displayName}
+                            </span>
+                            {softwareProject && <SupportSignalChip signal={softwareProject} />}
+                        </div>
+                        <span className={`TextSmall ${styles.Version}`}>{dependency.dependency.version}</span>
+                        <span className={`TextUltraSmall ${styles.Scope} ${direct ? styles.DirectScope : ""}`}>
+                            {t(direct ? "DependenciesAnalyzer.scope.direct" : "DependenciesAnalyzer.scope.transitive")}
+                        </span>
+                    </>
+                }
+            >
+                <DependencyDetail dependency={dependency} rootCoordinates={rootCoordinates} />
+            </Accordion>
+        </>
     );
 };

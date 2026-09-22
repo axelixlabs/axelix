@@ -17,11 +17,11 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { LinkIcon } from "@/assets";
-import { buildResolutionPath, isDirectDependency } from "@/helpers";
+import { isDirectDependency } from "@/helpers";
 import type { IResolvedDependency } from "@/models";
-import { dependencyNoteLabelKey } from "@/utils";
 
+import { DependencyDetailFacts } from "./DependencyDetailFacts";
+import { DependencyDetailPath } from "./DependencyDetailPath";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -41,68 +41,29 @@ export const DependencyDetail = ({ dependency, rootCoordinates }: IProps) => {
     const { t } = useTranslation();
 
     const direct = isDirectDependency(dependency);
-    const path = buildResolutionPath(rootCoordinates, dependency);
-    const note = dependency.signal?.note;
 
     return (
-        <div className={styles.Detail}>
-            <div className={styles.Section}>
-                <div className={styles.SectionHeader}>
-                    <span className={styles.Label}>{t("DependenciesAnalyzer.detail.resolutionPath")}</span>
-                    <span className={`TextUltraSmall ${styles.PathSummary}`}>
-                        {direct
-                            ? t("DependenciesAnalyzer.detail.declaredDirectly")
-                            : t("DependenciesAnalyzer.detail.levelsBelowRoot", {
-                                  count: dependency.resolutionPath.length,
-                              })}
-                    </span>
-                </div>
-                <div className={styles.Path}>
-                    {path.map((node) => (
-                        <div
-                            key={`${node.depth}-${node.coordinates}`}
-                            className={styles.PathNode}
-                            style={{ paddingLeft: `${node.depth * 18}px` }}
-                        >
-                            <span className={styles.Guide}>{node.root ? "■" : "└"}</span>
-                            <span className={`${styles.NodeId} ${node.root || node.resolved ? styles.Emphasized : ""}`}>
-                                {node.coordinates}
-                            </span>
-                            {node.root && (
-                                <span className={`${styles.Tag} ${styles.RootTag}`}>
-                                    {t("DependenciesAnalyzer.detail.thisApplication")}
-                                </span>
-                            )}
-                            {node.resolved && !node.root && (
-                                <span className={styles.Tag}>{t("DependenciesAnalyzer.detail.resolvedHere")}</span>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <>
+            <div className={styles.Detail}>
+                <div className={styles.Section}>
+                    <div className={styles.SectionHeader}>
+                        <span className={`TextUltraSmall ${styles.Label}`}>
+                            {t("DependenciesAnalyzer.detail.resolutionPath")}
+                        </span>
+                        <span className={`TextUltraSmall ${styles.PathSummary}`}>
+                            {direct
+                                ? t("DependenciesAnalyzer.detail.declaredDirectly")
+                                : t("DependenciesAnalyzer.detail.levelsBelowRoot", {
+                                      count: dependency.resolutionPath.length,
+                                  })}
+                        </span>
+                    </div>
 
-            <div className={styles.Facts}>
-                <span className={styles.Label}>{t("DependenciesAnalyzer.detail.projectStatus")}</span>
-                <span className={`TextSmall ${styles.Prose}`}>{dependency.status}</span>
-                {note && (
-                    <>
-                        <span className={styles.Label}>{t(dependencyNoteLabelKey[note.kind])}</span>
-                        <span className={styles.NoteValue}>{note.value}</span>
-                    </>
-                )}
-                <span className={styles.Label}>{t("DependenciesAnalyzer.detail.reference")}</span>
-                <span className={styles.Reference}>
-                    <a
-                        href={dependency.referenceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`TextSmall ${styles.ReferenceLink}`}
-                    >
-                        {dependency.referenceLabel}
-                    </a>
-                    <LinkIcon className={styles.ReferenceIcon} />
-                </span>
+                    <DependencyDetailPath dependency={dependency} rootCoordinates={rootCoordinates} />
+
+                    <DependencyDetailFacts dependency={dependency} />
+                </div>
             </div>
-        </div>
+        </>
     );
 };

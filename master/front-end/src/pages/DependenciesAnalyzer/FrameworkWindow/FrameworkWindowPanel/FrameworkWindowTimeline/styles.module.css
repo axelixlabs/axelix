@@ -1,0 +1,44 @@
+.Timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.Bar {
+    display: flex;
+    height: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: var(--axelix-medium-grey);
+}
+
+.OssSegment {
+    background-color: var(--axelix-primary-green);
+}
+
+.CommercialSegment {
+    /* TODO: Improve in future */
+    background-image: repeating-linear-gradient(115deg, #fec84b 0 5px, #fef0c7 5px 10px);
+}
+
+.TodayTrack {
+    position: relative;
+    height: 15px;
+}
+
+.TodayMark {
+    position: absolute;
+    top: -18px;
+    width: 2px;
+    height: 20px;
+    background-color: var(--axelix-primary-black);
+}
+
+.TodayLabel {
+    position: absolute;
+    top: 2px;
+    transform: translateX(-50%);
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}

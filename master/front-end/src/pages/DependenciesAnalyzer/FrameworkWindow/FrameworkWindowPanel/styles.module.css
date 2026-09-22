@@ -1,0 +1,81 @@
+.Panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 430px;
+    gap: 25px;
+    padding: 20px;
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-medium-grey);
+    border-left: 3px solid var(--accent-color);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+
+    @media (width <=1100px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* TODO: Improve in future */
+.Breached {
+    --accent-color: #b42318;
+    --accent-bg: #fef3f2;
+    --accent-border: #fecdca;
+}
+
+.Supported {
+    --accent-color: var(--axelix-primary-green);
+    --accent-bg: var(--axelix-primary-light-green);
+    --accent-border: #bbf7d0;
+}
+
+.Window {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.Heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.Version {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.FrameworkName {
+    font-weight: 600;
+}
+
+.Line {
+    color: var(--axelix-bold-grey);
+}
+
+/* TODO: Fix in the future */
+.StatusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 3px 8px;
+    white-space: nowrap;
+    font-weight: 700;
+    color: var(--accent-color);
+    background-color: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+/* TODO: Fix in the future */
+.StatusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background-color: var(--accent-color);
+}
