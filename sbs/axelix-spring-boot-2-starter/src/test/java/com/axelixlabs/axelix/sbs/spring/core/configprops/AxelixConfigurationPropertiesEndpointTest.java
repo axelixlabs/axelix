@@ -39,13 +39,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
@@ -95,7 +95,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 .withRole(role)
                 .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
-        List<KeyValue> properties = response.getBody().getBeans().stream()
+        List<ConfigurationPropertiesEntry> properties = response.getBody().getBeans().stream()
                 .filter(bean -> bean.getPrefix().equals("axelix.prop.test"))
                 .flatMap(bean -> bean.getProperties().stream())
                 .collect(Collectors.toList());
@@ -104,7 +104,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
         assertThat(properties)
                 .filteredOn(e -> e.getKey().equals(propertyName))
-                .extracting(KeyValue::getValue)
+                .extracting(ConfigurationPropertiesEntry::getValue)
                 .containsExactly(expectedValue);
     }
 

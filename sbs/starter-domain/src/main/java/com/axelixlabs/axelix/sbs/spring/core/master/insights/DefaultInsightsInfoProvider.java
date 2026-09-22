@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
@@ -38,6 +37,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Transa
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
@@ -61,7 +61,8 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.insights.WellKnownVmO
  */
 public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
 
-    private static final GcLogStatus DISABLED_GC_LOG_STATUS = new GcLogStatus(false, null, List.of());
+    private static final GcLogStatus DISABLED_GC_LOG_STATUS =
+            new GcLogStatus().enabled(false).availableLevels(List.of());
 
     private final OpenSessionInViewStateProvider openSessionInViewStateProvider;
 
@@ -183,7 +184,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     }
 
     private InsightFeature getGcLoggingFeature(GcLogStatus gcLogStatus) {
-        return new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLogStatus.isEnabled());
+        return new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLogStatus.getEnabled());
     }
 
     private InsightFeature getGcLogFileSpecifiedFeature() {

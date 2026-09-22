@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
 import com.axelixlabs.axelix.common.api.registration.insights.Insights;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -351,15 +351,18 @@ class DefaultInsightsInfoProviderTest {
     }
 
     private static GcLogService gcLogDisabled() {
-        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), false);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(false).level(null).availableLevels(List.of("debug", "info")), false);
     }
 
     private static GcLogService gcLogEnabled() {
-        return new TestGcLogService(new GcLogStatus(true, "debug", List.of("debug", "info")), false);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(true).level("debug").availableLevels(List.of("debug", "info")), false);
     }
 
     private static GcLogService gcLogFileSpecified() {
-        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), true);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(false).level(null).availableLevels(List.of("debug", "info")), true);
     }
 
     private static GcLogService throwingGcLogService() {

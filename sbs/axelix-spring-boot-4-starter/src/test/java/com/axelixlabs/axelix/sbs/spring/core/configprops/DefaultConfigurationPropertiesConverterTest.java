@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,27 +64,57 @@ public class DefaultConfigurationPropertiesConverterTest extends AbstractConfigP
                     // properties
                     assertThat(bean.getProperties())
                             .containsOnly(
-                                    new KeyValue("tags.environment", "test"),
-                                    new KeyValue("tags.version", "1.0.0"),
-                                    new KeyValue("tags.forSanitization", "toBeSanitized"),
-                                    new KeyValue("tags.FOR_SANITIZATION", "toBeSanitized"),
-                                    new KeyValue("enabledContexts[0]", "user-service"),
-                                    new KeyValue("enabledContexts[1]", "payment-service"),
-                                    new KeyValue("httpClient.requests[0].name", "user-api"),
-                                    new KeyValue("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                                    new KeyValue("httpClient.requests[0].methods[0].type", "GET"),
-                                    new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                                    new KeyValue(
-                                            "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                                    new KeyValue("httpClient.requests[0].methods[1].type", "POST"),
-                                    new KeyValue("httpClient.requests[1].name", "payment-api"),
-                                    new KeyValue(
-                                            "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
-                                    new KeyValue("httpClient.requests[1].methods[0].type", "PUT"),
-                                    new KeyValue("httpClient.requests[1].methods[0].retries[0].count", "2"),
-                                    new KeyValue(
-                                            "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
-                                            "DEBUG"));
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.environment")
+                                            .value("test"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.version")
+                                            .value("1.0.0"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.forSanitization")
+                                            .value("toBeSanitized"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("tags.FOR_SANITIZATION")
+                                            .value("toBeSanitized"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("enabledContexts[0]")
+                                            .value("user-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("enabledContexts[1]")
+                                            .value("payment-service"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].name")
+                                            .value("user-api"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].baseUrl")
+                                            .value("https://api.users.example.com/v1"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].type")
+                                            .value("GET"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].retries[0].count")
+                                            .value("3"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[0].retries[0].parameters.timeout")
+                                            .value("5000"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[0].methods[1].type")
+                                            .value("POST"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[1].name")
+                                            .value("payment-api"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[1].baseUrl")
+                                            .value("https://api.payments.example.com/v2"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[1].methods[0].type")
+                                            .value("PUT"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[1].methods[0].retries[0].count")
+                                            .value("2"),
+                                    new ConfigurationPropertiesEntry()
+                                            .key("httpClient.requests[1].methods[0].retries[0].parameters.log-level")
+                                            .value("DEBUG"));
 
                     // inputs
                     assertThat(bean.getInputs())

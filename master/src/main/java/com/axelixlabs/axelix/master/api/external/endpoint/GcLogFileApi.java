@@ -25,12 +25,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.contract.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;

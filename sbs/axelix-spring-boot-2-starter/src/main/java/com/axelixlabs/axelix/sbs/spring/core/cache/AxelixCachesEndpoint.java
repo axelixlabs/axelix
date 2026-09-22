@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
 
 /**
  * Custom Spring Boot Actuator endpoint that exposes operations for managing cache entries via HTTP.

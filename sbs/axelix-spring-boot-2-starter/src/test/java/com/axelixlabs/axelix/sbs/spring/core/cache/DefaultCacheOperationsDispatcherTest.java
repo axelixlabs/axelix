@@ -28,8 +28,10 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.LookupOutcome;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
@@ -183,7 +185,7 @@ class DefaultCacheOperationsDispatcherTest {
         CachesFeed cachesFeed = dispatcher.getAll();
 
         // then.
-        CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
+        CacheDto cache = cachesFeed.getCacheManagers().stream()
                 .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
                 .findFirst()
                 .orElseThrow()
@@ -193,7 +195,7 @@ class DefaultCacheOperationsDispatcherTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(cache.isContainsStats()).isTrue();
+        assertThat(cache.getContainsStats()).isTrue();
     }
 
     @Test
@@ -206,7 +208,7 @@ class DefaultCacheOperationsDispatcherTest {
         CachesFeed cachesFeed = dispatcher.getAll();
 
         // then.
-        CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
+        CacheDto cache = cachesFeed.getCacheManagers().stream()
                 .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
                 .findFirst()
                 .orElseThrow()
@@ -216,12 +218,12 @@ class DefaultCacheOperationsDispatcherTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(cache.isContainsStats()).isFalse();
+        assertThat(cache.getContainsStats()).isFalse();
     }
 
     @Test
     void isCacheEnabled_shouldReturnTrueForEnabledCache() {
-        assertThat(dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_1).isEnabled())
+        assertThat(dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_1).getEnabled())
                 .isTrue();
     }
 
@@ -235,7 +237,7 @@ class DefaultCacheOperationsDispatcherTest {
         dispatcher.disableCache(cacheManagerName, cacheName);
 
         // then.
-        assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isFalse();
+        assertThat(dispatcher.get(cacheManagerName, cacheName).getEnabled()).isFalse();
     }
 
     @Test
@@ -249,7 +251,7 @@ class DefaultCacheOperationsDispatcherTest {
         dispatcher.enableCache(cacheManagerName, cacheName);
 
         // then.
-        assertThat(dispatcher.get(cacheManagerName, cacheName).isEnabled()).isTrue();
+        assertThat(dispatcher.get(cacheManagerName, cacheName).getEnabled()).isTrue();
     }
 
     @Test
@@ -268,11 +270,9 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         assertThat(first.getEstimatedEntrySize()).isEqualTo(2L);
-        assertThat(first.getLookupHistory().stream()
-                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+        assertThat(first.getLookupHistory().stream().filter(it -> LookupOutcome.MISS.equals(it.getOutcome())))
                 .hasSize(2);
-        assertThat(first.getLookupHistory().stream()
-                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+        assertThat(first.getLookupHistory().stream().filter(it -> LookupOutcome.HIT.equals(it.getOutcome())))
                 .hasSize(2);
 
         // given.
@@ -286,11 +286,9 @@ class DefaultCacheOperationsDispatcherTest {
 
         // then.
         assertThat(second.getEstimatedEntrySize()).isEqualTo(1L);
-        assertThat(second.getLookupHistory().stream()
-                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+        assertThat(second.getLookupHistory().stream().filter(it -> LookupOutcome.MISS.equals(it.getOutcome())))
                 .hasSize(1);
-        assertThat(second.getLookupHistory().stream()
-                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+        assertThat(second.getLookupHistory().stream().filter(it -> LookupOutcome.HIT.equals(it.getOutcome())))
                 .hasSize(1);
     }
 

@@ -28,8 +28,11 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.CacheManager;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheDto;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheManagerDto;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.LookupOutcome;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
 
 /**
  * Default implementation of {@link CacheOperationsDispatcher}.
@@ -68,41 +71,41 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                 throw new CacheNotFoundException(cacheName, cacheManagerName);
             }
 
-            return new SingleCache(
-                    cache.getName(),
-                    cache.getNativeCache().getClass().getName(),
-                    cacheManager.getUnderlyingCacheManagerBeanName(),
-                    toApiCacheLookups(cache.getCacheLookups()),
-                    cacheSizeProvider.getEstimatedCacheSize(cache.getNativeCache()),
-                    cache.isEnabled());
+            return new SingleCache()
+                    .name(cache.getName())
+                    .target(cache.getNativeCache().getClass().getName())
+                    .cacheManager(cacheManager.getUnderlyingCacheManagerBeanName())
+                    .lookupHistory(toApiCacheLookups(cache.getCacheLookups()))
+                    .estimatedEntrySize(cacheSizeProvider.getEstimatedCacheSize(cache.getNativeCache()))
+                    .enabled(cache.isEnabled());
         });
     }
 
     @Override
     public CachesFeed getAll() {
-        List<CachesFeed.CacheManagerDto> feed = new ArrayList<>();
+        List<CacheManagerDto> feed = new ArrayList<>();
 
         this.cacheManagers.forEach((cacheManagerName, enhancedCacheManager) -> {
-            feed.add(new CachesFeed.CacheManagerDto(
-                    cacheManagerName,
-                    enhancedCacheManager.getAll().stream()
+            feed.add(new CacheManagerDto()
+                    .name(cacheManagerName)
+                    .caches(enhancedCacheManager.getAll().stream()
                             .map(enhancedCache -> {
                                 boolean containsStats =
                                         !enhancedCache.getCacheLookups().isEmpty();
 
-                                return new CachesFeed.CacheDto(
-                                        enhancedCache.getName(),
-                                        enhancedCache
+                                return new CacheDto()
+                                        .name(enhancedCache.getName())
+                                        .target(enhancedCache
                                                 .getNativeCache()
                                                 .getClass()
-                                                .getName(),
-                                        enhancedCache.isEnabled(),
-                                        containsStats);
+                                                .getName())
+                                        .enabled(enhancedCache.isEnabled())
+                                        .containsStats(containsStats);
                             })
                             .collect(Collectors.toList())));
         });
 
-        return new CachesFeed(feed);
+        return new CachesFeed().cacheManagers(feed);
     }
 
     @Override
@@ -152,11 +155,12 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         return enhancedCacheManager;
     }
 
-    private static List<SingleCache.CacheLookup> toApiCacheLookups(List<CacheLookup> cache) {
+    private static List<com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheLookup> toApiCacheLookups(
+            List<CacheLookup> cache) {
         return cache.stream()
-                .map(it -> new SingleCache.CacheLookup(
-                        it.timestamp().toEpochMilli(),
-                        SingleCache.LookupOutcome.valueOf(it.outcome().name())))
+                .map(it -> new com.axelixlabs.axelix.sbs.spring.core.contract.caches.CacheLookup()
+                        .timestamp(it.timestamp().toEpochMilli())
+                        .outcome(LookupOutcome.valueOf(it.outcome().name())))
                 .collect(Collectors.toList());
     }
 }
