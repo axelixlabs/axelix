@@ -17,7 +17,14 @@
  */
 import dayjs from "dayjs";
 
-import type { EDependencyEcosystem, ESupportSignal, IPlatformSupportWindow, IResolvedDependency } from "@/models";
+import {
+    type EDependencyEcosystem,
+    EFrameworkSupportStatus,
+    type ESupportStatus,
+    type IFrameworkSupportWindow,
+    type IResolvedDependency,
+} from "@/models";
+import { frameworkSupportStatusLabelKey } from "@/utils";
 
 /**
  * A single hop of the chain leading from the root application down to a resolved dependency.
@@ -79,27 +86,25 @@ export const isDirectDependency = (dependency: IResolvedDependency): boolean => 
     return dependency.resolutionPath.length === 1;
 };
 
-/**
- * Whether a dependency survives the current search, ecosystem tab and support-signal filters. Exposed on its own
- * because the tab and filter counters each re-run it with one of the three relaxed.
- */
 export const matchesDependencyFilters = (
     dependency: IResolvedDependency,
     search: string,
     ecosystem: EDependencyEcosystem | null,
-    signals: ESupportSignal[],
+    signals: ESupportStatus[],
 ): boolean => {
     const formattedSearch = search.trim();
 
-    if (formattedSearch && !relax(`${dependency.coordinates} ${dependency.project}`).includes(relax(formattedSearch))) {
+    const coordinates = `${dependency.dependency.library.groupId}:${dependency.dependency.library.artifactId}`;
+
+    if (formattedSearch && !relax(coordinates).includes(relax(formattedSearch))) {
         return false;
     }
 
-    if (ecosystem !== null && dependency.ecosystem !== ecosystem) {
+    if (ecosystem !== null && dependency.softwareProject?.ecosystem !== ecosystem) {
         return false;
     }
 
-    if (signals.length > 0 && (dependency.signal === null || !signals.includes(dependency.signal.kind))) {
+    if (signals.length > 0 && (!dependency.softwareProject || !signals.includes(dependency.softwareProject.status))) {
         return false;
     }
 
@@ -113,7 +118,7 @@ export const filterDependencies = (
     dependencies: IResolvedDependency[],
     search: string,
     ecosystem: EDependencyEcosystem | null,
-    signals: ESupportSignal[],
+    signals: ESupportStatus[],
 ): IResolvedDependency[] => {
     return dependencies.filter((dependency) => matchesDependencyFilters(dependency, search, ecosystem, signals));
 };
@@ -137,10 +142,10 @@ export const buildResolutionPath = (rootCoordinates: string, dependency: IResolv
  * Measures out the maintenance window bar: how much of it the line spent under OSS maintenance, how much it spends
  * under commercial support only, and where today falls. A line without commercial support is entirely OSS.
  */
-export const buildSupportTimeline = (platform: IPlatformSupportWindow): ISupportTimeline => {
-    const released = dayjs(platform.releasedAt).valueOf();
-    const ossEnd = dayjs(platform.ossSupportEndsAt).valueOf();
-    const end = platform.commercialSupportEndsAt ? dayjs(platform.commercialSupportEndsAt).valueOf() : ossEnd;
+export const buildSupportTimeline = (platform: IFrameworkSupportWindow): ISupportTimeline => {
+    const released = dayjs(platform.line.releasedAt).valueOf();
+    const ossEnd = dayjs(platform.line.ossSupportEndsAt).valueOf();
+    const end = platform.line.commercialSupportEndsAt ? dayjs(platform.line.commercialSupportEndsAt).valueOf() : ossEnd;
     const span = end - released;
 
     if (span <= 0) {
@@ -162,4 +167,25 @@ export const buildSupportTimeline = (platform: IPlatformSupportWindow): ISupport
  */
 export const elapsedMonthsSince = (isoDate: string): number => {
     return Math.max(dayjs().diff(dayjs(isoDate), "month"), 0);
+};
+
+export const getDependenciesAutocompleteOptions = (dependencies: IResolvedDependency[]) => {
+    return dependencies.map(({ dependency }) => {
+        const coordinates = `${dependency.library.groupId}:${dependency.library.artifactId}`;
+
+        return {
+            value: coordinates,
+            label: coordinates,
+        };
+    });
+};
+
+export const getFrameworkSupportStatusLabelKey = (outOfOssMaintenance: boolean): string => {
+    return frameworkSupportStatusLabelKey[
+        outOfOssMaintenance ? EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE : EFrameworkSupportStatus.OSS_SUPPORTED
+    ];
+};
+
+export const getDependencyCoordinates = (dependency: IResolvedDependency): string => {
+    return `${dependency.dependency.library.groupId}:${dependency.dependency.library.artifactId}`;
 };

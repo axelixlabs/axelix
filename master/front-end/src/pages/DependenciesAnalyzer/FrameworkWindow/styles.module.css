@@ -1,32 +1,24 @@
-.Detail {
+.MainWrapper {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 16px 16px 16px 45px;
-    background-color: var(--axelix-extra-light-grey);
-    border-top: 1px solid var(--axelix-medium-grey);
 }
 
-.Section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.SectionHeader {
+.Caption {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
-.Label {
+.CaptionLabel {
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--axelix-bold-grey);
 }
 
-.PathSummary {
+.CaptionSource {
     color: var(--axelix-bold-grey);
 }

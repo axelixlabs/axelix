@@ -18,8 +18,8 @@
 import { useTranslation } from "react-i18next";
 
 import { matchesDependencyFilters } from "@/helpers";
-import type { EDependencyEcosystem, ESupportSignal, IResolvedDependency } from "@/models";
-import { SUPPORT_SIGNAL_ORDER, supportSignalClassToken, supportSignalLabelKey } from "@/utils";
+import type { EDependencyEcosystem, ESupportStatus, IResolvedDependency } from "@/models";
+import { SUPPORT_STATUS_ORDER, supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -39,19 +39,10 @@ interface IProps {
      */
     activeEcosystem: EDependencyEcosystem | null;
 
-    /**
-     * The currently active support-signal filters.
-     */
-    activeSignals: ESupportSignal[];
+    activeStatuses: ESupportStatus[];
 
-    /**
-     * Toggles a support signal in the active filters.
-     */
-    onToggle: (signal: ESupportSignal) => void;
+    onToggle: (status: ESupportStatus) => void;
 
-    /**
-     * Drops every active support-signal filter.
-     */
     onClear: () => void;
 }
 
@@ -59,7 +50,7 @@ export const SupportSignalFilter = ({
     dependencies,
     search,
     activeEcosystem,
-    activeSignals,
+    activeStatuses,
     onToggle,
     onClear,
 }: IProps) => {
@@ -68,29 +59,32 @@ export const SupportSignalFilter = ({
     return (
         <>
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                {SUPPORT_SIGNAL_ORDER.map((signal) => {
-                    const active = activeSignals.includes(signal);
-                    const count = dependencies.filter(
+                {SUPPORT_STATUS_ORDER.map((status) => {
+                    const active = activeStatuses.includes(status);
+
+                    const filteredDependencies = dependencies.filter(
                         (dependency) =>
-                            dependency.signal?.kind === signal &&
+                            dependency.softwareProject?.status === status &&
                             matchesDependencyFilters(dependency, search, activeEcosystem, []),
-                    ).length;
+                    );
+
+                    const count = filteredDependencies.length;
 
                     return (
                         <button
-                            key={signal}
+                            key={status}
                             type="button"
-                            onClick={() => onToggle(signal)}
-                            className={`${styles.Chip} ${styles[supportSignalClassToken[signal]]} ${active ? styles.ActiveChip : ""}`}
+                            onClick={() => onToggle(status)}
+                            className={`${styles.Chip} ${styles[status]} ${active ? styles.ActiveChip : ""}`}
                         >
                             <span className={styles.ChipDot} />
-                            {t(supportSignalLabelKey[signal])}
+                            {t(supportSignalLabelKey[status])}
                             <span className={styles.Count}>{count}</span>
                         </button>
                     );
                 })}
 
-                {activeSignals.length > 0 && (
+                {activeStatuses.length > 0 && (
                     <button type="button" onClick={onClear} className={styles.Clear}>
                         {t("DependenciesAnalyzer.feed.clear")}
                     </button>

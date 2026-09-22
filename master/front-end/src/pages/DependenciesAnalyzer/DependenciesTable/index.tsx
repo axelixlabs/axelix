@@ -18,6 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler } from "@/components";
+import { getDependencyCoordinates } from "@/helpers";
 import type { IResolvedDependency } from "@/models";
 
 import { DependencyRow } from "./DependencyRow";
@@ -44,21 +45,27 @@ export const DependenciesTable = ({ dependencies, rootCoordinates }: IProps) => 
     }
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.Table}>
-                <div className={`TextUltraSmall ${styles.HeaderRow}`}>
-                    <span>{t("DependenciesAnalyzer.columns.dependency")}</span>
-                    <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.version")}</span>
-                    <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.scope")}</span>
+        <>
+            {/* TODO: Improve in the future */}
+            <div className={styles.MainWrapper}>
+                <div className={styles.Table}>
+                    <div className={`TextUltraSmall ${styles.HeaderRow}`}>
+                        <span>{t("DependenciesAnalyzer.columns.dependency")}</span>
+                        <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.version")}</span>
+                        <span className={styles.AlignEnd}>{t("DependenciesAnalyzer.columns.scope")}</span>
+                    </div>
+
+                    {dependencies.map((dependency) => {
+                        return (
+                            <DependencyRow
+                                dependency={dependency}
+                                rootCoordinates={rootCoordinates}
+                                key={getDependencyCoordinates(dependency)}
+                            />
+                        );
+                    })}
                 </div>
-                {dependencies.map((dependency) => (
-                    <DependencyRow
-                        key={dependency.coordinates}
-                        dependency={dependency}
-                        rootCoordinates={rootCoordinates}
-                    />
-                ))}
             </div>
-        </div>
+        </>
     );
 };

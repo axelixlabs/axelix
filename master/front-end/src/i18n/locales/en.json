@@ -211,7 +211,8 @@
             "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the instance got redeployed since the last request from your browser to the server. Visit the Wallboard",
             "INVALID_CREDENTIALS" : "Invalid username or password",
             "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username.",
-            "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email."
+            "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email.",
+            "SBOM_NOT_AVAILABLE": "SBOM data is not available for this project."
         }
     },
     "Metrics": {
@@ -467,8 +468,8 @@
         }
     },
     "DependenciesAnalyzer": {
-        "platform": {
-            "caption": "{{platform}} maintenance window",
+        "framework": {
+            "caption": "{{framework}} maintenance window",
             "source": "Read from the running JVM · {{date}}",
             "runningLine": "Running the {{line}} line · latest line known to Axelix is {{latest}}",
             "today": "Today",
@@ -481,7 +482,7 @@
             "supportedTarget": "Supported target",
             "targetValue": "{{line}} · OSS to {{date}}"
         },
-        "platformStatus": {
+        "frameworkStatus": {
             "OSS_SUPPORTED": "Within OSS maintenance",
             "OUT_OF_OSS_MAINTENANCE": "Out of OSS maintenance"
         },
@@ -510,9 +511,10 @@
             "RESILIENCE": "Resilience",
             "OTHER": "Other"
         },
-        "signals": {
-            "DISCONTINUED": "Discontinued",
-            "MAINTENANCE": "Maintenance mode"
+        "statuses": {
+            "MAINTENANCE": "Maintenance mode",
+            "SUNSET": "Sunset",
+            "DORMANT": "Dormant"
         },
         "columns": {
             "dependency": "Dependency",
@@ -522,10 +524,6 @@
         "scope": {
             "direct": "Direct",
             "transitive": "Transitive"
-        },
-        "notes": {
-            "SUPERSEDED_BY": "Superseded by",
-            "MIGRATION_NOTE": "Migration note"
         },
         "detail": {
             "resolutionPath": "Resolution path from the root",

@@ -17,30 +17,31 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "@/components";
-import { filterDependencies } from "@/helpers";
-import { type EDependencyEcosystem, type ESupportSignal, type IDependenciesAnalysis, StatefulRequest } from "@/models";
+import { fetchData, filterDependencies, getDependenciesAutocompleteOptions } from "@/helpers";
+import { type EDependencyEcosystem, type ESupportStatus, type IDependenciesAnalysis, StatefulRequest } from "@/models";
+import { getDependenciesAnalysis } from "@/services";
 
 import { DependenciesTable } from "./DependenciesTable";
 import { EcosystemTabs } from "./EcosystemTabs";
-import { PlatformWindow } from "./PlatformWindow";
+import { FrameworkWindow } from "./FrameworkWindow";
 import { SupportSignalFilter } from "./SupportSignalFilter";
-import { DEPENDENCIES_ANALYSIS_MOCK } from "./mock";
 import styles from "./styles.module.css";
 
 const DependenciesAnalyzer = () => {
+    const { instanceId } = useParams();
+
     const [analysis, setAnalysis] = useState(StatefulRequest.loading<IDependenciesAnalysis>());
     const [search, setSearch] = useState<string>("");
     const [ecosystem, setEcosystem] = useState<EDependencyEcosystem | null>(null);
-    const [activeSignals, setActiveSignals] = useState<ESupportSignal[]>([]);
+    const [activeStatuses, setActiveStatuses] = useState<ESupportStatus[]>([]);
 
     const { t } = useTranslation();
 
     useEffect(() => {
-        // TODO: Swap for fetchData(setAnalysis, () => getDependenciesAnalysis(instanceId!)) once the backend serves
-        //  the dependency analysis, and drop ./mock.ts.
-        setAnalysis(() => StatefulRequest.success(DEPENDENCIES_ANALYSIS_MOCK));
+        fetchData(setAnalysis, () => getDependenciesAnalysis(instanceId!));
     }, []);
 
     if (analysis.loading) {
@@ -51,29 +52,31 @@ const DependenciesAnalyzer = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const { platform, dependencies, rootCoordinates, analyzedAt } = analysis.response!;
+    const { framework, dependencies, rootCoordinates, analyzedAt } = analysis.response!;
 
     if (dependencies.length === 0) {
         return <EmptyHandler isEmpty />;
     }
 
-    const toggleSignal = (signal: ESupportSignal): void => {
-        setActiveSignals((prev) => {
-            if (prev.includes(signal)) {
-                return prev.filter((current) => current !== signal);
+    const toggleStatus = (status: ESupportStatus): void => {
+        setActiveStatuses((prev) => {
+            if (prev.includes(status)) {
+                return prev.filter((current) => current !== status);
             }
 
-            return [...prev, signal];
+            return [...prev, status];
         });
     };
 
-    const filtered = filterDependencies(dependencies, search, ecosystem, activeSignals);
+    const filtered = filterDependencies(dependencies, search, ecosystem, activeStatuses);
     const addonAfter = `${filtered.length} / ${dependencies.length}`;
+
+    const autocompleteOptions = getDependenciesAutocompleteOptions(dependencies);
 
     return (
         <>
             <div className={styles.MainWrapper}>
-                <PlatformWindow platform={platform} analyzedAt={analyzedAt} />
+                <FrameworkWindow framework={framework} analyzedAt={analyzedAt} />
 
                 <div className={styles.Feed}>
                     <span className={`TextUltraSmall ${styles.Caption}`}>{t("DependenciesAnalyzer.feed.caption")}</span>
@@ -81,30 +84,28 @@ const DependenciesAnalyzer = () => {
                         <PageSearch
                             setSearch={setSearch}
                             addonAfter={addonAfter}
+                            autocompleteOptions={autocompleteOptions}
                             removeBottomGutter
-                            autocompleteOptions={dependencies.map((dependency) => {
-                                return {
-                                    value: dependency.coordinates,
-                                    label: dependency.coordinates,
-                                };
-                            })}
                         />
+
                         <EcosystemTabs
                             dependencies={dependencies}
                             search={search}
-                            activeSignals={activeSignals}
+                            activeStatuses={activeStatuses}
                             activeEcosystem={ecosystem}
                             onPick={setEcosystem}
                         />
+
                         <SupportSignalFilter
                             dependencies={dependencies}
                             search={search}
                             activeEcosystem={ecosystem}
-                            activeSignals={activeSignals}
-                            onToggle={toggleSignal}
-                            onClear={() => setActiveSignals([])}
+                            activeStatuses={activeStatuses}
+                            onToggle={toggleStatus}
+                            onClear={() => setActiveStatuses([])}
                         />
                     </div>
+
                     <DependenciesTable dependencies={filtered} rootCoordinates={rootCoordinates} />
                 </div>
             </div>

@@ -213,7 +213,8 @@
             "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что экземпляр сервиса был передеплоен. Посетите панель сервисов чтобы убедиться.",
             "INVALID_CREDENTIALS" : "Неверное имя пользователя или пароль",
             "USERNAME_ALREADY_EXISTS": "Пользователь с таким именем уже существует. Пожалуйста, выберите другое имя пользователя.",
-            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email."
+            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email.",
+            "SBOM_NOT_AVAILABLE": "SBOM not found for this project."
         }
     },
     "Metrics": {
@@ -469,8 +470,8 @@
         }
     },
     "DependenciesAnalyzer": {
-        "platform": {
-            "caption": "Окно поддержки {{platform}}",
+        "framework": {
+            "caption": "Окно поддержки {{framework}}",
             "source": "Считано из работающей JVM · {{date}}",
             "runningLine": "Используется линия {{line}} · последняя известная Axelix линия — {{latest}}",
             "today": "Сегодня",
@@ -483,7 +484,7 @@
             "supportedTarget": "Поддерживаемая цель",
             "targetValue": "{{line}} · OSS до {{date}}"
         },
-        "platformStatus": {
+        "frameworkStatus": {
             "OSS_SUPPORTED": "В рамках OSS-поддержки",
             "OUT_OF_OSS_MAINTENANCE": "Вне OSS-поддержки"
         },
@@ -516,9 +517,10 @@
             "RESILIENCE": "Отказоустойчивость",
             "OTHER": "Прочее"
         },
-        "signals": {
-            "DISCONTINUED": "Прекращён",
-            "MAINTENANCE": "Режим поддержки"
+        "statuses": {
+            "SUNSET": "Устаревший",
+            "MAINTENANCE": "Режим поддержки",
+            "DORMANT": "Без активности"
         },
         "columns": {
             "dependency": "Зависимость",
@@ -528,10 +530,6 @@
         "scope": {
             "direct": "Прямая",
             "transitive": "Транзитивная"
-        },
-        "notes": {
-            "SUPERSEDED_BY": "Заменён на",
-            "MIGRATION_NOTE": "Примечание о миграции"
         },
         "detail": {
             "resolutionPath": "Путь разрешения от корня",

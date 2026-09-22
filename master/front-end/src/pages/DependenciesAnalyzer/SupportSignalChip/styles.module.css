@@ -21,22 +21,28 @@
     background-color: var(--chip-color);
 }
 
-.Discontinued {
-    --chip-color: var(--signal-discontinued);
-    --chip-bg: var(--signal-discontinued-bg);
-    --chip-border: var(--signal-discontinued-border);
+.MAINTENANCE {
+    --chip-color: var(--status-maintenance);
+    --chip-bg: var(--status-maintenance-bg);
+    --chip-border: var(--status-maintenance-border);
 }
 
-.Maintenance {
-    --chip-color: var(--signal-maintenance);
-    --chip-bg: var(--signal-maintenance-bg);
-    --chip-border: var(--signal-maintenance-border);
+.SUNSET {
+    --chip-color: var(--status-sunset);
+    --chip-bg: var(--status-sunset-bg);
+    --chip-border: var(--status-sunset-border);
+}
+
+.DORMANT {
+    --chip-color: var(--status-dormant);
+    --chip-bg: var(--status-dormant-bg);
+    --chip-border: var(--status-dormant-border);
 }
 
 .HintHeader {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
 }
 
 .HintDot {
@@ -51,28 +57,4 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-}
-
-.Evidence {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-top: 2px;
-    padding-top: 8px;
-
-    /* the tooltip surface is dark, so the rule has to be a translucent white rather than a grey token */
-    border-top: 1px solid rgb(255 255 255 / 12%);
-}
-
-.EvidenceLabel {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--axelix-bold-grey);
-}
-
-.EvidenceValue {
-    font-size: 12px;
-    overflow-wrap: anywhere;
 }
