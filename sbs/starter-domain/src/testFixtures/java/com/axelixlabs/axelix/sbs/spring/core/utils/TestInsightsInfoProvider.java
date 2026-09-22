@@ -40,7 +40,7 @@ public final class TestInsightsInfoProvider implements InsightsInfoProvider {
                             new InsightFeature("GCLogFileSpecified", false)),
                     List.of(new InsightFeature("CompactObjectHeaders", true))),
             List.of(new InsightFeature("OSIV", false)),
-            new PersistenceInsights(List.of()));
+            new PersistenceInsights(List.of()), List.of());
 
     @Override
     public Insights getInsight() {

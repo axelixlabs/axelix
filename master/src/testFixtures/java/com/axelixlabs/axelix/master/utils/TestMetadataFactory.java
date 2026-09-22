@@ -149,7 +149,7 @@ public final class TestMetadataFactory {
                         List.of(feature(FeatureId.GC_LOGGING_ENABLED, gcLoggingEnabled)),
                         List.of(feature(FeatureId.COMPACT_OBJECT_HEADERS, compactObjectHeadersEnabled))),
                 List.of(feature(FeatureId.OSIV, osivEnabled)),
-                persistenceInsights);
+                persistenceInsights, List.of());
     }
 
     private static InsightFeature feature(FeatureId featureId, boolean enabled) {
