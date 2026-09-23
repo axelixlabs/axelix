@@ -17,24 +17,28 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
-import java.lang.reflect.Method;
-
-import org.springframework.asm.Type;
+import org.springframework.asm.Opcodes;
 
 /**
- * A method identified by its declaring class' internal name ({@code owner}) and ASM name+descriptor
- * ({@code key}, e.g. {@code toString()Ljava/lang/String;}).
+ * A method discovered in bytecode together with its access flags and body.
  *
  * @author Dmitry Mazurov
  */
-record MethodRef(String owner, String key) {
+record MethodInfo(MethodRef ref, int access, MethodBody body) {
 
-    static MethodRef from(Method method) {
-        return new MethodRef(
-                Type.getInternalName(method.getDeclaringClass()), method.getName() + Type.getMethodDescriptor(method));
+    boolean isPrivate() {
+        return (access & Opcodes.ACC_PRIVATE) != 0;
     }
 
-    static MethodRef of(String owner, String name, String descriptor) {
-        return new MethodRef(owner, name + descriptor);
+    boolean isStatic() {
+        return (access & Opcodes.ACC_STATIC) != 0;
+    }
+
+    boolean isFinal() {
+        return (access & Opcodes.ACC_FINAL) != 0;
+    }
+
+    boolean isPackagePrivate() {
+        return (access & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED | Opcodes.ACC_PRIVATE)) == 0;
     }
 }

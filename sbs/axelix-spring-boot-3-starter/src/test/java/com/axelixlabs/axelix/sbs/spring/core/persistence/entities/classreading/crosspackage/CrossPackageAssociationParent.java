@@ -15,26 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
+package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.crosspackage;
 
-import java.lang.reflect.Method;
-
-import org.springframework.asm.Type;
+import jakarta.persistence.ManyToOne;
 
 /**
- * A method identified by its declaring class' internal name ({@code owner}) and ASM name+descriptor
- * ({@code key}, e.g. {@code toString()Ljava/lang/String;}).
+ * Superclass in a different package from {@code EntityMethodsInspectorTest}, with a package-private
+ * helper read by {@code toString()}.
  *
  * @author Dmitry Mazurov
  */
-record MethodRef(String owner, String key) {
+public class CrossPackageAssociationParent {
 
-    static MethodRef from(Method method) {
-        return new MethodRef(
-                Type.getInternalName(method.getDeclaringClass()), method.getName() + Type.getMethodDescriptor(method));
+    @ManyToOne
+    protected Object customer;
+
+    @Override
+    public String toString() {
+        return describe();
     }
 
-    static MethodRef of(String owner, String name, String descriptor) {
-        return new MethodRef(owner, name + descriptor);
+    String describe() {
+        return "CrossPackageAssociationParent{customer=" + customer + "}";
     }
 }

@@ -17,24 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
-import java.lang.reflect.Method;
-
-import org.springframework.asm.Type;
+import java.lang.reflect.Member;
+import java.util.Objects;
 
 /**
- * A method identified by its declaring class' internal name ({@code owner}) and ASM name+descriptor
- * ({@code key}, e.g. {@code toString()Ljava/lang/String;}).
+ * JPA association together with the Java member used to access it.
  *
  * @author Dmitry Mazurov
  */
-record MethodRef(String owner, String key) {
+public record AssociationMember(String name, Member member) {
 
-    static MethodRef from(Method method) {
-        return new MethodRef(
-                Type.getInternalName(method.getDeclaringClass()), method.getName() + Type.getMethodDescriptor(method));
-    }
-
-    static MethodRef of(String owner, String name, String descriptor) {
-        return new MethodRef(owner, name + descriptor);
+    public AssociationMember {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(member, "member");
     }
 }

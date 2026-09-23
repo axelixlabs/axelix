@@ -18,20 +18,16 @@
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.MethodVisitor;
-import org.springframework.asm.Opcodes;
 import org.springframework.asm.SpringAsmInfo;
 
 /**
- * ASM class visitor that, for every method declared in one class, delegates the field/call collection to
- * a {@link MethodBodyReadingMethodVisitor}. The result is available through {@link #getBodies()} once
- * this visitor has been passed to {@link org.springframework.asm.ClassReader#accept}.
+ * ASM class visitor that collects the methods of a class, delegating to
+ * {@link MethodBodyReadingMethodVisitor} for each one.
  *
  * @author Dmitry Mazurov
  */
@@ -39,8 +35,7 @@ final class MethodBodyReadingClassVisitor extends ClassVisitor {
 
     private final String owner;
     private final List<String> hierarchy;
-    private final Map<MethodRef, MethodBody> bodies = new HashMap<>();
-    private final Set<MethodRef> privateMethods = new HashSet<>();
+    private final Map<MethodRef, MethodInfo> methods = new HashMap<>();
 
     MethodBodyReadingClassVisitor(String owner, List<String> hierarchy) {
         super(SpringAsmInfo.ASM_VERSION);
@@ -51,20 +46,11 @@ final class MethodBodyReadingClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(
             int access, String name, String descriptor, String signature, String[] exceptions) {
-        MethodRef ref = new MethodRef(owner, name + descriptor);
-        if ((access & Opcodes.ACC_PRIVATE) != 0) {
-            // javac compiles a private method's self-call as invokevirtual too, so opcode alone can't
-            // tell exact from virtual here - the declaring class' own access flags must.
-            privateMethods.add(ref);
-        }
-        return new MethodBodyReadingMethodVisitor(ref, hierarchy, bodies);
+        MethodRef ref = MethodRef.of(owner, name, descriptor);
+        return new MethodBodyReadingMethodVisitor(ref, access, hierarchy, methods);
     }
 
-    Map<MethodRef, MethodBody> getBodies() {
-        return bodies;
-    }
-
-    Set<MethodRef> getPrivateMethods() {
-        return privateMethods;
+    Map<MethodRef, MethodInfo> getMethods() {
+        return methods;
     }
 }

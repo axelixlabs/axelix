@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Associ
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.AssociationMember;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.EntityMethodsInspector;
 
 /**
@@ -107,13 +108,15 @@ public class EntityMappingScanner {
     }
 
     private static EntityMethodsInspector createMethodsInspector(EntityType<?> entityType) {
-        Set<String> associationNames = new HashSet<>();
+        Set<AssociationMember> associations = new HashSet<>();
+
         for (Attribute<?, ?> attribute : entityType.getAttributes()) {
             if (attribute.isAssociation()) {
-                associationNames.add(attribute.getName());
+                associations.add(new AssociationMember(attribute.getName(), attribute.getJavaMember()));
             }
         }
-        return new EntityMethodsInspector(entityType.getJavaType(), associationNames);
+
+        return new EntityMethodsInspector(entityType.getJavaType(), associations);
     }
 
     private static String resolveTable(Class<?> javaType, String entityName) {
