@@ -17,10 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -65,8 +67,12 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public JwtJsonEngine jwtJsonEngine(ObjectMapper objectMapper) {
-        return new JacksonJwtJsonEngine(objectMapper);
+    @ConditionalOnMissingBean
+    public JwtJsonEngine jwtJsonEngine() {
+        // Dedicated mapper: the JWT wire format must not follow host-application Jackson customizations.
+        return new JacksonJwtJsonEngine(JsonMapper.builder()
+                .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                .build());
     }
 
     @Bean

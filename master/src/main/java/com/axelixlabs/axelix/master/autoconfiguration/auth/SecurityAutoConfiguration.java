@@ -22,11 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -161,8 +164,12 @@ public class SecurityAutoConfiguration {
     public static class JwtAutoConfiguration {
 
         @Bean
-        public JwtJsonEngine jwtJsonEngine(ObjectMapper objectMapper) {
-            return new JacksonJwtJsonEngine(objectMapper);
+        @ConditionalOnMissingBean
+        public JwtJsonEngine jwtJsonEngine() {
+            // Dedicated mapper: the JWT wire format must not follow host-application Jackson customizations.
+            return new JacksonJwtJsonEngine(JsonMapper.builder()
+                    .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                    .build());
         }
 
         @Bean

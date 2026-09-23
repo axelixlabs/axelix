@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -44,7 +43,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JwtAuthAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withBean(ObjectMapper.class, ObjectMapper::new)
             .withPropertyValues(
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",
@@ -76,6 +74,8 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage("The jwt signing algorithm is not specified, although it is required");
                 });
     }
 
@@ -89,6 +89,8 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage("The jwt signing key is not specified, although it is required");
                 });
     }
 
@@ -105,6 +107,9 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage(
+                                    "No enum constant com.axelixlabs.axelix.common.auth.core.JwtAlgorithm.RSA512");
                 });
     }
 }
