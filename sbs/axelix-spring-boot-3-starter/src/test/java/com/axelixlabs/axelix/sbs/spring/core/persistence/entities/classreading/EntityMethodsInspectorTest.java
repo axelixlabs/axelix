@@ -93,6 +93,11 @@ class EntityMethodsInspectorTest {
         void shouldResolveAHiddenStaticHelperExactlyAsCalledNotFromTheConcreteType() {
             assertThat(inspect(ChildHidingStaticHelper.class)).containsExactly("items");
         }
+
+        @Test // GH-1633
+        void shouldNotShadowAPrivateSuperclassHelperWithAnUnrelatedSameSignaturePrivateMethod() {
+            assertThat(inspect(ChildWithUnrelatedPrivateHelper.class)).containsExactly("items");
+        }
     }
 
     @Nested
@@ -240,6 +245,27 @@ class EntityMethodsInspectorTest {
 
         static String staticHelper(ParentWithHiddenStaticHelper self) {
             return "ChildHidingStaticHelper - unrelated";
+        }
+    }
+
+    static class ParentWithPrivateHelper {
+
+        protected List<String> items;
+
+        @Override
+        public String toString() {
+            return describe();
+        }
+
+        private String describe() {
+            return "ParentWithPrivateHelper{items=" + items + "}";
+        }
+    }
+
+    static class ChildWithUnrelatedPrivateHelper extends ParentWithPrivateHelper {
+
+        private String describe() {
+            return "ChildWithUnrelatedPrivateHelper - unrelated, does not read items";
         }
     }
 
