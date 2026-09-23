@@ -1,0 +1,29 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--axelix-medium-grey);
+}
+
+.LegendItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--axelix-bold-grey);
+}
+
+.LegendSupported {
+    width: 14px;
+    height: 8px;
+    border-radius: var(--axelix-border-radius-small);
+    background-color: var(--axelix-primary-green);
+}
+
+.LegendUnsupported {
+    width: 22px;
+    height: 8px;
+    border-radius: var(--axelix-border-radius-small);
+    background: linear-gradient(90deg, var(--axelix-medium-grey), rgb(217 217 217 / 0%));
+}

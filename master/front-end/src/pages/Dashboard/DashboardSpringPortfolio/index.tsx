@@ -30,42 +30,47 @@ import styles from "./styles.module.css";
 
 const DashboardSpringPortfolio = () => {
     const { t } = useTranslation();
-    const [state, setState] = useState(StatefulRequest.loading<IDashboardSpringPortfolioResponseBody>());
+    const [dashboardSpringPortfolioData, setDashboardSpringPortfolioData] = useState(
+        StatefulRequest.loading<IDashboardSpringPortfolioResponseBody>(),
+    );
 
     useEffect(() => {
-        fetchData(setState, () => getDashboardSpringPortfolioData());
+        fetchData(setDashboardSpringPortfolioData, () => getDashboardSpringPortfolioData());
     }, []);
 
-    if (state.loading) {
+    if (dashboardSpringPortfolioData.loading) {
         return <Loader />;
     }
 
-    if (state.error) {
+    if (dashboardSpringPortfolioData.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const portfolio = state.response!;
+    const portfolio = dashboardSpringPortfolioData.response!;
 
     return (
-        <EmptyHandler isEmpty={portfolio.applicationsTotal === 0}>
-            <div className={styles.Header}>
-                <div className={styles.HeaderText}>
-                    <div className="TextLarge">{t("Dashboard.SpringPortfolio.title")}</div>
-                    <p className={styles.Subtitle}>{t("Dashboard.SpringPortfolio.subtitle")}</p>
+        <>
+            <EmptyHandler isEmpty={portfolio.applicationsTotal === 0}>
+                {/* TODO: Improve in future */}
+                <div className={styles.Header}>
+                    <div>
+                        <div className="TextLarge">{t("Dashboard.SpringPortfolio.title")}</div>
+                        <p className={styles.Subtitle}>{t("Dashboard.SpringPortfolio.subtitle")}</p>
+                    </div>
+                    <PortfolioSummary
+                        applicationsTotal={portfolio.applicationsTotal}
+                        applicationsFullyOssSupported={portfolio.applicationsFullyOssSupported}
+                    />
                 </div>
-                <PortfolioSummary
-                    applicationsTotal={portfolio.applicationsTotal}
-                    applicationsFullyOssSupported={portfolio.applicationsFullyOssSupported}
-                />
-            </div>
 
-            <div className={styles.Cards}>
-                <PlatformDistributionCard distribution={portfolio.springBoot} />
-                <PlatformDistributionCard distribution={portfolio.springFramework} />
-            </div>
+                <div className={styles.CardsWrapper}>
+                    <PlatformDistributionCard distribution={portfolio.springBoot} />
+                    <PlatformDistributionCard distribution={portfolio.springFramework} />
+                </div>
 
-            {portfolio.linesInUse.length > 0 && <MaintenanceLadder entries={portfolio.linesInUse} />}
-        </EmptyHandler>
+                {portfolio.linesInUse.length > 0 && <MaintenanceLadder entries={portfolio.linesInUse} />}
+            </EmptyHandler>
+        </>
     );
 };
 
