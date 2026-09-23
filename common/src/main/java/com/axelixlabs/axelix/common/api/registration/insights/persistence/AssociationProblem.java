@@ -23,6 +23,7 @@ package com.axelixlabs.axelix.common.api.registration.insights.persistence;
  * the kind of mapping smell that was found.
  *
  * @author Mikhail Polivakha
+ * @author Dmitry Mazurov
  */
 public enum AssociationProblem {
 
@@ -50,5 +51,11 @@ public enum AssociationProblem {
      * A {@code @OneToMany} declared without {@code mappedBy}, i.e. unidirectional, which requires an
      * extra join table or per-row updates instead of a plain foreign key.
      */
-    UNIDIRECTIONAL_ONE_TO_MANY
+    UNIDIRECTIONAL_ONE_TO_MANY,
+
+    /**
+     * The association is read by the entity's {@code toString()}, which may initialize a lazy
+     * association or recurse through a bidirectional one.
+     */
+    TO_STRING
 }

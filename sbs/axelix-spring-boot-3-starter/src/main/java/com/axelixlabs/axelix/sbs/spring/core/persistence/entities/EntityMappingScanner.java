@@ -21,6 +21,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Associ
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.EntityMethodsInspector;
 
 /**
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
@@ -43,6 +45,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.persistence.Mapped
  * it works with any JPA provider and does not require Hibernate or Spring Data JPA.
  *
  * @author Mikhail Polivakha
+ * @author Dmitry Mazurov
  */
 public class EntityMappingScanner {
 
@@ -71,6 +74,8 @@ public class EntityMappingScanner {
         String entityName = entityType.getName();
         int associationsCount = 0;
         List<FlaggedAssociation> flagged = new ArrayList<>();
+        EntityMethodsInspector methodsInspector = createMethodsInspector(entityType);
+        Set<String> associationsReadByToString = methodsInspector.detectAssociationsReadByToString();
 
         for (Attribute<?, ?> attribute : entityType.getAttributes()) {
             if (!attribute.isAssociation()) {
@@ -86,6 +91,9 @@ public class EntityMappingScanner {
 
             AssociationInspector inspector = new AssociationInspector(attribute, annotated);
             Set<AssociationProblem> problems = inspector.detectProblems();
+            if (associationsReadByToString.contains(attribute.getName())) {
+                problems.add(AssociationProblem.TO_STRING);
+            }
 
             if (!problems.isEmpty()) {
                 Association association = new Association(entityName, attribute.getName());
@@ -96,6 +104,16 @@ public class EntityMappingScanner {
 
         return new MappedEntity(
                 entityName, resolveTable(entityType.getJavaType(), entityName), associationsCount, flagged);
+    }
+
+    private static EntityMethodsInspector createMethodsInspector(EntityType<?> entityType) {
+        Set<String> associationNames = new HashSet<>();
+        for (Attribute<?, ?> attribute : entityType.getAttributes()) {
+            if (attribute.isAssociation()) {
+                associationNames.add(attribute.getName());
+            }
+        }
+        return new EntityMethodsInspector(entityType.getJavaType(), associationNames);
     }
 
     private static String resolveTable(Class<?> javaType, String entityName) {

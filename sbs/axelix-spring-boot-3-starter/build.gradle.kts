@@ -13,6 +13,7 @@ val springBootVersion = "3.0.13"
 val springCloudVersion = "2022.0.4"
 
 val jsonUnitAssertJVersion = "2.40.1"
+val lombokVersion = "1.18.36"
 
 dependencies {
     // Self
@@ -55,6 +56,8 @@ dependencies {
     testImplementation("digital.pragmatech.testing:spring-test-profiler:0.2.3")
     testImplementation("com.tngtech.archunit:archunit:1.4.2")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 }
 
 tasks.withType<JavaCompile>().configureEach {
