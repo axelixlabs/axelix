@@ -21,32 +21,39 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 
 /**
  * Insight information discovered for the given service instance.
+ *
+ * @author Vycheslav Yanin
  */
 public final class Insights {
 
     private final HotSpotInsights hotSpotInsights;
     private final List<InsightFeature> springFramework;
     private final PersistenceInsights persistenceInsights;
+    private final List<ScheduledTaskExecution> scheduledTaskExecutions;
 
     /**
      * Creates a new Insight.
      *
      * @param hotSpotInsights         the HotSpot-specific insight groups.
      * @param springFramework the Spring Framework insight features.
+     * @param scheduledTaskExecutions the list of results of a single execution of a scheduled task
      */
     @JsonCreator
     public Insights(
             @JsonProperty("hotSpot") HotSpotInsights hotSpotInsights,
             @JsonProperty("springFramework") List<InsightFeature> springFramework,
-            @JsonProperty("persistenceInsights") PersistenceInsights persistenceInsights) {
+            @JsonProperty("persistenceInsights") PersistenceInsights persistenceInsights,
+            @JsonProperty("scheduledTaskExecutions") @Nullable List<ScheduledTaskExecution> scheduledTaskExecutions) {
         this.hotSpotInsights = hotSpotInsights;
         this.springFramework = springFramework;
         this.persistenceInsights = persistenceInsights;
+        this.scheduledTaskExecutions = scheduledTaskExecutions != null ? scheduledTaskExecutions : List.of();
     }
 
     public HotSpotInsights getHotSpot() {
@@ -61,11 +68,16 @@ public final class Insights {
         return persistenceInsights;
     }
 
+    public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
+        return scheduledTaskExecutions;
+    }
+
     @Override
     public String toString() {
         return "Insights{" + "hotSpotInsights="
                 + hotSpotInsights + ", springFramework="
                 + springFramework + ", persistenceInsights="
-                + persistenceInsights + '}';
+                + persistenceInsights + ", scheduledTaskExecutions="
+                + scheduledTaskExecutions + '}';
     }
 }
