@@ -25,30 +25,33 @@ import org.springframework.asm.Opcodes;
 import org.springframework.asm.SpringAsmInfo;
 
 /**
- * ASM method visitor that collects the fields read and the methods called by one method, considering
- * only field/method owners within the given class hierarchy. The resulting {@link MethodBody} is
- * published into {@code bodies} only once fully built, in {@link #visitEnd()}.
+ * ASM method visitor that collects fields read and methods called by one method.
  *
  * @author Dmitry Mazurov
  */
 final class MethodBodyReadingMethodVisitor extends MethodVisitor {
 
     private final MethodRef ref;
+    private final int access;
     private final List<String> hierarchy;
-    private final Map<MethodRef, MethodBody> bodies;
+    private final Map<MethodRef, MethodInfo> methods;
+
     private final MethodBody body = new MethodBody();
 
-    MethodBodyReadingMethodVisitor(MethodRef ref, List<String> hierarchy, Map<MethodRef, MethodBody> bodies) {
+    MethodBodyReadingMethodVisitor(
+            MethodRef ref, int access, List<String> hierarchy, Map<MethodRef, MethodInfo> methods) {
+
         super(SpringAsmInfo.ASM_VERSION);
         this.ref = ref;
+        this.access = access;
         this.hierarchy = hierarchy;
-        this.bodies = bodies;
+        this.methods = methods;
     }
 
     @Override
     public void visitFieldInsn(int opcode, String owner, String fieldName, String fieldDescriptor) {
         if (opcode == Opcodes.GETFIELD && hierarchy.contains(owner)) {
-            body.addReadField(fieldName);
+            body.addReadField(new FieldRef(owner, fieldName, fieldDescriptor));
         }
     }
 
@@ -58,18 +61,18 @@ final class MethodBodyReadingMethodVisitor extends MethodVisitor {
         if (!hierarchy.contains(owner)) {
             return;
         }
-        MethodRef call = new MethodRef(owner, methodName + methodDescriptor);
-        // invokespecial (super calls, private methods, constructors) and invokestatic are never
-        // dispatched virtually, so the JVM always calls exactly the method named by `owner`.
+
+        MethodRef call = MethodRef.of(owner, methodName, methodDescriptor);
+
         if (opcode == Opcodes.INVOKESPECIAL || opcode == Opcodes.INVOKESTATIC) {
             body.addExactCall(call);
-        } else {
+        } else if (opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKEINTERFACE) {
             body.addVirtualCall(call);
         }
     }
 
     @Override
     public void visitEnd() {
-        bodies.put(ref, body);
+        methods.put(ref, new MethodInfo(ref, access, body));
     }
 }

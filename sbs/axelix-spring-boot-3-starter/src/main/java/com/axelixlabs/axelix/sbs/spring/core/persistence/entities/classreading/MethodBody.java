@@ -21,21 +21,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The fields read and the methods called by a single method, as found by {@link
- * MethodBodyReadingClassVisitor}, restricted to the given class hierarchy. Calls are split by dispatch:
- * {@code virtualCalls} resolve against the entity's most derived override, {@code exactCalls} exactly
- * as named.
+ * The fields read and the methods called by a single method.
+ *
+ * <p>Calls are split by dispatch semantics: {@code exactCalls} are statically resolved calls such as
+ * {@code invokespecial} and {@code invokestatic}, while {@code virtualCalls} require runtime method
+ * selection.
  *
  * @author Dmitry Mazurov
  */
 final class MethodBody {
 
-    private final Set<String> readFields = new HashSet<>();
+    private final Set<FieldRef> readFields = new HashSet<>();
     private final Set<MethodRef> virtualCalls = new HashSet<>();
     private final Set<MethodRef> exactCalls = new HashSet<>();
 
-    void addReadField(String fieldName) {
-        readFields.add(fieldName);
+    void addReadField(FieldRef field) {
+        readFields.add(field);
     }
 
     void addVirtualCall(MethodRef call) {
@@ -46,7 +47,7 @@ final class MethodBody {
         exactCalls.add(call);
     }
 
-    Set<String> getReadFields() {
+    Set<FieldRef> getReadFields() {
         return readFields;
     }
 

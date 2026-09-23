@@ -17,10 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
+import java.lang.reflect.Method;
+
+import org.springframework.asm.Type;
+
 /**
  * A method identified by its declaring class' internal name ({@code owner}) and ASM name+descriptor
  * ({@code key}, e.g. {@code toString()Ljava/lang/String;}).
  *
  * @author Dmitry Mazurov
  */
-record MethodRef(String owner, String key) {}
+record MethodRef(String owner, String key) {
+
+    static MethodRef from(Method method) {
+        return new MethodRef(
+                Type.getInternalName(method.getDeclaringClass()), method.getName() + Type.getMethodDescriptor(method));
+    }
+
+    static MethodRef of(String owner, String name, String descriptor) {
+        return new MethodRef(owner, name + descriptor);
+    }
+}

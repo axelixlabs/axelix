@@ -17,13 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import lombok.Data;
 import lombok.ToString;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.crosspackage.CrossPackageAssociationParent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,69 +45,92 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class EntityMethodsInspectorTest {
 
-    @Test // GH-1633
-    void shouldReturnNothingWhenEntityHasNoAssociations() {
-        assertThat(new EntityMethodsInspector(DirectToString.class, Set.of()).detectAssociationsReadByToString())
-                .isEmpty();
+    @Nested
+    class FieldAccess {
+
+        @Test // GH-1633
+        void shouldReportAssociationReadDirectlyByToString() {
+            assertThat(inspectFieldAssociation(DirectToString.class, "items")).containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldReportAssociationReadViaGetter() {
+            assertThat(inspectFieldAssociation(GetterToString.class, "items")).containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldNotReportAssociationNotUsedByToString() {
+            assertThat(inspectFieldAssociation(SafeEntity.class, "items")).isEmpty();
+        }
+
+        @Test // GH-1633
+        void shouldReportAssociationReadByPrivateHelper() {
+            assertThat(inspectFieldAssociation(PrivateHelperToString.class, "items"))
+                    .containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldReportAssociationReadBySuperclassToString() {
+            assertThat(inspectFieldAssociation(ChildWithSuperToString.class, "items"))
+                    .containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldReportInheritedAssociationReadByOverriddenHelper() {
+            assertThat(inspectFieldAssociation(ChildOverridingHelper.class, "items"))
+                    .containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldResolveStaticHelperFromDeclaringClass() {
+            assertThat(inspectFieldAssociation(ChildHidingStaticHelper.class, "items"))
+                    .containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldNotReplacePrivateSuperclassHelperWithChildMethod() {
+            assertThat(inspectFieldAssociation(ChildWithSamePrivateHelper.class, "items"))
+                    .containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldNotTreatSameSignatureMethodInDifferentPackageAsOverride() {
+            assertThat(inspectFieldAssociation(ChildInDifferentPackageWithUnrelatedHelper.class, "customer"))
+                    .containsExactly("customer");
+        }
     }
 
     @Nested
-    class HandWrittenToString {
+    class PropertyAccess {
 
         @Test // GH-1633
-        void shouldReportToStringReadingAssociationDirectly() {
-            assertThat(inspect(DirectToString.class)).containsExactly("items");
+        void shouldReportAssociationReadViaPropertyGetter() {
+            assertThat(inspectPropertyAssociation(PropertyGetterToString.class, "customer", "getCustomer"))
+                    .containsExactly("customer");
         }
 
         @Test // GH-1633
-        void shouldReportToStringReadingAssociationViaGetter() {
-            assertThat(inspect(GetterToString.class)).containsExactly("items");
+        void shouldReportInheritedAssociationReadViaSuperGetter() {
+            assertThat(inspectPropertyAssociation(PropertyChildWithSuperGetter.class, "customer", "getCustomer"))
+                    .containsExactly("customer");
         }
 
         @Test // GH-1633
-        void shouldNotReportMethodsThatDoNotTouchAssociations() {
-            assertThat(inspect(SafeEntity.class)).isEmpty();
+        void shouldReportPropertyAssociationWhenToStringReadsBackingFieldDirectly() {
+            assertThat(inspectPropertyAssociation(PropertyDirectBackingFieldToString.class, "customer", "getCustomer"))
+                    .containsExactly("customer");
         }
 
         @Test // GH-1633
-        void shouldFollowPrivateHelperInsideEntity() {
-            assertThat(inspect(HelperToString.class)).containsExactly("items");
+        void shouldInferBackingFieldWhenGetterReadsAnotherNonAssociationField() {
+            assertThat(inspectPropertyAssociation(PropertyGetterWithAdditionalField.class, "customer", "getCustomer"))
+                    .containsExactly("customer");
         }
 
         @Test // GH-1633
-        void shouldFollowSuperToString() {
-            assertThat(inspect(ChildWithSuperToString.class)).containsExactly("items");
-        }
-
-        @Test // GH-1633
-        void shouldFollowAnOverriddenHelperCalledFromAMappedSuperclass() {
-            assertThat(inspect(ChildOverridingHelper.class)).containsExactly("items");
-        }
-
-        @Test // GH-1633
-        void shouldMapAGetterCallToItsAssociationNameEvenWhenTheBackingFieldDiffers() {
-            Set<String> result = new EntityMethodsInspector(MismatchedAccessorToString.class, Set.of("customer"))
-                    .detectAssociationsReadByToString();
-
-            assertThat(result).containsExactly("customer");
-        }
-
-        @Test // GH-1633
-        void shouldMapASuperGetterCallToItsAssociationNameEvenWhenTheBackingFieldDiffers() {
-            Set<String> result = new EntityMethodsInspector(MismatchedAccessorSuperCall.class, Set.of("customer"))
-                    .detectAssociationsReadByToString();
-
-            assertThat(result).containsExactly("customer");
-        }
-
-        @Test // GH-1633
-        void shouldResolveAHiddenStaticHelperExactlyAsCalledNotFromTheConcreteType() {
-            assertThat(inspect(ChildHidingStaticHelper.class)).containsExactly("items");
-        }
-
-        @Test // GH-1633
-        void shouldNotShadowAPrivateSuperclassHelperWithAnUnrelatedSameSignaturePrivateMethod() {
-            assertThat(inspect(ChildWithUnrelatedPrivateHelper.class)).containsExactly("items");
+        void shouldNotGuessBackingFieldWhenGetterReadsSeveralAssociationTypedFields() {
+            assertThat(inspectPropertyAssociation(PropertyAmbiguousGetter.class, "customer", "getCustomer"))
+                    .isEmpty();
         }
     }
 
@@ -104,39 +138,107 @@ class EntityMethodsInspectorTest {
     class LombokGeneratedToString {
 
         @Test // GH-1633
-        void shouldReportAssociationRead() {
-            assertThat(inspect(LombokToString.class)).containsExactly("items");
+        void shouldReportAssociationReadByLombokToString() {
+            assertThat(inspectFieldAssociation(LombokToStringEntity.class, "items"))
+                    .containsExactly("items");
         }
 
         @Test // GH-1633
-        void shouldNotReportExcludedAssociation() {
-            assertThat(inspect(LombokExcludedToString.class)).isEmpty();
+        void shouldNotReportAssociationExcludedFromLombokToString() {
+            assertThat(inspectFieldAssociation(LombokExcludedEntity.class, "items"))
+                    .isEmpty();
         }
 
         @Test // GH-1633
         void shouldNotReportAssociationWithoutExplicitInclude() {
-            assertThat(inspect(LombokOnlyExplicitToString.class)).isEmpty();
+            assertThat(inspectFieldAssociation(LombokOnlyExplicitEntity.class, "items"))
+                    .isEmpty();
         }
 
         @Test // GH-1633
-        void shouldReportAssociationReadByData() {
-            assertThat(inspect(LombokDataEntity.class)).containsExactly("items");
+        void shouldReportAssociationReadByLombokData() {
+            assertThat(inspectFieldAssociation(LombokDataEntity.class, "items")).containsExactly("items");
         }
 
         @Test // GH-1633
-        void shouldReportAssociationInheritedViaCallSuper() {
-            assertThat(inspect(LombokChildWithCallSuper.class)).containsExactly("items");
+        void shouldReportInheritedAssociationViaCallSuper() {
+            assertThat(inspectFieldAssociation(LombokChildEntity.class, "items"))
+                    .containsExactly("items");
         }
     }
 
-    private static Set<String> inspect(Class<?> entityClass) {
-        return new EntityMethodsInspector(entityClass, Set.of("items")).detectAssociationsReadByToString();
+    private static Set<String> inspectFieldAssociation(Class<?> entityClass, String fieldName) {
+        Field field = findField(entityClass, fieldName);
+
+        assertThat(field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToOne.class))
+                .as("%s must be a real JPA association", field)
+                .isTrue();
+
+        return inspect(entityClass, new AssociationMember(fieldName, field));
     }
+
+    private static Set<String> inspectPropertyAssociation(
+            Class<?> entityClass, String associationName, String getterName) {
+        Method method = findMethod(entityClass, getterName);
+
+        assertThat(method.isAnnotationPresent(ManyToOne.class) || method.isAnnotationPresent(OneToMany.class))
+                .as("%s must be a real JPA association", method)
+                .isTrue();
+
+        return inspect(entityClass, new AssociationMember(associationName, method));
+    }
+
+    private static Set<String> inspect(Class<?> entityClass, AssociationMember association) {
+        return new EntityMethodsInspector(entityClass, Set.of(association)).detectAssociationsReadByToString();
+    }
+
+    private static Field findField(Class<?> type, String name) {
+        for (Class<?> current = type; current != null && current != Object.class; current = current.getSuperclass()) {
+            try {
+                return current.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                // Continue with superclass.
+            }
+        }
+
+        throw new IllegalStateException("Field '%s' was not found in %s hierarchy".formatted(name, type.getName()));
+    }
+
+    private static Method findMethod(Class<?> type, String name) {
+        for (Class<?> current = type; current != null && current != Object.class; current = current.getSuperclass()) {
+            for (Method method : current.getDeclaredMethods()) {
+                if (method.getName().equals(name)) {
+                    return method;
+                }
+            }
+        }
+
+        throw new IllegalStateException("Method '%s' was not found in %s hierarchy".formatted(name, type.getName()));
+    }
+
+    // Associated entities
+
+    static class ItemEntity {
+
+        @Id
+        private Long id;
+    }
+
+    static class CustomerEntity {
+
+        @Id
+        private Long id;
+    }
+
+    // Field access
 
     static class DirectToString {
 
+        @Id
         private Long id;
-        private List<String> items;
+
+        @OneToMany
+        private List<ItemEntity> items;
 
         @Override
         public String toString() {
@@ -146,10 +248,13 @@ class EntityMethodsInspectorTest {
 
     static class GetterToString {
 
+        @Id
         private Long id;
-        private List<String> items;
 
-        public List<String> getItems() {
+        @OneToMany
+        private List<ItemEntity> items;
+
+        public List<ItemEntity> getItems() {
             return items;
         }
 
@@ -161,8 +266,11 @@ class EntityMethodsInspectorTest {
 
     static class SafeEntity {
 
+        @Id
         private Long id;
-        private List<String> items;
+
+        @OneToMany
+        private List<ItemEntity> items;
 
         @Override
         public String toString() {
@@ -170,10 +278,13 @@ class EntityMethodsInspectorTest {
         }
     }
 
-    static class HelperToString {
+    static class PrivateHelperToString {
 
+        @Id
         private Long id;
-        private List<String> items;
+
+        @OneToMany
+        private List<ItemEntity> items;
 
         @Override
         public String toString() {
@@ -181,33 +292,36 @@ class EntityMethodsInspectorTest {
         }
 
         private String describe() {
-            return "HelperToString{items=" + items + "}";
+            return "PrivateHelperToString{items=" + items + "}";
         }
     }
 
-    static class ParentWithItems {
+    static class ParentWithToString {
 
-        protected List<String> items;
+        @OneToMany
+        protected List<ItemEntity> items;
 
         @Override
         public String toString() {
-            return "ParentWithItems{items=" + items + "}";
+            return "ParentWithToString{items=" + items + "}";
         }
     }
 
-    static class ChildWithSuperToString extends ParentWithItems {
+    static class ChildWithSuperToString extends ParentWithToString {
 
+        @Id
         private Long id;
 
         @Override
         public String toString() {
-            return "Child{id=" + id + "} " + super.toString();
+            return "ChildWithSuperToString{id=" + id + "} " + super.toString();
         }
     }
 
     static class ParentCallingOverridableHelper {
 
-        protected List<String> items;
+        @OneToMany
+        protected List<ItemEntity> items;
 
         @Override
         public String toString() {
@@ -221,36 +335,44 @@ class EntityMethodsInspectorTest {
 
     static class ChildOverridingHelper extends ParentCallingOverridableHelper {
 
+        @Id
+        private Long id;
+
         @Override
         String describe() {
             return "ChildOverridingHelper{items=" + items + "}";
         }
     }
 
-    static class ParentWithHiddenStaticHelper {
+    static class ParentWithStaticHelper {
 
-        protected List<String> items;
+        @OneToMany
+        protected List<ItemEntity> items;
 
         @Override
         public String toString() {
-            return staticHelper(this);
+            return describe(this);
         }
 
-        static String staticHelper(ParentWithHiddenStaticHelper self) {
-            return "ParentWithHiddenStaticHelper{items=" + self.items + "}";
+        static String describe(ParentWithStaticHelper self) {
+            return "ParentWithStaticHelper{items=" + self.items + "}";
         }
     }
 
-    static class ChildHidingStaticHelper extends ParentWithHiddenStaticHelper {
+    static class ChildHidingStaticHelper extends ParentWithStaticHelper {
 
-        static String staticHelper(ParentWithHiddenStaticHelper self) {
-            return "ChildHidingStaticHelper - unrelated";
+        @Id
+        private Long id;
+
+        static String describe(ParentWithStaticHelper self) {
+            return "ChildHidingStaticHelper{}";
         }
     }
 
     static class ParentWithPrivateHelper {
 
-        protected List<String> items;
+        @OneToMany
+        protected List<ItemEntity> items;
 
         @Override
         public String toString() {
@@ -262,85 +384,214 @@ class EntityMethodsInspectorTest {
         }
     }
 
-    static class ChildWithUnrelatedPrivateHelper extends ParentWithPrivateHelper {
+    static class ChildWithSamePrivateHelper extends ParentWithPrivateHelper {
 
+        @Id
+        private Long id;
+
+        @SuppressWarnings("unused")
         private String describe() {
-            return "ChildWithUnrelatedPrivateHelper - unrelated, does not read items";
+            return "ChildWithSamePrivateHelper{}";
         }
     }
 
-    static class MismatchedAccessorToString {
+    static class ChildInDifferentPackageWithUnrelatedHelper extends CrossPackageAssociationParent {
 
-        private Long customerRef;
+        @Id
+        private Long id;
 
-        public Long getCustomer() {
+        /*
+         * Same name and signature as CrossPackageAssociationParent.describe(), but declared in a
+         * different package, so per JLS 8.4.8.1 this does not override it - it is an unrelated method.
+         */
+        @SuppressWarnings("unused")
+        String describe() {
+            return "ChildInDifferentPackageWithUnrelatedHelper{}";
+        }
+    }
+
+    // Property access
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyGetterToString {
+
+        private Long id;
+        private CustomerEntity customerRef;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
             return customerRef;
         }
 
         @Override
         public String toString() {
-            return "MismatchedAccessorToString{customer=" + getCustomer() + "}";
+            return "PropertyGetterToString{customer=" + getCustomer() + "}";
         }
     }
 
-    static class MismatchedAccessorSuperclass {
+    @Access(AccessType.PROPERTY)
+    static class PropertyAssociationSuperclass {
 
-        protected Long customerRef;
+        private CustomerEntity customerRef;
 
-        public Long getCustomer() {
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
             return customerRef;
         }
     }
 
-    static class MismatchedAccessorSuperCall extends MismatchedAccessorSuperclass {
+    @Access(AccessType.PROPERTY)
+    static class PropertyChildWithSuperGetter extends PropertyAssociationSuperclass {
+
+        private Long id;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
 
         @Override
         public String toString() {
-            return "MismatchedAccessorSuperCall{customer=" + super.getCustomer() + "}";
+            return "PropertyChildWithSuperGetter{customer=" + super.getCustomer() + "}";
         }
     }
 
-    @ToString
-    static class LombokToString {
+    @Access(AccessType.PROPERTY)
+    static class PropertyDirectBackingFieldToString {
 
         private Long id;
-        private List<String> items;
+        private CustomerEntity customerRef;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            return customerRef;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyDirectBackingFieldToString{customer=" + customerRef + "}";
+        }
+    }
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyGetterWithAdditionalField {
+
+        private Long id;
+        private boolean initialized;
+        private CustomerEntity customerRef;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            if (!initialized) {
+                return null;
+            }
+
+            return customerRef;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyGetterWithAdditionalField{customer=" + customerRef + "}";
+        }
+    }
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyAmbiguousGetter {
+
+        private Long id;
+        private CustomerEntity primaryCustomer;
+        private CustomerEntity fallbackCustomer;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            if (primaryCustomer != null) {
+                return primaryCustomer;
+            }
+
+            return fallbackCustomer;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyAmbiguousGetter{customer=" + primaryCustomer + "}";
+        }
+    }
+
+    // Lombok
+
+    @ToString
+    static class LombokToStringEntity {
+
+        @Id
+        private Long id;
+
+        @OneToMany
+        private List<ItemEntity> items;
     }
 
     @ToString
-    static class LombokExcludedToString {
+    static class LombokExcludedEntity {
 
+        @Id
         private Long id;
 
+        @OneToMany
         @ToString.Exclude
-        private List<String> items;
+        private List<ItemEntity> items;
     }
 
     @ToString(onlyExplicitlyIncluded = true)
-    static class LombokOnlyExplicitToString {
+    static class LombokOnlyExplicitEntity {
 
+        @Id
         @ToString.Include
         private Long id;
 
-        private List<String> items;
+        @OneToMany
+        private List<ItemEntity> items;
     }
 
     @Data
     static class LombokDataEntity {
 
+        @Id
         private Long id;
-        private List<String> items;
+
+        @OneToMany
+        private List<ItemEntity> items;
     }
 
     @ToString
-    static class LombokParentWithItems {
+    static class LombokParent {
 
-        protected List<String> items;
+        @OneToMany
+        protected List<ItemEntity> items;
     }
 
     @ToString(callSuper = true)
-    static class LombokChildWithCallSuper extends LombokParentWithItems {
+    static class LombokChildEntity extends LombokParent {
 
+        @Id
         private Long id;
     }
 }
