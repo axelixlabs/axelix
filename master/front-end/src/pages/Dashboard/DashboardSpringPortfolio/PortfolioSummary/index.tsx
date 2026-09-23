@@ -26,26 +26,39 @@ interface IProps {
 
 export const PortfolioSummary = ({ applicationsTotal, applicationsFullyOssSupported }: IProps) => {
     const { t } = useTranslation();
+
     const notFullySupported = Math.max(applicationsTotal - applicationsFullyOssSupported, 0);
 
     return (
-        <div className={styles.Summary}>
-            <div className={styles.TotalBlock}>
-                <span className={styles.TotalCount}>{applicationsTotal}</span>
-                <span className={styles.TotalLabel}>{t("Dashboard.SpringPortfolio.applications")}</span>
+        <>
+            <div className={styles.MainWrapper}>
+                <div>
+                    <div className="TextLarge">{applicationsTotal}</div>
+                    <div className={`TextUltraSmall ${styles.TotalLabel}`}>
+                        {t("Dashboard.SpringPortfolio.applications")}
+                    </div>
+                </div>
+                <div className={styles.Breakdown}>
+                    <span className={styles.BreakdownRow}>
+                        <span className={styles.SupportedCount}>{applicationsFullyOssSupported}</span>
+                        <span className={`${styles.Chip} ${styles.ChipOk}`}>
+                            {t("Dashboard.SpringPortfolio.ossOk")}
+                        </span>
+                        <span className={`TextUltraSmall ${styles.BreakdownHint}`}>
+                            {t("Dashboard.SpringPortfolio.supportedHint")}
+                        </span>
+                    </span>
+                    <span className={styles.BreakdownRow}>
+                        <span className={styles.UnsupportedCount}>{notFullySupported}</span>
+                        <span className={`${styles.Chip} ${styles.ChipNo}`}>
+                            {t("Dashboard.SpringPortfolio.ossNo")}
+                        </span>
+                        <span className={`TextUltraSmall ${styles.BreakdownHint}`}>
+                            {t("Dashboard.SpringPortfolio.unsupportedHint")}
+                        </span>
+                    </span>
+                </div>
             </div>
-            <div className={styles.Breakdown}>
-                <span className={styles.BreakdownRow}>
-                    <span className={styles.SupportedCount}>{applicationsFullyOssSupported}</span>
-                    <span className={`${styles.Chip} ${styles.ChipOk}`}>{t("Dashboard.SpringPortfolio.ossOk")}</span>
-                    <span className={styles.BreakdownHint}>{t("Dashboard.SpringPortfolio.supportedHint")}</span>
-                </span>
-                <span className={styles.BreakdownRow}>
-                    <span className={styles.UnsupportedCount}>{notFullySupported}</span>
-                    <span className={`${styles.Chip} ${styles.ChipNo}`}>{t("Dashboard.SpringPortfolio.ossNo")}</span>
-                    <span className={styles.BreakdownHint}>{t("Dashboard.SpringPortfolio.unsupportedHint")}</span>
-                </span>
-            </div>
-        </div>
+        </>
     );
 };

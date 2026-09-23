@@ -17,10 +17,6 @@
  */
 import type { IPlatformDistribution, IPlatformName } from "@/models";
 
-/**
- * Categorical palette used to keep each release line identifiable across the donut
- * arc and its legend row. Colours are assigned per card in line order.
- */
 export const LINE_COLORS = [
     "#2EC4B6",
     "#60A5FA",
@@ -42,10 +38,6 @@ export const platformShortName = (platform: IPlatformName): string => {
     return platform === "SPRING_BOOT" ? "Boot" : "Framework";
 };
 
-/**
- * Builds a stable {@code line -> colour} map for a distribution, walking majors and
- * their lines in the order the backend returns them (newest first).
- */
 export const buildLineColorMap = (distribution: IPlatformDistribution): Map<string, string> => {
     const colors = new Map<string, string>();
     let index = 0;
@@ -60,11 +52,6 @@ export const buildLineColorMap = (distribution: IPlatformDistribution): Map<stri
     return colors;
 };
 
-/**
- * Parses an ISO {@code YYYY-MM-DD} date coming from the Master backend. Falls back to
- * an array form ({@code [year, month, day]}) in case Jackson is configured to emit dates
- * as timestamps.
- */
 export const parseIsoDate = (value: string | number[]): Date => {
     if (Array.isArray(value)) {
         const [year, month, day] = value;
@@ -74,9 +61,6 @@ export const parseIsoDate = (value: string | number[]): Date => {
     return new Date(`${value}T00:00:00`);
 };
 
-/**
- * Formats a maintenance-window date the way the design renders it, e.g. {@code "Jun 2027"}.
- */
 export const formatMonthYear = (value: string | number[]): string => {
     return parseIsoDate(value).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 };

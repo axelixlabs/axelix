@@ -1,0 +1,27 @@
+
+.HeaderRow {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.HeaderCell {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+}
+
+.HeaderRight {
+    justify-self: end;
+}
+
+.Axis {
+    position: relative;
+}
+
+.AxisTick {
+    position: absolute;
+    transform: translateX(-50%);
+    color: var(--axelix-bold-grey);
+}
