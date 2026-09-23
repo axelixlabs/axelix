@@ -26,4 +26,5 @@
   <include file="db/changelog/postgres/changelog/1.1/012-add-oidc-subject-to-users.xml"/>
   <include file="db/changelog/postgres/changelog/1.2/001-add-starter-version-to-instances.xml"/>
   <include file="db/changelog/postgres/changelog/1.2/002-add-spring-versions-to-historical-application-snapshots.xml"/>
+  <include file="db/changelog/postgres/changelog/1.2/003-add-starter-version-to-historical-application-snapshots.xml"/>
 </databaseChangeLog>

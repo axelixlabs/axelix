@@ -146,6 +146,10 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         return this.compareTo(semanticVersion) >= 0;
     }
 
+    public boolean isOlderThan(SemanticVersion semanticVersion) {
+        return this.compareTo(semanticVersion) < 0;
+    }
+
     /**
      * Parses number from version string
      *

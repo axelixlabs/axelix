@@ -169,6 +169,14 @@ public class DatabaseHistoricalApplicationSnapshotService {
         return repository.findLatestStarterVersionsSince(since);
     }
 
+    @Transactional(readOnly = true)
+    public @Nullable PersistenceInsights getLatestPersistenceInsights(InstanceId instanceId) {
+        return repository.findLatestPersistenceInsightsForInstance(instanceId.instanceId());
+    }
+
+    /**
+     * {@code metadata} is expected to already carry a valid starter version.
+     */
     @Transactional
     public void reloadCurrentState(BasicRegistrationMetadata metadata) {
         HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
@@ -176,11 +184,9 @@ public class DatabaseHistoricalApplicationSnapshotService {
         jdbcAggregateTemplate.upsert(applicationSnapshot);
     }
 
-    @Transactional(readOnly = true)
-    public @Nullable PersistenceInsights getLatestPersistenceInsights(InstanceId instanceId) {
-        return repository.findLatestPersistenceInsightsForInstance(instanceId.instanceId());
-    }
-
+    /**
+     * Every entry in {@code metadata} is expected to already carry a valid starter version.
+     */
     @Transactional
     public void reloadCurrentStateBulk(Collection<BasicRegistrationMetadata> metadata) {
         // TODO:

@@ -36,6 +36,8 @@ import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesRespo
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.LatestStarterVersion;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
+import static com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy.WINDOW_SIZE;
+
 /**
  * Default implementation of {@link UpgradesService}.
  *
@@ -44,12 +46,7 @@ import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationS
 @Service
 public class DefaultUpgradesService implements UpgradesService {
 
-    private static final int OBSERVATION_WINDOW_DAYS = 30;
-
-    private static final int COMPATIBILITY_WINDOW = 4;
-
-    private static final Comparator<SemanticVersion> BY_MAJOR_MINOR =
-            Comparator.comparingInt(SemanticVersion::major).thenComparingInt(SemanticVersion::minor);
+    public static final int OBSERVATION_WINDOW_DAYS = 30;
 
     private final DatabaseHistoricalApplicationSnapshotService snapshotService;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
@@ -74,34 +71,26 @@ public class DefaultUpgradesService implements UpgradesService {
         int servicesTotal = 0;
 
         for (LatestStarterVersion snapshot : snapshots) {
-            Optional<SemanticVersion> parsed = SemanticVersion.tryParse(snapshot.starterVersion());
-            if (parsed.isEmpty()) {
-                // The starter version could not be parsed, so this service cannot be placed on the timeline.
-                continue;
-            }
+            SemanticVersion version = SemanticVersion.parse(snapshot.starterVersion());
 
-            SemanticVersion version = parsed.get();
             servicesTotal++;
             serviceCountByVersion.merge(version.majorMinor(), 1, Integer::sum);
 
-            if (oldest == null || BY_MAJOR_MINOR.compare(version, oldest) < 0) {
+            if (oldest == null || version.isOlderThan(oldest)) {
                 oldest = version;
             }
         }
 
         if (oldest == null) {
-            return new UpgradesResponse(masterVersion, 0, null, COMPATIBILITY_WINDOW, null, List.of(), List.of());
+            return new UpgradesResponse(masterVersion, 0, WINDOW_SIZE, List.of(), List.of());
         }
 
         String oldestLabel = oldest.majorMinor();
-        String ceilingLabel = oldest.major() + "." + (oldest.minor() + COMPATIBILITY_WINDOW - 1);
 
         return new UpgradesResponse(
                 masterVersion,
                 servicesTotal,
-                oldestLabel,
-                COMPATIBILITY_WINDOW,
-                ceilingLabel,
+                WINDOW_SIZE,
                 buildStarterVersions(serviceCountByVersion),
                 buildCeilingBlockers(snapshots, oldestLabel));
     }

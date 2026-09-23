@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesRespo
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
+import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,15 +83,13 @@ class DefaultUpgradesServiceTest {
         // then.
         assertThat(response.masterVersion()).isEqualTo(masterVersion);
         assertThat(response.servicesTotal()).isZero();
-        assertThat(response.oldestStarterVersion()).isNull();
-        assertThat(response.compatibilityWindow()).isEqualTo(4);
-        assertThat(response.safeUpgradeCeiling()).isNull();
+        assertThat(response.compatibilityWindow()).isEqualTo(WindowCompatibilityDetectionStrategy.WINDOW_SIZE);
         assertThat(response.starterVersions()).isEmpty();
         assertThat(response.ceilingBlockers()).isEmpty();
     }
 
     @Test
-    void computesTheSafeUpgradeCeilingFromTheOldestStarterLine() {
+    void groupsStarterVersionsAndIdentifiesCeilingBlockersFromTheOldestLine() {
         // given. four services within the 30-day window; app-c and app-d are the oldest, on 1.2.x.
         LocalDate today = LocalDate.now(ZoneOffset.UTC);
         jdbcAggregateTemplate.insertAll(List.of(
@@ -105,8 +104,6 @@ class DefaultUpgradesServiceTest {
         // then.
         assertThat(response.masterVersion()).isEqualTo(masterVersion);
         assertThat(response.servicesTotal()).isEqualTo(4);
-        assertThat(response.oldestStarterVersion()).isEqualTo("1.2");
-        assertThat(response.safeUpgradeCeiling()).isEqualTo("1.5"); // 1.2 + (compatibility window 4 - 1)
 
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version, StarterVersionUsage::serviceCount)
@@ -125,17 +122,20 @@ class DefaultUpgradesServiceTest {
 
     @Test
     void ignoresServicesNotSeenWithinTheObservationWindow() {
-        // given. one service seen today, another only 31 days ago (just outside the 30-day window).
+        // given. one service seen today, another outside the 30-day window.
         LocalDate today = LocalDate.now(ZoneOffset.UTC);
-        jdbcAggregateTemplate.insertAll(
-                List.of(snapshot("current", today, "1.4.0"), snapshot("stale", today.minusDays(31), "1.0.0")));
+        jdbcAggregateTemplate.insertAll(List.of(
+                snapshot("current", today, "1.4.0"),
+                snapshot("stale", today.minusDays(DefaultUpgradesService.OBSERVATION_WINDOW_DAYS + 1), "1.0.0")));
 
         // when.
         UpgradesResponse response = subject.getUpgrades();
 
         // then.
         assertThat(response.servicesTotal()).isEqualTo(1);
-        assertThat(response.oldestStarterVersion()).isEqualTo("1.4");
+        assertThat(response.starterVersions())
+                .extracting(StarterVersionUsage::version)
+                .containsExactly("1.4");
     }
 
     @Test
@@ -150,7 +150,6 @@ class DefaultUpgradesServiceTest {
 
         // then.
         assertThat(response.servicesTotal()).isEqualTo(1);
-        assertThat(response.oldestStarterVersion()).isEqualTo("1.4");
         assertThat(response.ceilingBlockers())
                 .extracting(CeilingBlocker::starterVersion, CeilingBlocker::lastSeen)
                 .containsExactly(Tuple.tuple("1.4.0", today));
