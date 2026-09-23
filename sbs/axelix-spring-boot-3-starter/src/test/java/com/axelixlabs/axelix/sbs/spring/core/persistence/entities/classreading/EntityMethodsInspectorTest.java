@@ -67,6 +67,32 @@ class EntityMethodsInspectorTest {
         void shouldFollowSuperToString() {
             assertThat(inspect(ChildWithSuperToString.class)).containsExactly("items");
         }
+
+        @Test // GH-1633
+        void shouldFollowAnOverriddenHelperCalledFromAMappedSuperclass() {
+            assertThat(inspect(ChildOverridingHelper.class)).containsExactly("items");
+        }
+
+        @Test // GH-1633
+        void shouldMapAGetterCallToItsAssociationNameEvenWhenTheBackingFieldDiffers() {
+            Set<String> result = new EntityMethodsInspector(MismatchedAccessorToString.class, Set.of("customer"))
+                    .detectAssociationsReadByToString();
+
+            assertThat(result).containsExactly("customer");
+        }
+
+        @Test // GH-1633
+        void shouldMapASuperGetterCallToItsAssociationNameEvenWhenTheBackingFieldDiffers() {
+            Set<String> result = new EntityMethodsInspector(MismatchedAccessorSuperCall.class, Set.of("customer"))
+                    .detectAssociationsReadByToString();
+
+            assertThat(result).containsExactly("customer");
+        }
+
+        @Test // GH-1633
+        void shouldResolveAHiddenStaticHelperExactlyAsCalledNotFromTheConcreteType() {
+            assertThat(inspect(ChildHidingStaticHelper.class)).containsExactly("items");
+        }
     }
 
     @Nested
@@ -171,6 +197,80 @@ class EntityMethodsInspectorTest {
         @Override
         public String toString() {
             return "Child{id=" + id + "} " + super.toString();
+        }
+    }
+
+    static class ParentCallingOverridableHelper {
+
+        protected List<String> items;
+
+        @Override
+        public String toString() {
+            return describe();
+        }
+
+        String describe() {
+            return "ParentCallingOverridableHelper{}";
+        }
+    }
+
+    static class ChildOverridingHelper extends ParentCallingOverridableHelper {
+
+        @Override
+        String describe() {
+            return "ChildOverridingHelper{items=" + items + "}";
+        }
+    }
+
+    static class ParentWithHiddenStaticHelper {
+
+        protected List<String> items;
+
+        @Override
+        public String toString() {
+            return staticHelper(this);
+        }
+
+        static String staticHelper(ParentWithHiddenStaticHelper self) {
+            return "ParentWithHiddenStaticHelper{items=" + self.items + "}";
+        }
+    }
+
+    static class ChildHidingStaticHelper extends ParentWithHiddenStaticHelper {
+
+        static String staticHelper(ParentWithHiddenStaticHelper self) {
+            return "ChildHidingStaticHelper - unrelated";
+        }
+    }
+
+    static class MismatchedAccessorToString {
+
+        private Long customerRef;
+
+        public Long getCustomer() {
+            return customerRef;
+        }
+
+        @Override
+        public String toString() {
+            return "MismatchedAccessorToString{customer=" + getCustomer() + "}";
+        }
+    }
+
+    static class MismatchedAccessorSuperclass {
+
+        protected Long customerRef;
+
+        public Long getCustomer() {
+            return customerRef;
+        }
+    }
+
+    static class MismatchedAccessorSuperCall extends MismatchedAccessorSuperclass {
+
+        @Override
+        public String toString() {
+            return "MismatchedAccessorSuperCall{customer=" + super.getCustomer() + "}";
         }
     }
 

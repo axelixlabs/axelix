@@ -17,8 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -35,6 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.asm.ClassReader;
 import org.springframework.asm.Type;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 
 /**
  * Inspects the bytecode of a JPA entity to find which of its associations are read by {@code toString()},
@@ -51,20 +56,20 @@ public class EntityMethodsInspector {
     private static final String TO_STRING_METHOD = "toString()Ljava/lang/String;";
 
     private final Class<?> entityClass;
+    private final String entityInternalName;
     private final Set<String> associationNames;
 
     private final List<String> hierarchy = new ArrayList<>();
     private final Map<MethodRef, MethodBody> bodies = new HashMap<>();
+    private final Map<String, String> associationGetterKeys = new HashMap<>();
     private boolean hierarchyCollected;
 
     public EntityMethodsInspector(Class<?> entityClass, Set<String> associationNames) {
         this.entityClass = entityClass;
+        this.entityInternalName = Type.getInternalName(entityClass);
         this.associationNames = associationNames;
     }
 
-    /**
-     * @return the associations read by {@code toString()}. Empty if none is, or if the bytecode is unavailable.
-     */
     public Set<String> detectAssociationsReadByToString() {
         return detectAssociationsReadBy(TO_STRING_METHOD);
     }
@@ -76,7 +81,7 @@ public class EntityMethodsInspector {
 
         collectHierarchy();
 
-        MethodBody root = resolve(Type.getInternalName(entityClass), methodKey);
+        MethodBody root = resolve(entityInternalName, methodKey);
         if (root == null) {
             return Set.of();
         }
@@ -92,6 +97,23 @@ public class EntityMethodsInspector {
         forEachClassInHierarchy(type -> hierarchy.add(Type.getInternalName(type)));
         // the hierarchy must be fully known before any bytecode is read, so super.toString() resolves.
         forEachClassInHierarchy(this::readMethods);
+        mapAssociationGetters();
+    }
+
+    private void mapAssociationGetters() {
+        try {
+            for (PropertyDescriptor property : BeanUtils.getPropertyDescriptors(entityClass)) {
+                Method getter = property.getReadMethod();
+                if (getter != null && associationNames.contains(property.getName())) {
+                    associationGetterKeys.put(getter.getName() + Type.getMethodDescriptor(getter), property.getName());
+                }
+            }
+        } catch (BeansException e) {
+            log.warn(
+                    "Could not introspect the getters of {}, property-access associations may be missed",
+                    entityClass,
+                    e);
+        }
     }
 
     private void forEachClassInHierarchy(Consumer<Class<?>> action) {
@@ -114,14 +136,26 @@ public class EntityMethodsInspector {
 
             body.getReadFields().stream().filter(associationNames::contains).forEach(read::add);
 
-            for (MethodRef call : body.getCalls()) {
-                MethodBody target = resolve(call.owner(), call.key());
-                if (target != null) {
-                    queue.add(target);
-                }
-            }
+            followCalls(body.getExactCalls(), MethodRef::owner, read, queue);
+            // a virtual call is dispatched by the JVM against the concrete entity, not against
+            // `owner` as written at the call site, so an override further down is followed instead.
+            followCalls(body.getVirtualCalls(), call -> entityInternalName, read, queue);
         }
         return read;
+    }
+
+    private void followCalls(
+            Set<MethodRef> calls, Function<MethodRef, String> startOwner, Set<String> read, Deque<MethodBody> queue) {
+        for (MethodRef call : calls) {
+            String property = associationGetterKeys.get(call.key());
+            if (property != null) {
+                read.add(property);
+            }
+            MethodBody target = resolve(startOwner.apply(call), call.key());
+            if (target != null) {
+                queue.add(target);
+            }
+        }
     }
 
     private @Nullable MethodBody resolve(String owner, String key) {
