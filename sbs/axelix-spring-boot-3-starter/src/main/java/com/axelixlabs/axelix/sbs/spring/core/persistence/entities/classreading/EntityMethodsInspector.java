@@ -62,6 +62,7 @@ public class EntityMethodsInspector {
     private final List<String> hierarchy = new ArrayList<>();
     private final Map<MethodRef, MethodBody> bodies = new HashMap<>();
     private final Map<String, String> associationGetterKeys = new HashMap<>();
+    private final Set<MethodRef> privateMethods = new HashSet<>();
     private boolean hierarchyCollected;
 
     public EntityMethodsInspector(Class<?> entityClass, Set<String> associationNames) {
@@ -137,9 +138,11 @@ public class EntityMethodsInspector {
             body.getReadFields().stream().filter(associationNames::contains).forEach(read::add);
 
             followCalls(body.getExactCalls(), MethodRef::owner, read, queue);
-            // a virtual call is dispatched by the JVM against the concrete entity, not against
-            // `owner` as written at the call site, so an override further down is followed instead.
-            followCalls(body.getVirtualCalls(), call -> entityInternalName, read, queue);
+            followCalls(
+                    body.getVirtualCalls(),
+                    call -> privateMethods.contains(call) ? call.owner() : entityInternalName,
+                    read,
+                    queue);
         }
         return read;
     }
@@ -181,6 +184,7 @@ public class EntityMethodsInspector {
             MethodBodyReadingClassVisitor visitor = new MethodBodyReadingClassVisitor(internalName, hierarchy);
             new ClassReader(stream).accept(visitor, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             bodies.putAll(visitor.getBodies());
+            privateMethods.addAll(visitor.getPrivateMethods());
         } catch (IOException | RuntimeException e) {
             log.warn("Could not read the bytecode of {}, association detection is skipped for it", internalName, e);
         }

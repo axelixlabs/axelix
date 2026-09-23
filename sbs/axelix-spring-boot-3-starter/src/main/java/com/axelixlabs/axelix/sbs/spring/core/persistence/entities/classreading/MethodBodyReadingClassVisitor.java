@@ -18,11 +18,14 @@
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.MethodVisitor;
+import org.springframework.asm.Opcodes;
 import org.springframework.asm.SpringAsmInfo;
 
 /**
@@ -37,6 +40,7 @@ final class MethodBodyReadingClassVisitor extends ClassVisitor {
     private final String owner;
     private final List<String> hierarchy;
     private final Map<MethodRef, MethodBody> bodies = new HashMap<>();
+    private final Set<MethodRef> privateMethods = new HashSet<>();
 
     MethodBodyReadingClassVisitor(String owner, List<String> hierarchy) {
         super(SpringAsmInfo.ASM_VERSION);
@@ -48,10 +52,19 @@ final class MethodBodyReadingClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(
             int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodRef ref = new MethodRef(owner, name + descriptor);
+        if ((access & Opcodes.ACC_PRIVATE) != 0) {
+            // javac compiles a private method's self-call as invokevirtual too, so opcode alone can't
+            // tell exact from virtual here - the declaring class' own access flags must.
+            privateMethods.add(ref);
+        }
         return new MethodBodyReadingMethodVisitor(ref, hierarchy, bodies);
     }
 
     Map<MethodRef, MethodBody> getBodies() {
         return bodies;
+    }
+
+    Set<MethodRef> getPrivateMethods() {
+        return privateMethods;
     }
 }
