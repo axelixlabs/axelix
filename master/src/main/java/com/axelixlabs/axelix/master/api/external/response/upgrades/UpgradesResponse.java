@@ -24,7 +24,6 @@ import java.util.List;
  * compatibility window.
  *
  * @param masterVersion       the version of Axelix Master currently running.
- * @param servicesTotal       the number of distinct services seen at least once in the last 30 days.
  * @param compatibilityWindow the number of consecutive minor releases (inclusive) a starter stays compatible
  *                            with Master for.
  * @param starterVersions     the fleet's starter versions, grouped by {@code major.minor}, newest first. The
@@ -36,7 +35,6 @@ import java.util.List;
  */
 public record UpgradesResponse(
         String masterVersion,
-        int servicesTotal,
         int compatibilityWindow,
         List<StarterVersionUsage> starterVersions,
         List<CeilingBlocker> ceilingBlockers) {}

@@ -82,7 +82,6 @@ class DefaultUpgradesServiceTest {
 
         // then.
         assertThat(response.masterVersion()).isEqualTo(masterVersion);
-        assertThat(response.servicesTotal()).isZero();
         assertThat(response.compatibilityWindow()).isEqualTo(WindowCompatibilityDetectionStrategy.WINDOW_SIZE);
         assertThat(response.starterVersions()).isEmpty();
         assertThat(response.ceilingBlockers()).isEmpty();
@@ -103,7 +102,6 @@ class DefaultUpgradesServiceTest {
 
         // then.
         assertThat(response.masterVersion()).isEqualTo(masterVersion);
-        assertThat(response.servicesTotal()).isEqualTo(4);
 
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version, StarterVersionUsage::serviceCount)
@@ -132,7 +130,6 @@ class DefaultUpgradesServiceTest {
         UpgradesResponse response = subject.getUpgrades();
 
         // then.
-        assertThat(response.servicesTotal()).isEqualTo(1);
         assertThat(response.starterVersions())
                 .extracting(StarterVersionUsage::version)
                 .containsExactly("1.4");
@@ -149,10 +146,28 @@ class DefaultUpgradesServiceTest {
         UpgradesResponse response = subject.getUpgrades();
 
         // then.
-        assertThat(response.servicesTotal()).isEqualTo(1);
         assertThat(response.ceilingBlockers())
                 .extracting(CeilingBlocker::starterVersion, CeilingBlocker::lastSeen)
                 .containsExactly(Tuple.tuple("1.4.0", today));
+    }
+
+    @Test
+    void skipsServicesWhoseStarterVersionCannotBeParsed() {
+        // given. one service on a valid version, another whose starter version is not a semantic version.
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        jdbcAggregateTemplate.insertAll(
+                List.of(snapshot("valid", today, "1.4.0"), snapshot("broken", today, "not-a-version")));
+
+        // when.
+        UpgradesResponse response = subject.getUpgrades();
+
+        // then. the unparseable service is ignored everywhere.
+        assertThat(response.starterVersions())
+                .extracting(StarterVersionUsage::version)
+                .containsExactly("1.4");
+        assertThat(response.ceilingBlockers())
+                .extracting(CeilingBlocker::artifactId)
+                .containsExactly("valid");
     }
 
     private static HistoricalApplicationSnapshot snapshot(String artifactId, LocalDate date, String starterVersion) {

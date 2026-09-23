@@ -68,12 +68,14 @@ public class DefaultUpgradesService implements UpgradesService {
 
         SemanticVersion oldest = null;
         Map<String, Integer> serviceCountByVersion = new HashMap<>();
-        int servicesTotal = 0;
 
         for (LatestStarterVersion snapshot : snapshots) {
-            SemanticVersion version = SemanticVersion.parse(snapshot.starterVersion());
+            Optional<SemanticVersion> parsed = SemanticVersion.tryParse(snapshot.starterVersion());
+            if (parsed.isEmpty()) {
+                continue;
+            }
+            SemanticVersion version = parsed.get();
 
-            servicesTotal++;
             serviceCountByVersion.merge(version.majorMinor(), 1, Integer::sum);
 
             if (oldest == null || version.isOlderThan(oldest)) {
@@ -82,14 +84,13 @@ public class DefaultUpgradesService implements UpgradesService {
         }
 
         if (oldest == null) {
-            return new UpgradesResponse(masterVersion, 0, WINDOW_SIZE, List.of(), List.of());
+            return new UpgradesResponse(masterVersion, WINDOW_SIZE, List.of(), List.of());
         }
 
         String oldestLabel = oldest.majorMinor();
 
         return new UpgradesResponse(
                 masterVersion,
-                servicesTotal,
                 WINDOW_SIZE,
                 buildStarterVersions(serviceCountByVersion),
                 buildCeilingBlockers(snapshots, oldestLabel));
