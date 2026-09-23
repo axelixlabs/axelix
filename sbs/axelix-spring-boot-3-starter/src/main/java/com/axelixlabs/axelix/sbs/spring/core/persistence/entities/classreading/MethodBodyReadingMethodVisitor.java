@@ -55,8 +55,16 @@ final class MethodBodyReadingMethodVisitor extends MethodVisitor {
     @Override
     public void visitMethodInsn(
             int opcode, String owner, String methodName, String methodDescriptor, boolean isInterface) {
-        if (hierarchy.contains(owner)) {
-            body.addCall(new MethodRef(owner, methodName + methodDescriptor));
+        if (!hierarchy.contains(owner)) {
+            return;
+        }
+        MethodRef call = new MethodRef(owner, methodName + methodDescriptor);
+        // invokespecial (super calls, private methods, constructors) and invokestatic are never
+        // dispatched virtually, so the JVM always calls exactly the method named by `owner`.
+        if (opcode == Opcodes.INVOKESPECIAL || opcode == Opcodes.INVOKESTATIC) {
+            body.addExactCall(call);
+        } else {
+            body.addVirtualCall(call);
         }
     }
 
