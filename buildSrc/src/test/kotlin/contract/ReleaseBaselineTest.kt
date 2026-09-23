@@ -64,7 +64,7 @@ class ReleaseBaselineTest {
         val released = ReleaseBaseline
             .find(repoRoot)!!
             .contract(repoRoot.resolve(CONTRACT_PATH))!!
-        assertEquals("starter", released.server)
+        assertEquals(setOf("starter"), released.sides)
         assertEquals(Version(1, 1, 0), released.axelixVersion)
     }
 

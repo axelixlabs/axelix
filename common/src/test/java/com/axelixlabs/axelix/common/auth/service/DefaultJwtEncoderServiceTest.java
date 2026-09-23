@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.testfixtures.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -75,6 +76,9 @@ class DefaultJwtEncoderServiceTest {
     @Autowired
     private JwtEncoderService jwtEncoderService;
 
+    @Autowired
+    private JwtJsonEngine jsonEngine;
+
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
         // given.
@@ -86,6 +90,7 @@ class DefaultJwtEncoderServiceTest {
 
         // then.
         Jws<Claims> claims = Jwts.parser()
+                .json(jsonEngine.deserializer())
                 .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
                 .build()
                 .parseSignedClaims(token);
@@ -264,7 +269,7 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtToken_WithHs256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        JwtEncoderService encoder = new DefaultJwtEncoderService(jsonEngine, JwtAlgorithm.HMAC256, key256, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -306,7 +311,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateValidJwtToken_WithHs384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        JwtEncoderService encoder = new DefaultJwtEncoderService(jsonEngine, JwtAlgorithm.HMAC384, key384, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.VIEWER));
 
@@ -340,7 +345,8 @@ class DefaultJwtEncoderServiceTest {
     void shouldFailWithInsufficientlyShortSecretKey() {
         String shortSecretKey = "shortKey";
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
-        DefaultJwtEncoderService invalidService = new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
+        DefaultJwtEncoderService invalidService =
+                new DefaultJwtEncoderService(jsonEngine, jwtAlgorithm, shortSecretKey, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR));
 
@@ -369,11 +375,17 @@ class DefaultJwtEncoderServiceTest {
     static class DefaultJwtEncoderServiceTestConfiguration {
 
         @Bean
+        JwtJsonEngine jwtJsonEngine() {
+            return new JacksonJwtJsonEngine();
+        }
+
+        @Bean
         JwtEncoderService jwtEncoderService(
+                JwtJsonEngine jsonEngine,
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
+            return new DefaultJwtEncoderService(jsonEngine, algorithm, signingKey, lifespan);
         }
     }
 }

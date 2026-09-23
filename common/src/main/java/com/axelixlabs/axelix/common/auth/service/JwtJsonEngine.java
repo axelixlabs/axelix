@@ -20,31 +20,24 @@ package com.axelixlabs.axelix.common.auth.service;
 import java.util.Map;
 
 import io.jsonwebtoken.io.Deserializer;
-
-import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import io.jsonwebtoken.io.Serializer;
 
 /**
- * Factory class for creating JWT verification strategy instances based on the specified algorithm.
+ * SPI that supplies the JSON {@link Serializer}/{@link Deserializer}.
+ * <p>
+ * Each module-consumer provides its own {@link JwtJsonEngine}, backed by whichever Jackson it already depends on.
  *
- * <p>This factory provides a centralized way to obtain appropriate verification strategies
- * for different JWT signing algorithms.</p>
- *
- * @since 25.07.2025
  * @author Nikita Kirillov
  */
-public class JwtVerificationStrategyFactory {
+public interface JwtJsonEngine {
 
-    private JwtVerificationStrategyFactory() {}
+    /**
+     * @return the serializer.
+     */
+    Serializer<Map<String, ?>> serializer();
 
-    public static JwtVerificationStrategy createVerificationStrategy(
-            JwtAlgorithm algorithm, Deserializer<Map<String, ?>> deserializer) {
-        switch (algorithm) {
-            case HMAC256:
-            case HMAC384:
-            case HMAC512:
-                return new HmacVerificationStrategy(deserializer);
-            default:
-                throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
-        }
-    }
+    /**
+     * @return the deserializer.
+     */
+    Deserializer<Map<String, ?>> deserializer();
 }

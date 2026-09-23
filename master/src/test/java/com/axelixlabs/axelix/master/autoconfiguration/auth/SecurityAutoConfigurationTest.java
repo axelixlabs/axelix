@@ -518,6 +518,11 @@ class SecurityAutoConfigurationTest {
         }
 
         @Bean
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper();
+        }
+
+        @Bean
         public UserService userService() {
             return Mockito.mock(UserService.class);
         }
@@ -534,11 +539,6 @@ class SecurityAutoConfigurationTest {
         @Bean
         public RestClient restClient() {
             return RestClient.builder().build();
-        }
-
-        @Bean
-        public ObjectMapper objectMapper() {
-            return new ObjectMapper();
         }
     }
 

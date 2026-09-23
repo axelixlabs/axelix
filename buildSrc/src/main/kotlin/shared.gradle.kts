@@ -13,10 +13,10 @@ dependencies {
     api("io.jsonwebtoken:jjwt-api:${jsonwebtokenVersion}")
 
     // Runtime
+    // Every consumer of JwtEncoderService/JwtDecoderService supplies its own Jackson-backed JwtJsonEngine,
+    // built on whichever Jackson it already depends on.
     runtimeOnly("io.jsonwebtoken:jjwt-impl:${jsonwebtokenVersion}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonwebtokenVersion}")
 
     // Test
     testRuntimeOnly("io.jsonwebtoken:jjwt-impl:${jsonwebtokenVersion}")
-    testRuntimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonwebtokenVersion}")
 }

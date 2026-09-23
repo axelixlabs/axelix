@@ -45,6 +45,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LocalAuthenticationOption;
@@ -64,6 +65,7 @@ import com.axelixlabs.axelix.master.mcp.auth.handler.BearerMcpAuthenticationHand
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
+import com.axelixlabs.axelix.master.service.auth.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoint;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpointResolver;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
@@ -159,15 +161,21 @@ public class SecurityAutoConfiguration {
     public static class JwtAutoConfiguration {
 
         @Bean
-        public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
-            return new DefaultJwtEncoderService(
-                    jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
+        public JwtJsonEngine jwtJsonEngine(ObjectMapper objectMapper) {
+            return new JacksonJwtJsonEngine(objectMapper);
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
+        public JwtEncoderService jwtEncoderService(JwtJsonEngine jwtJsonEngine, JwtProperties jwtProperties) {
+            return new DefaultJwtEncoderService(
+                    jwtJsonEngine, jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
+        }
+
+        @Bean
+        public JwtDecoderService jwtDecoderService(
+                JwtJsonEngine jwtJsonEngine, JwtProperties jwtProperties, AuthoritiesManager authoritiesManager) {
             return new DefaultJwtDecoderService(
-                    authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
+                    jwtJsonEngine, authoritiesManager, jwtProperties.algorithm(), jwtProperties.signingKey());
         }
     }
 

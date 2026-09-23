@@ -49,9 +49,11 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.service.auth.JacksonJwtJsonEngine;
 
 /**
  * Default implementation of {@link OidcClient}
@@ -69,6 +71,8 @@ public class DefaultOidcClient implements OidcClient {
 
     private final ObjectMapper objectMapper;
 
+    private final JwtJsonEngine jsonEngine;
+
     public DefaultOidcClient(
             RestClient restClient,
             OAuth2Properties oAuth2Properties,
@@ -78,6 +82,7 @@ public class DefaultOidcClient implements OidcClient {
         this.oAuth2Properties = oAuth2Properties;
         this.oidcMetadataProvider = oidcMetadataProvider;
         this.objectMapper = objectMapper;
+        this.jsonEngine = new JacksonJwtJsonEngine(objectMapper);
     }
 
     /**
@@ -136,6 +141,7 @@ public class DefaultOidcClient implements OidcClient {
             PublicKey publicKey = fetchPublicKey(kid);
 
             Claims claims = Jwts.parser()
+                    .json(jsonEngine.deserializer())
                     .verifyWith(publicKey)
                     .requireIssuer(oAuth2Properties.issuerUri())
                     .requireAudience(oAuth2Properties.clientId())

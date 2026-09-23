@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JwtAuthAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            .withBean(ObjectMapper.class, ObjectMapper::new)
             .withPropertyValues(
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",

@@ -30,6 +30,8 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
@@ -106,8 +108,13 @@ class HeartBeatAutoConfigurationTest {
         }
 
         @Bean
-        public JwtEncoderService jwtEncoderService() {
-            return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
+        public JwtJsonEngine jwtJsonEngine(ObjectMapper objectMapper) {
+            return new JacksonJwtJsonEngine(objectMapper);
+        }
+
+        @Bean
+        public JwtEncoderService jwtEncoderService(JwtJsonEngine jwtJsonEngine) {
+            return new DefaultJwtEncoderService(jwtJsonEngine, JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
         }
     }
 }
