@@ -70,6 +70,7 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- TODO: pin to 1.2 on the next Axelix upgrade (compatibility window playground) -->
     <dependency>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-spring-boot-2-starter</artifactId>
@@ -219,6 +220,7 @@
           </execution>
         </executions>
       </plugin>
+      <!-- TODO: pin to 1.2 on the next Axelix upgrade (compatibility window playground) -->
       <plugin>
         <groupId>com.axelixlabs</groupId>
         <artifactId>axelix-maven-plugin</artifactId>
