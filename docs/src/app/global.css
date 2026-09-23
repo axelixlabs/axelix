@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* Same declaration as master/front-end, so the docs match the product UI. */
+@font-face {
+    font-family: Golos;
+    src: url("./fonts/variable-golos-text.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/*
+ * Two greens per theme, on purpose — they are different roles, not a mistake to tidy up.
+ *
+ *   brand    #00ab55 — the logo and filled brand surfaces (`--axelix-primary-green`
+ *            in master/front-end). Never used as text: only 2.77:1 on the light
+ *            background, which fails WCAG AA.
+ *   text     the same hue, darkened for light and lightened for dark until it clears
+ *            4.5:1 in every place `--color-fd-primary` paints text — links, the active
+ *            sidebar item (which sits on a `bg-fd-primary/10` tint), the active TOC
+ *            entry and the active tab pill.
+ *
+ * `--color-fd-accent` is the brand green at 10%, so the pill stays on brand while its
+ * label stays readable. Measured against `--color-fd-background`: #F7F7F4 light,
+ * #141414 dark. Re-measure before changing any of these.
+ */
+:root {
+    --color-fd-background: #f7f7f4;
+    /* 7.88:1 on the page */
+    --color-fd-muted-foreground: #4d4d4d;
+    /* Raised article surface against the page background. */
+    --docs-article-surface: #ffffff;
+    /* 5.43:1 on the page, 4.71:1 on `bg-fd-primary/10`, 4.89:1 on the pill */
+    --color-fd-primary: #00753a;
+    --color-fd-primary-foreground: #ffffff; /* 5.82:1 on the fill */
+    --color-fd-accent: #00ab551a;
+    --color-fd-accent-foreground: #00753a;
+    --color-fd-ring: #00753a;
+}
+
+.dark {
+    --color-fd-background: #141414;
+    /* 11.47:1 on the page, 10.50:1 on the card */
+    --docs-muted-foreground-dark: #cccccc;
+    --color-fd-muted-foreground: var(--docs-muted-foreground-dark);
+    --docs-article-surface: #1d1d1d;
+    /* 10.72:1 on the page, 8.93:1 on `bg-fd-primary/10`, 9.52:1 on the pill */
+    --color-fd-primary: #38e08d;
+    --color-fd-primary-foreground: #06130d; /* 11.04:1 on the fill */
+    --color-fd-accent: #00ab551a;
+    --color-fd-accent-foreground: #38e08d;
+    --color-fd-ring: #38e08d;
+}
+
+/* fumadocs-ui's neutral.css sets a dimmer value here; match our muted foreground. */
+.dark #nd-sidebar {
+    --color-fd-muted-foreground: var(--docs-muted-foreground-dark);
+}
+
+#nd-page {
+    margin: 0.5rem 0.5rem 1.5rem;
+    border: 1px solid var(--color-fd-border);
+    border-radius: 0.5rem;
+    background-color: var(--docs-article-surface);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.12);
+}
+
+html {
+    font-family: Golos, Helvetica, Arial, sans-serif;
+    scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+    margin-right: 0px !important;
+    --removed-body-scroll-bar-size: 0px !important;
+}

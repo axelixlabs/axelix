@@ -1,0 +1,4 @@
+{
+    "title": "Начало работы",
+    "pages": ["getting-started", "configuring-master", "configuring-spring-boot-starter", "configuring-build-plugin"]
+}
