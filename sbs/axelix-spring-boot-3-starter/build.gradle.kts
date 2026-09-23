@@ -13,7 +13,7 @@ val springBootVersion = "3.0.13"
 val springCloudVersion = "2022.0.4"
 
 val jsonUnitAssertJVersion = "2.40.1"
-val lombokVersion = "1.18.36"
+val lombokVersion = "1.18.48"
 
 dependencies {
     // Self
