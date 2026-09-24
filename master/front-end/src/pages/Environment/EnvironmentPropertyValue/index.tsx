@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
+import { HintTooltip } from "@/components";
 import type { IEnvProperty } from "@/models";
 
 import styles from "./styles.module.css";
@@ -60,12 +60,22 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
             </span>
 
             <span className={styles.StatusCell}>
-                <Tooltip title={t(`Environments.${statusKey}Hint`)}>
+                <HintTooltip
+                    content={
+                        <>
+                            <span className={styles.TooltipLabel}>
+                                <span className={styles.TooltipDot} />
+                                {t(`Environments.${statusKey}`)}
+                            </span>
+                            <span>{t(`Environments.${statusKey}Hint`)}</span>
+                        </>
+                    }
+                >
                     <span className={`${styles.Status} ${isPrimary ? styles.Active : styles.Suppressed}`}>
                         {isPrimary ? <ActiveMark /> : <SuppressedMark />}
                         {t(`Environments.${statusKey}`)}
                     </span>
-                </Tooltip>
+                </HintTooltip>
             </span>
         </>
     );
