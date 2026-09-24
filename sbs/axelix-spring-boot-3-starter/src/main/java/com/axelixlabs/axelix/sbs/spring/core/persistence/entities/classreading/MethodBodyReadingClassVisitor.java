@@ -18,8 +18,8 @@
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.MethodVisitor;
@@ -34,10 +34,10 @@ import org.springframework.asm.SpringAsmInfo;
 final class MethodBodyReadingClassVisitor extends ClassVisitor {
 
     private final String owner;
-    private final List<String> hierarchy;
+    private final Set<String> hierarchy;
     private final Map<MethodRef, MethodInfo> methods = new HashMap<>();
 
-    MethodBodyReadingClassVisitor(String owner, List<String> hierarchy) {
+    MethodBodyReadingClassVisitor(String owner, Set<String> hierarchy) {
         super(SpringAsmInfo.ASM_VERSION);
         this.owner = owner;
         this.hierarchy = hierarchy;

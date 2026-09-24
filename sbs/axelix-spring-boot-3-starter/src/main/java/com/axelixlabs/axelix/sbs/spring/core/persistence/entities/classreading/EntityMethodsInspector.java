@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class EntityMethodsInspector {
     private final String entityInternalName;
     private final Set<AssociationMember> associations;
 
-    private final List<Class<?>> hierarchy = new ArrayList<>();
+    private final List<String> hierarchyInternalNames = new ArrayList<>();
     private final Map<String, Class<?>> hierarchyByInternalName = new HashMap<>();
     private final Map<MethodRef, MethodInfo> methods = new HashMap<>();
 
@@ -97,15 +98,16 @@ public class EntityMethodsInspector {
         initialized = true;
         collectHierarchy();
 
-        for (Class<?> type : hierarchy) {
-            readClass(type);
+        for (String internalName : hierarchyInternalNames) {
+            readClass(internalName);
         }
     }
 
     private void collectHierarchy() {
         for (Class<?> type = entityClass; type != null && type != Object.class; type = type.getSuperclass()) {
-            hierarchy.add(type);
-            hierarchyByInternalName.put(Type.getInternalName(type), type);
+            String internalName = Type.getInternalName(type);
+            hierarchyInternalNames.add(internalName);
+            hierarchyByInternalName.put(internalName, type);
         }
     }
 
@@ -122,8 +124,8 @@ public class EntityMethodsInspector {
             }
 
             detectFieldAssociations(method.body().getReadFields(), result);
-            followCalls(method.body().getExactCalls(), false, result, queue);
-            followCalls(method.body().getVirtualCalls(), true, result, queue);
+            followCalls(method.body().getExactCalls(), this::resolveMethod, result, queue);
+            followCalls(method.body().getVirtualCalls(), this::resolveVirtual, result, queue);
         }
 
         return result;
@@ -159,8 +161,8 @@ public class EntityMethodsInspector {
     }
 
     /*
-     * If the accessor reads exactly one field, that field is used. If it reads several, the single
-     * one whose descriptor matches the accessor's return type is used; otherwise it's ambiguous.
+     * Only fields whose type is assignable to the accessor's return type are considered; the
+     * backing field is used only when exactly one such candidate remains.
      */
     private @Nullable FieldRef resolveBackingField(Method accessor) {
         MethodInfo accessorMethod = resolveMethod(MethodRef.from(accessor));
@@ -168,28 +170,23 @@ public class EntityMethodsInspector {
             return null;
         }
 
-        List<FieldRef> readFields = accessorMethod.body().getReadFields().stream()
-                .map(this::resolveField)
+        List<Field> candidates = accessorMethod.body().getReadFields().stream()
+                .map(this::resolveJavaField)
                 .filter(Objects::nonNull)
+                .filter(field -> accessor.getReturnType().isAssignableFrom(field.getType()))
                 .distinct()
                 .toList();
 
-        if (readFields.size() == 1) {
-            return readFields.get(0);
-        }
-
-        String returnDescriptor = Type.getDescriptor(accessor.getReturnType());
-
-        List<FieldRef> matchingFields = readFields.stream()
-                .filter(field -> field.descriptor().equals(returnDescriptor))
-                .toList();
-
-        return matchingFields.size() == 1 ? matchingFields.get(0) : null;
+        return candidates.size() == 1 ? FieldRef.from(candidates.get(0)) : null;
     }
 
-    private void followCalls(Set<MethodRef> calls, boolean virtual, Set<String> result, Deque<MethodInfo> queue) {
+    private void followCalls(
+            Set<MethodRef> calls,
+            Function<MethodRef, @Nullable MethodInfo> resolver,
+            Set<String> result,
+            Deque<MethodInfo> queue) {
         for (MethodRef call : calls) {
-            MethodInfo target = virtual ? resolveVirtual(call) : resolveMethod(call);
+            MethodInfo target = resolver.apply(call);
             if (target == null) {
                 continue;
             }
@@ -228,11 +225,16 @@ public class EntityMethodsInspector {
         }
     }
 
+    private @Nullable FieldRef resolveField(FieldRef ref) {
+        Field field = resolveJavaField(ref);
+        return field != null ? FieldRef.from(field) : null;
+    }
+
     /*
      * The owner stored in a GETFIELD instruction does not necessarily declare the field - e.g.
      * bytecode may reference Child.items even if items is declared by Parent.
      */
-    private @Nullable FieldRef resolveField(FieldRef ref) {
+    private @Nullable Field resolveJavaField(FieldRef ref) {
         Class<?> owner = hierarchyByInternalName.get(ref.owner());
         if (owner == null) {
             return null;
@@ -242,7 +244,7 @@ public class EntityMethodsInspector {
             try {
                 Field field = type.getDeclaredField(ref.name());
                 if (Type.getDescriptor(field.getType()).equals(ref.descriptor())) {
-                    return FieldRef.from(field);
+                    return field;
                 }
             } catch (NoSuchFieldException ignored) {
                 // Continue with superclass.
@@ -251,16 +253,18 @@ public class EntityMethodsInspector {
         return null;
     }
 
+    /*
+     * Mirrors JVM symbolic method resolution (JVMS 5.4.3.3): the search starts at ref.owner() and
+     * walks up towards Object, not down from the concrete entity type.
+     */
     private @Nullable MethodInfo resolveMethod(MethodRef ref) {
-        int ownerIndex = hierarchyIndex(ref.owner());
+        int ownerIndex = hierarchyInternalNames.indexOf(ref.owner());
         if (ownerIndex < 0) {
             return null;
         }
 
-        for (int i = ownerIndex; i < hierarchy.size(); i++) {
-            String owner = Type.getInternalName(hierarchy.get(i));
-
-            MethodInfo method = methods.get(new MethodRef(owner, ref.key()));
+        for (int i = ownerIndex; i < hierarchyInternalNames.size(); i++) {
+            MethodInfo method = methods.get(new MethodRef(hierarchyInternalNames.get(i), ref.key()));
             if (method != null) {
                 return method;
             }
@@ -283,12 +287,10 @@ public class EntityMethodsInspector {
         }
 
         MethodInfo selected = resolved;
-        int resolvedIndex = hierarchyIndex(resolved.ref().owner());
+        int resolvedIndex = hierarchyInternalNames.indexOf(resolved.ref().owner());
 
         for (int i = resolvedIndex - 1; i >= 0; i--) {
-            String owner = Type.getInternalName(hierarchy.get(i));
-
-            MethodInfo candidate = methods.get(new MethodRef(owner, ref.key()));
+            MethodInfo candidate = methods.get(new MethodRef(hierarchyInternalNames.get(i), ref.key()));
             if (candidate != null && overrides(candidate, selected)) {
                 selected = candidate;
             }
@@ -313,15 +315,6 @@ public class EntityMethodsInspector {
                 || samePackage(candidate.ref().owner(), overridden.ref().owner());
     }
 
-    private int hierarchyIndex(String internalName) {
-        for (int i = 0; i < hierarchy.size(); i++) {
-            if (Type.getInternalName(hierarchy.get(i)).equals(internalName)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private static boolean samePackage(String first, String second) {
         return packageName(first).equals(packageName(second));
     }
@@ -331,8 +324,12 @@ public class EntityMethodsInspector {
         return separator < 0 ? "" : internalName.substring(0, separator);
     }
 
-    private void readClass(Class<?> type) {
-        String internalName = Type.getInternalName(type);
+    private void readClass(String internalName) {
+        Class<?> type = hierarchyByInternalName.get(internalName);
+        if (type == null) {
+            return;
+        }
+
         ClassLoader classLoader = type.getClassLoader();
 
         if (classLoader == null) {
@@ -345,8 +342,8 @@ public class EntityMethodsInspector {
                 return;
             }
 
-            MethodBodyReadingClassVisitor visitor = new MethodBodyReadingClassVisitor(
-                    internalName, hierarchy.stream().map(Type::getInternalName).toList());
+            MethodBodyReadingClassVisitor visitor =
+                    new MethodBodyReadingClassVisitor(internalName, hierarchyByInternalName.keySet());
             new ClassReader(stream).accept(visitor, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             methods.putAll(visitor.getMethods());
         } catch (IOException | RuntimeException e) {

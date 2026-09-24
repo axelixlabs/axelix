@@ -132,6 +132,12 @@ class EntityMethodsInspectorTest {
             assertThat(inspectPropertyAssociation(PropertyAmbiguousGetter.class, "customer", "getCustomer"))
                     .isEmpty();
         }
+
+        @Test // GH-1633
+        void shouldNotConfuseForeignKeyFieldWithBackingField() {
+            assertThat(inspectPropertyAssociation(PropertyLookupByIdToString.class, "customer", "getCustomer"))
+                    .isEmpty();
+        }
     }
 
     @Nested
@@ -534,6 +540,32 @@ class EntityMethodsInspectorTest {
         @Override
         public String toString() {
             return "PropertyAmbiguousGetter{customer=" + primaryCustomer + "}";
+        }
+    }
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyLookupByIdToString {
+
+        private Long id;
+        private Long customerId;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            return findCustomer(customerId);
+        }
+
+        private CustomerEntity findCustomer(Long customerId) {
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyLookupByIdToString{customerId=" + customerId + "}";
         }
     }
 
