@@ -93,14 +93,6 @@ export const filterPropertySources = (
 
 /**
  * Indexes every occurrence of every property across all the property sources.
- *
- * The property sources arrive from the Spring Boot starter in their precedence order, the highest
- * precedence first, and that order is preserved here - so the first occurrence recorded for a
- * property is the one that wins. Names are canonicalized, so that an environment variable such as
- * SPRING_JPA_OPEN_IN_VIEW lands on the same key as spring.jpa.open-in-view.
- *
- * Must be built from the full, unfiltered list of property sources: a chain assembled from a
- * searched or triaged subset would omit the very sources that explain who wins.
  */
 export const buildPrecedenceIndex = (propertySources: IEnvironmentPropertySource[]): TPrecedenceIndex => {
     const precedenceIndex: TPrecedenceIndex = new Map();

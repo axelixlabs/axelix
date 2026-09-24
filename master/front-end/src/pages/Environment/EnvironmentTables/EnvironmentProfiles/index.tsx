@@ -26,12 +26,12 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * List of active profiles inside the given Spring Boot application
+     * List of active profiles (both default and explicitly activated) inside the given Spring Boot application
      */
-    activeProfiles: string[];
+    profiles: string[];
 }
 
-export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
+export const EnvironmentProfiles = ({ profiles }: IProps) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState<boolean>(false);
@@ -42,11 +42,11 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
             placement="bottomLeft"
             onOpenChange={setOpen}
             styles={{ container: { padding: 0 } }}
-            content={<EnvironmentProfilesData activeProfiles={activeProfiles} />}
+            content={<EnvironmentProfilesData profiles={profiles} />}
         >
             <button type="button" className={`${styles.Trigger} ${open ? styles.TriggerOpen : ""}`}>
                 <ProfileIcon className={styles.TriggerIcon} />
-                {t("Environments.profilesCount", { value: activeProfiles.length })}
+                {t("Environments.profilesCount", { value: profiles.length })}
                 <span className={styles.Caret}>{open ? "▴" : "▾"}</span>
             </button>
         </Popover>

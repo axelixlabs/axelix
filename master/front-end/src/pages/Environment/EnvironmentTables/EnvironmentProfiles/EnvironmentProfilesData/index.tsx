@@ -20,10 +20,10 @@ import { useTranslation } from "react-i18next";
 import styles from "./styles.module.css";
 
 interface IProps {
-    activeProfiles: string[];
+    profiles: string[];
 }
 
-export const EnvironmentProfilesData = ({ activeProfiles }: IProps) => {
+export const EnvironmentProfilesData = ({ profiles }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -34,8 +34,8 @@ export const EnvironmentProfilesData = ({ activeProfiles }: IProps) => {
                     <div className={styles.DropdownHint}>{t("Environments.profilesPrecedenceHint")}</div>
                 </div>
 
-                {activeProfiles.map((activeProfile, index) => {
-                    const isLastProfile = index === activeProfiles.length - 1;
+                {profiles.map((activeProfile, index) => {
+                    const isLastProfile = index === profiles.length - 1;
 
                     return (
                         <div

@@ -64,7 +64,7 @@ export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
         <>
             <div className={styles.ToolbarWrapper}>
                 <div className={styles.ToolbarRow}>
-                    {profiles.length !== 0 && <EnvironmentProfiles activeProfiles={profiles} />}
+                    {profiles.length !== 0 && <EnvironmentProfiles profiles={profiles} />}
                     <PageSearch
                         addonAfter={addonAfter}
                         setSearch={setSearch}
