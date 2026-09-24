@@ -1,0 +1,21 @@
+name: Helm Pull Requests
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'charts/**'
+      - '.github/actions/check-helm-chart/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-helm-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check Helm chart
+        uses: ./.github/actions/check-helm-chart

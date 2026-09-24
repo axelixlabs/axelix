@@ -1,0 +1,153 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.deployment.name }}
+  labels:
+    {{- include "master.labels.common" $ | nindent 4 }}
+    {{- with $.Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $.Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  # TODO:
+  #  As of now, Axelix Master backend does not really support multiple replicas being deployed,
+  #  nor it supports the HPA. The reason is the internal design of Axelix Master. We're gonna
+  #  address that if we're going to see the need from the community.
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "master.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- with $.Values.pod.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "master.labels.common" $ | nindent 8 }}
+        {{- with $.Values.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ $.Values.serviceAccount.name }}
+      securityContext:
+        {{- toYaml $.Values.pod.securityContext | nindent 8 }}
+      containers:
+        - name: axelix-master
+          image: "{{ $.Values.image.name }}:{{ $.Values.image.ref | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: {{ $.Values.liveness.delay }}
+            periodSeconds: {{ $.Values.liveness.period }}
+            failureThreshold: {{ $.Values.liveness.failureThreshold }}
+            timeoutSeconds: {{ $.Values.liveness.timeoutSeconds }}
+            httpGet:
+              path: /api/actuator/health/liveness
+              port: http
+          readinessProbe:
+            initialDelaySeconds: {{ $.Values.readiness.delay }}
+            periodSeconds: {{ $.Values.readiness.period }}
+            failureThreshold: {{ $.Values.readiness.failureThreshold }}
+            timeoutSeconds: {{ $.Values.readiness.timeoutSeconds }}
+            httpGet:
+              path: /api/actuator/health/readiness
+              port: http
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          {{- with $.Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AXELIX_MASTER_AUTH_COOKIE_SECURE
+              value: {{ $.Values.axelix.master.auth.cookie.secure | quote }}
+
+            - name: AXELIX_MASTER_AUTH_JWT_ALGORITHM
+              value: {{ $.Values.axelix.master.auth.jwt.algorithm | quote }}
+            - name: AXELIX_MASTER_AUTH_JWT_SIGNING_KEY
+              value: {{ $.Values.axelix.master.auth.jwt.signingKey | quote }}
+            - name: AXELIX_MASTER_AUTH_JWT_LIFESPAN
+              value: {{ $.Values.axelix.master.auth.jwt.lifespan | quote }}
+
+            - name: AXELIX_MASTER_AUTH_OPTIONS_SUPER_ADMIN_CREDENTIALS_USERNAME
+              value: {{ $.Values.axelix.master.auth.options.superAdmin.credentials.username | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_SUPER_ADMIN_CREDENTIALS_PASSWORD
+              value: {{ $.Values.axelix.master.auth.options.superAdmin.credentials.password | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_LOCAL_ENABLED
+              value: {{ $.Values.axelix.master.auth.options.local.enabled | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED
+              value: {{ $.Values.axelix.master.auth.options.oauth2.enabled | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI
+              value: {{ $.Values.axelix.master.auth.options.oauth2.issuerUri | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL
+              value: {{ $.Values.axelix.master.auth.options.oauth2.baseUrl | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID
+              value: {{ $.Values.axelix.master.auth.options.oauth2.clientId | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET
+              value: {{ $.Values.axelix.master.auth.options.oauth2.clientSecret | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ROLE_ATTRIBUTE_PATH
+              value: {{ $.Values.axelix.master.auth.options.oauth2.roleAttributePath | quote }}
+            - name: AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_SCOPES
+              value: {{ $.Values.axelix.master.auth.options.oauth2.scopes | quote }}
+
+            - name: AXELIX_MASTER_DATABASE_URL
+              value: {{ $.Values.axelix.master.database.url | quote }}
+            - name: AXELIX_MASTER_DATABASE_USERNAME
+              value: {{ $.Values.axelix.master.database.username | quote }}
+            - name: AXELIX_MASTER_DATABASE_PASSWORD
+              value: {{ $.Values.axelix.master.database.password | quote }}
+
+            - name: AXELIX_MASTER_DISCOVERY_SELF_REGISTRATION_ENABLED
+              value: {{ $.Values.axelix.master.discovery.selfRegistration.enabled | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_SELF_REGISTRATION_EVICTION_HEARTBEAT_TIMEOUT
+              value: {{ $.Values.axelix.master.discovery.selfRegistration.eviction.heartbeatTimeout | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_SELF_REGISTRATION_EVICTION_SCHEDULE
+              value: {{ $.Values.axelix.master.discovery.selfRegistration.eviction.schedule | quote }}
+
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_ENABLED
+              value: {{ $.Values.axelix.master.discovery.auto.enabled | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_BROADCAST_SCHEDULE
+              value: {{ $.Values.axelix.master.discovery.auto.broadcast.schedule | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_KUBERNETES_KUBE_APISERVER_URL
+              value: {{ $.Values.axelix.master.discovery.auto.kubernetes.kubeApiserverUrl | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_KUBERNETES_SA_TOKEN_PATH
+              value: {{ $.Values.axelix.master.discovery.auto.kubernetes.saTokenPath | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_KUBERNETES_CA_CERT_PATH
+              value: {{ $.Values.axelix.master.discovery.auto.kubernetes.caCertPath | quote }}
+            - name: AXELIX_MASTER_DISCOVERY_AUTO_KUBERNETES_FILTERS_NAMESPACES
+              value: {{ $.Values.rbac.targetNamespaces | join "," | quote }}
+                        
+            - name: AXELIX_MASTER_MCP_SERVER_ENABLED
+              value: {{ $.Values.axelix.master.mcpServer.enabled | quote }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      {{- with $.Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
