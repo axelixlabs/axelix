@@ -108,7 +108,8 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         List.of(getCompressedObjectHeadersFeature())),
                 List.of(new InsightFeature(
                         FeatureId.OSIV.getId(), openSessionInViewStateProvider.isOpenSessionInViewEnabled())),
-                assemblePersistenceInsights(), List.of());
+                assemblePersistenceInsights(),
+                List.of());
     }
 
     private PersistenceInsights assemblePersistenceInsights() {
