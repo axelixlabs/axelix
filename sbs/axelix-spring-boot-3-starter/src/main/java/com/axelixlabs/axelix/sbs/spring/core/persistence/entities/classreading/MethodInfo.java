@@ -22,6 +22,9 @@ import org.springframework.asm.Opcodes;
 /**
  * A method discovered in bytecode together with its access flags and body.
  *
+ * @param ref the method's owner and ASM name+descriptor
+ * @param access the method's ASM access flags (see {@link Opcodes})
+ * @param body the fields read and methods called by the method
  * @author Dmitry Mazurov
  */
 record MethodInfo(MethodRef ref, int access, MethodBody body) {

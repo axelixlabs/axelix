@@ -22,8 +22,11 @@ import java.lang.reflect.Field;
 import org.springframework.asm.Type;
 
 /**
- * A field identified by its declaring class, name and JVM descriptor.
+ * A field identified by its owner, name and JVM descriptor.
  *
+ * @param owner the declaring class' internal name
+ * @param name the field's name
+ * @param descriptor the field's JVM type descriptor
  * @author Dmitry Mazurov
  */
 record FieldRef(String owner, String name, String descriptor) {

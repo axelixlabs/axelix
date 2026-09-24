@@ -23,6 +23,8 @@ import java.util.Objects;
 /**
  * JPA association together with the Java member used to access it.
  *
+ * @param name the association's name in the JPA metamodel
+ * @param member the field or accessor method through which the association is read
  * @author Dmitry Mazurov
  */
 public record AssociationMember(String name, Member member) {

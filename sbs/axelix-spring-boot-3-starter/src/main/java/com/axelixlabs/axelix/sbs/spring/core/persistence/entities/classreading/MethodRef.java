@@ -22,9 +22,10 @@ import java.lang.reflect.Method;
 import org.springframework.asm.Type;
 
 /**
- * A method identified by its declaring class' internal name ({@code owner}) and ASM name+descriptor
- * ({@code key}, e.g. {@code toString()Ljava/lang/String;}).
+ * A method identified by its owner and ASM name+descriptor.
  *
+ * @param owner the declaring class' internal name
+ * @param key the ASM name+descriptor, e.g. {@code toString()Ljava/lang/String;}
  * @author Dmitry Mazurov
  */
 record MethodRef(String owner, String key) {

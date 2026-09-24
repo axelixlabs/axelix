@@ -47,6 +47,9 @@ import org.springframework.asm.Type;
  *
  * <p>For property-based associations, the accessor itself is treated as an association access.
  *
+ * <p>Only the entity's class hierarchy is followed; associations read through a lambda body or an
+ * interface's default method are not detected.
+ *
  * @author Dmitry Mazurov
  */
 public class EntityMethodsInspector {

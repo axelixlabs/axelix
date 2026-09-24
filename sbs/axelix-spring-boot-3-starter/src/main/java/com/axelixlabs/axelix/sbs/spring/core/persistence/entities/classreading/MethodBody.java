@@ -23,16 +23,17 @@ import java.util.Set;
 /**
  * The fields read and the methods called by a single method.
  *
- * <p>Calls are split by dispatch semantics: {@code exactCalls} are statically resolved calls such as
- * {@code invokespecial} and {@code invokestatic}, while {@code virtualCalls} require runtime method
- * selection.
- *
  * @author Dmitry Mazurov
  */
 final class MethodBody {
 
+    /** Fields read via {@code GETFIELD} within the entity hierarchy. */
     private final Set<FieldRef> readFields = new HashSet<>();
+
+    /** Calls requiring runtime dispatch, i.e. {@code invokevirtual}/{@code invokeinterface}. */
     private final Set<MethodRef> virtualCalls = new HashSet<>();
+
+    /** Statically resolved calls, i.e. {@code invokespecial}/{@code invokestatic}. */
     private final Set<MethodRef> exactCalls = new HashSet<>();
 
     void addReadField(FieldRef field) {
