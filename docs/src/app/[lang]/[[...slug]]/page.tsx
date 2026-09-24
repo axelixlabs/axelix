@@ -10,6 +10,7 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { PageActionsBasePathFix } from "@/components/PageActionsBasePathFix";
 import { TocPageActions } from "@/components/TocPageActions";
 import { getMDXComponents } from "@/components/mdx";
 import { DEFAULT_LOCALE, prefixedLocales } from "@/lib/constants.mjs";
@@ -72,10 +73,12 @@ export default async function Page(props: PageProps<"/[lang]/[[...slug]]">) {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
                 <DocsTitle>{page.data.title}</DocsTitle>
 
-                <div className="flex shrink-0 items-center gap-2">
-                    <MarkdownCopyButton markdownUrl={markdownUrl} />
-                    <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubFileUrl} />
-                </div>
+                <PageActionsBasePathFix>
+                    <div className="flex shrink-0 items-center gap-2">
+                        <MarkdownCopyButton markdownUrl={markdownUrl} />
+                        <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubFileUrl} />
+                    </div>
+                </PageActionsBasePathFix>
             </div>
             <DocsDescription className="mb-6">{page.data.description}</DocsDescription>
             <DocsBody>

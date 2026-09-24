@@ -8,6 +8,8 @@ import { DOCS_CONTENT_ROUTE, DOCS_IMAGE_ROUTE } from "@/lib/shared";
 // docs are mounted at the root of `app/[lang]`, so every page path is a candidate
 const { rewrite: rewriteDocs } = rewritePath("{/*path}", `${DOCS_CONTENT_ROUTE}{/*path}/content.md`);
 const { rewrite: rewriteSuffix } = rewritePath("{/*path}.md", `${DOCS_CONTENT_ROUTE}{/*path}/content.md`);
+// `{/*path}` requires at least one segment, so the bare docs root (`/.md`) needs its own rule.
+const { rewrite: rewriteRootSuffix } = rewritePath("/.md", `${DOCS_CONTENT_ROUTE}/content.md`);
 
 // TODO: wrapper — layers custom routing in front of Fumadocs' i18n middleware.
 const i18nProxy = createI18nMiddleware(i18n);
@@ -54,7 +56,7 @@ function resolveMarkdown(request: NextRequest, path: string) {
     if (isReserved(path)) return undefined;
 
     // an `.md` suffix is an explicit request, so the response does not vary by `Accept`
-    const suffixed = rewriteSuffix(path);
+    const suffixed = rewriteSuffix(path) || rewriteRootSuffix(path);
     if (suffixed) return { path: suffixed };
 
     if (!isMarkdownPreferred(request)) return undefined;
