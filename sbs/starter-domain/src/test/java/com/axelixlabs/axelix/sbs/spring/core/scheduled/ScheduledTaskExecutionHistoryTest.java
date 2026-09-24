@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class ScheduledTaskExecutionHistoryTest {
 
-    private static final UUID TASK_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
-    private static final UUID ANOTHER_TASK_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private static final String TASK_ID = "com.example.Job#run()";
+    private static final String ANOTHER_TASK_ID = "com.example.AnotherJob#run()";
 
     private ScheduledTaskExecutionHistory history;
 
@@ -185,7 +184,7 @@ class ScheduledTaskExecutionHistoryTest {
         return properties;
     }
 
-    private static ScheduledTaskExecution execution(UUID taskId, long sequence) {
+    private static ScheduledTaskExecution execution(String taskId, long sequence) {
         return new ScheduledTaskExecution(
                 taskId, Instant.parse("2026-01-01T00:00:00Z").plusSeconds(sequence), 100L, true, null, null);
     }
