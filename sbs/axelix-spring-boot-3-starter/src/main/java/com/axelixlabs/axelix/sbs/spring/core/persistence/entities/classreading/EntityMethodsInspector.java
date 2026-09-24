@@ -170,14 +170,48 @@ public class EntityMethodsInspector {
             return null;
         }
 
-        List<Field> candidates = accessorMethod.body().getReadFields().stream()
-                .map(this::resolveJavaField)
-                .filter(Objects::nonNull)
+        List<Field> candidates = collectReadFields(accessorMethod).stream()
                 .filter(field -> accessor.getReturnType().isAssignableFrom(field.getType()))
-                .distinct()
                 .toList();
 
         return candidates.size() == 1 ? FieldRef.from(candidates.get(0)) : null;
+    }
+
+    /*
+     * Collects fields read by the given method and by any helper it calls (exact or virtual), not
+     * just its own body.
+     */
+    private Set<Field> collectReadFields(MethodInfo root) {
+        Set<Field> result = new HashSet<>();
+        Set<MethodRef> visited = new HashSet<>();
+        Deque<MethodInfo> queue = new ArrayDeque<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            MethodInfo method = queue.removeFirst();
+            if (!visited.add(method.ref())) {
+                continue;
+            }
+
+            method.body().getReadFields().stream()
+                    .map(this::resolveJavaField)
+                    .filter(Objects::nonNull)
+                    .forEach(result::add);
+            queueResolvedCalls(method.body().getExactCalls(), this::resolveMethod, queue);
+            queueResolvedCalls(method.body().getVirtualCalls(), this::resolveVirtual, queue);
+        }
+
+        return result;
+    }
+
+    private void queueResolvedCalls(
+            Set<MethodRef> calls, Function<MethodRef, @Nullable MethodInfo> resolver, Deque<MethodInfo> queue) {
+        for (MethodRef call : calls) {
+            MethodInfo target = resolver.apply(call);
+            if (target != null) {
+                queue.add(target);
+            }
+        }
     }
 
     private void followCalls(

@@ -138,6 +138,18 @@ class EntityMethodsInspectorTest {
             assertThat(inspectPropertyAssociation(PropertyLookupByIdToString.class, "customer", "getCustomer"))
                     .isEmpty();
         }
+
+        @Test // GH-1633
+        void shouldResolvePropertyAssociationThroughHelper() {
+            assertThat(inspectPropertyAssociation(PropertyGetterDelegatingToHelper.class, "customer", "getCustomer"))
+                    .containsExactly("customer");
+        }
+
+        @Test // GH-1633
+        void shouldNotGuessBackingFieldWhenHelpersReadSeveralCompatibleFields() {
+            assertThat(inspectPropertyAssociation(PropertyGetterWithAmbiguousHelpers.class, "customer", "getCustomer"))
+                    .isEmpty();
+        }
     }
 
     @Nested
@@ -566,6 +578,64 @@ class EntityMethodsInspectorTest {
         @Override
         public String toString() {
             return "PropertyLookupByIdToString{customerId=" + customerId + "}";
+        }
+    }
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyGetterDelegatingToHelper {
+
+        private Long id;
+        private CustomerEntity customerRef;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            return loadCustomer();
+        }
+
+        private CustomerEntity loadCustomer() {
+            return customerRef;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyGetterDelegatingToHelper{customer=" + customerRef + "}";
+        }
+    }
+
+    @Access(AccessType.PROPERTY)
+    static class PropertyGetterWithAmbiguousHelpers {
+
+        private Long id;
+        private CustomerEntity primaryCustomer;
+        private CustomerEntity secondaryCustomer;
+
+        @Id
+        public Long getId() {
+            return id;
+        }
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        public CustomerEntity getCustomer() {
+            CustomerEntity primary = loadPrimary();
+            return primary != null ? primary : loadSecondary();
+        }
+
+        private CustomerEntity loadPrimary() {
+            return primaryCustomer;
+        }
+
+        private CustomerEntity loadSecondary() {
+            return secondaryCustomer;
+        }
+
+        @Override
+        public String toString() {
+            return "PropertyGetterWithAmbiguousHelpers{primary=" + primaryCustomer + "}";
         }
     }
 
