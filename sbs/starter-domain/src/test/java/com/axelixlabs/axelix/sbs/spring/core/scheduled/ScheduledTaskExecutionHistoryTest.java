@@ -179,9 +179,7 @@ class ScheduledTaskExecutionHistoryTest {
     }
 
     private static ScheduledTaskHistoryConfigurationProperties properties(int historyMaxSize) {
-        var properties = new ScheduledTaskHistoryConfigurationProperties();
-        properties.setHistoryMaxSize(historyMaxSize);
-        return properties;
+        return new ScheduledTaskHistoryConfigurationProperties(historyMaxSize);
     }
 
     private static ScheduledTaskExecution execution(String taskId, long sequence) {
