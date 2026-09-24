@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.exception.auth;
 
+import java.util.Collection;
+
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -26,10 +28,15 @@ import com.axelixlabs.axelix.common.auth.core.Role;
  *
  * @see Role
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 public class UserRoleNotFoundException extends RuntimeException {
 
     public UserRoleNotFoundException(@Nullable String role) {
         super("Role '%s' is not allowed".formatted(role));
+    }
+
+    public UserRoleNotFoundException(Collection<String> roles) {
+        super("Roles %s are not allowed".formatted(roles));
     }
 }
