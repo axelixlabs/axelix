@@ -1,0 +1,83 @@
+openapi: 3.1.0
+info:
+  title: jwt-claims
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the JWT claims Axelix issues to authenticate a
+    user or a managed service. This documents the payload of the auth cookie Master sets on a
+    successful login, as well as the token a starter signs for its own heartbeat registration —
+    both use the exact same claims shape.
+  # JWT auth itself predates this contract by a long way, but the marker deliberately says
+  # 1.2.0: the release in which this contract document was born and the compatibility checks
+  # started guarding it. Backdating it would make the birth-time shape of the document look
+  # like a years-old promise, outlawing legitimate changes (e.g. new required fields) that are
+  # perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  # Both Master and a starter write this exact shape, so every property here is protected in
+  # both directions: Master can't quietly drop a 'required' guarantee a lagging starter relies
+  # on, and a starter can't add a new 'required' field before the compatibility window lets it.
+  x-axelix-server:
+    - starter
+    - master
+paths:
+  /api/external/users/login:
+    post:
+      operationId: login
+      summary: Authenticates a user and issues the JWT auth cookie.
+      responses:
+        '200':
+          description: The user was authenticated; the auth cookie carries the JWT claims below.
+          headers:
+            Set-Cookie:
+              description: >-
+                The auth cookie. Its value is a signed JWT whose payload matches JwtClaims.
+              schema:
+                $ref: '#/components/schemas/JwtClaims'
+components:
+  schemas:
+    JwtClaims:
+      type: object
+      description: The claims encoded into an Axelix-issued JWT.
+      required:
+        - sub
+        - uid
+        - roles
+      properties:
+        sub:
+          type: string
+          description: The username of the authenticated user (the standard JWT 'sub' claim).
+          x-axelix-introduced-in: 1.2.0
+        uid:
+          type: string
+          description: The stable id of the authenticated user.
+          x-axelix-introduced-in: 1.2.0
+        roles:
+          type: array
+          description: The roles granted to the user.
+          items:
+            $ref: '#/components/schemas/JwtRole'
+          x-axelix-introduced-in: 1.2.0
+    JwtRole:
+      type: object
+      description: A single role, together with its authorities and nested component roles.
+      required:
+        - name
+        - authorities
+        - components
+      properties:
+        name:
+          type: string
+          description: The name of the role.
+          x-axelix-introduced-in: 1.2.0
+        authorities:
+          type: array
+          description: The names of the authorities granted by this role.
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        components:
+          type: array
+          description: The nested roles this role is composed of.
+          items:
+            $ref: '#/components/schemas/JwtRole'
+          x-axelix-introduced-in: 1.2.0

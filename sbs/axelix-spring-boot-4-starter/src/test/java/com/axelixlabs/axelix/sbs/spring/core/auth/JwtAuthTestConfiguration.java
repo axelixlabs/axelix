@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.time.Duration;
 
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -37,6 +39,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 /**
@@ -54,14 +57,23 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
-        return new DefaultJwtEncoderService(
-                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey(), Duration.ofHours(1));
+    public JwtJsonEngine jwtJsonEngine() {
+        return new JacksonJwtJsonEngine(new ObjectMapper());
     }
 
     @Bean
-    public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
+    public JwtEncoderService jwtEncoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
+        return new DefaultJwtEncoderService(
+                jwtJsonEngine,
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey(),
+                Duration.ofHours(1));
+    }
+
+    @Bean
+    public JwtDecoderService jwtDecoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
         return new DefaultJwtDecoderService(
+                jwtJsonEngine,
                 new DefaultAuthoritiesManager(null),
                 authProperties.getJwt().getAlgorithm(),
                 authProperties.getJwt().getSigningKey());

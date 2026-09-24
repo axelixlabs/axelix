@@ -13,6 +13,7 @@ import contract.ContractDocument.Companion.SERVER_SIDES
 object ServerIsDeclared : StatelessContractInvariant {
 
     override fun check(document: ContractDocument): List<String> =
-        if (document.server in SERVER_SIDES) emptyList()
-        else listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES")
+        if (document.sides.isNotEmpty() && document.sides.all { side -> side in SERVER_SIDES }) emptyList()
+        else listOf("the 'info' block must declare '$SERVER' as one of $SERVER_SIDES, "
+            + "or as a list combining them")
 }

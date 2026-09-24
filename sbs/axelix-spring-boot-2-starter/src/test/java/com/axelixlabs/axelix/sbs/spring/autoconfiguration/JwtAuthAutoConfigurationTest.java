@@ -73,6 +73,8 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage("The jwt signing algorithm is not specified, although it is required");
                 });
     }
 
@@ -86,6 +88,8 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage("The jwt signing key is not specified, although it is required");
                 });
     }
 
@@ -102,6 +106,9 @@ class JwtAuthAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage(
+                                    "No enum constant com.axelixlabs.axelix.common.auth.core.JwtAlgorithm.RSA512");
                 });
     }
 }

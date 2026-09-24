@@ -54,8 +54,21 @@ class MasterProducedPropertyMustNotBecomeOptionalTest {
             problems)
     }
 
-    private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    @Test
+    fun `a withdrawn required of a property produced by starter and master sides fails`() {
+        val problems = MasterProducedPropertyMustNotBecomeOptional
+            .check(baseline("released-baseline-starter-and-master.yaml"), current("required-withdrawn-starter-and-master.yaml"))
+
+        assertEquals(
+            listOf(
+                "the property 'LogLevelChangeRequest.configuredLevel' is produced by the Master and is "
+                    + "'required' in the released contract (1.1.0): withdrawing 'required' is a hidden "
+                    + "removal, deprecate the property instead and keep it required until the window passes"),
+            problems)
+    }
+
+    private fun baseline(name: String = "released-baseline.yaml"): ContractDocument =
+        ContractDocument.parse(document(name), RELEASED_VERSION)
 
     private fun current(name: String): ContractDocument =
         ContractDocument.parse(document(name), CURRENT_VERSION)
