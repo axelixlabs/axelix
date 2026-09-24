@@ -15,24 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringPortfolio";
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./instanceSiderMenu";
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./entitiesMap";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./wallboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./license";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./mcp";
+import { useTranslation } from "react-i18next";
+
+import type { IMaintenanceWindowEntry } from "@/models";
+
+import { MaintenanceLadderCard } from "./MaintenanceLadderCard";
+import styles from "./styles.module.css";
+
+interface IProps {
+    entries: IMaintenanceWindowEntry[];
+}
+
+export const MaintenanceLadder = ({ entries }: IProps) => {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <div className={`TextUltraSmall ${styles.Header}`}>
+                <div className={styles.SectionTitle}>{t("Dashboard.SpringPortfolio.ladderTitle")}</div>
+                <div>{t("Dashboard.SpringPortfolio.ladderHint")}</div>
+            </div>
+
+            <MaintenanceLadderCard entries={entries} />
+        </>
+    );
+};

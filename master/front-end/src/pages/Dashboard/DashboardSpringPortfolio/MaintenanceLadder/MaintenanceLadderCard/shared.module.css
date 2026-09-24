@@ -1,0 +1,7 @@
+.Row {
+    display: grid;
+    grid-template-columns: 215px minmax(0, 1fr) 105px 75px;
+    gap: 16px;
+    align-items: center;
+    min-height: 34px;
+}

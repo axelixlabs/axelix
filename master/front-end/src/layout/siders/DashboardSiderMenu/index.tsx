@@ -36,6 +36,10 @@ const getDashboardItems = (): AntdMenuItem[] => {
             path: "/dashboard/overview",
             label: "Overview",
         },
+        {
+            path: "/dashboard/spring-portfolio",
+            label: "Spring Portfolio",
+        },
     ];
 
     const technologiesItems: ISiderMenuItem[] = [

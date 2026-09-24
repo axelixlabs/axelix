@@ -15,24 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringPortfolio";
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./instanceSiderMenu";
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./entitiesMap";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./wallboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./license";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./mcp";
+import type { IPlatformName } from "@/models";
+
+export const PLATFORM_ORDER: IPlatformName[] = ["SPRING_BOOT", "SPRING_FRAMEWORK"];
