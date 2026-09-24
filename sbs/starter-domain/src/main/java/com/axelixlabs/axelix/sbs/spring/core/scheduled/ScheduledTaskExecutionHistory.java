@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,7 @@ import com.axelixlabs.axelix.common.api.registration.insights.ScheduledTaskExecu
  */
 public class ScheduledTaskExecutionHistory {
 
-    private final Map<UUID, Deque<Entry>> history;
+    private final Map<String, Deque<Entry>> history;
     private final ScheduledTaskHistoryConfigurationProperties properties;
     private final Object lock;
     private long insertionCounter;
