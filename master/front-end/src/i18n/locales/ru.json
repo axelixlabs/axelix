@@ -80,7 +80,7 @@
         "configProps": "Configuration Properties",
         "injectedIn": "Инжектируется в",
         "profilesCount": "Профили: {{value}}",
-        "profilesPrecedenceHint": "Перечислены в порядке приоритета, начиная с наименьшего — профиль, активированный позже, перекрывает предыдущие.",
+        "profilesPrecedenceHint": "Перечислены в порядке убывания приоритета, т.е. чем выше профиль в списке - тем больше его приоритет",
         "propertiesCount": "Свойства: {{value}}",
         "flaggedCount": "Отмечено: {{value}}",
         "clearFilters": "Сбросить",

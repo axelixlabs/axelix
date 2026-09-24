@@ -78,7 +78,7 @@
         "configProps": "Configuration Properties",
         "injectedIn": "Injected in",
         "profilesCount": "Profiles: {{value}}",
-        "profilesPrecedenceHint": "Listed in precedence order, lowest first — a profile activated later overrides the ones before it.",
+        "profilesPrecedenceHint": "Listed in reverse order of precedence, i.e. profiles that are higher override values provided by lower profiles",
         "propertiesCount": "Properties: {{value}}",
         "flaggedCount": "{{value}} flagged",
         "clearFilters": "Clear",
