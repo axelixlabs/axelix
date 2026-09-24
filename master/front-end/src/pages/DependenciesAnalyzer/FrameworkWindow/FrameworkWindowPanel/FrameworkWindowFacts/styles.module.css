@@ -1,0 +1,37 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 12px 16px;
+    padding-left: 25px;
+    border-left: 1px solid var(--axelix-medium-grey);
+}
+
+.FactLabel {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.FactProse {
+    color: var(--axelix-bold-grey);
+}
+
+.FactValue {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.Breaching {
+    /* TODO: Improve in future */
+    color: var(--accent-color);
+}
+
+@media (width <=1100px) {
+    .MainWrapper {
+        padding-left: 0;
+        padding-top: 16px;
+        border-left: none;
+        border-top: 1px solid var(--axelix-medium-grey);
+    }
+}

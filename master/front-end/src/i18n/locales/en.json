@@ -122,6 +122,7 @@
         "scheduledTasks": "Scheduled Tasks",
         "conditions": "Conditions",
         "loggers": "Loggers",
+        "dependenciesAnalyzer": "Dependencies Analyzer",
         "mappings": "Mappings",
         "caches": "Caches",
         "transactionControl" : "Transaction Control",
@@ -228,7 +229,8 @@
             "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the instance got redeployed since the last request from your browser to the server. Visit the Wallboard",
             "INVALID_CREDENTIALS" : "Invalid username or password",
             "USERNAME_ALREADY_EXISTS": "A user with this username already exists. Please choose a different username.",
-            "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email."
+            "EMAIL_ALREADY_EXISTS": "A user with this email already exists. Please choose a different email.",
+            "SBOM_NOT_AVAILABLE": "SBOM data is not available for this project."
         }
     },
     "Metrics": {
@@ -481,6 +483,76 @@
         "clean": {
             "title": "No mapping problems",
             "description": "All {{count}} mapped entities are clean — no eager fetching, no List-backed @ManyToMany, no dangerous cascades, and no unidirectional @OneToMany."
+        }
+    },
+    "DependenciesAnalyzer": {
+        "framework": {
+            "caption": "{{framework}} maintenance window",
+            "source": "Read from the running JVM · {{date}}",
+            "runningLine": "Running the {{line}} line · latest line known to Axelix is {{latest}}",
+            "today": "Today",
+            "released": "Released {{date}}",
+            "ossEnded": "OSS ended {{date}}",
+            "ossEnds": "OSS ends {{date}}",
+            "commercial": "Commercial to {{date}}",
+            "consequence": "Consequence",
+            "outOfOssFor": "Out of OSS for",
+            "supportedTarget": "Supported target",
+            "targetValue": "{{line}} · OSS to {{date}}"
+        },
+        "frameworkStatus": {
+            "OSS_SUPPORTED": "Within OSS maintenance",
+            "OUT_OF_OSS_MAINTENANCE": "Out of OSS maintenance"
+        },
+        "consequences": {
+            "OSS_SUPPORTED": "This line still receives OSS releases, security patches included.",
+            "OUT_OF_OSS_MAINTENANCE": "No further OSS releases, including security patches. CVEs in this line are fixed only under a commercial subscription."
+        },
+        "duration": {
+            "years_one": "{{count}} year",
+            "years_other": "{{count}} years",
+            "months_one": "{{count}} month",
+            "months_other": "{{count}} months",
+            "lessThanAMonth": "less than a month"
+        },
+        "feed": {
+            "caption": "Resolved dependencies",
+            "clear": "Clear"
+        },
+        "ecosystems": {
+            "ALL": "All",
+            "SPRING": "Spring",
+            "PERSISTENCE": "Persistence",
+            "SERIALIZATION": "Serialization",
+            "LOGGING": "Logging",
+            "OBSERVABILITY": "Observability",
+            "RESILIENCE": "Resilience",
+            "OTHER": "Other"
+        },
+        "statuses": {
+            "MAINTENANCE": "Maintenance mode",
+            "SUNSET": "Sunset",
+            "DORMANT": "Dormant"
+        },
+        "columns": {
+            "dependency": "Dependency",
+            "version": "Version",
+            "scope": "Scope"
+        },
+        "scope": {
+            "direct": "Direct",
+            "transitive": "Transitive"
+        },
+        "detail": {
+            "resolutionPath": "Resolution path from the root",
+            "declaredDirectly": "Declared directly in the build file",
+            "levelsBelowRoot_one": "{{count}} level below the root",
+            "levelsBelowRoot_other": "{{count}} levels below the root",
+            "thisApplication": "This application",
+            "resolvedHere": "Resolved here",
+            "projectStatus": "Project status",
+            "detectedFrom": "Detected from",
+            "reference": "Reference"
         }
     },
     "Users": {

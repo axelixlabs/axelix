@@ -1,0 +1,66 @@
+.Row {
+    display: grid;
+    grid-template-columns: var(--da-columns);
+    gap: 16px;
+    align-items: center;
+    background-color: var(--row-bg, var(--axelix-primary-white));
+    border-left: 3px solid var(--row-accent, transparent);
+
+    &:hover {
+        /* TODO: Improve in future */
+        background-color: #f9f9f9;
+    }
+}
+
+/* TODO: Improve in future */
+.MAINTENAnce {
+    --row-accent: var(--status-maintenance);
+    --row-bg: #fffdf7;
+}
+
+.SUNSET {
+    --row-accent: var(--status-sunset);
+    --row-bg: #fffbfa;
+}
+
+.DORMANT {
+    --row-accent: var(--status-dormant);
+    --row-bg: #fffbfa;
+}
+
+.Dependency {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.Coordinates {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.Project {
+    color: var(--axelix-bold-grey);
+    white-space: nowrap;
+}
+
+.Version,
+.Scope {
+    justify-self: end;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.Scope {
+    color: var(--axelix-bold-grey);
+}
+
+.DirectScope {
+    color: var(--axelix-primary-black);
+}
+
+.Content {
+    padding: 0;
+}

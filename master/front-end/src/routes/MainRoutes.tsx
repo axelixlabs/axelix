@@ -26,6 +26,7 @@ import { DashboardSiderMenu } from "@/layout/siders";
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DashboardOverview = Loadable(lazy(() => import("@/pages/Dashboard/DashboardOverview")));
+const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
@@ -74,6 +75,7 @@ export const MainRoutes = () => {
                 <Route element={<MainLayout />}>
                     <Route path="/instance/:instanceId/details" element={<Details />} />
                     <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
+                    <Route path="/instance/:instanceId/dependencies" element={<DependenciesAnalyzer />} />
                     <Route path="/instance/:instanceId/environment" element={<Environment />} />
                     <Route path="/instance/:instanceId/beans" element={<Beans />} />
                     <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />

@@ -124,6 +124,7 @@
         "scheduledTasks": "Запланированные задачи",
         "conditions": "Условия",
         "loggers": "Логгеры",
+        "dependenciesAnalyzer": "Анализатор зависимостей",
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
@@ -230,7 +231,8 @@
             "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что экземпляр сервиса был передеплоен. Посетите панель сервисов чтобы убедиться.",
             "INVALID_CREDENTIALS" : "Неверное имя пользователя или пароль",
             "USERNAME_ALREADY_EXISTS": "Пользователь с таким именем уже существует. Пожалуйста, выберите другое имя пользователя.",
-            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email."
+            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email.",
+            "SBOM_NOT_AVAILABLE": "SBOM not found for this project."
         }
     },
     "Metrics": {
@@ -483,6 +485,82 @@
         "clean": {
             "title": "Проблем в маппинге нет",
             "description": "Все {{count}} сопоставленных сущностей чисты — нет жадной загрузки, нет @ManyToMany на основе List, нет опасных каскадов и нет однонаправленных @OneToMany."
+        }
+    },
+    "DependenciesAnalyzer": {
+        "framework": {
+            "caption": "Окно поддержки {{framework}}",
+            "source": "Считано из работающей JVM · {{date}}",
+            "runningLine": "Используется линия {{line}} · последняя известная Axelix линия — {{latest}}",
+            "today": "Сегодня",
+            "released": "Выпущено {{date}}",
+            "ossEnded": "OSS-поддержка завершена {{date}}",
+            "ossEnds": "OSS-поддержка завершится {{date}}",
+            "commercial": "Коммерческая до {{date}}",
+            "consequence": "Последствие",
+            "outOfOssFor": "Без OSS-поддержки уже",
+            "supportedTarget": "Поддерживаемая цель",
+            "targetValue": "{{line}} · OSS до {{date}}"
+        },
+        "frameworkStatus": {
+            "OSS_SUPPORTED": "В рамках OSS-поддержки",
+            "OUT_OF_OSS_MAINTENANCE": "Вне OSS-поддержки"
+        },
+        "consequences": {
+            "OSS_SUPPORTED": "Эта линия продолжает получать OSS-релизы, включая исправления безопасности.",
+            "OUT_OF_OSS_MAINTENANCE": "OSS-релизов больше не будет, включая исправления безопасности. CVE в этой линии исправляются только по коммерческой подписке."
+        },
+        "duration": {
+            "years_one": "{{count}} год",
+            "years_few": "{{count}} года",
+            "years_many": "{{count}} лет",
+            "years_other": "{{count}} лет",
+            "months_one": "{{count}} месяц",
+            "months_few": "{{count}} месяца",
+            "months_many": "{{count}} месяцев",
+            "months_other": "{{count}} месяцев",
+            "lessThanAMonth": "менее месяца"
+        },
+        "feed": {
+            "caption": "Разрешённые зависимости",
+            "clear": "Сбросить"
+        },
+        "ecosystems": {
+            "ALL": "Все",
+            "SPRING": "Spring",
+            "PERSISTENCE": "Хранение данных",
+            "SERIALIZATION": "Сериализация",
+            "LOGGING": "Логирование",
+            "OBSERVABILITY": "Наблюдаемость",
+            "RESILIENCE": "Отказоустойчивость",
+            "OTHER": "Прочее"
+        },
+        "statuses": {
+            "SUNSET": "Устаревший",
+            "MAINTENANCE": "Режим поддержки",
+            "DORMANT": "Без активности"
+        },
+        "columns": {
+            "dependency": "Зависимость",
+            "version": "Версия",
+            "scope": "Тип"
+        },
+        "scope": {
+            "direct": "Прямая",
+            "transitive": "Транзитивная"
+        },
+        "detail": {
+            "resolutionPath": "Путь разрешения от корня",
+            "declaredDirectly": "Объявлена напрямую в файле сборки",
+            "levelsBelowRoot_one": "{{count}} уровень ниже корня",
+            "levelsBelowRoot_few": "{{count}} уровня ниже корня",
+            "levelsBelowRoot_many": "{{count}} уровней ниже корня",
+            "levelsBelowRoot_other": "{{count}} уровней ниже корня",
+            "thisApplication": "Это приложение",
+            "resolvedHere": "Разрешена здесь",
+            "projectStatus": "Статус проекта",
+            "detectedFrom": "Определено из",
+            "reference": "Ссылка"
         }
     },
     "Users": {
