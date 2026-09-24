@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.asm.MethodVisitor;
 import org.springframework.asm.Opcodes;
@@ -33,14 +33,13 @@ final class MethodBodyReadingMethodVisitor extends MethodVisitor {
 
     private final MethodRef ref;
     private final int access;
-    private final List<String> hierarchy;
+    private final Set<String> hierarchy;
     private final Map<MethodRef, MethodInfo> methods;
 
     private final MethodBody body = new MethodBody();
 
     MethodBodyReadingMethodVisitor(
-            MethodRef ref, int access, List<String> hierarchy, Map<MethodRef, MethodInfo> methods) {
-
+            MethodRef ref, int access, Set<String> hierarchy, Map<MethodRef, MethodInfo> methods) {
         super(SpringAsmInfo.ASM_VERSION);
         this.ref = ref;
         this.access = access;
