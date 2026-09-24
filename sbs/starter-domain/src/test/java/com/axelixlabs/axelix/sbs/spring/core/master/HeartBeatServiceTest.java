@@ -164,7 +164,8 @@ class HeartBeatServiceTest {
             return () -> new Insights(
                     new HotSpotInsights(List.of(), List.of(), List.of()),
                     List.of(),
-                    new PersistenceInsights(List.of()), List.of());
+                    new PersistenceInsights(List.of()),
+                    List.of());
         }
 
         @Bean
