@@ -204,6 +204,10 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint DEPENDENCIES_READ =
             register("dependencies:read", HttpMethod.GET, ApiPaths.DependenciesApi.INSTANCE_ID, null);
 
+    // Upgrades
+    public static final MasterWebEndpoint UPGRADES_READ =
+            register("upgrades:read", HttpMethod.GET, ApiPaths.UpgradesApi.MAIN, null);
+
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =
             register("mcp-tools:read", HttpMethod.GET, ApiPaths.McpToolApi.TOOLS_LIST, null);

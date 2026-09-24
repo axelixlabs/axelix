@@ -44,6 +44,7 @@ import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
  * Converter that is capable to conver the {@link BasicRegistrationMetadata} into {@link HistoricalApplicationSnapshot}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Component
 public class HistoricalApplicationSnapshotConverter {
@@ -52,7 +53,8 @@ public class HistoricalApplicationSnapshotConverter {
 
         return new HistoricalApplicationSnapshot(
                 new SnapshotId(metadata.getGroupId(), metadata.getArtifactId(), LocalDate.now(ZoneOffset.UTC)),
-                fromDto(metadata));
+                fromDto(metadata),
+                metadata.getVersion());
     }
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with

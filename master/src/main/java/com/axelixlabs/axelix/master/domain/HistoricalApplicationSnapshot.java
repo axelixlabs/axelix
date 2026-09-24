@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -30,14 +31,17 @@ import org.springframework.data.relational.core.mapping.Table;
  * {@link LocalDate}). It is assumed we will not need the granularity of insights to be more
  * than 24 hours.
  *
- * @param insights the actual insights.
+ * @param insights       the actual insights.
+ * @param starterVersion the version of the Axelix starter reported at the time of this snapshot.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Table("historical_application_snapshots")
 public record HistoricalApplicationSnapshot(
         @Id @Embedded.Empty SnapshotId snapshotId,
-        @Embedded.Empty Insights insights) {
+        @Embedded.Empty Insights insights,
+        @Column("starter_version") String starterVersion) {
 
     /**
      * The composite key ID.

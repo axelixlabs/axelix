@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +46,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.GarbageCollectorDistributionAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
+import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.LatestStarterVersion;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.ServicePersistenceInsights;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.SpringFrameworkInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
@@ -53,6 +55,7 @@ import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapsho
  * Service for operating over the {@link HistoricalApplicationSnapshot}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 // TODO: Extract an interface
 @Service
@@ -153,11 +156,17 @@ public class DatabaseHistoricalApplicationSnapshotService {
         return repository.findLatestApplicationSnapshot(applicationId.groupId(), applicationId.artifactId());
     }
 
-    @Transactional
-    public void reloadCurrentState(BasicRegistrationMetadata metadata) {
-        HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
-
-        jdbcAggregateTemplate.upsert(applicationSnapshot);
+    /**
+     * Returns the latest starter version reported by every service seen at least once since the given date.
+     *
+     * @param since the earliest date (inclusive) a snapshot must fall on to be considered
+     *
+     * @return one row per service, holding its {@code groupId}, {@code artifactId}, latest starter version and
+     *         the date it was last seen on
+     */
+    @Transactional(readOnly = true)
+    public List<LatestStarterVersion> getLatestStarterVersionsSince(LocalDate since) {
+        return repository.findLatestStarterVersionsSince(since);
     }
 
     @Transactional(readOnly = true)
@@ -165,6 +174,19 @@ public class DatabaseHistoricalApplicationSnapshotService {
         return repository.findLatestPersistenceInsightsForInstance(instanceId.instanceId());
     }
 
+    /**
+     * {@code metadata} is expected to already carry a valid starter version.
+     */
+    @Transactional
+    public void reloadCurrentState(BasicRegistrationMetadata metadata) {
+        HistoricalApplicationSnapshot applicationSnapshot = converter.currentSnapshot(metadata);
+
+        jdbcAggregateTemplate.upsert(applicationSnapshot);
+    }
+
+    /**
+     * Every entry in {@code metadata} is expected to already carry a valid starter version.
+     */
     @Transactional
     public void reloadCurrentStateBulk(Collection<BasicRegistrationMetadata> metadata) {
         // TODO:

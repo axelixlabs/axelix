@@ -61,6 +61,7 @@ import static org.assertj.core.api.Assertions.tuple;
  * Base class for integration tests of the {@link DatabaseHistoricalApplicationSnapshotService}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @DatabaseMatrixTest
 class DatabaseHistoricalApplicationSnapshotServiceTest {
@@ -551,7 +552,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                         false, GarbageCollector.G1),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
-                        persistenceInsights));
+                        persistenceInsights),
+                "1.0.0");
     }
 
     private static BasicRegistrationMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
@@ -571,7 +573,8 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                         false, garbageCollector),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
-                        new PersistenceInsights(List.of())));
+                        new PersistenceInsights(List.of())),
+                "1.0.0");
     }
 
     private static BasicRegistrationMetadata otherAppMetadata() {
