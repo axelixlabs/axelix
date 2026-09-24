@@ -35,7 +35,6 @@ export const EnvironmentProfilesData = ({ profiles }: IProps) => {
                 </div>
 
                 {profiles.map((activeProfile, index) => {
-
                     return (
                         <div
                             className={`${styles.ProfileRow} ${index === 0 ? styles.HighestPrecedenceProfile : ""}`}
