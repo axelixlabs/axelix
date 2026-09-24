@@ -152,7 +152,8 @@ class AxelixMetadataEndpointTest {
                         + "    \"persistenceInsights\" : {\n"
                         + "      \"transactions\" : [ ],\n"
                         + "      \"entitiesMap\" : null\n"
-                        + "    }\n"
+                        + "    },\n"
+                        + "    \"scheduledTaskExecutions\" : [ ]\n"
                         + "  }\n"
                         + "}");
     }

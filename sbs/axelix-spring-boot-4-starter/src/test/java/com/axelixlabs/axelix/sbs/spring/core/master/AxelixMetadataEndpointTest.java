@@ -92,7 +92,8 @@ class AxelixMetadataEndpointTest extends AbstractMasterSharedContextTest {
                 "persistenceInsights" : {
                   "transactions" : [ ],
                   "entitiesMap" : null
-                }
+                },
+                "scheduledTaskExecutions" : [ ]
               }
             }
             """);
