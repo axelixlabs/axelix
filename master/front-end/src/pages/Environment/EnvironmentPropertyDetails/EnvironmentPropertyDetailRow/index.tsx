@@ -15,31 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
+import type { PropsWithChildren } from "react";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * List of active profiles inside the given Spring Boot application
-     */
-    activeProfiles: string[];
+    label: string;
 }
 
-export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
-    const { t } = useTranslation();
-
+export const EnvironmentPropertyDetailRow = ({ children, label }: PropsWithChildren<IProps>) => {
     return (
         <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.ProfilesWrapper}>
-                    <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
-                    {activeProfiles.map((activeProfile) => (
-                        <div className={styles.ProfileValue} key={activeProfile}>
-                            {activeProfile}
-                        </div>
-                    ))}
-                </div>
+            <div className={styles.DetailRow}>
+                <span className={styles.DetailLabel}>{label}</span>
+                <div className={styles.DetailValue}>{children}</div>
             </div>
         </>
     );

@@ -1,15 +1,27 @@
 .AccordionBody {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 14px;
 }
 
-.Value {
-  word-break: break-all;
+.BeanName {
+    font-size: 12.5px;
+    overflow-wrap: anywhere;
+}
+
+.InjectionPointWrapper {
+    display: flex;
+    align-items: baseline;
+    column-gap: 8px;
 }
 
 .InjectionPointWrapper:not(:last-child) {
-  border-bottom: 1px solid var(--axelix-medium-grey);
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.LinkIcon {
+    flex-shrink: 0;
+    color: var(--prop-accent);
 }

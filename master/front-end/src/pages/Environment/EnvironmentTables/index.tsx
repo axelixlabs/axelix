@@ -16,23 +16,42 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, PageSearch } from "@/components";
-import { buildAutoCompleteOptions, filterPropertySources, getPropertiesCount } from "@/helpers";
-import type { IEnvironmentPropertySource } from "@/models";
+import { PageSearch } from "@/components";
+import { buildAutoCompleteOptions, buildPrecedenceIndex, filterPropertySources, getPropertiesCount } from "@/helpers";
+import type { EPropertyTriageTag, IEnvironmentPropertySource } from "@/models";
 
 import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
+
+import { EnvironmentProfiles } from "./EnvironmentProfiles";
+import { EnvironmentTriageFilters } from "./EnvironmentTriageFilters";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
      * The list of property sources to render
      */
     propertySources: IEnvironmentPropertySource[];
+
+    /**
+     * The profiles the inspected application runs with
+     */
+    profiles: string[];
 }
 
-export const EnvironmentTables = ({ propertySources }: IProps) => {
+export const EnvironmentTables = ({ propertySources, profiles }: IProps) => {
+    const { t } = useTranslation();
+
     const [search, setSearch] = useState<string>("");
-    const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
+    const [triageTags, setTriageTags] = useState<EPropertyTriageTag[]>([]);
+
+    const isFiltered = Boolean(search) || triageTags.length > 0;
+    const effectivePropertySources = isFiltered
+        ? filterPropertySources(propertySources, search, triageTags)
+        : propertySources;
+
+    const precedenceIndex = buildPrecedenceIndex(propertySources);
 
     const totalPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(propertySources);
     const filteredPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(effectivePropertySources);
@@ -43,15 +62,38 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} autocompleteOptions={autocompleteOptions} />
+            <div className={styles.ToolbarWrapper}>
+                <div className={styles.ToolbarRow}>
+                    {profiles.length !== 0 && <EnvironmentProfiles profiles={profiles} />}
+                    <PageSearch
+                        addonAfter={addonAfter}
+                        setSearch={setSearch}
+                        autocompleteOptions={autocompleteOptions}
+                        searchWrapperClassName={styles.SearchWrapper}
+                        removeBottomGutter
+                    />
+                </div>
 
-            <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
-                <>
-                    {effectivePropertySources.map((propertySource) => (
-                        <EnvironmentModifiableTable propertySource={propertySource} key={propertySource.name} />
-                    ))}
-                </>
-            </EmptyHandler>
+                <EnvironmentTriageFilters
+                    propertySources={propertySources}
+                    selectedTags={triageTags}
+                    onSelectedTagsChange={setTriageTags}
+                />
+            </div>
+
+            <div className={styles.ContentWrapper}>
+                {effectivePropertySources.length === 0 ? (
+                    <div className={styles.NoResults}>{t("Environments.noMatchingProperties")}</div>
+                ) : (
+                    effectivePropertySources.map((propertySource) => (
+                        <EnvironmentModifiableTable
+                            propertySource={propertySource}
+                            precedenceIndex={precedenceIndex}
+                            key={propertySource.name}
+                        />
+                    ))
+                )}
+            </div>
         </>
     );
 };
