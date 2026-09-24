@@ -27,7 +27,7 @@ const featuredCards = [
         title: "Transactional inspection",
         description: "Live transactions, durations, the SQL timeline of each one — the verbs your APM forgot.",
         icon: <TransactionsIcon width="22" height="22" />,
-        href: "https://axelix.io/docs/features/transaction-control",
+        href: "https://axelix.io/docs/features/spring-framework/transaction-control",
         visual: (
             <div className={styles.VisualBars}>
                 <span className={styles.VisualBar} style={{ height: "30%" }} />
@@ -54,7 +54,7 @@ const featuredCards = [
             </>
         ),
         icon: <ConfigIcon width="22" height="22" />,
-        href: "https://axelix.io/docs/features/configuration-properties",
+        href: "https://axelix.io/docs/features/spring-framework/configuration-properties",
         visual: (
             <div className={styles.PropsTable}>
                 <div className={styles.Row}>
@@ -80,7 +80,7 @@ const featuredCards = [
         title: "Loggers",
         description: "Flip log levels per package, live — no redeploy, no SSH, fully audited.",
         icon: <LoggersIcon width="22" height="22" />,
-        href: "https://axelix.io/docs/features/loggers",
+        href: "https://axelix.io/docs/features/insights/loggers/loggers",
         visual: (
             <div className={styles.LoggersTree}>
                 <div className={styles.Row}>
@@ -107,7 +107,7 @@ const featuredCards = [
             </>
         ),
         icon: <BeansIcon width="22" height="22" />,
-        href: "https://axelix.io/docs/features/beans",
+        href: "https://axelix.io/docs/features/spring-framework/beans",
         visual: <VisGraphIcon className={styles.Graph} />,
     },
 ];

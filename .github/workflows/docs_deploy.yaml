@@ -37,13 +37,19 @@ jobs:
           source: "docker-compose.yml,infra/nginx"
           target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}"
 
-      - name: Copy build to VM via SCP
+      - name: Prepare Standalone Folder
+        working-directory: docs
+        run: |
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+
+      - name: Copy build resources to VM via SCP
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ env.PRODUCTION_WEBSITE_HOST }}
           username: ${{ env.PRODUCTION_WEBSITE_USER }}
           key: ${{ env.PRODUCTION_WEBSITE_PRIVATE_KEY }}
-          source: "docs/build,docs/Dockerfile"
+          source: "docs/.next/standalone,docs/Dockerfile"
           target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}/axelix-docs"
           strip_components: 1
 
