@@ -30,6 +30,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.Association;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.AssociationProblem;
 import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
@@ -49,6 +52,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.classreading.E
  * @author Dmitry Mazurov
  */
 public class EntityMappingScanner {
+
+    private static final Logger log = LoggerFactory.getLogger(EntityMappingScanner.class);
 
     private final EntityManagerFactory entityManagerFactory;
 
@@ -75,8 +80,14 @@ public class EntityMappingScanner {
         String entityName = entityType.getName();
         int associationsCount = 0;
         List<FlaggedAssociation> flagged = new ArrayList<>();
-        EntityMethodsInspector methodsInspector = createMethodsInspector(entityType);
-        Set<String> associationsReadByToString = methodsInspector.detectAssociationsReadByToString();
+        Set<String> associationsReadByToString = new HashSet<>();
+
+        try {
+            EntityMethodsInspector methodsInspector = createMethodsInspector(entityType, entityName);
+            associationsReadByToString.addAll(methodsInspector.detectAssociationsReadByToString());
+        } catch (RuntimeException e) {
+            log.warn("Could not detect associations of {}, association inspection is skipped for it", entityName, e);
+        }
 
         for (Attribute<?, ?> attribute : entityType.getAttributes()) {
             if (!attribute.isAssociation()) {
@@ -107,12 +118,22 @@ public class EntityMappingScanner {
                 entityName, resolveTable(entityType.getJavaType(), entityName), associationsCount, flagged);
     }
 
-    private static EntityMethodsInspector createMethodsInspector(EntityType<?> entityType) {
+    private static EntityMethodsInspector createMethodsInspector(EntityType<?> entityType, String entityName) {
         Set<AssociationMember> associations = new HashSet<>();
 
         for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-            if (attribute.isAssociation()) {
+            if (!attribute.isAssociation()) {
+                continue;
+            }
+
+            try {
                 associations.add(new AssociationMember(attribute.getName(), attribute.getJavaMember()));
+            } catch (RuntimeException e) {
+                log.warn(
+                        "Could not resolve association member {}.{}, it is skipped",
+                        entityName,
+                        attribute.getName(),
+                        e);
             }
         }
 
