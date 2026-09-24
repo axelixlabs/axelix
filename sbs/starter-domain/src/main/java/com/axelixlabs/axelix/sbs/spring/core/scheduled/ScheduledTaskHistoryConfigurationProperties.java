@@ -32,14 +32,14 @@ public class ScheduledTaskHistoryConfigurationProperties implements Validatable 
     /**
      * The value of the queue limit
      */
-    private int historyMaxSize = 30;
+    private final int historyMaxSize;
+
+    public ScheduledTaskHistoryConfigurationProperties(int historyMaxSize) {
+        this.historyMaxSize = historyMaxSize != 0 ? historyMaxSize : 30;
+    }
 
     public int getHistoryMaxSize() {
         return historyMaxSize;
-    }
-
-    public void setHistoryMaxSize(int historyMaxSize) {
-        this.historyMaxSize = historyMaxSize;
     }
 
     @Override
