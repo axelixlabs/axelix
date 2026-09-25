@@ -1,0 +1,25 @@
+.LegendWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.LegendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.LegendDotGreen {
+    background-color: var(--axelix-primary-green);
+}
+
+.LegendDotOutside {
+    background-color: #2e3d55;
+    border: 1px solid #3a4660;
+}
+
+.LegendText {
+    color: var(--axelix-bold-grey);
+}

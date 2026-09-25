@@ -1,0 +1,71 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.Header {
+    display: flex;
+    gap: 8px;
+}
+
+.Title {
+    font-weight: 600;
+}
+
+.Meta,
+.FootNote {
+    color: var(--axelix-bold-grey);
+}
+
+.BarsContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+}
+
+.BarRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.VersionLabel {
+    min-width: 32px;
+    flex-shrink: 0;
+}
+
+.BarTrack {
+    flex: 1;
+    height: 15px;
+    background-color: var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-small);
+    overflow: hidden;
+}
+
+.BarFill {
+    height: 100%;
+    background-color: var(--axelix-bold-grey);
+    border-radius: var(--axelix-border-radius-small);
+    transition: width 0.3s ease;
+}
+
+.BarFillCurrent {
+    background-color: var(--axelix-primary-green);
+}
+
+.ServiceCount {
+    font-weight: 500;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.CurrentTag {
+    color: var(--axelix-primary-green);
+    flex-shrink: 0;
+}
+
+.CappingTag {
+    color: var(--axelix-bold-grey);
+    flex-shrink: 0;
+}

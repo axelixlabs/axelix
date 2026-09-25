@@ -40,6 +40,7 @@ const Wallboard = Loadable(lazy(() => import("@/pages/Wallboard")));
 const Loggers = Loadable(lazy(() => import("@/pages/Loggers")));
 const Details = Loadable(lazy(() => import("@/pages/Details")));
 const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
+const Upgrade = Loadable(lazy(() => import("@/pages/Upgrade")));
 const Caches = Loadable(lazy(() => import("@/pages/Caches")));
 const Beans = Loadable(lazy(() => import("@/pages/Beans")));
 const Users = Loadable(lazy(() => import("@/pages/Users")));
@@ -54,6 +55,7 @@ export const MainRoutes = () => {
                 <Route path="/" element={<MainLayout hideSider />}>
                     <Route index element={<Navigate to="/wallboard" replace />} />
                     <Route path="/wallboard" element={<Wallboard />} />
+                    <Route path="/upgrade" element={<Upgrade />} />
                     {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
                 </Route>

@@ -1,0 +1,66 @@
+.Table {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    overflow: hidden;
+}
+
+.ArtifactCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ArtifactId {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axelix-primary-green);
+}
+
+.GroupId {
+    font-size: 11px;
+    color: var(--axelix-bold-grey);
+}
+
+.VersionBadge {
+    font-size: 12px;
+    font-weight: 600;
+    background-color: transparent;
+    color: var(--axelix-primary-black);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-small);
+    padding: 2px 8px;
+    display: inline-block;
+}
+
+.PluginVersion {
+    font-size: 13px;
+    color: var(--axelix-bold-grey);
+}
+
+.LastSeen {
+    font-size: 13px;
+    color: var(--axelix-bold-grey);
+}
+
+.FootNote {
+    color: var(--axelix-bold-grey);
+    margin-top: 8px;
+}
+
+.SectionRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.SectionTitle {
+    font-weight: 600;
+}
+
+.SectionNote {
+    font-size: 13px;
+    color: var(--axelix-bold-grey);
+    margin: 0;
+    text-align: right;
+}

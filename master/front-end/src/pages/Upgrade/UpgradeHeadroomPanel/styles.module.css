@@ -1,0 +1,42 @@
+.MainWrapper {
+    border-radius: var(--axelix-border-radius-large);
+    padding: 20px;
+    background-color: #1a2233;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* TODO: Improve in the future */
+.TagRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* TODO: Improve in the future */
+.Tag {
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.Title {
+    color: var(--axelix-primary-white);
+    margin-bottom: 20px;
+}
+
+.Description {
+    color: var(--axelix-bold-grey);
+}
+
+.FirstSectionWrapper {
+    display: flex;
+    column-gap: 20px;
+}
+
+.Divider {
+    height: 2px;
+    background-color: #2e3d55;
+}

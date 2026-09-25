@@ -31,6 +31,7 @@ export * from "./globals";
 export * from "./details";
 export * from "./loggers";
 export * from "./license";
+export * from "./upgrade";
 export * from "./caches";
 export * from "./beans";
 export * from "./users";

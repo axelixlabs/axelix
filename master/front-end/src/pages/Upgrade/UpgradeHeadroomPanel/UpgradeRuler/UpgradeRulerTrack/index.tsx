@@ -15,20 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardOverview";
-export * from "./dashboard/dashboardJava";
-export * from "./transactional";
-export * from "./entitiesMap";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./wallboard";
-export * from "./upgrade";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./license";
-export * from "./caches";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import type { IRulerTick } from "@/models";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    ticks: IRulerTick[];
+}
+
+export const UpgradeRulerTrack = ({ ticks }: IProps) => {
+    return (
+        <>
+            <div className={styles.MainWrapper}>
+                {ticks.map((tick) => (
+                    <div
+                        key={tick.version}
+                        className={`${styles.RulerSegment} ${tick.isSupported ? styles.InWindow : ""}`}
+                    />
+                ))}
+            </div>
+        </>
+    );
+};

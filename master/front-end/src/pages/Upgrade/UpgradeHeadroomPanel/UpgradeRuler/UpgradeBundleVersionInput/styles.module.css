@@ -1,0 +1,38 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    background-color: #232f45;
+    border: 1px solid #3a4660;
+    border-radius: var(--axelix-border-radius-large);
+    padding: 8px 12px;
+    width: fit-content;
+}
+
+.Label {
+    color: var(--axelix-bold-grey);
+}
+
+.Input {
+    width: 120px;
+    background-color: #1a2233 !important;
+    border-color: #3a4660 !important;
+    color: var(--axelix-primary-white);
+}
+
+.Input input {
+    color: #e8ecf0 !important;
+    background-color: transparent !important;
+}
+
+.BundleInputHint {
+    color: var(--axelix-primary-green);
+}
+
+.Note {
+    color: var(--axelix-bold-grey);
+    background-color: #232f45;
+    border: 1px solid #3a4660;
+    border-radius: var(--axelix-border-radius-large);
+    padding: 12px 16px;
+}
