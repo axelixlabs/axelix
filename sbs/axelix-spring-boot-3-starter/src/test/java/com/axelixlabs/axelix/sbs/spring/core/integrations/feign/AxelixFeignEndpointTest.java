@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +43,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.feign.FeignHttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.feign.FeignIntegration;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
@@ -80,12 +82,12 @@ public class AxelixFeignEndpointTest {
 
     @Test
     void shouldReturnService_WithPathInFeignAnnotation() {
-        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
-                new FeignIntegration.FeignHttpMethod("POST", "/path/post"),
-                new FeignIntegration.FeignHttpMethod("GET", "/path/get"),
-                new FeignIntegration.FeignHttpMethod("PUT", "/path/put"),
-                new FeignIntegration.FeignHttpMethod("DELETE", "/path/delete"),
-                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path/request"));
+        List<FeignHttpMethod> httpMethods = List.of(
+                feignMethodOf("POST", "/path/post"),
+                feignMethodOf("GET", "/path/get"),
+                feignMethodOf("PUT", "/path/put"),
+                feignMethodOf("DELETE", "/path/delete"),
+                feignMethodOf("UNKNOWN", "/path/request"));
 
         FeignIntegration service = getFeignIntegration(SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION);
 
@@ -99,12 +101,12 @@ public class AxelixFeignEndpointTest {
 
     @Test
     void shouldReturnService_WithPathInFeignAnnotationAndPathWithoutMappingAnnotation() {
-        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
-                new FeignIntegration.FeignHttpMethod("POST", "/path"),
-                new FeignIntegration.FeignHttpMethod("GET", "/path"),
-                new FeignIntegration.FeignHttpMethod("PUT", "/path"),
-                new FeignIntegration.FeignHttpMethod("DELETE", "/path"),
-                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path"));
+        List<FeignHttpMethod> httpMethods = List.of(
+                feignMethodOf("POST", "/path"),
+                feignMethodOf("GET", "/path"),
+                feignMethodOf("PUT", "/path"),
+                feignMethodOf("DELETE", "/path"),
+                feignMethodOf("UNKNOWN", "/path"));
 
         FeignIntegration service =
                 getFeignIntegration(SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION);
@@ -121,12 +123,12 @@ public class AxelixFeignEndpointTest {
 
     @Test
     void shouldReturnService_WithoutPathInFeignAnnotationAndPathWithoutMappingAnnotation() {
-        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
-                new FeignIntegration.FeignHttpMethod("POST", null),
-                new FeignIntegration.FeignHttpMethod("GET", null),
-                new FeignIntegration.FeignHttpMethod("PUT", null),
-                new FeignIntegration.FeignHttpMethod("DELETE", null),
-                new FeignIntegration.FeignHttpMethod("UNKNOWN", null));
+        List<FeignHttpMethod> httpMethods = List.of(
+                feignMethodOf("POST", null),
+                feignMethodOf("GET", null),
+                feignMethodOf("PUT", null),
+                feignMethodOf("DELETE", null),
+                feignMethodOf("UNKNOWN", null));
 
         FeignIntegration service =
                 getFeignIntegration(SERVICE_WITH_WITHOUT_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION);
@@ -146,12 +148,12 @@ public class AxelixFeignEndpointTest {
     // can appear in the services feed.
     @Test
     void shouldReturnService_WithoutURL() {
-        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
-                new FeignIntegration.FeignHttpMethod("POST", "/post"),
-                new FeignIntegration.FeignHttpMethod("GET", "/get"),
-                new FeignIntegration.FeignHttpMethod("PUT", "/put"),
-                new FeignIntegration.FeignHttpMethod("DELETE", "/delete"),
-                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/request"));
+        List<FeignHttpMethod> httpMethods = List.of(
+                feignMethodOf("POST", "/post"),
+                feignMethodOf("GET", "/get"),
+                feignMethodOf("PUT", "/put"),
+                feignMethodOf("DELETE", "/delete"),
+                feignMethodOf("UNKNOWN", "/request"));
 
         FeignIntegration service = getFeignIntegration(SERVICE_WITHOUT_URL);
 
@@ -165,12 +167,12 @@ public class AxelixFeignEndpointTest {
 
     @Test
     void shouldReturnService_Discovery() {
-        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
-                new FeignIntegration.FeignHttpMethod("POST", "/path/post"),
-                new FeignIntegration.FeignHttpMethod("GET", "/path/get"),
-                new FeignIntegration.FeignHttpMethod("PUT", "/path/put"),
-                new FeignIntegration.FeignHttpMethod("DELETE", "/path/delete"),
-                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path/request"));
+        List<FeignHttpMethod> httpMethods = List.of(
+                feignMethodOf("POST", "/path/post"),
+                feignMethodOf("GET", "/path/get"),
+                feignMethodOf("PUT", "/path/put"),
+                feignMethodOf("DELETE", "/path/delete"),
+                feignMethodOf("UNKNOWN", "/path/request"));
 
         FeignIntegration service = getFeignIntegration(SERVICE_DISCOVERY);
 
@@ -186,6 +188,10 @@ public class AxelixFeignEndpointTest {
             method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
             path = "/actuator/axelix-feign")
     void negativeAuthTests() {}
+
+    private static FeignHttpMethod feignMethodOf(String httpMethod, @Nullable String path) {
+        return new FeignHttpMethod().httpMethod(httpMethod).path(path);
+    }
 
     private FeignIntegration getFeignIntegration(String serviceName) {
         ResponseEntity<Set<FeignIntegration>> response = testRestTemplate

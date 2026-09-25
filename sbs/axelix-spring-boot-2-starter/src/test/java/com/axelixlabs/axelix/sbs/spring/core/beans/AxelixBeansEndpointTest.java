@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import java.util.function.Supplier;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +35,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanDependency;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -131,92 +135,126 @@ class AxelixBeansEndpointTest {
         assertConfigPropsBeanName(beanNameToBeanProfile);
     }
 
+    @Test
+    void shouldKeepTheWireFormatOfTheBeansFeed() {
+        // when.
+        ResponseEntity<String> response =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", String.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        String beanPath = "$.beans[?(@.beanName == '" + CurrentConfiguration.CUSTOM_SUPPLIER + "')]";
+
+        JsonAssertions.assertThatJson(response.getBody())
+                .inPath(beanPath + ".beanSource")
+                .isArray()
+                .containsExactly("{\n"
+                        + "  \"origin\" : \"BEAN_METHOD\",\n"
+                        + "  \"enclosingClassName\" : \"CurrentConfiguration\",\n"
+                        + "  \"enclosingClassFullName\" : \"#{json-unit.any-string}\",\n"
+                        + "  \"methodName\" : \"customSupplier\"\n"
+                        + "}");
+        JsonAssertions.assertThatJson(response.getBody())
+                .inPath(beanPath)
+                .isArray()
+                .first()
+                .isObject()
+                .containsKeys(
+                        "beanName",
+                        "className",
+                        "scope",
+                        "proxyType",
+                        "aliases",
+                        "dependencies",
+                        "isPrimary",
+                        "isLazyInit",
+                        "isConfigPropsBean",
+                        "qualifiers",
+                        "beanSource");
+    }
+
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-beans")
     void negativeAuthTests() {}
 
     private static void assertQualifiersPostProcessorBean(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+        var bean = getBean(beanNameToBeanFeed, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
 
-        assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-        assertThat(bean.getBeanSource())
-                .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName())
-                            .isEqualTo(CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
-        assertThat(bean.isConfigPropsBean()).isFalse();
+        assertThat(bean.getBeanSource()).isInstanceOf(BeanMethod.class);
+        assertThat(bean.getBeanSource()).asInstanceOf(type(BeanMethod.class)).satisfies(beanMethod -> {
+            assertThat(beanMethod.getMethodName())
+                    .isEqualTo(CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+            assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+        });
+        assertThat(bean.getIsConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
         assertThat(bean.getDependencies()).isEmpty();
-        assertThat(bean.isLazyInit()).isFalse();
-        assertThat(bean.isPrimary()).isFalse();
+        assertThat(bean.getIsLazyInit()).isFalse();
+        assertThat(bean.getIsPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
-        assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+        assertThat(bean.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
         assertThat(bean.getClassName()).isEqualTo(QualifiersPersistencePostProcessor.class.getName());
     }
 
     private static void assertBeanMetaInfoExtractor(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
+        var bean = getBean(beanNameToBeanFeed, CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
 
-        assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-        assertThat(bean.getBeanSource())
-                .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
-        assertThat(bean.isConfigPropsBean()).isFalse();
+        assertThat(bean.getBeanSource()).isInstanceOf(BeanMethod.class);
+        assertThat(bean.getBeanSource()).asInstanceOf(type(BeanMethod.class)).satisfies(beanMethod -> {
+            assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
+            assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+        });
+        assertThat(bean.getIsConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
         assertThat(bean.getDependencies())
                 .hasSize(2)
-                .contains(new BeansFeed.BeanDependency(
-                        "conditionalBeanRefBuilder", false)); // second bean is the application context itself
-        assertThat(bean.isLazyInit()).isFalse();
-        assertThat(bean.isPrimary()).isFalse();
+                .contains(new BeanDependency()
+                        .name("conditionalBeanRefBuilder")
+                        .isConfigPropsDependency(false)); // second bean is the application context itself
+        assertThat(bean.getIsLazyInit()).isFalse();
+        assertThat(bean.getIsPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
-        assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+        assertThat(bean.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
         assertThat(bean.getClassName()).isEqualTo(DefaultBeanMetaInfoExtractor.class.getName());
     }
 
     private static void assertCustomBeanSupplier(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.CUSTOM_SUPPLIER);
+        var bean = getBean(beanNameToBeanFeed, CurrentConfiguration.CUSTOM_SUPPLIER);
 
-        assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-        assertThat(bean.getBeanSource())
-                .asInstanceOf(type(BeansFeed.BeanMethod.class))
-                .satisfies(beanMethod -> {
-                    assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.CUSTOM_SUPPLIER);
-                    assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
-                });
-        assertThat(bean.isConfigPropsBean()).isFalse();
+        assertThat(bean.getBeanSource()).isInstanceOf(BeanMethod.class);
+        assertThat(bean.getBeanSource()).asInstanceOf(type(BeanMethod.class)).satisfies(beanMethod -> {
+            assertThat(beanMethod.getMethodName()).isEqualTo(CurrentConfiguration.CUSTOM_SUPPLIER);
+            assertThat(beanMethod.getEnclosingClassName()).isEqualTo("CurrentConfiguration");
+        });
+        assertThat(bean.getIsConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
         assertThat(bean.getDependencies()).isEmpty();
-        assertThat(bean.isLazyInit()).isFalse();
-        assertThat(bean.isPrimary()).isFalse();
+        assertThat(bean.getIsLazyInit()).isFalse();
+        assertThat(bean.getIsPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
-        assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+        assertThat(bean.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
         assertThat(bean.getClassName()).isEqualTo(Supplier.class.getName());
     }
 
     private static void assertConfigPropsBeanName(BeansFeed beanNameToBeanFeed) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, AxelixPropTest.class.getName());
+        var bean = getBean(beanNameToBeanFeed, AxelixPropTest.class.getName());
 
         assertThat(bean.getClassName()).isEqualTo(AxelixPropTest.class.getName());
         assertThat(bean.getBeanSource()).isNotNull();
-        assertThat(bean.isConfigPropsBean()).isTrue();
+        assertThat(bean.getIsConfigPropsBean()).isTrue();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
         assertThat(bean.getDependencies()).isEmpty();
-        assertThat(bean.isLazyInit()).isFalse();
-        assertThat(bean.isPrimary()).isFalse();
+        assertThat(bean.getIsLazyInit()).isFalse();
+        assertThat(bean.getIsPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
-        assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+        assertThat(bean.getProxyType()).isEqualTo(ProxyType.NO_PROXYING);
     }
 
-    private static BeansFeed.Bean getBean(BeansFeed beanNameToBeanFeed, String beanName) {
+    private static com.axelixlabs.axelix.sbs.spring.core.contract.beans.Bean getBean(
+            BeansFeed beanNameToBeanFeed, String beanName) {
         return beanNameToBeanFeed.getBeans().stream()
                 .filter(bean -> bean.getBeanName().equals(beanName))
                 .findFirst()

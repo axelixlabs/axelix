@@ -29,10 +29,13 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
     init {
         properties = root.path("components").path("schemas").properties().flatMap { (schemaName, schema) ->
 
-            val requiredProperties = schema.path("required").map { name -> name.asText() }.toSet()
+            // The inline 'allOf' parts (e.g. subtypes) declare their own properties.
+            (listOf(schema) + schema.path("allOf").toList()).flatMap { part ->
+                val requiredProperties = part.path("required").map { name -> name.asText() }.toSet()
 
-            schema.path("properties").properties().map { (propertyName, propertyNode) ->
-                Property(schemaName, propertyName, propertyNode, propertyName in requiredProperties)
+                part.path("properties").properties().map { (propertyName, propertyNode) ->
+                    Property(schemaName, propertyName, propertyNode, propertyName in requiredProperties)
+                }
             }
         }
         markedParts = listOf(MarkedPart("the 'info' block", info)) +
@@ -73,7 +76,13 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
         val schemas = root.path("components").path("schemas")
         val queue = ArrayDeque(produced)
         while (queue.isNotEmpty()) {
-            schemas.path(queue.removeFirst()).findValues("\$ref").forEach { reference ->
+            val schema = schemas.path(queue.removeFirst())
+
+            // Discriminator mapping holds the subtype references as plain values, not as '$ref'.
+            val references =
+                schema.findValues("\$ref") + schema.path("discriminator").path("mapping").toList()
+
+            references.forEach { reference ->
                 val name = reference.asText().substringAfterLast('/')
                 if (produced.add(name)) {
                     queue += name

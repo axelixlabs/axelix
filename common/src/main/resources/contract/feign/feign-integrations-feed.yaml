@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: feign-integrations-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'feign-integrations-feed' operation.
+    This operation returns the Feign integrations discovered in the Spring Boot app, so that Axelix
+    Master can render them.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-feign:
+    get:
+      operationId: getFeignIntegrations
+      summary: Returns the Feign client integrations of the service.
+      responses:
+        '200':
+          description: The Feign integrations of the service.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeignIntegration'
+components:
+  schemas:
+    FeignIntegration:
+      type: object
+      description: Describes a discovered Feign integration exposed by Axelix endpoints.
+      required:
+        - serviceName
+        - networkAddresses
+        - protocol
+        - httpMethods
+      properties:
+        serviceName:
+          type: string
+          description: Service name from @FeignClient.
+          x-axelix-introduced-in: 1.2.0
+        networkAddresses:
+          type: array
+          description: >-
+            May contain one or more URLs (for example, when obtained from a Discovery Client with
+            multiple registered service replicas). The value may also be empty if the FeignClient
+            cannot resolve the URL or if it was intentionally not provided in the @FeignClient
+            annotation. URLs follow the format protocol://host:port (for example,
+            http://localhost:8080).
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        protocol:
+          type: string
+          description: HTTP protocol display name (for example, HTTP/1.1).
+          x-axelix-introduced-in: 1.2.0
+        httpMethods:
+          type: array
+          description: Methods declared on the Feign client interface.
+          items:
+            $ref: '#/components/schemas/FeignHttpMethod'
+          x-axelix-introduced-in: 1.2.0
+    FeignHttpMethod:
+      type: object
+      description: Describes a single HTTP method declared on a Feign client.
+      required:
+        - httpMethod
+      properties:
+        httpMethod:
+          type: string
+          description: HTTP method name (for example, GET, POST), or UNKNOWN if the method is not specified.
+          x-axelix-introduced-in: 1.2.0
+        path:
+          type: string
+          description: Mapping path associated with the method, or null if none is defined.
+          x-axelix-introduced-in: 1.2.0

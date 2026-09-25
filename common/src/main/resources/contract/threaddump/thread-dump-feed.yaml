@@ -1,0 +1,249 @@
+openapi: 3.1.0
+info:
+  title: thread-dump-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'thread-dump-feed' operation.
+    This operation returns the thread dump of the Spring Boot app, so that Axelix Master can
+    render it.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-thread-dump:
+    get:
+      operationId: getThreadDump
+      summary: Returns the dump of all the live threads of the service.
+      responses:
+        '200':
+          description: The thread dump of the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadDumpFeed'
+components:
+  schemas:
+    ThreadDumpFeed:
+      type: object
+      description: The response to thread dump endpoint.
+      required:
+        - threadContentionMonitoringEnabled
+        - threads
+      properties:
+        threadContentionMonitoringEnabled:
+          type: boolean
+          description: Whether the thread contention monitoring is enabled.
+          x-axelix-introduced-in: 1.2.0
+        threads:
+          type: array
+          description: Thread dump itself.
+          items:
+            $ref: '#/components/schemas/ThreadInfo'
+          x-axelix-introduced-in: 1.2.0
+    ThreadInfo:
+      type: object
+      description: Thread information. ThreadInfo contains the information about a thread.
+      required:
+        - threadName
+        - threadId
+        - blockedTime
+        - blockedCount
+        - waitedTime
+        - waitedCount
+        - lockOwnerId
+        - daemon
+        - inNative
+        - suspended
+        - threadState
+        - priority
+        - stackTrace
+        - lockedMonitors
+        - lockedSynchronizers
+      properties:
+        threadName:
+          type: string
+          description: Name of the thread.
+          x-axelix-introduced-in: 1.2.0
+        threadId:
+          type: integer
+          format: int64
+          description: Id of the thread.
+          x-axelix-introduced-in: 1.2.0
+        blockedTime:
+          type: integer
+          format: int64
+          description: >-
+            Time in milliseconds that the thread has spent blocked. -1 if thread contention
+            monitoring is disabled.
+          x-axelix-introduced-in: 1.2.0
+        blockedCount:
+          type: integer
+          format: int64
+          description: Total number of times that the thread has been blocked.
+          x-axelix-introduced-in: 1.2.0
+        waitedTime:
+          type: integer
+          format: int64
+          description: >-
+            Time in milliseconds that the thread has spent waiting. -1 if thread contention
+            monitoring is disabled.
+          x-axelix-introduced-in: 1.2.0
+        waitedCount:
+          type: integer
+          format: int64
+          description: Total number of times that the thread has waited for notification.
+          x-axelix-introduced-in: 1.2.0
+        lockInfo:
+          description: Object for which the thread is blocked waiting.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/LockInfo'
+        lockName:
+          type: string
+          description: Description of the object on which the thread is blocked.
+          x-axelix-introduced-in: 1.2.0
+        lockOwnerId:
+          type: integer
+          format: int64
+          description: Id of the thread that owns the object on which the thread is blocked. -1 if the thread is not blocked.
+          x-axelix-introduced-in: 1.2.0
+        lockOwnerName:
+          type: string
+          description: Name of the thread that owns the object on which the thread is blocked.
+          x-axelix-introduced-in: 1.2.0
+        daemon:
+          type: boolean
+          description: Whether the thread is a daemon thread.
+          x-axelix-introduced-in: 1.2.0
+        inNative:
+          type: boolean
+          description: Whether the thread is executing native code.
+          x-axelix-introduced-in: 1.2.0
+        suspended:
+          type: boolean
+          description: Whether the thread is suspended.
+          x-axelix-introduced-in: 1.2.0
+        threadState:
+          description: State of the thread.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ThreadState'
+        priority:
+          type: integer
+          format: int32
+          description: Priority of the thread.
+          x-axelix-introduced-in: 1.2.0
+        stackTrace:
+          type: array
+          description: Stack trace of the thread.
+          items:
+            $ref: '#/components/schemas/StackTraceElement'
+          x-axelix-introduced-in: 1.2.0
+        lockedMonitors:
+          type: array
+          description: Monitors locked by this thread.
+          items:
+            $ref: '#/components/schemas/MonitorInfo'
+          x-axelix-introduced-in: 1.2.0
+        lockedSynchronizers:
+          type: array
+          description: Synchronizers locked by this thread.
+          items:
+            $ref: '#/components/schemas/LockInfo'
+          x-axelix-introduced-in: 1.2.0
+    LockInfo:
+      type: object
+      description: Object for which the thread is blocked waiting.
+      required:
+        - className
+        - identityHashCode
+      properties:
+        className:
+          type: string
+          description: Fully qualified class name of the lock object.
+          x-axelix-introduced-in: 1.2.0
+        identityHashCode:
+          type: integer
+          format: int32
+          description: The identity hash code of the lock object.
+          x-axelix-introduced-in: 1.2.0
+    MonitorInfo:
+      type: object
+      description: Monitors locked by this thread.
+      required:
+        - className
+        - identityHashCode
+        - lockedStackDepth
+        - lockedStackFrame
+      properties:
+        className:
+          type: string
+          description: Class name of the lock object.
+          x-axelix-introduced-in: 1.2.0
+        identityHashCode:
+          type: integer
+          format: int32
+          description: The identity hash code of the lock object.
+          x-axelix-introduced-in: 1.2.0
+        lockedStackDepth:
+          type: integer
+          format: int32
+          description: Stack depth where the monitor was locked.
+          x-axelix-introduced-in: 1.2.0
+        lockedStackFrame:
+          description: Stack frame that locked the monitor.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/StackTraceElement'
+    StackTraceElement:
+      type: object
+      description: Stack trace of the thread.
+      required:
+        - className
+        - lineNumber
+        - methodName
+        - nativeMethod
+      properties:
+        classLoaderName:
+          type: string
+          description: Name of the class loader of the class that contains the execution point identified by this entry.
+          x-axelix-introduced-in: 1.2.0
+        className:
+          type: string
+          description: Name of the class that contains the execution point identified by this entry.
+          x-axelix-introduced-in: 1.2.0
+        fileName:
+          type: string
+          description: Name of the source file that contains the execution point identified by this entry.
+          x-axelix-introduced-in: 1.2.0
+        lineNumber:
+          type: integer
+          format: int32
+          description: Line number of the execution point identified by this entry. Negative if unknown.
+          x-axelix-introduced-in: 1.2.0
+        methodName:
+          type: string
+          description: Name of the method.
+          x-axelix-introduced-in: 1.2.0
+        moduleName:
+          type: string
+          description: Name of the module that contains the execution point identified by this entry.
+          x-axelix-introduced-in: 1.2.0
+        moduleVersion:
+          type: string
+          description: Version of the module that contains the execution point identified by this entry.
+          x-axelix-introduced-in: 1.2.0
+        nativeMethod:
+          type: boolean
+          description: Whether the execution point is a native method.
+          x-axelix-introduced-in: 1.2.0
+    ThreadState:
+      type: string
+      description: State of the thread.
+      enum:
+        - NEW
+        - RUNNABLE
+        - BLOCKED
+        - WAITING
+        - TIMED_WAITING
+        - TERMINATED

@@ -1,0 +1,226 @@
+openapi: 3.1.0
+info:
+  title: beans-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'beans-feed' operation.
+    This operation returns the beans of the Spring Boot app, so that Axelix Master can render them.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-beans:
+    get:
+      operationId: getBeans
+      summary: Returns the beans of the service.
+      responses:
+        '200':
+          description: The feed of the beans of the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeansFeed'
+components:
+  schemas:
+    BeansFeed:
+      type: object
+      description: The response to beans actuator endpoint.
+      required:
+        - beans
+      properties:
+        beans:
+          type: array
+          description: The unified list of beans that contains beans from one or more contexts.
+          items:
+            $ref: '#/components/schemas/Bean'
+          x-axelix-introduced-in: 1.2.0
+    Bean:
+      type: object
+      description: The profile of a given bean.
+      required:
+        - beanName
+        - className
+        - scope
+        - proxyType
+        - aliases
+        - dependencies
+        - isPrimary
+        - isLazyInit
+        - isConfigPropsBean
+        - qualifiers
+        - beanSource
+      properties:
+        beanName:
+          type: string
+          description: The name of the bean.
+          x-axelix-introduced-in: 1.2.0
+        className:
+          type: string
+          description: The fully qualified class name of the bean.
+          x-axelix-introduced-in: 1.2.0
+        scope:
+          type: string
+          description: The scope of the bean.
+          x-axelix-introduced-in: 1.2.0
+        proxyType:
+          description: The proxying approach that has been applied for the given bean.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ProxyType'
+        aliases:
+          type: array
+          description: The aliases of the given bean.
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        autoConfigurationRef:
+          type: string
+          description: >-
+            The reference to an @AutoConfiguration class if it is annotated with conditions
+            className, or, if it contains a method annotated with conditions, a reference to the
+            class with the method specified className#methodName.
+          x-axelix-introduced-in: 1.2.0
+        dependencies:
+          type: array
+          description: The list of dependencies of this bean (i.e. other beans that this bean depends on).
+          items:
+            $ref: '#/components/schemas/BeanDependency'
+          x-axelix-introduced-in: 1.2.0
+        isPrimary:
+          type: boolean
+          description: Whether the bean is marked with BeanDefinition#isPrimary() primary marker.
+          x-axelix-introduced-in: 1.2.0
+        isLazyInit:
+          type: boolean
+          description: Whether the bean is lazily instantiated or eagerly.
+          x-axelix-introduced-in: 1.2.0
+        isConfigPropsBean:
+          type: boolean
+          description: Whether the bean is a configuration properties bean ConfigurationProperties.
+          x-axelix-introduced-in: 1.2.0
+        qualifiers:
+          type: array
+          description: The list of AutowireCandidateQualifier qualifiers that are assigned to this bean.
+          items:
+            type: string
+          x-axelix-introduced-in: 1.2.0
+        beanSource:
+          description: The source information describing how this bean was created and its origin type.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/BeanSource'
+    BeanDependency:
+      type: object
+      description: The profile of a given bean dependency.
+      required:
+        - name
+        - isConfigPropsDependency
+      properties:
+        name:
+          type: string
+          description: The name of the dependency bean.
+          x-axelix-introduced-in: 1.2.0
+        isConfigPropsDependency:
+          type: boolean
+          description: Whether the dependency is a configuration properties dependency.
+          x-axelix-introduced-in: 1.2.0
+    ProxyType:
+      type: string
+      description: The proxying approach that has been applied for the given bean.
+      enum:
+        - JDK_PROXY
+        - CGLIB
+        - NO_PROXYING
+    BeanOrigin:
+      type: string
+      description: >-
+        COMPONENT_ANNOTATION - bean originated from some variant of a @Component annotation.
+        BEAN_METHOD - bean was produced as a result of the @Bean method invocation.
+        FACTORY_BEAN - bean was created by another bean, factory bean, for example Spring Data
+        repositories are typically registered in this way.
+        SYNTHETIC_BEAN - the "synthetic" bean, most likely created programmatically inside the
+        Spring Framework, but it might be also created programmatically by some library that uses
+        Spring as well.
+        UNKNOWN - we do not know the origin of this bean. As of now, beans registered
+        programmatically via BeanDefinitionRegistry or anything similar are going to reside here.
+      enum:
+        - COMPONENT_ANNOTATION
+        - BEAN_METHOD
+        - FACTORY_BEAN
+        - SYNTHETIC_BEAN
+        - UNKNOWN
+    BeanSource:
+      type: object
+      description: Represents bean source information.
+      required:
+        - origin
+      properties:
+        origin:
+          description: The origin of the bean.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/BeanOrigin'
+      discriminator:
+        propertyName: origin
+        mapping:
+          COMPONENT_ANNOTATION: '#/components/schemas/ComponentVariant'
+          BEAN_METHOD: '#/components/schemas/BeanMethod'
+          FACTORY_BEAN: '#/components/schemas/FactoryBean'
+          SYNTHETIC_BEAN: '#/components/schemas/SyntheticBean'
+          UNKNOWN: '#/components/schemas/UnknownBean'
+    ComponentVariant:
+      description: >-
+        The BeanSource for the COMPONENT_ANNOTATION origin. Does not have any additional fields
+        since it is quite obvious by the className bean class name from where the class actually
+        originated.
+      allOf:
+        - $ref: '#/components/schemas/BeanSource'
+    BeanMethod:
+      description: >-
+        The BeanSource for the BEAN_METHOD origin. Has an additional String fields for name of the
+        method that produced the actual bean, and the name of the class, where this method resides.
+      allOf:
+        - $ref: '#/components/schemas/BeanSource'
+        - type: object
+          required:
+            - methodName
+          properties:
+            enclosingClassName:
+              type: string
+              description: The class name where the bean is created.
+              x-axelix-introduced-in: 1.2.0
+            enclosingClassFullName:
+              type: string
+              description: The full class name where the bean is created.
+              x-axelix-introduced-in: 1.2.0
+            methodName:
+              type: string
+              description: The method name that creates a bean.
+              x-axelix-introduced-in: 1.2.0
+    FactoryBean:
+      description: >-
+        The BeanSource for the FACTORY_BEAN origin. Holds the reference to the factory bean that
+        produced this bean.
+      allOf:
+        - $ref: '#/components/schemas/BeanSource'
+        - type: object
+          required:
+            - factoryBeanName
+          properties:
+            factoryBeanName:
+              type: string
+              description: The reference to the factory bean.
+              x-axelix-introduced-in: 1.2.0
+    SyntheticBean:
+      description: >-
+        The "synthetic" bean. It means that, most likely, this Bean was created programmatically
+        inside the Spring Framework, but it might be also created programmatically by some library
+        that uses Spring as well.
+      allOf:
+        - $ref: '#/components/schemas/BeanSource'
+    UnknownBean:
+      description: >-
+        The BeanSource for the UNKNOWN origin. Does not hold any fields since the actual origin
+        is unknown.
+      allOf:
+        - $ref: '#/components/schemas/BeanSource'

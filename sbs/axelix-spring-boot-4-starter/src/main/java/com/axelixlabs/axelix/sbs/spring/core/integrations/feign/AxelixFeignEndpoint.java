@@ -22,7 +22,7 @@ import java.util.Set;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.feign.FeignIntegration;
 
 /**
  * Custom endpoint to expose Feign Client information.

@@ -21,18 +21,18 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.BuildProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.GitProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.OSProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.RuntimeProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.SpringProfile;
+import com.axelixlabs.axelix.master.contract.details.BuildDetails;
+import com.axelixlabs.axelix.master.contract.details.GitDetails;
+import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.master.contract.details.OsDetails;
+import com.axelixlabs.axelix.master.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.master.contract.details.SpringDetails;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Instance;
