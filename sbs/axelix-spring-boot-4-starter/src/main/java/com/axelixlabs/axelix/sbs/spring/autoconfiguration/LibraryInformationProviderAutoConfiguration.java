@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
@@ -27,9 +26,9 @@ import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
  * Auto-configuration for the {@link LibraryInformationProvider}.
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 public class LibraryInformationProviderAutoConfiguration {
 
     @Bean

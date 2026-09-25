@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
@@ -36,9 +35,9 @@ import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesL
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 public class AxelixInfoPropertiesAutoConfiguration {
 
     @Bean

@@ -25,7 +25,6 @@ import jakarta.servlet.DispatcherType;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -74,10 +73,9 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Vyacheslav Yanin
  * @author Mikhail Polivakha
  */
-@AutoConfiguration(
+@AxelixAutoConfiguration(
         after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class},
         afterName = "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration")
-@ConditionalOnAxelixStarterEnabled
 @ConditionalOnProperty(
         prefix = TransactionMonitoringConfigurationProperties.CONFIG_PROPS_PREFIX,
         name = "enabled",

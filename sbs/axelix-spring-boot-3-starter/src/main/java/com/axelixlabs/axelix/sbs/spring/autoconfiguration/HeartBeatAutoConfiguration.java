@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -39,9 +38,9 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
  *
  * @since 04.02.2026
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(after = ValidationListenerAutoConfiguration.class)
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration(after = ValidationListenerAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "self-registration", havingValue = "true")
 public class HeartBeatAutoConfiguration {
 
