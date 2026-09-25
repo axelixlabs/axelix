@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.mcp.tools;
 
-import java.nio.charset.StandardCharsets;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpTool.McpAnnotations;
@@ -26,8 +26,11 @@ import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
+import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -41,9 +44,16 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class EnvironmentMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
+    private final ObjectMapper objectMapper;
+    private final Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter;
 
-    public EnvironmentMcpServerTools(EndpointInvoker endpointInvoker) {
+    public EnvironmentMcpServerTools(
+            EndpointInvoker endpointInvoker,
+            ObjectMapper objectMapper,
+            Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.objectMapper = objectMapper;
+        this.environmentFeedConverter = environmentFeedConverter;
     }
 
     @McpTool(
@@ -68,6 +78,7 @@ public class EnvironmentMcpServerTools {
     public String getInstanceEnvironment(@McpToolParam(description = "The instance ID") String instanceId) {
         byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
-        return new String(body, StandardCharsets.UTF_8);
+        EnvironmentFeed feed = objectMapper.readValue(body, EnvironmentFeed.class);
+        return objectMapper.writeValueAsString(environmentFeedConverter.convert(feed));
     }
 }

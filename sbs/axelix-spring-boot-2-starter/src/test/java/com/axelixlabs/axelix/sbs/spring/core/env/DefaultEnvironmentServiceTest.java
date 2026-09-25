@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;

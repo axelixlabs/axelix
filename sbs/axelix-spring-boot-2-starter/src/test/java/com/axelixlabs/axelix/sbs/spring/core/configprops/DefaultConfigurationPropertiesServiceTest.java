@@ -40,13 +40,13 @@ import com.axelixlabs.axelix.common.auth.core.OssAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;

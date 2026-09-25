@@ -28,11 +28,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigPropsTestSupportConfiguration.SharedAxelixConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 /**
  * Shared test configuration for the {@code configprops} integration tests.

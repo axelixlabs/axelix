@@ -15,30 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.env;
-
-import java.util.Collection;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+package com.axelixlabs.axelix.common.domain;
 
 /**
- * Default implementation {@link PropertyNameNormalizer}.
+ * Constants related to the sanitization of property values.
  *
- * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultPropertyNameNormalizer implements PropertyNameNormalizer {
+public final class Sanitization {
 
-    @Override
-    public String normalize(String propertyName) {
-        return propertyName
-                .replaceAll("(?<!\\d)0(?!\\d)", "") // removes the zero index like [0] --> []
-                .replaceAll("[^A-Za-z0-9]", "")
-                .toLowerCase();
-    }
+    private Sanitization() {}
 
-    @Override
-    public <C extends Collection<String>> C normalizeAll(C propertyNames, Supplier<C> collectionFactory) {
-        return propertyNames.stream().map(this::normalize).collect(Collectors.toCollection(collectionFactory));
-    }
+    /**
+     * The value that replaces the actual value of a sanitized property.
+     */
+    public static final String SANITIZED_VALUE = "******";
 }

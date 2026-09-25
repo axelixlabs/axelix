@@ -29,9 +29,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.actuate.endpoint.SanitizableData;
 import org.springframework.core.env.MapPropertySource;
 
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
