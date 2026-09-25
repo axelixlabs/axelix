@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
@@ -34,7 +33,11 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.Bean;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanDependency;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 import com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils;
 
@@ -60,7 +63,7 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
     @NonNull
     public BeansFeed buildBeansFeed() {
         BeansEndpoint.ApplicationBeans actuatorResponse = delegate.beans();
-        List<BeansFeed.Bean> beans = new ArrayList<>();
+        List<Bean> beans = new ArrayList<>();
 
         actuatorResponse.getContexts().forEach((contextId, contextDescriptor) -> {
             ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
@@ -74,7 +77,7 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                 contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
 
-                    Set<BeansFeed.BeanDependency> enrichedDependencies = resolveDependencies(
+                    List<BeanDependency> enrichedDependencies = resolveDependencies(
                             beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.getBeanSource());
 
                     Class<?> clazz = beanDescriptor.getType();
@@ -83,24 +86,24 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
 
                     boolean isConfigPropsBean = configPropsBeanMap.containsKey(beanName);
 
-                    beans.add(new BeansFeed.Bean(
-                            BeanNameUtils.withoutConfigPropsPrefix(beanName, isConfigPropsBean),
-                            beanType,
-                            beanDescriptor.getScope(),
-                            metaInfo.getProxyType(),
-                            StringUtils.toSet(beanDescriptor.getAliases()),
-                            metaInfo.getAutoConfigurationRef(),
-                            enrichedDependencies,
-                            metaInfo.isPrimary(),
-                            metaInfo.isLazyInit(),
-                            isConfigPropsBean,
-                            metaInfo.getQualifiers(),
-                            metaInfo.getBeanSource()));
+                    beans.add(new Bean()
+                            .beanName(BeanNameUtils.withoutConfigPropsPrefix(beanName, isConfigPropsBean))
+                            .className(beanType)
+                            .scope(beanDescriptor.getScope())
+                            .proxyType(metaInfo.getProxyType())
+                            .aliases(new ArrayList<>(StringUtils.toSet(beanDescriptor.getAliases())))
+                            .autoConfigurationRef(metaInfo.getAutoConfigurationRef())
+                            .dependencies(enrichedDependencies)
+                            .isPrimary(metaInfo.isPrimary())
+                            .isLazyInit(metaInfo.isLazyInit())
+                            .isConfigPropsBean(isConfigPropsBean)
+                            .qualifiers(metaInfo.getQualifiers())
+                            .beanSource(metaInfo.getBeanSource()));
                 });
             }
         });
 
-        return new BeansFeed(beans);
+        return new BeansFeed().beans(beans);
     }
 
     @Nullable
@@ -120,13 +123,11 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
         return null;
     }
 
-    private Set<BeansFeed.BeanDependency> resolveDependencies(
-            String[] dependencies,
-            Map<String, ConfigurationPropertiesBean> configPropsBeanMap,
-            BeansFeed.BeanSource beanSource) {
+    private List<BeanDependency> resolveDependencies(
+            String[] dependencies, Map<String, ConfigurationPropertiesBean> configPropsBeanMap, BeanSource beanSource) {
 
         if (dependencies == null || dependencies.length == 0) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         return Arrays.stream(dependencies)
@@ -135,8 +136,8 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                 .filter(dep -> {
                     // For some reason, @Bean methods inside configuration classes have enclosing
                     // @Configuration class as their dependency.
-                    if (beanSource instanceof BeansFeed.BeanMethod) {
-                        BeansFeed.BeanMethod beanMethod = (BeansFeed.BeanMethod) beanSource;
+                    if (beanSource instanceof BeanMethod) {
+                        BeanMethod beanMethod = (BeanMethod) beanSource;
                         try {
                             String[] beanNamesForType =
                                     context.getBeanNamesForType(Class.forName(beanMethod.getEnclosingClassFullName()));
@@ -151,9 +152,11 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                 })
                 .map(depName -> {
                     boolean isConfigPropsBean = configPropsBeanMap.containsKey(depName);
-                    return new BeansFeed.BeanDependency(
-                            BeanNameUtils.withoutConfigPropsPrefix(depName, isConfigPropsBean), isConfigPropsBean);
+                    return new BeanDependency()
+                            .name(BeanNameUtils.withoutConfigPropsPrefix(depName, isConfigPropsBean))
+                            .isConfigPropsDependency(isConfigPropsBean);
                 })
-                .collect(Collectors.toSet());
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

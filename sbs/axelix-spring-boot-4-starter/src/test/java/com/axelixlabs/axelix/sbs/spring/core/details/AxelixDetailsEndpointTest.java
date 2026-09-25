@@ -77,6 +77,19 @@ class AxelixDetailsEndpointTest {
 
         String responseBody = response.getBody();
         assertThat(responseBody).isNotNull();
+        assertThatJson(responseBody).isObject().containsOnlyKeys("git", "spring", "runtime", "build", "os");
+        assertThatJson(responseBody)
+                .inPath("git")
+                .isObject()
+                .containsOnlyKeys("commitShaShort", "branch", "commitAuthor", "commitTimestamp");
+        assertThatJson(responseBody)
+                .inPath("spring")
+                .isObject()
+                .containsOnlyKeys("springBootVersion", "springFrameworkVersion", "springCloudVersion");
+        assertThatJson(responseBody)
+                .inPath("runtime")
+                .isObject()
+                .containsOnlyKeys("javaVersion", "jdkVendor", "kotlinVersion");
 
         assertThatJson(responseBody).node("git").isNotNull();
         assertThatJson(responseBody)

@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.details;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.InstanceDetails;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides comprehensive instance operational details.

@@ -25,7 +25,7 @@ import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEn
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.threaddump.ThreadDumpFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint to enable or disable thread contention monitoring.
@@ -46,7 +46,7 @@ public class ThreadDumpManagementEndpoint {
     @GetMapping
     public ThreadDumpFeed getThreadDump() {
         ThreadInfo[] jmxThreads = THREAD_MX_BEAN.dumpAllThreads(true, true);
-        return new ThreadDumpFeed(THREAD_MX_BEAN.isThreadContentionMonitoringEnabled(), jmxThreads);
+        return ThreadDumpFeedAssembler.assemble(THREAD_MX_BEAN.isThreadContentionMonitoringEnabled(), jmxThreads);
     }
 
     @PostMapping("/enable")

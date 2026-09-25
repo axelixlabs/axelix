@@ -22,8 +22,8 @@ import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 
 /**
  * Additional bean metadata.
@@ -41,7 +41,7 @@ public final class BeanMetaInfo {
     private final boolean isLazyInit;
     private final boolean isPrimary;
     private final List<String> qualifiers;
-    private final BeansFeed.BeanSource beanSource;
+    private final BeanSource beanSource;
 
     public BeanMetaInfo(
             @Nullable String autoConfigurationRef,
@@ -49,7 +49,7 @@ public final class BeanMetaInfo {
             boolean isLazyInit,
             boolean isPrimary,
             List<String> qualifiers,
-            BeansFeed.BeanSource beanSource) {
+            BeanSource beanSource) {
         this.autoConfigurationRef = autoConfigurationRef;
         this.proxyType = proxyType;
         this.isLazyInit = isLazyInit;
@@ -79,7 +79,7 @@ public final class BeanMetaInfo {
         return qualifiers;
     }
 
-    public BeansFeed.BeanSource getBeanSource() {
+    public BeanSource getBeanSource() {
         return beanSource;
     }
 

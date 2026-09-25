@@ -56,6 +56,13 @@ class ContractDocumentsValidatorTest {
     }
 
     @Test
+    fun `a property inside an allOf part without an introduction marker fails`() {
+        expectProblem(
+            "stateless/IntroductionIsDeclared/allof-property-missing-introduction.yaml",
+            "the property 'Dog.barkVolume' is missing 'x-axelix-introduced-in'")
+    }
+
+    @Test
     fun `a malformed version marker fails`() {
         expectProblem(
             "stateless/MarkersAreWellFormed/malformed-marker.yaml",
@@ -83,6 +90,14 @@ class ContractDocumentsValidatorTest {
         expectProblem(
             "stateless/RequiredHonoursTheWindow/premature-required.yaml",
             "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
+                + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
+    }
+
+    @Test
+    fun `a late required property of a discriminator subtype of a starter-produced payload fails within the window`() {
+        expectProblem(
+            "stateless/RequiredHonoursTheWindow/premature-required-in-discriminator-subtype.yaml",
+            "the property 'Dog.barkVolume' cannot be 'required' yet: starters older "
                 + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
     }
 
