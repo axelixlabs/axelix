@@ -1,0 +1,17 @@
+---
+{{- if $.Values.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.service.name }}
+  labels:
+    {{- include "master.labels.common" $ | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $.Values.service.port.source }}
+      targetPort: {{ $.Values.service.port.target }}
+      name: {{ $.Values.service.port.name }}
+  selector:
+    {{- include "master.selectorLabels" $ | nindent 4 }}
+{{- end }}

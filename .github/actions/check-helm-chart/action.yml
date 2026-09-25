@@ -1,0 +1,60 @@
+name: Check Helm chart
+description: Lints the Axelix Helm chart and validates its values schema. Optionally verifies that the chart is at the release version.
+inputs:
+  release:
+    description: Whether the chart is being released, i.e. whether its version must match the release version from gradle.properties
+    required: false
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - name: Resolve release version from gradle.properties
+      if: inputs.release == 'true'
+      id: version
+      uses: ./.github/actions/read-axelix-version
+      with:
+        file: gradle.properties
+        pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
+    - name: Verify the Helm chart is at the release version
+      if: inputs.release == 'true'
+      shell: bash
+      env:
+        RELEASE_VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        chart_version="$(sed -n 's/^version: *//p' charts/axelix/Chart.yaml | tr -d '"[:space:]')"
+        app_version="$(sed -n 's/^appVersion: *//p' charts/axelix/Chart.yaml | tr -d '"[:space:]')"
+
+        failed=false
+        for pair in "version=${chart_version}" "appVersion=${app_version}"; do
+          if [ "${pair#*=}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::charts/axelix ${pair%%=*} is '${pair#*=}', but the release version is '${RELEASE_VERSION}'."
+            failed=true
+          fi
+        done
+        [ "${failed}" = "false" ]
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v5.0.1
+      with:
+        version: v3.14.0
+
+    - name: Generate values.schema.json
+      uses: losisin/helm-values-schema-json-action@v2
+      with:
+        useHelmDocs: true
+        # Working around bug https://github.com/losisin/helm-values-schema-json-action/pull/408
+        # TODO: that will not work in case we would have multiple charts
+        values: charts/axelix/values.yaml
+
+    - name: Verify schema has no null types
+      shell: bash
+      run: |
+        "${{ github.action_path }}/verify-no-null-types.sh" values.schema.json
+
+    # Helm validates the values against the schema included into the chart, so lint the chart the way it is packaged.
+    - name: Lint axelix chart with the generated schema
+      shell: bash
+      run: |
+        cp values.schema.json charts/axelix/
+        helm lint charts/axelix
