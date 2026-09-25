@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.threaddump;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,36 @@ public class ThreadDumpManagementEndpointTest {
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        JsonAssertions.assertThatJson(response.getBody())
+                .node("threadContentionMonitoringEnabled")
+                .isBoolean();
+        JsonAssertions.assertThatJson(response.getBody())
+                .node("threads")
+                .isArray()
+                .isNotEmpty();
+        JsonAssertions.assertThatJson(response.getBody())
+                .inPath("$.threads[0]")
+                .isObject()
+                .containsKeys(
+                        "threadName",
+                        "threadId",
+                        "blockedTime",
+                        "blockedCount",
+                        "waitedTime",
+                        "waitedCount",
+                        "lockOwnerId",
+                        "daemon",
+                        "inNative",
+                        "suspended",
+                        "threadState",
+                        "priority",
+                        "stackTrace",
+                        "lockedMonitors",
+                        "lockedSynchronizers");
+        JsonAssertions.assertThatJson(response.getBody())
+                .inPath("$.threads[0].stackTrace[0]")
+                .isObject()
+                .containsKeys("className", "lineNumber", "methodName", "nativeMethod");
     }
 
     @Test

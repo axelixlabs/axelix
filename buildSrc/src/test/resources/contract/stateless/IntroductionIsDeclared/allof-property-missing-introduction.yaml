@@ -1,0 +1,36 @@
+openapi: 3.1.0
+info:
+  title: pets-feed
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-pets:
+    get:
+      operationId: getPets
+      responses:
+        '200':
+          description: The pets of the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+          x-axelix-introduced-in: 1.0.0
+    Dog:
+      allOf:
+        - $ref: '#/components/schemas/Pet'
+        - type: object
+          properties:
+            # INVALID: the property lives inside an 'allOf' part of the schema, and still needs
+            # its 'x-axelix-introduced-in' marker.
+            barkVolume:
+              type: integer

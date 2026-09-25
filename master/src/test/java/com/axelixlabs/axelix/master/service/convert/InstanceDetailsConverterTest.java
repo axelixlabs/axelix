@@ -25,12 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.BuildProfile;
@@ -38,6 +32,13 @@ import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsRespons
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.OSProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.RuntimeProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.SpringProfile;
+import com.axelixlabs.axelix.master.contract.details.BuildDetails;
+import com.axelixlabs.axelix.master.contract.details.CommitAuthor;
+import com.axelixlabs.axelix.master.contract.details.GitDetails;
+import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.master.contract.details.OsDetails;
+import com.axelixlabs.axelix.master.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.master.contract.details.SpringDetails;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.details.DetailsConversionRequest;
 import com.axelixlabs.axelix.master.service.convert.response.details.InstanceDetailsConverter;
@@ -115,21 +116,35 @@ public class InstanceDetailsConverterTest {
     }
 
     private static InstanceDetails getInstanceDetails() {
-        GitDetails.CommitAuthor commitAuthor =
-                new InstanceDetails.GitDetails.CommitAuthor("sergeycherkasovv", "sergeycherkasovv@github.com");
+        CommitAuthor commitAuthor = new CommitAuthor().name("sergeycherkasovv").email("sergeycherkasovv@github.com");
 
-        GitDetails gitDetails =
-                new InstanceDetails.GitDetails("7a663cb", "local/local-test", commitAuthor, "2025-11-23T02:25:22Z");
+        GitDetails gitDetails = new GitDetails()
+                .commitShaShort("7a663cb")
+                .branch("local/local-test")
+                .commitAuthor(commitAuthor)
+                .commitTimestamp("2025-11-23T02:25:22Z");
 
-        SpringDetails springDetails = new InstanceDetails.SpringDetails("3.5.0", "7.0", "2023.0.1");
+        SpringDetails springDetails = new SpringDetails()
+                .springBootVersion("3.5.0")
+                .springFrameworkVersion("7.0")
+                .springCloudVersion("2023.0.1");
 
-        RuntimeDetails runtimeDetails = new InstanceDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", null);
+        RuntimeDetails runtimeDetails =
+                new RuntimeDetails().javaVersion("17.0.16").jdkVendor("Corretto-17.0.16.8.1");
 
-        BuildDetails buildDetails = new InstanceDetails.BuildDetails(
-                "spring-petclinic", "3.5.0-SNAPSHOT", "org.springframework.samples", "2025-10-29T15:10:54.770Z");
+        BuildDetails buildDetails = new BuildDetails()
+                .artifact("spring-petclinic")
+                .version("3.5.0-SNAPSHOT")
+                .group("org.springframework.samples")
+                .time("2025-10-29T15:10:54.770Z");
 
-        OsDetails osDetails = new InstanceDetails.OsDetails("Windows 10", "10.0", "amd64");
+        OsDetails osDetails = new OsDetails().name("Windows 10").version("10.0").arch("amd64");
 
-        return new InstanceDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
+        return new InstanceDetails()
+                .git(gitDetails)
+                .spring(springDetails)
+                .runtime(runtimeDetails)
+                .build(buildDetails)
+                .os(osDetails);
     }
 }
