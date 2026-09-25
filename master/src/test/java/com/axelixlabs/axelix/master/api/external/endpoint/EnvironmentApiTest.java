@@ -93,6 +93,18 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                       "propertyExpression": "${java.vm.vendor}"
                     }
                   ]
+                },
+                {
+                  "name": "spring.jpa.open-in-view",
+                  "value": "true",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null,
+                  "injectionPoints": null,
+                  "dangerousValue": {
+                    "rationale": "Open Session In View keeps the persistence context open for the whole duration of the request, which hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a consequence, leads to the N+1 problem and to the database connections being held much longer than necessary.",
+                    "alternativeExample": "false"
+                  }
                 }
               ]
             },
@@ -197,6 +209,14 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                       "propertyExpression": "${java.vm.vendor}"
                     }
                   ]
+                },
+                {
+                  "name": "spring.jpa.open-in-view",
+                  "value": "true",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null,
+                  "injectionPoints": null
                 }
               ]
             },

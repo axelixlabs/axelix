@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.env;
+package com.axelixlabs.axelix.master.api.external.response.env;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 
 /**
  * The dictionary of the property values that we consider dangerous in production. One constant per
