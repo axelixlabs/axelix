@@ -23,16 +23,34 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.core.annotation.AliasFor;
 
 /**
- * Global kill-switch for the Axelix starter.
- * When {@code axelix.sbs.enabled} is {@code false}, the annotated auto-configuration is skipped entirely.
+ * Specialized replacement for {@link AutoConfiguration} that additionally
+ * applies {@link ConditionalOnAxelixStarterEnabled}.
  *
- * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ConditionalOnProperty(prefix = "axelix.sbs", name = "enabled", matchIfMissing = true)
-public @interface ConditionalOnAxelixStarterEnabled {}
+@AutoConfiguration
+@ConditionalOnAxelixStarterEnabled
+public @interface AxelixAutoConfiguration {
+    /**
+     * The auto-configuration classes that should have already been applied.
+     *
+     * @return the classes
+     */
+    @AliasFor(annotation = AutoConfiguration.class, attribute = "after")
+    Class<?>[] after() default {};
+
+    /**
+     * The names of the auto-configuration classes that should have already been applied.
+     *
+     * @return the class names
+     */
+    @AliasFor(annotation = AutoConfiguration.class, attribute = "afterName")
+    String[] afterName() default {};
+}

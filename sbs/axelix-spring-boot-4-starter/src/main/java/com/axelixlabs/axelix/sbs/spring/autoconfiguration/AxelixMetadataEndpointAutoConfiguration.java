@@ -22,7 +22,6 @@ import java.lang.management.ManagementFactory;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.health.autoconfigure.actuate.endpoint.HealthEndpointAutoConfiguration;
 import org.springframework.boot.health.contributor.Status;
@@ -54,8 +53,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(
+@AxelixAutoConfiguration(
         after = {
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
@@ -63,7 +63,6 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
             LibraryInformationProviderAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class,
         })
-@ConditionalOnAxelixStarterEnabled
 public class AxelixMetadataEndpointAutoConfiguration {
 
     @Bean

@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.threaddump.DefaultThreadDumpContentionMonitoringManagement;
@@ -29,9 +28,9 @@ import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndp
  * Auto-configuration for Thread Dump management functionality.
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = ThreadDumpManagementEndpoint.class)
 public class ThreadDumpManagementEndpointAutoConfiguration {
 

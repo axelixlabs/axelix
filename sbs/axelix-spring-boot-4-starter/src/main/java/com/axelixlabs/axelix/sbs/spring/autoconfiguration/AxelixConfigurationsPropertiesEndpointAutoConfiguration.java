@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -37,9 +36,9 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 

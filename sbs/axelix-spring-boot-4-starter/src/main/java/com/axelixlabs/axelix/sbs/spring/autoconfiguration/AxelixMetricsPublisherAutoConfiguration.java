@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import io.micrometer.core.instrument.MeterRegistry;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +30,9 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublish
  * Auto-configuration for the {@link AxelixMetricsPublisher}.
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration(after = CompositeMeterRegistryAutoConfiguration.class)
 @ConditionalOnBean(MeterRegistry.class)
 public class AxelixMetricsPublisherAutoConfiguration {
 
