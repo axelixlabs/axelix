@@ -49,6 +49,7 @@ import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
@@ -553,7 +554,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
                         persistenceInsights),
-                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, null));
+                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, JdkVendor.ADOPTIUM, null));
     }
 
     private static BasicRegistrationMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
@@ -574,7 +575,7 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, null));
+                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, JdkVendor.ADOPTIUM, null));
     }
 
     private static BasicRegistrationMetadata otherAppMetadata() {

@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesRespo
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
@@ -180,6 +181,7 @@ class DefaultUpgradesServiceTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                new HistoricalApplicationSnapshot.Versions(starterVersion, "3.5.0", "6.2.0", 21, null));
+                new HistoricalApplicationSnapshot.Versions(
+                        starterVersion, "3.5.0", "6.2.0", 21, JdkVendor.ADOPTIUM, null));
     }
 }

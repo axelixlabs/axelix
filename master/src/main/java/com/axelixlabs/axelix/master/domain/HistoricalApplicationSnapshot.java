@@ -65,6 +65,8 @@ public record HistoricalApplicationSnapshot(
      * @param springFrameworkVersion the Spring Framework version the application ran on.
      * @param javaVersion the Java feature release the application ran on (e.g. {@code 19}, {@code 21}, {@code 27}).
      *                    This is the feature-release number only; it does not include the minor/patch components.
+     * @param jdkVendor the vendor of the JDK distribution the application ran on, or {@link JdkVendor#UNKNOWN}
+     *                  if the reported vendor could not be recognised.
      * @param kotlinVersion the Kotlin version the application ran on, or {@code null} if the application does not use Kotlin.
      */
     public record Versions(
@@ -72,6 +74,7 @@ public record HistoricalApplicationSnapshot(
             @Column("spring_boot_version") String springBootVersion,
             @Column("spring_framework_version") String springFrameworkVersion,
             @Column("java_version") int javaVersion,
+            @Column("jdk_vendor") JdkVendor jdkVendor,
             @Column("kotlin_version") @Nullable String kotlinVersion) {}
 
     // Intentionally based on snapshotId only: in k8s the same application can run as several

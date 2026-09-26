@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.utils.IdentityAwareTestRestTemplate;
@@ -157,6 +158,7 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                new HistoricalApplicationSnapshot.Versions(starterVersion, "3.5.0", "6.2.0", 21, null));
+                new HistoricalApplicationSnapshot.Versions(
+                        starterVersion, "3.5.0", "6.2.0", 21, JdkVendor.ADOPTIUM, null));
     }
 }

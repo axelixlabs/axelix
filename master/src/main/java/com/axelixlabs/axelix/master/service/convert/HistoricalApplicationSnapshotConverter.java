@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.master.domain.Insights.HotSpot;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 
 /**
  * Converter that is capable to conver the {@link BasicRegistrationMetadata} into {@link HistoricalApplicationSnapshot}.
@@ -65,6 +66,7 @@ public class HistoricalApplicationSnapshotConverter {
                 softwareVersions.getSpringBoot(),
                 softwareVersions.getSpringFramework(),
                 javaFeatureRelease(softwareVersions.getJava()),
+                JdkVendor.fromVendorName(metadata.getJdkVendor()),
                 softwareVersions.getKotlin());
     }
 
