@@ -155,8 +155,8 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
                                 new Insights.HotSpot.ProjectLeyden(false, false),
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
-                        new Insights.SpringFramework(false, null, null),
+                        new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                starterVersion);
+                new HistoricalApplicationSnapshot.Versions(starterVersion, null, null));
     }
 }

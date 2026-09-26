@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.master.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -31,8 +33,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * {@link LocalDate}). It is assumed we will not need the granularity of insights to be more
  * than 24 hours.
  *
- * @param insights       the actual insights.
- * @param starterVersion the version of the Axelix starter reported at the time of this snapshot.
+ * @param insights the actual insights.
+ * @param versions the important versions in the app that we care about.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
@@ -41,7 +43,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public record HistoricalApplicationSnapshot(
         @Id @Embedded.Empty SnapshotId snapshotId,
         @Embedded.Empty Insights insights,
-        @Column("starter_version") String starterVersion) {
+        @Embedded.Empty Versions versions) {
 
     /**
      * The composite key ID.
@@ -54,6 +56,18 @@ public record HistoricalApplicationSnapshot(
     //  We should use the ApplicationId here, but we cannot now do that since we need Spring Data JDBC 4.1
     //  that supports embedded fields in the composite keys
     public record SnapshotId(String groupId, String artifactId, LocalDate date) {}
+
+    /**
+     * The versions reported at the time of this snapshot.
+     *
+     * @param starterVersion the version of the Axelix starter reported at the time of this snapshot.
+     * @param springBootVersion the Spring Boot version the application ran on.
+     * @param springFrameworkVersion the Spring Framework version the application ran on.
+     */
+    public record Versions(
+            @Column("starter_version") String starterVersion,
+            @Column("spring_boot_version") @Nullable String springBootVersion,
+            @Column("spring_framework_version") @Nullable String springFrameworkVersion) {}
 
     // Intentionally based on snapshotId only: in k8s the same application can run as several
     // instances with differing insights, but they must still collapse to one snapshotId.

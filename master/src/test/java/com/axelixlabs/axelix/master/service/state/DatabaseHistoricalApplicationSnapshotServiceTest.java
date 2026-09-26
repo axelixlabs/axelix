@@ -551,9 +551,9 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
                                         false, GarbageCollector.G1),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
-                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
                         persistenceInsights),
-                "1.0.0");
+                new HistoricalApplicationSnapshot.Versions("1.0.0", null, null));
     }
 
     private static BasicRegistrationMetadata petclinicMetadata(boolean appCdsEnabled, boolean osivEnabled) {
@@ -572,9 +572,9 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.GarbageCollector(
                                         false, garbageCollector),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
-                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false, null, null),
+                        new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                "1.0.0");
+                new HistoricalApplicationSnapshot.Versions("1.0.0", null, null));
     }
 
     private static BasicRegistrationMetadata otherAppMetadata() {

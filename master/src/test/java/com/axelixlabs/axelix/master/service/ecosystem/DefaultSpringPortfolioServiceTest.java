@@ -200,8 +200,8 @@ class DefaultSpringPortfolioServiceTest {
                                 new Insights.HotSpot.ProjectLeyden(false, false),
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
-                        new Insights.SpringFramework(false, springBootVersion, springFrameworkVersion),
+                        new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                "1.0.0");
+                new HistoricalApplicationSnapshot.Versions("1.0.0", springBootVersion, springFrameworkVersion));
     }
 }

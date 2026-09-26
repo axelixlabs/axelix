@@ -252,8 +252,8 @@ class TransactionsMcpServerToolsTest {
                                 new Insights.HotSpot.ProjectLeyden(false, false),
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
-                        new Insights.SpringFramework(false, null, null),
+                        new Insights.SpringFramework(false),
                         persistenceInsights),
-                "1.0.0");
+                new HistoricalApplicationSnapshot.Versions("1.0.0", null, null));
     }
 }
