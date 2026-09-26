@@ -20,8 +20,6 @@ package com.axelixlabs.axelix.master.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -66,8 +64,8 @@ public record HistoricalApplicationSnapshot(
      */
     public record Versions(
             @Column("starter_version") String starterVersion,
-            @Column("spring_boot_version") @Nullable String springBootVersion,
-            @Column("spring_framework_version") @Nullable String springFrameworkVersion) {}
+            @Column("spring_boot_version") String springBootVersion,
+            @Column("spring_framework_version") String springFrameworkVersion) {}
 
     // Intentionally based on snapshotId only: in k8s the same application can run as several
     // instances with differing insights, but they must still collapse to one snapshotId.

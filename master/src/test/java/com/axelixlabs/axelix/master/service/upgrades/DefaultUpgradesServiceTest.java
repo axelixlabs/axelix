@@ -180,6 +180,6 @@ class DefaultUpgradesServiceTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                new HistoricalApplicationSnapshot.Versions(starterVersion, null, null));
+                new HistoricalApplicationSnapshot.Versions(starterVersion, "3.5.0", "6.2.0"));
     }
 }

@@ -6,19 +6,25 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="1.2-002-1-postgres-add-spring-versions-to-historical-application-snapshots" author="Axelix Team">
+  <changeSet id="1.2-002-1-postgres-add-versions-to-historical-application-snapshots" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <columnExists tableName="historical_application_snapshots" columnName="spring_boot_version"/>
       </not>
     </preConditions>
 
+    <!-- We do not render any historical data yet, so it is safe to drop it and add the new columns as mandatory. -->
+    <delete tableName="historical_application_snapshots"/>
+
     <addColumn tableName="historical_application_snapshots">
       <column name="spring_boot_version" type="TEXT">
-        <constraints nullable="true"/>
+        <constraints nullable="false"/>
       </column>
       <column name="spring_framework_version" type="TEXT">
-        <constraints nullable="true"/>
+        <constraints nullable="false"/>
+      </column>
+      <column name="starter_version" type="TEXT">
+        <constraints nullable="false"/>
       </column>
     </addColumn>
   </changeSet>

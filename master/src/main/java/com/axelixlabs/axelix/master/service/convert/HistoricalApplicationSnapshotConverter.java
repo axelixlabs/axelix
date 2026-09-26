@@ -22,6 +22,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.SoftwareVersions;
@@ -58,10 +59,11 @@ public class HistoricalApplicationSnapshotConverter {
 
     private Versions fromVersions(BasicRegistrationMetadata metadata) {
         SoftwareVersions softwareVersions = metadata.getSoftwareVersions();
+        Assert.notNull(softwareVersions, "Cannot build a historical snapshot without the reported software versions");
         return new Versions(
                 metadata.getVersion(),
-                softwareVersions == null ? null : softwareVersions.getSpringBoot(),
-                softwareVersions == null ? null : softwareVersions.getSpringFramework());
+                softwareVersions.getSpringBoot(),
+                softwareVersions.getSpringFramework());
     }
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
