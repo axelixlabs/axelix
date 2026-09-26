@@ -202,6 +202,7 @@ class DefaultSpringPortfolioServiceTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         new PersistenceInsights(List.of())),
-                new HistoricalApplicationSnapshot.Versions("1.0.0", springBootVersion, springFrameworkVersion));
+                new HistoricalApplicationSnapshot.Versions(
+                        "1.0.0", springBootVersion, springFrameworkVersion, 21, null));
     }
 }

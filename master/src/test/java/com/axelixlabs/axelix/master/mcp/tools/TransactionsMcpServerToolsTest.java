@@ -254,6 +254,6 @@ class TransactionsMcpServerToolsTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         persistenceInsights),
-                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0"));
+                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, null));
     }
 }

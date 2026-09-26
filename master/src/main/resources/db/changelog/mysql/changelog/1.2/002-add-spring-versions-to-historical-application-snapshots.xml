@@ -26,6 +26,12 @@
       <column name="starter_version" type="TEXT">
         <constraints nullable="false"/>
       </column>
+      <column name="java_version" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="kotlin_version" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
     </addColumn>
   </changeSet>
 </databaseChangeLog>

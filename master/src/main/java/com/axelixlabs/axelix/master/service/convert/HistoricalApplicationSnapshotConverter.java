@@ -63,7 +63,18 @@ public class HistoricalApplicationSnapshotConverter {
         return new Versions(
                 metadata.getVersion(),
                 softwareVersions.getSpringBoot(),
-                softwareVersions.getSpringFramework());
+                softwareVersions.getSpringFramework(),
+                javaFeatureRelease(softwareVersions.getJava()),
+                softwareVersions.getKotlin());
+    }
+
+    /**
+     * Extracts the Java feature release (e.g. {@code 21}) from the reported Java version string, which may include the
+     * minor/patch components (e.g. {@code 21.0.2}).
+     */
+    private int javaFeatureRelease(String java) {
+        int dot = java.indexOf('.');
+        return Integer.parseInt(dot == -1 ? java : java.substring(0, dot));
     }
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
