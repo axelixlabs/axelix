@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeanRenamingProcessor;
@@ -26,9 +25,9 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeanRenamingProcessor;
  * Auto-configuration for the {@link com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeanRenamingProcessor}
  *
  * @author Vyacheslav Yanin
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 public class AxelixCoreNamingAutoConfiguration {
 
     @Bean
