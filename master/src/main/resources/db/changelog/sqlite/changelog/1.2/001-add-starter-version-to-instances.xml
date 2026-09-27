@@ -26,7 +26,10 @@
 
     <delete tableName="instances"/>
 
-    <dropColumn tableName="instances" columnName="java_version"/>
+    <!-- Liquibase's <dropColumn> is a no-op on SQLite; use the native ALTER TABLE DROP COLUMN instead. -->
+    <sql>
+      ALTER TABLE instances DROP COLUMN java_version;
+    </sql>
 
     <addColumn tableName="instances">
       <column name="starter_version" type="TEXT" defaultValue="">
