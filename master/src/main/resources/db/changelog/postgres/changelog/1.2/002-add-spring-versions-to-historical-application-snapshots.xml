@@ -26,7 +26,16 @@
       <column name="starter_version" type="TEXT">
         <constraints nullable="false"/>
       </column>
-      <column name="java_version" type="INT">
+      <column name="java_feature" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_interim" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_update" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_patch" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="jdk_vendor" type="TEXT">

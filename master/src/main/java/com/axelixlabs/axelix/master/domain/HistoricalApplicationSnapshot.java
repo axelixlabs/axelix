@@ -63,8 +63,8 @@ public record HistoricalApplicationSnapshot(
      * @param starterVersion the version of the Axelix starter reported at the time of this snapshot.
      * @param springBootVersion the Spring Boot version the application ran on.
      * @param springFrameworkVersion the Spring Framework version the application ran on.
-     * @param javaVersion the Java feature release the application ran on (e.g. {@code 19}, {@code 21}, {@code 27}).
-     *                    This is the feature-release number only; it does not include the minor/patch components.
+     * @param javaVersion the full Java version the application ran on, as the JEP 322 coordinate
+     *                    (feature/interim/update/patch); see {@link JavaVersion}.
      * @param jdkVendor the vendor of the JDK distribution the application ran on, or {@link JdkVendor#UNKNOWN}
      *                  if the reported vendor could not be recognised.
      * @param kotlinVersion the Kotlin version the application ran on, or {@code null} if the application does not use Kotlin.
@@ -73,7 +73,10 @@ public record HistoricalApplicationSnapshot(
             @Column("starter_version") String starterVersion,
             @Column("spring_boot_version") String springBootVersion,
             @Column("spring_framework_version") String springFrameworkVersion,
-            @Column("java_version") int javaVersion,
+
+            @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY, prefix = "java_")
+            JavaVersion javaVersion,
+
             @Column("jdk_vendor") JdkVendor jdkVendor,
             @Column("kotlin_version") @Nullable String kotlinVersion) {}
 

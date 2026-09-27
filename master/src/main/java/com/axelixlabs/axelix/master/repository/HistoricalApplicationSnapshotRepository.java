@@ -217,7 +217,7 @@ public interface HistoricalApplicationSnapshotRepository
      */
     @Query("""
             SELECT
-                s.java_version AS java_version,
+                s.java_feature AS java_version,
                 s.jdk_vendor AS jdk_vendor,
                 s.kotlin_version AS kotlin_version,
                 s.date AS date

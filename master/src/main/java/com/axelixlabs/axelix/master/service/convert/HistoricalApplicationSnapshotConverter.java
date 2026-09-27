@@ -39,6 +39,7 @@ import com.axelixlabs.axelix.master.domain.Insights.HotSpot;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 
 /**
@@ -65,18 +66,9 @@ public class HistoricalApplicationSnapshotConverter {
                 metadata.getVersion(),
                 softwareVersions.getSpringBoot(),
                 softwareVersions.getSpringFramework(),
-                javaFeatureRelease(softwareVersions.getJava()),
+                JavaVersion.parse(softwareVersions.getJava()),
                 JdkVendor.fromVendorName(metadata.getJdkVendor()),
                 softwareVersions.getKotlin());
-    }
-
-    /**
-     * Extracts the Java feature release (e.g. {@code 21}) from the reported Java version string, which may include the
-     * minor/patch components (e.g. {@code 21.0.2}).
-     */
-    private int javaFeatureRelease(String java) {
-        int dot = java.indexOf('.');
-        return Integer.parseInt(dot == -1 ? java : java.substring(0, dot));
     }
 
     // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with

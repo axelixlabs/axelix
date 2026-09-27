@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
@@ -255,6 +256,7 @@ class TransactionsMcpServerToolsTest {
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
                         persistenceInsights),
-                new HistoricalApplicationSnapshot.Versions("1.0.0", "3.5.0", "6.2.0", 21, JdkVendor.ADOPTIUM, null));
+                new HistoricalApplicationSnapshot.Versions(
+                        "1.0.0", "3.5.0", "6.2.0", new JavaVersion(21, 0, 0, 0), JdkVendor.ADOPTIUM, null));
     }
 }
