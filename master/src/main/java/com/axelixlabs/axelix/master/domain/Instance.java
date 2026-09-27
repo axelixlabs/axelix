@@ -33,7 +33,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
  * @param starterVersion          Version of the Axelix starter used inside the service
- * @param javaVersion             Version of the Java Platform used inside the service
+ * @param javaVersion             Version of the Java Platform used inside the service, as the JEP 322 coordinate (see {@link JavaVersion})
  * @param springBootVersion       Version of the Spring Boot used inside the service
  * @param springFrameworkVersion  Version of the Spring Framework used inside the service
  * @param kotlinVersion           Version of the Kotlin used inside the service. Might be {@code null}.
@@ -52,7 +52,7 @@ public record Instance(
         String name,
         String serviceVersion,
         String starterVersion,
-        String javaVersion,
+        @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) JavaVersion javaVersion,
         String springBootVersion,
         String springFrameworkVersion,
         @Nullable String kotlinVersion,

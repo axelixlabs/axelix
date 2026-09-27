@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.domain;
 
+import org.springframework.data.relational.core.mapping.Column;
+
 /**
  * The Java runtime version a managed service ran on, modeled as the JEP 322 (JDK 10+) version
  * coordinate {@code $FEATURE.$INTERIM.$UPDATE.$PATCH}.
@@ -40,7 +42,11 @@ package com.axelixlabs.axelix.master.domain;
  *
  * @author Mikhail Polivakha
  */
-public record JavaVersion(int feature, int interim, int update, int patch) {
+public record JavaVersion(
+    @Column("java_feature") int feature,
+    @Column("java_interim") int interim,
+    @Column("java_update") int update,
+    @Column("java_patch") int patch) {
 
     /**
      * Parses a reported {@code java.version} string (e.g. {@code "21"}, {@code "21.0.2"}) into its
@@ -55,5 +61,24 @@ public record JavaVersion(int feature, int interim, int update, int patch) {
     public static JavaVersion parse(String reported) {
         Runtime.Version version = Runtime.Version.parse(reported);
         return new JavaVersion(version.feature(), version.interim(), version.update(), version.patch());
+    }
+
+    /**
+     * Renders this version back to its canonical JEP 322 string, dropping trailing zero components the
+     * same way Java itself prints versions. For example {@code (21, 0, 0, 0)} renders as {@code "21"} and
+     * {@code (17, 0, 16, 0)} as {@code "17.0.16"}.
+     *
+     * @return the canonical, trailing-zero-trimmed version string.
+     */
+    public String render() {
+        StringBuilder rendered = new StringBuilder().append(feature);
+        if (patch != 0) {
+            rendered.append('.').append(interim).append('.').append(update).append('.').append(patch);
+        } else if (update != 0) {
+            rendered.append('.').append(interim).append('.').append(update);
+        } else if (interim != 0) {
+            rendered.append('.').append(interim);
+        }
+        return rendered.toString();
     }
 }

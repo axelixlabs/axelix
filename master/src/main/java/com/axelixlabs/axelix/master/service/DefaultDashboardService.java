@@ -83,11 +83,7 @@ public class DefaultDashboardService implements DashboardService {
                 case UNKNOWN -> statuesMap.compute(Status.UNKNOWN, counterIncrementFunction());
             }
 
-            int dot = instance.javaVersion().indexOf('.');
-            String javaVersion =
-                    dot == -1 ? instance.javaVersion() : instance.javaVersion().substring(0, dot);
-
-            java.addVersion(javaVersion);
+            java.addVersion(String.valueOf(instance.javaVersion().feature()));
             springBoot.addVersion(
                     SemanticVersion.parse(instance.springBootVersion()).majorMinor());
             springFramework.addVersion(

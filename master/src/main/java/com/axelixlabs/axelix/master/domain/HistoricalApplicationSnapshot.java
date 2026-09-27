@@ -73,10 +73,7 @@ public record HistoricalApplicationSnapshot(
             @Column("starter_version") String starterVersion,
             @Column("spring_boot_version") String springBootVersion,
             @Column("spring_framework_version") String springFrameworkVersion,
-
-            @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY, prefix = "java_")
-            JavaVersion javaVersion,
-
+            @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) JavaVersion javaVersion,
             @Column("jdk_vendor") JdkVendor jdkVendor,
             @Column("kotlin_version") @Nullable String kotlinVersion) {}
 

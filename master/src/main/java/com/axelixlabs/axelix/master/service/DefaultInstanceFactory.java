@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
 /**
@@ -63,7 +64,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 instanceName,
                 metadata.getServiceVersion(),
                 metadata.getVersion(),
-                metadata.getSoftwareVersions().getJava(),
+                JavaVersion.parse(metadata.getSoftwareVersions().getJava()),
                 metadata.getSoftwareVersions().getSpringBoot(),
                 metadata.getSoftwareVersions().getSpringFramework(),
                 metadata.getSoftwareVersions().getKotlin(),
