@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.sbom.AxelixDependenciesEndpoint;
@@ -28,9 +27,9 @@ import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
  * Auto-configuration class for the dependency SBOM custom actuator endpoint.
  *
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixDependenciesEndpoint.class)
 public class AxelixDependenciesEndpointAutoConfiguration {
 
