@@ -23,8 +23,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultDependencyAnalysisService;
+import com.axelixlabs.axelix.master.service.ecosystem.DefaultLanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.DefaultSpringPortfolioService;
 import com.axelixlabs.axelix.master.service.ecosystem.DependencyAnalysisService;
+import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.DefaultPlatformCatalog;
 import com.axelixlabs.axelix.master.service.ecosystem.platform.PlatformCatalog;
@@ -88,5 +90,10 @@ public class EcosystemAutoConfiguration {
     public SpringPortfolioService springPortfolioService(
             HistoricalApplicationSnapshotRepository snapshotRepository, PlatformCatalog platformCatalog) {
         return new DefaultSpringPortfolioService(snapshotRepository, platformCatalog);
+    }
+
+    @Bean
+    public LanguagesProfileService languagesProfileService(HistoricalApplicationSnapshotRepository snapshotRepository) {
+        return new DefaultLanguagesProfileService(snapshotRepository);
     }
 }

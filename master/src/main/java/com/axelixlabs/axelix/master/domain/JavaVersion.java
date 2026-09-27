@@ -43,10 +43,10 @@ import org.springframework.data.relational.core.mapping.Column;
  * @author Mikhail Polivakha
  */
 public record JavaVersion(
-    @Column("java_feature") int feature,
-    @Column("java_interim") int interim,
-    @Column("java_update") int update,
-    @Column("java_patch") int patch) {
+        @Column("java_feature") int feature,
+        @Column("java_interim") int interim,
+        @Column("java_update") int update,
+        @Column("java_patch") int patch) {
 
     /**
      * Parses a reported {@code java.version} string (e.g. {@code "21"}, {@code "21.0.2"}) into its
@@ -73,7 +73,12 @@ public record JavaVersion(
     public String render() {
         StringBuilder rendered = new StringBuilder().append(feature);
         if (patch != 0) {
-            rendered.append('.').append(interim).append('.').append(update).append('.').append(patch);
+            rendered.append('.')
+                    .append(interim)
+                    .append('.')
+                    .append(update)
+                    .append('.')
+                    .append(patch);
         } else if (update != 0) {
             rendered.append('.').append(interim).append('.').append(update);
         } else if (interim != 0) {

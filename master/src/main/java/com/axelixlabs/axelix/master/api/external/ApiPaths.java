@@ -154,6 +154,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the fleet-wide Spring Boot / Spring Framework version portfolio.
          */
         public static final String SPRING_PORTFOLIO = "/dashboard/spring-portfolio";
+
+        /**
+         * Endpoint to retrieve the fleet-wide languages profile (Java releases, JDK builds and Kotlin adoption).
+         */
+        public static final String LANGUAGES = "/dashboard/languages";
     }
 
     public static final class LoggersApi {
