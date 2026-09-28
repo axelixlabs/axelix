@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails.CommitAuthor;
-import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.BuildDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.CommitAuthor;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.GitDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.OsDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.SpringDetails;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
@@ -54,47 +54,53 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         BuildDetails build = getBuildDetails();
         OsDetails os = getOsDetails();
 
-        return new InstanceDetails(git, spring, runtime, build, os);
+        return new InstanceDetails()
+                .git(git)
+                .spring(spring)
+                .runtime(runtime)
+                .build(build)
+                .os(os);
     }
 
     private GitDetails getGitDetails() {
-        CommitAuthor commitAuthor =
-                new CommitAuthor(axelixInfoProperties.getCommitUserName(), axelixInfoProperties.getCommitUserEmail());
+        CommitAuthor commitAuthor = new CommitAuthor()
+                .name(axelixInfoProperties.getCommitUserName())
+                .email(axelixInfoProperties.getCommitUserEmail());
 
-        return new GitDetails(
-                axelixInfoProperties.getCommitShaShort(),
-                axelixInfoProperties.getBranch(),
-                commitAuthor,
-                axelixInfoProperties.getCommitTimestamp());
+        return new GitDetails()
+                .commitShaShort(axelixInfoProperties.getCommitShaShort())
+                .branch(axelixInfoProperties.getBranch())
+                .commitAuthor(commitAuthor)
+                .commitTimestamp(axelixInfoProperties.getCommitTimestamp());
     }
 
     private SpringDetails getSpringDetails() {
-        return new SpringDetails(
-                libraryInformationProvider.getSpringBootVersion(),
-                libraryInformationProvider.getSpringVersion(),
-                libraryInformationProvider.getSpringCloudVersion());
+        return new SpringDetails()
+                .springBootVersion(libraryInformationProvider.getSpringBootVersion())
+                .springFrameworkVersion(libraryInformationProvider.getSpringVersion())
+                .springCloudVersion(libraryInformationProvider.getSpringCloudVersion());
     }
 
     private RuntimeDetails getRuntimeDetails() {
-        return new RuntimeDetails(
-                libraryInformationProvider.getJavaVersion(),
-                libraryInformationProvider.getJdkVendorName(),
-                libraryInformationProvider.getKotlinVersion());
+        return new RuntimeDetails()
+                .javaVersion(libraryInformationProvider.getJavaVersion())
+                .jdkVendor(libraryInformationProvider.getJdkVendorName())
+                .kotlinVersion(libraryInformationProvider.getKotlinVersion());
     }
 
     private BuildDetails getBuildDetails() {
 
-        return new BuildDetails(
-                axelixInfoProperties.getArtifactId(),
-                axelixInfoProperties.getServiceVersion(),
-                axelixInfoProperties.getGroupId(),
-                axelixInfoProperties.getBuildTimestamp());
+        return new BuildDetails()
+                .artifact(axelixInfoProperties.getArtifactId())
+                .version(axelixInfoProperties.getServiceVersion())
+                .group(axelixInfoProperties.getGroupId())
+                .time(axelixInfoProperties.getBuildTimestamp());
     }
 
     private OsDetails getOsDetails() {
-        return new OsDetails(
-                emptyIfNull(System.getProperty("os.name")),
-                emptyIfNull(System.getProperty("os.version")),
-                emptyIfNull(System.getProperty("os.arch")));
+        return new OsDetails()
+                .name(emptyIfNull(System.getProperty("os.name")))
+                .version(emptyIfNull(System.getProperty("os.version")))
+                .arch(emptyIfNull(System.getProperty("os.arch")));
     }
 }

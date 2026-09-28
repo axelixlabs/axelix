@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
 
 /**
  * Interface that is capable to assemble the {@link BeansFeed}.
