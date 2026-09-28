@@ -42,6 +42,12 @@ choose from:
 - The **Gradle plugin** is tested to work on Gradle major versions **5 through 9**.
 - The **Maven plugin** is compatible with **Maven 3**, which is what virtually every Maven project uses today.
 
+:::info[Minimum Spring Boot 2 version is 2.7.x]
+`axelix-spring-boot-2-starter` supports Spring Boot 2 starting from **2.7**, not the whole 2.x line. If your service
+is on an earlier Spring Boot 2.x — some services run as far back as **2.5.15** — you must upgrade to at least
+**Spring Boot 2.7** before adding Axelix.
+:::
+
 ## Java version compatibility
 
 **Axelix Master** is itself a Spring Boot application, written on **Java 25**. This will be the concern only in case you'd

@@ -155,7 +155,7 @@ implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
 // Spring Boot 3.x
 implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0")
 
-// Spring Boot 2.x
+// Spring Boot 2.7.x
 implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0")
 ```
 
