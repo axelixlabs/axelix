@@ -1,5 +1,5 @@
-![Axelix Logo (Light)](docs/static/img/logo.svg#gh-light-mode-only)
-![Axelix Logo (Dark)](docs/static/img/logo-dark.svg#gh-dark-mode-only)
+![Axelix Logo (Light)](docs/public/img/logo.svg#gh-light-mode-only)
+![Axelix Logo (Dark)](docs/public/img/logo-dark.svg#gh-dark-mode-only)
 
 [![License](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](LICENSE)
 [![Nightly Heavy Tests](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml/badge.svg)](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml)
@@ -87,7 +87,7 @@ Master persists its own state in a database (SQLite by default; PostgreSQL or My
 for anything beyond a small deployment). Authentication for both the UI and MCP is available via
 Basic auth or OAuth2/OIDC, with a single role model gating every human and agent identity.
 
-See the [Architecture docs](docs/docs/product/architecture.mdx) for the full picture, including
+See the [Architecture docs](docs/content/docs/product/architecture.mdx) for the full picture, including
 multi-master deployments and the security model.
 
 ## Installation
@@ -138,7 +138,7 @@ helm install axelix axelix/axelix \
 Master then serves the UI at `http://localhost:8080`. It ships with a built-in super-admin account
 (`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
 else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
-MCP) are in [Configuring Master](docs/docs/installation/configuring-master.mdx).
+MCP) are in [Configuring Master](docs/content/docs/start/configuring-master.mdx).
 
 ### 2. Add the Axelix Starter and build plugin to your Spring Boot service
 
@@ -186,7 +186,7 @@ Or, with Maven:
 
 The full setup (sharing the JWT signing key with Master, self-registration, sanitizing sensitive
 property values) is documented in
-[Configuring the Spring Boot Starter](docs/docs/setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
+[Configuring the Spring Boot Starter](docs/content/docs/setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
 
 ## Building the community distribution from source
 
@@ -235,13 +235,13 @@ Either way Master serves the UI at `http://localhost:8080`, just like the publis
 
 ## Documentation
 
-Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](docs/docs):
+Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](docs/content/docs):
 
-- [Introduction](docs/docs/product/introduction.mdx) and [Motivation](docs/docs/product/motivation.mdx)
-- [Architecture](docs/docs/product/architecture.mdx)
-- [Installation](docs/docs/installation/configuring-master.mdx)
-- [Features reference](docs/docs/features/details.mdx)
-- [UI Guide](docs/docs/ui-guide/dashboard.mdx)
+- [Introduction](docs/content/docs/product/introduction.mdx) and [Motivation](docs/content/docs/product/motivation.mdx)
+- [Architecture](docs/content/docs/product/architecture.mdx)
+- [Installation](docs/content/docs/start/configuring-master.mdx)
+- [Features reference](docs/content/docs/features/insights/details.mdx)
+- [UI Guide](docs/content/docs/ui-guide/dashboard.mdx)
 
 ## Axelix OSS and Enterprise
 
