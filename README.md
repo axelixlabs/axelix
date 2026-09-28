@@ -138,7 +138,7 @@ helm install axelix axelix/axelix \
 Master then serves the UI at `http://localhost:8080`. It ships with a built-in super-admin account
 (`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
 else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
-MCP) are in [Configuring Master](docs/content/docs/start/configuring-master.mdx).
+MCP) are in [Configuring Master](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx).
 
 ### 2. Add the Axelix Starter and build plugin to your Spring Boot service
 
@@ -239,7 +239,7 @@ Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](
 
 - [Introduction](docs/content/docs/product/introduction.mdx) and [Motivation](docs/content/docs/product/motivation.mdx)
 - [Architecture](docs/content/docs/product/architecture.mdx)
-- [Installation](docs/content/docs/start/configuring-master.mdx)
+- [Installation](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Features reference](docs/content/docs/features/insights/details.mdx)
 - [UI Guide](docs/content/docs/ui-guide/dashboard.mdx)
 

@@ -52,7 +52,7 @@ export default async function Page(props: PageProps<"/[lang]/[[...slug]]">) {
 
     const MDX = page.data.body;
     const markdownUrl = getPageMarkdownUrl(page).url;
-    const githubFilePath = `${gitConfig.branch}/content/docs/${page.path}`;
+    const githubFilePath = `${gitConfig.branch}/${gitConfig.contentDir}/${page.path}`;
     const githubFileUrl = `${GITHUB_REPO_URL}/blob/${githubFilePath}`;
     const githubEditUrl = `${GITHUB_REPO_URL}/edit/${githubFilePath}`;
     const reportIssueUrl = new URL(`${GITHUB_REPO_URL}/issues/new`);
