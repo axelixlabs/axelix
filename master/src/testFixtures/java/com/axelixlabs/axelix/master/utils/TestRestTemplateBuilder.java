@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
@@ -72,10 +73,11 @@ public class TestRestTemplateBuilder {
         this.testTomcatServerPort = event.getWebServer().getPort();
     }
 
-    public TestRestTemplateBuilder(JwtProperties jwtProperties, JwtEncoderService defaultJwtEncoderService) {
+    public TestRestTemplateBuilder(
+            JwtProperties jwtProperties, JwtJsonEngine jwtJsonEngine, JwtEncoderService defaultJwtEncoderService) {
         this.defaultJwtEncoderService = defaultJwtEncoderService;
-        this.expiredJwtEncoderService =
-                new DefaultJwtEncoderService(jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
+        this.expiredJwtEncoderService = new DefaultJwtEncoderService(
+                jwtJsonEngine, jwtProperties.algorithm(), jwtProperties.signingKey(), Duration.ZERO);
     }
 
     public IdentityAwareTestRestTemplate asViewer() {

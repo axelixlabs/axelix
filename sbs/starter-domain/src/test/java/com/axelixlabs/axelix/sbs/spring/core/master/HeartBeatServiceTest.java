@@ -53,7 +53,9 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.testfixtures.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -107,16 +109,23 @@ class HeartBeatServiceTest {
         }
 
         @Bean
-        public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
+        public JwtJsonEngine jwtJsonEngine() {
+            return new JacksonJwtJsonEngine();
+        }
+
+        @Bean
+        public JwtEncoderService jwtEncoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
             return new DefaultJwtEncoderService(
+                    jwtJsonEngine,
                     authProperties.getJwt().getAlgorithm(),
                     authProperties.getJwt().getSigningKey(),
                     Duration.ofHours(1));
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
+        public JwtDecoderService jwtDecoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
             return new DefaultJwtDecoderService(
+                    jwtJsonEngine,
                     new DefaultAuthoritiesManager(null),
                     authProperties.getJwt().getAlgorithm(),
                     authProperties.getJwt().getSigningKey());

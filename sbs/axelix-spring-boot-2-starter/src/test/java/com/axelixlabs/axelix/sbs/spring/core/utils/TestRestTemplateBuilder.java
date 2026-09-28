@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -37,6 +39,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JacksonJwtJsonEngine;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -68,8 +71,11 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.defaultJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ofHours(1));
-        this.expiredJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ZERO);
+        JacksonJwtJsonEngine jwtJsonEngine = new JacksonJwtJsonEngine(new ObjectMapper());
+        this.defaultJwtEncoderService =
+                new DefaultJwtEncoderService(jwtJsonEngine, algorithm, signingKey, Duration.ofHours(1));
+        this.expiredJwtEncoderService =
+                new DefaultJwtEncoderService(jwtJsonEngine, algorithm, signingKey, Duration.ZERO);
     }
 
     public TestRestTemplate asViewer() {

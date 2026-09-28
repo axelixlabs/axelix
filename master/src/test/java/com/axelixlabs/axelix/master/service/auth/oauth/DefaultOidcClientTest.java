@@ -39,6 +39,7 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Serializer;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -63,6 +64,7 @@ import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.service.auth.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,6 +87,8 @@ class DefaultOidcClientTest {
     private static final String CLIENT_ID = "test-client-id";
     private static final String CLIENT_SECRET = "test-secret";
     private static final String AUTH_CODE = "test-code";
+    private static final Serializer<Map<String, ?>> serializer =
+            new JacksonJwtJsonEngine(new ObjectMapper()).serializer();
 
     private static MockWebServer mockWebServer;
     private static RSAKey rsaKey;
@@ -275,6 +279,7 @@ class DefaultOidcClientTest {
             Instant now = Instant.now();
 
             JwtBuilder builder = Jwts.builder()
+                    .json(serializer)
                     .header()
                     .keyId(keyId)
                     .and()
@@ -299,6 +304,7 @@ class DefaultOidcClientTest {
             Instant past = Instant.now().minus(Duration.ofHours(2));
 
             return Jwts.builder()
+                    .json(serializer)
                     .header()
                     .keyId(RSA_KEY_ID)
                     .and()

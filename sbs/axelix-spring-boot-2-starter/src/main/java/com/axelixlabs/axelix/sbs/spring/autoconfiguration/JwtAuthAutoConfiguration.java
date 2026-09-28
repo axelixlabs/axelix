@@ -17,8 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -35,8 +39,10 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ManagedServiceWebIdentityAccessManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
@@ -61,16 +67,27 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
+    @ConditionalOnMissingBean
+    public JwtJsonEngine jwtJsonEngine() {
+        // Dedicated mapper: the JWT wire format must not follow host-application Jackson customizations.
+        return new JacksonJwtJsonEngine(JsonMapper.builder()
+                .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                .build());
+    }
+
+    @Bean
+    public JwtDecoderService jwtDecoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
         return new DefaultJwtDecoderService(
+                jwtJsonEngine,
                 new DefaultAuthoritiesManager(null),
                 authProperties.getJwt().getAlgorithm(),
                 authProperties.getJwt().getSigningKey());
     }
 
     @Bean
-    public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
+    public JwtEncoderService jwtEncoderService(JwtJsonEngine jwtJsonEngine, AuthProperties authProperties) {
         return new DefaultJwtEncoderService(
+                jwtJsonEngine,
                 authProperties.getJwt().getAlgorithm(),
                 authProperties.getJwt().getSigningKey(),
                 authProperties.getJwt().getDuration());

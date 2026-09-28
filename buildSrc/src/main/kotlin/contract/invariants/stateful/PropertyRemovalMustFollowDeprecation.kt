@@ -42,17 +42,17 @@ object PropertyRemovalMustFollowDeprecation : StatefulContractInvariant {
             }
 
             val deprecated = baseline.markerVersion(removed.node, DEPRECATED_IN)
-            val starterProduced = removed.schemaName in baseline.starterProducedSchemas
+            val masterProduced = removed.schemaName in baseline.masterProducedSchemas
 
             if (deprecated == null) {
-                if (starterProduced) {
-                    // a pure removal of a starter-produced property is immediate
-                    return@mapNotNull null;
-                } else {
+                if (masterProduced) {
                     return@mapNotNull ("${removed.location} is produced by the Master and was removed without prior "
                             + "deprecation against the released contract (${baseline.axelixVersion}): "
                             + "deprecate the property and keep producing it until the window passes before "
                             + "removing it")
+                } else {
+                    // a pure removal of a starter-only-produced property is immediate
+                    return@mapNotNull null;
                 }
             } else {
                 if (!current.windowPassed(deprecated)) {

@@ -5,7 +5,11 @@ plugins {
 
 val jsonUnitAssertJVersion = "2.40.1"
 
+val jacksonDatabindVersion = "2.13.5"
+
 dependencies {
+    testFixturesApi("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
+
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
 
     // Test

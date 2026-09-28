@@ -18,11 +18,13 @@
 package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Deserializer;
 import io.jsonwebtoken.security.Keys;
 
 /**
@@ -34,9 +36,16 @@ import io.jsonwebtoken.security.Keys;
  */
 public class HmacVerificationStrategy implements JwtVerificationStrategy {
 
+    private final Deserializer<Map<String, ?>> deserializer;
+
+    public HmacVerificationStrategy(Deserializer<Map<String, ?>> deserializer) {
+        this.deserializer = deserializer;
+    }
+
     @Override
     public Jws<Claims> verifyAndParse(String token, String signingKey) throws JwtException {
         return Jwts.parser()
+                .json(deserializer)
                 .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseSignedClaims(token);

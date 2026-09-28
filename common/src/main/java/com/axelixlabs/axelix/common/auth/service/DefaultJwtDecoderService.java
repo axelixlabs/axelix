@@ -55,12 +55,17 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     private final AuthoritiesManager authoritiesManager;
     private final String signingKey;
 
-    public DefaultJwtDecoderService(AuthoritiesManager authoritiesManager, JwtAlgorithm algorithm, String signingKey) {
+    public DefaultJwtDecoderService(
+            JwtJsonEngine jsonEngine,
+            AuthoritiesManager authoritiesManager,
+            JwtAlgorithm algorithm,
+            String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
         Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 
         this.authoritiesManager = authoritiesManager;
-        this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
+        this.verificationStrategy =
+                JwtVerificationStrategyFactory.createVerificationStrategy(algorithm, jsonEngine.deserializer());
         this.signingKey = Objects.requireNonNull(signingKey);
     }
 

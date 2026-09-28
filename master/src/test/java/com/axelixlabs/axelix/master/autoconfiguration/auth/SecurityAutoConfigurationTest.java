@@ -158,6 +158,8 @@ class SecurityAutoConfigurationTest {
                 // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .hasRootCauseMessage("JWT algorithm is required. Set axelix.master.auth.jwt.algorithm");
             });
         }
 
@@ -179,6 +181,8 @@ class SecurityAutoConfigurationTest {
                 // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .hasRootCauseMessage("JWT signing-key is required. Set axelix.master.auth.jwt.signing-key");
             });
         }
 
@@ -226,6 +230,10 @@ class SecurityAutoConfigurationTest {
             contextRunner.run(context -> {
                 // then.
                 assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .hasRootCauseMessage(
+                                "No enum constant com.axelixlabs.axelix.common.auth.core.JwtAlgorithm.RSA512");
             });
         }
 
@@ -249,6 +257,9 @@ class SecurityAutoConfigurationTest {
                 // then.
                 assertThat(context).hasFailed();
                 assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                assertThat(context.getStartupFailure())
+                        .hasRootCauseMessage("JWT signing-key is too short for HS512 (requires at least 64 bytes). Set "
+                                + "axelix.master.auth.jwt.signing-key");
             });
         }
 
@@ -518,6 +529,11 @@ class SecurityAutoConfigurationTest {
         }
 
         @Bean
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper();
+        }
+
+        @Bean
         public UserService userService() {
             return Mockito.mock(UserService.class);
         }
@@ -534,11 +550,6 @@ class SecurityAutoConfigurationTest {
         @Bean
         public RestClient restClient() {
             return RestClient.builder().build();
-        }
-
-        @Bean
-        public ObjectMapper objectMapper() {
-            return new ObjectMapper();
         }
     }
 

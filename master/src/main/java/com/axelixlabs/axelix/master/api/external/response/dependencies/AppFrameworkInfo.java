@@ -23,7 +23,7 @@ import com.axelixlabs.axelix.master.domain.ecosystem.platform.Platform;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformReleaseLine;
 
 /**
- * The {@link Platform} that represents the Framework being used in the particulat app.
+ * The {@link Platform} that represents the Framework being used in the particular app.
  *
  * @param name                the name of the framework, e.g. {@code Spring Boot}.
  * @param version             the exact version of the framework the app runs.

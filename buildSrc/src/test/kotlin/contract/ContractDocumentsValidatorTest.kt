@@ -35,17 +35,25 @@ class ContractDocumentsValidatorTest {
     }
 
     @Test
+    fun `a server marker declared as a list of starter and master sides passes`() {
+        ContractDocumentsValidator.validate(
+            document("stateless/ServerIsDeclared/server-declared-as-list.yaml"), CURRENT_VERSION)
+    }
+
+    @Test
     fun `a missing server marker fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/missing-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master], "
+                + "or as a list combining them")
     }
 
     @Test
     fun `an unknown server side fails`() {
         expectProblem(
             "stateless/ServerIsDeclared/unknown-server.yaml",
-            "the 'info' block must declare 'x-axelix-server' as one of [starter, master]")
+            "the 'info' block must declare 'x-axelix-server' as one of [starter, master], "
+                + "or as a list combining them")
     }
 
     @Test
@@ -82,6 +90,14 @@ class ContractDocumentsValidatorTest {
     fun `a late required property of a starter-produced payload fails within the window`() {
         expectProblem(
             "stateless/RequiredHonoursTheWindow/premature-required.yaml",
+            "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
+                + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
+    }
+
+    @Test
+    fun `a late required property of a payload produced by starter and master fails within the window`() {
+        expectProblem(
+            "stateless/RequiredHonoursTheWindow/premature-required-starter-and-master.yaml",
             "the property 'LoggersReply.effectiveLevel' cannot be 'required' yet: starters older "
                 + "than 1.2.0 do not send it and only leave the compatibility window in 1.5")
     }

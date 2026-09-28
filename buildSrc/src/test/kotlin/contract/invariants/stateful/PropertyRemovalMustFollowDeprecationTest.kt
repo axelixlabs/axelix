@@ -70,6 +70,22 @@ class PropertyRemovalMustFollowDeprecationTest {
     }
 
     @Test
+    fun `a property produced by starter and master removed without prior deprecation fails`() {
+        val problems = PropertyRemovalMustFollowDeprecation
+            .check(
+                baseline("released-baseline-starter-and-master.yaml"),
+                current("removed-without-deprecation-starter-and-master.yaml"))
+
+        assertEquals(
+            listOf(
+                "the property 'LogLevelChangeRequest.undeprecatedShared' is produced by the Master and "
+                    + "was removed without prior deprecation against the released contract (1.1.0): "
+                    + "deprecate the property and keep producing it until the window passes before "
+                    + "removing it"),
+            problems)
+    }
+
+    @Test
     fun `a pure removal of a starter-produced property passes`() {
         val problems = PropertyRemovalMustFollowDeprecation
             .check(baseline(), current("starter-produced-pure-removal.yaml"))
@@ -98,8 +114,8 @@ class PropertyRemovalMustFollowDeprecationTest {
         assertEquals(emptyList<String>(), problems)
     }
 
-    private fun baseline(): ContractDocument =
-        ContractDocument.parse(document("released-baseline.yaml"), RELEASED_VERSION)
+    private fun baseline(name: String = "released-baseline.yaml"): ContractDocument =
+        ContractDocument.parse(document(name), RELEASED_VERSION)
 
     private fun current(name: String, version: String = WITHIN_WINDOW_VERSION): ContractDocument =
         ContractDocument.parse(document(name), version)

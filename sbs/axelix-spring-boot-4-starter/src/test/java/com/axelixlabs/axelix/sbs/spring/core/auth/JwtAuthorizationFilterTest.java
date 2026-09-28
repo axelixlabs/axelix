@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtJsonEngine;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
@@ -150,6 +151,9 @@ class JwtAuthorizationFilterTest {
 
     @Autowired
     private JwtEncoderService jwtEncoderService;
+
+    @Autowired
+    private JwtJsonEngine jwtJsonEngine;
 
     @ParameterizedTest
     @MethodSource("adminEndpoints")
@@ -278,7 +282,7 @@ class JwtAuthorizationFilterTest {
     void shouldReturnUnauthorized_TokenSigningKeyIsTampered() {
         String wrongSecret = "MX3TNBx0j8bGCjGWCvq1JffIqqzXLIV-URlKFLX4mfA";
         JwtEncoderService encoderWithWrongSecret =
-                new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
+                new DefaultJwtEncoderService(jwtJsonEngine, JwtAlgorithm.HMAC256, wrongSecret, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = encoderWithWrongSecret.generateToken(user);

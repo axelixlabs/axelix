@@ -31,7 +31,7 @@ object MasterProducedPropertyMustNotBecomeOptional : StatefulContractInvariant {
                 ?: return@mapNotNull null
 
             if (released.required && !currentProperty.required
-                && currentProperty.schemaName !in current.starterProducedSchemas) {
+                && currentProperty.schemaName in current.masterProducedSchemas) {
                 ("${currentProperty.location} is produced by the Master and is 'required' in the released "
                     + "contract (${baseline.axelixVersion}): withdrawing 'required' is a hidden removal, "
                     + "deprecate the property instead and keep it required until the window passes")

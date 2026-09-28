@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -38,6 +40,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JacksonJwtJsonEngine;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.BeanSourceTestJsonSupport.beanSourceAwareJsonConverter;
 
@@ -71,8 +74,13 @@ public class TestRestTemplateBuilder {
     public TestRestTemplateBuilder(
             final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
             final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        this.defaultJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ofHours(1));
-        this.expiredJwtEncoderService = new DefaultJwtEncoderService(algorithm, signingKey, Duration.ZERO);
+        // Self-contained on purpose: this component is picked up by many @SpringBootTest contexts
+        // that never boot JwtAuthAutoConfiguration, so it cannot rely on a JwtJsonEngine bean.
+        JacksonJwtJsonEngine jwtJsonEngine = new JacksonJwtJsonEngine(new ObjectMapper());
+        this.defaultJwtEncoderService =
+                new DefaultJwtEncoderService(jwtJsonEngine, algorithm, signingKey, Duration.ofHours(1));
+        this.expiredJwtEncoderService =
+                new DefaultJwtEncoderService(jwtJsonEngine, algorithm, signingKey, Duration.ZERO);
     }
 
     public TestRestTemplate asViewer() {

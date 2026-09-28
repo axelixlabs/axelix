@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.testfixtures.JacksonJwtJsonEngine;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
 
@@ -81,6 +82,9 @@ class DefaultJwtDecoderServiceTest {
 
     @Autowired
     private AuthoritiesManager authoritiesManager;
+
+    @Autowired
+    private JwtJsonEngine jsonEngine;
 
     @ParameterizedTest
     @MethodSource("roles")
@@ -156,9 +160,10 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldEncodeDecodeTokenWithHS256() {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, key256, lifespan);
+        JwtEncoderService encoder = new DefaultJwtEncoderService(jsonEngine, JwtAlgorithm.HMAC256, key256, lifespan);
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.EDITOR)));
-        JwtDecoderService decoder256 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC256, key256);
+        JwtDecoderService decoder256 =
+                new DefaultJwtDecoderService(jsonEngine, authoritiesManager, JwtAlgorithm.HMAC256, key256);
 
         // when.
         PasswordlessUser decodedUser = decoder256.decodeTokenToUser(token);
@@ -179,9 +184,10 @@ class DefaultJwtDecoderServiceTest {
     void shouldEncodeDecodeTokenWithHS384() {
         String key384 =
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
-        JwtEncoderService encoder = new DefaultJwtEncoderService(JwtAlgorithm.HMAC384, key384, lifespan);
+        JwtEncoderService encoder = new DefaultJwtEncoderService(jsonEngine, JwtAlgorithm.HMAC384, key384, lifespan);
         String token = encoder.generateToken(UserUtils.withPassword(USER_NAME, PASSWORD, Set.of(TestRoles.ADMIN)));
-        JwtDecoderService decoder384 = new DefaultJwtDecoderService(authoritiesManager, JwtAlgorithm.HMAC384, key384);
+        JwtDecoderService decoder384 =
+                new DefaultJwtDecoderService(jsonEngine, authoritiesManager, JwtAlgorithm.HMAC384, key384);
 
         // when.
         PasswordlessUser decodedUser = decoder384.decodeTokenToUser(token);
@@ -258,7 +264,7 @@ class DefaultJwtDecoderServiceTest {
     void shouldFailToDecodeTokenWithWrongSecret() {
         String wrongSecret = "MX3TNBx0j8bGCjGWCvq1JffIqqzXLIV-URlKFLX4mfA";
         JwtEncoderService encoderWithWrongSecret =
-                new DefaultJwtEncoderService(JwtAlgorithm.HMAC256, wrongSecret, lifespan);
+                new DefaultJwtEncoderService(jsonEngine, JwtAlgorithm.HMAC256, wrongSecret, lifespan);
 
         User user = UserUtils.withPassword(USER_NAME, PASSWORD, Set.of());
         String token = encoderWithWrongSecret.generateToken(user);
@@ -286,6 +292,7 @@ class DefaultJwtDecoderServiceTest {
     void shouldThrowInCaseUserIdIsNotPresentInJWT() {
         // given a token issued with no uid claim.
         String tokenWithNoUserId = Jwts.builder()
+                .json(jsonEngine.serializer())
                 .subject(USER_NAME)
                 .claim(TokenClaim.ROLES.getEncoding(), List.of())
                 .signWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
@@ -322,19 +329,26 @@ class DefaultJwtDecoderServiceTest {
         }
 
         @Bean
+        JwtJsonEngine jwtJsonEngine() {
+            return new JacksonJwtJsonEngine();
+        }
+
+        @Bean
         public JwtDecoderService jwtDecoderService(
+                final JwtJsonEngine jsonEngine,
                 final AuthoritiesManager authoritiesManager,
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtDecoderService(authoritiesManager, algorithm, signingKey);
+            return new DefaultJwtDecoderService(jsonEngine, authoritiesManager, algorithm, signingKey);
         }
 
         @Bean
         JwtEncoderService jwtEncoderService(
+                final JwtJsonEngine jsonEngine,
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan,
                 final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
+            return new DefaultJwtEncoderService(jsonEngine, algorithm, signingKey, lifespan);
         }
     }
 }

@@ -47,13 +47,20 @@ import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 @NullMarked
 public class DefaultJwtEncoderService implements JwtEncoderService {
 
+    private final JwtJsonEngine jsonEngine;
+
     private final JwtSigningStrategy signingStrategy;
 
     private final String signingKey;
 
     private final Duration lifespan;
 
-    public DefaultJwtEncoderService(final JwtAlgorithm algorithm, final String signingKey, final Duration lifespan) {
+    public DefaultJwtEncoderService(
+            final JwtJsonEngine jsonEngine,
+            final JwtAlgorithm algorithm,
+            final String signingKey,
+            final Duration lifespan) {
+        this.jsonEngine = jsonEngine;
         this.signingStrategy = JwtSigningStrategyFactory.createSigningStrategy(algorithm);
         this.signingKey = signingKey;
         this.lifespan = lifespan;
@@ -73,6 +80,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
             List<JwtRole> roleClaims = buildRoleClaims(user);
 
             JwtBuilder builder = Jwts.builder()
+                    .json(jsonEngine.serializer())
                     .subject(user.getUsername())
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(lifespan)))

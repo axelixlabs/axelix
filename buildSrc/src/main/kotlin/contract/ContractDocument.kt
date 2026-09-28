@@ -17,7 +17,10 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
 
     val info: JsonNode = root.path("info")
 
-    val server: String = info.path(SERVER).asText("")
+    /**
+     * The declared 'x-axelix-server' side(s). Empty when the marker is absent or malformed.
+     */
+    val sides: Set<String> = parseSides(info.path(SERVER))
 
     /**
      * Every part of the document that carries lifecycle markers.
@@ -54,22 +57,50 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
      *
      * 1. Responses when the starter answers the call
      * 2. Request bodies when starter queries Axelix Master does
+     * 3. Every schema in the document when both sides are declared - an escape hatch for a wire
+     *    shape genuinely written by either side (e.g. a shared token format).
      */
-    val starterProducedSchemas: Set<String> by lazy {
-        if (server !in SERVER_SIDES) {
-            return@lazy emptySet()
+    val starterProducedSchemas: Set<String> by lazy { producedSchemas("starter") }
+
+    /**
+     * The names of the schemas that **travel in a payload produced by Master**.
+     */
+    val masterProducedSchemas: Set<String> by lazy { producedSchemas("master") }
+
+    private fun producedSchemas(side: String): Set<String> {
+        if (sides.isEmpty() || sides.any { declaredSide -> declaredSide !in SERVER_SIDES }) {
+            return emptySet()
         }
+        if (sides.size > 1) {
+            return expandThroughSchemas(root.path("components").path("schemas")
+                .properties().map { (name, _) -> name }.toSet())
+        }
+        val starterBearer = if (sides.single() == "starter") "responses" else "requestBody"
+        val masterBearer = if (starterBearer == "responses") "requestBody" else "responses"
+        val bearer = if (side == "starter") starterBearer else masterBearer
+
         val produced = mutableSetOf<String>()
         root.path("paths").properties().forEach { (_, path) ->
             path.properties().forEach { (_, operation) ->
-                val starterSide =
-                    if (server == "starter") operation.path("responses") else operation.path("requestBody")
-                starterSide.findValues("\$ref").forEach { reference ->
+                operation.path(bearer).findValues("\$ref").forEach { reference ->
                     produced += reference.asText().substringAfterLast('/')
                 }
             }
         }
+        return expandThroughSchemas(produced)
+    }
 
+    /**
+     * Parses the `x-axelix-server` marker, accepting either a single scalar value or a YAML list.
+     */
+    private fun parseSides(node: JsonNode): Set<String> = when {
+        node.isMissingNode -> emptySet()
+        node.isArray -> node.map { element -> element.asText() }.toSet()
+        else -> setOf(node.asText())
+    }
+
+    private fun expandThroughSchemas(seed: Set<String>): Set<String> {
+        val produced = seed.toMutableSet()
         val schemas = root.path("components").path("schemas")
         val queue = ArrayDeque(produced)
         while (queue.isNotEmpty()) {
@@ -80,7 +111,7 @@ class ContractDocument private constructor(private val root: JsonNode, val axeli
                 }
             }
         }
-        return@lazy produced
+        return produced
     }
 
     /**

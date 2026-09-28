@@ -1,0 +1,37 @@
+openapi: 3.1.0
+info:
+  title: loggers-list
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server:
+    - starter
+    - master
+paths:
+  /actuator/axelix-loggers:
+    get:
+      operationId: getLoggers
+      responses:
+        '200':
+          description: The loggers of the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggersReply'
+components:
+  schemas:
+    # Both sides declared: this schema is starter-produced too, so the same window rule as a
+    # starter-only document applies.
+    LoggersReply:
+      type: object
+      required:
+        - loggers
+        - effectiveLevel
+      properties:
+        loggers:
+          type: string
+          x-axelix-introduced-in: 1.0.0
+        effectiveLevel:
+          type: string
+          # INVALID: added in the release currently being built (1.2.0-SNAPSHOT), so starters
+          # 1.0-1.1 within the window do not send it — it cannot be 'required' until 1.5.
+          x-axelix-introduced-in: 1.2.0
