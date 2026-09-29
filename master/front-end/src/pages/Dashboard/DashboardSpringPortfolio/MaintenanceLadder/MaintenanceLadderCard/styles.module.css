@@ -1,0 +1,26 @@
+.MainWrapper {
+    background-color: var(--axelix-primary-white);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+    padding: 18px 22px;
+}
+
+.Rows {
+    position: relative;
+    padding-bottom: 20px; 
+}
+
+.TodayLine {
+    position: absolute;
+    top: 0;
+    bottom: 20px;
+    width: 1px;
+    background-color: var(--axelix-primary-black);
+    opacity: 0.3;
+    z-index: 2;
+}
+
+.GroupGap {
+    height: 10px;
+}

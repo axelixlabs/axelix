@@ -23,6 +23,7 @@ import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
 import { DashboardSiderMenu } from "@/layout/siders";
 
+const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DashboardOverview = Loadable(lazy(() => import("@/pages/Dashboard/DashboardOverview")));
@@ -61,6 +62,7 @@ export const MainRoutes = () => {
                 <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
                     <Route index element={<Navigate to="overview" replace />} />
                     <Route path="overview" element={<DashboardOverview />} />
+                    <Route path="spring-portfolio" element={<DashboardSpringPortfolio />} />
                     <Route path="java" element={<DashboardJava />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
                     <Route path="spring-framework" element={<DashboardSpringFramework />} />
