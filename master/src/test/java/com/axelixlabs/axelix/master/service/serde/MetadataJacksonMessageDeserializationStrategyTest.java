@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

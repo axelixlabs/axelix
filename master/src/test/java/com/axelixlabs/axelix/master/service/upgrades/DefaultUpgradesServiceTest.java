@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
@@ -37,6 +36,7 @@ import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocke
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
@@ -246,7 +246,7 @@ class DefaultUpgradesServiceTest {
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
-                        new PersistenceInsights(List.of())),
+                        new PersistenceInsights().transactions(List.of())),
                 new HistoricalApplicationSnapshot.Versions(
                         starterVersion, "3.5.0", "6.2.0", new JavaVersion(21, 0, 0, 0), JdkVendor.ADOPTIUM, null));
     }

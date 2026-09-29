@@ -36,15 +36,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
-import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -393,23 +393,29 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
             String artifactId,
             List<CountedLazyLoadingTarget> lazyLoadingTargets,
             Map<String, Integer> inMemoryPagination) {
-        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                TransactionOrigin.APPLICATION_DECLARATIVE,
-                new TransactionalKey("com.example.OwnerService", "loadOwners"),
-                new ExecutionStats(1, 10, 5),
-                lazyLoadingTargets,
-                inMemoryPagination,
-                List.of(),
-                "REQUIRED",
-                "DEFAULT",
-                false);
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                .transactionalKey(new TransactionalKey()
+                        .className("com.example.OwnerService")
+                        .methodName("loadOwners"))
+                .transactionOverallStats(
+                        new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                .lazyLoadingTargets(lazyLoadingTargets)
+                .inMemoryPagination(inMemoryPagination)
+                .externalCalls(List.of())
+                .propagation("REQUIRED")
+                .isolation("DEFAULT")
+                .readOnly(false);
         return TestMetadataFactory.withPersistenceInsights(
-                groupId, artifactId, new PersistenceInsights(List.of(profile)));
+                groupId, artifactId, new PersistenceInsights().transactions(List.of(profile)));
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(
-                new LazyLoadingTarget(String.class.getName(), associationPropertyName), count);
+        return new CountedLazyLoadingTarget()
+                .target(new LazyLoadingTarget()
+                        .ownerEntityClass(String.class.getName())
+                        .associationPropertyName(associationPropertyName))
+                .count(count);
     }
 
     private static HistoricalApplicationSnapshot languagesSnapshot(
@@ -419,10 +425,11 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 new Insights(
                         new Insights.HotSpot(
                                 new Insights.HotSpot.ProjectLeyden(false, false),
-                                new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
+                                new Insights.HotSpot.GarbageCollector(
+                                        false, com.axelixlabs.axelix.common.domain.insights.GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
-                        new PersistenceInsights(List.of())),
+                        new PersistenceInsights().transactions(List.of())),
                 new HistoricalApplicationSnapshot.Versions(
                         "1.0.0", "3.5.2", "6.2.1", new JavaVersion(javaVersion, 0, 0, 0), jdkVendor, kotlinVersion));
     }

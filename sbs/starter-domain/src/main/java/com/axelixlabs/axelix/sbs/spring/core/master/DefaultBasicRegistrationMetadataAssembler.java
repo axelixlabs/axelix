@@ -20,8 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
@@ -56,26 +59,27 @@ public class DefaultBasicRegistrationMetadataAssembler implements BasicRegistrat
 
     @Override
     public BasicRegistrationMetadata assemble() {
-        return new BasicRegistrationMetadata(
-                axelixVersionDiscoverer.getVersion(),
-                axelixInfoProperties.getServiceVersion(),
-                axelixInfoProperties.getGroupId(),
-                axelixInfoProperties.getArtifactId(),
-                axelixInfoProperties.getCommitShaShort(),
-                libraryInformationProvider.getJdkVendorName(),
-                GarbageCollectorInfoAssembler.getGarbageCollectorInfo(),
-                buildSoftwareVersionInUse(),
-                healthDetectionFunction.get(),
-                new BasicRegistrationMetadata.MemoryDetails(
-                        memoryMXBean.getHeapMemoryUsage().getUsed()),
-                insightsInfoProvider.getInsight());
+        return new BasicRegistrationMetadata()
+                .version(axelixVersionDiscoverer.getVersion())
+                .serviceVersion(axelixInfoProperties.getServiceVersion())
+                .groupId(axelixInfoProperties.getGroupId())
+                .artifactId(axelixInfoProperties.getArtifactId())
+                .commitShortSha(axelixInfoProperties.getCommitShaShort())
+                .jdkVendor(libraryInformationProvider.getJdkVendorName())
+                .gcInUse(GarbageCollector.valueOf(
+                        GarbageCollectorInfoAssembler.getGarbageCollectorInfo().name()))
+                .softwareVersions(buildSoftwareVersionInUse())
+                .healthStatus(healthDetectionFunction.get())
+                .memoryDetails(new MemoryDetails()
+                        .heap(memoryMXBean.getHeapMemoryUsage().getUsed()))
+                .insights(insightsInfoProvider.getInsight());
     }
 
-    private BasicRegistrationMetadata.SoftwareVersions buildSoftwareVersionInUse() {
-        return new BasicRegistrationMetadata.SoftwareVersions(
-                libraryInformationProvider.getJavaVersion(),
-                libraryInformationProvider.getSpringBootVersion(),
-                libraryInformationProvider.getSpringVersion(),
-                libraryInformationProvider.getKotlinVersion());
+    private SoftwareVersions buildSoftwareVersionInUse() {
+        return new SoftwareVersions()
+                .java(libraryInformationProvider.getJavaVersion())
+                .springBoot(libraryInformationProvider.getSpringBootVersion())
+                .springFramework(libraryInformationProvider.getSpringVersion())
+                .kotlin(libraryInformationProvider.getKotlinVersion());
     }
 }

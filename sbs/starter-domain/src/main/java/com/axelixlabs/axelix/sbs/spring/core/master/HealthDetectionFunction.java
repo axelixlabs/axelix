@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.util.function.Supplier;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HealthStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 
 /**
  * Just a nominal type for the {@link Supplier} that provides the {@link HealthStatus}.

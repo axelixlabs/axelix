@@ -1,0 +1,599 @@
+openapi: 3.1.0
+info:
+  title: heartbeat
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'heartbeat' operation.
+    This operation lets the starter push the extended service instance metadata to Axelix Master
+    as part of the self-registration / heartbeat process.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: master
+paths:
+  /service/register:
+    post:
+      operationId: registerService
+      summary: Accepts the heartbeat of a service instance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartBeatMetadata'
+      responses:
+        '204':
+          description: The heartbeat was accepted.
+        '400':
+          description: The heartbeat request could not be processed.
+        '409':
+          description: The starter version of the instance is not supported by this Axelix Master.
+components:
+  schemas:
+    HeartBeatMetadata:
+      type: object
+      description: Represents extended service instance metadata supplied as part of the heartbeat process.
+      required:
+        - basicRegistrationMetadata
+        - instanceId
+        - instanceName
+        - instanceActuatorUrl
+        - deploymentAt
+      properties:
+        basicRegistrationMetadata:
+          description: The basic metadata of a service instance.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/BasicRegistrationMetadata'
+        instanceId:
+          type: string
+          description: Unique identifier (uid) of the service.
+          x-axelix-introduced-in: 1.2.0
+        instanceName:
+          type: string
+          description: Name of the service.
+          x-axelix-introduced-in: 1.2.0
+        instanceActuatorUrl:
+          type: string
+          description: >-
+            The URL of the service, including the postfix for the actuator path, e.g.
+            https://my-app:6061/actuator.
+          x-axelix-introduced-in: 1.2.0
+        deploymentAt:
+          type: string
+          description: Timestamp when the service was created.
+          x-axelix-introduced-in: 1.2.0
+    # BasicRegistrationMetadata and everything below it is duplicated verbatim in
+    # metadata/metadata-feed.yaml (no cross-document schema reuse yet, see GH-1666). Keep both in sync.
+    BasicRegistrationMetadata:
+      type: object
+      description: >-
+        Represents the basic metadata that is always required in order to register the service,
+        regardless of the approach - either auto-discovery or self-registration.
+      required:
+        - version
+        - serviceVersion
+        - groupId
+        - artifactId
+        - commitShortSha
+        - jdkVendor
+        - gcInUse
+        - softwareVersions
+        - healthStatus
+        - memoryDetails
+        - insights
+      properties:
+        version:
+          type: string
+          description: The version of the axelix starter in the remote instance.
+          x-axelix-introduced-in: 1.2.0
+        serviceVersion:
+          type: string
+          description: >-
+            The version of the managed service itself, i.e. the version of the end-service
+            artifact (the V inside GAV coordinate). Never absent.
+          x-axelix-introduced-in: 1.2.0
+        groupId:
+          type: string
+          description: >-
+            The group id of the managed service artifact (the G inside GAV coordinate). Together
+            with the artifactId it forms the application id shared by all instances of the same
+            application. Mandatory - an instance cannot be registered without it.
+          x-axelix-introduced-in: 1.2.0
+        artifactId:
+          type: string
+          description: >-
+            The artifact id of the managed service artifact (the A inside GAV coordinate).
+            Together with the groupId it forms the application id shared by all instances of the
+            same application. Mandatory - an instance cannot be registered without it.
+          x-axelix-introduced-in: 1.2.0
+        commitShortSha:
+          type: string
+          description: The short commit hash (i.e. 'a622a54' or smth like that). Never absent.
+          x-axelix-introduced-in: 1.2.0
+        jdkVendor:
+          type: string
+          description: The JDK vendor name.
+          x-axelix-introduced-in: 1.2.0
+        gcInUse:
+          description: The garbage collector currently used by the service.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/GarbageCollector'
+        softwareVersions:
+          description: The software versions.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/SoftwareVersions'
+        healthStatus:
+          description: >-
+            The health status of the given instance that is reported by started infrastructure.
+            Never absent.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/HealthStatus'
+        memoryDetails:
+          description: The memory details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/MemoryDetails'
+        insights:
+          description: The insight information discovered for the given service instance.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/Insights'
+    SoftwareVersions:
+      type: object
+      description: Software versions information.
+      required:
+        - java
+        - springBoot
+        - springFramework
+      properties:
+        java:
+          type: string
+          description: >-
+            The version of java platform that service is currently running on. Because the
+            assumption is that we're going to manage java/kotlin services, the java platform is
+            always going to be there. Therefore, it is never absent.
+          x-axelix-introduced-in: 1.2.0
+        springBoot:
+          type: string
+          description: >-
+            The version of Spring Boot that service is currently running on. Because the
+            assumption is that we're managing the Spring Boot projects (at least as of now), the
+            Spring Boot version is also never absent.
+          x-axelix-introduced-in: 1.2.0
+        springFramework:
+          type: string
+          description: >-
+            The version of Spring Framework that service is currently running on. Because the
+            assumption is that we're managing the Spring Boot projects (at least as of now), the
+            Spring Framework version is also never absent.
+          x-axelix-introduced-in: 1.2.0
+        kotlin:
+          type: string
+          description: >-
+            The version of Kotlin that service is currently using. Might be absent in case the
+            service is not using kotlin.
+          x-axelix-introduced-in: 1.2.0
+    MemoryDetails:
+      type: object
+      description: Memory details of the given Instance.
+      required:
+        - heap
+      properties:
+        heap:
+          type: integer
+          format: int64
+          description: The estimated heap size of the given instance.
+          x-axelix-introduced-in: 1.2.0
+    HealthStatus:
+      type: string
+      description: The health status of the given instance during registration.
+      enum:
+        - UP
+        - DOWN
+        - UNKNOWN
+    GarbageCollector:
+      type: string
+      description: Garbage collector used by a managed JVM service instance.
+      enum:
+        - G1
+        - SHENADOAH
+        - GEN_SHENADOAH
+        - ZGC
+        - EPSILONGC
+        - PARALLEL
+        - SERIAL
+        - CMS
+        - UNKNOWN
+    Insights:
+      type: object
+      description: The insight information discovered for the given service instance.
+      required:
+        - hotSpot
+        - springFramework
+        - persistenceInsights
+      properties:
+        hotSpot:
+          description: The HotSpot-specific insight groups.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/HotSpotInsights'
+        springFramework:
+          type: array
+          description: The Spring Framework insight features.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/InsightFeature'
+        persistenceInsights:
+          description: The persistence-related insights.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/PersistenceInsights'
+        scheduledTaskExecutions:
+          type: array
+          description: The results of the scheduled task executions. Absent when there are none to report.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/ScheduledTaskExecution'
+    HotSpotInsights:
+      type: object
+      description: HotSpot-specific insight groups.
+      required:
+        - projectLeyden
+        - gc
+        - projectLilliputh
+      properties:
+        projectLeyden:
+          type: array
+          description: The Project Leyden insight features.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/InsightFeature'
+        gc:
+          type: array
+          description: The garbage collection insight features.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/InsightFeature'
+        projectLilliputh:
+          type: array
+          description: The Project Lilliputh insight features.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/InsightFeature'
+    InsightFeature:
+      type: object
+      description: A specific insight feature discovered for the given service instance.
+      required:
+        - featureId
+        - enabled
+      properties:
+        featureId:
+          type: string
+          description: The insight feature id.
+          x-axelix-introduced-in: 1.2.0
+        enabled:
+          type: boolean
+          description: The enabled state of the insight feature.
+          x-axelix-introduced-in: 1.2.0
+    ScheduledTaskExecution:
+      type: object
+      description: The result of a single execution of a scheduled task.
+      required:
+        - taskId
+        - startedAt
+        - durationMillis
+        - success
+      properties:
+        taskId:
+          type: string
+          description: The id of the scheduled task.
+          x-axelix-introduced-in: 1.2.0
+        startedAt:
+          type: string
+          description: The timestamp the task execution started at.
+          x-axelix-introduced-in: 1.2.0
+        durationMillis:
+          type: integer
+          format: int64
+          description: The duration of the task execution, in milliseconds.
+          x-axelix-introduced-in: 1.2.0
+        success:
+          type: boolean
+          description: Whether the task execution succeeded.
+          x-axelix-introduced-in: 1.2.0
+        errorType:
+          type: string
+          description: The name of the exception thrown by the task execution, or absent when it succeeded.
+          x-axelix-introduced-in: 1.2.0
+        errorMessage:
+          type: string
+          description: The message of the exception thrown by the task execution, or absent when it succeeded.
+          x-axelix-introduced-in: 1.2.0
+    PersistenceInsights:
+      type: object
+      description: Insights of a particular instance related to persistence.
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          description: The aggregated information about the transactions inside the instance.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/TransactionAggregatedProfile'
+        entitiesMap:
+          description: >-
+            The registry of JPA entities Axelix mapped in the instance and the problems detected in
+            their associations. Absent when the instance did not report it (e.g. no JPA on the
+            classpath, or an older agent).
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/JpaEntities'
+    TransactionAggregatedProfile:
+      type: object
+      description: Aggregated information about a particular transactional method in the instance.
+      required:
+        - transactionOrigin
+        - transactionalKey
+        - transactionOverallStats
+        - lazyLoadingTargets
+        - inMemoryPagination
+        - externalCalls
+      properties:
+        transactionOrigin:
+          description: The origin of the transaction, i.e. how exactly the transaction was created.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/TransactionOrigin'
+        transactionalKey:
+          description: The key that identifies the transactional method.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/TransactionalKey'
+        transactionOverallStats:
+          description: >-
+            The min/max/avg call duration aggregated across every invocation of the transactional
+            method.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ExecutionStats'
+        lazyLoadingTargets:
+          type: array
+          description: The aggregated counts of lazy-loading (N+1) occasions detected in the transaction.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/CountedLazyLoadingTarget'
+        inMemoryPagination:
+          type: object
+          description: >-
+            The in-memory pagination counters detected in the transaction, keyed by the offending
+            query.
+          x-axelix-introduced-in: 1.2.0
+          additionalProperties:
+            type: integer
+            format: int32
+        externalCalls:
+          type: array
+          description: >-
+            The aggregated timing of the blocking calls made to external endpoints from within the
+            transaction.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/ExternalCallInsight'
+        propagation:
+          type: string
+          description: >-
+            The declared propagation behavior of the transaction (e.g. 'REQUIRED'). Absent when it
+            could not be determined.
+          x-axelix-introduced-in: 1.2.0
+        isolation:
+          type: string
+          description: >-
+            The declared isolation level of the transaction (e.g. 'DEFAULT'). Absent when it could
+            not be determined.
+          x-axelix-introduced-in: 1.2.0
+        readOnly:
+          type: boolean
+          description: >-
+            Whether the transaction was declared read-only. Absent when it could not be determined
+            (e.g. an older agent that did not report it).
+          x-axelix-introduced-in: 1.2.0
+    TransactionOrigin:
+      type: string
+      description: The origin of the transaction, i.e. how exactly the transaction was created.
+      enum:
+        - SPRING_INFRASTRUCTURE
+        - APPLICATION_DECLARATIVE
+        - APPLICATION_IMPERATIVE
+    TransactionalKey:
+      type: object
+      description: The key that identifies the transactional method.
+      required:
+        - className
+        - methodName
+      properties:
+        className:
+          type: string
+          description: The class name that declares the transactional method.
+          x-axelix-introduced-in: 1.2.0
+        methodName:
+          type: string
+          description: The name of the transactional method.
+          x-axelix-introduced-in: 1.2.0
+    ExecutionStats:
+      type: object
+      description: The min/max/avg duration statistics of repeated executions.
+      required:
+        - minMs
+        - maxMs
+        - averageMs
+      properties:
+        minMs:
+          type: integer
+          format: int64
+          description: The minimum observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.2.0
+        maxMs:
+          type: integer
+          format: int64
+          description: The maximum observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.2.0
+        averageMs:
+          type: integer
+          format: int64
+          description: The average observed duration, in milliseconds.
+          x-axelix-introduced-in: 1.2.0
+    CountedLazyLoadingTarget:
+      type: object
+      description: The aggregated count of lazy-loading (N+1) occasions for a particular association.
+      required:
+        - target
+        - count
+      properties:
+        target:
+          description: The association that was presumably lazy loaded.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/LazyLoadingTarget'
+        count:
+          type: integer
+          format: int32
+          description: The number of lazy-loading occasions observed.
+          x-axelix-introduced-in: 1.2.0
+    LazyLoadingTarget:
+      type: object
+      description: The particular association that presumably was lazy loaded.
+      required:
+        - ownerEntityClass
+        - associationPropertyName
+      properties:
+        ownerEntityClass:
+          type: string
+          description: The fully qualified name of the entity on which the association was lazy loaded.
+          x-axelix-introduced-in: 1.2.0
+        associationPropertyName:
+          type: string
+          description: The name of the lazy-loaded association property.
+          x-axelix-introduced-in: 1.2.0
+    ExternalCallInsight:
+      type: object
+      description: >-
+        Aggregated timing of the blocking calls made to a single external endpoint from within a
+        transactional method, folded across every invocation of that method.
+      required:
+        - type
+        - target
+        - stats
+      properties:
+        type:
+          description: The client that performed the call, e.g. an HTTP client or a messaging client.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/TypeExternalCall'
+        target:
+          type: string
+          description: >-
+            Where the call went: the request method and url for an HTTP call, e.g.
+            'GET https://payments/charge'. The topic / queue / exchange for a messaging call.
+          x-axelix-introduced-in: 1.2.0
+        stats:
+          description: >-
+            The min/max/avg call duration aggregated across every invocation of the transactional
+            method.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/ExecutionStats'
+    TypeExternalCall:
+      type: string
+      description: The client that performed a blocking call to an external system.
+      enum:
+        - HTTP_CLIENT
+        - KAFKA
+        - RABBIT
+    JpaEntities:
+      type: object
+      description: >-
+        The scan-first registry of every JPA entity Axelix mapped in an instance, together with the
+        association-mapping problems detected inside each.
+      required:
+        - entities
+      properties:
+        entities:
+          type: array
+          description: The mapped JPA entities.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/MappedEntity'
+    MappedEntity:
+      type: object
+      description: >-
+        A single JPA entity that Axelix mapped while scanning an instance, together with the
+        association problems detected inside it.
+      required:
+        - name
+        - table
+        - flaggedAssociations
+      properties:
+        name:
+          type: string
+          description: The entity name (e.g. 'Order').
+          x-axelix-introduced-in: 1.2.0
+        table:
+          type: string
+          description: The mapped table name (e.g. 'orders').
+          x-axelix-introduced-in: 1.2.0
+        associationsCount:
+          type: integer
+          format: int32
+          description: >-
+            The total number of associations mapped by the entity. Absent when it could not be
+            determined (e.g. an older agent that did not report it).
+          x-axelix-introduced-in: 1.2.0
+        flaggedAssociations:
+          type: array
+          description: The associations of this entity in which a problem was detected.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/FlaggedAssociation'
+    FlaggedAssociation:
+      type: object
+      description: A single association of a mapped entity in which Axelix detected a problem.
+      required:
+        - association
+        - mapping
+        - problems
+      properties:
+        association:
+          description: The association in which the problem was detected.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/Association'
+        mapping:
+          type: string
+          description: >-
+            A human-readable rendering of the offending mapping (e.g.
+            '@ManyToOne(fetch = FetchType.EAGER)').
+          x-axelix-introduced-in: 1.2.0
+        problems:
+          type: array
+          description: The categories of the detected problem.
+          x-axelix-introduced-in: 1.2.0
+          items:
+            $ref: '#/components/schemas/AssociationProblem'
+    Association:
+      type: object
+      description: >-
+        A single JPA association, identified by the entity that declares it and the field that maps
+        it.
+      required:
+        - entity
+        - field
+      properties:
+        entity:
+          type: string
+          description: The entity that declares the association (e.g. 'Order').
+          x-axelix-introduced-in: 1.2.0
+        field:
+          type: string
+          description: The field that maps the association (e.g. 'customer').
+          x-axelix-introduced-in: 1.2.0
+    AssociationProblem:
+      type: string
+      description: >-
+        A neutral category of a problem detected in a JPA association mapping while Axelix scanned
+        the entities of an instance.
+      enum:
+        - EAGER_FETCHING
+        - LIST_BACKED_MANY_TO_MANY
+        - CASCADE_REMOVE_OR_ALL
+        - UNIDIRECTIONAL_ONE_TO_MANY

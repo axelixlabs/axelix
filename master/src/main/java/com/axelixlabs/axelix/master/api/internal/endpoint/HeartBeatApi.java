@@ -29,9 +29,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
@@ -75,7 +76,8 @@ public class HeartBeatApi {
     @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
 
-        String starterVersion = request.getBasicRegistrationMetadata().getVersion();
+        BasicRegistrationMetadata metadata = request.getBasicRegistrationMetadata();
+        String starterVersion = metadata.getVersion();
 
         if (!compatibilityDetectionStrategy.isCompatible(starterVersion)) {
             log.warn(
@@ -92,11 +94,11 @@ public class HeartBeatApi {
                     request.getDeploymentAt(),
                     Instant.now(),
                     request.getInstanceActuatorUrl(),
-                    request.getBasicRegistrationMetadata());
+                    metadata);
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
-                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicRegistrationMetadata());
+                databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
             });
 
             return ResponseEntity.noContent().build();

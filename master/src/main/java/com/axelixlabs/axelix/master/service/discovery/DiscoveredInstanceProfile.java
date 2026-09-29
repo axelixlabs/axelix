@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 
 /**

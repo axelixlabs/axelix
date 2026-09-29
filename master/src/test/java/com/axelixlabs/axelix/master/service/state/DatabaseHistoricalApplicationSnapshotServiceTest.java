@@ -30,14 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFeature;
@@ -45,6 +37,14 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboar
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.master.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -116,18 +116,23 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         @Test
         void shouldPersistPersistenceTransactionalInsightsAsJson() {
             // given.
-            TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                    TransactionOrigin.APPLICATION_DECLARATIVE,
-                    new TransactionalKey("com.example.OwnerService", "saveOwner"),
-                    new ExecutionStats(1, 10, 5),
-                    List.of(),
-                    Map.of("com.example.Pet", 2),
-                    List.of(),
-                    "REQUIRED",
-                    "DEFAULT",
-                    false);
+            TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                    .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                    .transactionalKey(new TransactionalKey()
+                            .className("com.example.OwnerService")
+                            .methodName("saveOwner"))
+                    .transactionOverallStats(
+                            new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                    .lazyLoadingTargets(List.of())
+                    .inMemoryPagination(Map.of("com.example.Pet", 2))
+                    .externalCalls(List.of())
+                    .propagation("REQUIRED")
+                    .isolation("DEFAULT")
+                    .readOnly(false);
             BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
-                    "org.springframework.samples", "petclinic", new PersistenceInsights(List.of(profile)));
+                    "org.springframework.samples",
+                    "petclinic",
+                    new PersistenceInsights().transactions(List.of(profile)));
 
             // when.
             subject.reloadCurrentState(metadata);
@@ -258,11 +263,32 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
         void shouldAggregateGarbageCollectorDistributionAcrossServices() {
             // given.
             BasicRegistrationMetadata first = TestMetadataFactory.withFeatures(
-                    "com.example", "service-a", false, false, false, false, false, GarbageCollector.G1);
+                    "com.example",
+                    "service-a",
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.G1);
             BasicRegistrationMetadata second = TestMetadataFactory.withFeatures(
-                    "com.example", "service-b", false, false, false, false, false, GarbageCollector.G1);
+                    "com.example",
+                    "service-b",
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.G1);
             BasicRegistrationMetadata third = TestMetadataFactory.withFeatures(
-                    "com.example", "service-c", false, false, false, false, false, GarbageCollector.ZGC);
+                    "com.example",
+                    "service-c",
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.ZGC);
             subject.reloadCurrentStateBulk(List.of(first, second, third));
 
             // when.
@@ -329,18 +355,21 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
             String instanceId = "instance-with-persistence-insights";
             String groupId = "org.springframework.samples";
             String artifactId = "petclinic";
-            TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                    TransactionOrigin.APPLICATION_DECLARATIVE,
-                    new TransactionalKey("com.example.OwnerService", "saveOwner"),
-                    new ExecutionStats(1, 10, 5),
-                    List.of(),
-                    Map.of("com.example.Pet", 2),
-                    List.of(),
-                    "REQUIRED",
-                    "DEFAULT",
-                    false);
+            TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                    .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                    .transactionalKey(new TransactionalKey()
+                            .className("com.example.OwnerService")
+                            .methodName("saveOwner"))
+                    .transactionOverallStats(
+                            new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                    .lazyLoadingTargets(List.of())
+                    .inMemoryPagination(Map.of("com.example.Pet", 2))
+                    .externalCalls(List.of())
+                    .propagation("REQUIRED")
+                    .isolation("DEFAULT")
+                    .readOnly(false);
             BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
-                    groupId, artifactId, new PersistenceInsights(List.of(profile)));
+                    groupId, artifactId, new PersistenceInsights().transactions(List.of(profile)));
             jdbcAggregateTemplate.insert(TestInstanceFactory.create(instanceId, groupId, artifactId));
             subject.reloadCurrentState(metadata);
 
@@ -525,22 +554,28 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
 
     private static PersistenceInsights insights(
             List<CountedLazyLoadingTarget> lazyLoadingTargets, Map<String, Integer> inMemoryPagination) {
-        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                TransactionOrigin.APPLICATION_DECLARATIVE,
-                new TransactionalKey("com.example.OwnerService", "loadOwners"),
-                new ExecutionStats(1, 10, 5),
-                lazyLoadingTargets,
-                inMemoryPagination,
-                List.of(),
-                "REQUIRED",
-                "DEFAULT",
-                false);
-        return new PersistenceInsights(List.of(profile));
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                .transactionalKey(new TransactionalKey()
+                        .className("com.example.OwnerService")
+                        .methodName("loadOwners"))
+                .transactionOverallStats(
+                        new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                .lazyLoadingTargets(lazyLoadingTargets)
+                .inMemoryPagination(inMemoryPagination)
+                .externalCalls(List.of())
+                .propagation("REQUIRED")
+                .isolation("DEFAULT")
+                .readOnly(false);
+        return new PersistenceInsights().transactions(List.of(profile));
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(
-                new LazyLoadingTarget(String.class.getName(), associationPropertyName), count);
+        return new CountedLazyLoadingTarget()
+                .target(new LazyLoadingTarget()
+                        .ownerEntityClass(String.class.getName())
+                        .associationPropertyName(associationPropertyName))
+                .count(count);
     }
 
     private static HistoricalApplicationSnapshot persistenceSnapshot(
@@ -576,13 +611,20 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
                                         false, garbageCollector),
                                 new com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput(false)),
                         new com.axelixlabs.axelix.master.domain.Insights.SpringFramework(false),
-                        new PersistenceInsights(List.of())),
+                        new PersistenceInsights().transactions(List.of())),
                 new HistoricalApplicationSnapshot.Versions(
                         "1.0.0", "3.5.0", "6.2.0", new JavaVersion(21, 0, 0, 0), JdkVendor.ADOPTIUM, null));
     }
 
     private static BasicRegistrationMetadata otherAppMetadata() {
         return TestMetadataFactory.withFeatures(
-                "com.example", "other-app", false, false, true, true, false, GarbageCollector.ZGC);
+                "com.example",
+                "other-app",
+                false,
+                false,
+                true,
+                true,
+                false,
+                com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.ZGC);
     }
 }

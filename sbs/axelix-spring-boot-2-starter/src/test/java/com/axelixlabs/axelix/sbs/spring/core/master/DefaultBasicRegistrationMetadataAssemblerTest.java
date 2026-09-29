@@ -31,8 +31,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
@@ -57,7 +58,7 @@ class DefaultBasicRegistrationMetadataAssemblerTest {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicRegistrationMetadata.HealthStatus.UP;
+            return () -> HealthStatus.UP;
         }
 
         @Bean
@@ -113,7 +114,7 @@ class DefaultBasicRegistrationMetadataAssemblerTest {
         assertThat(serviceMetadata.getSoftwareVersions().getJava()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
-        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
+        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
         assertThat(serviceMetadata.getInsights()).isEqualTo(TEST_INSIGHTS);
     }

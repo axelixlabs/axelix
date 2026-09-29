@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.BuildProfile;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse.GitProfile;
@@ -39,6 +38,7 @@ import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
 import com.axelixlabs.axelix.master.contract.details.OsDetails;
 import com.axelixlabs.axelix.master.contract.details.RuntimeDetails;
 import com.axelixlabs.axelix.master.contract.details.SpringDetails;
+import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.details.DetailsConversionRequest;
 import com.axelixlabs.axelix.master.service.convert.response.details.InstanceDetailsConverter;

@@ -28,8 +28,8 @@ import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.master.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.master.contract.metadata.MappedEntity;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;

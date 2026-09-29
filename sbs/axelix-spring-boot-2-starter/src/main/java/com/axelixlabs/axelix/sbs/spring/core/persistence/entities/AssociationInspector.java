@@ -35,7 +35,7 @@ import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.AssociationProblem;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
 
 /**
  * Inspects a single JPA association (an {@link Attribute} together with the {@link AnnotatedElement}

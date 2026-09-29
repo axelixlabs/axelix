@@ -22,7 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link BasicRegistrationMetadata}.

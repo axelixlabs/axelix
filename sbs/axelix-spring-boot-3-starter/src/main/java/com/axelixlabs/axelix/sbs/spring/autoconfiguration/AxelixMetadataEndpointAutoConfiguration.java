@@ -28,10 +28,10 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
@@ -120,22 +120,22 @@ public class AxelixMetadataEndpointAutoConfiguration {
         return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
     }
 
-    private BasicRegistrationMetadata.HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {
+    private HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {
         if (healthEndpoint == null) {
-            return BasicRegistrationMetadata.HealthStatus.UP;
+            return HealthStatus.UP;
         }
 
         Status status = healthEndpoint.health().getStatus();
 
         if (status == Status.UP) {
-            return BasicRegistrationMetadata.HealthStatus.UP;
+            return HealthStatus.UP;
         }
 
         if (status == Status.DOWN) {
-            return BasicRegistrationMetadata.HealthStatus.DOWN;
+            return HealthStatus.DOWN;
         }
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
-        return BasicRegistrationMetadata.HealthStatus.UNKNOWN;
+        return HealthStatus.UNKNOWN;
     }
 }
