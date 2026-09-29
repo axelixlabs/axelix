@@ -56,7 +56,7 @@ class ScheduledTaskExecutionResultRepositoryTest {
     @Test
     void save_shouldPersistAndReadBackScheduledTaskExecutionResult() {
         var id = UUID.randomUUID();
-        var startedAt = Instant.parse("2026-09-27T10:00:00Z");
+        var startedAt = Instant.parse("2026-09-27T10:00:00.123Z");
         var executionResult = new ScheduledTaskExecutionResult(
                 id,
                 "com.axelixlabs",
@@ -68,11 +68,27 @@ class ScheduledTaskExecutionResultRepositoryTest {
                 false,
                 "NullPointerException",
                 "boom");
+        // A second execution of the same instance and task within the same second must be
+        // distinguishable from the first one by its millisecond timestamp.
+        var sameSecondExecution = new ScheduledTaskExecutionResult(
+                UUID.randomUUID(),
+                "com.axelixlabs",
+                "sample-app",
+                "instance-1",
+                "com.example.Job#run()",
+                startedAt.plusMillis(1),
+                2000L,
+                true,
+                null,
+                null);
 
         subject.save(executionResult);
+        subject.save(sameSecondExecution);
 
         ScheduledTaskExecutionResult loaded = subject.findById(id).orElseThrow();
         assertThat(loaded).isEqualTo(executionResult);
+        ScheduledTaskExecutionResult sameSecondLoaded = subject.findById(sameSecondExecution.id()).orElseThrow();
+        assertThat(sameSecondLoaded).isEqualTo(sameSecondExecution);
     }
 
     @Test

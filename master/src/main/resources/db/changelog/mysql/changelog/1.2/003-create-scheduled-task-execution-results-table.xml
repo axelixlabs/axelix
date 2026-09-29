@@ -29,7 +29,7 @@
       <column name="task_id" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="started_at" type="DATETIME">
+      <column name="started_at" type="DATETIME(3)">
         <constraints nullable="false"/>
       </column>
       <column name="duration_millis" type="BIGINT">
