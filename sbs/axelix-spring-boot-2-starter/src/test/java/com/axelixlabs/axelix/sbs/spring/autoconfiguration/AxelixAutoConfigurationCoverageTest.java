@@ -27,25 +27,28 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 /**
- * Verifies that every auto-configuration contributed by this starter is annotated with
- * {@link ConditionalOnAxelixStarterEnabled}.
+ * Verifies that every auto-configuration contributed by this starter uses
+ * {@link AxelixAutoConfiguration}.
  *
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
-class ConditionalOnAxelixStarterEnabledCoverageTest {
+class AxelixAutoConfigurationCoverageTest {
 
     private static final JavaClasses AUTOCONFIGURATION_CLASSES = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
             .importPackages("com.axelixlabs.axelix.sbs.spring.autoconfiguration");
 
-    @Test
-    void everyAutoConfigurationCarriesTheKillSwitchAnnotation() {
+    @Test // GH-1630
+    void everyAutoConfigurationUsesAxelixAutoConfiguration() {
         classes()
                 .that()
-                .areAnnotatedWith(AutoConfiguration.class)
+                .areMetaAnnotatedWith(AutoConfiguration.class)
+                .and()
+                .areNotAnnotations()
                 .should()
-                .beMetaAnnotatedWith(ConditionalOnAxelixStarterEnabled.class)
-                .because("axelix.sbs.enabled=false won't actually disable an auto-configuration without it")
+                .beAnnotatedWith(AxelixAutoConfiguration.class)
+                .because("every Axelix auto-configuration must use AxelixAutoConfiguration")
                 .allowEmptyShould(false)
                 .check(AUTOCONFIGURATION_CLASSES);
     }
