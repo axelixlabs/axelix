@@ -18,6 +18,7 @@
 
 .Axis {
     position: relative;
+    margin-bottom: 19px;
 }
 
 .AxisTick {
