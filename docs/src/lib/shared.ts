@@ -22,6 +22,8 @@ export const gitConfig = {
     user: "axelixlabs",
     repo: "axelix",
     branch: "master",
+    /** Directory of the MDX sources, relative to the repository root. */
+    contentDir: "docs/content/docs",
 };
 
 /** Base URL of the GitHub repository — e.g. for blob/edit/issue links. */
