@@ -176,10 +176,6 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint HEAP_DUMP_READ =
             register("heap-dump:read", HttpMethod.GET, ApiPaths.HeapDumpApi.INSTANCE_ID, null);
 
-    // Feign clients
-    public static final MasterWebEndpoint FEIGN_READ =
-            register("feign:read", HttpMethod.GET, ApiPaths.FeignClientApi.INSTANCE_ID, null);
-
     // Transaction monitoring
     public static final MasterWebEndpoint TRANSACTION_MONITORING_READ = register(
             "transaction-monitoring:read", HttpMethod.GET, ApiPaths.TransactionMonitoringApi.INSTANCE_ID, null);

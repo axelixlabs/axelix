@@ -225,14 +225,6 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/heapdump/{instanceId}";
     }
 
-    public static final class PropertyManagementApi {
-
-        /**
-         * Endpoint to update property of a given application instance.
-         */
-        public static final String INSTANCE_ID = "/property-management/{instanceId}";
-    }
-
     public static final class CachesApi {
 
         /**
@@ -334,14 +326,6 @@ public final class ApiPaths {
          */
         public static final String DISABLE_CONTENTION_MONITORING =
                 "/thread-dump/{instanceId}/thread-contention-monitoring/disable";
-    }
-
-    public static final class FeignClientApi {
-
-        /**
-         * Feign Client endpoint with instance ID.
-         */
-        public static final String INSTANCE_ID = "/feign/{instanceId}";
     }
 
     public static final class McpOAuth2Api {
