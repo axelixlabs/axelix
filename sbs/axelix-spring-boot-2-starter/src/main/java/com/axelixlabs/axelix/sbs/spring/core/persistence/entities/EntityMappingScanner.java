@@ -29,11 +29,11 @@ import javax.persistence.Table;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.Association;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.AssociationProblem;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Association;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.FlaggedAssociation;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
 
 /**
  * Scans the JPA metamodel of an {@link EntityManagerFactory} to build the {@link JpaEntities}: every
@@ -64,7 +64,7 @@ public class EntityMappingScanner {
         }
 
         entities.sort(Comparator.comparing(MappedEntity::getName));
-        return new JpaEntities(entities);
+        return new JpaEntities().entities(entities);
     }
 
     private MappedEntity scanEntity(EntityType<?> entityType) {
@@ -89,14 +89,20 @@ public class EntityMappingScanner {
             Set<AssociationProblem> problems = inspector.detectProblems();
 
             if (!problems.isEmpty()) {
-                Association association = new Association(entityName, attribute.getName());
+                Association association = new Association().entity(entityName).field(attribute.getName());
                 String mapping = inspector.renderMapping();
-                flagged.add(new FlaggedAssociation(association, mapping, problems));
+                flagged.add(new FlaggedAssociation()
+                        .association(association)
+                        .mapping(mapping)
+                        .problems(List.copyOf(problems)));
             }
         }
 
-        return new MappedEntity(
-                entityName, resolveTable(entityType.getJavaType(), entityName), associationsCount, flagged);
+        return new MappedEntity()
+                .name(entityName)
+                .table(resolveTable(entityType.getJavaType(), entityName))
+                .associationsCount(associationsCount)
+                .flaggedAssociations(flagged);
     }
 
     private static String resolveTable(Class<?> javaType, String entityName) {

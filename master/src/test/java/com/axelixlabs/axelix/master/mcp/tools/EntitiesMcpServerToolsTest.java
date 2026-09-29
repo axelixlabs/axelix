@@ -20,20 +20,19 @@ package com.axelixlabs.axelix.master.mcp.tools;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.Association;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.AssociationProblem;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.Association;
+import com.axelixlabs.axelix.master.contract.metadata.AssociationProblem;
+import com.axelixlabs.axelix.master.contract.metadata.FlaggedAssociation;
+import com.axelixlabs.axelix.master.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.master.contract.metadata.MappedEntity;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -72,7 +71,7 @@ class EntitiesMcpServerToolsTest {
             MappedEntity order =
                     entity("Order", "orders", 2, List.of(flagged("Order", "items", AssociationProblem.EAGER_FETCHING)));
             MappedEntity customer = entity("Customer", "customers", 0, List.of());
-            stubApplication(new JpaEntities(List.of(order, customer)));
+            stubApplication(new JpaEntities().entities(List.of(order, customer)));
 
             // when.
             String result = subject.getApplicationEntitiesProfile(GROUP_ID, ARTIFACT_ID, null);
@@ -92,7 +91,7 @@ class EntitiesMcpServerToolsTest {
             MappedEntity order =
                     entity("Order", "orders", 3, List.of(flagged("Order", "items", AssociationProblem.EAGER_FETCHING)));
             MappedEntity customer = entity("Customer", "customers", 0, List.of());
-            stubApplication(new JpaEntities(List.of(order, customer)));
+            stubApplication(new JpaEntities().entities(List.of(order, customer)));
 
             // when.
             String result = subject.getApplicationEntitiesProfile(GROUP_ID, ARTIFACT_ID, "Order");
@@ -115,7 +114,7 @@ class EntitiesMcpServerToolsTest {
         @Test
         void shouldReturnMessageWhenNoMatchingEntity() {
             // given.
-            stubApplication(new JpaEntities(List.of(entity("Customer", "customers", 0, List.of()))));
+            stubApplication(new JpaEntities().entities(List.of(entity("Customer", "customers", 0, List.of()))));
 
             // when.
             String result = subject.getApplicationEntitiesProfile(GROUP_ID, ARTIFACT_ID, "Order");
@@ -182,12 +181,18 @@ class EntitiesMcpServerToolsTest {
 
     private static MappedEntity entity(
             String name, String table, int associationsCount, List<FlaggedAssociation> flaggedAssociations) {
-        return new MappedEntity(name, table, associationsCount, flaggedAssociations);
+        return new MappedEntity()
+                .name(name)
+                .table(table)
+                .associationsCount(associationsCount)
+                .flaggedAssociations(flaggedAssociations);
     }
 
     private static FlaggedAssociation flagged(String entity, String field, AssociationProblem problem) {
-        return new FlaggedAssociation(
-                new Association(entity, field), "@ManyToOne(fetch = FetchType.EAGER)", Set.of(problem));
+        return new FlaggedAssociation()
+                .association(new Association().entity(entity).field(field))
+                .mapping("@ManyToOne(fetch = FetchType.EAGER)")
+                .problems(List.of(problem));
     }
 
     private static HistoricalApplicationSnapshot snapshot(@Nullable JpaEntities jpaEntities) {
@@ -199,7 +204,7 @@ class EntitiesMcpServerToolsTest {
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
-                        new PersistenceInsights(List.of(), jpaEntities)),
+                        new PersistenceInsights().transactions(List.of()).entitiesMap(jpaEntities)),
                 new HistoricalApplicationSnapshot.Versions(
                         "1.0.0", "3.5.0", "6.2.0", new JavaVersion(21, 0, 0, 0), JdkVendor.ADOPTIUM, null));
     }

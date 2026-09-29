@@ -145,6 +145,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "%s",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -154,6 +155,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
         """;
@@ -209,6 +221,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -218,6 +231,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -231,6 +255,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -240,6 +265,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -287,6 +323,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -296,6 +333,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -352,6 +400,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "artifactId" : "petclinic",
              "commitShortSha" : "a8b0929",
              "jdkVendor" : "BellSoft",
+             "gcInUse" : "G1",
              "softwareVersions" : {
                "springBoot" : "3.5.0",
                "java" : "25",
@@ -361,6 +410,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
+             },
+             "insights" : {
+               "hotSpot" : {
+                 "projectLeyden" : [ ],
+                 "gc" : [ ],
+                 "projectLilliputh" : [ ]
+               },
+               "springFramework" : [ ],
+               "persistenceInsights" : {
+                 "transactions" : [ ]
+               }
              }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
@@ -396,6 +456,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "artifactId" : "petclinic",
              "commitShortSha" : "a8b0929",
              "jdkVendor" : "BellSoft",
+             "gcInUse" : "G1",
              "softwareVersions" : {
                "springBoot" : "3.5.0",
                "java" : "25",
@@ -405,6 +466,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
+             },
+             "insights" : {
+               "hotSpot" : {
+                 "projectLeyden" : [ ],
+                 "gc" : [ ],
+                 "projectLilliputh" : [ ]
+               },
+               "springFramework" : [ ],
+               "persistenceInsights" : {
+                 "transactions" : [ ]
+               }
              }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
@@ -431,6 +503,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -440,6 +513,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -502,6 +586,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",

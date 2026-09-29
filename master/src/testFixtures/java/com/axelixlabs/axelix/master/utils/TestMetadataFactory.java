@@ -19,13 +19,16 @@ package com.axelixlabs.axelix.master.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
-import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.master.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.master.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.master.contract.metadata.Insights;
+import com.axelixlabs.axelix.master.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
 
 /**
  * Test fixture factory for {@link BasicRegistrationMetadata}.
@@ -92,7 +95,7 @@ public final class TestMetadataFactory {
                 compactObjectHeadersEnabled,
                 osivEnabled,
                 garbageCollector,
-                new PersistenceInsights(List.of()));
+                new PersistenceInsights().transactions(List.of()));
     }
 
     public static BasicRegistrationMetadata withPersistenceInsights(
@@ -111,21 +114,21 @@ public final class TestMetadataFactory {
             boolean osivEnabled,
             GarbageCollector garbageCollector,
             PersistenceInsights persistenceInsights) {
-        BasicRegistrationMetadata.SoftwareVersions softwareVersions =
-                new BasicRegistrationMetadata.SoftwareVersions("25", "3.5.0", "6.1.2", null);
+        SoftwareVersions softwareVersions =
+                new SoftwareVersions().java("25").springBoot("3.5.0").springFramework("6.1.2");
 
-        return new BasicRegistrationMetadata(
-                DEFAULT_VERSION,
-                DEFAULT_SERVICE_VERSION,
-                groupId,
-                artifactId,
-                DEFAULT_COMMIT_SHORT_SHA,
-                DEFAULT_JDK_VENDOR,
-                garbageCollector,
-                softwareVersions,
-                BasicRegistrationMetadata.HealthStatus.UP,
-                new BasicRegistrationMetadata.MemoryDetails(DEFAULT_HEAP),
-                insights(
+        return new BasicRegistrationMetadata()
+                .version(DEFAULT_VERSION)
+                .serviceVersion(DEFAULT_SERVICE_VERSION)
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .commitShortSha(DEFAULT_COMMIT_SHORT_SHA)
+                .jdkVendor(DEFAULT_JDK_VENDOR)
+                .gcInUse(garbageCollector)
+                .softwareVersions(softwareVersions)
+                .healthStatus(HealthStatus.UP)
+                .memoryDetails(new MemoryDetails().heap(DEFAULT_HEAP))
+                .insights(insights(
                         appCdsEnabled,
                         aotCacheEnabled,
                         gcLoggingEnabled,
@@ -141,19 +144,20 @@ public final class TestMetadataFactory {
             boolean compactObjectHeadersEnabled,
             boolean osivEnabled,
             PersistenceInsights persistenceInsights) {
-        return new Insights(
-                new HotSpotInsights(
-                        List.of(
+        return new Insights()
+                .hotSpot(new HotSpotInsights()
+                        .projectLeyden(List.of(
                                 feature(FeatureId.APP_CDS, appCdsEnabled),
-                                feature(FeatureId.AOT_CACHE, aotCacheEnabled)),
-                        List.of(feature(FeatureId.GC_LOGGING_ENABLED, gcLoggingEnabled)),
-                        List.of(feature(FeatureId.COMPACT_OBJECT_HEADERS, compactObjectHeadersEnabled))),
-                List.of(feature(FeatureId.OSIV, osivEnabled)),
-                persistenceInsights,
-                List.of());
+                                feature(FeatureId.AOT_CACHE, aotCacheEnabled)))
+                        .gc(List.of(feature(FeatureId.GC_LOGGING_ENABLED, gcLoggingEnabled)))
+                        .projectLilliputh(
+                                List.of(feature(FeatureId.COMPACT_OBJECT_HEADERS, compactObjectHeadersEnabled))))
+                .springFramework(List.of(feature(FeatureId.OSIV, osivEnabled)))
+                .persistenceInsights(persistenceInsights)
+                .scheduledTaskExecutions(List.of());
     }
 
     private static InsightFeature feature(FeatureId featureId, boolean enabled) {
-        return new InsightFeature(featureId.getId(), enabled);
+        return new InsightFeature().featureId(featureId.getId()).enabled(enabled);
     }
 }

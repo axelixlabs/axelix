@@ -24,13 +24,16 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.master.contract.metadata.MemoryDetails;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
@@ -73,18 +76,21 @@ class HistoricalApplicationSnapshotConverterTest {
     @Test
     void shouldMapPersistenceTransactionalInsights() {
         // given.
-        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                TransactionOrigin.APPLICATION_DECLARATIVE,
-                new TransactionalKey("com.example.OwnerService", "saveOwner"),
-                new ExecutionStats(1, 10, 5),
-                List.of(),
-                Map.of("com.example.Pet", 2),
-                List.of(),
-                "REQUIRED",
-                "DEFAULT",
-                false);
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                .transactionalKey(new TransactionalKey()
+                        .className("com.example.OwnerService")
+                        .methodName("saveOwner"))
+                .transactionOverallStats(
+                        new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                .lazyLoadingTargets(List.of())
+                .inMemoryPagination(Map.of("com.example.Pet", 2))
+                .externalCalls(List.of())
+                .propagation("REQUIRED")
+                .isolation("DEFAULT")
+                .readOnly(false);
         BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
-                "org.springframework.samples", "petclinic", new PersistenceInsights(List.of(profile)));
+                "org.springframework.samples", "petclinic", new PersistenceInsights().transactions(List.of(profile)));
 
         // when.
         HistoricalApplicationSnapshot snapshot = subject.currentSnapshot(metadata);
@@ -103,5 +109,69 @@ class HistoricalApplicationSnapshotConverterTest {
                             .isEqualTo(5);
                     assertThat(mapped.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
                 });
+    }
+
+    @Test
+    void shouldDefaultInsteadOfThrowingWhenGcInUseAndInsightsAreMissing() {
+        // given.
+        BasicRegistrationMetadata metadata = new BasicRegistrationMetadata()
+                .version("1.0.0-SNAPSHOT")
+                .serviceVersion("3.5.0-SNAPSHOT")
+                .groupId("org.springframework.samples")
+                .artifactId("petclinic")
+                .commitShortSha("a8b0929")
+                .jdkVendor("BellSoft")
+                .softwareVersions(
+                        new SoftwareVersions().java("25").springBoot("3.5.0").springFramework("6.1.2"))
+                .healthStatus(HealthStatus.UP)
+                .memoryDetails(new MemoryDetails().heap(12_000L));
+
+        // when.
+        HistoricalApplicationSnapshot snapshot = subject.currentSnapshot(metadata);
+
+        // then.
+        assertThat(snapshot.insights().hotSpot().gc().gcInUse()).isEqualTo(GarbageCollector.UNKNOWN);
+        assertThat(snapshot.insights().hotSpot().projectLeyden().appCdsEnabled())
+                .isFalse();
+        assertThat(snapshot.insights().springFramework().osivEnabled()).isFalse();
+        assertThat(snapshot.insights().persistenceInsights().getTransactions()).isEmpty();
+    }
+
+    @Test
+    void shouldPreserveReportedGcInUseWhenInsightsIsMissing() {
+        // given.
+        BasicRegistrationMetadata metadata = new BasicRegistrationMetadata()
+                .version("1.0.0-SNAPSHOT")
+                .serviceVersion("3.5.0-SNAPSHOT")
+                .groupId("org.springframework.samples")
+                .artifactId("petclinic")
+                .commitShortSha("a8b0929")
+                .jdkVendor("BellSoft")
+                .gcInUse(com.axelixlabs.axelix.master.contract.metadata.GarbageCollector.G1)
+                .softwareVersions(
+                        new SoftwareVersions().java("25").springBoot("3.5.0").springFramework("6.1.2"))
+                .healthStatus(HealthStatus.UP)
+                .memoryDetails(new MemoryDetails().heap(12_000L));
+        // insights is deliberately left unset.
+
+        // when.
+        HistoricalApplicationSnapshot snapshot = subject.currentSnapshot(metadata);
+
+        // then.
+        assertThat(snapshot.insights().hotSpot().gc().gcInUse()).isEqualTo(GarbageCollector.G1);
+    }
+
+    @Test
+    void shouldDefaultInsteadOfThrowingWhenPersistenceInsightsIsMissing() {
+        // given.
+        BasicRegistrationMetadata metadata = TestMetadataFactory.create("org.springframework.samples", "petclinic");
+        metadata.getInsights().persistenceInsights(null);
+
+        // when / then.
+        assertThat(subject.currentSnapshot(metadata)
+                        .insights()
+                        .persistenceInsights()
+                        .getTransactions())
+                .isEmpty();
     }
 }

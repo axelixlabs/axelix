@@ -21,8 +21,8 @@ import java.time.Instant;
 import java.util.Random;
 import java.util.UUID;
 
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
 
 /**
  * Default implementation of {@link HeartBeatMetadataAssembler}.
@@ -61,12 +61,12 @@ public class DefaultHeartBeatMetadataAssembler implements HeartBeatMetadataAssem
     @Override
     public HeartBeatMetadata assemble() {
 
-        return new HeartBeatMetadata(
-                basicRegistrationMetadataAssembler.assemble(),
-                instanceId,
-                instanceName,
-                heartBeatConfigurationProperties.getInstanceActuatorUrl(),
-                deploymentAt);
+        return new HeartBeatMetadata()
+                .basicRegistrationMetadata(basicRegistrationMetadataAssembler.assemble())
+                .instanceId(instanceId)
+                .instanceName(instanceName)
+                .instanceActuatorUrl(heartBeatConfigurationProperties.getInstanceActuatorUrl())
+                .deploymentAt(deploymentAt);
     }
 
     private String generateNamePostfix() {

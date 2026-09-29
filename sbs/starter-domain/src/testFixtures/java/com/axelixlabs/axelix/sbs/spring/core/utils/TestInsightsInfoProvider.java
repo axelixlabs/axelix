@@ -19,10 +19,10 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 /**
@@ -32,16 +32,20 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvide
  */
 public final class TestInsightsInfoProvider implements InsightsInfoProvider {
 
-    public static final Insights TEST_INSIGHTS = new Insights(
-            new HotSpotInsights(
-                    List.of(new InsightFeature("AppCDS", true), new InsightFeature("AotCache", false)),
-                    List.of(
-                            new InsightFeature("GCLoggingEnabled", true),
-                            new InsightFeature("GCLogFileSpecified", false)),
-                    List.of(new InsightFeature("CompactObjectHeaders", true))),
-            List.of(new InsightFeature("OSIV", false)),
-            new PersistenceInsights(List.of()),
-            List.of());
+    public static final Insights TEST_INSIGHTS = new Insights()
+            .hotSpot(new HotSpotInsights()
+                    .projectLeyden(List.of(
+                            new InsightFeature().featureId("AppCDS").enabled(true),
+                            new InsightFeature().featureId("AotCache").enabled(false)))
+                    .gc(List.of(
+                            new InsightFeature().featureId("GCLoggingEnabled").enabled(true),
+                            new InsightFeature().featureId("GCLogFileSpecified").enabled(false)))
+                    .projectLilliputh(List.of(new InsightFeature()
+                            .featureId("CompactObjectHeaders")
+                            .enabled(true))))
+            .springFramework(List.of(new InsightFeature().featureId("OSIV").enabled(false)))
+            .persistenceInsights(new PersistenceInsights().transactions(List.of()))
+            .scheduledTaskExecutions(List.of());
 
     @Override
     public Insights getInsight() {

@@ -17,10 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
 
 /**
- * Abstractions responsible for assembling the {@link HeartBeatMetadata}.
+ * Abstractions responsible for assembling the wire {@link HeartBeatMetadata}.
  *
  * @since 04.02.2026
  * @author Nikita Kirillov

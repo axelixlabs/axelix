@@ -29,10 +29,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.master.AbstractMasterSharedContextTest.SharedConfig;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
@@ -60,7 +60,7 @@ abstract class AbstractMasterSharedContextTest {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicRegistrationMetadata.HealthStatus.UP;
+            return () -> HealthStatus.UP;
         }
 
         @Bean

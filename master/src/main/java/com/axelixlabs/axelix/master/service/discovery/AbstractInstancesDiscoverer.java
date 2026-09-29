@@ -31,9 +31,9 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * the {{@link ActuatorEndpoints#METADATA} metadata endpoint} for compatibility etc.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer {
 

@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 
 /**
  * {@link JpaEntitiesProfileProvider} used when no JPA persistence provider is available in the instance. It
@@ -31,6 +31,6 @@ public class NoOpJpaEntitiesProfileProvider implements JpaEntitiesProfileProvide
 
     @Override
     public JpaEntities getEntities() {
-        return new JpaEntities(List.of());
+        return new JpaEntities().entities(List.of());
     }
 }

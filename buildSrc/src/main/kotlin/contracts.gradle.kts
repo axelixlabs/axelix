@@ -36,7 +36,25 @@ val contractSources = fileTree("$rootDir/common/src/main/resources/contract") { 
             inputSpec.set(document.absolutePath)
             outputDir.set(outputRoot.absolutePath)
             modelPackage.set(contracts.modelBasePackage.map { basePackage -> "$basePackage.$featurePackage" })
-            globalProperties.set(mapOf("models" to "", "modelDocs" to "false", "modelTests" to "false"))
+
+            // heartbeat.yaml textually duplicates metadata-feed.yaml's BasicRegistrationMetadata subtree
+            // (GH-1666, see the yaml comments). Avoid duplicate classes: only generate the one model
+            // heartbeat.yaml actually adds (HeartBeatMetadata); map everything else to metadata-feed's classes.
+            if (featurePackage == "heartbeat") {
+                globalProperties.set(mapOf("models" to "HeartBeatMetadata", "modelDocs" to "false", "modelTests" to "false"))
+                importMappings.set(contracts.modelBasePackage.map { basePackage ->
+                    listOf(
+                        "BasicRegistrationMetadata", "SoftwareVersions", "MemoryDetails", "HealthStatus", "GarbageCollector",
+                        "Insights", "HotSpotInsights", "InsightFeature", "ScheduledTaskExecution", "PersistenceInsights",
+                        "TransactionAggregatedProfile", "TransactionOrigin", "TransactionalKey", "ExecutionStats",
+                        "CountedLazyLoadingTarget", "LazyLoadingTarget", "ExternalCallInsight", "TypeExternalCall",
+                        "JpaEntities", "MappedEntity", "FlaggedAssociation", "Association", "AssociationProblem",
+                    ).associateWith { schema -> "$basePackage.metadata.$schema" }
+                })
+            } else {
+                globalProperties.set(mapOf("models" to "", "modelDocs" to "false", "modelTests" to "false"))
+            }
+
             configOptions.set(mapOf(
                 "hideGenerationTimestamp" to "true",
                 "openApiNullable" to "false",
