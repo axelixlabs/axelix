@@ -18,9 +18,11 @@
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
 import com.axelixlabs.axelix.master.service.upgrades.UpgradesService;
 
@@ -45,5 +47,13 @@ public class UpgradesApi {
     @GetMapping(path = ApiPaths.UpgradesApi.MAIN)
     public UpgradesResponse getUpgrades() {
         return upgradesService.getUpgrades();
+    }
+
+    /**
+     * Retrieve how many applications would lose compatibility if Axelix Master were upgraded to the given version.
+     */
+    @GetMapping(path = ApiPaths.UpgradesApi.IMPACT)
+    public UpgradeImpactResponse getUpgradeImpact(@RequestParam("targetVersion") String targetVersion) {
+        return upgradesService.getUpgradeImpact(targetVersion);
     }
 }

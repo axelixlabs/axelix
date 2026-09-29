@@ -32,9 +32,12 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
+import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.LatestStarterVersion;
+import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 import static com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy.WINDOW_SIZE;
 
@@ -94,6 +97,24 @@ public class DefaultUpgradesService implements UpgradesService {
                 WINDOW_SIZE,
                 buildStarterVersions(serviceCountByVersion),
                 buildCeilingBlockers(snapshots, oldestLabel));
+    }
+
+    @Override
+    public UpgradeImpactResponse getUpgradeImpact(String targetVersion) {
+        SemanticVersion target = SemanticVersion.tryParse(targetVersion)
+                .orElseThrow(() -> new BadRequestException("Not a valid semantic version: " + targetVersion));
+
+        LocalDate since = LocalDate.now(ZoneOffset.UTC).minusDays(OBSERVATION_WINDOW_DAYS);
+
+        int lostApplications = 0;
+        for (LatestStarterVersion snapshot : snapshotService.getLatestStarterVersionsSince(since)) {
+            if (!WindowCompatibilityDetectionStrategy.isCompatible(
+                    target, SemanticVersion.parse(snapshot.starterVersion()))) {
+                lostApplications++;
+            }
+        }
+
+        return new UpgradeImpactResponse(targetVersion, lostApplications);
     }
 
     private static List<StarterVersionUsage> buildStarterVersions(Map<String, Integer> serviceCountByVersion) {

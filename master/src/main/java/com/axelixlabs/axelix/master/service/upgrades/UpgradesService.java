@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.upgrades;
 
+import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 /**
  * Computes how far Axelix Master can be safely upgraded, given the starter versions currently in use across the
@@ -32,4 +34,11 @@ public interface UpgradesService {
      *         the fleet.
      */
     UpgradesResponse getUpgrades();
+
+    /**
+     * @param targetVersion the version Axelix Master is going to be upgraded to.
+     * @return how many applications would lose compatibility with Axelix Master after the upgrade.
+     * @throws BadRequestException if the {@code targetVersion} is not a valid semantic version.
+     */
+    UpgradeImpactResponse getUpgradeImpact(String targetVersion);
 }

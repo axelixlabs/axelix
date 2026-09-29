@@ -57,6 +57,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class UpgradesApiTest extends AbstractProtectedEndpointTest {
 
+    private static final String IMPACT_URL = "/api/external/upgrades/impact?targetVersion=1.6.0";
+
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
@@ -144,9 +146,40 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.UPGRADES_READ, viewer.getActor());
     }
 
+    @Test
+    void shouldReturnUpgradeImpact() {
+        // given. 1.2 falls out of the compatibility window of 1.6, 1.5 does not.
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        jdbcAggregateTemplate.insertAll(List.of(snapshot("app-a", today, "1.2.1"), snapshot("app-b", today, "1.5.0")));
+
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity(IMPACT_URL, String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).node("targetVersion").isString().isEqualTo("1.6.0");
+        assertThatJson(response.getBody()).node("lostApplications").isEqualTo(1);
+        assertSuccessfulCallback(MasterWebEndpoints.UPGRADES_READ_IMPACT, viewer.getActor());
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidTargetVersion() {
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .asViewer()
+                .getForEntity("/api/external/upgrades/impact?targetVersion=not-a-version", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
-        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.UPGRADES_READ, "/api/external/upgrades"));
+        return Set.of(
+                new TestableMasterWebEndpoint(MasterWebEndpoints.UPGRADES_READ, "/api/external/upgrades"),
+                new TestableMasterWebEndpoint(MasterWebEndpoints.UPGRADES_READ_IMPACT, IMPACT_URL));
     }
 
     private static HistoricalApplicationSnapshot snapshot(String artifactId, LocalDate date, String starterVersion) {

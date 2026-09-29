@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.CeilingBlocker;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.StarterVersionUsage;
+import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradeImpactResponse;
 import com.axelixlabs.axelix.master.api.external.response.upgrades.UpgradesResponse;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
@@ -42,9 +43,11 @@ import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.discovery.WindowCompatibilityDetectionStrategy;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link DefaultUpgradesService}.
@@ -170,6 +173,68 @@ class DefaultUpgradesServiceTest {
         assertThat(response.ceilingBlockers())
                 .extracting(CeilingBlocker::artifactId)
                 .containsExactly("valid");
+    }
+
+    @Test
+    void returnsZeroWhenNoServiceHasBeenSeen() {
+        // when.
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+
+        // then.
+        assertThat(response.targetVersion()).isEqualTo("1.6.0");
+        assertThat(response.lostApplications()).isZero();
+    }
+
+    @Test
+    void countsServicesFallingOutOfTheCompatibilityWindowOfTheTargetVersion() {
+        // given. the window of 1.6 covers starters from 1.3 up to 1.6.
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        jdbcAggregateTemplate.insertAll(List.of(
+                snapshot("same-minor", today, "1.6.0"),
+                snapshot("window-edge", today, "1.3.9"),
+                snapshot("too-old", today, "1.2.5"),
+                snapshot("newer-than-target", today, "1.7.0"),
+                snapshot("other-major", today, "2.4.0")));
+
+        // when.
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+
+        // then.
+        assertThat(response.lostApplications()).isEqualTo(3);
+    }
+
+    @Test
+    void upgradeImpactIgnoresServicesNotSeenWithinTheObservationWindow() {
+        // given. an incompatible service that was last seen outside the 30-day window.
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        jdbcAggregateTemplate.insertAll(List.of(
+                snapshot("current", today, "1.6.0"),
+                snapshot("stale", today.minusDays(DefaultUpgradesService.OBSERVATION_WINDOW_DAYS + 1), "1.0.0")));
+
+        // when.
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+
+        // then.
+        assertThat(response.lostApplications()).isZero();
+    }
+
+    @Test
+    void onlyTheLatestSnapshotOfEachServiceCounts() {
+        // given. the service was on an incompatible version yesterday, but upgraded today.
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        jdbcAggregateTemplate.insertAll(
+                List.of(snapshot("app-a", today.minusDays(1), "1.0.0"), snapshot("app-a", today, "1.5.0")));
+
+        // when.
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+
+        // then.
+        assertThat(response.lostApplications()).isZero();
+    }
+
+    @Test
+    void rejectsTargetVersionThatIsNotASemanticVersion() {
+        assertThatThrownBy(() -> subject.getUpgradeImpact("not-a-version")).isInstanceOf(BadRequestException.class);
     }
 
     private static HistoricalApplicationSnapshot snapshot(String artifactId, LocalDate date, String starterVersion) {

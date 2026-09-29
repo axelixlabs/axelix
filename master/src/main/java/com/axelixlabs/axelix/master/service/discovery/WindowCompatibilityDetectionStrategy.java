@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
  * (like {@code -SNAPSHOT}) are irrelevant to the window.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Component
 public class WindowCompatibilityDetectionStrategy implements CompatibilityDetectionStrategy {
@@ -53,9 +54,19 @@ public class WindowCompatibilityDetectionStrategy implements CompatibilityDetect
         SemanticVersion master = SemanticVersion.parse(axelixVersionDiscoverer.getVersion());
 
         return SemanticVersion.tryParse(starterVersion)
-                .filter(starter -> starter.major() == master.major())
-                .filter(starter -> starter.minor() <= master.minor())
-                .filter(starter -> master.minor() - starter.minor() < WINDOW_SIZE)
+                .filter(starter -> isCompatible(master, starter))
                 .isPresent();
+    }
+
+    /**
+     * Applies the compatibility window rule only. Both versions are expected to be already successfully parsed:
+     * validation of raw, untrusted version strings is the responsibility of {@link #isCompatible(String)}.
+     *
+     * @return whether the given starter version falls into the compatibility window of the given master version.
+     */
+    public static boolean isCompatible(SemanticVersion master, SemanticVersion starter) {
+        return starter.major() == master.major()
+                && starter.minor() <= master.minor()
+                && master.minor() - starter.minor() < WINDOW_SIZE;
     }
 }
