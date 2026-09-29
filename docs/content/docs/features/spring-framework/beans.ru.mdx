@@ -12,7 +12,7 @@ Axelix***
 
 Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть`VIEWER`, `EDITOR`,
 `ADMIN` и `SUPER_ADMIN`. Полную матрицу ролей и полномочий см. в разделе [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 Прокручиваемый список всех бинов с полем поиска над списком и счётчиком вида `<соответствует> / <всего>`.
 
@@ -59,16 +59,16 @@ Axelix***
 происхождение Spring сообщает для бина:
 
 - **`@Component` или его варианты** — бин получен из `@Component` / `@Service` / `@Repository` / `@Controller` /
-  пользовательского стереотипа. Если объявляющий класс отслеживается на странице [Условия](./conditions.ru.mdx), метка меняется
+  пользовательского стереотипа. Если объявляющий класс отслеживается на странице [Условия](./conditions.mdx), метка меняется
   на **`Класс Авто-Конфигурации`** и становится ссылкой на эту страницу.
 - **`@Bean` метод** — бин получен из фабричного метода `@Bean`. Дерево показывает:
     - имя **`@Bean` метода**.
     - **Объявляющий класс** — класс, в котором определён `@Bean` метод, доступный для перехода к компоненту, класс
       которого соответствует, когда он зарегистрирован. Метка меняется на **«Класс Авто-Конфигурации»**, когда
-      объявляющий класс отслеживается на странице [Условия](./conditions.ru.mdx).
-    - **Кто определяет этот компонент?** ссылка на страницу [Условия](./conditions.ru.mdx) — показывается в том же случае, т.
+      объявляющий класс отслеживается на странице [Условия](./conditions.mdx).
+    - **Кто определяет этот компонент?** ссылка на страницу [Условия](./conditions.mdx) — показывается в том же случае, т.
       е. когда объявляющий класс там отслеживается.
-    - `@ConfigurationProperties` бин - ссылка на страницу [Configuration Properties](./configuration-properties.ru.mdx) (только
+    - `@ConfigurationProperties` бин - ссылка на страницу [Configuration Properties](./configuration-properties.mdx) (только
       если бин помечен аннотацией `@ConfigurationProperties`).
 - **Создан через `FactoryBean`** — бин был создан `FactoryBean`. Дерево показывает имя класса **Factory Bean**.
 - **Синтетический бин** — внутренний бин Spring (например, инфраструктурные объекты, регистрируемые фреймворком или
@@ -76,12 +76,12 @@ Axelix***
 - **Неизвестно** — Spring не сообщил достаточно метаданных, чтобы классифицировать происхождение. Для бинов,
   зарегистрированных программно через `BeanDefinitionRegistry`, это обычный результат. Если такой бин также помечен
   аннотацией `@ConfigurationProperties`, метка «Происхождение» переключается на **бин `@ConfigurationProperties`** и
-  ссылается на страницу [Configuration Properties](./configuration-properties.ru.mdx).
+  ссылается на страницу [Configuration Properties](./configuration-properties.mdx).
 
 ## MCP-инструменты
 
 Каталог бинов управляемого сервиса также доступен ИИ-агентам через MCP. См. [Каталог
-MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.ru.mdx#инспекция-сервиса).
+MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#инспекция-сервиса).
 
 ## Включите Нужный Actuator Ендпоинт
 
@@ -94,7 +94,7 @@ actuator-эндпоинты, а эндпоинты `health`/`info` Axelix бол
 Страница работает поверх actuator-эндпоинта `axelix-beans`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
 разделе [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx):
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
 
 <Tabs items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -120,10 +120,10 @@ management:
 
 ## См. также
 
-- [Окружение](./properties.ru.mdx) — содержит ссылки на бин с этой страницы через поле **Инжектируется в**.
-- [Configuration Properties](./configuration-properties.ru.mdx) — переход по ссылке **бин `@ConfigurationProperties`** в
+- [Окружение](./properties.mdx) — содержит ссылки на бин с этой страницы через поле **Инжектируется в**.
+- [Configuration Properties](./configuration-properties.mdx) — переход по ссылке **бин `@ConfigurationProperties`** в
   Происхождении.
-- [Условия](./conditions.ru.mdx) — переход по ссылкам **`Класс Авто-Конфигурации`** / **«Происхождение бина»** в Происхождении.
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Условия](./conditions.mdx) — переход по ссылкам **`Класс Авто-Конфигурации`** / **«Происхождение бина»** в Происхождении.
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

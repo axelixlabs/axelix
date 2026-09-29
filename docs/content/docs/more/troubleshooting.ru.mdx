@@ -56,9 +56,9 @@ Axelix предоставляет отдельный артефакт старт
 ### Решение
 
 Подберите стартер под **мажорную** версию Spring Boot вашего приложения - см. [Отдельный стартер под каждую мажорную
-версию Spring Boot](./compatibility-and-versioning.ru.mdx#отдельный-стартер-под-каждую-мажорную-версию-spring-boot) и
+версию Spring Boot](./compatibility-and-versioning.mdx#отдельный-стартер-под-каждую-мажорную-версию-spring-boot) и
 точные координаты в разделе [Настройка Spring Boot
-Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#добавьте-зависимость).
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#добавьте-зависимость).
 
 ## 3. Локально запущенный сервис не регистрируется в локально запущенном Master
 
@@ -89,7 +89,7 @@ Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.
 
 Хотя бы раз выполните сборку перед тем, как полагаться на кнопку Run в IDE - `mvn package` (или
 `mvn install`), либо `./gradlew build`. См. [Что такое build-плагин
-Axelix?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.ru.mdx) - что именно генерирует плагин и
+Axelix?](../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) - что именно генерирует плагин и
 почему он обязателен.
 
 Дальше направьте стартер на ваш локальный Master через механизм саморегистрации и пропишите JWT-ключ подписи с обеих сторон -
@@ -123,9 +123,9 @@ java \
 
 При несовпадении ключа heartbeat отклоняется с `401` вместо регистрации. Полный справочник по саморегистрации - в
 разделе [Настройка Spring Boot
-Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#дайте-master-найти-сервис), а про
+Starter](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#дайте-master-найти-сервис), а про
 сторону Master - в разделе [Запуск как
-JAR](../setting-up-master-ui/configuring-master/configuring-master.ru.mdx#запуск-как-jar).
+JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-как-jar).
 
 :::warning
 Никогда не используйте ключ подписи выше, как и любой другой пример-ключ с этой страницы, в реальном развёртывании.
@@ -158,4 +158,4 @@ Spring Boot по умолчанию скрывает кастомные actuator
 
 Добавьте недостающие ID эндпоинтов в `management.endpoints.web.exposure.include` на стороне управляемого сервиса -
 полный список см. в разделе [Что открывает
-стартер](../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#что-открывает-стартер).
+стартер](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#что-открывает-стартер).

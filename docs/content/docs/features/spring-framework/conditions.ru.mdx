@@ -11,7 +11,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть `VIEWER`, `EDITOR`,
 `ADMIN` и `SUPER_ADMIN`. Полную матрицу ролей и полномочий см. в реазделе [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 В верхней части расположены две вкладки — **Отрицательные совпадения** (по умолчанию) и **Положительные совпадения** — с
 одним полем поиска над ними и счётчиком вида `<соответствует> / <всего>`, отражающим текущую активную вкладку.
@@ -55,7 +55,7 @@ style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), чтобы вы мо
 ## MCP-инструменты
 
 Отчёт об автоконфигурации также доступен ИИ-агентам через MCP. См. [Каталог
-MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.ru.mdx#инспекция-сервиса).
+MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#инспекция-сервиса).
 
 ## Включите Нужный Actuator Ендпоинт
 
@@ -68,7 +68,7 @@ actuator-эндпоинты, а эндпоинты `health`/`info` Axelix бол
 Страница работает поверх actuator-эндпоинта `axelix-conditions`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек
 см. в разделе [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx):
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
 
 <Tabs items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -94,7 +94,7 @@ management:
 
 ## См. также
 
-- [Бины](./beans.ru.mdx) — строки бинов ссылаются сюда через **`@AutoConfiguration class`** / **«Происхождение бина»**.
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Бины](./beans.mdx) — строки бинов ссылаются сюда через **`@AutoConfiguration class`** / **«Происхождение бина»**.
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -15,7 +15,7 @@ import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 
 Страница доступна для всех пользователей, прошедших аутентификацию:`VIEWER`, `EDITOR`, `ADMIN` и `SUPER_ADMIN` могут
 открывать ее, изменять уровни доступа и сбрасывать их. Полную матрицу ролей и полномочий см. в разделе [Роли и
-полномочия](../../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 ## Вкладка «Логгеры»
 Прокручиваемый список со всеми активными логгерами сервиса, с индикатором их уровней логирования, функцией поиска для
@@ -66,7 +66,7 @@ import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 
 Чтение дерева логгеров и изменение уровней во время работы — для отдельного логгера, группы логгеров или сброса
 отдельного логгера — также доступны ИИ-агентам через MCP. См. [Каталог
-MCP-инструментов](../../../setting-up-master-ui/mcp/mcp-tools.ru.mdx#логгеры).
+MCP-инструментов](../../../setting-up-master-ui/mcp/mcp-tools.mdx#логгеры).
 
 ## Включите Нужный Actuator Ендпоинт
 
@@ -79,7 +79,7 @@ actuator-эндпоинты, а эндпоинты `health`/`info` Axelix бол
 Страница работает поверх actuator-эндпоинта `axelix-loggers`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
 разделе [Настройка Spring Boot
-Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx):
+Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
 
 <Tabs items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -105,6 +105,6 @@ management:
 
 ## См. также
 
-- [Настройка Master](../../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Настройка Master](../../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

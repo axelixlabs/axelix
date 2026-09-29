@@ -60,11 +60,11 @@ Spring Boot вернуть сырые значения (`Show.ALWAYS`) и пов
 **Кто видит исходные значения.** Вызывающие с полномочием `ENV_VALUES_READ` предоставляемыми встроенными ролями `ADMIN`
 и `SUPER_ADMIN` — получают исходные значения. Остальные получают значения, заменённые на `******`. Полную матрицу ролей
 и полномочий см. в разделе [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 **Какие ключи маскируются.** Одно свойство стартера — `axelix.sbs.endpoints.config.sanitized-properties` — управляет
 этим набором, и оно применяется и к `axelix-env` (эта страница), и к `axelix-configprops` (страница [Configuration
-Properties](./configuration-properties.ru.mdx)):
+Properties](./configuration-properties.mdx)):
 
 - **Пустой список (по умолчанию)** — все значения маскируются для пользователей без соответствующих полномочий.
 - **Непустой список** — маскируются только указанные ключи, остальные возвращаются без изменений.
@@ -96,7 +96,7 @@ axelix:
 </Tabs>
 
 См. [Маскирование чувствительных значений
-свойств](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#маскирование-чувствительных-значений-свойств)
+свойств](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#маскирование-чувствительных-значений-свойств)
 в руководстве по настройке Spring Boot Starter — то же свойство описано рядом с остальными настройками стартера.
 
 :::note
@@ -109,7 +109,7 @@ axelix:
 
 Полное окружение управляемого сервиса — свойства приложения, системные свойства и переменные окружения ОС — также
 доступно ИИ-агентам через MCP. См. [Каталог
-MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.ru.mdx#инспекция-сервиса).
+MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#инспекция-сервиса).
 
 ## Включите Нужный Actuator Ендпоинт
 
@@ -122,7 +122,7 @@ actuator-эндпоинты, а эндпоинты `health`/`info` Axelix бол
 Страница работает поверх actuator-эндпоинта `axelix-env`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
 разделе [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx):
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
 
 <Tabs items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -148,6 +148,6 @@ management:
 
 ## См. также
 
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

@@ -11,7 +11,7 @@ description: "На странице Мониторинг транзакций п
 
 Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть `VIEWER`, `EDITOR`,
 `ADMIN` и `SUPER_ADMIN`. Полную матрицу ролей и полномочий см. в разделе [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 Прокручиваемый список каждой транзакционной точки входа, которую видел сервис, с полем поиска над списком и счётчиком
 вида `<соответствует> / <всего>`. Каждая строка — аккордеон, в её заголовке отображается:
@@ -61,15 +61,15 @@ APM-инструмент не требуется.
 Страница не опирается на отдельный actuator-эндпоинт. Axelix Spring Boot Starter агрегирует данные о транзакциях на
 JVM и отправляет их в Master как часть регистрационных метаданных инстанса — того же ответа, который отдаёт эндпоинт
 `axelix-metadata`, уже опрашиваемый Master. Пока `axelix-metadata` открыт (см. [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)), страница работает без каких-либо
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)), страница работает без каких-либо
 дополнительных эндпоинтов.
 
 Мониторинг транзакций включён по умолчанию. Чтобы полностью его выключить, установите
 `axelix.sbs.transaction.monitoring.enabled=false` — подробности см. в разделе [Мониторинг
-транзакций](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#мониторинг-транзакций).
+транзакций](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#мониторинг-транзакций).
 
 ## См. также
 
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

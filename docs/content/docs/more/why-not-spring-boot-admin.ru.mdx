@@ -5,8 +5,8 @@ description: "Spring Boot Admin (SBA) — часто первый инструм
               какие задачи он закрывает и как два продукта сравниваются по возможностям и по эксплуатации."
 ---
 
-Если вы выбираете между инструментами, прочитайте эту страницу вместе со справочником ["Возможностей"](../features/insights/details.ru.mdx) и
-разделом ["Мотивация"](../product/motivation.ru.mdx) — там разобраны повседневные проблемы, на которые ориентирован Axelix.
+Если вы выбираете между инструментами, прочитайте эту страницу вместе со справочником ["Возможностей"](../features/insights/details.mdx) и
+разделом ["Мотивация"](../product/motivation.mdx) — там разобраны повседневные проблемы, на которые ориентирован Axelix.
 
 ## Создан инженерами, которые много лет работали с SBA
 
@@ -35,12 +35,12 @@ Spring Boot Admin работает **поверх** встроенных endpoin
 
 Такие сценарии требуют кода в мониторируемом приложении: своих endpoint'ов, перехватчиков, расширенных отчётов.
 
-Axelix поставляет эту логику в [Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.ru.mdx) в виде
+Axelix поставляет эту логику в [Spring Boot Starter](../setting-up-spring-boot-service/spring-boot-starter/what-is-spring-boot-starter.mdx) в виде
 отдельных Actuator endpoint'ов `axelix-*`, к которым обращаются Master и UI. Это кстати одна из главных причин появления проекта
 Axelix: **Spring Boot Admin просто не давал той глубины операционной работы, которая нужна при отладке живых сервисов в сложных
 развёртываниях**.
 
-Конкретные примеры такой отладки — в разделе [Мотивация](../product/motivation.ru.mdx).
+Конкретные примеры такой отладки — в разделе [Мотивация](../product/motivation.mdx).
 
 ## Причина 2: Axelix готов к установке; SBA нужно собирать самим
 
@@ -53,14 +53,14 @@ Spring Boot Admin обычно встраивают в приложение, к�
 
 Axelix же специально дизайнился так, чтобы поставляться как **готовый к запуску** продукт:
 
-- **автономный JAR** с встроенным UI и MCP сервером — см. [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.ru.mdx);
+- **автономный JAR** с встроенным UI и MCP сервером — см. [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.mdx);
 - **официальный Docker-образ** и примеры **Docker Compose** в том же руководстве;
 - **официальный Helm-чарт** на [Artifact Hub](https://artifacthub.io/packages/helm/axelix/axelix) (исходники:
   [github.com/axelixlabs/helm-charts](https://github.com/axelixlabs/helm-charts)).
 
 Аутентификация встроена: для простых установок — локальная база пользователей, для production — **OAuth2/OIDC**
 (Keycloak, Auth0, Okta, Google и другие провайдеры) с сопоставлением ролей — см.
-[Аутентификация](../setting-up-master-ui/authentication/authentication.ru.mdx). Управляемые приложения защищены JWT между Master и starter;
+[Аутентификация](../setting-up-master-ui/authentication/authentication.mdx). Управляемые приложения защищены JWT между Master и starter;
 authorities на уровне операций (например, `CACHES_TOGGLE`, `SCHEDULED_TASKS_MODIFY`) ограничивают опасные действия в UI
 и через MCP.
 
@@ -88,38 +88,38 @@ Starter по-прежнему добавляется в каждый Spring Boot
 | JWT-защита Actuator endpoint'ов инстанса | ❌ | ✅ starter + Master |
 | **Стандартные поверхности Actuator** | | |
 | Health, info, metrics | ✅ | ✅ |
-| Loggers (смена уровней) | ✅ | ✅ ([Loggers](../features/insights/loggers/loggers.ru.mdx)) |
-| Environment / config properties (чтение) | ✅ | ✅ ([Properties](../features/spring-framework/properties.ru.mdx), [Configuration Properties](../features/spring-framework/configuration-properties.ru.mdx)) |
-| Thread dump, heap dump | ✅ | ✅ ([Thread Dump](../features/jvm/thread-dump.ru.mdx)) |
+| Loggers (смена уровней) | ✅ | ✅ ([Loggers](../features/insights/loggers/loggers.mdx)) |
+| Environment / config properties (чтение) | ✅ | ✅ ([Properties](../features/spring-framework/properties.mdx), [Configuration Properties](../features/spring-framework/configuration-properties.mdx)) |
+| Thread dump, heap dump | ✅ | ✅ ([Thread Dump](../features/jvm/thread-dump.mdx)) |
 | **Сверх стандартного Actuator** | | |
-| Включение / отключение кэшей в runtime | ❌ (только evict/clear через `/actuator/caches`) | ✅ ([Caches](../features/spring-framework/caches.ru.mdx)) |
+| Включение / отключение кэшей в runtime | ❌ (только evict/clear через `/actuator/caches`) | ✅ ([Caches](../features/spring-framework/caches.mdx)) |
 | Очистка кэшей | ✅ | ✅ |
 | Графики hit/miss и оценка числа записей | ❌ | ✅ |
 | Список задач с `@Scheduled` | ✅ (только чтение через Actuator) | ✅ |
-| Запуск scheduled-задачи по требованию | ❌ | ✅ ([Scheduled Tasks](../features/spring-framework/scheduled-tasks.ru.mdx)) |
+| Запуск scheduled-задачи по требованию | ❌ | ✅ ([Scheduled Tasks](../features/spring-framework/scheduled-tasks.mdx)) |
 | Смена cron / fixed delay / fixed rate в runtime | ❌ | ✅ |
 | Включение / отключение scheduled-задач в runtime | ❌ | ✅ |
-| Мониторинг транзакций (`@Transactional` + timeline SQL) | ❌ | ✅ ([Transaction Control](../features/spring-framework/transaction-control.ru.mdx)) |
-| Расширенные beans (зависимости, origin, qualifiers, proxying) | Частично (Actuator `/beans`) | ✅ ([Beans](../features/spring-framework/beans.ru.mdx)) |
-| Источник свойства + ссылки «injected in» / `@ConfigurationProperties` | Частично | ✅ ([Properties](../features/spring-framework/properties.ru.mdx)) |
-| Отчёт по условиям auto-configuration | ✅ | ✅ ([Conditions](../features/spring-framework/conditions.ru.mdx)) |
-| Группировка metrics с живыми графиками и drill-down по тегам | ✅ | ✅ ([Metrics](../features/insights/metrics.ru.mdx)) |
-| Вкл./выкл. GC-лога, trigger GC, скачивание GC-лога | ❌ | ✅ ([Garbage Collector](../features/jvm/garbage-collector.ru.mdx)) |
-| Опрос thread dump в реальном времени + переключатель contention monitoring | ✅ | ✅ ([Thread Dump](../features/jvm/thread-dump.ru.mdx)) |
+| Мониторинг транзакций (`@Transactional` + timeline SQL) | ❌ | ✅ ([Transaction Control](../features/spring-framework/transaction-control.mdx)) |
+| Расширенные beans (зависимости, origin, qualifiers, proxying) | Частично (Actuator `/beans`) | ✅ ([Beans](../features/spring-framework/beans.mdx)) |
+| Источник свойства + ссылки «injected in» / `@ConfigurationProperties` | Частично | ✅ ([Properties](../features/spring-framework/properties.mdx)) |
+| Отчёт по условиям auto-configuration | ✅ | ✅ ([Conditions](../features/spring-framework/conditions.mdx)) |
+| Группировка metrics с живыми графиками и drill-down по тегам | ✅ | ✅ ([Metrics](../features/insights/metrics.mdx)) |
+| Вкл./выкл. GC-лога, trigger GC, скачивание GC-лога | ❌ | ✅ ([Garbage Collector](../features/jvm/garbage-collector.mdx)) |
+| Опрос thread dump в реальном времени + переключатель contention monitoring | ✅ | ✅ ([Thread Dump](../features/jvm/thread-dump.mdx)) |
 | Обнаружение интеграций Feign client | ❌ | ✅ (endpoint `axelix-feign`) |
-| Экспорт состояния приложения в ZIP в один клик | Частично | ✅ ([Details](../features/insights/details.ru.mdx) — Download state) |
+| Экспорт состояния приложения в ZIP в один клик | Частично | ✅ ([Details](../features/insights/details.mdx) — Download state) |
 | **AI и автоматизация** | | |
-| MCP-сервер (Model Context Protocol) для AI-агентов | ❌ | ✅ ([MCP](../ui-guide/mcp), [MCP Tools](../setting-up-master-ui/mcp/mcp-tools)) |
+| MCP-сервер (Model Context Protocol) для AI-агентов | ❌ | ✅ ([MCP](../ui-guide/mcp.mdx), [MCP Tools](../setting-up-master-ui/mcp/mcp-tools.mdx)) |
 | Те же операции в UI и у MCP-клиентов | ❌ | ✅ |
 | **Обзор парка** | | |
-| Wallboard всех инстансов с health | ✅ | ✅ ([Wallboard](../ui-guide/wallboard)) |
+| Wallboard всех инстансов с health | ✅ | ✅ ([Wallboard](../ui-guide/wallboard.mdx)) |
 | Фильтры по версиям (Spring Boot, Java, Framework, Kotlin) | Частично | ✅ |
-| Discovery в Kubernetes / Docker Compose | ✅ (через Spring Cloud / своё) | ✅ ([Что такое Master](../setting-up-master-ui/what-is-master)) |
+| Discovery в Kubernetes / Docker Compose | ✅ (через Spring Cloud / своё) | ✅ ([Что такое Master](../setting-up-master-ui/what-is-master.mdx)) |
 
 ## См. также
 
-- [Введение](../product/introduction) — что такое Axelix.
-- [Мотивация](../product/motivation) — задачи, ради которых создан Axelix.
-- [Что такое Master](../setting-up-master-ui/what-is-master) — discovery и консоль управления.
-- [Настройка Master](../setting-up-master-ui/configuring-master/) — JAR, Docker, Helm, Compose.
-- [Возможности](../features/insights/details.ru.mdx) — справочник по экранам управляемых инстансов.
+- [Введение](../product/introduction.mdx) — что такое Axelix.
+- [Мотивация](../product/motivation.mdx) — задачи, ради которых создан Axelix.
+- [Что такое Master](../setting-up-master-ui/what-is-master.mdx) — discovery и консоль управления.
+- [Настройка Master](../setting-up-master-ui/configuring-master/configuring-master.mdx) — JAR, Docker, Helm, Compose.
+- [Возможности](../features/insights/details.mdx) — справочник по экранам управляемых инстансов.

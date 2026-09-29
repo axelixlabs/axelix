@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import styles from './styles.module.css';
 
 На этой странице показано, как подключить Axelix Spring Boot Starter к сервису на [Spring Boot](https://spring.io/),
-чтобы [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx) мог обнаруживать его, считывать его состояние и
+чтобы [Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) мог обнаруживать его, считывать его состояние и
 взаимодействовать с ним — как через пользовательский интерфейс, так и через встроенный в Master сервер MCP (Model
 Context Protocol), который предоставляет те же данные агентам искусственного интеллекта. Выберите модуль стартера,
 соответствующий мажорной версии Boot, предоставьте доступ к Axelix actuator-эндпоинтам (начиная с Axelix 1.2.0 это
@@ -33,8 +33,8 @@ Context Protocol), который предоставляет те же данн�
 - **Плагин сборки Axelix также обязателен**: помимо зависимости стартера, подключите Gradle- или Maven-плагин сборки
   Axelix. Он записывает координаты сборки (`groupId`/`artifactId`/`version`) в артефакт, а Master идентифицирует каждое
   приложение именно по этим координатам — сервис, собранный без плагина, **не сможет зарегистрироваться**. См.
-   [Что такое плагин сборки Axelix?](../build-plugin/what-is-build-plugin.ru.mdx) и [Настройка плагина
-   сборки](../build-plugin/configuration.ru.mdx).
+   [Что такое плагин сборки Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) и [Настройка плагина
+   сборки](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
 - **Два потребителя одних и тех же данных**: Master отдаёт пользовательский интерфейс Axelix по адресу `/` и сервер MCP
   по адресу `/api/mcp` (управляется `axelix.master.mcp-server.enabled`, по умолчанию включён). Оба считывают данные с
   тех же actuator-эндпоинтов, которые публикует стартер, — поэтому подключение стартера делает сервис видимым и для
@@ -42,7 +42,7 @@ Context Protocol), который предоставляет те же данн�
 - **Что нужно Master для взаимодействия с сервисом**: HTTP-доступность к базовому пути актуатора сервиса (по умолчанию
   `/actuator`), Axelix-эндпоинты, открытые через `management.endpoints.web.exposure.include`, и ключ для подписи JWT,
   идентичный тому, который настроен на Master — см. [Аутентификация —
-   JWT](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx#аутентификация--jwt) на стороне Master.
+   JWT](../../setting-up-master-ui/configuring-master/configuring-master.mdx#аутентификация--jwt) на стороне Master.
 - **Master может найти сервис двумя способами**:
     - **Автоматическое обнаружение на стороне Master** — Master сканирует свою среду (в настоящее время — Kubernetes
       Services) и проверяет actuator-эндпоинт каждого из них. Стартеру нужно только предоставить доступ к эндпоинтам,
@@ -181,8 +181,8 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 
 :::tip[Плагин сборки — отдельный шаг]
 Подключение плагина сборки Axelix обязательно для каждого управляемого сервиса, но оно вынесено в отдельный раздел —
-см. [Что такое плагин сборки Axelix?](../build-plugin/what-is-build-plugin.ru.mdx) и [Настройка плагина
-сборки](../build-plugin/configuration.ru.mdx).
+см. [Что такое плагин сборки Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) и [Настройка плагина
+сборки](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
 :::
 
 ## Actuator-эндпоинты
@@ -421,7 +421,7 @@ axelix.sbs.auth.jwt.duration=5m
 namespace в поисках Services и опрашивал `/actuator/axelix-metadata` каждого из них. На стороне стартера не требуется
 никакой дополнительной настройки, помимо открытия actuator-эндпоинтов и общего JWT-ключа подписи. Настройте сканирование
 на стороне Master через `axelix.master.discovery.auto.*` — см. [Обнаружение —
-автообнаружение](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx#обнаружение--автообнаружение) на странице Master.
+автообнаружение](../../setting-up-master-ui/configuring-master/configuring-master.mdx#обнаружение--автообнаружение) на странице Master.
 
 ### Вариант B — Саморегистрация
 
@@ -493,7 +493,7 @@ axelix.sbs.discovery.heartbeat-interval=15s
 
 Оба полномочия выдаются встроенными в Master ролями `ADMIN` и `SUPER_ADMIN`. `VIEWER` и `EDITOR` всегда проходят через
 функцию маскирования. Полную матрицу см. в [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 <Tabs items={['application.yaml', 'application.properties']}>
   <Tab value="application.yaml">
@@ -602,7 +602,7 @@ axelix.sbs.enabled=false
 
 Приёмник этих heartbeat-сигналов на стороне Master — эндпоинт, таймаут выселения, расписание подметания выселений —
 описан на странице Master в [Обнаружение —
-саморегистрация](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx#обнаружение--саморегистрация). JWT-ключ подписи, заданный в
+саморегистрация](../../setting-up-master-ui/configuring-master/configuring-master.mdx#обнаружение--саморегистрация). JWT-ключ подписи, заданный в
 `axelix.sbs.auth.jwt.signing-key`, должен совпадать с `axelix.master.auth.jwt.signing-key` на Master, иначе
 heartbeat-сигналы будут отклоняться с `401`.
 
@@ -721,11 +721,11 @@ axelix.sbs.transaction.monitoring.in-memory-pagination-detection.enabled=false
 
 ## См. также
 
-- [Настройка плагина сборки](../build-plugin/configuration.ru.mdx) — вторая половина подключения сервиса; обязательна для
+- [Настройка плагина сборки](../../setting-up-spring-boot-service/build-plugin/configuration.mdx) — вторая половина подключения сервиса; обязательна для
   регистрации сервиса.
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx) — где задаются ключ подписи, таймаут выселения и
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx) — где задаются ключ подписи, таймаут выселения и
   сканирование Kubernetes.
-- [Что такое Master?](../../setting-up-master-ui/what-is-master.ru.mdx) — фон того, как Master использует данные, которые
+- [Что такое Master?](../../setting-up-master-ui/what-is-master.mdx) — фон того, как Master использует данные, которые
   публикует стартер.
-- [Аутентификация](../../setting-up-master-ui/authentication/authentication.ru.mdx) — углублённый взгляд на JWT и резолюцию
+- [Аутентификация](../../setting-up-master-ui/authentication/authentication.mdx) — углублённый взгляд на JWT и резолюцию
   полномочий с обеих сторон.

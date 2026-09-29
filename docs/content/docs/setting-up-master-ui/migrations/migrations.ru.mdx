@@ -16,7 +16,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
   недостающие changeset'ы.
 - **В настроенной базе данных.** Миграции выполняются на том же движке, который Master использует во время работы —
   SQLite, PostgreSQL или MySQL, выбираемом по префиксу JDBC URL. О том, как выбирается движок, см. раздел
-  [База данных](../configuring-master/configuring-master.ru.mdx#база-данных).
+  [База данных](../configuring-master/configuring-master.mdx#база-данных).
 - **Только один раз на изменение.** Liquibase фиксирует каждый применённый changeset в своей служебной таблице
   (`DATABASECHANGELOG`). Уже применённый changeset пропускается, поэтому перезапуск Master безопасен и не затратен.
 - **Быстрый отказ (fail-fast).** Если миграцию применить невозможно, запуск прерывается с ошибкой, а не продолжается на
@@ -148,5 +148,5 @@ AXELIX_MIGRATIONS_PASSWORD=...
 
 ## Связанные материалы
 
-- [Настройка Master](../configuring-master/configuring-master.ru.mdx) — полный справочник свойств, включая настройки
+- [Настройка Master](../configuring-master/configuring-master.mdx) — полный справочник свойств, включая настройки
   подключения `axelix.master.database.*`.

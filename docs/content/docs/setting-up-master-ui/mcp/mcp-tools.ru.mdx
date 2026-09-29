@@ -8,20 +8,20 @@ import styles from './styles.module.css';
 
 В каждой записи указано название инструмента, теги аннотаций, которые он поддерживает, состояние
 активации, роли, которым разрешён доступ к инструменту, а также краткое описание его функций. Тот же каталог доступен в
-браузере на [экране MCP](../../ui-guide/mcp.ru.mdx). Эта страница является основным источником информации для операторов,
+браузере на [экране MCP](../../ui-guide/mcp.mdx). Эта страница является основным источником информации для операторов,
 которые планируют, кому и что можно разрешить.
 
 В списке предполагается, что сервер MCP включён (`axelix.master.mcp-server.enabled=true`, по умолчанию). Если для этого
 свойства установлено значение `false`, сервер вообще не регистрируется, ни один из перечисленных ниже инструментов
 недоступен, а ссылка **MCP** скрыта в пользовательском интерфейсе. См. [Конфигурация сервера
-MCP](../configuring-master/configuring-master.ru.mdx#mcp-сервер).
+MCP](../configuring-master/configuring-master.mdx#mcp-сервер).
 
 ## Состояние инструмента
 
 Все перечисленные ниже инструменты входят в состав Master и регистрируются на сервере MCP при запуске. Для каждого
 инструмента нет переключателя, позволяющего включать или отключать его, — каталог фиксирован в сборке. Инструмент
 становится недоступным только в том случае, если отключён сам сервер MCP или не запущен основной процесс. В [каталоге
-пользовательского интерфейса](../../ui-guide/mcp.ru.mdx#каталог-инструментов) точка состояния на каждой карточке отражает текущее
+пользовательского интерфейса](../../ui-guide/mcp.mdx#каталог-инструментов) точка состояния на каждой карточке отражает текущее
 состояние регистрации: зелёная — если сервер зарегистрировал инструмент, красная — если в данный момент он недоступен.
 
 ## Аннотационные теги инструмента
@@ -40,7 +40,7 @@ MCP](../configuring-master/configuring-master.ru.mdx#mcp-сервер).
 
 MCP-фильтр (`McpAuthorizationFilter`) аутентифицирует агента так же, как интерфейс аутентифицирует сеанс в браузере.
 Схемы учётных данных см. в разделе [Аутентификация на
-MCP-сервере](../authentication/authentication.ru.mdx#аутентификация-на-mcp-сервере).
+MCP-сервере](../authentication/authentication.mdx#аутентификация-на-mcp-сервере).
 
 ## Каталог
 
@@ -55,7 +55,7 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 точка для любой задачи, начинающейся с «найди сервис по имени и получи его `instanceId`» — `instanceId` нужен каждому
 другому инструменту.
 
-См. также: [Панель — UI-гайд](../../ui-guide/wallboard.ru.mdx).
+См. также: [Панель — UI-гайд](../../ui-guide/wallboard.mdx).
 
 <div className={styles.McpToolsTable}>
 
@@ -71,9 +71,9 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 `@ConfigurationProperties`, отчёт об автоконфигурации и зарегистрированные запланированные задачи. Каждый инструмент в
 этой группе принимает `instanceId`, полученный через `getWallboard`.
 
-См. также: [Бины](../../features/spring-framework/beans.ru.mdx), [Окружение](../../features/spring-framework/properties.ru.mdx), [Свойства
-конфигурации](../../features/spring-framework/configuration-properties.ru.mdx), [Условия](../../features/spring-framework/conditions.ru.mdx), [Запланированные
-задачи](../../features/spring-framework/scheduled-tasks.ru.mdx), [Профиль сервиса — UI-гайд](../../ui-guide/service-profile.ru.mdx).
+См. также: [Бины](../../features/spring-framework/beans.mdx), [Окружение](../../features/spring-framework/properties.mdx), [Свойства
+конфигурации](../../features/spring-framework/configuration-properties.mdx), [Условия](../../features/spring-framework/conditions.mdx), [Запланированные
+задачи](../../features/spring-framework/scheduled-tasks.mdx), [Профиль сервиса — UI-гайд](../../ui-guide/service-profile.mdx).
 
 <div className={styles.McpToolsTable}>
 
@@ -92,7 +92,7 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 Инспекция каждого кэш менеджера и каждого кэша внутри сервиса Spring Boot, а также удаление записей — либо во всех кэшах
 всех кэш менеджеров сразу, либо в конкретном именованном кэше внутри выбранного кэш менеджера.
 
-См. также: [Кэши](../../features/spring-framework/caches.ru.mdx).
+См. также: [Кэши](../../features/spring-framework/caches.mdx).
 
 <div className={styles.McpToolsTable}>
 
@@ -110,7 +110,7 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 — и менять уровни во время работы: для одного логгера, для целой группы логгеров или сбросить логгер на значение по
 умолчанию, заданное приложением.
 
-См. также: [Логгеры](../../features/insights/loggers/loggers.ru.mdx).
+См. также: [Логгеры](../../features/insights/loggers/loggers.mdx).
 
 <div className={styles.McpToolsTable}>
 
@@ -121,8 +121,8 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 | Список логгеров                 | `getLoggersFeed`                 | только для чтения: <span className={styles.TagTrue}>true</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagFalse}>false</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Перечисляет каждый отдельный логгер, настроенный в сервисе, вместе с его действующим на данный момент уровнем логирования.                                                                     |
 | Найти логгер                    | `findLoggersByName`              | только для чтения: <span className={styles.TagTrue}>true</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagFalse}>false</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Ищет один или несколько отдельных логгеров по точному или частичному имени. Возвращает сконфигурированный и действующий уровни для каждого совпадения.                                         |
 | Найти группу логгеров           | `findGroupsByName`               | только для чтения: <span className={styles.TagTrue}>true</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagFalse}>false</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Ищет одну или несколько групп логгеров по точному или частичному имени. Возвращает имя группы, уровень и членов-логгеров.                                                                      |
-| Сменить уровень логгера         | `changeLoggingLevelByLoggerName` | только для чтения: <span className={styles.TagFalse}>false</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagTrue}>true</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Устанавливает уровень логирования у конкретного отдельного логгера. Если не уверены в имени логгера, сначала воспользуйтесь [Найти логгер](#loggers).                                          |
-| Сменить уровень логгеров группы | `changeLoggingLevelByGroupName`  | только для чтения: <span className={styles.TagFalse}>false</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagTrue}>true</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Устанавливает уровень логирования каждому логгеру внутри группы логгеров. Если не уверены в имени группы, сначала воспользуйтесь [Найти группу логгеров](#loggers).                            |
+| Сменить уровень логгера         | `changeLoggingLevelByLoggerName` | только для чтения: <span className={styles.TagFalse}>false</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagTrue}>true</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Устанавливает уровень логирования у конкретного отдельного логгера. Если не уверены в имени логгера, сначала воспользуйтесь [Найти логгер](#логгеры).                                          |
+| Сменить уровень логгеров группы | `changeLoggingLevelByGroupName`  | только для чтения: <span className={styles.TagFalse}>false</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagTrue}>true</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Устанавливает уровень логирования каждому логгеру внутри группы логгеров. Если не уверены в имени группы, сначала воспользуйтесь [Найти группу логгеров](#логгеры).                            |
 | Сбросить уровень логгера        | `resetLoggingLevelByLoggerName`  | только для чтения: <span className={styles.TagFalse}>false</span><br/>идемпотентный: <span className={styles.TagTrue}>true</span><br/>разрушительный: <span className={styles.TagTrue}>true</span><br/>открытый мир: <span className={styles.TagFalse}>false</span> | `VIEWER`<br/>`EDITOR`<br/>`ADMIN`<br/>`SUPER_ADMIN` | Сбрасывает уровень отдельного логгера на значение по умолчанию, объявленное в конфигурации приложения. Сброс на уровне группы недоступен.                                                      |
 
 </div>
@@ -134,7 +134,7 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 которых обязательны, — а не по `instanceId`, и читают данные из записанного снимка приложения, а не опрашивают живой
 сервис.
 
-См. также: [Мониторинг транзакций](../../features/spring-framework/transaction-control.ru.mdx).
+См. также: [Мониторинг транзакций](../../features/spring-framework/transaction-control.mdx).
 
 <div className={styles.McpToolsTable}>
 
@@ -147,11 +147,11 @@ MCP-сервере](../authentication/authentication.ru.mdx#аутентифик
 
 ## См. также
 
-- [Экран каталога MCP](../../ui-guide/mcp.ru.mdx) — представление того же каталога в браузере только для чтения, с индикаторами
+- [Экран каталога MCP](../../ui-guide/mcp.mdx) — представление того же каталога в браузере только для чтения, с индикаторами
   состояния по каждому инструменту и всплывающим окном аннотаций.
-- [Аутентификация на MCP-сервере](../authentication/authentication.ru.mdx#аутентификация-на-mcp-сервере) — как принимаются
+- [Аутентификация на MCP-сервере](../authentication/authentication.mdx#аутентификация-на-mcp-сервере) — как принимаются
   учётные данные MCP (`Basic`, `Bearer`) и как личность сопоставляется с ролью.
-- [Роли и полномочия](../authentication/authentication.ru.mdx#роли-и-полномочия) — что защищает каждое полномочие и
+- [Роли и полномочия](../authentication/authentication.mdx#роли-и-полномочия) — что защищает каждое полномочие и
   какая встроенная роль им владеет.
-- [Настройка MCP-сервера](../configuring-master/configuring-master.ru.mdx#mcp-сервер) — ключи свойств
+- [Настройка MCP-сервера](../configuring-master/configuring-master.mdx#mcp-сервер) — ключи свойств
   `axelix.master.mcp-server.*`.
