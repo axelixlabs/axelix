@@ -367,6 +367,12 @@ public final class ApiPaths {
          * currently in use across the fleet.
          */
         public static final String MAIN = "/upgrades";
+
+        /**
+         * Endpoint to retrieve how many applications would lose compatibility if Axelix Master were
+         * upgraded to a given version.
+         */
+        public static final String IMPACT = "/upgrades/impact";
     }
 
     public static final class McpToolApi {
