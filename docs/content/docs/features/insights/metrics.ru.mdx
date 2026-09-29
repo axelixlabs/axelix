@@ -15,7 +15,7 @@ Axelix***
 
 Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть `VIEWER`, `EDITOR`,
 `ADMIN` и `SUPER_ADMIN` Полную матрицу ролей и полномочий см. в разделе [Роли и
-полномочия](../../setting-up-master-ui/authentication/authentication.ru.mdx#роли-и-полномочия).
+полномочия](../../setting-up-master-ui/authentication/authentication.mdx#роли-и-полномочия).
 
 ## Метрики, публикуемые Axelix
 
@@ -31,7 +31,7 @@ Axelix***
 Эндпоинт `/actuator/prometheus` также будет экспортировать эти метриаи по-умолчанию (если prometheus эндпоинт, конечно, включён). Это означает, что
 впоследствие вы сможете использовать данные метрики для построения своих собственных дашбордов, например, в Grafana.
 
-Больше деталей доступно [в данной секции документации](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx#экспорт-метрик-axelix-через-micrometer).
+Больше деталей доступно [в данной секции документации](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#экспорт-метрик-axelix-через-micrometer).
 
 ## Детали метрики
 
@@ -100,7 +100,7 @@ actuator-эндпоинты, а эндпоинты `health`/`info` Axelix бол
 Страница работает поверх actuator-эндпоинта `axelix-metrics`, который добавляет Axelix Spring Boot Starter. Она доступна
 через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек см. в
 разделе [Настройка Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx):
+Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx):
 
 <Tabs items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -126,6 +126,6 @@ management:
 
 ## См. также
 
-- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx)
+- [Настройка Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx)
 - [Настройка Spring Boot
-  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.ru.mdx)
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)

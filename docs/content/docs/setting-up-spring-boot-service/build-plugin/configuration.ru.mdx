@@ -6,16 +6,16 @@ description: "При использовании плагина Axelix для с�
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 Подключение плагина сборки Axelix — это вторая половина того, что делает сервис видимым для
-[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.ru.mdx); первая половина —
-[подключение стартера](../spring-boot-starter/configuration.ru.mdx). У плагина нечего настраивать: вы его подключаете, и он
+[Axelix Master](../../setting-up-master-ui/configuring-master/configuring-master.mdx); первая половина —
+[подключение стартера](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx). У плагина нечего настраивать: вы его подключаете, и он
 записывает координаты сборки в артефакт, чтобы Master мог идентифицировать сервис. См. [Что такое плагин сборки
-Axelix?](./what-is-build-plugin.ru.mdx), чтобы узнать, что он создаёт и почему он обязателен.
+Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx), чтобы узнать, что он создаёт и почему он обязателен.
 
 :::warning[Обязателен для регистрации]
 Master идентифицирует каждое приложение по его `groupId` + `artifactId`. Без плагина файл
 `META-INF/axelix-info.properties` отсутствует, координаты пусты, и **Master отклоняет регистрацию** — сервис так и не
 появится в UI. Эти же координаты используются как ключ для [инсайтов по
-персистентности](../../setting-up-master-ui/mcp/mcp-tools.ru.mdx) (анализ N+1 и маппинга сущностей). Подключайте плагин к
+персистентности](../../setting-up-master-ui/mcp/mcp-tools.mdx) (анализ N+1 и маппинга сущностей). Подключайте плагин к
 каждому сервису, которым вы хотите управлять через Axelix.
 :::
 
@@ -107,7 +107,7 @@ plugins {
 
 ## См. также
 
-- [Что такое плагин сборки Axelix?](./what-is-build-plugin.ru.mdx) — что генерирует плагин и почему от него зависит
+- [Что такое плагин сборки Axelix?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) — что генерирует плагин и почему от него зависит
   регистрация.
-- [Настройка Spring Boot Starter](../spring-boot-starter/configuration.ru.mdx) — runtime-сторона, которая читает
+- [Настройка Spring Boot Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx) — runtime-сторона, которая читает
   сгенерированные координаты и передаёт их в Master.
