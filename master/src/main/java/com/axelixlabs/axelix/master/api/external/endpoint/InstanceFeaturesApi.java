@@ -27,21 +27,22 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.features.FeatureAvailabilityService;
 
 /**
- * The API for resolving which Axelix UI features are available for a managed instance. The front-end queries it when
- * it enters the instance view, so it can render only the features the instance's starter version supports.
+ * The API for resolving which features are available for a managed instance, that Axelix Master UI would care about.
+ * <p>
+ * The front-end needs it so it can render only the features the instance's supports.
  *
  * @author Mikhail Polivakha
  */
 @ExternalApiRestController
-public class FeaturesApi {
+public class InstanceFeaturesApi {
 
     private final FeatureAvailabilityService featureAvailabilityService;
 
-    public FeaturesApi(FeatureAvailabilityService featureAvailabilityService) {
+    public InstanceFeaturesApi(FeatureAvailabilityService featureAvailabilityService) {
         this.featureAvailabilityService = featureAvailabilityService;
     }
 
-    @GetMapping(path = ApiPaths.FeaturesApi.INSTANCE_ID)
+    @GetMapping(path = ApiPaths.InstanceFeaturesApi.INSTANCE_ID)
     public InstanceFeaturesResponse getFeatures(@PathVariable("instanceId") String instanceId) {
         return featureAvailabilityService.resolveFeatures(InstanceId.of(instanceId));
     }

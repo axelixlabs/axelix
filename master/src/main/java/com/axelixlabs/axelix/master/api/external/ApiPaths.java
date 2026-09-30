@@ -367,10 +367,10 @@ public final class ApiPaths {
         public static final String TOOLS_LIST = "/mcp/tools-feed";
     }
 
-    public static final class FeaturesApi {
+    public static final class InstanceFeaturesApi {
 
         /**
-         * Endpoint to resolve which Axelix UI features are available for a given application instance.
+         * Endpoint to resolve which features are available for a given application instance.
          */
         public static final String INSTANCE_ID = "/features/{instanceId}";
     }

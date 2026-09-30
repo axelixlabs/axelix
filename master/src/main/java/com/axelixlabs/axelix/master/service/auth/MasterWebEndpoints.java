@@ -210,7 +210,7 @@ public final class MasterWebEndpoints {
 
     // Features
     public static final MasterWebEndpoint FEATURES_READ =
-            register("features:read", HttpMethod.GET, ApiPaths.FeaturesApi.INSTANCE_ID, null);
+            register("features:read", HttpMethod.GET, ApiPaths.InstanceFeaturesApi.INSTANCE_ID, null);
 
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =

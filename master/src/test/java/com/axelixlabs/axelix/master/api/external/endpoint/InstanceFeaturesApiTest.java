@@ -42,11 +42,11 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link FeaturesApi}.
+ * Integration tests for {@link InstanceFeaturesApi}.
  *
  * @author Mikhail Polivakha
  */
-class FeaturesApiTest extends AbstractProtectedEndpointTest {
+class InstanceFeaturesApiTest extends AbstractProtectedEndpointTest {
 
     private static final String instanceOn12 = UUID.randomUUID().toString();
     private static final String instanceOn11 = UUID.randomUUID().toString();
