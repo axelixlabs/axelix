@@ -37,7 +37,7 @@ import {
     ThreadDumpIcon,
     TransactionIcon,
 } from "@/assets";
-import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "@/models";
+import { type MenuItem as AntdMenuItem, EInstanceFeature, type ISiderMenuItem } from "@/models";
 
 const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
     return items.map(({ path, icon, label }) => ({
@@ -47,7 +47,11 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
     }));
 };
 
-export const getInstanceItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
+export const getInstanceItems = (
+    instanceId: string,
+    t: TFunction,
+    availableFeatures: EInstanceFeature[],
+): AntdMenuItem[] => {
     const basePath = `/instance/${instanceId}`;
 
     const insightsMenuItemsData: ISiderMenuItem[] = [
@@ -66,11 +70,18 @@ export const getInstanceItems = (instanceId: string, t: TFunction): AntdMenuItem
             icon: <LoggersIcon />,
             label: t("Sider.loggers"),
         },
-        {
-            path: `${basePath}/dependencies`,
-            icon: <DependenciesIcon />,
-            label: t("Sider.dependenciesAnalyzer"),
-        },
+        // The Dependency Analyzer relies on the /axelix-dependencies actuator endpoint, which only exists in starters
+        // recent enough to expose it. Master resolves that per instance, so we render the entry only when it reports
+        // the feature as available - older instances would otherwise 404 on the request.
+        ...(availableFeatures.includes(EInstanceFeature.DEPENDENCY_ANALYSIS)
+            ? [
+                  {
+                      path: `${basePath}/dependencies`,
+                      icon: <DependenciesIcon />,
+                      label: t("Sider.dependenciesAnalyzer"),
+                  },
+              ]
+            : []),
     ];
 
     const springMenuItemsData: ISiderMenuItem[] = [
