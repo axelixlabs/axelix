@@ -17,10 +17,9 @@
  */
 package com.axelixlabs.axelix.master.domain;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -32,100 +31,91 @@ import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
  * {@code (property, value)} pair, so a property with several offending values is listed several times.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public enum DangerousPropertyValue {
     OPEN_IN_VIEW(
             "spring.jpa.open-in-view",
-            "true",
-            "false",
-            "Open Session In View keeps the persistence context open for the whole duration of the request, which "
-                    + "hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a "
-                    + "consequence, leads to the N+1 problem and to the database connections being held much longer "
-                    + "than necessary."),
+            Set.of(new DangerousValue(
+                    "true",
+                    "Open Session In View keeps the persistence context open for the whole duration of the request, which "
+                            + "hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a "
+                            + "consequence, leads to the N+1 problem and to the database connections being held much longer "
+                            + "than necessary.",
+                    "false"))),
 
     DDL_AUTO_CREATE(
             "spring.jpa.hibernate.ddl-auto",
-            "create",
-            "validate",
-            "Hibernate recreates the whole schema on every startup, which means a guaranteed data loss. This is "
-                    + "acceptable for a throwaway local setup, but never for an environment whose data matters."),
-
-    DDL_AUTO_CREATE_DROP(
-            "spring.jpa.hibernate.ddl-auto",
-            "create-drop",
-            "validate",
-            "Hibernate creates the schema on startup and drops it on shutdown, which means a guaranteed data loss. "
-                    + "This is acceptable for a throwaway local setup, but never for an environment whose data matters."),
-
-    DDL_AUTO_UPDATE(
-            "spring.jpa.hibernate.ddl-auto",
-            "update",
-            "validate",
-            "Hibernate alters the schema implicitly at runtime, based on whatever the entity mapping happens to be. "
-                    + "The resulting migration is neither reviewed nor reproducible, and Hibernate never drops or "
-                    + "renames anything, so the schema silently drifts away from the mapping. A dedicated migration "
-                    + "tool, such as Liquibase or Flyway, is the way to evolve a schema you care about."),
+            Set.of(
+                    new DangerousValue(
+                            "create",
+                            "Hibernate recreates the whole schema on every startup, which means a guaranteed data loss. This is "
+                                    + "acceptable for a throwaway local setup, but never for an environment whose data matters.",
+                            "validate"),
+                    new DangerousValue(
+                            "create-drop",
+                            "Hibernate creates the schema on startup and drops it on shutdown, which means a guaranteed data loss. "
+                                    + "This is acceptable for a throwaway local setup, but never for an environment whose data matters.",
+                            "validate"),
+                    new DangerousValue(
+                            "update",
+                            "Hibernate alters the schema implicitly at runtime, based on whatever the entity mapping happens to be. "
+                                    + "The resulting migration is neither reviewed nor reproducible, and Hibernate never drops or "
+                                    + "renames anything, so the schema silently drifts away from the mapping. A dedicated migration "
+                                    + "tool, such as Liquibase or Flyway, is the way to evolve a schema you care about.",
+                            "validate"))),
 
     SHOW_SQL(
             "spring.jpa.show-sql",
-            "true",
-            "false",
-            "The generated SQL is printed straight to the standard output, bypassing the logging subsystem entirely, "
-                    + "so it can be neither formatted, nor filtered, nor correlated with anything else. Raising the "
-                    + "'org.hibernate.SQL' logger to DEBUG achieves the same goal without any of that."),
+            Set.of(new DangerousValue(
+                    "true",
+                    "The generated SQL is printed straight to the standard output, bypassing the logging subsystem entirely, "
+                            + "so it can be neither formatted, nor filtered, nor correlated with anything else. Raising the "
+                            + "'org.hibernate.SQL' logger to DEBUG achieves the same goal without any of that.",
+                    "false"))),
 
     ENABLE_LAZY_LOAD_NO_TRANS(
             "spring.jpa.properties.hibernate.enable_lazy_load_no_trans",
-            "true",
-            "false",
-            "Every lazy association accessed outside of a transaction is loaded in a separate short-lived session of "
-                    + "its own. This masks the missing transaction boundaries instead of exposing them, and turns a "
-                    + "LazyInitializationException into a swarm of unnoticed queries."),
+            Set.of(new DangerousValue(
+                    "true",
+                    "Every lazy association accessed outside of a transaction is loaded in a separate short-lived session of "
+                            + "its own. This masks the missing transaction boundaries instead of exposing them, and turns a "
+                            + "LazyInitializationException into a swarm of unnoticed queries.",
+                    "false"))),
 
     INCLUDE_STACKTRACE_ALWAYS(
             "server.error.include-stacktrace",
-            "always",
-            "never",
-            "The stack trace is included into every error response, which exposes the internals of the application, "
-                    + "the libraries it is built upon and their versions to whoever is on the other side of the wire."),
+            Set.of(new DangerousValue(
+                    "always",
+                    "The stack trace is included into every error response, which exposes the internals of the application, "
+                            + "the libraries it is built upon and their versions to whoever is on the other side of the wire.",
+                    "never"))),
 
     EXPOSURE_INCLUDE_ALL(
             "management.endpoints.web.exposure.include",
-            "*",
-            "health,info",
-            "Every actuator endpoint present on the classpath is exposed over HTTP, including the ones that dump the "
-                    + "heap, the thread stacks, the environment and the configuration properties. The endpoints that "
-                    + "are actually needed are better listed explicitly.");
+            Set.of(new DangerousValue(
+                    "*",
+                    "Every actuator endpoint present on the classpath is exposed over HTTP, including the ones that dump the "
+                            + "heap, the thread stacks, the environment and the configuration properties. The endpoints that "
+                            + "are actually needed are better listed explicitly.",
+                    "health,info")));
 
-    private static final Map<String, List<DangerousPropertyValue>> BY_NORMALIZED_NAME = buildIndex();
+    private static final Map<String, DangerousPropertyValue> BY_NORMALIZED_NAME = buildIndex();
 
     private final String propertyName;
-    private final String dangerousValue;
-    private final @Nullable String alternativeExample;
-    private final String rationale;
+    private final Set<DangerousValue> dangerousValues;
 
-    DangerousPropertyValue(
-            String propertyName, String dangerousValue, @Nullable String alternativeExample, String rationale) {
+    DangerousPropertyValue(String propertyName, Set<DangerousValue> dangerousValues) {
         this.propertyName = propertyName;
-        this.dangerousValue = dangerousValue;
-        this.alternativeExample = alternativeExample;
-        this.rationale = rationale;
+        this.dangerousValues = dangerousValues;
     }
 
     public String getPropertyName() {
         return propertyName;
     }
 
-    public String getDangerousValue() {
-        return dangerousValue;
-    }
-
-    public @Nullable String getAlternativeExample() {
-        return alternativeExample;
-    }
-
-    public String getRationale() {
-        return rationale;
+    public Set<DangerousValue> getDangerousValues() {
+        return dangerousValues;
     }
 
     /**
@@ -133,37 +123,44 @@ public enum DangerousPropertyValue {
      * @param value                  the value the property is set to.
      * @return the matching constant, {@code null} when we consider the combination fine.
      */
-    public static @Nullable DangerousPropertyValue resolve(String normalizedPropertyName, @Nullable String value) {
-        if (value == null) {
+    public static @Nullable DangerousValue resolve(String normalizedPropertyName, @Nullable String value) {
+        DangerousPropertyValue candidate = BY_NORMALIZED_NAME.get(normalizedPropertyName);
+
+        if (candidate == null) {
             return null;
         }
 
-        List<DangerousPropertyValue> candidates = BY_NORMALIZED_NAME.get(normalizedPropertyName);
-
-        if (candidates == null) {
-            return null;
-        }
-
-        String trimmedValue = value.trim();
-
-        for (DangerousPropertyValue candidate : candidates) {
-            if (candidate.dangerousValue.equalsIgnoreCase(trimmedValue)) {
-                return candidate;
+        for (DangerousValue dangerousValue : candidate.getDangerousValues()) {
+            if (value == null) {
+                if (dangerousValue.value() == null) {
+                    return dangerousValue;
+                }
+            } else {
+                if (value.equalsIgnoreCase(dangerousValue.value())) {
+                    return dangerousValue;
+                }
             }
         }
 
         return null;
     }
 
-    private static Map<String, List<DangerousPropertyValue>> buildIndex() {
+    private static Map<String, DangerousPropertyValue> buildIndex() {
         PropertyNameNormalizer normalizer = new DefaultPropertyNameNormalizer();
-        Map<String, List<DangerousPropertyValue>> index = new HashMap<>();
+        Map<String, DangerousPropertyValue> index = new HashMap<>();
 
         for (DangerousPropertyValue dangerousProperty : values()) {
-            index.computeIfAbsent(normalizer.normalize(dangerousProperty.propertyName), key -> new ArrayList<>())
-                    .add(dangerousProperty);
+            index.computeIfAbsent(normalizer.normalize(dangerousProperty.propertyName), _ -> dangerousProperty);
         }
 
         return index;
     }
+
+    /**
+     * @param value the actual value considered dangerous. Might be {@code null} in case the null
+     *              is the actually dangerous value.
+     * @param rationale the rationale behind why is this dangerous
+     * @param alternative the alternative value to be used instead
+     */
+    public record DangerousValue(@Nullable String value, String rationale, String alternative) {}
 }

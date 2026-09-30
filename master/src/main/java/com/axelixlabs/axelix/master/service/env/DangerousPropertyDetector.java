@@ -19,9 +19,10 @@ package com.axelixlabs.axelix.master.service.env;
 
 import java.util.Map;
 
-import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.contract.env.Property;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue.DangerousValue;
 
 /**
  * Finds the properties of the environment whose values are listed in {@link DangerousPropertyValue}.
@@ -38,9 +39,9 @@ public interface DangerousPropertyDetector {
      * unknown.
      *
      * @param feed the environment feed to check.
-     * @return the dangerous properties mapped to the matching {@link DangerousPropertyValue}. The keys are the
+     * @return the dangerous properties mapped to the matching {@link DangerousValue}. The keys are the
      *         {@link Property} instances of the given feed, compared by identity, since the same property with the
      *         same value may be present in several sources.
      */
-    Map<Property, DangerousPropertyValue> detect(EnvironmentFeed feed);
+    Map<Property, DangerousValue> detect(EnvironmentFeed feed);
 }
