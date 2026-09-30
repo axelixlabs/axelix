@@ -1,0 +1,32 @@
+.Detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 16px 16px 45px;
+    background-color: var(--axelix-extra-light-grey);
+    border-top: 1px solid var(--axelix-medium-grey);
+}
+
+.Section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.SectionHeader {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.Label {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-bold-grey);
+}
+
+.PathSummary {
+    color: var(--axelix-bold-grey);
+}

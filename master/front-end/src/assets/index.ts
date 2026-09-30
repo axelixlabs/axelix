@@ -18,6 +18,7 @@
 export { default as ScheduledTasksIcon } from "../assets/icons/scheduledTasks.svg?react";
 export { default as BackwardArrowIcon } from "../assets/icons/backwardArrow.svg?react";
 export { default as LockOutlinedIcon } from "../assets/icons/lockOutlined.svg?react";
+export { default as DependenciesIcon } from "../assets/icons/dependencies.svg?react";
 export { default as ConfigPropsIcon } from "../assets/icons/configProps.svg?react";
 export { default as EnvironmentIcon } from "../assets/icons/environment.svg?react";
 export { default as TransactionIcon } from "../assets/icons/transaction.svg?react";

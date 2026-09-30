@@ -17,7 +17,6 @@
  */
 import { notification } from "antd";
 import type { AxiosResponse } from "axios";
-import dayjs from "dayjs";
 import { t } from "i18next";
 
 import {
@@ -27,6 +26,7 @@ import {
     EWallboardFilterOperator,
     type IConfigPropsBean,
     type IEnvironmentPropertySource,
+    type PlatformName,
     type SetRequestState,
     StatefulRequest,
 } from "@/models";
@@ -118,8 +118,12 @@ export const toFormattedTime = (value: number): string => {
     });
 };
 
-export const toFormattedTimeWithMs = (value: number): string => {
-    return dayjs(value).format("HH:mm:ss.SSS");
+export const platformFullName = (platform: PlatformName): string => {
+    return platform === "SPRING_BOOT" ? "Spring Boot" : "Spring Framework";
+};
+
+export const platformShortName = (platform: PlatformName): string => {
+    return platform === "SPRING_BOOT" ? "Boot" : "Framework";
 };
 
 export const createWallboardFilterSearchParam = (
