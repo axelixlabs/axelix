@@ -146,8 +146,6 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
     void testFinalClassAlreadyWrappedInJdkProxyIsStillMonitored() {
         TransactionMonitoringBeanPostProcessor processor = newStandaloneProcessor();
 
-        // A JDK dynamic proxy is the only way Spring can already be proxying a bean whose real class is
-        // final - CGLIB could never have produced this proxy in the first place.
         Object jdkProxiedBean = new ProxyFactory(new FinalGreeterImpl()).getProxy();
         assertThat(AopUtils.isJdkDynamicProxy(jdkProxiedBean)).isTrue();
 

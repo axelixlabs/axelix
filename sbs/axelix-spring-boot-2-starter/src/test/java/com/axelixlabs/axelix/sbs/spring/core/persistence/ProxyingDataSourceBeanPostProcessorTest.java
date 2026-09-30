@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.support.AopUtils;
@@ -44,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
  * Integration test for {@link ProxyingDataSourceBeanPostProcessor}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringSharedContextTest {
 
@@ -88,19 +88,8 @@ class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitor
         }
     }
 
-    @Nested
-    class RoutingDataSource {
+    static class RoutingDataSourceTest {
 
-        /**
-         * Reproduces the originally reported crash: a user's own {@code @Configuration} class declares an
-         * {@link AbstractRoutingDataSource} {@code @Bean} and calls that same {@code @Bean} method again
-         * from another {@code @Bean} method in the same class. Spring's CGLIB-enhanced
-         * {@code @Configuration} class intercepts the second, in-class call and returns the
-         * already-initialized container-managed singleton, checkcast to the method's declared
-         * {@link AbstractRoutingDataSource} return type - which used to fail once this bean had been
-         * wrapped in a hand-written {@code ProxyingDataSource} decorator that only implements
-         * {@link DataSource}, not the user's concrete routing type.
-         */
         @Test
         void staysAssignmentCompatibleAcrossInClassBeanMethodCall() {
             assertThatCode(() -> {
@@ -115,60 +104,54 @@ class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitor
                     })
                     .doesNotThrowAnyException();
         }
-    }
-}
 
-// Top-level (not nested in the test class) on purpose: Spring's test support auto-detects static
-// @Configuration classes declared directly inside a test class and adds them to that test's own
-// ApplicationContext, which collides with the beans already provided by AbstractTransactionMonitoringSharedContextTest.
-@TestConfiguration
-class RoutingTestConfig {
+        static class SingleTargetRoutingDataSource extends AbstractRoutingDataSource {
+            @Override
+            protected Object determineCurrentLookupKey() {
+                return "default";
+            }
+        }
 
-    @Bean
-    public TransactionAccessor transactionAccessor() {
-        return new TransactionAccessor();
-    }
+        static class DataSourceConsumer {
+            final AbstractRoutingDataSource dataSource;
 
-    @Bean
-    public ProxyingDataSourceBeanPostProcessor proxyingDataSourceBeanPostProcessor(
-            TransactionAccessor transactionAccessor) {
-        return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
-    }
+            DataSourceConsumer(AbstractRoutingDataSource dataSource) {
+                this.dataSource = dataSource;
+            }
+        }
 
-    @Bean
-    public AbstractRoutingDataSource routingDataSource() {
-        SingleTargetRoutingDataSource routing = new SingleTargetRoutingDataSource();
-        DataSource target = new DriverManagerDataSource("jdbc:h2:mem:routing-test;DB_CLOSE_DELAY=-1");
+        @TestConfiguration
+        static class RoutingTestConfig {
 
-        Map<Object, Object> targets = new HashMap<>();
-        targets.put("default", target);
-        routing.setTargetDataSources(targets);
-        routing.setDefaultTargetDataSource(target);
-        routing.afterPropertiesSet();
+            @Bean
+            public TransactionAccessor transactionAccessor() {
+                return new TransactionAccessor();
+            }
 
-        return routing;
-    }
+            @Bean
+            public ProxyingDataSourceBeanPostProcessor proxyingDataSourceBeanPostProcessor(
+                    TransactionAccessor transactionAccessor) {
+                return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
+            }
 
-    @Bean
-    public DataSourceConsumer dataSourceConsumer() {
-        // Direct in-class call to the @Bean method above - intercepted by the CGLIB @Configuration
-        // enhancer, which returns the already fully-initialized container-managed singleton instead
-        // of re-executing the method body.
-        return new DataSourceConsumer(routingDataSource());
-    }
-}
+            @Bean
+            public AbstractRoutingDataSource routingDataSource() {
+                SingleTargetRoutingDataSource routing = new SingleTargetRoutingDataSource();
+                DataSource target = new DriverManagerDataSource("jdbc:h2:mem:routing-test;DB_CLOSE_DELAY=-1");
 
-class SingleTargetRoutingDataSource extends AbstractRoutingDataSource {
-    @Override
-    protected Object determineCurrentLookupKey() {
-        return "default";
-    }
-}
+                Map<Object, Object> targets = new HashMap<>();
+                targets.put("default", target);
+                routing.setTargetDataSources(targets);
+                routing.setDefaultTargetDataSource(target);
+                routing.afterPropertiesSet();
 
-class DataSourceConsumer {
-    final AbstractRoutingDataSource dataSource;
+                return routing;
+            }
 
-    DataSourceConsumer(AbstractRoutingDataSource dataSource) {
-        this.dataSource = dataSource;
+            @Bean
+            public DataSourceConsumer dataSourceConsumer() {
+                return new DataSourceConsumer(routingDataSource());
+            }
+        }
     }
 }

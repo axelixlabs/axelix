@@ -112,9 +112,8 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
             return bean;
         }
 
-        if (!AopUtils.isAopProxy(bean)
-                && (Modifier.isFinal(targetClass.getModifiers()) || hasFinalProxyableMethod(targetClass))) {
-            log.debug(
+        if (!AopUtils.isAopProxy(bean) && !ProxyingUtils.isSafeToCGLIBProxy(targetClass)) {
+            log.warn(
                     "Cannot enable transaction monitoring for bean '{}' of class {}: CGLIB cannot proxy a final "
                             + "class or override a final method. Transaction monitoring is skipped for this bean; "
                             + "the bean itself and every other Axelix feature are unaffected.",
@@ -124,19 +123,6 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         }
 
         return createTransactionalProxy(bean);
-    }
-
-    /**
-     * CGLIB can't override a final method, even on a non-final class - calling it on the proxy would run
-     * against the proxy's own empty state instead of the real target's.
-     */
-    private boolean hasFinalProxyableMethod(Class<?> targetClass) {
-        MethodFilter finalMethodFilter = method -> !ReflectionUtils.isObjectMethod(method)
-                && !Modifier.isPrivate(method.getModifiers())
-                && !Modifier.isStatic(method.getModifiers())
-                && Modifier.isFinal(method.getModifiers());
-
-        return ReflectionUtils.getUniqueDeclaredMethods(targetClass, finalMethodFilter).length > 0;
     }
 
     /**
