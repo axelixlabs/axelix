@@ -33,15 +33,7 @@ import com.axelixlabs.axelix.common.utils.SemanticVersion;
 import com.axelixlabs.axelix.master.domain.features.Feature;
 
 /**
- * Reads the curated feature manifest off the classpath into the {@link Feature Features} a {@link StarterFeaturesCatalog} is
- * built from.
- * <p>
- * The manifest is authored by release: each entry names the release that introduced a set of features, which reads
- * naturally as the product grows and keeps a feature's introduction version in a single place. It is flattened here
- * into one {@link Feature} per id, tagged with the release it became available in.
- * <p>
- * Unknown properties are rejected rather than ignored: the manifest is data Axelix authors by hand, and a misspelled
- * key that is silently dropped would mean a curated fact quietly disappearing from the product.
+ * Loader of the YAML manifest with all the possible instance features in YAML.
  *
  * @author Mikhail Polivakha
  */

@@ -21,10 +21,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 
-import com.axelixlabs.axelix.master.service.features.DefaultFeatureAvailabilityService;
-import com.axelixlabs.axelix.master.service.features.FeatureAvailabilityService;
+import com.axelixlabs.axelix.master.service.features.DefaultInstanceFeatureAvailabilityService;
 import com.axelixlabs.axelix.master.service.features.FeatureManifestLoader;
-import com.axelixlabs.axelix.master.service.features.StarterFeaturesCatalog;
+import com.axelixlabs.axelix.master.service.features.InstanceFeatureAvailabilityService;
+import com.axelixlabs.axelix.master.service.features.InstanceFeaturesCatalog;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -41,13 +41,13 @@ public class FeaturesAutoConfiguration {
     }
 
     @Bean
-    public StarterFeaturesCatalog featureCatalog(FeatureManifestLoader featureManifestLoader) {
-        return new StarterFeaturesCatalog(featureManifestLoader);
+    public InstanceFeaturesCatalog featureCatalog(FeatureManifestLoader featureManifestLoader) {
+        return new InstanceFeaturesCatalog(featureManifestLoader);
     }
 
     @Bean
-    public FeatureAvailabilityService featureAvailabilityService(
-            InstanceRegistry instanceRegistry, StarterFeaturesCatalog starterFeaturesCatalog) {
-        return new DefaultFeatureAvailabilityService(instanceRegistry, starterFeaturesCatalog);
+    public InstanceFeatureAvailabilityService featureAvailabilityService(
+            InstanceRegistry instanceRegistry, InstanceFeaturesCatalog instanceFeaturesCatalog) {
+        return new DefaultInstanceFeatureAvailabilityService(instanceRegistry, instanceFeaturesCatalog);
     }
 }

@@ -27,13 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Unit tests for {@link StarterFeaturesCatalog}.
+ * Unit tests for {@link InstanceFeaturesCatalog}.
  *
  * @author Mikhail Polivakha
  */
-class StarterFeaturesCatalogTest {
+class InstanceFeaturesCatalogTest {
 
-    private final StarterFeaturesCatalog subject = catalogOf("classpath:axelix/features/test/valid.yaml");
+    private final InstanceFeaturesCatalog subject = catalogOf("classpath:axelix/features/test/valid.yaml");
 
     @Test
     void reportsOnlyTheBaselineFeatureBelowTheFirstGate() {
@@ -70,7 +70,7 @@ class StarterFeaturesCatalogTest {
                 .hasMessageContaining("always-on");
     }
 
-    private static StarterFeaturesCatalog catalogOf(String location) {
-        return new StarterFeaturesCatalog(new FeatureManifestLoader(new DefaultResourceLoader(), location));
+    private static InstanceFeaturesCatalog catalogOf(String location) {
+        return new InstanceFeaturesCatalog(new FeatureManifestLoader(new DefaultResourceLoader(), location));
     }
 }

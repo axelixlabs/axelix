@@ -24,7 +24,7 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.features.InstanceFeaturesResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.features.FeatureAvailabilityService;
+import com.axelixlabs.axelix.master.service.features.InstanceFeatureAvailabilityService;
 
 /**
  * The API for resolving which features are available for a managed instance, that Axelix Master UI would care about.
@@ -36,14 +36,14 @@ import com.axelixlabs.axelix.master.service.features.FeatureAvailabilityService;
 @ExternalApiRestController
 public class InstanceFeaturesApi {
 
-    private final FeatureAvailabilityService featureAvailabilityService;
+    private final InstanceFeatureAvailabilityService instanceFeatureAvailabilityService;
 
-    public InstanceFeaturesApi(FeatureAvailabilityService featureAvailabilityService) {
-        this.featureAvailabilityService = featureAvailabilityService;
+    public InstanceFeaturesApi(InstanceFeatureAvailabilityService instanceFeatureAvailabilityService) {
+        this.instanceFeatureAvailabilityService = instanceFeatureAvailabilityService;
     }
 
     @GetMapping(path = ApiPaths.InstanceFeaturesApi.INSTANCE_ID)
     public InstanceFeaturesResponse getFeatures(@PathVariable("instanceId") String instanceId) {
-        return featureAvailabilityService.resolveFeatures(InstanceId.of(instanceId));
+        return instanceFeatureAvailabilityService.resolveFeatures(InstanceId.of(instanceId));
     }
 }

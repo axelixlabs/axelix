@@ -30,22 +30,22 @@ import com.axelixlabs.axelix.master.domain.features.Feature;
  *
  * @author Mikhail Polivakha
  */
-public class StarterFeaturesCatalog {
+public class InstanceFeaturesCatalog {
 
-    private final List<Feature> starterFeatures;
+    private final List<Feature> features;
 
     /**
      * @throws FeatureCatalogException when the manifest cannot be loaded, or declares a feature id more than once.
      */
-    public StarterFeaturesCatalog(FeatureManifestLoader loader) {
-        this.starterFeatures = loader.load();
+    public InstanceFeaturesCatalog(FeatureManifestLoader loader) {
+        this.features = loader.load();
         assertUniqueIds();
     }
 
     private void assertUniqueIds() {
-        Set<String> seen = new HashSet<>(starterFeatures.size());
+        Set<String> seen = new HashSet<>(features.size());
 
-        for (Feature feature : starterFeatures) {
+        for (Feature feature : features) {
             if (!seen.add(feature.id())) {
                 throw new FeatureCatalogException("Feature id '%s' is declared more than once".formatted(feature.id()));
             }
@@ -59,7 +59,7 @@ public class StarterFeaturesCatalog {
      * @return the ids of the features available for that instance, in manifest order.
      */
     public List<String> availableFor(SemanticVersion starterVersion) {
-        return starterFeatures.stream()
+        return features.stream()
                 .filter(feature -> feature.isAvailableFor(starterVersion))
                 .map(Feature::id)
                 .toList();

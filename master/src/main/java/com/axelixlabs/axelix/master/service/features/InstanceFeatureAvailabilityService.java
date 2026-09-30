@@ -22,11 +22,11 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 /**
- * Resolves the set of Axelix UI features available for a managed instance, based on the Axelix starter version it runs.
+ * Resolves the set of features available for a managed instance.
  *
  * @author Mikhail Polivakha
  */
-public interface FeatureAvailabilityService {
+public interface InstanceFeatureAvailabilityService {
 
     /**
      * Resolves the features available for the given instance.

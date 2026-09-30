@@ -28,23 +28,23 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * Default {@link FeatureAvailabilityService}.
+ * Default {@link InstanceFeatureAvailabilityService}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultFeatureAvailabilityService implements FeatureAvailabilityService {
+public class DefaultInstanceFeatureAvailabilityService implements InstanceFeatureAvailabilityService {
 
     private static final SemanticVersion FALLBACK_STARTER_VERSION = SemanticVersion.parse("1.1.0");
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultFeatureAvailabilityService.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultInstanceFeatureAvailabilityService.class);
 
     private final InstanceRegistry instanceRegistry;
-    private final StarterFeaturesCatalog starterFeaturesCatalog;
+    private final InstanceFeaturesCatalog instanceFeaturesCatalog;
 
-    public DefaultFeatureAvailabilityService(
-            InstanceRegistry instanceRegistry, StarterFeaturesCatalog starterFeaturesCatalog) {
+    public DefaultInstanceFeatureAvailabilityService(
+            InstanceRegistry instanceRegistry, InstanceFeaturesCatalog instanceFeaturesCatalog) {
         this.instanceRegistry = instanceRegistry;
-        this.starterFeaturesCatalog = starterFeaturesCatalog;
+        this.instanceFeaturesCatalog = instanceFeaturesCatalog;
     }
 
     @Override
@@ -66,6 +66,6 @@ public class DefaultFeatureAvailabilityService implements FeatureAvailabilitySer
                 });
 
         return new InstanceFeaturesResponse(
-                instanceId.instanceId(), starterFeaturesCatalog.availableFor(starterVersion));
+                instanceId.instanceId(), instanceFeaturesCatalog.availableFor(starterVersion));
     }
 }
