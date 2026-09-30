@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * of Axelix detecting various problems during persistence, such as N + 1 and so on.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoringSharedContextTest {
 
@@ -212,11 +213,6 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
     @Nested
     class NestedTransactions {
 
-        /**
-         * {@code outerRequiredMethod} (REQUIRED) saves 2 owners and, in between, calls
-         * {@code saveRequiresNew} (REQUIRES_NEW) which saves a 3rd owner in its own, separate transaction.
-         * Verifies the 3 INSERTs split 2/1 across the two transactions, not 3/0 or 0/3.
-         */
         @Test
         void shouldIsolateQueriesBetweenOuterAndRequiresNewTransaction() throws Exception {
             // given.
