@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
@@ -45,6 +44,7 @@ import org.springframework.core.annotation.RepeatableContainers;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
@@ -53,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyingUtils;
 
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
@@ -112,17 +113,21 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
             return bean;
         }
 
-        if (!AopUtils.isAopProxy(bean) && !ProxyingUtils.isSafeToCGLIBProxy(targetClass)) {
+        TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
+                propagationCache, statsCollector, metricsPublisherObjectProvider.getIfAvailable(), transactionAccessor);
+
+        // Pointcut provides fast filtering at the proxy level and is necessary for performance
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);
+
+        return ProxyingUtils.tryCreateProxy(bean, advisor).orElseGet(() -> {
             log.warn(
                     "Cannot enable transaction monitoring for bean '{}' of class {}: CGLIB cannot proxy a final "
                             + "class or override a final method. Transaction monitoring is skipped for this bean; "
                             + "the bean itself and every other Axelix feature are unaffected.",
                     beanName,
-                    targetClass.getName());
+                    ClassUtils.getUserClass(targetClass).getName());
             return bean;
-        }
-
-        return createTransactionalProxy(bean);
+        });
     }
 
     /**
@@ -165,21 +170,6 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         }
 
         return false;
-    }
-
-    private Object createTransactionalProxy(Object bean) {
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.setTarget(bean);
-        proxyFactory.setProxyTargetClass(true);
-
-        TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, metricsPublisherObjectProvider.getIfAvailable(), transactionAccessor);
-
-        // Pointcut provides fast filtering at the proxy level and is necessary for performance
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);
-
-        proxyFactory.addAdvisor(advisor);
-        return proxyFactory.getProxy();
     }
 
     private Pointcut createTransactionMonitoringPointcut() {

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
+import java.io.Closeable;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -76,6 +78,24 @@ class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitor
         Object result = subject.postProcessAfterInitialization(new FinalMethodDataSource(), "finalMethodDataSource");
 
         assertThat(AopUtils.isAopProxy(result)).isFalse();
+    }
+
+    @Test
+    void shouldWrapJdkProxiedDataSourceViaInterfaceProxy() throws SQLException {
+        DataSource target = new DriverManagerDataSource("jdbc:h2:mem:jdk-proxy-test;DB_CLOSE_DELAY=-1");
+        DataSource jdkProxiedDataSource = (DataSource) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class<?>[] {DataSource.class, Closeable.class},
+                (proxy, method, args) -> method.invoke(target, args));
+
+        Object result = subject.postProcessAfterInitialization(jdkProxiedDataSource, "jdkProxiedDataSource");
+
+        assertThat(AopUtils.isJdkDynamicProxy(result)).isTrue();
+        assertThat(result).isInstanceOf(Closeable.class);
+
+        try (Connection connection = ((DataSource) result).getConnection()) {
+            assertThat(connection).isInstanceOf(ProxyingConnection.class);
+        }
     }
 
     static class FinalMethodDataSource extends DriverManagerDataSource {
