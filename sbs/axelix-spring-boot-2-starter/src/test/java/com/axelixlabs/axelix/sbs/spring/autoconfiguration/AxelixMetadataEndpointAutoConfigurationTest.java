@@ -23,8 +23,7 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
@@ -59,7 +58,7 @@ class AxelixMetadataEndpointAutoConfigurationTest {
             BasicRegistrationMetadata metadata =
                     context.getBean(BasicRegistrationMetadataAssembler.class).assemble();
 
-            assertThat(metadata.getHealthStatus()).isEqualTo(HealthStatus.UP);
+            assertThat(metadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
         });
     }
 
