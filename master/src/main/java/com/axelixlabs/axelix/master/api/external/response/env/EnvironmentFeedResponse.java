@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.master.api.external.RequiredSince;
 import com.axelixlabs.axelix.master.contract.env.DeprecationLevel;
 import com.axelixlabs.axelix.master.contract.env.InjectionType;
 
@@ -82,14 +83,14 @@ public record EnvironmentFeedResponse(
      * The deprecation details of a property.
      *
      * @param message The deprecation message.
-     * @param level The deprecation severity, if available.
+     * @param level The deprecation severity, if available. Should always present since 1.2.0
      * @param replacedBy The replacement property, if any.
      *
      * @author Sergey Cherkasov
      */
     public record Deprecation(
             String message,
-            @Nullable DeprecationLevel level,
+            @RequiredSince(value = "1.2.0") @Nullable DeprecationLevel level,
             @Nullable String replacedBy) {}
 
     /**
