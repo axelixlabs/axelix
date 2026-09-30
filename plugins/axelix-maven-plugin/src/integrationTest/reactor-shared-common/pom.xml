@@ -17,7 +17,7 @@
             <plugin>
                 <groupId>com.axelixlabs</groupId>
                 <artifactId>axelix-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>${axelix.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

@@ -32,17 +32,12 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link GenerateDependenciesSbomMojo}.
+ * Tests the SBOM half of the umbrella {@code axelix-generate-project-info} goal, exercised through
+ * {@link DependenciesSbomGenerator}.
  *
  * @author Mikhail Polivakha
  */
-class GenerateDependenciesSbomMojoTest {
-
-    /**
-     * The version of the plugin the enclosing Gradle build just published to the local repository,
-     * so the fixture poms always exercise the workspace code rather than a stale release.
-     */
-    private static final String PLUGIN_VERSION = System.getProperty("axelix.plugin.version");
+class DependenciesSbomGeneratorTest {
 
     @TempDir
     private Path projectDir;
@@ -390,7 +385,7 @@ class GenerateDependenciesSbomMojoTest {
                                 <executions>
                                     <execution>
                                         <goals>
-                                            <goal>axelix-generate-dependencies-sbom</goal>
+                                            <goal>axelix-generate-project-info</goal>
                                         </goals>
                                     </execution>
                                 </executions>
@@ -398,7 +393,7 @@ class GenerateDependenciesSbomMojoTest {
                         </plugins>
                     </build>
                 </project>
-                """.formatted(PLUGIN_VERSION));
+                """.formatted(MavenTestUtils.getLocallyPublishedPluginVersion()));
 
         // when.
         runPackage();
@@ -460,7 +455,7 @@ class GenerateDependenciesSbomMojoTest {
                                 <executions>
                                     <execution>
                                         <goals>
-                                            <goal>axelix-generate-dependencies-sbom</goal>
+                                            <goal>axelix-generate-project-info</goal>
                                         </goals>
                                     </execution>
                                 </executions>
@@ -468,7 +463,7 @@ class GenerateDependenciesSbomMojoTest {
                         </plugins>
                     </build>
                 </project>
-                """.formatted(dependenciesBlock, PLUGIN_VERSION);
+                """.formatted(dependenciesBlock, MavenTestUtils.getLocallyPublishedPluginVersion());
     }
 
     /**
@@ -532,7 +527,7 @@ class GenerateDependenciesSbomMojoTest {
     private void assertSBOMActuallyGetPackaged() throws IOException {
         try (ZipFile jar = new ZipFile(
                 projectDir.resolve("target/axelix-plugin-test-1.2.3.jar").toFile())) {
-            assertThat(jar.getEntry(GenerateDependenciesSbomMojo.SBOM_RESOURCE_PATH))
+            assertThat(jar.getEntry(DependenciesSbomGenerator.SBOM_RESOURCE_PATH))
                     .isNotNull();
         }
     }
@@ -561,7 +556,7 @@ class GenerateDependenciesSbomMojoTest {
         Path sbom = projectDir
                 .resolve(module)
                 .resolve("target/classes")
-                .resolve(GenerateDependenciesSbomMojo.SBOM_RESOURCE_PATH);
+                .resolve(DependenciesSbomGenerator.SBOM_RESOURCE_PATH);
         assertThat(sbom).exists();
         return new String(Files.readAllBytes(sbom), StandardCharsets.UTF_8);
     }

@@ -31,13 +31,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
 import org.apache.maven.project.DependencyResolutionResult;
@@ -53,16 +51,21 @@ import org.cyclonedx.model.Metadata;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Mojo that generates a CycloneDX SBOM of the project's runtime dependency graph.
+ * Generates a CycloneDX SBOM of the project's runtime dependency graph.
  *
  * @author Mikhail Polivakha
  */
-@Mojo(name = "axelix-generate-dependencies-sbom", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
-public class GenerateDependenciesSbomMojo extends AbstractMojo {
+@Named
+@Singleton
+public class DependenciesSbomGenerator {
 
     public static final String SBOM_RESOURCE_PATH = "META-INF/axelix/dependencies.cdx.json";
+
+    private static final Logger log = LoggerFactory.getLogger(DependenciesSbomGenerator.class);
 
     /**
      * The dependency scopes present on the runtime classpath of the packaged application.
@@ -71,45 +74,35 @@ public class GenerateDependenciesSbomMojo extends AbstractMojo {
      */
     private static final Set<String> RUNTIME_SCOPES = Set.of("compile", "runtime", "");
 
-    @Parameter(readonly = true, defaultValue = "${project}")
-    @SuppressWarnings("NullAway")
-    private MavenProject mavenProject;
-
-    @Parameter(readonly = true, defaultValue = "${repositorySystemSession}")
-    @SuppressWarnings("NullAway")
-    private RepositorySystemSession repositorySystemSession;
-
-    @Parameter(readonly = true, defaultValue = "${session}")
-    @SuppressWarnings("NullAway")
-    private MavenSession mavenSession;
-
     @Inject
     @SuppressWarnings("NullAway")
     private ProjectDependenciesResolver resolver;
 
-    @Override
-    public void execute() throws MojoExecutionException {
+    public void generate(
+            MavenProject mavenProject, MavenSession mavenSession, RepositorySystemSession repositorySystemSession)
+            throws MojoExecutionException {
         if ("pom".equals(mavenProject.getPackaging())) {
-            getLog().info("Skipping the Axelix dependency SBOM: 'pom' packaging has no runtime classpath to describe");
+            log.info("Skipping the Axelix dependency SBOM: 'pom' packaging has no runtime classpath to describe");
             return;
         }
 
-        DependencyNode graphRoot = resolveGraph();
-        Set<String> reactorModules = reactorModules();
+        DependencyNode graphRoot = resolveGraph(mavenProject, repositorySystemSession);
+        Set<String> reactorModules = reactorModules(mavenSession);
 
         Map<String, DependencyNode> libraries = new LinkedHashMap<>();
         collectLibraries(graphRoot, libraries, new HashSet<>(), reactorModules);
 
         Map<String, Set<String>> edges = new LinkedHashMap<>();
-        addEdges(rootReference(), graphRoot, edges, reactorModules);
+        addEdges(rootReference(mavenProject), graphRoot, edges, reactorModules);
         for (Map.Entry<String, DependencyNode> library : libraries.entrySet()) {
             addEdges(library.getKey(), library.getValue(), edges, reactorModules);
         }
 
-        writeToFile(serialize(bomOf(libraries, edges)));
+        writeToFile(mavenProject, serialize(bomOf(mavenProject, libraries, edges)));
     }
 
-    private DependencyNode resolveGraph() throws MojoExecutionException {
+    private DependencyNode resolveGraph(MavenProject mavenProject, RepositorySystemSession repositorySystemSession)
+            throws MojoExecutionException {
         try {
             DependencyResolutionResult result =
                     resolver.resolve(new DefaultDependencyResolutionRequest(mavenProject, repositorySystemSession));
@@ -124,7 +117,7 @@ public class GenerateDependenciesSbomMojo extends AbstractMojo {
      * The {@code groupId:artifactId:version} keys of every project in this reactor. Dependencies on
      * these are the application's own modules, which the document treats as transparent.
      */
-    private Set<String> reactorModules() {
+    private Set<String> reactorModules(MavenSession mavenSession) {
         Set<String> modules = new HashSet<>();
         for (MavenProject reactorProject : mavenSession.getProjects()) {
             modules.add(reactorProject.getGroupId() + ":" + reactorProject.getArtifactId() + ":"
@@ -206,7 +199,7 @@ public class GenerateDependenciesSbomMojo extends AbstractMojo {
                 + "?type=jar";
     }
 
-    private String rootReference() {
+    private String rootReference(MavenProject mavenProject) {
         return "pkg:maven/" + mavenProject.getGroupId() + "/" + mavenProject.getArtifactId() + "@"
                 + mavenProject.getVersion() + "?type=jar";
     }
@@ -215,7 +208,8 @@ public class GenerateDependenciesSbomMojo extends AbstractMojo {
      * Assembles a CycloneDX 1.6 document from the collected graph: a metadata component for the
      * application, a flat list of library components, and the {@code dependsOn} edges.
      */
-    private Bom bomOf(Map<String, DependencyNode> libraries, Map<String, Set<String>> edges) {
+    private Bom bomOf(
+            MavenProject mavenProject, Map<String, DependencyNode> libraries, Map<String, Set<String>> edges) {
         Bom bom = new Bom();
 
         Metadata metadata = new Metadata();
@@ -268,7 +262,7 @@ public class GenerateDependenciesSbomMojo extends AbstractMojo {
         }
     }
 
-    private void writeToFile(String json) throws MojoExecutionException {
+    private void writeToFile(MavenProject mavenProject, String json) throws MojoExecutionException {
         Path target = Paths.get(mavenProject.getBuild().getOutputDirectory()).resolve(SBOM_RESOURCE_PATH);
         try {
             Files.createDirectories(target.getParent());
