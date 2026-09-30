@@ -18,7 +18,7 @@
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
-import { getFrameworkSupportStatusLabelKey } from "@/helpers";
+import { getFrameworkSupportStatusLabelKey, platformFullName } from "@/helpers";
 import { type IFrameworkSupportWindow } from "@/models";
 
 import { FrameworkWindowFacts } from "./FrameworkWindowFacts";
@@ -40,7 +40,9 @@ export const FrameworkWindowPanel = ({ framework }: IProps) => {
                 <div className={styles.Window}>
                     <div className={styles.Heading}>
                         <div className={styles.Version}>
-                            <span className={`TextUltraSmall ${styles.FrameworkName}`}>{framework.name}</span>
+                            <span className={`TextUltraSmall ${styles.FrameworkName}`}>
+                                {platformFullName(framework.name)}
+                            </span>
                             <span className="TextLarge">{framework.version}</span>
                             <span className={`TextUltraSmall ${styles.Line}`}>
                                 {t("DependenciesAnalyzer.framework.runningLine", {

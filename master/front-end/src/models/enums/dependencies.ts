@@ -31,12 +31,15 @@ export enum ESupportStatus {
  * The area of the runtime a resolved dependency belongs to. Used to group the dependency feed into tabs.
  */
 export enum EDependencyEcosystem {
-    SPRING = "SPRING",
     PERSISTENCE = "PERSISTENCE",
     SERIALIZATION = "SERIALIZATION",
     LOGGING = "LOGGING",
     OBSERVABILITY = "OBSERVABILITY",
     RESILIENCE = "RESILIENCE",
+    SECURITY = "SECURITY",
+    MESSAGING = "MESSAGING",
+    WEB = "WEB",
+    TESTING = "TESTING",
     OTHER = "OTHER",
 }
 

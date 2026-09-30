@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import { LinkIcon } from "@/assets";
 import { type IResolvedDependency } from "@/models";
+import { supportSignalLabelKey } from "@/utils";
 
 import styles from "./styles.module.css";
 
@@ -41,7 +42,7 @@ export const DependencyDetailFacts = ({ dependency }: IProps) => {
                 <span className={`TextUltraSmall ${styles.Label}`}>
                     {t("DependenciesAnalyzer.detail.projectStatus")}
                 </span>
-                <span className={`TextSmall ${styles.Prose}`}>{softwareProject.status}</span>
+                <span className={`TextSmall ${styles.Prose}`}>{t(supportSignalLabelKey[softwareProject.status])}</span>
                 <span className={`TextUltraSmall ${styles.Label}`}>{t("DependenciesAnalyzer.detail.reference")}</span>
 
                 {/* TODO: Fix in the future */}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IPlatformDistribution, IPlatformName } from "@/models";
+import type { IPlatformDistribution } from "@/models";
 
 export const LINE_COLORS = [
     "#2EC4B6",
@@ -29,14 +29,6 @@ export const LINE_COLORS = [
     "#E879F9",
     "#22D3EE",
 ];
-
-export const platformFullName = (platform: IPlatformName): string => {
-    return platform === "SPRING_BOOT" ? "Spring Boot" : "Spring Framework";
-};
-
-export const platformShortName = (platform: IPlatformName): string => {
-    return platform === "SPRING_BOOT" ? "Boot" : "Framework";
-};
 
 export const buildLineColorMap = (distribution: IPlatformDistribution): Map<string, string> => {
     const colors = new Map<string, string>();

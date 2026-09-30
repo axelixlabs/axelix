@@ -18,7 +18,7 @@
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
-import { elapsedMonthsSince, getFrameworkSupportStatusLabelKey } from "@/helpers";
+import { elapsedMonthsSince, getFrameworkConsequencesLabelKey } from "@/helpers";
 import type { IFrameworkSupportWindow } from "@/models";
 import { DEPENDENCY_MONTH_FORMAT } from "@/utils";
 
@@ -49,7 +49,7 @@ export const FrameworkWindowFacts = ({ framework, outOfOssMaintenance }: IProps)
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
                 <span className={styles.FactLabel}>{t("DependenciesAnalyzer.framework.consequence")}</span>
                 <span className={`TextSmall ${styles.FactProse}`}>
-                    {t(getFrameworkSupportStatusLabelKey(outOfOssMaintenance))}
+                    {t(getFrameworkConsequencesLabelKey(outOfOssMaintenance))}
                 </span>
                 {outOfOssMaintenance && (
                     <>

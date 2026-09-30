@@ -515,8 +515,8 @@
             "ossEnds": "OSS ends {{date}}",
             "commercial": "Commercial to {{date}}",
             "consequence": "Consequence",
-            "outOfOssFor": "Out of OSS for",
-            "supportedTarget": "Supported target",
+            "outOfOssFor": "Out of OSS Support for",
+            "supportedTarget": "Closest supported target",
             "targetValue": "{{line}} · OSS to {{date}}"
         },
         "frameworkStatus": {
@@ -540,18 +540,22 @@
         },
         "ecosystems": {
             "ALL": "All",
-            "SPRING": "Spring",
             "PERSISTENCE": "Persistence",
             "SERIALIZATION": "Serialization",
             "LOGGING": "Logging",
             "OBSERVABILITY": "Observability",
             "RESILIENCE": "Resilience",
+            "SECURITY": "Security",
+            "MESSAGING": "Messaging",
+            "WEB": "Web",
+            "TESTING": "Testing",
             "OTHER": "Other"
         },
         "statuses": {
             "MAINTENANCE": "Maintenance mode",
-            "SUNSET": "Sunset",
-            "DORMANT": "Dormant"
+            "SUNSET": "Discontinued",
+            "DORMANT": "Dormant",
+            "ACTIVE": "Actively maintained"
         },
         "columns": {
             "dependency": "Dependency",
@@ -571,7 +575,7 @@
             "resolvedHere": "Resolved here",
             "projectStatus": "Project status",
             "detectedFrom": "Detected from",
-            "reference": "Reference"
+            "reference": "More information"
         }
     },
     "Users": {

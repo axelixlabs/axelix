@@ -30,7 +30,7 @@
 .Window {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 32px;
     min-width: 0;
 }
 
@@ -54,6 +54,8 @@
 
 .Line {
     color: var(--axelix-bold-grey);
+    margin-top: 12px;
+    white-space: nowrap;
 }
 
 /* TODO: Fix in the future */

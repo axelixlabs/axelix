@@ -24,7 +24,7 @@ import {
     type IFrameworkSupportWindow,
     type IResolvedDependency,
 } from "@/models";
-import { frameworkSupportStatusLabelKey } from "@/utils";
+import { frameworkSupportConsequenceKey, frameworkSupportStatusLabelKey } from "@/utils";
 
 /**
  * A single hop of the chain leading from the root application down to a resolved dependency.
@@ -182,6 +182,12 @@ export const getDependenciesAutocompleteOptions = (dependencies: IResolvedDepend
 
 export const getFrameworkSupportStatusLabelKey = (outOfOssMaintenance: boolean): string => {
     return frameworkSupportStatusLabelKey[
+        outOfOssMaintenance ? EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE : EFrameworkSupportStatus.OSS_SUPPORTED
+    ];
+};
+
+export const getFrameworkConsequencesLabelKey = (outOfOssMaintenance: boolean): string => {
+    return frameworkSupportConsequenceKey[
         outOfOssMaintenance ? EFrameworkSupportStatus.OUT_OF_OSS_MAINTENANCE : EFrameworkSupportStatus.OSS_SUPPORTED
     ];
 };

@@ -24,19 +24,23 @@ export const SUPPORT_STATUS_ORDER: EProblemSupportStatus[] = [
 ];
 
 export const DEPENDENCY_ECOSYSTEM_ORDER: EDependencyEcosystem[] = [
-    EDependencyEcosystem.SPRING,
     EDependencyEcosystem.PERSISTENCE,
     EDependencyEcosystem.SERIALIZATION,
     EDependencyEcosystem.LOGGING,
     EDependencyEcosystem.OBSERVABILITY,
     EDependencyEcosystem.RESILIENCE,
+    EDependencyEcosystem.SECURITY,
+    EDependencyEcosystem.MESSAGING,
+    EDependencyEcosystem.WEB,
+    EDependencyEcosystem.TESTING,
     EDependencyEcosystem.OTHER,
 ];
 
-export const supportSignalLabelKey: Record<EProblemSupportStatus, string> = {
+export const supportSignalLabelKey: Record<ESupportStatus, string> = {
     [ESupportStatus.SUNSET]: "DependenciesAnalyzer.statuses.SUNSET",
     [ESupportStatus.MAINTENANCE]: "DependenciesAnalyzer.statuses.MAINTENANCE",
     [ESupportStatus.DORMANT]: "DependenciesAnalyzer.statuses.DORMANT",
+    [ESupportStatus.ACTIVE]: "DependenciesAnalyzer.statuses.ACTIVE",
 };
 
 export const supportSignalColor: Record<EProblemSupportStatus, string> = {
@@ -46,12 +50,15 @@ export const supportSignalColor: Record<EProblemSupportStatus, string> = {
 };
 
 export const dependencyEcosystemLabelKey: Record<EDependencyEcosystem, string> = {
-    [EDependencyEcosystem.SPRING]: "DependenciesAnalyzer.ecosystems.SPRING",
     [EDependencyEcosystem.PERSISTENCE]: "DependenciesAnalyzer.ecosystems.PERSISTENCE",
     [EDependencyEcosystem.SERIALIZATION]: "DependenciesAnalyzer.ecosystems.SERIALIZATION",
     [EDependencyEcosystem.LOGGING]: "DependenciesAnalyzer.ecosystems.LOGGING",
     [EDependencyEcosystem.OBSERVABILITY]: "DependenciesAnalyzer.ecosystems.OBSERVABILITY",
     [EDependencyEcosystem.RESILIENCE]: "DependenciesAnalyzer.ecosystems.RESILIENCE",
+    [EDependencyEcosystem.SECURITY]: "DependenciesAnalyzer.ecosystems.SECURITY",
+    [EDependencyEcosystem.MESSAGING]: "DependenciesAnalyzer.ecosystems.MESSAGING",
+    [EDependencyEcosystem.WEB]: "DependenciesAnalyzer.ecosystems.WEB",
+    [EDependencyEcosystem.TESTING]: "DependenciesAnalyzer.ecosystems.TESTING",
     [EDependencyEcosystem.OTHER]: "DependenciesAnalyzer.ecosystems.OTHER",
 };
 

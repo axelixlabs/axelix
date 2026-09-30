@@ -518,7 +518,7 @@
             "commercial": "Коммерческая до {{date}}",
             "consequence": "Последствие",
             "outOfOssFor": "Без OSS-поддержки уже",
-            "supportedTarget": "Поддерживаемая цель",
+            "supportedTarget": "Близжайший поддерживаемый таргет",
             "targetValue": "{{line}} · OSS до {{date}}"
         },
         "frameworkStatus": {
@@ -541,23 +541,27 @@
             "lessThanAMonth": "менее месяца"
         },
         "feed": {
-            "caption": "Разрешённые зависимости",
+            "caption": "Обнаруженные зависимости",
             "clear": "Сбросить"
         },
         "ecosystems": {
             "ALL": "Все",
-            "SPRING": "Spring",
             "PERSISTENCE": "Хранение данных",
             "SERIALIZATION": "Сериализация",
             "LOGGING": "Логирование",
             "OBSERVABILITY": "Наблюдаемость",
             "RESILIENCE": "Отказоустойчивость",
+            "SECURITY": "Безопасность",
+            "MESSAGING": "Обмен сообщениями",
+            "WEB": "Веб",
+            "TESTING": "Тестирование",
             "OTHER": "Прочее"
         },
         "statuses": {
-            "SUNSET": "Устаревший",
-            "MAINTENANCE": "Режим поддержки",
-            "DORMANT": "Без активности"
+            "SUNSET": "Официально прекращён",
+            "MAINTENANCE": "В режиме поддержки",
+            "DORMANT": "Неактивный",
+            "ACTIVE": "Активно разрабатывается"
         },
         "columns": {
             "dependency": "Зависимость",
@@ -579,7 +583,7 @@
             "resolvedHere": "Разрешена здесь",
             "projectStatus": "Статус проекта",
             "detectedFrom": "Определено из",
-            "reference": "Ссылка"
+            "reference": "Больше информации"
         }
     },
     "Users": {

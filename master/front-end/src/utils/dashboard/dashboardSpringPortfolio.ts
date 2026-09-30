@@ -15,6 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IPlatformName } from "@/models";
+import type { PlatformName } from "@/models";
 
-export const PLATFORM_ORDER: IPlatformName[] = ["SPRING_BOOT", "SPRING_FRAMEWORK"];
+export const PLATFORM_ORDER: PlatformName[] = ["SPRING_BOOT", "SPRING_FRAMEWORK"];

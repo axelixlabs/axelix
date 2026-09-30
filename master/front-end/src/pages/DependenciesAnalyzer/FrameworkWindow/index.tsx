@@ -18,6 +18,7 @@
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
+import { platformFullName } from "@/helpers";
 import { type IFrameworkSupportWindow } from "@/models";
 import { DEPENDENCY_DATE_FORMAT } from "@/utils";
 
@@ -44,7 +45,7 @@ export const FrameworkWindow = ({ framework, analyzedAt }: IProps) => {
             <div className={styles.MainWrapper}>
                 <div className={styles.Caption}>
                     <span className={`TextUltraSmall ${styles.CaptionLabel}`}>
-                        {t("DependenciesAnalyzer.framework.caption", { framework: framework.name })}
+                        {t("DependenciesAnalyzer.framework.caption", { framework: platformFullName(framework.name) })}
                     </span>
                     <span className={`TextUltraSmall ${styles.CaptionSource}`}>
                         {t("DependenciesAnalyzer.framework.source", {
