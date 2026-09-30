@@ -47,6 +47,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;

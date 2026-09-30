@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionType;
 

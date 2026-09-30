@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -33,7 +34,6 @@ import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtracto
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
 
 /**

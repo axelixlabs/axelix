@@ -33,6 +33,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionType;
 

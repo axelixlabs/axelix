@@ -33,6 +33,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.Deprecation;
