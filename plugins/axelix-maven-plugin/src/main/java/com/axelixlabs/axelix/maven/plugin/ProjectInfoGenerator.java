@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class ProjectInfoGenerator {
 
-    public static final String PROFILER_DETECTED_PROPERTY = "spring.test.profiler.detected";
     public static final String AXELIX_INFO_PROPERTIES_LOCATION = "META-INF/axelix-info.properties";
 
     private static final Logger log = LoggerFactory.getLogger(ProjectInfoGenerator.class);
