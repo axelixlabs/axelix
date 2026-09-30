@@ -18,9 +18,11 @@ val mavenPluginAnnotationsVersion = "3.15.2"
 val junitBomVersion = "5.14.4"
 val mavenVerifierVersion = "1.8.0"
 val assertjVersion = "3.27.7"
+val jsonUnitVersion = "4.1.1"
 
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}")
+    implementation("org.cyclonedx:cyclonedx-core-java:13.2.0")
 
     compileOnly("org.apache.maven:maven-plugin-api:${mavenPluginVersion}")
     compileOnly("org.apache.maven:maven-core:${mavenPluginVersion}")
@@ -31,6 +33,7 @@ dependencies {
     testImplementation("org.apache.maven.shared:maven-verifier:${mavenVerifierVersion}")
     testImplementation("org.apache.maven:maven-core:${mavenPluginVersion}")
     testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitVersion}")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -48,4 +51,5 @@ tasks.publishToMavenLocal {
 tasks.test {
     dependsOn(tasks.named("publishToMavenLocal"))
     useJUnitPlatform()
+    systemProperty("axelix.plugin.version", project.version)
 }

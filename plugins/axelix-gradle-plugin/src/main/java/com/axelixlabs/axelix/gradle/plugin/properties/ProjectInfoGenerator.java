@@ -41,6 +41,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 
 import com.axelixlabs.axelix.gradle.plugin.BuildDirAccessor;
+import com.axelixlabs.axelix.gradle.plugin.ConfigurationCacheSupport;
 import com.axelixlabs.axelix.gradle.plugin.GeneratedResourcesPackager;
 import com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector;
 
@@ -71,6 +72,8 @@ public final class ProjectInfoGenerator {
         generateTask.setGroup("build");
         generateTask.setDescription(
                 "Generates META-INF/axelix-info.properties describing this build and its git commit.");
+        ConfigurationCacheSupport.markNotCompatible(
+                generateTask, "Project information generation inspects all projects during task execution.");
 
         generateTask.getInputs().property("projectGroup", String.valueOf(project.getGroup()));
         generateTask.getInputs().property("projectName", project.getName());
