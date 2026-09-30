@@ -29,16 +29,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Unit tests for {@link FeatureManifestLoader}.
+ * Unit tests for {@link InstanceFeaturesManifestLoader}.
  *
  * @author Mikhail Polivakha
  */
-class FeatureManifestLoaderTest {
+class InstanceFeaturesManifestLoaderTest {
 
     @Test
     void flattensEveryReleaseIntoAFeatureTaggedWithItsIntroducingVersion() {
         // given
-        FeatureManifestLoader subject = loaderOf("classpath:axelix/features/test/valid.yaml");
+        InstanceFeaturesManifestLoader subject = loaderOf("classpath:axelix/features/test/valid.yaml");
 
         // when
         List<Feature> features = subject.load();
@@ -53,7 +53,7 @@ class FeatureManifestLoaderTest {
     @Test
     void rejectsAnUnknownProperty() {
         // given
-        FeatureManifestLoader subject = loaderOf("classpath:axelix/features/test/unknown-property.yaml");
+        InstanceFeaturesManifestLoader subject = loaderOf("classpath:axelix/features/test/unknown-property.yaml");
 
         // when / then
         assertThatThrownBy(subject::load).isInstanceOf(FeatureCatalogException.class);
@@ -62,13 +62,13 @@ class FeatureManifestLoaderTest {
     @Test
     void rejectsAMissingManifest() {
         // given
-        FeatureManifestLoader subject = loaderOf("classpath:axelix/features/test/does-not-exist.yaml");
+        InstanceFeaturesManifestLoader subject = loaderOf("classpath:axelix/features/test/does-not-exist.yaml");
 
         // when / then
         assertThatThrownBy(subject::load).isInstanceOf(FeatureCatalogException.class);
     }
 
-    private static FeatureManifestLoader loaderOf(String location) {
-        return new FeatureManifestLoader(new DefaultResourceLoader(), location);
+    private static InstanceFeaturesManifestLoader loaderOf(String location) {
+        return new InstanceFeaturesManifestLoader(new DefaultResourceLoader(), location);
     }
 }

@@ -22,9 +22,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 
 import com.axelixlabs.axelix.master.service.features.DefaultInstanceFeatureAvailabilityService;
-import com.axelixlabs.axelix.master.service.features.FeatureManifestLoader;
 import com.axelixlabs.axelix.master.service.features.InstanceFeatureAvailabilityService;
 import com.axelixlabs.axelix.master.service.features.InstanceFeaturesCatalog;
+import com.axelixlabs.axelix.master.service.features.InstanceFeaturesManifestLoader;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -36,13 +36,14 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 public class FeaturesAutoConfiguration {
 
     @Bean
-    public FeatureManifestLoader featureManifestLoader() {
-        return new FeatureManifestLoader(new DefaultResourceLoader(), FeatureManifestLoader.DEFAULT_LOCATION);
+    public InstanceFeaturesManifestLoader featureManifestLoader() {
+        return new InstanceFeaturesManifestLoader(
+                new DefaultResourceLoader(), InstanceFeaturesManifestLoader.DEFAULT_LOCATION);
     }
 
     @Bean
-    public InstanceFeaturesCatalog featureCatalog(FeatureManifestLoader featureManifestLoader) {
-        return new InstanceFeaturesCatalog(featureManifestLoader);
+    public InstanceFeaturesCatalog featureCatalog(InstanceFeaturesManifestLoader instanceFeaturesManifestLoader) {
+        return new InstanceFeaturesCatalog(instanceFeaturesManifestLoader);
     }
 
     @Bean

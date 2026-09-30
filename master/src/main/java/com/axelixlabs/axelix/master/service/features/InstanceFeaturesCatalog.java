@@ -37,7 +37,7 @@ public class InstanceFeaturesCatalog {
     /**
      * @throws FeatureCatalogException when the manifest cannot be loaded, or declares a feature id more than once.
      */
-    public InstanceFeaturesCatalog(FeatureManifestLoader loader) {
+    public InstanceFeaturesCatalog(InstanceFeaturesManifestLoader loader) {
         this.features = loader.load();
         assertUniqueIds();
     }

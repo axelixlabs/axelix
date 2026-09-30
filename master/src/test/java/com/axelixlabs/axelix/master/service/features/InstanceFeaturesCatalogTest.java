@@ -71,6 +71,6 @@ class InstanceFeaturesCatalogTest {
     }
 
     private static InstanceFeaturesCatalog catalogOf(String location) {
-        return new InstanceFeaturesCatalog(new FeatureManifestLoader(new DefaultResourceLoader(), location));
+        return new InstanceFeaturesCatalog(new InstanceFeaturesManifestLoader(new DefaultResourceLoader(), location));
     }
 }

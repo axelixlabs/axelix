@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.master.domain.features.Feature;
  *
  * @author Mikhail Polivakha
  */
-public class FeatureManifestLoader {
+public class InstanceFeaturesManifestLoader {
 
     public static final String DEFAULT_LOCATION = "classpath:axelix/features/features.yaml";
 
@@ -49,7 +49,7 @@ public class FeatureManifestLoader {
      * @param resourceLoader the loader the manifest is looked up through
      * @param location       the location the manifest is read from
      */
-    public FeatureManifestLoader(ResourceLoader resourceLoader, String location) {
+    public InstanceFeaturesManifestLoader(ResourceLoader resourceLoader, String location) {
         this.resourceLoader = resourceLoader;
         this.location = location;
         this.yamlMapper = YAMLMapper.builder()
@@ -68,7 +68,7 @@ public class FeatureManifestLoader {
         Resource manifest = resourceLoader.getResource(location);
 
         try (InputStream source = manifest.getInputStream()) {
-            return yamlMapper.readValue(source, FeatureManifest.class).toFeatures();
+            return yamlMapper.readValue(source, InstanceFeatureManifest.class).toFeatures();
         } catch (IOException | JacksonException | IllegalArgumentException e) {
             throw new FeatureCatalogException(
                     "Failed to read the feature manifest %s".formatted(manifest.getDescription()), e);
@@ -80,7 +80,7 @@ public class FeatureManifestLoader {
      *
      * @param releases the curated releases
      */
-    record FeatureManifest(List<Release> releases) {
+    record InstanceFeatureManifest(List<Release> releases) {
 
         List<Feature> toFeatures() {
             return releases.stream()
