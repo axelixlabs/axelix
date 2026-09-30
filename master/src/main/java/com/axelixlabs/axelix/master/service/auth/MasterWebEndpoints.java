@@ -208,6 +208,10 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint UPGRADES_READ_IMPACT =
             register("upgrades:read-impact", HttpMethod.GET, ApiPaths.UpgradesApi.IMPACT, null);
 
+    // Features
+    public static final MasterWebEndpoint FEATURES_READ =
+            register("features:read", HttpMethod.GET, ApiPaths.FeaturesApi.INSTANCE_ID, null);
+
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =
             register("mcp-tools:read", HttpMethod.GET, ApiPaths.McpToolApi.TOOLS_LIST, null);
