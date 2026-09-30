@@ -39,6 +39,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata.Deprecation;
 

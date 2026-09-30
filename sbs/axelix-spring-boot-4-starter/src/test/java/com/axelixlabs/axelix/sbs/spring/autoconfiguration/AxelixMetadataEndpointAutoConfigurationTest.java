@@ -23,9 +23,11 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
@@ -57,7 +59,30 @@ class AxelixMetadataEndpointAutoConfigurationTest {
             BasicRegistrationMetadata metadata =
                     context.getBean(BasicRegistrationMetadataAssembler.class).assemble();
 
-            assertThat(metadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
+            assertThat(metadata.getHealthStatus()).isEqualTo(HealthStatus.UP);
         });
+    }
+
+    @Test // regression: disabling transaction monitoring must not break the rest of the metadata endpoint.
+    void shouldCreateMetadataEndpointWithoutTransactionMonitoringBeans() {
+        new ApplicationContextRunner()
+                .withPropertyValues("axelix.sbs.transaction.monitoring.enabled=false")
+                .withConfiguration(AutoConfigurations.of(
+                        AxelixInfoPropertiesAutoConfiguration.class,
+                        LibraryInformationProviderAutoConfiguration.class,
+                        TransactionMonitoringAutoConfiguration.class,
+                        AxelixMetadataEndpointAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
+                    assertThat(context).doesNotHaveBean(TransactionAttributesRegistry.class);
+                    assertThat(context).hasSingleBean(InsightsInfoProvider.class);
+                    assertThat(context).hasSingleBean(AxelixMetadataEndpoint.class);
+
+                    BasicRegistrationMetadata metadata = context.getBean(BasicRegistrationMetadataAssembler.class)
+                            .assemble();
+
+                    assertThat(metadata.getInsights().getPersistenceInsights().getTransactions())
+                            .isEmpty();
+                });
     }
 }

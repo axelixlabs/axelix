@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
 
 /**
  * Custom actuator endpoint that provides the beans feed.

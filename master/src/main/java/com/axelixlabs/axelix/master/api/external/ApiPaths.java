@@ -154,6 +154,11 @@ public final class ApiPaths {
          * Endpoint to retrieve the fleet-wide Spring Boot / Spring Framework version portfolio.
          */
         public static final String SPRING_PORTFOLIO = "/dashboard/spring-portfolio";
+
+        /**
+         * Endpoint to retrieve the fleet-wide languages profile (Java releases, JDK builds and Kotlin adoption).
+         */
+        public static final String LANGUAGES = "/dashboard/languages";
     }
 
     public static final class LoggersApi {
@@ -218,14 +223,6 @@ public final class ApiPaths {
          * Heap-dump endpoint with instance ID.
          */
         public static final String INSTANCE_ID = "/heapdump/{instanceId}";
-    }
-
-    public static final class PropertyManagementApi {
-
-        /**
-         * Endpoint to update property of a given application instance.
-         */
-        public static final String INSTANCE_ID = "/property-management/{instanceId}";
     }
 
     public static final class CachesApi {
@@ -331,14 +328,6 @@ public final class ApiPaths {
                 "/thread-dump/{instanceId}/thread-contention-monitoring/disable";
     }
 
-    public static final class FeignClientApi {
-
-        /**
-         * Feign Client endpoint with instance ID.
-         */
-        public static final String INSTANCE_ID = "/feign/{instanceId}";
-    }
-
     public static final class McpOAuth2Api {
 
         /**
@@ -353,6 +342,21 @@ public final class ApiPaths {
          * Endpoint to retrieve the dependency analysis of a given application instance.
          */
         public static final String INSTANCE_ID = "/dependencies/{instanceId}";
+    }
+
+    public static final class UpgradesApi {
+
+        /**
+         * Endpoint to retrieve how far Axelix Master can be safely upgraded, given the starter versions
+         * currently in use across the fleet.
+         */
+        public static final String MAIN = "/upgrades";
+
+        /**
+         * Endpoint to retrieve how many applications would lose compatibility if Axelix Master were
+         * upgraded to a given version.
+         */
+        public static final String IMPACT = "/upgrades/impact";
     }
 
     public static final class McpToolApi {

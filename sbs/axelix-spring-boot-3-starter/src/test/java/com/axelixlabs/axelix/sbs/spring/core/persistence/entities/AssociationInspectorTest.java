@@ -47,10 +47,9 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.AssociationProblem;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.FlaggedAssociation;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.AssociationProblem;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.MappedEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -127,7 +126,9 @@ class AssociationInspectorTest {
             assertThat(order.getTable()).isEqualTo("orders");
             assertThat(order.getAssociationsCount()).isEqualTo(8);
             assertThat(order.getFlaggedAssociations())
-                    .extracting(flagged -> flagged.getAssociation().getField(), FlaggedAssociation::getProblems)
+                    .extracting(
+                            flagged -> flagged.getAssociation().getField(),
+                            flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactlyInAnyOrder(
                             tuple("customer", Set.of(AssociationProblem.EAGER_FETCHING, AssociationProblem.TO_STRING)),
                             tuple("coCustomer", Set.of(AssociationProblem.EAGER_FETCHING)),
@@ -142,7 +143,9 @@ class AssociationInspectorTest {
 
             // the association read by a Lombok-generated toString() is flagged too, through the same path.
             assertThat(entity(profile, "LombokOrder").getFlaggedAssociations())
-                    .extracting(flagged -> flagged.getAssociation().getField(), FlaggedAssociation::getProblems)
+                    .extracting(
+                            flagged -> flagged.getAssociation().getField(),
+                            flagged -> Set.copyOf(flagged.getProblems()))
                     .containsExactly(tuple("customer", Set.of(AssociationProblem.TO_STRING)));
 
             // every other entity is clean.

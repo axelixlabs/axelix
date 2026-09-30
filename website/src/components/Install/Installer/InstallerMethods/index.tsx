@@ -49,22 +49,22 @@ const METHODS_DATA: TInstallMethodData = {
     [EInstallMethod.K8S]: {
         description:
             "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-on-kubernetes",
+        href: "https://axelix.io/docs/start/configuring-master#run-on-kubernetes",
     },
     [EInstallMethod.COMPOSE]: {
         description:
             "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker-compose",
+        href: "https://axelix.io/docs/start/configuring-master#run-with-docker-compose",
     },
     [EInstallMethod.DOCKER]: {
         description:
             "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
-        href: "https://axelix.io/docs/installation/configuring-master#run-with-docker",
+        href: "https://axelix.io/docs/start/configuring-master#run-with-docker",
     },
     [EInstallMethod.BARE]: {
         description:
             "Installing Axelix on bare metal or VMs without containerization is also possible by directly launching a JAR file",
-        href: "https://axelix.io/docs/installation/configuring-master#run-as-a-jar",
+        href: "https://axelix.io/docs/start/configuring-master#run-as-a-jar",
     },
 };
 

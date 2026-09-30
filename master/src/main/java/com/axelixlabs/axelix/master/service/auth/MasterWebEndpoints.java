@@ -176,10 +176,6 @@ public final class MasterWebEndpoints {
     public static final MasterWebEndpoint HEAP_DUMP_READ =
             register("heap-dump:read", HttpMethod.GET, ApiPaths.HeapDumpApi.INSTANCE_ID, null);
 
-    // Feign clients
-    public static final MasterWebEndpoint FEIGN_READ =
-            register("feign:read", HttpMethod.GET, ApiPaths.FeignClientApi.INSTANCE_ID, null);
-
     // Transaction monitoring
     public static final MasterWebEndpoint TRANSACTION_MONITORING_READ = register(
             "transaction-monitoring:read", HttpMethod.GET, ApiPaths.TransactionMonitoringApi.INSTANCE_ID, null);
@@ -199,10 +195,18 @@ public final class MasterWebEndpoints {
             register("dashboard:read-persistence", HttpMethod.GET, ApiPaths.DashboardApi.PERSISTENCE, null);
     public static final MasterWebEndpoint DASHBOARD_READ_SPRING_PORTFOLIO =
             register("dashboard:read-spring-portfolio", HttpMethod.GET, ApiPaths.DashboardApi.SPRING_PORTFOLIO, null);
+    public static final MasterWebEndpoint DASHBOARD_READ_LANGUAGES =
+            register("dashboard:read-languages", HttpMethod.GET, ApiPaths.DashboardApi.LANGUAGES, null);
 
     // Dependencies
     public static final MasterWebEndpoint DEPENDENCIES_READ =
             register("dependencies:read", HttpMethod.GET, ApiPaths.DependenciesApi.INSTANCE_ID, null);
+
+    // Upgrades
+    public static final MasterWebEndpoint UPGRADES_READ =
+            register("upgrades:read", HttpMethod.GET, ApiPaths.UpgradesApi.MAIN, null);
+    public static final MasterWebEndpoint UPGRADES_READ_IMPACT =
+            register("upgrades:read-impact", HttpMethod.GET, ApiPaths.UpgradesApi.IMPACT, null);
 
     // MCP
     public static final MasterWebEndpoint MCP_TOOLS_READ =

@@ -102,6 +102,25 @@ export interface IEnvironmentPropertySource {
     properties: IEnvProperty[];
 }
 
+export interface IPropertyOccurrence {
+    /**
+     * The name of the property source this occurrence comes from
+     */
+    propertySourceName: string;
+
+    /**
+     * The value that this particular property source assigns to the property
+     */
+    value: string;
+}
+
+/**
+ * Canonicalized property name -> every occurrence of that property across all the property sources,
+ * kept in the precedence order of the sources they come from. The first entry is therefore always
+ * the winning one, and every following entry is suppressed by it.
+ */
+export type TPrecedenceIndex = Map<string, IPropertyOccurrence[]>;
+
 export interface IEnvironmentResponseBody {
     /**
      * Environment active profiles list

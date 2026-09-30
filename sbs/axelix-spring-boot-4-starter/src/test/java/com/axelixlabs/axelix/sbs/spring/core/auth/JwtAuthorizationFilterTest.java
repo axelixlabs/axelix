@@ -48,7 +48,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
@@ -60,6 +59,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.IgnoreTestContextArchitecture;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
@@ -77,10 +77,10 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilde
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
@@ -422,7 +422,7 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public BeansFeedBuilder noOpBeanFeedBuilder() {
-            return () -> new BeansFeed(List.of());
+            return () -> new BeansFeed();
         }
 
         @Bean

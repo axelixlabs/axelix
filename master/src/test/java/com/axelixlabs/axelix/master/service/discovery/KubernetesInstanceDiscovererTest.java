@@ -49,6 +49,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
@@ -159,6 +160,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -168,6 +170,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -205,7 +218,7 @@ class KubernetesInstanceDiscovererTest {
         assertThat(instance).satisfies(it -> {
             assertThat(it.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
             assertThat(it.commitShaShort()).isEqualTo("a8b0929");
-            assertThat(it.javaVersion()).isEqualTo("25");
+            assertThat(it.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
             assertThat(it.springBootVersion()).isEqualTo("3.5.0");
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
@@ -229,6 +242,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -238,6 +252,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -278,6 +303,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -287,6 +313,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -299,6 +336,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -308,6 +346,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -401,6 +450,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -410,6 +460,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
         """;
@@ -482,6 +543,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : null,
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -491,6 +553,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -529,6 +602,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -538,6 +612,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -550,6 +635,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -559,6 +645,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -612,6 +709,7 @@ class KubernetesInstanceDiscovererTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -621,6 +719,17 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
         """;

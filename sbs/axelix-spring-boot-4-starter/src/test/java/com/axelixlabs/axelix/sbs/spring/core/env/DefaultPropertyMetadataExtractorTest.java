@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
 
 import static org.assertj.core.api.Assertions.assertThat;

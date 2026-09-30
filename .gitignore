@@ -72,3 +72,6 @@ apm.lock.yaml
 .gemini/
 .mcp.json
 openspec
+
+### TLS private key (injected at deploy time from Bitwarden, never committed) ###
+/ssl/certificate.key

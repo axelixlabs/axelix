@@ -1,36 +1,29 @@
-.AccordionWrapper {
-    margin-bottom: 40px;
+.Panel {
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-panel-border);
+    border-radius: var(--prop-radius);
+    box-shadow: var(--prop-shadow-card);
 }
 
-.AccordionHeader {
+.PanelAccordion.PanelAccordion {
+    border-bottom: none;
+}
+
+.PanelHeader.PanelHeader {
     display: flex;
     align-items: center;
-    column-gap: 8px;
-    font-weight: 600;
+    min-height: 44px;
+    padding: 0 16px 0 34px;
+    background-color: var(--prop-surface-soft);
+    border-radius: 9px 9px 0 0;
 }
 
-.MainAccordionHeaderStyles {
-    background-color: var(--axelix-primary-light-green);
-    padding: 16px;
+.PanelHeader.PanelHeader::before {
+    left: 14px;
+    width: 12px;
+    height: 12px;
 }
 
-.KeyChunk {
-    padding-right: 16px;
-    flex-shrink: 0;
-    word-break: break-all;
-}
-
-.ValueChunk {
-    display: flex;
-    justify-content: flex-end;
-    word-break: break-all;
-    padding-left: 16px;
-}
-
-.DeprecatedPropertyAccordionsHeader {
-    background-color: var(--axelix-primary-light-red);
-}
-
-.ListAccordionStyles {
+.PanelBody.PanelBody {
     padding: 0;
 }

@@ -21,29 +21,32 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.SoftwareVersions;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.master.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.master.contract.metadata.Insights;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.SoftwareVersions;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Versions;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLeyden;
 import com.axelixlabs.axelix.master.domain.Insights.HotSpot.ProjectLilliput;
 import com.axelixlabs.axelix.master.domain.Insights.SpringFramework;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 
 /**
  * Converter that is capable to conver the {@link BasicRegistrationMetadata} into {@link HistoricalApplicationSnapshot}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Component
 public class HistoricalApplicationSnapshotConverter {
@@ -52,33 +55,50 @@ public class HistoricalApplicationSnapshotConverter {
 
         return new HistoricalApplicationSnapshot(
                 new SnapshotId(metadata.getGroupId(), metadata.getArtifactId(), LocalDate.now(ZoneOffset.UTC)),
-                fromDto(metadata));
+                fromDto(metadata),
+                fromVersions(metadata));
     }
 
-    // TODO: nullability checks here are performed solely because we have not yet covered BasicDiscoveryMetadata with
-    // nullability annotations.
+    private Versions fromVersions(BasicRegistrationMetadata metadata) {
+        SoftwareVersions softwareVersions = metadata.getSoftwareVersions();
+        Assert.notNull(softwareVersions, "Cannot build a historical snapshot without the reported software versions");
+        return new Versions(
+                metadata.getVersion(),
+                softwareVersions.getSpringBoot(),
+                softwareVersions.getSpringFramework(),
+                JavaVersion.parse(softwareVersions.getJava()),
+                JdkVendor.fromVendorName(metadata.getJdkVendor()),
+                softwareVersions.getKotlin());
+    }
+
     private com.axelixlabs.axelix.master.domain.Insights fromDto(BasicRegistrationMetadata metadata) {
+        GarbageCollector gcInUse = resolveGcInUse(metadata.getGcInUse());
+
         Insights insights = metadata.getInsights();
         if (insights == null) {
-            return defaultInsights();
+            return defaultInsights(gcInUse);
         }
 
         return new com.axelixlabs.axelix.master.domain.Insights(
-                fromHotSpot(insights.getHotSpot(), metadata.getGcInUse()),
-                fromSpringFramework(insights.getSpringFramework(), metadata.getSoftwareVersions()),
+                fromHotSpot(insights.getHotSpot(), gcInUse),
+                fromSpringFramework(insights.getSpringFramework()),
                 fromPersistenceInsights(insights.getPersistenceInsights()));
+    }
+
+    private GarbageCollector resolveGcInUse(com.axelixlabs.axelix.master.contract.metadata.GarbageCollector gcInUse) {
+        return gcInUse == null ? GarbageCollector.UNKNOWN : GarbageCollector.valueOf(gcInUse.name());
     }
 
     private PersistenceInsights fromPersistenceInsights(PersistenceInsights persistenceInsights) {
         if (persistenceInsights == null || persistenceInsights.getTransactions() == null) {
-            return new PersistenceInsights(List.of());
+            return new PersistenceInsights().transactions(List.of());
         }
         return persistenceInsights;
     }
 
     private HotSpot fromHotSpot(HotSpotInsights hotSpotInsights, GarbageCollector gcInUse) {
         if (hotSpotInsights == null) {
-            return defaultHotSpot();
+            return defaultHotSpot(gcInUse);
         }
 
         return new HotSpot(
@@ -93,20 +113,15 @@ public class HistoricalApplicationSnapshotConverter {
     }
 
     private HotSpot.GarbageCollector fromGarbageCollector(List<InsightFeature> features, GarbageCollector gcInUse) {
-        return new HotSpot.GarbageCollector(
-                isFeatureEnabled(features, FeatureId.GC_LOGGING_ENABLED), resolveGcInUse(gcInUse));
+        return new HotSpot.GarbageCollector(isFeatureEnabled(features, FeatureId.GC_LOGGING_ENABLED), gcInUse);
     }
 
     private ProjectLilliput fromProjectLilliput(List<InsightFeature> features) {
         return new ProjectLilliput(isFeatureEnabled(features, FeatureId.COMPACT_OBJECT_HEADERS));
     }
 
-    private SpringFramework fromSpringFramework(
-            List<InsightFeature> features, @Nullable SoftwareVersions softwareVersions) {
-        return new SpringFramework(
-                isFeatureEnabled(features, FeatureId.OSIV),
-                softwareVersions == null ? null : softwareVersions.getSpringBoot(),
-                softwareVersions == null ? null : softwareVersions.getSpringFramework());
+    private SpringFramework fromSpringFramework(List<InsightFeature> features) {
+        return new SpringFramework(isFeatureEnabled(features, FeatureId.OSIV));
     }
 
     private boolean isFeatureEnabled(List<InsightFeature> features, FeatureId featureId) {
@@ -117,23 +132,19 @@ public class HistoricalApplicationSnapshotConverter {
         return features.stream()
                 .filter(feature -> featureId.getId().equals(feature.getFeatureId()))
                 .findFirst()
-                .map(InsightFeature::isEnabled)
+                .map(InsightFeature::getEnabled)
                 .orElse(false);
     }
 
-    private GarbageCollector resolveGcInUse(GarbageCollector gcInUse) {
-        return gcInUse == null ? GarbageCollector.UNKNOWN : gcInUse;
-    }
-
-    private com.axelixlabs.axelix.master.domain.Insights defaultInsights() {
+    private com.axelixlabs.axelix.master.domain.Insights defaultInsights(GarbageCollector gcInUse) {
         return new com.axelixlabs.axelix.master.domain.Insights(
-                defaultHotSpot(), new SpringFramework(false, null, null), new PersistenceInsights(List.of()));
+                defaultHotSpot(gcInUse), new SpringFramework(false), new PersistenceInsights().transactions(List.of()));
     }
 
-    private HotSpot defaultHotSpot() {
+    private HotSpot defaultHotSpot(GarbageCollector gcInUse) {
         return new HotSpot(
                 new ProjectLeyden(false, false),
-                new HotSpot.GarbageCollector(false, GarbageCollector.UNKNOWN),
+                new HotSpot.GarbageCollector(false, gcInUse),
                 new ProjectLilliput(false));
     }
 }

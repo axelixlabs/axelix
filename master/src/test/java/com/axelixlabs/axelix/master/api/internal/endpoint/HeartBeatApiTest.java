@@ -41,14 +41,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -191,7 +192,7 @@ public class HeartBeatApiTest {
             assertThat(instance.name()).isEqualTo("petclinic");
             assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
             assertThat(instance.starterVersion()).isEqualTo("1.0.0-SNAPSHOT");
-            assertThat(instance.javaVersion()).isEqualTo("25");
+            assertThat(instance.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
             assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
             assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(instance.kotlinVersion()).isNull();

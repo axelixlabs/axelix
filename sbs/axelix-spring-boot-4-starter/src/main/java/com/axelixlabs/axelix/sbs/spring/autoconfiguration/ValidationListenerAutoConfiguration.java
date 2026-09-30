@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
@@ -26,9 +25,9 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * Auto-configuration for the {@link ValidationListener}.
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 public class ValidationListenerAutoConfiguration {
 
     @Bean

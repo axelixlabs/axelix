@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
 /**
@@ -61,7 +62,7 @@ public final class TestInstanceFactory {
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 DEFAULT_STARTER_VERSION,
-                "25",
+                JavaVersion.parse("25"),
                 "3.5.2",
                 "6.0.2",
                 null,
@@ -85,7 +86,7 @@ public final class TestInstanceFactory {
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 starterVersion,
-                "25",
+                JavaVersion.parse("25"),
                 "3.5.2",
                 "6.0.2",
                 null,
@@ -143,7 +144,7 @@ public final class TestInstanceFactory {
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 DEFAULT_STARTER_VERSION,
-                java,
+                JavaVersion.parse(java),
                 springBoot,
                 springFramework,
                 kotlin,
@@ -167,7 +168,7 @@ public final class TestInstanceFactory {
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
                 DEFAULT_STARTER_VERSION,
-                "25",
+                JavaVersion.parse("25"),
                 "3.5.2",
                 "6.0.2",
                 null,
@@ -196,7 +197,7 @@ public final class TestInstanceFactory {
                 name,
                 "1.2.3-classifer-test",
                 DEFAULT_STARTER_VERSION,
-                java,
+                JavaVersion.parse(java),
                 springBoot,
                 springFramework,
                 kotlin,

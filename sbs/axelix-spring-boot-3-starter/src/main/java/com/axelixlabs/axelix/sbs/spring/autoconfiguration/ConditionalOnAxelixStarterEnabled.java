@@ -26,9 +26,8 @@ import java.lang.annotation.Target;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
- * Global kill-switch for the Axelix starter: put on every {@code @AutoConfiguration} class this module
- * contributes. When {@code axelix.sbs.enabled} is {@code false}, the annotated auto-configuration is
- * skipped entirely.
+ * Global kill-switch for the Axelix starter.
+ * When {@code axelix.sbs.enabled} is {@code false}, the annotated auto-configuration is skipped entirely.
  *
  * @author Nikita Kirillov
  */

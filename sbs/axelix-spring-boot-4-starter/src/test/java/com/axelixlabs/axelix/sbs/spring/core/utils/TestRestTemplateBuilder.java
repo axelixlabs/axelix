@@ -28,7 +28,6 @@ import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.web.server.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
@@ -38,8 +37,6 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
-
-import static com.axelixlabs.axelix.sbs.spring.core.utils.BeanSourceTestJsonSupport.beanSourceAwareJsonConverter;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -119,26 +116,14 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate withoutToken() {
-        return withBeanSourceSupport(
-                new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort)));
+        return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
     }
     // END: Bad token auth scenarios
 
     private TestRestTemplate buildWithToken(String expiredToken) {
-        return withBeanSourceSupport(new TestRestTemplate(new RestTemplateBuilder()
+        return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + expiredToken)));
-    }
-
-    // The polymorphic BeansFeed.BeanSource relies on a Jackson 2 deserializer in common/api, which Spring Boot 4's
-    // Jackson 3 client cannot use. Swap in a Jackson 3 aware converter so HTTP tests can deserialize the response.
-    private static TestRestTemplate withBeanSourceSupport(TestRestTemplate template) {
-        template.getRestTemplate()
-                .getMessageConverters()
-                .replaceAll(converter -> converter instanceof JacksonJsonHttpMessageConverter
-                        ? beanSourceAwareJsonConverter()
-                        : converter);
-        return template;
+                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + expiredToken));
     }
 
     private String generateToken(Role[] roles) {

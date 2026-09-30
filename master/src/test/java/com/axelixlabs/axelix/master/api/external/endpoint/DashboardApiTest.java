@@ -17,11 +17,14 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,18 +36,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
-import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.master.contract.metadata.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
+import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
@@ -341,6 +347,31 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_SPRING_PORTFOLIO, viewer.getActor());
     }
 
+    @Test
+    void shouldReturnLanguagesProfileAggregatedAcrossApplications() {
+        // given two distinct applications, one Java-only and one that also contains Kotlin, aggregated from the
+        // latest snapshot per service.
+        deRegisterAll();
+        jdbcAggregateTemplate.insertAll(List.of(
+                languagesSnapshot("com.example", "a", 25, JdkVendor.BELLSOFT_LIBERICA, null),
+                languagesSnapshot("com.example", "b", 21, JdkVendor.ADOPTIUM, "2.1.0")));
+
+        // when.
+        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
+        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard/languages", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).node("applicationsOnLts").isEqualTo(2);
+        assertThatJson(response.getBody()).node("applicationsOnNonLts").isEqualTo(0);
+        assertThatJson(response.getBody())
+                .node("languageMix.kotlinApplications")
+                .isEqualTo(1);
+        assertThatJson(response.getBody()).node("kotlinReleases").isArray().hasSize(1);
+        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ_LANGUAGES, viewer.getActor());
+    }
+
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
         return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.DASHBOARD_READ, "/api/external/dashboard"));
@@ -362,22 +393,44 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
             String artifactId,
             List<CountedLazyLoadingTarget> lazyLoadingTargets,
             Map<String, Integer> inMemoryPagination) {
-        TransactionAggregatedProfile profile = new TransactionAggregatedProfile(
-                TransactionOrigin.APPLICATION_DECLARATIVE,
-                new TransactionalKey("com.example.OwnerService", "loadOwners"),
-                new ExecutionStats(1, 10, 5),
-                lazyLoadingTargets,
-                inMemoryPagination,
-                List.of(),
-                "REQUIRED",
-                "DEFAULT",
-                false);
+        TransactionAggregatedProfile profile = new TransactionAggregatedProfile()
+                .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                .transactionalKey(new TransactionalKey()
+                        .className("com.example.OwnerService")
+                        .methodName("loadOwners"))
+                .transactionOverallStats(
+                        new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                .lazyLoadingTargets(lazyLoadingTargets)
+                .inMemoryPagination(inMemoryPagination)
+                .externalCalls(List.of())
+                .propagation("REQUIRED")
+                .isolation("DEFAULT")
+                .readOnly(false);
         return TestMetadataFactory.withPersistenceInsights(
-                groupId, artifactId, new PersistenceInsights(List.of(profile)));
+                groupId, artifactId, new PersistenceInsights().transactions(List.of(profile)));
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(
-                new LazyLoadingTarget(String.class.getName(), associationPropertyName), count);
+        return new CountedLazyLoadingTarget()
+                .target(new LazyLoadingTarget()
+                        .ownerEntityClass(String.class.getName())
+                        .associationPropertyName(associationPropertyName))
+                .count(count);
+    }
+
+    private static HistoricalApplicationSnapshot languagesSnapshot(
+            String groupId, String artifactId, int javaVersion, JdkVendor jdkVendor, @Nullable String kotlinVersion) {
+        return new HistoricalApplicationSnapshot(
+                new HistoricalApplicationSnapshot.SnapshotId(groupId, artifactId, LocalDate.now(ZoneOffset.UTC)),
+                new Insights(
+                        new Insights.HotSpot(
+                                new Insights.HotSpot.ProjectLeyden(false, false),
+                                new Insights.HotSpot.GarbageCollector(
+                                        false, com.axelixlabs.axelix.common.domain.insights.GarbageCollector.G1),
+                                new Insights.HotSpot.ProjectLilliput(false)),
+                        new Insights.SpringFramework(false),
+                        new PersistenceInsights().transactions(List.of())),
+                new HistoricalApplicationSnapshot.Versions(
+                        "1.0.0", "3.5.2", "6.2.1", new JavaVersion(javaVersion, 0, 0, 0), jdkVendor, kotlinVersion));
     }
 }

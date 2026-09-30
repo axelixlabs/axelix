@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +56,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.applicationId()).isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
         assertThat(instance.name()).isEqualTo("petclinic");
         assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(instance.javaVersion()).isEqualTo("25");
+        assertThat(instance.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
         assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
         assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
         assertThat(instance.kotlinVersion()).isNull();

@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.contract.env.DeprecationLevel;
 
 import static org.assertj.core.api.Assertions.assertThat;

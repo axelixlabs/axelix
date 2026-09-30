@@ -51,7 +51,7 @@ public class InstancesToShortProfileConverter implements Converter<Instance, Ins
                     case UNKNOWN -> InstanceStatus.UNKNOWN;
                 },
                 buildDeployedForField(instance),
-                instance.javaVersion(),
+                instance.javaVersion().render(),
                 instance.springBootVersion(),
                 instance.springFrameworkVersion(),
                 instance.kotlinVersion());

@@ -1,0 +1,181 @@
+openapi: 3.1.0
+info:
+  title: instance-details
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'instance-details' operation.
+    This operation returns the details of the Spring Boot app instance, so that Axelix Master can
+    render them.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-details:
+    get:
+      operationId: getInstanceDetails
+      summary: Returns the details of the service instance.
+      responses:
+        '200':
+          description: The details of the service instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceDetails'
+components:
+  schemas:
+    InstanceDetails:
+      type: object
+      description: The response returned by the custom details endpoint.
+      required:
+        - git
+        - spring
+        - runtime
+        - build
+        - os
+      properties:
+        git:
+          description: The git component details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/GitDetails'
+        spring:
+          description: The spring component details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/SpringDetails'
+        runtime:
+          description: The runtime component details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/RuntimeDetails'
+        build:
+          description: The build component details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/BuildDetails'
+        os:
+          description: The OS component details.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/OsDetails'
+    GitDetails:
+      type: object
+      description: The git information of the given artifact.
+      required:
+        - commitShaShort
+        - branch
+        - commitAuthor
+        - commitTimestamp
+      properties:
+        commitShaShort:
+          type: string
+          description: The ID of the commit.
+          x-axelix-introduced-in: 1.2.0
+        branch:
+          type: string
+          description: The name of the Git branch.
+          x-axelix-introduced-in: 1.2.0
+        commitAuthor:
+          description: The commit author information.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/CommitAuthor'
+        commitTimestamp:
+          type: string
+          description: The timestamp of the commit.
+          x-axelix-introduced-in: 1.2.0
+    CommitAuthor:
+      type: object
+      description: Author of the commit information.
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          description: The commit author name.
+          x-axelix-introduced-in: 1.2.0
+        email:
+          type: string
+          description: The commit author email.
+          x-axelix-introduced-in: 1.2.0
+    SpringDetails:
+      type: object
+      description: The spring information of the given artifact.
+      required:
+        - springBootVersion
+        - springFrameworkVersion
+      properties:
+        springBootVersion:
+          type: string
+          description: The version of the Spring Boot.
+          x-axelix-introduced-in: 1.2.0
+        springFrameworkVersion:
+          type: string
+          description: The version of the Spring Framework.
+          x-axelix-introduced-in: 1.2.0
+        springCloudVersion:
+          type: string
+          description: The version of the Spring Cloud, if any.
+          x-axelix-introduced-in: 1.2.0
+    RuntimeDetails:
+      type: object
+      description: The Runtime information of the given artifact.
+      required:
+        - javaVersion
+        - jdkVendor
+      properties:
+        javaVersion:
+          type: string
+          description: The version of the java.
+          x-axelix-introduced-in: 1.2.0
+        jdkVendor:
+          type: string
+          description: The name of the vendor.
+          x-axelix-introduced-in: 1.2.0
+        kotlinVersion:
+          type: string
+          description: The version of the kotlin, if any.
+          x-axelix-introduced-in: 1.2.0
+    BuildDetails:
+      type: object
+      description: The build information of the given artifact.
+      required:
+        - artifact
+        - version
+        - group
+        - time
+      properties:
+        artifact:
+          type: string
+          description: The artifact ID of the application.
+          x-axelix-introduced-in: 1.2.0
+        version:
+          type: string
+          description: The version of the application.
+          x-axelix-introduced-in: 1.2.0
+        group:
+          type: string
+          description: The group ID of the application.
+          x-axelix-introduced-in: 1.2.0
+        time:
+          type: string
+          description: The time the application was built.
+          x-axelix-introduced-in: 1.2.0
+    OsDetails:
+      type: object
+      description: The OS information of the given artifact.
+      required:
+        - name
+        - version
+        - arch
+      properties:
+        name:
+          type: string
+          description: The name of the operating system.
+          x-axelix-introduced-in: 1.2.0
+        version:
+          type: string
+          description: The version of the operating system.
+          x-axelix-introduced-in: 1.2.0
+        arch:
+          type: string
+          description: The architecture of the CPU.
+          x-axelix-introduced-in: 1.2.0

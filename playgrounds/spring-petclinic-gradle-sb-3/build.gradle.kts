@@ -17,6 +17,7 @@ plugins {
   id("org.cyclonedx.bom") version "3.4.1"
   id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
+  // TODO: pin to 1.3 on the next-but-one Axelix upgrade (compatibility window playground)
   id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
 }
 
@@ -51,6 +52,7 @@ configurations.all {
 }
 
 dependencies {
+  // TODO: pin to 1.3 on the next-but-one Axelix upgrade (compatibility window playground)
   implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.0-SNAPSHOT") {
     isChanging = true
   }

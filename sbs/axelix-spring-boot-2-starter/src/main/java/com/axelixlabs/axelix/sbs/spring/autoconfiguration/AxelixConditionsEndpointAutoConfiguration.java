@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -35,9 +34,9 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTarget
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConditionsEndpoint.class)
 public class AxelixConditionsEndpointAutoConfiguration {
 

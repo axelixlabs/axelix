@@ -17,24 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 /**
  * Auto-configuration for shared endpoint properties support beans.
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class})
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration(after = {SecurityContextExecutorAutoConfiguration.class})
 public class EndpointPropertiesSupportAutoConfiguration {
 
     @Bean

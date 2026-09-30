@@ -24,20 +24,21 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExternalCallInsight;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ExternalCallInsight;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionalKey;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.OpenSessionInViewStateProvider;
@@ -101,14 +102,16 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
     public Insights getInsight() {
         GcLogStatus gcLogStatus = resolveGcLogStatus();
 
-        return new Insights(
-                new HotSpotInsights(
-                        List.of(getAppCdsFeature(), getAotCacheFeature()),
-                        List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature()),
-                        List.of(getCompressedObjectHeadersFeature())),
-                List.of(new InsightFeature(
-                        FeatureId.OSIV.getId(), openSessionInViewStateProvider.isOpenSessionInViewEnabled())),
-                assemblePersistenceInsights());
+        return new Insights()
+                .hotSpot(new HotSpotInsights()
+                        .projectLeyden(List.of(getAppCdsFeature(), getAotCacheFeature()))
+                        .gc(List.of(getGcLoggingFeature(gcLogStatus), getGcLogFileSpecifiedFeature()))
+                        .projectLilliputh(List.of(getCompressedObjectHeadersFeature())))
+                .springFramework(List.of(new InsightFeature()
+                        .featureId(FeatureId.OSIV.getId())
+                        .enabled(openSessionInViewStateProvider.isOpenSessionInViewEnabled())))
+                .persistenceInsights(assemblePersistenceInsights())
+                .scheduledTaskExecutions(List.of());
     }
 
     private PersistenceInsights assemblePersistenceInsights() {
@@ -121,37 +124,38 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                     PerformanceStats performanceStats = transactionStats.getPerformanceStats();
                     TransactionDefinitionAttributes attributes = transactionAttributesRegistry.get(key);
 
-                    return new TransactionAggregatedProfile(
-                            TransactionOrigin.APPLICATION_DECLARATIVE,
-                            new TransactionalKey(
-                                    key.getTargetClass().getName(),
-                                    key.getMethod().getName()),
-                            new ExecutionStats(
-                                    performanceStats.getMinMs(),
-                                    performanceStats.getMaxMs(),
-                                    performanceStats.getAvgMs()),
-                            convertLazyLoadingTargets(transactionStats.getNPlusOneOccasions()),
-                            new HashMap<>(transactionStats.getInMemoryPaginatedEntities()),
-                            convertExternalCalls(transactionStats.getExternalCalls()),
-                            attributes != null ? attributes.getPropagation() : null,
-                            attributes != null ? attributes.getIsolation() : null,
-                            attributes != null && attributes.isReadOnly());
+                    return new TransactionAggregatedProfile()
+                            .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                            .transactionalKey(new TransactionalKey()
+                                    .className(key.getTargetClass().getName())
+                                    .methodName(key.getMethod().getName()))
+                            .transactionOverallStats(new ExecutionStats()
+                                    .minMs(performanceStats.getMinMs())
+                                    .maxMs(performanceStats.getMaxMs())
+                                    .averageMs(performanceStats.getAvgMs()))
+                            .lazyLoadingTargets(convertLazyLoadingTargets(transactionStats.getNPlusOneOccasions()))
+                            .inMemoryPagination(new HashMap<>(transactionStats.getInMemoryPaginatedEntities()))
+                            .externalCalls(convertExternalCalls(transactionStats.getExternalCalls()))
+                            .propagation(attributes != null ? attributes.getPropagation() : null)
+                            .isolation(attributes != null ? attributes.getIsolation() : null)
+                            .readOnly(attributes != null && attributes.isReadOnly());
                 })
                 .collect(Collectors.toList());
 
         JpaEntities jpaEntities = entitiesMapProvider.getEntities();
-        return new PersistenceInsights(transactions, jpaEntities);
+        return new PersistenceInsights().transactions(transactions).entitiesMap(jpaEntities);
     }
 
     private static List<CountedLazyLoadingTarget> convertLazyLoadingTargets(
             Map<com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget, Integer>
                     nPlusOneOccasions) {
         return nPlusOneOccasions.entrySet().stream()
-                .map(entry -> new CountedLazyLoadingTarget(
-                        new LazyLoadingTarget(
-                                entry.getKey().ownerEntityClass().getName(),
-                                entry.getKey().associationPropertyName()),
-                        entry.getValue()))
+                .map(entry -> new CountedLazyLoadingTarget()
+                        .target(new LazyLoadingTarget()
+                                .ownerEntityClass(
+                                        entry.getKey().ownerEntityClass().getName())
+                                .associationPropertyName(entry.getKey().associationPropertyName()))
+                        .count(entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -159,32 +163,40 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
         return externalCalls.stream()
                 .map(aggregatedCall -> {
                     PerformanceStats stats = aggregatedCall.getStats();
-                    return new ExternalCallInsight(
-                            aggregatedCall.getType(),
-                            aggregatedCall.getTarget(),
-                            new ExecutionStats(stats.getMinMs(), stats.getMaxMs(), stats.getAvgMs()));
+                    return new ExternalCallInsight()
+                            .type(TypeExternalCall.valueOf(
+                                    aggregatedCall.getType().name()))
+                            .target(aggregatedCall.getTarget())
+                            .stats(new ExecutionStats()
+                                    .minMs(stats.getMinMs())
+                                    .maxMs(stats.getMaxMs())
+                                    .averageMs(stats.getAvgMs()));
                 })
                 .collect(Collectors.toList());
     }
 
     private InsightFeature getAppCdsFeature() {
-        return new InsightFeature(
-                FeatureId.APP_CDS.getId(), vmOptionsAccessor.isAdvancedFeatureSpecified(SHARED_ARCHIVE_FILE));
+        return new InsightFeature()
+                .featureId(FeatureId.APP_CDS.getId())
+                .enabled(vmOptionsAccessor.isAdvancedFeatureSpecified(SHARED_ARCHIVE_FILE));
     }
 
     private InsightFeature getAotCacheFeature() {
-        return new InsightFeature(
-                FeatureId.AOT_CACHE.getId(), vmOptionsAccessor.isAdvancedFeatureSpecified(AOT_CACHE_OPTION));
+        return new InsightFeature()
+                .featureId(FeatureId.AOT_CACHE.getId())
+                .enabled(vmOptionsAccessor.isAdvancedFeatureSpecified(AOT_CACHE_OPTION));
     }
 
     private InsightFeature getCompressedObjectHeadersFeature() {
-        return new InsightFeature(
-                FeatureId.COMPACT_OBJECT_HEADERS.getId(),
-                vmOptionsAccessor.isAdvancedFeatureEnabled(USE_COMPACT_OBJECT_HEADERS));
+        return new InsightFeature()
+                .featureId(FeatureId.COMPACT_OBJECT_HEADERS.getId())
+                .enabled(vmOptionsAccessor.isAdvancedFeatureEnabled(USE_COMPACT_OBJECT_HEADERS));
     }
 
     private InsightFeature getGcLoggingFeature(GcLogStatus gcLogStatus) {
-        return new InsightFeature(FeatureId.GC_LOGGING_ENABLED.getId(), gcLogStatus.getEnabled());
+        return new InsightFeature()
+                .featureId(FeatureId.GC_LOGGING_ENABLED.getId())
+                .enabled(gcLogStatus.getEnabled());
     }
 
     private InsightFeature getGcLogFileSpecifiedFeature() {
@@ -196,7 +208,9 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                 // Reporting GC-log insights must never break the rest of the insights payload.
             }
         }
-        return new InsightFeature(FeatureId.GC_LOG_FILE_SPECIFIED.getId(), fileSpecified);
+        return new InsightFeature()
+                .featureId(FeatureId.GC_LOG_FILE_SPECIFIED.getId())
+                .enabled(fileSpecified);
     }
 
     private GcLogStatus resolveGcLogStatus() {

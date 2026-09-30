@@ -23,10 +23,12 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
+import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
@@ -41,14 +43,17 @@ public class DashboardApi {
 
     private final DashboardService dashboardService;
     private final SpringPortfolioService springPortfolioService;
+    private final LanguagesProfileService languagesProfileService;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
 
     public DashboardApi(
             DashboardService dashboardService,
             SpringPortfolioService springPortfolioService,
+            LanguagesProfileService languagesProfileService,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService) {
         this.dashboardService = dashboardService;
         this.springPortfolioService = springPortfolioService;
+        this.languagesProfileService = languagesProfileService;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
     }
 
@@ -90,5 +95,13 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.SPRING_PORTFOLIO)
     public SpringPortfolioResponse getSpringPortfolio() {
         return springPortfolioService.getSpringPortfolio();
+    }
+
+    /**
+     * Retrieve the fleet-wide languages profile: Java releases, JDK builds and Kotlin adoption across the ecosystem.
+     */
+    @GetMapping(path = ApiPaths.DashboardApi.LANGUAGES)
+    public LanguagesProfileResponse getLanguagesProfile() {
+        return languagesProfileService.getLanguagesProfile();
     }
 }

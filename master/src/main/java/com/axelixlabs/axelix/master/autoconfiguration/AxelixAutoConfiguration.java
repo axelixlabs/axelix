@@ -27,6 +27,8 @@ import org.springframework.web.client.RestClient;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.utils.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 import com.axelixlabs.axelix.master.filter.ExceptionHandlingFilter;
 
@@ -42,6 +44,12 @@ public class AxelixAutoConfiguration {
     @ConditionalOnMissingBean
     public AxelixVersionDiscoverer axelixVersionDiscoverer() {
         return new CachingAxelixVersionDiscoverer(new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties"));
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PropertyNameNormalizer propertyNameNormalizer() {
+        return new DefaultPropertyNameNormalizer();
     }
 
     @Bean

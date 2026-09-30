@@ -17,20 +17,25 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 
 /**
  * Repository for the {@link HistoricalApplicationSnapshot} aggregate.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public interface HistoricalApplicationSnapshotRepository
         extends CrudRepository<HistoricalApplicationSnapshot, SnapshotId> {
@@ -139,6 +144,35 @@ public interface HistoricalApplicationSnapshotRepository
             """)
     List<ServicePersistenceInsights> findLatestPersistenceInsightsPerService();
 
+    /**
+     * Returns the latest starter version reported by every service seen at least once within the given window.
+     * For every service (identified by its {@code group_id} + {@code artifact_id}) only the most recent snapshot
+     * within the window is taken into account, so that a service is represented exactly once.
+     *
+     * @param since the earliest date (inclusive) a snapshot must fall on to be considered
+     *
+     * @return one row per service, holding its {@code groupId}, {@code artifactId}, latest {@code starterVersion}
+     *         and the {@code date} of that latest snapshot.
+     */
+    @Query("""
+            SELECT
+                s.group_id AS group_id,
+                s.artifact_id AS artifact_id,
+                s.starter_version AS starter_version,
+                s.date AS date
+            FROM historical_application_snapshots s
+            WHERE
+                s.date >= :since
+                AND s.date = (
+                    SELECT MAX(latest.date)
+                    FROM historical_application_snapshots latest
+                    WHERE latest.group_id = s.group_id
+                      AND latest.artifact_id = s.artifact_id
+                      AND latest.date >= :since
+                )
+            """)
+    List<LatestStarterVersion> findLatestStarterVersionsSince(@Param("since") LocalDate since);
+
     // Select * is generally a bad idea. Here, it does not cost that much, but still.
     @Query(value = """
         SELECT *
@@ -172,6 +206,30 @@ public interface HistoricalApplicationSnapshotRepository
                 AND s.spring_framework_version IS NOT NULL
             """)
     List<ApplicationPlatformVersions> findLatestPlatformVersionsPerService();
+
+    /**
+     * Returns the JVM languages profile of every service in the ecosystem. For every service (identified by its
+     * {@code group_id} + {@code artifact_id}) only the most recent snapshot is taken into account, so that a service
+     * is represented exactly once.
+     *
+     * @return one row per service, holding its Java feature release, JDK vendor, Kotlin version (or {@code null}) and
+     *         the {@code date} of that most recent snapshot.
+     */
+    @Query("""
+            SELECT
+                s.java_feature AS java_version,
+                s.jdk_vendor AS jdk_vendor,
+                s.kotlin_version AS kotlin_version,
+                s.date AS date
+            FROM historical_application_snapshots s
+            WHERE s.date = (
+                SELECT MAX(latest.date)
+                FROM historical_application_snapshots latest
+                WHERE latest.group_id = s.group_id
+                  AND latest.artifact_id = s.artifact_id
+            )
+            """)
+    List<ApplicationLanguages> findLatestLanguagesPerService();
 
     /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Java/JVM features.
@@ -214,10 +272,31 @@ public interface HistoricalApplicationSnapshotRepository
     record ApplicationPlatformVersions(String springBootVersion, String springFrameworkVersion) {}
 
     /**
+     * The JVM languages profile of a single service, taken from its most recent snapshot.
+     *
+     * @param javaVersion   the Java feature release the service ran on (e.g. {@code 21}, {@code 25}).
+     * @param jdkVendor     the vendor of the JDK distribution the service ran on.
+     * @param kotlinVersion the Kotlin version the service ran on, or {@code null} if it does not use Kotlin.
+     * @param date          the date of the service's most recent snapshot.
+     */
+    record ApplicationLanguages(
+            int javaVersion, JdkVendor jdkVendor, @Nullable String kotlinVersion, LocalDate date) {}
+
+    /**
      * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.
      *
      * @param totalServices the total number of distinct services that reported at least one snapshot.
      * @param osivEnabledCount how many services have OSIV enabled.
      */
     record SpringFrameworkInsightsAggregate(long totalServices, long osivEnabledCount) {}
+
+    /**
+     * The latest starter version reported by a single service within a time window.
+     *
+     * @param groupId        the group id of the service.
+     * @param artifactId     the artifact id of the service.
+     * @param starterVersion the Axelix starter version from the service's most recent snapshot in the window.
+     * @param date           the date of that most recent snapshot.
+     */
+    record LatestStarterVersion(String groupId, String artifactId, String starterVersion, LocalDate date) {}
 }

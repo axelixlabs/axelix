@@ -23,9 +23,9 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.contract.details.InstanceDetails;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;

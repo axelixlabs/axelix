@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
@@ -75,7 +76,7 @@ class DatabaseInstanceRegistryTest {
                 "name",
                 "1.0.0",
                 "1.0.0-SNAPSHOT",
-                "java-17",
+                new JavaVersion(17, 0, 0, 0),
                 "SB-3",
                 "Spring-6",
                 "2.0.0",
@@ -112,7 +113,7 @@ class DatabaseInstanceRegistryTest {
                 "name",
                 "1.0.0",
                 "1.0.0-SNAPSHOT",
-                "java-17",
+                new JavaVersion(17, 0, 0, 0),
                 "SB-3",
                 "Spring-6",
                 "2.0.0",
@@ -132,7 +133,7 @@ class DatabaseInstanceRegistryTest {
                 "updated-name",
                 "1.0.1",
                 "1.0.1-SNAPSHOT",
-                "java-21",
+                new JavaVersion(21, 0, 0, 0),
                 "SB-4",
                 "Spring-7",
                 "2.2.0",
@@ -263,7 +264,7 @@ class DatabaseInstanceRegistryTest {
                 "updated-name",
                 "1.0.1",
                 "1.0.1-SNAPSHOT",
-                "java-21",
+                new JavaVersion(21, 0, 0, 0),
                 "SB-4",
                 "Spring-7",
                 "2.2.0",

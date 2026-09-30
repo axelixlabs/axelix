@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.lang.reflect.Proxy;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
 
 /**
  * Utilities to work with proxy.
@@ -52,12 +52,12 @@ public class ProxyUtils {
      * @param beanType                  the bean class at runtime.
      * @return the proxy type, or ProxyType#NO_PROXYING if the class is not proxied.
      */
-    public static BeansFeed.ProxyType analyzeProxyType(Class<?> beanType, boolean isRuntimeGeneratedClass) {
+    public static ProxyType analyzeProxyType(Class<?> beanType, boolean isRuntimeGeneratedClass) {
         if (Proxy.isProxyClass(beanType)) {
-            return BeansFeed.ProxyType.JDK_PROXY;
+            return ProxyType.JDK_PROXY;
         } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !isRuntimeGeneratedClass) {
-            return BeansFeed.ProxyType.CGLIB;
+            return ProxyType.CGLIB;
         }
-        return BeansFeed.ProxyType.NO_PROXYING;
+        return ProxyType.NO_PROXYING;
     }
 }

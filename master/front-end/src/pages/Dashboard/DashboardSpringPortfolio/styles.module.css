@@ -1,0 +1,19 @@
+.Header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.Subtitle {
+    color: var(--axelix-bold-grey);
+    margin-top: 8px;
+}
+
+.CardsWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}

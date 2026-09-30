@@ -71,11 +71,29 @@
     },
     "Environments": {
         "activeProfiles": "Профили:",
-        "primaryProperty": "Актуальное значение",
+        "primaryProperty": "Активное",
+        "primaryPropertyHint": "Это значение, которое приложение использует для данного свойства",
+        "suppressedProperty": "Перекрыто",
+        "suppressedPropertyHint": "Свойство определено также в источнике с более высоким приоритетом, поэтому это значение не применяется",
         "deprecated": "Устаревшее",
         "description": "Описание",
         "configProps": "Configuration Properties",
-        "injectedIn": "Инжектируется в"
+        "injectedIn": "Инжектируется в",
+        "profilesCount": "Профили: {{value}}",
+        "profilesPrecedenceHint": "Перечислены в порядке убывания приоритета, т.е. чем выше профиль в списке - тем больше его приоритет",
+        "propertiesCount": "Свойства: {{value}}",
+        "flaggedCount": "Отмечено: {{value}}",
+        "clearFilters": "Сбросить",
+        "triageTags": {
+            "DEPRECATED": "Устаревшее",
+            "SUPPRESSED": "Перекрыто"
+        },
+        "definedInSources": "Определено в источниках: {{value}}",
+        "wins": "Применяется",
+        "highestPrecedence": "Наивысший приоритет",
+        "lowestPrecedence": "Наименьший",
+        "noMatchingProperties": "Нет свойств, соответствующих поиску и фильтрам.",
+        "noPropertiesInSource": "Этот источник не определяет ни одного свойства."
     },
     "Loggers": {
         "loggers": "Логгеры",
@@ -267,6 +285,25 @@
             "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
             "osivChartTitle": "Open Session in View (OSIV)",
             "osivChartSubtitle": "Проблемы с производительностью"
+        },
+        "SpringPortfolio": {
+            "title": "Spring Portfolio",
+            "subtitle": "Используемые версии по всей экосистеме относительно опубликованного графика поддержки OSS",
+            "applications": "Приложения",
+            "ossOk": "OSS ✓",
+            "ossNo": "OSS ✕",
+            "supportedHint": "выпуск обновлений сообществом продолжается",
+            "unsupportedHint": "окно поддержки закрыто",
+            "generation": "Поколение программного компонента",
+            "onSupportedLine": "{{supported}} из {{total}} приложений на поддерживаемой OSS линии",
+            "detectedAtRuntime": "Обнаружено во время выполнения в {{total}} приложениях",
+            "ladderTitle": "Окно поддержки OSS · используемые линии",
+            "ladderHint": "На основе графиков, опубликованных командой Spring",
+            "line": "Линия",
+            "ossEnds": "Конец OSS",
+            "apps": "Прил.",
+            "legendSupported": "Поддерживается OSS — сообщество выпускает исправления для этой линии",
+            "legendUnsupported": "Не поддерживается OSS — после этой даты выпусков от сообщества нет"
         }
     },
     "About": {

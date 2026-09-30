@@ -38,13 +38,14 @@ import org.springframework.core.SpringVersion;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
-import com.axelixlabs.axelix.common.api.registration.insights.HotSpotInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesLoader.AXELIX_INFO_LOCATION;
@@ -100,7 +101,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
 
         @Bean
         HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicRegistrationMetadata.HealthStatus.UP;
+            return () -> HealthStatus.UP;
         }
 
         @Bean
@@ -115,10 +116,14 @@ class DefaultHeartBeatMetadataAssemblerTest {
 
         @Bean
         InsightsInfoProvider insightsInfoProvider() {
-            return () -> new Insights(
-                    new HotSpotInsights(List.of(), List.of(), List.of()),
-                    List.of(),
-                    new PersistenceInsights(List.of()));
+            return () -> new Insights()
+                    .hotSpot(new HotSpotInsights()
+                            .projectLeyden(List.of())
+                            .gc(List.of())
+                            .projectLilliputh(List.of()))
+                    .springFramework(List.of())
+                    .persistenceInsights(new PersistenceInsights().transactions(List.of()))
+                    .scheduledTaskExecutions(List.of());
         }
 
         @Bean
@@ -162,7 +167,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(basicMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(basicMetadata.getServiceVersion()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(basicMetadata.getCommitShortSha()).isEqualTo("a8b0929");
-        assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicRegistrationMetadata.HealthStatus.UP);
+        assertThat(basicMetadata.getHealthStatus()).isEqualTo(HealthStatus.UP);
         assertThat(basicMetadata.getGcInUse()).isNotNull();
         assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());

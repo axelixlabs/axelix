@@ -1,0 +1,36 @@
+.Trigger {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    flex-shrink: 0;
+    height: 32px;
+    padding-inline: 12px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--prop-text);
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-border);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--prop-shadow-card);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s;
+}
+
+.Trigger:hover,
+.TriggerOpen {
+    border-color: var(--prop-text);
+}
+
+.TriggerIcon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.Caret {
+    font-size: 10px;
+    color: var(--prop-text-dim);
+}
+

@@ -40,16 +40,15 @@ import org.springframework.core.type.StandardMethodMetadata;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanOrigin;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeanSource;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ComponentVariant;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.ProxyType;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.SyntheticBean;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.UnknownBean;
 import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
-
-import static com.axelixlabs.axelix.common.api.BeansFeed.BeanMethod;
-import static com.axelixlabs.axelix.common.api.BeansFeed.BeanSource;
-import static com.axelixlabs.axelix.common.api.BeansFeed.ComponentVariant;
-import static com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
-import static com.axelixlabs.axelix.common.api.BeansFeed.SyntheticBean;
-import static com.axelixlabs.axelix.common.api.BeansFeed.UnknownBean;
 
 /**
  * Default implementation of {@link BeanMetaInfoExtractor}.
@@ -100,20 +99,23 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         if (beanDefinition.getFactoryMethodName() != null) {
             Class<?> enclosingClass = extractEnclosingClass(beanDefinition, beanName);
 
-            return new BeanMethod(
-                    Optional.ofNullable(enclosingClass)
+            return new BeanMethod()
+                    .origin(BeanOrigin.BEAN_METHOD)
+                    .enclosingClassName(Optional.ofNullable(enclosingClass)
                             .map(ClassUtils::getUserClass)
                             .map(Class::getSimpleName)
-                            .orElse(null),
-                    Optional.ofNullable(enclosingClass)
+                            .orElse(null))
+                    .enclosingClassFullName(Optional.ofNullable(enclosingClass)
                             .map(ClassUtils::getUserClass)
                             .map(Class::getName)
-                            .orElse(null),
-                    beanDefinition.getFactoryMethodName());
+                            .orElse(null))
+                    .methodName(beanDefinition.getFactoryMethodName());
         }
 
         if (beanDefinition.getBeanClassName() != null && isFactoryBeanClass(beanDefinition.getBeanClassName())) {
-            return new BeansFeed.FactoryBean(beanDefinition.getBeanClassName());
+            return new com.axelixlabs.axelix.sbs.spring.core.contract.beans.FactoryBean()
+                    .origin(BeanOrigin.FACTORY_BEAN)
+                    .factoryBeanName(beanDefinition.getBeanClassName());
         }
 
         if (beanDefinition instanceof AnnotatedBeanDefinition) {
@@ -123,18 +125,18 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             var mergedComponentAnnotation = metadata.getAnnotations().get(Component.class);
 
             if (mergedComponentAnnotation.isPresent()) {
-                return new ComponentVariant();
+                return new ComponentVariant().origin(BeanOrigin.COMPONENT_ANNOTATION);
             }
         }
 
         if (beanDefinition instanceof AbstractBeanDefinition) {
             AbstractBeanDefinition abstractBeanDefinition = (AbstractBeanDefinition) beanDefinition;
             if (abstractBeanDefinition.isSynthetic()) {
-                return new SyntheticBean();
+                return new SyntheticBean().origin(BeanOrigin.SYNTHETIC_BEAN);
             }
         }
 
-        return new UnknownBean();
+        return new UnknownBean().origin(BeanOrigin.UNKNOWN);
     }
 
     @Nullable
@@ -209,7 +211,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
         Class<?> configPropsTarget;
 
-        if (beanSource.origin() == BeansFeed.BeanOrigin.BEAN_METHOD) {
+        if (beanSource instanceof BeanMethod) {
             configPropsTarget = extractEnclosingClass(beanDefinition, beanName);
         } else {
             configPropsTarget = bean.getClass();

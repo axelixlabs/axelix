@@ -21,7 +21,6 @@ import feign.Feign;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -41,9 +40,9 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryCli
  * </p>
  *
  * @author Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration
-@ConditionalOnAxelixStarterEnabled
+@AxelixAutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixFeignEndpoint.class)
 @ConditionalOnClass({Feign.class, FeignClient.class})
 @ConditionalOnBean(FeignClientFactoryBean.class)

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +28,10 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
+import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -35,21 +40,31 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 27.08.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @ExternalApiRestController
 public class EnvironmentApi {
 
     private final EndpointInvoker endpointInvoker;
+    private final ObjectMapper objectMapper;
+    private final Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter;
 
-    public EnvironmentApi(EndpointInvoker endpointInvoker) {
+    public EnvironmentApi(
+            EndpointInvoker endpointInvoker,
+            ObjectMapper objectMapper,
+            Converter<EnvironmentFeed, EnvironmentFeedResponse> environmentFeedConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.objectMapper = objectMapper;
+        this.environmentFeedConverter = environmentFeedConverter;
     }
 
     @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
-    public ResponseEntity<byte[]> getAllEnvironmentProperties(@PathVariable("instanceId") String instanceId) {
+    public ResponseEntity<EnvironmentFeedResponse> getAllEnvironmentProperties(
+            @PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+        EnvironmentFeed feed = objectMapper.readValue(body, EnvironmentFeed.class);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(environmentFeedConverter.convert(feed));
     }
 }
