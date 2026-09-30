@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -65,6 +67,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @author Nikita Kirillov
  */
 public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionMonitoringBeanPostProcessor.class);
 
     private static final Set<Propagation> TRANSACTION_CREATING_TYPES =
             EnumSet.of(Propagation.REQUIRED, Propagation.REQUIRES_NEW, Propagation.NESTED);
@@ -109,11 +113,35 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
             hasTransactionalMethods |= preloadMethodPropagationCacheForClass(clazz);
         }
 
-        if (hasTransactionalMethods) {
-            return createTransactionalProxy(bean);
-        } else {
+        if (!hasTransactionalMethods) {
             return bean;
         }
+
+        if (!AopUtils.isAopProxy(bean)
+                && (Modifier.isFinal(targetClass.getModifiers()) || hasFinalProxyableMethod(targetClass))) {
+            log.debug(
+                    "Cannot enable transaction monitoring for bean '{}' of class {}: CGLIB cannot proxy a final "
+                            + "class or override a final method. Transaction monitoring is skipped for this bean; "
+                            + "the bean itself and every other Axelix feature are unaffected.",
+                    beanName,
+                    targetClass.getName());
+            return bean;
+        }
+
+        return createTransactionalProxy(bean);
+    }
+
+    /**
+     * CGLIB can't override a final method, even on a non-final class - calling it on the proxy would run
+     * against the proxy's own empty state instead of the real target's.
+     */
+    private boolean hasFinalProxyableMethod(Class<?> targetClass) {
+        MethodFilter finalMethodFilter = method -> !ReflectionUtils.isObjectMethod(method)
+                && !Modifier.isPrivate(method.getModifiers())
+                && !Modifier.isStatic(method.getModifiers())
+                && Modifier.isFinal(method.getModifiers());
+
+        return ReflectionUtils.getUniqueDeclaredMethods(targetClass, finalMethodFilter).length > 0;
     }
 
     /**

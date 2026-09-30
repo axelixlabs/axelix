@@ -58,6 +58,9 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
     @Autowired
     private MeterRegistry meterRegistry;
 
+    @Autowired
+    private PropagationTestHelper propagationTestHelper;
+
     @BeforeEach
     void setUp() {
         petRepository.deleteAll();
@@ -206,6 +209,30 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
         }
     }
 
+    @Nested
+    class NestedTransactions {
+
+        /**
+         * {@code outerRequiredMethod} (REQUIRED) saves 2 owners and, in between, calls
+         * {@code saveRequiresNew} (REQUIRES_NEW) which saves a 3rd owner in its own, separate transaction.
+         * Verifies the 3 INSERTs split 2/1 across the two transactions, not 3/0 or 0/3.
+         */
+        @Test
+        void shouldIsolateQueriesBetweenOuterAndRequiresNewTransaction() throws Exception {
+            // given.
+            MethodClassKey outerKey = keyFor(PropagationTestHelper.class, "outerRequiredMethod", String.class);
+            MethodClassKey innerKey = keyFor(PropagationTestHelper.class, "saveRequiresNew", String.class);
+
+            // when.
+            propagationTestHelper.outerRequiredMethod("Nested");
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKeys(outerKey, innerKey);
+            assertMetersRecordedFor(PropagationTestHelper.class, "outerRequiredMethod", 2);
+            assertMetersRecordedFor(PropagationTestHelper.class, "saveRequiresNew", 1);
+        }
+    }
+
     private TransactionStats statsFor(MethodClassKey key) {
         Map<MethodClassKey, TransactionStats> stats = transactionStatsCollector.getCopyOfStats();
         assertThat(stats).containsKey(key);
@@ -219,7 +246,11 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
      * actuator endpoint, so their tags and values form a contract worth asserting precisely.
      */
     private void assertMetersRecordedFor(String methodName, int expectedQueries) {
-        String className = OwnerRepository.class.getSimpleName();
+        assertMetersRecordedFor(OwnerRepository.class, methodName, expectedQueries);
+    }
+
+    private void assertMetersRecordedFor(Class<?> declaringClass, String methodName, int expectedQueries) {
+        String className = declaringClass.getSimpleName();
 
         Timer durationTimer = meterRegistry
                 .find(AxelixMetricNames.TRANSACTION_DURATION)
@@ -240,7 +271,12 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
     }
 
     private static MethodClassKey keyFor(String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        Method method = OwnerRepository.class.getMethod(methodName, parameterTypes);
-        return new MethodClassKey(method, OwnerRepository.class);
+        return keyFor(OwnerRepository.class, methodName, parameterTypes);
+    }
+
+    private static MethodClassKey keyFor(Class<?> declaringClass, String methodName, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
+        Method method = declaringClass.getMethod(methodName, parameterTypes);
+        return new MethodClassKey(method, declaringClass);
     }
 }
