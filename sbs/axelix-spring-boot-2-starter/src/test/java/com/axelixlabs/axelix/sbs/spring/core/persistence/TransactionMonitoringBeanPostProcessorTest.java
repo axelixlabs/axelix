@@ -27,15 +27,22 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.NoOpTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Integration test for {@link TransactionMonitoringBeanPostProcessor}.
@@ -121,5 +128,92 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
         assertThat(attributes.getPropagation()).isEqualTo("REQUIRED");
         assertThat(attributes.getIsolation()).isEqualTo("DEFAULT");
         assertThat(attributes.isReadOnly()).isFalse();
+    }
+
+    @Test
+    void testFinalClassBeanIsSkippedInsteadOfThrowing() {
+        TransactionMonitoringBeanPostProcessor processor = newStandaloneProcessor();
+        FinalGreeterImpl bean = new FinalGreeterImpl();
+
+        assertThatCode(() -> {
+                    Object result = processor.postProcessAfterInitialization(bean, "finalGreeter");
+                    assertThat(result).isSameAs(bean);
+                })
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testFinalClassAlreadyWrappedInJdkProxyIsStillMonitored() {
+        TransactionMonitoringBeanPostProcessor processor = newStandaloneProcessor();
+
+        // A JDK dynamic proxy is the only way Spring can already be proxying a bean whose real class is
+        // final - CGLIB could never have produced this proxy in the first place.
+        Object jdkProxiedBean = new ProxyFactory(new FinalGreeterImpl()).getProxy();
+        assertThat(AopUtils.isJdkDynamicProxy(jdkProxiedBean)).isTrue();
+
+        Object result = processor.postProcessAfterInitialization(jdkProxiedBean, "jdkProxiedFinalGreeter");
+
+        assertThat(result).isNotSameAs(jdkProxiedBean);
+        assertThat(AopUtils.isAopProxy(result)).isTrue();
+    }
+
+    @Test
+    void testBeanWithFinalMethodIsSkippedFromMonitoring() {
+        TransactionMonitoringBeanPostProcessor processor = newStandaloneProcessor();
+        FinalMethodGreeterImpl bean = new FinalMethodGreeterImpl();
+
+        Object result = processor.postProcessAfterInitialization(bean, "finalMethodGreeter");
+
+        assertThat(result).isSameAs(bean);
+    }
+
+    private TransactionMonitoringBeanPostProcessor newStandaloneProcessor() {
+        ObjectProvider<AxelixMetricsPublisher> noopProvider = new ObjectProvider<>() {
+            @Override
+            public AxelixMetricsPublisher getObject() {
+                return null;
+            }
+
+            @Override
+            public AxelixMetricsPublisher getObject(Object... args) {
+                return null;
+            }
+
+            @Override
+            public AxelixMetricsPublisher getIfAvailable() {
+                return null;
+            }
+
+            @Override
+            public AxelixMetricsPublisher getIfUnique() {
+                return null;
+            }
+        };
+
+        return new TransactionMonitoringBeanPostProcessor(
+                new NoOpTransactionStatsCollector(),
+                noopProvider,
+                new TransactionAccessor(),
+                new TransactionAttributesRegistry());
+    }
+
+    interface Greeter {
+        String greet();
+    }
+
+    static final class FinalGreeterImpl implements Greeter {
+        @Override
+        @Transactional
+        public String greet() {
+            return "hi";
+        }
+    }
+
+    static class FinalMethodGreeterImpl implements Greeter {
+        @Override
+        @Transactional
+        public final String greet() {
+            return "hi";
+        }
     }
 }
