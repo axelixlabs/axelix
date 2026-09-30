@@ -36,9 +36,9 @@ public interface UpgradesService {
     UpgradesResponse getUpgrades();
 
     /**
-     * @param targetVersion the version Axelix Master is going to be upgraded to.
+     * @param targetVersion the {@code major.minor} version Axelix Master is going to be upgraded to.
      * @return how many applications would lose compatibility with Axelix Master after the upgrade.
-     * @throws BadRequestException if the {@code targetVersion} is not a valid semantic version.
+     * @throws BadRequestException if the {@code targetVersion} is not a valid {@code major.minor} version.
      */
     UpgradeImpactResponse getUpgradeImpact(String targetVersion);
 }

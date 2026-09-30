@@ -101,8 +101,8 @@ public class DefaultUpgradesService implements UpgradesService {
 
     @Override
     public UpgradeImpactResponse getUpgradeImpact(String targetVersion) {
-        SemanticVersion target = SemanticVersion.tryParse(targetVersion)
-                .orElseThrow(() -> new BadRequestException("Not a valid semantic version: " + targetVersion));
+        SemanticVersion target = SemanticVersion.tryParseMajorMinor(targetVersion)
+                .orElseThrow(() -> new BadRequestException("Not a valid major.minor version: " + targetVersion));
 
         LocalDate since = LocalDate.now(ZoneOffset.UTC).minusDays(OBSERVATION_WINDOW_DAYS);
 

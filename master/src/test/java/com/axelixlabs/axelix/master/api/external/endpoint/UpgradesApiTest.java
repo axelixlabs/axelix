@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class UpgradesApiTest extends AbstractProtectedEndpointTest {
 
-    private static final String IMPACT_URL = "/api/external/upgrades/impact?targetVersion=1.6.0";
+    private static final String IMPACT_URL = "/api/external/upgrades/impact?targetVersion=1.6";
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;
@@ -159,7 +159,7 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).node("targetVersion").isString().isEqualTo("1.6.0");
+        assertThatJson(response.getBody()).node("targetVersion").isString().isEqualTo("1.6");
         assertThatJson(response.getBody()).node("lostApplications").isEqualTo(1);
         assertSuccessfulCallback(MasterWebEndpoints.UPGRADES_READ_IMPACT, viewer.getActor());
     }
@@ -170,6 +170,16 @@ class UpgradesApiTest extends AbstractProtectedEndpointTest {
         ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .getForEntity("/api/external/upgrades/impact?targetVersion=not-a-version", String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnBadRequestForTargetVersionWithPatchSegment() {
+        // when.
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/upgrades/impact?targetVersion=1.6.0", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.common.utils;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -42,6 +44,8 @@ import org.jspecify.annotations.Nullable;
  * @author Mikhail Polivakha
  */
 public class SemanticVersion implements Comparable<SemanticVersion> {
+
+    private static final Pattern MAJOR_MINOR_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)");
 
     private static final Comparator<SemanticVersion> ORDER = Comparator.comparingInt(SemanticVersion::major)
             .thenComparingInt(SemanticVersion::minor)
@@ -114,6 +118,34 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         }
 
         return Optional.of(new SemanticVersion(major, minor, patch, qualifier));
+    }
+
+    /**
+     * Leniently parses a {@code major.minor} version string, e.g. {@code 1.2}.
+     *
+     * @param version the version string to parse, may be {@code null}
+     * @return the parsed {@link SemanticVersion} with {@link #patch()} set to {@code 0} and no qualifier,
+     *         or {@link Optional#empty()} if the version is {@code null}, blank or not exactly {@code major.minor}.
+     */
+    public static Optional<SemanticVersion> tryParseMajorMinor(@Nullable String version) {
+        if (version == null || version.isBlank()) {
+            return Optional.empty();
+        }
+
+        String trimmed = version.trim();
+        Matcher matcher = MAJOR_MINOR_PATTERN.matcher(trimmed);
+        if (!matcher.matches()) {
+            return Optional.empty();
+        }
+
+        Integer major = parseNumber(trimmed, matcher.start(1), matcher.end(1));
+        Integer minor = parseNumber(trimmed, matcher.start(2), matcher.end(2));
+
+        if (major == null || minor == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new SemanticVersion(major, minor, 0, null));
     }
 
     /**

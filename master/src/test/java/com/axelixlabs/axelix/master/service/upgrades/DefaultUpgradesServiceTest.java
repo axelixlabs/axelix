@@ -178,10 +178,10 @@ class DefaultUpgradesServiceTest {
     @Test
     void returnsZeroWhenNoServiceHasBeenSeen() {
         // when.
-        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6");
 
         // then.
-        assertThat(response.targetVersion()).isEqualTo("1.6.0");
+        assertThat(response.targetVersion()).isEqualTo("1.6");
         assertThat(response.lostApplications()).isZero();
     }
 
@@ -197,7 +197,7 @@ class DefaultUpgradesServiceTest {
                 snapshot("other-major", today, "2.4.0")));
 
         // when.
-        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6");
 
         // then.
         assertThat(response.lostApplications()).isEqualTo(3);
@@ -212,7 +212,7 @@ class DefaultUpgradesServiceTest {
                 snapshot("stale", today.minusDays(DefaultUpgradesService.OBSERVATION_WINDOW_DAYS + 1), "1.0.0")));
 
         // when.
-        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6");
 
         // then.
         assertThat(response.lostApplications()).isZero();
@@ -226,15 +226,20 @@ class DefaultUpgradesServiceTest {
                 List.of(snapshot("app-a", today.minusDays(1), "1.0.0"), snapshot("app-a", today, "1.5.0")));
 
         // when.
-        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6.0");
+        UpgradeImpactResponse response = subject.getUpgradeImpact("1.6");
 
         // then.
         assertThat(response.lostApplications()).isZero();
     }
 
     @Test
-    void rejectsTargetVersionThatIsNotASemanticVersion() {
+    void rejectsTargetVersionThatIsNotMajorMinor() {
         assertThatThrownBy(() -> subject.getUpgradeImpact("not-a-version")).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void rejectsTargetVersionThatCarriesAPatchSegment() {
+        assertThatThrownBy(() -> subject.getUpgradeImpact("1.6.0")).isInstanceOf(BadRequestException.class);
     }
 
     private static HistoricalApplicationSnapshot snapshot(String artifactId, LocalDate date, String starterVersion) {
