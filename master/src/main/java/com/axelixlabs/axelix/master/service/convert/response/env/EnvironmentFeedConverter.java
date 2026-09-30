@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.master.api.external.response.env.DangerousProperty;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
 import com.axelixlabs.axelix.master.contract.env.Deprecation;
 import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
@@ -53,7 +53,7 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
 
     @Override
     public @NonNull EnvironmentFeedResponse convertInternal(@NonNull EnvironmentFeed source) {
-        Map<Property, DangerousProperty> dangerousProperties = dangerousPropertyDetector.detect(source);
+        Map<Property, DangerousPropertyValue> dangerousProperties = dangerousPropertyDetector.detect(source);
         List<EnvironmentFeedResponse.PropertySource> propertySources = new ArrayList<>();
 
         for (PropertySource propertySource : source.getPropertySources()) {
@@ -79,7 +79,7 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
     }
 
     private EnvironmentFeedResponse.@Nullable DangerousValue convertDangerousValue(
-            @Nullable DangerousProperty dangerousProperty) {
+            @Nullable DangerousPropertyValue dangerousProperty) {
         return dangerousProperty == null
                 ? null
                 : new EnvironmentFeedResponse.DangerousValue(

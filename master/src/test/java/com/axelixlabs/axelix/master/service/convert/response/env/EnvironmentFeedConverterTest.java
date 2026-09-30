@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.api.external.response.env.DangerousProperty;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.api.external.response.env.EnvironmentFeedResponse;
 import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.contract.env.Property;
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class EnvironmentFeedConverterTest {
 
-    private final Map<Property, DangerousProperty> dangerousProperties = new IdentityHashMap<>();
+    private final Map<Property, DangerousPropertyValue> dangerousProperties = new IdentityHashMap<>();
     private final EnvironmentFeedConverter subject = new EnvironmentFeedConverter(feed -> dangerousProperties);
 
     @Test
@@ -52,8 +52,8 @@ class EnvironmentFeedConverterTest {
         // then.
         assertThat(response.propertySources().get(0).properties().get(0).dangerousValue())
                 .isEqualTo(new EnvironmentFeedResponse.DangerousValue(
-                        DangerousProperty.OPEN_IN_VIEW.getRationale(),
-                        DangerousProperty.OPEN_IN_VIEW.getAlternativeExample()));
+                        DangerousPropertyValue.OPEN_IN_VIEW.getRationale(),
+                        DangerousPropertyValue.OPEN_IN_VIEW.getAlternativeExample()));
         assertThat(response.propertySources().get(1).properties().get(0).dangerousValue())
                 .isNull();
     }
@@ -63,7 +63,7 @@ class EnvironmentFeedConverterTest {
                 new Property().name("spring.jpa.open-in-view").value("true").isPrimary(true);
         Property overridden =
                 new Property().name("spring.jpa.open-in-view").value("true").isPrimary(false);
-        dangerousProperties.put(effective, DangerousProperty.OPEN_IN_VIEW);
+        dangerousProperties.put(effective, DangerousPropertyValue.OPEN_IN_VIEW);
 
         return new EnvironmentFeed()
                 .activeProfiles(List.of("production"))

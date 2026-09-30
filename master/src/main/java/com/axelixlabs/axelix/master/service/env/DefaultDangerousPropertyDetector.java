@@ -21,14 +21,13 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
-import com.axelixlabs.axelix.common.domain.Sanitization;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
-import com.axelixlabs.axelix.master.api.external.response.env.DangerousProperty;
+import com.axelixlabs.axelix.master.domain.DangerousPropertyValue;
 import com.axelixlabs.axelix.master.contract.env.EnvironmentFeed;
 import com.axelixlabs.axelix.master.contract.env.Property;
 import com.axelixlabs.axelix.master.contract.env.PropertySource;
+
+import org.springframework.stereotype.Service;
 
 /**
  * Default {@link DangerousPropertyDetector}.
@@ -45,7 +44,7 @@ public class DefaultDangerousPropertyDetector implements DangerousPropertyDetect
     }
 
     @Override
-    public Map<Property, DangerousProperty> detect(EnvironmentFeed feed) {
+    public Map<Property, DangerousPropertyValue> detect(EnvironmentFeed feed) {
         Map<String, Property> effectiveProperties = new HashMap<>();
 
         for (PropertySource propertySource : feed.getPropertySources()) {
@@ -54,14 +53,11 @@ public class DefaultDangerousPropertyDetector implements DangerousPropertyDetect
             }
         }
 
-        Map<Property, DangerousProperty> dangerousProperties = new IdentityHashMap<>();
+        Map<Property, DangerousPropertyValue> dangerousProperties = new IdentityHashMap<>();
 
         effectiveProperties.forEach((normalizedName, property) -> {
-            if (Sanitization.SANITIZED_VALUE.equals(property.getValue())) {
-                return;
-            }
 
-            DangerousProperty dangerousProperty = DangerousProperty.resolve(normalizedName, property.getValue());
+            DangerousPropertyValue dangerousProperty = DangerousPropertyValue.resolve(normalizedName, property.getValue());
 
             if (dangerousProperty != null) {
                 dangerousProperties.put(property, dangerousProperty);

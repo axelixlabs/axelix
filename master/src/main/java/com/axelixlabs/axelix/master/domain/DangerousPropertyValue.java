@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.response.env;
+package com.axelixlabs.axelix.master.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
  *
  * @author Sergey Cherkasov
  */
-public enum DangerousProperty {
+public enum DangerousPropertyValue {
     OPEN_IN_VIEW(
             "spring.jpa.open-in-view",
             "true",
@@ -97,14 +97,14 @@ public enum DangerousProperty {
                     + "heap, the thread stacks, the environment and the configuration properties. The endpoints that "
                     + "are actually needed are better listed explicitly.");
 
-    private static final Map<String, List<DangerousProperty>> BY_NORMALIZED_NAME = buildIndex();
+    private static final Map<String, List<DangerousPropertyValue>> BY_NORMALIZED_NAME = buildIndex();
 
     private final String propertyName;
     private final String dangerousValue;
     private final @Nullable String alternativeExample;
     private final String rationale;
 
-    DangerousProperty(
+    DangerousPropertyValue(
             String propertyName, String dangerousValue, @Nullable String alternativeExample, String rationale) {
         this.propertyName = propertyName;
         this.dangerousValue = dangerousValue;
@@ -133,12 +133,12 @@ public enum DangerousProperty {
      * @param value                  the value the property is set to.
      * @return the matching constant, {@code null} when we consider the combination fine.
      */
-    public static @Nullable DangerousProperty resolve(String normalizedPropertyName, @Nullable String value) {
+    public static @Nullable DangerousPropertyValue resolve(String normalizedPropertyName, @Nullable String value) {
         if (value == null) {
             return null;
         }
 
-        List<DangerousProperty> candidates = BY_NORMALIZED_NAME.get(normalizedPropertyName);
+        List<DangerousPropertyValue> candidates = BY_NORMALIZED_NAME.get(normalizedPropertyName);
 
         if (candidates == null) {
             return null;
@@ -146,7 +146,7 @@ public enum DangerousProperty {
 
         String trimmedValue = value.trim();
 
-        for (DangerousProperty candidate : candidates) {
+        for (DangerousPropertyValue candidate : candidates) {
             if (candidate.dangerousValue.equalsIgnoreCase(trimmedValue)) {
                 return candidate;
             }
@@ -155,11 +155,11 @@ public enum DangerousProperty {
         return null;
     }
 
-    private static Map<String, List<DangerousProperty>> buildIndex() {
+    private static Map<String, List<DangerousPropertyValue>> buildIndex() {
         PropertyNameNormalizer normalizer = new DefaultPropertyNameNormalizer();
-        Map<String, List<DangerousProperty>> index = new HashMap<>();
+        Map<String, List<DangerousPropertyValue>> index = new HashMap<>();
 
-        for (DangerousProperty dangerousProperty : values()) {
+        for (DangerousPropertyValue dangerousProperty : values()) {
             index.computeIfAbsent(normalizer.normalize(dangerousProperty.propertyName), key -> new ArrayList<>())
                     .add(dangerousProperty);
         }

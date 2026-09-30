@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.endpoint.SanitizableData;
 import org.springframework.boot.actuate.endpoint.SanitizingFunction;
 
-import com.axelixlabs.axelix.common.domain.Sanitization;
+import com.axelixlabs.axelix.sbs.spring.core.Sanitization;
 import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 
