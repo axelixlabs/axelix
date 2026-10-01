@@ -39,9 +39,19 @@
     border-color: var(--chip-accent);
 }
 
-.Deprecated {
+.Dangerous {
     --chip-accent: var(--prop-danger);
     --chip-surface: var(--prop-danger-surface);
+}
+
+.DeprecatedError {
+    --chip-accent: var(--prop-dep-error);
+    --chip-surface: var(--prop-dep-error-surface);
+}
+
+.DeprecatedWarning {
+    --chip-accent: var(--prop-dep-warn);
+    --chip-surface: var(--prop-dep-warn-surface);
 }
 
 .Suppressed {

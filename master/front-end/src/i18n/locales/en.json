@@ -74,6 +74,9 @@
         "suppressedProperty": "Suppressed",
         "suppressedPropertyHint": "A property source of a higher precedence defines this property as well, so this value never takes effect",
         "deprecated": "Deprecated",
+        "replacedBy": "Replaced by",
+        "dangerousValue": "Dangerous value",
+        "recommended": "Recommended",
         "description": "Description",
         "configProps": "Configuration Properties",
         "injectedIn": "Injected in",
@@ -83,7 +86,9 @@
         "flaggedCount": "{{value}} flagged",
         "clearFilters": "Clear",
         "triageTags": {
-            "DEPRECATED": "Deprecated",
+            "DANGEROUS": "Dangerous value",
+            "DEPRECATED_ERROR": "Deprecated · error",
+            "DEPRECATED_WARNING": "Deprecated · warning",
             "SUPPRESSED": "Suppressed"
         },
         "definedInSources": "Defined in {{value}} sources",

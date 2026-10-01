@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-
-import { Copy, HintTooltip } from "@/components";
-import type { IEnvProperty } from "@/models";
+import { Copy } from "@/components";
+import { type TPropertyRiskKind, propertyRisks } from "@/helpers";
+import { EPropertyTriageTag, type IEnvProperty } from "@/models";
 
 import { EnvironmentPropertyValue } from "../../EnvironmentPropertyValue";
 
+import { RiskChip } from "./RiskChip";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -29,24 +29,24 @@ interface IProps {
      * Single property
      */
     property: IEnvProperty;
-
-    /**
-     * Reserves the caret gutter on rows that cannot be expanded, so that every row in a source lines
-     * up on the same columns
-     */
-    caretPlaceholder?: boolean;
 }
 
-export const EnvironmentProperty = ({ property, caretPlaceholder }: IProps) => {
-    const { name, deprecation, isPrimary } = property;
+const RISK_ROW_STYLES: Record<TPropertyRiskKind, string> = {
+    [EPropertyTriageTag.DANGEROUS]: styles.DangerousRow,
+    [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedErrorRow,
+    [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarningRow,
+};
 
-    const { t } = useTranslation();
+export const EnvironmentProperty = ({ property }: IProps) => {
+    const { name, isPrimary } = property;
+
+    const risks = propertyRisks(property);
+    const primaryRisk = risks[0];
 
     const rowStyles = [
         styles.MainWrapper,
-        deprecation ? styles.FlaggedRow : "",
-        !deprecation && !isPrimary ? styles.SuppressedRow : "",
-        caretPlaceholder ? styles.CaretPlaceholder : "",
+        primaryRisk ? RISK_ROW_STYLES[primaryRisk.kind] : "",
+        !primaryRisk && !isPrimary ? styles.SuppressedRow : "",
     ]
         .filter(Boolean)
         .join(" ");
@@ -59,25 +59,9 @@ export const EnvironmentProperty = ({ property, caretPlaceholder }: IProps) => {
                 <div className={styles.KeyChunk}>
                     <span className={styles.Key}>{name}</span>
                     <Copy text={name} />
-                    {deprecation && (
-                        <HintTooltip
-                            placement="bottomLeft"
-                            content={
-                                <>
-                                    <span className={styles.TooltipLabel}>
-                                        <span className={styles.TooltipDot} />
-                                        {t("Environments.deprecated")}
-                                    </span>
-                                    <span>{deprecation.message}</span>
-                                </>
-                            }
-                        >
-                            <span className={styles.DeprecationChip}>
-                                <span className={styles.ChipDot} />
-                                {t("Environments.deprecated")}
-                            </span>
-                        </HintTooltip>
-                    )}
+                    {risks.map((risk) => (
+                        <RiskChip risk={risk} key={risk.kind} />
+                    ))}
                 </div>
 
                 <EnvironmentPropertyValue property={property} />

@@ -16,8 +16,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import {
+    EDeprecationLevel,
     EPropertyTriageTag,
     type IAutocompletionOption,
+    type IDeprecation,
     type IEnvProperty,
     type IEnvironmentPropertySource,
     type IInjectionPoint,
@@ -29,10 +31,83 @@ import { canonicalize } from "./globals";
 
 const EMPTY_PRECEDENCE_CHAIN: IPropertyOccurrence[] = [];
 
+/**
+ * The triage tags that mark a property as risky and get an inline chip on its row. They are the
+ * triage tags minus {@link EPropertyTriageTag.SUPPRESSED}, which is a precedence fact rather than a
+ * risk and is surfaced on the value cell instead.
+ */
+export type TPropertyRiskKind =
+    EPropertyTriageTag.DANGEROUS | EPropertyTriageTag.DEPRECATED_ERROR | EPropertyTriageTag.DEPRECATED_WARNING;
+
+export interface IPropertyRisk {
+    /**
+     * The kind of risk, which selects the chip's colour and label.
+     */
+    kind: TPropertyRiskKind;
+
+    /**
+     * Why the property is flagged (the deprecation message or the dangerous-value rationale).
+     */
+    reason: string;
+
+    /**
+     * The actionable suggestion, when any: the replacement property for a deprecation, or a safer
+     * value for a dangerous one.
+     */
+    hint: string | null;
+}
+
+/**
+ * Maps a deprecation onto its risk kind. A deprecation with no stated level is treated as a warning.
+ */
+export const deprecationTriageTag = (deprecation: IDeprecation): TPropertyRiskKind => {
+    return (deprecation.level ?? EDeprecationLevel.WARNING) === EDeprecationLevel.ERROR
+        ? EPropertyTriageTag.DEPRECATED_ERROR
+        : EPropertyTriageTag.DEPRECATED_WARNING;
+};
+
+/**
+ * The risks a property carries, most severe first: a dangerous value outranks a deprecation. A
+ * property can carry both at once, so this returns a list rather than a single risk.
+ */
+export const propertyRisks = (property: IEnvProperty): IPropertyRisk[] => {
+    const risks: IPropertyRisk[] = [];
+
+    if (property.dangerousValue) {
+        risks.push({
+            kind: EPropertyTriageTag.DANGEROUS,
+            reason: property.dangerousValue.rationale,
+            hint: property.dangerousValue.alternativeExample ?? null,
+        });
+    }
+
+    if (property.deprecation) {
+        risks.push({
+            kind: deprecationTriageTag(property.deprecation),
+            reason: property.deprecation.message,
+            hint: property.deprecation.replacedBy ?? null,
+        });
+    }
+
+    return risks;
+};
+
+/**
+ * A property is flagged when it carries any risk, i.e. a deprecation or a dangerous value. Drives the
+ * "N flagged" counter in a source's header.
+ */
+export const isFlaggedProperty = (property: IEnvProperty): boolean => {
+    return !!property.deprecation || !!property.dangerousValue;
+};
+
 const hasTriageTag = (property: IEnvProperty, triageTag: EPropertyTriageTag): boolean => {
     switch (triageTag) {
-        case EPropertyTriageTag.DEPRECATED:
-            return !!property.deprecation;
+        case EPropertyTriageTag.DANGEROUS:
+            return !!property.dangerousValue;
+        case EPropertyTriageTag.DEPRECATED_ERROR:
+            return !!property.deprecation && deprecationTriageTag(property.deprecation) === triageTag;
+        case EPropertyTriageTag.DEPRECATED_WARNING:
+            return !!property.deprecation && deprecationTriageTag(property.deprecation) === triageTag;
         case EPropertyTriageTag.SUPPRESSED:
             return !property.isPrimary;
     }
@@ -119,9 +194,12 @@ export const precedenceChainOf = (precedenceIndex: TPrecedenceIndex, propertyNam
 };
 
 export const isDropdownNeededProperty = (property: IEnvProperty, precedenceChainLength = 0): boolean => {
-    const { configPropsBeanName, deprecation, description, injectionPoints } = property;
+    const { configPropsBeanName, deprecation, dangerousValue, description, injectionPoints } = property;
 
-    return !!(deprecation || description || injectionPoints || configPropsBeanName) || precedenceChainLength > 1;
+    return (
+        !!(deprecation || dangerousValue || description || injectionPoints || configPropsBeanName) ||
+        precedenceChainLength > 1
+    );
 };
 
 /**

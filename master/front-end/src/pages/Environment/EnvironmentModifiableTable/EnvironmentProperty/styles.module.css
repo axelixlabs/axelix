@@ -14,12 +14,30 @@
     }
 }
 
-.FlaggedRow {
+.DangerousRow {
     background-color: var(--prop-danger-surface);
     border-left-color: var(--prop-danger);
 
     &:hover {
         background-color: #fee4e2;
+    }
+}
+
+.DeprecatedErrorRow {
+    background-color: var(--prop-dep-error-surface);
+    border-left-color: var(--prop-dep-error);
+
+    &:hover {
+        background-color: #fef0c7;
+    }
+}
+
+.DeprecatedWarningRow {
+    background-color: var(--prop-dep-warn-surface);
+    border-left-color: var(--prop-dep-warn);
+
+    &:hover {
+        background-color: #fef7c3;
     }
 }
 
@@ -44,48 +62,4 @@
     font-weight: 500;
     color: var(--prop-text);
     overflow-wrap: anywhere;
-}
-
-.DeprecationChip {
-    display: inline-flex;
-    align-items: center;
-    column-gap: 6px;
-    flex-shrink: 0;
-    padding: 3px 9px;
-    font-size: 11.5px;
-    font-weight: 700;
-    white-space: nowrap;
-    color: var(--prop-danger);
-    background-color: var(--prop-danger-surface);
-    border: 1px solid var(--prop-danger-border);
-    border-radius: 999px;
-    cursor: help;
-    transition:
-        color 0.12s,
-        background-color 0.12s;
-
-    &:hover {
-        color: var(--prop-surface);
-        background-color: var(--prop-danger);
-    }
-}
-
-.ChipDot,
-.TooltipDot {
-    width: 6px;
-    height: 6px;
-    flex-shrink: 0;
-    background-color: currentcolor;
-    border-radius: 2px;
-}
-
-.TooltipLabel {
-    display: flex;
-    align-items: center;
-    column-gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #fda29b;
 }

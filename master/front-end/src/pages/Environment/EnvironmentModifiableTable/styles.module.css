@@ -3,6 +3,7 @@
     border: 1px solid var(--prop-panel-border);
     border-radius: var(--prop-radius);
     box-shadow: var(--prop-shadow-card);
+    overflow: hidden;
 }
 
 .PanelAccordion.PanelAccordion {

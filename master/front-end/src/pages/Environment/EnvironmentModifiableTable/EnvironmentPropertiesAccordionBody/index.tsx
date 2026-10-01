@@ -60,7 +60,7 @@ export const EnvironmentPropertiesAccordionBody = ({ allProperties, precedenceIn
                         );
                     }
 
-                    return <EnvironmentProperty property={property} caretPlaceholder key={property.name} />;
+                    return <EnvironmentProperty property={property} key={property.name} />;
                 })
             )}
         </>

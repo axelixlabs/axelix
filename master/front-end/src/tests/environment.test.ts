@@ -21,10 +21,12 @@ import {
     buildPrecedenceIndex,
     countTriageTag,
     filterPropertySources,
+    isFlaggedProperty,
     precedenceChainOf,
+    propertyRisks,
     splitProperties,
 } from "@/helpers";
-import { EPropertyTriageTag, type IEnvProperty, type IEnvironmentPropertySource } from "@/models";
+import { EDeprecationLevel, EPropertyTriageTag, type IEnvProperty, type IEnvironmentPropertySource } from "@/models";
 
 const namesOf = (properties: IEnvProperty[]): string[] => properties.map(({ name }) => name);
 
@@ -165,6 +167,71 @@ describe("Precedence chain", () => {
 
     it("Counts the suppressed properties across all the sources", () => {
         expect(countTriageTag(propertySources, EPropertyTriageTag.SUPPRESSED)).toBe(2);
-        expect(countTriageTag(propertySources, EPropertyTriageTag.DEPRECATED)).toBe(0);
+        expect(countTriageTag(propertySources, EPropertyTriageTag.DEPRECATED_WARNING)).toBe(0);
+    });
+});
+
+describe("Triage classification", () => {
+    const base = (name: string): IEnvProperty => ({
+        name,
+        value: "x",
+        isPrimary: true,
+        configPropsBeanName: null,
+        description: null,
+    });
+
+    const dangerous: IEnvProperty = {
+        ...base("spring.h2.console.enabled"),
+        dangerousValue: { rationale: "Unauthenticated SQL console", alternativeExample: "false" },
+    };
+    const depError: IEnvProperty = {
+        ...base("spring.datasource.initialization-mode"),
+        deprecation: { message: "Removed", level: EDeprecationLevel.ERROR, replacedBy: "spring.sql.init.mode" },
+    };
+    const depWarn: IEnvProperty = {
+        ...base("spring.redis.host"),
+        deprecation: { message: "Relocated", level: EDeprecationLevel.WARNING, replacedBy: "spring.data.redis.host" },
+    };
+    const depNoLevel: IEnvProperty = {
+        ...base("management.metrics.export.prometheus.enabled"),
+        deprecation: { message: "Renamed" },
+    };
+    const dangerousAndDeprecated: IEnvProperty = {
+        ...base("spring.jpa.open-in-view"),
+        dangerousValue: { rationale: "Open Session In View", alternativeExample: "false" },
+        deprecation: { message: "Legacy", level: EDeprecationLevel.WARNING },
+    };
+
+    const propertySources: IEnvironmentPropertySource[] = [
+        {
+            name: "application.properties",
+            description: null,
+            properties: [dangerous, depError, depWarn, depNoLevel],
+        },
+    ];
+
+    it("Counts each risk category independently", () => {
+        expect(countTriageTag(propertySources, EPropertyTriageTag.DANGEROUS)).toBe(1);
+        expect(countTriageTag(propertySources, EPropertyTriageTag.DEPRECATED_ERROR)).toBe(1);
+        expect(countTriageTag(propertySources, EPropertyTriageTag.DEPRECATED_WARNING)).toBe(2);
+    });
+
+    it("Treats a deprecation with no stated level as a warning", () => {
+        expect(propertyRisks(depNoLevel)).toEqual([
+            { kind: EPropertyTriageTag.DEPRECATED_WARNING, reason: "Renamed", hint: null },
+        ]);
+    });
+
+    it("Lists the dangerous risk before the deprecation when a property carries both", () => {
+        expect(propertyRisks(dangerousAndDeprecated).map((risk) => risk.kind)).toEqual([
+            EPropertyTriageTag.DANGEROUS,
+            EPropertyTriageTag.DEPRECATED_WARNING,
+        ]);
+    });
+
+    it("Flags a property that carries any risk", () => {
+        expect(isFlaggedProperty(dangerous)).toBe(true);
+        expect(isFlaggedProperty(depWarn)).toBe(true);
+        expect(isFlaggedProperty(base("plain.property"))).toBe(false);
     });
 });

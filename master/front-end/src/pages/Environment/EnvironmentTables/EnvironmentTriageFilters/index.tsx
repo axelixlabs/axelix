@@ -22,10 +22,17 @@ import { EPropertyTriageTag, type IEnvironmentPropertySource } from "@/models";
 
 import styles from "./styles.module.css";
 
-const TRIAGE_TAGS = [EPropertyTriageTag.DEPRECATED, EPropertyTriageTag.SUPPRESSED];
+const TRIAGE_TAGS = [
+    EPropertyTriageTag.DANGEROUS,
+    EPropertyTriageTag.DEPRECATED_ERROR,
+    EPropertyTriageTag.DEPRECATED_WARNING,
+    EPropertyTriageTag.SUPPRESSED,
+];
 
 const TAG_STYLES: Record<EPropertyTriageTag, string> = {
-    [EPropertyTriageTag.DEPRECATED]: styles.Deprecated,
+    [EPropertyTriageTag.DANGEROUS]: styles.Dangerous,
+    [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedError,
+    [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarning,
     [EPropertyTriageTag.SUPPRESSED]: styles.Suppressed,
 };
 

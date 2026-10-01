@@ -26,6 +26,7 @@ import type { IEnvProperty, IPropertyOccurrence } from "@/models";
 import { EnvironmentPrecedenceChain } from "../EnvironmentPrecedenceChain";
 
 import { EnvironmentPropertyDetailRow } from "./EnvironmentPropertyDetailRow";
+import { EnvironmentPropertyRiskDetails } from "./EnvironmentPropertyRiskDetails";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -44,16 +45,12 @@ export const EnvironmentPropertyDetails = ({ property, precedenceChain }: IProps
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const { deprecation, description, configPropsBeanName, injectionPoints } = property;
+    const { deprecation, dangerousValue, description, configPropsBeanName, injectionPoints } = property;
 
     return (
         <>
             <div className={styles.AccordionBody}>
-                {deprecation && (
-                    <EnvironmentPropertyDetailRow label={t("Environments.deprecated")}>
-                        {deprecation.message}
-                    </EnvironmentPropertyDetailRow>
-                )}
+                <EnvironmentPropertyRiskDetails deprecation={deprecation} dangerousValue={dangerousValue} />
 
                 {description && (
                     <EnvironmentPropertyDetailRow label={t("Environments.description")}>
