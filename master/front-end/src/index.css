@@ -49,6 +49,19 @@
     --prop-danger: #b42318;
     --prop-danger-surface: #fef3f2;
     --prop-danger-border: #fecdca;
+    --prop-danger-on-dark: #fda29b;
+
+    /* Deprecation reported as an error: the value is no longer bound and will break on strict binding. */
+    --prop-dep-error: #b54708;
+    --prop-dep-error-surface: #fffaeb;
+    --prop-dep-error-border: #fec84b;
+    --prop-dep-error-on-dark: #fdb022;
+
+    /* Deprecation reported as a warning: still honoured, but slated for removal. */
+    --prop-dep-warn: #854a0e;
+    --prop-dep-warn-surface: #fefbe8;
+    --prop-dep-warn-border: #fde68a;
+    --prop-dep-warn-on-dark: #fde047;
     --prop-radius: 10px;
     --prop-shadow-card: 0 1px 2px rgb(16 24 40 / 4%);
 }

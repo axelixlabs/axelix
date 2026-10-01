@@ -76,6 +76,9 @@
         "suppressedProperty": "Перекрыто",
         "suppressedPropertyHint": "Свойство определено также в источнике с более высоким приоритетом, поэтому это значение не применяется",
         "deprecated": "Устаревшее",
+        "replacedBy": "Заменено на",
+        "dangerousValue": "Опасное значение",
+        "recommended": "Рекомендуется",
         "description": "Описание",
         "configProps": "Configuration Properties",
         "injectedIn": "Инжектируется в",
@@ -85,7 +88,9 @@
         "flaggedCount": "Отмечено: {{value}}",
         "clearFilters": "Сбросить",
         "triageTags": {
-            "DEPRECATED": "Устаревшее",
+            "DANGEROUS": "Опасное значение",
+            "DEPRECATED_ERROR": "Устаревшее · ошибка",
+            "DEPRECATED_WARNING": "Устаревшее · предупреждение",
             "SUPPRESSED": "Перекрыто"
         },
         "definedInSources": "Определено в источниках: {{value}}",

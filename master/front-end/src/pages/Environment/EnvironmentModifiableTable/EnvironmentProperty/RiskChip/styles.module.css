@@ -1,0 +1,94 @@
+.Chip {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 6px;
+    flex-shrink: 0;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--risk-color);
+    background-color: var(--risk-surface);
+    border: 1px solid var(--risk-border);
+    border-radius: 999px;
+    cursor: help;
+    transition:
+        color 0.12s,
+        background-color 0.12s;
+
+    &:hover {
+        color: var(--prop-surface);
+        background-color: var(--risk-color);
+    }
+}
+
+.ChipDot,
+.TooltipDot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    background-color: currentcolor;
+    border-radius: 2px;
+}
+
+.Dangerous {
+    --risk-color: var(--prop-danger);
+    --risk-surface: var(--prop-danger-surface);
+    --risk-border: var(--prop-danger-border);
+    --risk-on-dark: var(--prop-danger-on-dark);
+}
+
+.DeprecatedError {
+    --risk-color: var(--prop-dep-error);
+    --risk-surface: var(--prop-dep-error-surface);
+    --risk-border: var(--prop-dep-error-border);
+    --risk-on-dark: var(--prop-dep-error-on-dark);
+}
+
+.DeprecatedWarning {
+    --risk-color: var(--prop-dep-warn);
+    --risk-surface: var(--prop-dep-warn-surface);
+    --risk-border: var(--prop-dep-warn-border);
+    --risk-on-dark: var(--prop-dep-warn-on-dark);
+}
+
+.Tooltip {
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+}
+
+.TooltipLabel {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--risk-on-dark);
+}
+
+.TooltipHint {
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+    margin-top: 2px;
+    padding-top: 8px;
+    border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.TooltipHintLabel {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--prop-text-dim);
+}
+
+.TooltipHintValue {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--prop-surface);
+    overflow-wrap: anywhere;
+}

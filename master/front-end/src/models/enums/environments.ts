@@ -28,15 +28,43 @@ export enum EPropertyInjectionType {
 }
 
 /**
+ * The severity with which a property deprecation is reported by the Spring Boot configuration
+ * metadata.
+ */
+export enum EDeprecationLevel {
+    /**
+     * The property is still bound, but it is slated for removal in a future release.
+     */
+    WARNING = "WARNING",
+
+    /**
+     * The property is no longer bound, so its value has no effect and startup breaks once strict
+     * binding is enabled.
+     */
+    ERROR = "ERROR",
+}
+
+/**
  * The categories a property can be triaged into. They are the facets the user can filter the
  * property list down to, so that the handful of properties that need attention do not have to be
  * spotted by eye among the hundreds that do not.
  */
 export enum EPropertyTriageTag {
     /**
-     * The property is deprecated according to the Spring Boot configuration metadata.
+     * The property carries a value the master flagged as dangerous (e.g. one that exposes internal
+     * state or lets the schema drift at runtime).
      */
-    DEPRECATED = "DEPRECATED",
+    DANGEROUS = "DANGEROUS",
+
+    /**
+     * The property is deprecated with {@link EDeprecationLevel.ERROR} severity.
+     */
+    DEPRECATED_ERROR = "DEPRECATED_ERROR",
+
+    /**
+     * The property is deprecated with {@link EDeprecationLevel.WARNING} severity.
+     */
+    DEPRECATED_WARNING = "DEPRECATED_WARNING",
 
     /**
      * The property is defined in this property source, but a source of a higher precedence

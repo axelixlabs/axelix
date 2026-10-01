@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 
 import { InfoIcon } from "@/assets";
 import { HintTooltip } from "@/components";
+import { isFlaggedProperty } from "@/helpers";
 import type { IEnvProperty, IEnvironmentPropertySource } from "@/models";
 
 import styles from "./styles.module.css";
@@ -33,7 +34,7 @@ export const EnvironmentPropertiesAccordionHeader = ({ properties, propertySourc
 
     const { name, description } = propertySource;
 
-    const deprecatedCount = properties.filter(({ deprecation }) => deprecation).length;
+    const flaggedCount = properties.filter(isFlaggedProperty).length;
 
     return (
         <>
@@ -58,9 +59,9 @@ export const EnvironmentPropertiesAccordionHeader = ({ properties, propertySourc
                 </span>
 
                 <span className={styles.Counters}>
-                    {deprecatedCount > 0 && (
+                    {flaggedCount > 0 && (
                         <span className={styles.FlaggedCounter}>
-                            {t("Environments.flaggedCount", { value: deprecatedCount })}
+                            {t("Environments.flaggedCount", { value: flaggedCount })}
                         </span>
                     )}
                     <span className={styles.PropertiesCounter}>
