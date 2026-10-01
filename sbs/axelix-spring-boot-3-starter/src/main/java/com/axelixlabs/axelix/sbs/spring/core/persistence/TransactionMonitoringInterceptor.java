@@ -66,7 +66,6 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     @Nullable
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
-        Class<?> declaringClass = method.getDeclaringClass();
 
         MethodClassKey key =
                 TransactionMonitoringBeanPostProcessor.resolveMonitoringKey(method, targetClass, propagationCache);
@@ -87,7 +86,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
                 if (metricsPublisher != null) {
                     metricsPublisher.publishTransactionMetrics(
-                            declaringClass.getSimpleName(), method.getName(), transactionExecutionProfile);
+                            key.getTargetClass().getSimpleName(), method.getName(), transactionExecutionProfile);
                 }
             }
         }

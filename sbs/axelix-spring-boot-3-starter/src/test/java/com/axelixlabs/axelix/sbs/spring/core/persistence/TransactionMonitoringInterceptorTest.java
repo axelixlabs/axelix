@@ -118,6 +118,12 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
 
             // then.
             assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
+            assertThat(meterRegistry
+                            .find(AxelixMetricNames.TRANSACTION_DURATION)
+                            .tag("class", "SimpleJpaRepository")
+                            .tag("method", "save")
+                            .timer())
+                    .isNotNull();
         }
 
         @Test
