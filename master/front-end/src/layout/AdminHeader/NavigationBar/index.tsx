@@ -18,8 +18,7 @@
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
-import { useAppSelector, useAuthority } from "@/hooks";
-import { EAuthorities } from "@/models";
+import { useAppSelector } from "@/hooks";
 
 import styles from "./styles.module.css";
 
@@ -27,20 +26,16 @@ export const NavigationBar = () => {
     const { t } = useTranslation();
 
     const settings = useAppSelector((state) => state.settings);
-    // Users is currently the only Administration entry, so the tab is shown only with access to it
-    const hasUsersViewAccess = useAuthority(EAuthorities.USERS_VIEW);
 
     return (
         <>
             <nav data-test="header-links">
-                {hasUsersViewAccess && (
-                    <NavLink
-                        to="/administration"
-                        className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
-                    >
-                        {t("Header.administration")}
-                    </NavLink>
-                )}
+                <NavLink
+                    to="/administration"
+                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                >
+                    {t("Header.administration")}
+                </NavLink>
                 {settings.isMcpServerEnabled && (
                     <NavLink
                         to="/mcp-server"
