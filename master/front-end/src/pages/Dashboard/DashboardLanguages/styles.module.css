@@ -1,0 +1,23 @@
+.FirstSectionWrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.CardsWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.NoKotlinBannerWrapper {
+    grid-column: 1 / -1;
+}
+
+@media (width <= 900px) {
+    .CardsWrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

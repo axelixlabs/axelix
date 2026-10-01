@@ -40,8 +40,8 @@ const getDashboardItems = (): AntdMenuItem[] => {
 
     const technologiesItems: ISiderMenuItem[] = [
         {
-            path: "/dashboard/java",
-            label: "Java",
+            path: "/dashboard/languages",
+            label: "Languages",
         },
         {
             path: "/dashboard/persistence",
