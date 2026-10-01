@@ -84,5 +84,5 @@ export const config = {
     // `'/'` is listed separately: the catch-all below does not match an empty path,
     // which is what the docs root becomes once `basePath` is stripped. `img` is the
     // `public/` folder and Next metadata files — static assets must not be given a locale prefix.
-    matcher: ["/", "/((?!api|_next|img|favicon.ico|icon.svg).*)"],
+    matcher: ["/", "/((?!api|_next|img|favicon.ico|icon.svg|sitemap.xml).*)"],
 };
