@@ -44,16 +44,19 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
+    private final Class<?> targetClass;
     private final TransactionStatsCollector statsCollector;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
     private final TransactionAccessor transactionAccessor;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
+            Class<?> targetClass,
             TransactionStatsCollector statsCollector,
             @Nullable AxelixMetricsPublisher metricsPublisher,
             TransactionAccessor transactionAccessor) {
         this.propagationCache = propagationCache;
+        this.targetClass = targetClass;
         this.statsCollector = statsCollector;
         this.metricsPublisher = metricsPublisher;
         this.transactionAccessor = transactionAccessor;
@@ -65,7 +68,8 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         Method method = invocation.getMethod();
         Class<?> declaringClass = method.getDeclaringClass();
 
-        MethodClassKey key = new MethodClassKey(method, declaringClass);
+        MethodClassKey key =
+                TransactionMonitoringBeanPostProcessor.resolveMonitoringKey(method, targetClass, propagationCache);
         Propagation propagation = propagationCache.get(key);
 
         if (propagation != null && shouldCreateNewTransaction(propagation)) {

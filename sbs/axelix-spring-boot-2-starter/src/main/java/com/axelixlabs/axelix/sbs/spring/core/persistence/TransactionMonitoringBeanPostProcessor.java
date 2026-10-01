@@ -119,10 +119,15 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         }
 
         TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, metricsPublisherObjectProvider.getIfAvailable(), transactionAccessor);
+                propagationCache,
+                targetClass,
+                statsCollector,
+                metricsPublisherObjectProvider.getIfAvailable(),
+                transactionAccessor);
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);
+        DefaultPointcutAdvisor advisor =
+                new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(targetClass), interceptor);
 
         return ProxyingUtils.tryCreateProxy(bean, advisor).orElseGet(() -> {
             log.warn(
@@ -177,11 +182,11 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         return false;
     }
 
-    private Pointcut createTransactionMonitoringPointcut() {
+    private Pointcut createTransactionMonitoringPointcut(Class<?> targetClass) {
         return new StaticMethodMatcherPointcut() {
             @Override
             public boolean matches(@NonNull Method method, @NonNull Class<?> clazz) {
-                MethodClassKey key = new MethodClassKey(method, method.getDeclaringClass());
+                MethodClassKey key = resolveMonitoringKey(method, targetClass, propagationCache);
                 Propagation propagation = propagationCache.get(key);
 
                 if (propagation != null) {
@@ -191,6 +196,23 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
                 return false;
             }
         };
+    }
+
+    /**
+     * Resolves the same cache key {@link #preloadMethodPropagationCacheForClass} used for this method, even
+     * when the invoked method comes back from a different class than the one that was preloaded - e.g. the
+     * interface method on a JDK proxy.
+     */
+    static MethodClassKey resolveMonitoringKey(
+            Method method, Class<?> targetClass, Map<MethodClassKey, Propagation> propagationCache) {
+        Method resolvedMethod = AopUtils.getMostSpecificMethod(method, targetClass);
+        MethodClassKey primaryKey = new MethodClassKey(resolvedMethod, targetClass);
+
+        if (propagationCache.containsKey(primaryKey)) {
+            return primaryKey;
+        }
+
+        return new MethodClassKey(method, method.getDeclaringClass());
     }
 
     private MergedAnnotation<Transactional> resolveTransactional(Method method, Class<?> clazz) {
