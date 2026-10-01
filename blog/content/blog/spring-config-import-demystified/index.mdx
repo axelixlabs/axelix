@@ -10,9 +10,9 @@ metaDescription: "How Spring Boot Loads Configuration Through `spring.config.imp
 
 # Spring Config Import Demystified
 
-Hi everyone! My name is Dmitry Mazurov, and I am a OSS contributor to the Axelix project. It is an open-source product that helps find common problems and inefficiencies in Spring Boot applications.
+Hi everyone! My name is Dmitry Mazurov, and I am a OSS contributor [to the Axelix project](https://github.com/axelixlabs/axelix). It is an open-source product that helps find common problems and inefficiencies in Spring Boot applications.
 
-In the previous article, Mikhail Polivakha examined `EnvironmentPostProcessor` and briefly mentioned `ConfigDataEnvironmentPostProcessor`, which loads `application.yml`, handles profiles, and processes `spring.config.import`. Today, we will look inside it.
+In [the previous article](https://axelix.io/blog/environment-post-processor), Mikhail examined `EnvironmentPostProcessor` and briefly mentioned `ConfigDataEnvironmentPostProcessor`, which loads `application.yml`, handles profiles, and processes `spring.config.import`. Today, we will look inside it.
 
 This investigation started with a practical task. We needed to integrate Axelix Master with Vault in such a way that users could configure it through our own properties under `axelix.master.*`, rather than through `spring.cloud.vault.*`. To do this cleanly, we first had to understand how entries like these actually work:
 
@@ -29,13 +29,13 @@ spring:
 
 ## A Bit of History
 
-Before Spring Boot 2.4, configuration was loaded by `ConfigFileApplicationListener`. Over time, its logic accumulated so many special cases that changing it became nearly impossible. Phil Webb described this in detail in his post about the redesign.
+Before Spring Boot 2.4, configuration was loaded by `ConfigFileApplicationListener`. Over time, its logic accumulated so many special cases that changing it became nearly impossible. [Phil Webb described this in detail in his post about the redesign](https://spring.io/blog/2020/08/14/config-file-processing-in-spring-boot-2-4).
 
 At the same time, there was another world. Spring Cloud Config and Spring Cloud Vault fetched remote configuration through a separate bootstrap context, with its own `bootstrap.yml`, its own parent `ApplicationContext`, and its own precedence rules. An application had two loading mechanisms, each with its own surprises.
 
 Spring Boot 2.4 unified these two worlds. It introduced the Config Data API and the `spring.config.import` property, while Spring Cloud—starting with version 2020.0—migrated Config, Vault, Consul, and Zookeeper to it. Support was later added to Spring Cloud Kubernetes as well. The bootstrap context had primarily been needed to fetch configuration from remote sources; now, ordinary imports handle that job.
 
-For this reason, Spring Cloud 2020.0 disabled the bootstrap context by default. It can be restored with `spring.cloud.bootstrap.enabled=true` or the `spring-cloud-starter-bootstrap` starter, but that is now a legacy mode.
+For this reason, [Spring Cloud 2020.0 disabled the bootstrap context by default](https://spring.io/blog/2020/10/07/spring-cloud-2020-0-0-m4-aka-ilford-is-available). It can be restored with `spring.cloud.bootstrap.enabled=true` or the `spring-cloud-starter-bootstrap` starter, but that is now a legacy mode.
 
 In practice, this means that every configuration source—from a file on disk to Vault—is now connected in the same way and follows the same precedence rules. You only need to understand the mechanism once.
 
@@ -74,7 +74,7 @@ The reason is that an import is placed immediately above the file in which it wa
 
 This leads to a non-obvious consequence: if the same property is defined in both Vault and `application-dev.yml`, the value from `application-dev.yml` wins.
 
-You can see the final ordering of sources in a running application at the `/actuator/env` endpoint, where sources are listed from highest to lowest precedence. It is even easier to inspect on the **Environment** page in Axelix. Properties are grouped by source, and a crown icon marks the value that is actually used when the same key is defined in multiple places.
+You can see the final ordering of sources in a running application at the `/actuator/env` endpoint, where sources are listed from highest to lowest precedence. It is even easier [to inspect on the **Environment** page in Axelix](https://axelix.io/docs/features/spring-framework/properties). Properties are grouped by source, and a crown icon marks the value that is actually used when the same key is defined in multiple places.
 
 ## The Resolver and the Loader
 
@@ -109,15 +109,15 @@ Kubernetes performs an additional platform check. Its `isResolvable` returns `tr
 
 | Prefix | When it runs |
 | --- | --- |
-| `configserver:` | During the first and third passes, so the server is queried twice |
-| `vault://` | Only during the third pass |
-| `kubernetes:` | Only during the third pass, and only inside a cluster |
+| [`configserver:`](https://github.com/spring-cloud/spring-cloud-config/blob/main/spring-cloud-config-client/src/main/java/org/springframework/cloud/config/client/ConfigServerConfigDataLocationResolver.java) | During the first and third passes, so the server is queried twice |
+| [`vault:`](https://github.com/spring-cloud/spring-cloud-vault/blob/main/spring-cloud-vault-config/src/main/java/org/springframework/cloud/vault/config/VaultConfigDataLocationResolver.java) | Only during the third pass |
+| [`kubernetes:`](https://github.com/spring-cloud/spring-cloud-kubernetes/blob/v5.0.3/spring-cloud-kubernetes-commons/src/main/java/org/springframework/cloud/kubernetes/commons/configdata/KubernetesConfigDataLocationResolver.java) | Only during the third pass, and only inside a cluster |
 
 ## `EnvironmentPostProcessor` Before and After Config Data
 
 The previous article established this rule: an `EnvironmentPostProcessor` that reads configuration must run after `ConfigDataEnvironmentPostProcessor`, while one that determines where configuration comes from must run before it. Now that we understand the loading process, we can see where this rule comes from.
 
-An `EnvironmentPostProcessor` that runs **before Config Data**—whose `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`—adds everything it produces to the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into an additional configuration location.
+An `EnvironmentPostProcessor` that runs **before Config Data**—whose `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`—adds everything it produces to the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into [an additional configuration location](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/config/AxelixConfigLocationEnvironmentPostProcessor.java).
 
 An `EnvironmentPostProcessor` that runs **after Config Data**—whose `getOrder()` is greater—runs after everything has been loaded, including secrets from Vault and ConfigMaps from Kubernetes. It can read and override the final values. This is how Axelix adds its endpoints to `management.endpoints.web.exposure.include`. However, such an `EnvironmentPostProcessor` can no longer affect loading itself: the resolvers have already run, and loading is complete.
 
@@ -160,7 +160,7 @@ Without `optional:`, this causes a startup error. With it, the import is simply 
 
 Placeholders are not suitable for Vault. `VaultProperties` has dozens of properties covering different authentication methods, SSL, timeouts, and more. Listing all of them manually would mean maintaining a copy of someone else's class.
 
-Instead, we wrote a custom resolver: `AxelixVaultConfigDataLocationResolver`. It extends the standard Vault resolver and runs before it, so it claims the `vault://` location.
+Instead, we wrote a custom resolver: [`AxelixVaultConfigDataLocationResolver`](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/externalconfig/AxelixVaultConfigDataLocationResolver.java). It extends the standard Vault resolver and runs before it, so it claims the `vault://` location.
 
 In `resolveProfileSpecific`, it reads our settings through the `Binder`, adds them to the `BootstrapContext` as `VaultProperties` by calling `registerIfAbsent`, and then delegates to the parent implementation of `resolveProfileSpecific`. The parent method attempts to register its own `VaultProperties` instance, but that slot is already occupied, so Vault uses our settings from that point onward.
 
@@ -190,6 +190,6 @@ We have examined how Spring Boot processes `spring.config.import`, how many pass
 2. A source's settings, such as a Vault address, can be stored in `application.yml` or in anything loaded before it, but not in something that will be loaded later.
 3. Different sources run at different times. Some load immediately, while others wait for profiles.
 4. An import is placed immediately above the file that declares it, so a profile-specific file can take precedence over a source imported by the base file.
-5. `optional:` silently skips anything that could not be loaded. If the application behaves unexpectedly, enable `TRACE` logging, inspect `/actuator/env`, or open the **Environment** page in Axelix.
+5. `optional:` silently skips anything that could not be loaded. If the application behaves unexpectedly, enable `TRACE` logging, inspect `/actuator/env`, or open [the **Environment** page in Axelix](https://axelix.io/docs/features/spring-framework/properties).
 
-Axelix is an open-source project. The code discussed in this article is available on GitHub, and you can always inspect how the complete implementation works.
+[Axelix is an open-source project](https://github.com/axelixlabs/axelix). The code discussed in this article is available on GitHub, and you can always inspect how the complete implementation works.

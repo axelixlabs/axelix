@@ -18,7 +18,9 @@
 }
 .PostRow .Rcover {
   width: 100%;
-  aspect-ratio: 16/10;
+  /* Match the 2400×1260 preview art so object-fit:cover shows the full
+     composition (full-bleed title + diagram) instead of slicing the sides. */
+  aspect-ratio: 40 / 21;
   border-radius: 14px;
   overflow: hidden;
   position: relative;

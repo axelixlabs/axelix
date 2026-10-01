@@ -37,7 +37,8 @@
   border-radius: 12px;
   overflow: hidden;
   background: var(--c-green-900);
-  aspect-ratio: 16/9;
+  /* Match the 2400×1260 preview art so object-fit:cover shows it in full. */
+  aspect-ratio: 40 / 21;
 }
 .Cover img {
   position: absolute;
@@ -68,7 +69,7 @@
   box-shadow: 0 24px 60px -36px rgba(15, 30, 5, 0.45);
 }
 .VIndex .Featured .Cover {
-  aspect-ratio: 16/9;
+  aspect-ratio: 40 / 21;
   border-radius: 14px;
 }
 .VIndex .Featured .Body {
