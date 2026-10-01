@@ -78,14 +78,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
               },
               "expression": "*/2 * * * * *",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.999631800Z"
-              },
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:48.014578100Z",
-                "status": "STARTED"
-              },
               "enabled": true
             },
             {
@@ -93,9 +85,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/5 * * * * *",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.999631800Z"
-              },
               "enabled": true
             },
             {
@@ -103,11 +92,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/2 * * * * *",
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:48.014578100Z",
-                "status": "SUCCESS"
-              },
               "enabled": true
             }
           ],
@@ -118,14 +102,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 0,
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.063630700Z"
-              },
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:47.001570800Z",
-                "status": "SUCCESS"
-              },
               "enabled": true
             }
           ],
@@ -136,9 +112,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 100,
-              "nextExecution": {
-                "time": "2025-10-14T06:33:50.086630700Z"
-              },
               "enabled": false
             }
           ],
@@ -148,17 +121,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
               },
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:50.086630700Z"
-              },
-              "lastExecution": {
-                "exception": {
-                  "type": "java.lang.IllegalStateException",
-                  "message": "Failed while running custom task"
-                },
-                "status": "ERROR",
-                "time": "2025-09-18T15:03:34.132500256Z"
-              },
               "enabled": false
             }
           ]
@@ -197,14 +159,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
                     },
                     "expression": "*/2 * * * * *",
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.999631800Z"
-                    },
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:48.014578100Z",
-                      "status": "STARTED"
-                    },
                     "enabled": true
                 },
                 {
@@ -212,9 +166,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
                     "expression": "*/5 * * * * *",
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.999631800Z"
-                    },
                     "enabled": true
                 },
                 {
@@ -222,11 +173,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
                     "expression": "*/2 * * * * *",
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:48.014578100Z",
-                      "status": "SUCCESS"
-                    },
                     "enabled": true
                 }
               ],
@@ -237,14 +183,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                     },
                     "initialDelay": 0,
                     "interval": 2000,
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.063630700Z"
-                    },
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:47.001570800Z",
-                      "status": "SUCCESS"
-                    },
                     "enabled": true
                 }
               ],
@@ -255,9 +193,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                     },
                     "initialDelay": 100,
                     "interval": 2000,
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:50.086630700Z"
-                    },
                     "enabled": false
                 }
               ],
@@ -267,17 +202,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
                     },
                     "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
-                    "nextExecution": {
-                       "time": "2025-10-14T06:33:50.086630700Z"
-                    },
-                    "lastExecution": {
-                      "exception": {
-                        "message": "Failed while running custom task",
-                        "type": "java.lang.IllegalStateException"
-                      },
-                      "status": "ERROR",
-                      "time": "2025-09-18T15:03:34.132500256Z"
-                    },
                     "enabled": false
                 }
               ]

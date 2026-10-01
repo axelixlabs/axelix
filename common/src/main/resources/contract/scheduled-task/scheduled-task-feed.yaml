@@ -76,14 +76,6 @@ components:
           type: string
           description: The cron expression that drives the task.
           x-axelix-introduced-in: 1.2.0
-        nextExecution:
-          description: The next scheduled execution of the task, when known.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskNextExecution'
-        lastExecution:
-          description: The most recent execution of the task, when it has run at least once.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskLastExecution'
         enabled:
           type: boolean
           description: Whether the task is currently enabled.
@@ -111,14 +103,6 @@ components:
           format: int64
           description: The delay, in milliseconds, before the first execution.
           x-axelix-introduced-in: 1.2.0
-        nextExecution:
-          description: The next scheduled execution of the task, when known.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskNextExecution'
-        lastExecution:
-          description: The most recent execution of the task, when it has run at least once.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskLastExecution'
         enabled:
           type: boolean
           description: Whether the task is currently enabled.
@@ -146,14 +130,6 @@ components:
           format: int64
           description: The delay, in milliseconds, before the first execution.
           x-axelix-introduced-in: 1.2.0
-        nextExecution:
-          description: The next scheduled execution of the task, when known.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskNextExecution'
-        lastExecution:
-          description: The most recent execution of the task, when it has run at least once.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskLastExecution'
         enabled:
           type: boolean
           description: Whether the task is currently enabled.
@@ -174,14 +150,6 @@ components:
           type: string
           description: The string representation of the custom trigger that drives the task.
           x-axelix-introduced-in: 1.2.0
-        nextExecution:
-          description: The next scheduled execution of the task, when known.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskNextExecution'
-        lastExecution:
-          description: The most recent execution of the task, when it has run at least once.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskLastExecution'
         enabled:
           type: boolean
           description: Whether the task is currently enabled.
@@ -195,48 +163,4 @@ components:
         target:
           type: string
           description: The string representation of the executed target.
-          x-axelix-introduced-in: 1.2.0
-    ScheduledTaskNextExecution:
-      type: object
-      description: The next planned execution of a scheduled task.
-      required:
-        - time
-      properties:
-        time:
-          type: string
-          description: The ISO-8601 timestamp of the next planned execution.
-          x-axelix-introduced-in: 1.2.0
-    ScheduledTaskLastExecution:
-      type: object
-      description: The most recent execution of a scheduled task.
-      required:
-        - status
-        - time
-      properties:
-        status:
-          type: string
-          description: The outcome of the last execution (e.g. STARTED, SUCCESS, ERROR).
-          x-axelix-introduced-in: 1.2.0
-        time:
-          type: string
-          description: The ISO-8601 timestamp of the last execution.
-          x-axelix-introduced-in: 1.2.0
-        exception:
-          description: The exception that failed the last execution, when it ended in error.
-          x-axelix-introduced-in: 1.2.0
-          $ref: '#/components/schemas/ScheduledTaskExecutionException'
-    ScheduledTaskExecutionException:
-      type: object
-      description: The exception that failed a scheduled task execution.
-      required:
-        - type
-        - message
-      properties:
-        type:
-          type: string
-          description: The fully-qualified class name of the thrown exception.
-          x-axelix-introduced-in: 1.2.0
-        message:
-          type: string
-          description: The message of the thrown exception.
           x-axelix-introduced-in: 1.2.0
