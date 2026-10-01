@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ArrowIcon, InfoIcon, LicenseIcon } from "@/assets";
+import { DOCS_URL } from "@/utils";
 
 import { HelpAboutItem } from "./HelpAboutItem";
 import { HelpLicenseItem } from "./HelpLicenseItem";
@@ -47,7 +48,7 @@ export const Help = () => {
             key: "documentation",
             icon: <BookOutlined className={styles.CommonIcon} />,
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="https://axelix.io/docs">
+                <a target="_blank" rel="noopener noreferrer" href={DOCS_URL}>
                     {t("documentation")}
                 </a>
             ),

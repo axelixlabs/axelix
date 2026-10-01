@@ -15,21 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./dashboard/dashboardSpringPortfolio";
-export * from "./dashboard/dashboardJava";
-export * from "./transactional";
-export * from "./dependencies";
-export * from "./entitiesMap";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./wallboard";
-export * from "./upgrades";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./license";
-export * from "./caches";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import { apiFetch } from "@/api";
+
+export const getUpgradesData = () => {
+    return apiFetch.get("upgrades");
+};
+
+export const getUpgradesLostApplications = (targetVersion: string) => {
+    return apiFetch.get("upgrades/impact", {
+        params: {
+            targetVersion: targetVersion,
+        },
+    });
+};

@@ -1,0 +1,22 @@
+.MainWrapper {
+    display: flex;
+}
+
+.RulerTick {
+    position: relative;
+    flex: 1;
+}
+
+.TickLabel {
+    color: var(--axelix-bold-grey);
+}
+
+.TickWhiteLabel {
+    color: var(--axelix-primary-white);
+}
+
+.TickAnnotation {
+    display: block;
+    margin-top: 2px;
+    color: var(--axelix-bold-grey);
+}

@@ -32,6 +32,12 @@ export const NavigationBar = () => {
     return (
         <>
             <nav data-test="header-links">
+                <NavLink
+                    to="/administration/upgrades"
+                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                >
+                    {t("Header.administration")}
+                </NavLink>
                 {hasUsersViewAccess && (
                     <NavLink
                         to="/users"

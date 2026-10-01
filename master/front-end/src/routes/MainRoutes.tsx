@@ -21,7 +21,7 @@ import { Navigate, Route, Routes } from "react-router";
 import Loadable from "@/components";
 import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
-import { DashboardSiderMenu } from "@/layout/siders";
+import { AdministrationSiderMenu, DashboardSiderMenu } from "@/layout/siders";
 
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
@@ -38,6 +38,7 @@ const UserProfile = Loadable(lazy(() => import("@/pages/UserProfile")));
 const Conditions = Loadable(lazy(() => import("@/pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("@/pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("@/pages/Wallboard")));
+const Upgrades = Loadable(lazy(() => import("@/pages/Upgrades")));
 const Loggers = Loadable(lazy(() => import("@/pages/Loggers")));
 const Details = Loadable(lazy(() => import("@/pages/Details")));
 const Metrics = Loadable(lazy(() => import("@/pages/Metrics")));
@@ -57,6 +58,10 @@ export const MainRoutes = () => {
                     <Route path="/wallboard" element={<Wallboard />} />
                     {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
+                </Route>
+
+                <Route path="/administration" element={<MainLayout siderContent={<AdministrationSiderMenu />} />}>
+                    <Route path="upgrades" element={<Upgrades />} />
                 </Route>
 
                 <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
