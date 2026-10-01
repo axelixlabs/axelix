@@ -116,6 +116,15 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
       { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
     ],
   },
+  "dmitry-mazurov": {
+    title: "Senior Software Engineer",
+    bio: "Contributor to Axelix OSS. Backend engineer working with Java and Spring Boot. Interested in everything around the code: architecture, security, infrastructure, and automation. Likes understanding how the whole system works, not just a single component.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/dima-bzz" },
+      // { kind: "x", label: "X", url: "https://x.com/mpolivaha" },
+      // { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
+    ],
+  },
 };
 
 /** The editorial profile for an author slug, or `null` if there isn't one. */
