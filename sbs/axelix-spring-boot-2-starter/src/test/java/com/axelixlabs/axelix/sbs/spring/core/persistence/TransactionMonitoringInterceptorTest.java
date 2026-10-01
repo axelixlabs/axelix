@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
@@ -96,6 +97,65 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
             assertThat(stats.getInMemoryPaginatedEntities()).isEmpty();
             // INSERT owner + findByLastName + count.
             assertMetersRecordedFor("executeMultipleSimpleQueries", 3);
+        }
+    }
+
+    /**
+     * These methods aren't declared on {@code OwnerRepository} - their {@code @Transactional} lives on
+     * {@link SimpleJpaRepository}, so preload and lookup must still agree on the same cache key.
+     */
+    @Nested
+    class InheritedRepositoryMethods {
+
+        @Test
+        void shouldRecordTransactionForDirectSaveCall() throws Exception {
+            // given.
+            Method save = SimpleJpaRepository.class.getMethod("save", Object.class);
+            MethodClassKey key = new MethodClassKey(save, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.save(new Owner().setLastName("Evans"));
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
+            assertThat(meterRegistry
+                            .find(AxelixMetricNames.TRANSACTION_DURATION)
+                            .tag("class", "SimpleJpaRepository")
+                            .tag("method", "save")
+                            .timer())
+                    .isNotNull();
+        }
+
+        @Test
+        void shouldRecordTransactionForDirectFindByIdCall() throws Exception {
+            // given.
+            Owner saved = ownerRepository.save(new Owner().setLastName("Evans"));
+            transactionStatsCollector.clear();
+
+            Method findById = SimpleJpaRepository.class.getMethod("findById", Object.class);
+            MethodClassKey key = new MethodClassKey(findById, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.findById(saved.getId());
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
+        }
+
+        @Test
+        void shouldRecordTransactionForDirectDeleteByIdCall() throws Exception {
+            // given.
+            Owner saved = ownerRepository.save(new Owner().setLastName("Evans"));
+            transactionStatsCollector.clear();
+
+            Method deleteById = SimpleJpaRepository.class.getMethod("deleteById", Object.class);
+            MethodClassKey key = new MethodClassKey(deleteById, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.deleteById(saved.getId());
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
         }
     }
 
