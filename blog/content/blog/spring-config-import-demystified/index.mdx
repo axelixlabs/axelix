@@ -10,7 +10,7 @@ metaDescription: "How Spring Boot Loads Configuration Through `spring.config.imp
 
 # Spring Config Import Demystified
 
-Hi everyone! My name is Dmitry Mazurov, and I am a OSS contributor [to the Axelix project](https://github.com/axelixlabs/axelix). It is an open-source product that helps find common problems and inefficiencies in Spring Boot applications.
+Hi everyone! My name is Dmitry Mazurov, and I am an OSS contributor [to the Axelix project](https://github.com/axelixlabs/axelix). It is an open-source product that helps find common problems and inefficiencies in Spring Boot applications.
 
 In [the previous article](https://axelix.io/blog/environment-post-processor), Mikhail examined `EnvironmentPostProcessor` and briefly mentioned `ConfigDataEnvironmentPostProcessor`, which loads `application.yml`, handles profiles, and processes `spring.config.import`. Today, we will look inside it.
 
@@ -70,6 +70,8 @@ After all three passes are complete, `ConfigDataEnvironment` traverses the tree 
 - **Among multiple imports in one list, the import declared later takes precedence.** With `spring.config.import: ["configserver:", "vault://"]`, Vault wins when both sources contain the same key.
 - **Profile-specific sources take precedence over non-profile-specific ones.** `application-dev.yml` overrides `application.yml`, and `secret/my-app/dev` overrides `secret/my-app`.
 
+The most important source is at the top and the least important at the bottom, with each source overriding everything below it.
+
 ![Who overrides whom](/posts/spring-config-import-demystified/who-overrides-whom.png)
 
 Consider the final order for an `application.yml` that imports `optional:vault://` while the `dev` profile is active. `application-dev.yml` appears above Vault, even though Vault overrides `application.yml`.
@@ -95,7 +97,7 @@ Spring Boot selects the resolver as follows:
 
 The loader in each pair is responsible for accessing the source itself. It reads a file, calls Vault or the Kubernetes API, and turns the response into a `PropertySource`. Spring Boot chooses a loader according to the resource type returned by the resolver. A resolver and loader for the same source therefore always operate as a pair, such as `VaultConfigDataLocationResolver` and `VaultConfigDataLoader`. If the source is unavailable or the resource does not exist, the error occurs at this step.
 
-The `optional:` prefix marks a location as optional. If nothing is found there, the application still starts without an error. However, it also suppresses errors when the source is disabled in the configuration or its starter is missing, causing `StandardConfigDataLocationResolver` to claim the location prefix. A typo in a prefix and a disabled source therefore look identical: nothing is loaded and no error is reported.
+The `optional:` prefix marks a location as optional. If nothing is found there, the application still starts without an error. However, it also suppresses errors when the source is disabled in the configuration or its starter is missing, causing `StandardConfigDataLocationResolver` to claim the location. A typo in a prefix and a disabled source therefore look identical: nothing is loaded and no error is reported.
 
 ## Where a Resolver Gets Its Settings
 
@@ -121,7 +123,7 @@ Kubernetes performs an additional platform check. Its `isResolvable` returns `tr
 
 The previous article established this rule: an `EnvironmentPostProcessor` that reads configuration must run after `ConfigDataEnvironmentPostProcessor`, while one that determines where configuration comes from must run before it. Now that we understand the loading process, we can see where this rule comes from.
 
-An `EnvironmentPostProcessor` that runs **before Config Data**, meaning its `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`, adds everything it produces to the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into [an additional configuration location](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/config/AxelixConfigLocationEnvironmentPostProcessor.java).
+An `EnvironmentPostProcessor` that runs **before Config Data**, meaning its `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`, writes to the `Environment`, and everything it adds there becomes part of the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into [an additional configuration location](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/config/AxelixConfigLocationEnvironmentPostProcessor.java).
 
 An `EnvironmentPostProcessor` that runs **after Config Data**, meaning its `getOrder()` is greater, runs after everything has been loaded, including secrets from Vault and ConfigMaps from Kubernetes. It can read and override the final values. This is how Axelix adds its endpoints to `management.endpoints.web.exposure.include`. However, such an `EnvironmentPostProcessor` can no longer affect loading itself: the resolvers have already run, and loading is complete.
 
@@ -192,7 +194,7 @@ The actual logging system is not yet running at this point, so Spring Boot buffe
 
 We have examined how Spring Boot processes `spring.config.import`, how many passes it uses to load sources, which sources override which, and why `EnvironmentPostProcessor` cannot always influence loading. Keeping a few points in mind answers most questions:
 
-1. All imports are processed at startup, before the `ApplicationContext` is created, over three passes both before and after profiles are determined.
+1. All imports are processed at startup, before the `ApplicationContext` is created, over three passes — before profiles are determined and after.
 2. A source's settings, such as a Vault address, can be stored in `application.yml` or in anything loaded before it, but not in something that will be loaded later.
 3. Different sources run at different times. Some load immediately, while others wait for profiles.
 4. An import is placed immediately above the file that declares it, so a profile-specific file can take precedence over a source imported by the base file.
