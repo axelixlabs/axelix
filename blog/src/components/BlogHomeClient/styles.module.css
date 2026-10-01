@@ -76,6 +76,10 @@
   flex-direction: column;
   gap: 16px;
   padding: 8px 24px 8px 12px;
+  /* Let the text column shrink to the card instead of being forced wider than
+     the viewport by a long unbreakable title word (grid items default to
+     min-width:auto == min-content). */
+  min-width: 0;
 }
 .VIndex .Featured h2 {
   margin: 0;
@@ -85,6 +89,7 @@
   line-height: 1.05;
   color: var(--ink);
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 .VIndex .Featured p {
   margin: 0;
