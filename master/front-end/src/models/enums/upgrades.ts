@@ -15,20 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import styles from "./styles.module.css";
-
-interface IProps {
-    title: string;
-    subtitle: string;
+export enum ERulerTickAnnotation {
+    OLDEST_SEEN = "oldestSeen",
+    MASTER_NOW = "masterNow",
+    SAFE_NEXT = "safeNext",
+    DROP = "drop",
 }
-
-export const DashboardPagesFirstSection = ({ title, subtitle }: IProps) => {
-    return (
-        <>
-            <div className={styles.MainWrapper}>
-                <div className="TextLarge">{title}</div>
-                <p className={styles.Subtitle}>{subtitle}</p>
-            </div>
-        </>
-    );
-};

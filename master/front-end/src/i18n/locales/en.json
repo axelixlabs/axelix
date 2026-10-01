@@ -111,6 +111,7 @@
         "dashboard": "Dashboard",
         "wallboard": "Wallboard",
         "users": "Users",
+        "administration": "Administration",
         "Help": {
             "title": "Help",
             "about": "About",
@@ -592,6 +593,80 @@
             "emailFormat": "Invalid email format!",
             "password": "Please input password!",
             "roles": "Please select roles!"
+        }
+    },
+    "Upgrades": {
+        "title": "Upgrades",
+        "subtitle": "Derived from starter versions observed in service registrations over the last 30 days. No external calls.",
+        "EmptyState": {
+            "label": "NO SERVICES REGISTERED",
+            "title": "Nothing has reported a starter version to Master {{masterVersion}} yet.",
+            "description_one": "A service registers as soon as it starts up with the Axelix starter on its classpath, and this page begins tracking the version it runs. Once registrations exist, it tells you how far Master can be upgraded before any service falls out of the compatibility window of {{count}} release, and which teams are lagging behind.",
+            "description_other": "A service registers as soon as it starts up with the Axelix starter on its classpath, and this page begins tracking the version it runs. Once registrations exist, it tells you how far Master can be upgraded before any service falls out of the compatibility window of {{count}} releases, and which teams are lagging behind.",
+            "readDocumentation": "Read documentation"
+        },
+        "NoBlockersState": {
+            "label": "FLEET UP TO DATE",
+            "title_one": "Nothing to do. The 1 service runs starter {{masterVersion}}, the same version as Master.",
+            "title_other": "Nothing to do. All {{count}} services run starter {{masterVersion}}, the same version as Master.",
+            "description": "No service constrains the upgrade path. Whenever your next Master release arrives it will be compatible with the whole fleet, and you can install it without coordinating with any dev team first.",
+            "masterRunningNow": "Master running now",
+            "oldestStarterObserved": "Oldest starter observed",
+            "servicesLagging": "Services lagging",
+            "none": "None"
+        },
+        "FleetBars": {
+            "title": "Starter versions across the fleet",
+            "meta_one": "{{count}} service · last 30 days",
+            "meta_other": "{{count}} services · last 30 days",
+            "serviceCount_one": "{{count}} service",
+            "serviceCount_other": "{{count}} services",
+            "currentRelease": "current release",
+            "cappingTag": "caps headroom at +1",
+            "footNote": "After the Master upgrade this should shift toward the release you install. A stubborn cluster on an old version usually means a service template nobody has refreshed."
+        },
+        "ArtifactsTable": {
+            "artifact": "ARTIFACT",
+            "starter": "STARTER",
+            "lastSeen": "LAST SEEN",
+            "sectionTitle": "Capping the headroom",
+            "sectionNote": "Bumping the starter in these services widens the headroom.",
+            "footNote": "Every service seen at least once in the last 30 days counts, online now or not"
+        },
+        "HeadroomPanel": {
+            "tagUpgrade": "UPGRADE",
+            "tagHeadroom": "HEADROOM",
+            "title_one": "Master can move {{count}} minor release ahead of {{version}} with nothing falling out of support",
+            "title_other": "Master can move {{count}} minor releases ahead of {{version}} with nothing falling out of support",
+            "description_one": "This instance makes no external calls, so it cannot know which releases exist — it counts releases instead of naming one. Take the newest Master bundle you have, up to {{count}} minor ahead of {{version}}, and it is safe today. Dev teams can bump their starters afterwards, at their own pace.",
+            "description_other": "This instance makes no external calls, so it cannot know which releases exist — it counts releases instead of naming one. Take the newest Master bundle you have, up to {{count}} minors ahead of {{version}}, and it is safe today. Dev teams can bump their starters afterwards, at their own pace.",
+            "masterRunning": "Master running now",
+            "oldestStarter": "Oldest starter observed",
+            "oldestStarterServices_one": "· {{count}} service",
+            "oldestStarterServices_other": "· {{count}} services",
+            "compatibilityWindow": "Compatibility window",
+            "minorReleases_one": "{{count}} minor release",
+            "minorReleases_other": "{{count}} minor releases"
+        },
+        "BundleVersionInput": {
+            "versionLabel": "Holding a Master bundle? Check the version you actually have:",
+            "noServicesFound": "No services found for this version.",
+            "allServicesSupported_one": "Safe - all {{count}} service stays supported.",
+            "allServicesSupported_other": "Safe - all {{count}} services stay supported.",
+            "versionNote": "Going two ahead is possible, but not free: on a {{version}} build the {{count}} services on starter {{starter}} would fall out of the support window and stop reporting data. They would remain listed here, marked unsupported. The upgrade itself is never blocked."
+        },
+        "Ruler": {
+            "oldestSeen": "oldest seen",
+            "masterNow": "Master now",
+            "safeNext": "+{{offset}} · safe",
+            "drop": "+{{offset}} · drops {{services}}",
+            "legendSupported": "Master versions every observed starter supports",
+            "legendOutside": "Outside the window · not necessarily released"
+        }
+    },
+    "Administration": {
+        "Sider": {
+            "upgrades": "Upgrades"
         }
     }
 }

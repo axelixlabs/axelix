@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { DashboardPagesFirstSection } from "./Dashboard/DashboardPagesFirstSection";
 export { NoRequiredAuthorityTooltip } from "./NoRequiredAuthorityTooltip";
 export { DashboardDonutChart } from "./Dashboard/DashboardDonutChart";
 export { DashboardGauge } from "./Dashboard/DashboardGauge";
 export { DashboardCard } from "./Dashboard/DashboardCard";
+export { PagesFirstSection } from "./PagesFirstSection";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";

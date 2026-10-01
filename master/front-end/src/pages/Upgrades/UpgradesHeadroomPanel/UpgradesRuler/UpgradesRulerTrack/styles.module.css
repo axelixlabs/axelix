@@ -1,0 +1,16 @@
+.MainWrapper {
+    display: flex;
+    gap: 4px;
+    height: 7px;
+}
+
+.RulerSegment {
+    flex: 1;
+    height: 100%;
+    border-radius: var(--axelix-border-radius-small);
+    background-color: #33363a;
+}
+
+.InWindow {
+    background-color: var(--axelix-primary-green);
+}
