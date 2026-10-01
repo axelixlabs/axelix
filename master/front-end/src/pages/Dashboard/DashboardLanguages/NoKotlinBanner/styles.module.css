@@ -1,0 +1,35 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 22px;
+    border: 1px dashed var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.MessageWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--axelix-bold-grey);
+}
+
+/* TODO: Fix in the future */
+.Badge {
+    font-weight: 700;
+    color: #6d28d9;
+    background-color: #f5f3ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 5px;
+    padding: 1px 7px;
+}
+
+.Message {
+    color: var(--axelix-bold-grey);
+}
+
+.Date {
+    color: var(--axelix-bold-grey);
+    font-variant-numeric: tabular-nums;
+}

@@ -17,6 +17,7 @@
  */
 export * from "./interfaces/dashboard/dashboardSpringPortfolio";
 export * from "./interfaces/dashboard/dashboardPersistence";
+export * from "./interfaces/dashboard/dashboardLanguages";
 export * from "./interfaces/dashboard/dashboardJava";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/transactional";

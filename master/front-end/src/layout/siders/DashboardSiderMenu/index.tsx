@@ -31,18 +31,18 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
 
 // TODO: Add icons in future
 const getDashboardItems = (): AntdMenuItem[] => {
-    const portfolioItems: ISiderMenuItem[] = [
+    const topLevelItems: ISiderMenuItem[] = [
         {
             path: "/dashboard/spring-portfolio",
             label: "Spring Portfolio",
         },
+        {
+            path: "/dashboard/languages",
+            label: "Languages Usage",
+        },
     ];
 
     const technologiesItems: ISiderMenuItem[] = [
-        {
-            path: "/dashboard/java",
-            label: "Java",
-        },
         {
             path: "/dashboard/persistence",
             label: "Persistence",
@@ -54,7 +54,7 @@ const getDashboardItems = (): AntdMenuItem[] => {
     ];
 
     return [
-        ...createMenuItems(portfolioItems),
+        ...createMenuItems(topLevelItems),
         {
             key: "technologies",
             label: "Technologies",

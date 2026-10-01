@@ -27,7 +27,7 @@ const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/D
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
-const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
+const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
@@ -62,7 +62,7 @@ export const MainRoutes = () => {
                 <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
                     <Route index element={<Navigate to="spring-portfolio" replace />} />
                     <Route path="spring-portfolio" element={<DashboardSpringPortfolio />} />
-                    <Route path="java" element={<DashboardJava />} />
+                    <Route path="languages" element={<DashboardLanguages />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
                     <Route path="spring-framework" element={<DashboardSpringFramework />} />
                 </Route>
