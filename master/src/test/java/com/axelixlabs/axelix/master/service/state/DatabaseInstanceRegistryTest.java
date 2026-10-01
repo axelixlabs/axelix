@@ -236,5 +236,4 @@ class DatabaseInstanceRegistryTest {
                 .ignoringFieldsOfTypes(Instant.class)
                 .isEqualTo(petclinicInstance);
     }
-
 }

@@ -18,15 +18,19 @@
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cache.CacheManager;
+import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyingUtils;
 
 /**
  * BeanPostProcessor that wraps existing CacheManager beans with EnhancedCacheManager
@@ -37,6 +41,8 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
  * @author Artemiy Degtyarev
  */
 public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(CacheManagerBeanPostProcessor.class);
 
     private final ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider;
 
@@ -56,12 +62,17 @@ public class CacheManagerBeanPostProcessor implements BeanPostProcessor {
         DefaultEnhancedCacheManager delegate =
                 new DefaultEnhancedCacheManager(beanName, target, metricsPublisherObjectProvider.getIfAvailable());
 
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.setTarget(target);
-        proxyFactory.setProxyTargetClass(true);
-        proxyFactory.addAdvisor(new DefaultIntroductionAdvisor(
-                new EnhancedCacheManagerIntroduction(delegate), EnhancedCacheManager.class));
+        Advisor advisor = new DefaultIntroductionAdvisor(
+                new EnhancedCacheManagerIntroduction(delegate), EnhancedCacheManager.class);
 
-        return proxyFactory.getProxy();
+        return ProxyingUtils.tryCreateProxy(target, advisor).orElseGet(() -> {
+            log.warn(
+                    "Cannot enable enhanced cache management for CacheManager bean '{}' of class {}: CGLIB cannot "
+                            + "proxy a final class or override a final method. Enhanced cache features are skipped "
+                            + "for this bean; the bean itself and every other Axelix feature are unaffected.",
+                    beanName,
+                    ClassUtils.getUserClass(target.getClass()).getName());
+            return target;
+        });
     }
 }
