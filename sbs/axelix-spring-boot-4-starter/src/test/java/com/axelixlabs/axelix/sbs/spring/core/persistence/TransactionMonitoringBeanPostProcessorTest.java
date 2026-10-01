@@ -97,7 +97,7 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
             List<Advisor> advisors = Arrays.asList(((Advised) bean).getAdvisors());
 
             boolean hasMonitoringInterceptor = advisors.stream()
-                    .allMatch(advisor -> advisor.getAdvice() instanceof TransactionMonitoringInterceptor);
+                    .anyMatch(advisor -> advisor.getAdvice() instanceof TransactionMonitoringInterceptor);
 
             assertThat(hasMonitoringInterceptor).isTrue();
         }
@@ -152,7 +152,7 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
 
         Object result = processor.postProcessAfterInitialization(jdkProxiedBean, "jdkProxiedFinalGreeter");
 
-        assertThat(result).isNotSameAs(jdkProxiedBean);
+        assertThat(result).isSameAs(jdkProxiedBean);
         assertThat(AopUtils.isAopProxy(result)).isTrue();
     }
 

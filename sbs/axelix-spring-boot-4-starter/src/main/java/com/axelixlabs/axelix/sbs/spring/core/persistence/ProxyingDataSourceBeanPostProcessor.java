@@ -29,13 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.aop.Pointcut;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyingUtils;
 
 /**
  * {@link BeanPostProcessor} that wraps {@link DataSource} beans with a monitoring proxy to collect
@@ -61,29 +62,18 @@ public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
             return bean;
         }
 
-        if (!ProxyingUtils.isSafeToCGLIBProxy(dataSource.getClass())) {
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
+                createGetConnectionPointcut(), new ConnectionProxyingInterceptor(transactionAccessor));
+
+        return ProxyingUtils.tryCreateProxy(dataSource, advisor).orElseGet(() -> {
             log.warn(
                     "Cannot enable SQL monitoring for DataSource bean '{}' of class {}: CGLIB cannot proxy a final "
                             + "class or override a final method. SQL monitoring is skipped for this bean; the bean "
                             + "itself and every other Axelix feature are unaffected.",
                     beanName,
-                    dataSource.getClass().getName());
+                    ClassUtils.getUserClass(dataSource.getClass()).getName());
             return bean;
-        }
-
-        return createMonitoringProxy(dataSource);
-    }
-
-    private Object createMonitoringProxy(DataSource dataSource) {
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.setTarget(dataSource);
-        proxyFactory.setProxyTargetClass(true);
-
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
-                createGetConnectionPointcut(), new ConnectionProxyingInterceptor(transactionAccessor));
-        proxyFactory.addAdvisor(advisor);
-
-        return proxyFactory.getProxy();
+        });
     }
 
     private Pointcut createGetConnectionPointcut() {
