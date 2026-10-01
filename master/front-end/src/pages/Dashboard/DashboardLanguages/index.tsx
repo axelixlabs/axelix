@@ -17,32 +17,18 @@
  */
 import { type TFunction } from "i18next";
 import { useEffect, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type ILanguagesProfileResponseBody, StatefulRequest } from "@/models";
 import { getLanguagesProfileData } from "@/services";
-import { DONUT_COLORS } from "@/utils";
 
+import { JavaCards } from "./JavaCards";
 import { KotlinCards } from "./KotlinCards";
-import { LanguageProfileCard } from "./LanguageProfileCard";
 import { LanguagesSummaryCard } from "./LanguagesSummaryCard";
 import { NoKotlinBanner } from "./NoKotlinBanner";
 import styles from "./styles.module.css";
-
-const detectedFooter = (t: TFunction, count: number) => (
-    <Trans
-        t={t}
-        i18nKey="Dashboard.Languages.detectedAcrossApplications"
-        values={{ count }}
-        components={[<b key="0" />]}
-    />
-);
-
-const percentageOf = (count: number, total: number) => (total === 0 ? 0 : Math.round((count * 100) / total));
-
-const centreTop = (usage?: { applicationPercentage: number }) => (usage ? `${usage.applicationPercentage}%` : "—");
 
 const formatLastScan = (t: TFunction, lastScannedAt: string | null) => {
     if (!lastScannedAt) {
@@ -88,8 +74,6 @@ const DashboardLanguages = () => {
     const kotlinDetected = kotlinReleases.length > 0;
 
     const lastScan = formatLastScan(t, lastScannedAt);
-    const newestJavaRelease = javaReleases[0];
-    const topJdkVendor = jdkVendors[0];
 
     return (
         <>
@@ -106,62 +90,12 @@ const DashboardLanguages = () => {
             </div>
 
             <div className={styles.CardsWrapper}>
-                <LanguageProfileCard
-                    eyebrow={t("Dashboard.Languages.javaEyebrow")}
-                    title={t("Dashboard.Languages.javaCardTitle")}
-                    descriptor={
-                        <Trans
-                            t={t}
-                            i18nKey="Dashboard.Languages.releasesInUse"
-                            values={{ count: javaReleases.length, apps: applicationsTotal }}
-                            components={[<b key="0" />, <b key="1" />]}
-                        />
-                    }
-                    segments={javaReleases.map((release, index) => ({
-                        value: release.applicationPercentage,
-                        color: DONUT_COLORS[index % DONUT_COLORS.length],
-                    }))}
-                    centreTop={centreTop(newestJavaRelease)}
-                    centreBottom={
-                        newestJavaRelease ? t("Dashboard.Languages.onJava", { release: newestJavaRelease.release }) : ""
-                    }
-                    summary={{
-                        label: t("Dashboard.Languages.ltsReleases"),
-                        value: `${applicationsOnLts} · ${percentageOf(applicationsOnLts, applicationsTotal)}%`,
-                    }}
-                    rows={javaReleases.map((release, index) => ({
-                        color: DONUT_COLORS[index % DONUT_COLORS.length],
-                        label: `${t("Dashboard.Languages.javaTitle")} ${release.release}`,
-                        cells: [`${release.applicationCount}`, `${release.applicationPercentage}%`],
-                    }))}
-                    footerLeft={detectedFooter(t, applicationsTotal)}
-                    footerRight={lastScan}
-                />
-
-                <LanguageProfileCard
-                    eyebrow={t("Dashboard.Languages.jdkEyebrow")}
-                    title={t("Dashboard.Languages.jdkCardTitle")}
-                    descriptor={
-                        <Trans
-                            t={t}
-                            i18nKey="Dashboard.Languages.vendorsAcrossApplications"
-                            values={{ vendors: jdkVendors.length, apps: applicationsTotal }}
-                            components={[<b key="0" />, <b key="1" />]}
-                        />
-                    }
-                    segments={jdkVendors.map((vendor, index) => ({
-                        value: vendor.applicationPercentage,
-                        color: DONUT_COLORS[index % DONUT_COLORS.length],
-                    }))}
-                    centreTop={centreTop(topJdkVendor)}
-                    centreBottom={t("Dashboard.Languages.singleJdk")}
-                    rows={jdkVendors.map((vendor, index) => ({
-                        color: DONUT_COLORS[index % DONUT_COLORS.length],
-                        label: vendor.vendor,
-                        cells: [`${vendor.applicationCount}`, `${vendor.applicationPercentage}%`],
-                    }))}
-                    footerLeft={detectedFooter(t, applicationsTotal)}
-                    footerRight={lastScan}
+                <JavaCards
+                    applicationsTotal={applicationsTotal}
+                    applicationsOnLts={applicationsOnLts}
+                    javaReleases={javaReleases}
+                    jdkVendors={jdkVendors}
+                    lastScan={lastScan}
                 />
 
                 {kotlinDetected && languageMix ? (

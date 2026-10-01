@@ -27,7 +27,6 @@ const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/D
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
-const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
 const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
