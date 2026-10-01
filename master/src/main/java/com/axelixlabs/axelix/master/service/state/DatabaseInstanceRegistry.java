@@ -83,18 +83,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public double getAverageHeapSize() {
-        Double result = instanceRepository.findAverageHeap();
-        return result != null ? result : -1d;
-    }
-
-    @Override
-    public double getTotalHeapSize() {
-        Double result = instanceRepository.findTotalHeap();
-        return result != null ? result : 0d;
-    }
-
-    @Override
     public Set<Instance> findByQuery(String query) {
         return instanceRepository.findByNameLikeIgnoreCase("%" + query + "%");
     }

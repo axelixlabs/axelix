@@ -37,12 +37,6 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  */
 public interface InstanceRepository extends ListCrudRepository<Instance, InstanceId> {
 
-    @Query("SELECT AVG(heap) FROM instances")
-    Double findAverageHeap();
-
-    @Query("SELECT SUM(heap) FROM instances")
-    Double findTotalHeap();
-
     Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
 
     @Modifying

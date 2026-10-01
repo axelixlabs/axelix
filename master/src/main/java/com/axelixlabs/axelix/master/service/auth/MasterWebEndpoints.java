@@ -185,8 +185,6 @@ public final class MasterWebEndpoints {
             register("state:export", HttpMethod.POST, ApiPaths.StateExportApi.INSTANCE_ID, null);
 
     // Dashboard
-    public static final MasterWebEndpoint DASHBOARD_READ =
-            register("dashboard:read", HttpMethod.GET, ApiPaths.DashboardApi.MAIN, null);
     public static final MasterWebEndpoint DASHBOARD_READ_JAVA =
             register("dashboard:read-java", HttpMethod.GET, ApiPaths.DashboardApi.JAVA, null);
     public static final MasterWebEndpoint DASHBOARD_READ_SPRING_FRAMEWORK =

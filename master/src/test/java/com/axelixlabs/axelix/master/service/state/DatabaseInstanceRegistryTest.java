@@ -216,26 +216,6 @@ class DatabaseInstanceRegistryTest {
     }
 
     @Test
-    void getAverageHeapSize_shouldReturnAverage() {
-        // given.
-        instanceRegistry.reload(createInstanceWithHeap("heap-id-1", 100.0));
-        instanceRegistry.reload(createInstanceWithHeap("heap-id-2", 200.0));
-
-        // when. / then.
-        assertThat(instanceRegistry.getAverageHeapSize()).isEqualTo(150.0);
-    }
-
-    @Test
-    void getTotalHeapSize_shouldReturnSum() {
-        // given.
-        instanceRegistry.reload(createInstanceWithHeap("total-id-1", 100.0));
-        instanceRegistry.reload(createInstanceWithHeap("total-id-2", 200.0));
-
-        // when. / then.
-        assertThat(instanceRegistry.getTotalHeapSize()).isEqualTo(300.0);
-    }
-
-    @Test
     void findByQuery_shouldReturnMatchingInstances() {
         // given.
         Instance petclinicInstance = withName("query-id-1", "petclinic-service");
@@ -257,23 +237,4 @@ class DatabaseInstanceRegistryTest {
                 .isEqualTo(petclinicInstance);
     }
 
-    private Instance createInstanceWithHeap(String instanceId, double heap) {
-        return new Instance(
-                InstanceId.of(instanceId),
-                ApplicationId.of("com.axelixlabs", "test-app"),
-                "updated-name",
-                "1.0.1",
-                "1.0.1-SNAPSHOT",
-                new JavaVersion(21, 0, 0, 0),
-                "SB-4",
-                "Spring-7",
-                "2.2.0",
-                "Axiom JDK",
-                "new-sha",
-                Instant.now(),
-                null,
-                Instance.InstanceStatus.DOWN,
-                new MemoryUsage(heap),
-                "/actuator");
-    }
 }

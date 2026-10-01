@@ -83,16 +83,6 @@ public interface InstanceRegistry {
     List<Instance> getAll();
 
     /**
-     * @return average heap usage in bytes across all instances, or -1 if no instances registered.
-     */
-    double getAverageHeapSize();
-
-    /**
-     * @return total heap usage in bytes across all instances, or 0 if no instances registered.
-     */
-    double getTotalHeapSize();
-
-    /**
      * Find instance by the arbitrary search query
      *
      * @return {@link Instance}

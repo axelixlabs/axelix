@@ -27,7 +27,6 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,6 @@ import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.Insights;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.domain.ecosystem.platform.PlatformName;
@@ -71,94 +69,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 public class DashboardApiTest extends AbstractProtectedEndpointTest {
-
-    // language=json
-    private static final String EXPECTED_DASHBOARD_JSON_WITH_INSTANCES = """
-        {
-          "distributions": [
-            {
-              "softwareComponentName": "SpringBoot",
-              "versions": {
-                "3.5": 67,
-                "2.7": 33
-              }
-            },
-            {
-              "softwareComponentName": "SpringFramework",
-              "versions": {
-                "6.0": 67,
-                "5.3": 33
-              }
-            },
-            {
-              "softwareComponentName": "Java",
-              "versions": {
-                "25": 67,
-                "17": 33
-              }
-            },
-            {
-              "softwareComponentName": "Kotlin",
-              "versions": {
-                "1.9": 100
-              }
-            }
-          ],
-          "healthStatus": {
-            "statuses": {
-              "UP": 2,
-              "DOWN": 1
-            }
-          },
-          "memoryUsage": {
-            "averageHeapSize": {
-              "unit": "bytes",
-              "value": 1000.0
-            },
-            "totalHeapSize": {
-              "unit": "KB",
-              "value": 2.93
-            }
-          }
-        }
-        """;
-
-    // language=json
-    private static final String EXPECTED_DASHBOARD_JSON_EMPTY = """
-        {
-          "distributions": [
-            {
-              "softwareComponentName": "SpringBoot",
-              "versions": {}
-            },
-            {
-              "softwareComponentName": "SpringFramework",
-              "versions": {}
-            },
-            {
-              "softwareComponentName": "Java",
-              "versions": {}
-            },
-            {
-              "softwareComponentName": "Kotlin",
-              "versions": {}
-            }
-          ],
-          "healthStatus": {
-            "statuses": {}
-          },
-          "memoryUsage": {
-            "averageHeapSize": {
-              "unit": "bytes",
-              "value": -1.0
-            },
-            "totalHeapSize": {
-              "unit": "bytes",
-              "value": 0.0
-            }
-          }
-        }
-        """;
 
     private static final String instance1Id = UUID.randomUUID().toString();
     private static final String instance2Id = UUID.randomUUID().toString();
@@ -219,59 +129,6 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
     @AfterEach
     void cleanup() {
         deRegisterAll();
-    }
-
-    @Test
-    void shouldReturnJSONDashboardResponse() {
-        // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DASHBOARD_JSON_WITH_INSTANCES);
-        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
-    }
-
-    @Test
-    void shouldReturnJSONDashboardResponseWithEmptyRegistry() {
-        // given.
-        deRegisterAll();
-
-        // when.
-        IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-        ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DASHBOARD_JSON_EMPTY);
-        assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
-    }
-
-    @Test
-    @DisplayName("Should return dashboard with UNKNOWN status instances")
-    void shouldReturnDashboardWithUnknownStatusInstances() {
-        // given.
-        String unknownInstanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
-
-        try {
-            // when.
-            IdentityAwareTestRestTemplate viewer = restTemplate.asViewer();
-            ResponseEntity<String> response = viewer.getForEntity("/api/external/dashboard", String.class);
-
-            // then.
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-            assertThatJson(response.getBody())
-                    .node("healthStatus.statuses.UNKNOWN")
-                    .isPresent();
-            assertSuccessfulCallback(MasterWebEndpoints.DASHBOARD_READ, viewer.getActor());
-        } finally {
-            registry.deRegister(InstanceId.of(unknownInstanceId));
-        }
     }
 
     @Test
@@ -374,7 +231,8 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
 
     @Override
     protected Set<TestableMasterWebEndpoint> endpointsUnderTest() {
-        return Set.of(new TestableMasterWebEndpoint(MasterWebEndpoints.DASHBOARD_READ, "/api/external/dashboard"));
+        return Set.of(
+                new TestableMasterWebEndpoint(MasterWebEndpoints.DASHBOARD_READ_JAVA, "/api/external/dashboard/java"));
     }
 
     private void deRegisterAll() {
