@@ -51,6 +51,8 @@ The tree is traversed three times:
 2. **Pass without profiles.** The initial configuration has now been loaded, and Spring Boot uses it to determine the cloud platform. This activates sources with `spring.config.activate.on-cloud-platform`, and their imports are processed as well.
 3. **Pass with profiles.** Spring Boot determines the active profiles from everything loaded so far. It then resolves every location again, this time with profile information, and includes sources with `spring.config.activate.on-profile`.
 
+![Pass with Spring Profiles](/posts/spring-config-import-demystified/three-passes-two-phases.png)
+
 The three passes form two phases: the first two passes run before profile activation, and the third runs afterward. Within each phase, the imports of a given source are processed no more than once, so they are processed at most twice in total.
 
 The second pass therefore does not repeat the first. It only picks up sources that became active after the cloud platform was determined. The third pass, after profile activation, finds everything that depends on profiles. For example, the same standard location with the `dev` profile finds not only `application.yml`, but also `application-dev.yml`.
@@ -67,6 +69,8 @@ After all three passes are complete, `ConfigDataEnvironment` traverses the tree 
 - **An imported source takes precedence over the source that declares the import.** The import is placed in the list immediately above the file that declared it. If `application.yml` contains `vault://`, values from Vault override properties with the same names in `application.yml`.
 - **Among multiple imports in one list, the import declared later takes precedence.** With `spring.config.import: ["configserver:", "vault://"]`, Vault wins when both sources contain the same key.
 - **Profile-specific sources take precedence over non-profile-specific ones.** `application-dev.yml` overrides `application.yml`, and `secret/my-app/dev` overrides `secret/my-app`.
+
+![Who overrides whom](/posts/spring-config-import-demystified/who-overrides-whom.png)
 
 Consider the final order for an `application.yml` that imports `optional:vault://` while the `dev` profile is active. `application-dev.yml` appears above Vault, even though Vault overrides `application.yml`.
 
@@ -122,6 +126,8 @@ An `EnvironmentPostProcessor` that runs **before Config Data**, meaning its `get
 An `EnvironmentPostProcessor` that runs **after Config Data**, meaning its `getOrder()` is greater, runs after everything has been loaded, including secrets from Vault and ConfigMaps from Kubernetes. It can read and override the final values. This is how Axelix adds its endpoints to `management.endpoints.web.exposure.include`. However, such an `EnvironmentPostProcessor` can no longer affect loading itself: the resolvers have already run, and loading is complete.
 
 Sometimes neither option works. An `EnvironmentPostProcessor` that runs before Config Data cannot see `application.yml`, because the file has not yet been loaded. If users put settings that need to be remapped into `application.yml`, an early `EnvironmentPostProcessor` cannot read them, while a late one arrives too late. This is exactly what we encountered in Axelix when moving Vault settings under our own prefix.
+
+![Before And After ConfigData](/posts/spring-config-import-demystified/before-and-after-config-data.png)
 
 There is only one way out of this trap: intervene in Config Data processing after `application.yml` has been read but before the remote source is loaded. In Axelix, we did this in two ways: with placeholders and with a custom resolver.
 
