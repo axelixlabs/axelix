@@ -18,7 +18,6 @@
 export * from "./dashboard/dashboardSpringPortfolio";
 export * from "./dashboard/dashboardSpringFramework";
 export * from "./dashboard/dashboardPersistence";
-export * from "./dashboard/dashboardOverview";
 export * from "./dashboard/dashboardJava";
 export * from "./scheduledTasks";
 export * from "./transactional";

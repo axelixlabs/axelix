@@ -1,9 +1,0 @@
-.MainWrapper {
-    margin-bottom: 40px;
-}
-
-.ChartsWrapper {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-}

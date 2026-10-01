@@ -31,11 +31,7 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
 
 // TODO: Add icons in future
 const getDashboardItems = (): AntdMenuItem[] => {
-    const overviewItems: ISiderMenuItem[] = [
-        {
-            path: "/dashboard/overview",
-            label: "Overview",
-        },
+    const portfolioItems: ISiderMenuItem[] = [
         {
             path: "/dashboard/spring-portfolio",
             label: "Spring Portfolio",
@@ -58,7 +54,7 @@ const getDashboardItems = (): AntdMenuItem[] => {
     ];
 
     return [
-        ...createMenuItems(overviewItems),
+        ...createMenuItems(portfolioItems),
         {
             key: "technologies",
             label: "Technologies",
@@ -72,7 +68,7 @@ export const DashboardSiderMenu = () => {
 
     return (
         <Menu
-            defaultSelectedKeys={["/dashboard/overview"]}
+            defaultSelectedKeys={["/dashboard/spring-portfolio"]}
             defaultOpenKeys={["technologies"]}
             selectedKeys={[pathname]}
             mode="inline"
