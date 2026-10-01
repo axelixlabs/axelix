@@ -171,3 +171,62 @@ a {
         background-color: var(--axelix-primary-light-green);
     }
 }
+
+/*
+ * Donut entrance animation ("spin and settle"), adapted from the 8C dashboard motion design.
+ * The ring fades in while rotating into place with a slight overshoot and scaling up to full
+ * size; its coloured arcs thicken from a thin line to full width; a surrounding legend fades
+ * in last. Plays once, when the donut first mounts. The end state matches the donut's resting
+ * transform (rotate(-90deg)), so the `both` fill leaves it in place after the animation.
+ */
+.DonutSpinSettle {
+    animation:
+        donut-spin-settle 1000ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both,
+        donut-fade-in 250ms linear 150ms both;
+}
+
+.DonutArc {
+    animation: donut-thicken 750ms cubic-bezier(0.33, 1, 0.68, 1) 400ms both;
+}
+
+.DonutLegendFade {
+    animation: donut-fade-in 400ms ease 750ms both;
+}
+
+@keyframes donut-spin-settle {
+    from {
+        transform: rotate(-210deg) scale(0.86);
+    }
+
+    to {
+        transform: rotate(-90deg) scale(1);
+    }
+}
+
+@keyframes donut-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes donut-thicken {
+    from {
+        stroke-width: 4;
+    }
+
+    to {
+        stroke-width: 22;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DonutSpinSettle,
+    .DonutArc,
+    .DonutLegendFade {
+        animation: none;
+    }
+}

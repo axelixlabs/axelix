@@ -73,7 +73,12 @@ export const PlatformDistributionCard = ({ distribution }: IProps) => {
 
                 <div className={styles.Body}>
                     <span className={styles.DonutWrapper}>
-                        <svg width="150" height="150" viewBox="0 0 140 140" className={styles.Donut}>
+                        <svg
+                            width="150"
+                            height="150"
+                            viewBox="0 0 140 140"
+                            className={`${styles.Donut} DonutSpinSettle`}
+                        >
                             <circle
                                 cx="70"
                                 cy="70"
@@ -85,6 +90,7 @@ export const PlatformDistributionCard = ({ distribution }: IProps) => {
                             {arcs.map((arc) => (
                                 <circle
                                     key={arc.line}
+                                    className="DonutArc"
                                     cx="70"
                                     cy="70"
                                     r={RADIUS}
@@ -108,7 +114,7 @@ export const PlatformDistributionCard = ({ distribution }: IProps) => {
                         </span>
                     </span>
 
-                    <div className={styles.Legend}>
+                    <div className={`${styles.Legend} DonutLegendFade`}>
                         {distribution.majors.map((major) => (
                             <div key={major.major} className={styles.MajorGroup}>
                                 <div className={styles.MajorHead}>

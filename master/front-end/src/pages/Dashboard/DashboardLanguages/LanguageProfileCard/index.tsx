@@ -62,7 +62,7 @@ export const LanguageProfileCard = ({
                 <div className={styles.Body}>
                     <LanguageDonut segments={segments} centreTop={centreTop} centreBottom={centreBottom} />
 
-                    <div className={`TextUltraSmall ${styles.Legend}`}>
+                    <div className={`TextUltraSmall ${styles.Legend} DonutLegendFade`}>
                         {summary && (
                             <div className={styles.SummaryRow}>
                                 <span className={styles.SummaryLabel}>{summary.label}</span>

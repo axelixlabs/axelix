@@ -34,7 +34,7 @@ export const LanguageDonut = ({ segments, centreTop, centreBottom }: IProps) => 
     return (
         <>
             <div className={styles.MainWrapper}>
-                <svg width="150" height="150" viewBox="0 0 140 140" className={styles.SVG}>
+                <svg width="150" height="150" viewBox="0 0 140 140" className={`${styles.SVG} DonutSpinSettle`}>
                     {segments.map(({ value, color }, index) => {
                         const length = (value / 100) * CIRCUMFERENCE;
                         const offset = -((consumed / 100) * CIRCUMFERENCE);
@@ -43,6 +43,7 @@ export const LanguageDonut = ({ segments, centreTop, centreBottom }: IProps) => 
                         return (
                             <circle
                                 key={index}
+                                className="DonutArc"
                                 cx="70"
                                 cy="70"
                                 r={RADIUS}
