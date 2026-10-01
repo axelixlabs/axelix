@@ -1,5 +1,6 @@
 import { Logo } from "../Logo";
 import { GITHUB_URL } from "@/lib/blog-metadata";
+import { withBlogBasePath } from "@/lib/url";
 import styles from "./styles.module.css";
 
 export const SiteFooter = () => {
@@ -57,6 +58,7 @@ export const SiteFooter = () => {
               <ul>
                 <li><a href="https://axelix.io">About</a></li>
                 <li><a href="/">Blog</a></li>
+                <li><a href={withBlogBasePath("/authors")}>Authors</a></li>
                 <li><a href="mailto:hello@axelix.io">Contact</a></li>
               </ul>
             </div>

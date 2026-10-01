@@ -14,3 +14,5 @@ export { TagRow } from "./TagRow";
 export { Avatar } from "./Avatar";
 export { DateMeta } from "./DateMeta";
 export { Authors } from "./Authors";
+export { AuthorCard } from "./AuthorCard";
+export { AuthorPosts } from "./AuthorPosts";

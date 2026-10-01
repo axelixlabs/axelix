@@ -1,0 +1,73 @@
+.Head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.Title {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+.Filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.Chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--cat, var(--accent)) 60%, var(--ink));
+  background: transparent;
+  border: 1px solid var(--line-2);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.Chip .Cdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cat, currentColor);
+  opacity: 0.85;
+}
+.Chip:hover {
+  background: color-mix(in srgb, var(--cat, var(--accent)) 18%, transparent);
+  border-color: color-mix(in srgb, var(--cat, var(--accent)) 40%, transparent);
+  color: color-mix(in srgb, var(--cat, var(--accent)) 75%, var(--ink));
+}
+.Chip.Active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.Chip.Active .Cdot {
+  opacity: 1;
+}
+.Rows {
+  display: flex;
+  flex-direction: column;
+}
+.Empty {
+  border: 1px dashed var(--line-3);
+  border-radius: 16px;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--ink-3);
+}
+.Empty b {
+  display: block;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
