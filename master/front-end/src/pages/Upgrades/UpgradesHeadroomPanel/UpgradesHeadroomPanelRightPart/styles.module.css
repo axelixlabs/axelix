@@ -1,0 +1,22 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 180px;
+    border-left: 2px solid #2e3d55;
+    padding-left: 20px;
+}
+
+.PanelMetaBlock {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+}
+
+.GreyText {
+    color: var(--axelix-bold-grey);
+}
+
+.WhiteText {
+    color: var(--axelix-primary-white);
+}

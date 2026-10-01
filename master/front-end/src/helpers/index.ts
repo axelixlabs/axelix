@@ -27,6 +27,7 @@ export * from "./environment";
 export * from "./conditions";
 export * from "./threadDump";
 export * from "./wallboard";
+export * from "./upgrades";
 export * from "./metrics";
 export * from "./globals";
 export * from "./details";

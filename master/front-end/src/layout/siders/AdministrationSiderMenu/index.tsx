@@ -23,6 +23,7 @@ import { ShieldIcon, UsersIcon } from "@/assets";
 import { useAuthority } from "@/hooks";
 import { EAuthorities, type TMenuItem } from "@/models";
 
+const UPGRADES_PATH = "/administration/upgrades";
 const USERS_PATH = "/administration/users";
 const ROLES_PATH = "/administration/roles";
 
@@ -31,7 +32,12 @@ export const AdministrationSiderMenu = () => {
     const { pathname } = useLocation();
     const hasUsersViewAccess = useAuthority(EAuthorities.USERS_VIEW);
 
-    const items: TMenuItem[] = [];
+    const items: TMenuItem[] = [
+        {
+            key: UPGRADES_PATH,
+            label: <Link to={UPGRADES_PATH}>{t("Administration.Sider.upgrades")}</Link>,
+        },
+    ];
 
     if (hasUsersViewAccess) {
         items.push(

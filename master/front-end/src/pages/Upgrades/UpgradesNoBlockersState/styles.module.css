@@ -1,0 +1,51 @@
+.Card {
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 30px;
+    display: flex;
+    column-gap: 20px;
+    margin-bottom: 30px;
+}
+
+.CardLeftPart {
+    flex: 1;
+    min-width: 0;
+}
+
+.Subtitle {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--axelix-primary-green);
+    margin-bottom: 8px;
+}
+
+.Title {
+    margin-bottom: 8px;
+}
+
+.Description {
+    color: var(--axelix-bold-grey);
+}
+
+.CardRightPart {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-left: 1px solid var(--axelix-medium-grey);
+    padding-left: 20px;
+}
+
+.MetaBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.MetaLabel {
+    color: var(--axelix-bold-grey);
+}
+
+.MetaValueGreen {
+    color: var(--axelix-primary-green);
+}
