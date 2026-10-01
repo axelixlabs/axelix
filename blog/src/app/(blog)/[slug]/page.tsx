@@ -92,7 +92,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           <h1>{page.data.title}</h1>
           {page.data.description && <p className="standfirst">{page.data.description}</p>}
           <div className="art-meta">
-            <Authors authors={page.data.authors} />
+            <Authors authors={page.data.authors} linked />
             <span className="sep" />
             <span className="m">{formatDate(page.data.date)}</span>
             <span className="sep" />

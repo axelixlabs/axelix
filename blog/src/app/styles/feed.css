@@ -78,4 +78,13 @@ a.tag-link:hover {
 .authors .who {
   font-weight: 500;
 }
+/* The article byline links to the author's profile (see Authors `linked`). */
+a.authors-link .who {
+  transition: color 0.15s;
+}
+a.authors-link:hover .who {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
