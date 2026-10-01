@@ -46,6 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // first-class entry; `languageAlternates` makes their hreflang sets reciprocal.
     return source.getPages().map((page) => ({
         url: toAbsolute(page.url),
+        lastModified: page.data.lastModified,
         alternates: languageAlternates(page.slugs),
     }));
 }

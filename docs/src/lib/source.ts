@@ -10,6 +10,10 @@ const docs = defineDocs({
     dir: "content/docs",
     docs: {
         schema: pageSchema,
+        // Resolves each page's git commit date into `page.data.lastModified` (typed via the
+        // macro), consumed by the sitemap's <lastmod>. Needs full git history at build (CI:
+        // fetch-depth 0); a shallow clone makes every date equal to checkout time.
+        lastModified: true,
         postprocess: {
             includeProcessedMarkdown: true,
         },

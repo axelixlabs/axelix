@@ -14,6 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          # Full history so fumadocs' git-based lastModified resolves real per-file
+          # dates for the sitemap's <lastmod>; a shallow clone makes them all equal.
+          fetch-depth: 0
 
       - name: Loading Secrets
         uses: ./.github/actions/bitwarden
