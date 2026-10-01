@@ -33,11 +33,11 @@ Before Spring Boot 2.4, configuration was loaded by `ConfigFileApplicationListen
 
 At the same time, there was another world. Spring Cloud Config and Spring Cloud Vault fetched remote configuration through a separate bootstrap context, with its own `bootstrap.yml`, its own parent `ApplicationContext`, and its own precedence rules. An application had two loading mechanisms, each with its own surprises.
 
-Spring Boot 2.4 unified these two worlds. It introduced the Config Data API and the `spring.config.import` property, while Spring Cloud—starting with version 2020.0—migrated Config, Vault, Consul, and Zookeeper to it. Support was later added to Spring Cloud Kubernetes as well. The bootstrap context had primarily been needed to fetch configuration from remote sources; now, ordinary imports handle that job.
+Spring Boot 2.4 unified these two worlds. It introduced the Config Data API and the `spring.config.import` property, while Spring Cloud, starting with version 2020.0, migrated Config, Vault, Consul, and Zookeeper to it. Support was later added to Spring Cloud Kubernetes as well. The bootstrap context had primarily been needed to fetch configuration from remote sources; now, ordinary imports handle that job.
 
 For this reason, [Spring Cloud 2020.0 disabled the bootstrap context by default](https://spring.io/blog/2020/10/07/spring-cloud-2020-0-0-m4-aka-ilford-is-available). It can be restored with `spring.cloud.bootstrap.enabled=true` or the `spring-cloud-starter-bootstrap` starter, but that is now a legacy mode.
 
-In practice, this means that every configuration source—from a file on disk to Vault—is now connected in the same way and follows the same precedence rules. You only need to understand the mechanism once.
+In practice, this means that every configuration source, from a file on disk to Vault, is now connected in the same way and follows the same precedence rules. You only need to understand the mechanism once.
 
 ## One `EnvironmentPostProcessor` and Three Passes
 
@@ -47,7 +47,7 @@ All loading is performed by `ConfigDataEnvironmentPostProcessor`, an ordinary `E
 
 The tree is traversed three times:
 
-1. **Initial pass, without an activation context.** Imports are processed from every source that has no activation conditions: environment variables, command-line arguments, and files. Activation conditions can only belong to loaded sources—files or, for example, data from Config Server—not to environment variables or command-line arguments. There are only two such conditions: `spring.config.activate.on-profile`, which includes a source only when one of the specified profiles is active, and `spring.config.activate.on-cloud-platform`, which includes it only on the specified platform, such as Kubernetes.
+1. **Initial pass, without an activation context.** Imports are processed from every source that has no activation conditions: environment variables, command-line arguments, and files. Activation conditions can only belong to loaded sources, such as files or data from Config Server, not to environment variables or command-line arguments. There are only two such conditions: `spring.config.activate.on-profile`, which includes a source only when one of the specified profiles is active, and `spring.config.activate.on-cloud-platform`, which includes it only on the specified platform, such as Kubernetes.
 2. **Pass without profiles.** The initial configuration has now been loaded, and Spring Boot uses it to determine the cloud platform. This activates sources with `spring.config.activate.on-cloud-platform`, and their imports are processed as well.
 3. **Pass with profiles.** Spring Boot determines the active profiles from everything loaded so far. It then resolves every location again, this time with profile information, and includes sources with `spring.config.activate.on-profile`.
 
@@ -95,7 +95,7 @@ The `optional:` prefix marks a location as optional. If nothing is found there, 
 
 ## Where a Resolver Gets Its Settings
 
-A resolver reads its own settings—such as the Vault address, a Kubernetes namespace, or an application name—through the `Binder` available from `ConfigDataLocationResolverContext`. This `Binder` sees sources that are already in the `Environment` and everything loaded up to that point, but it cannot see anything that will be loaded later.
+A resolver reads its own settings, such as the Vault address, a Kubernetes namespace, or an application name, through the `Binder` available from `ConfigDataLocationResolverContext`. This `Binder` sees sources that are already in the `Environment` and everything loaded up to that point, but it cannot see anything that will be loaded later.
 
 This is why Vault settings can be placed in `application.yml`. The file is loaded before the `vault://` import declared inside that same file is processed.
 
@@ -117,9 +117,9 @@ Kubernetes performs an additional platform check. Its `isResolvable` returns `tr
 
 The previous article established this rule: an `EnvironmentPostProcessor` that reads configuration must run after `ConfigDataEnvironmentPostProcessor`, while one that determines where configuration comes from must run before it. Now that we understand the loading process, we can see where this rule comes from.
 
-An `EnvironmentPostProcessor` that runs **before Config Data**—whose `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`—adds everything it produces to the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into [an additional configuration location](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/config/AxelixConfigLocationEnvironmentPostProcessor.java).
+An `EnvironmentPostProcessor` that runs **before Config Data**, meaning its `getOrder()` is less than `ConfigDataEnvironmentPostProcessor.ORDER`, adds everything it produces to the root of the `ConfigDataEnvironmentContributor` tree. As a result, every resolver's `Binder` can see it. This can be used to supply `spring.cloud.vault.uri`, change the Kubernetes namespace, or add `spring.config.additional-location`. This is how Axelix Master turns its own `axelix.master.config.location` property into [an additional configuration location](https://github.com/axelixlabs/axelix/blob/master/master/src/main/java/com/axelixlabs/axelix/master/autoconfiguration/config/AxelixConfigLocationEnvironmentPostProcessor.java).
 
-An `EnvironmentPostProcessor` that runs **after Config Data**—whose `getOrder()` is greater—runs after everything has been loaded, including secrets from Vault and ConfigMaps from Kubernetes. It can read and override the final values. This is how Axelix adds its endpoints to `management.endpoints.web.exposure.include`. However, such an `EnvironmentPostProcessor` can no longer affect loading itself: the resolvers have already run, and loading is complete.
+An `EnvironmentPostProcessor` that runs **after Config Data**, meaning its `getOrder()` is greater, runs after everything has been loaded, including secrets from Vault and ConfigMaps from Kubernetes. It can read and override the final values. This is how Axelix adds its endpoints to `management.endpoints.web.exposure.include`. However, such an `EnvironmentPostProcessor` can no longer affect loading itself: the resolvers have already run, and loading is complete.
 
 Sometimes neither option works. An `EnvironmentPostProcessor` that runs before Config Data cannot see `application.yml`, because the file has not yet been loaded. If users put settings that need to be remapped into `application.yml`, an early `EnvironmentPostProcessor` cannot read them, while a late one arrives too late. This is exactly what we encountered in Axelix when moving Vault settings under our own prefix.
 
