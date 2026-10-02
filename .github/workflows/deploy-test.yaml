@@ -2,12 +2,6 @@ name: Build / Deploy to Testing Env
 
 on:
   workflow_dispatch:
-    inputs:
-      helm_chart_branch:
-        description: 'Helm chart branch name'
-        required: false
-        type: string
-        default: 'main'
   push:
     branches: [ master ]
     paths:
@@ -16,6 +10,7 @@ on:
 
       # Application modules
       - 'axelix-enterprise' # Tracks changes to the Git submodule pointer (gitlink)
+      - 'charts/**'
       - 'common/**'
       - 'master/**'
       - 'master-oss/**'
@@ -49,8 +44,6 @@ jobs:
       CR_URL: ${{ vars.CR_URL }}
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: axelix
-      # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
-      HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
       # OIDC Related settings
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED: true
@@ -98,21 +91,13 @@ jobs:
       - name: Docker logout
         run: docker logout
 
-      - name: Checkout helm-charts repository
-        uses: actions/checkout@v7
-        with:
-          repository: axelixlabs/helm-charts
-          ref: ${{ env.HELM_CHART_BRANCH }}
-          path: helm-charts
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup Helm
         uses: azure/setup-helm@v5.0.1
         with:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        working-directory: helm-charts/charts/axelix
+        working-directory: charts/axelix
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config

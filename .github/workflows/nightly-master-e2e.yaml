@@ -5,10 +5,12 @@ on:
     branches: [ master ]
     paths:
       - 'master-e2e-tests/**'
+      - 'charts/**'
   push:
     branches: [ master ]
     paths:
       - 'master-e2e-tests/**'
+      - 'charts/**'
   workflow_dispatch:
   workflow_call:
   schedule:
@@ -58,12 +60,6 @@ jobs:
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
-
-      - name: Checkout helm-charts
-        uses: actions/checkout@v7
-        with:
-          repository: axelixlabs/helm-charts
-          path: helm-charts
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.6.0
@@ -262,7 +258,7 @@ jobs:
 
       - name: Deploy Axelix Master
         run: |
-          helm upgrade --install axelix-master helm-charts/charts/axelix \
+          helm upgrade --install axelix-master charts/axelix \
             ${{ env.MASTER_SET }} \
             --wait --timeout 3m
 

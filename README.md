@@ -128,7 +128,7 @@ docker run --rm -p 8080:8080 \
 in-cluster auto-discovery:
 
 ```bash
-helm repo add axelix https://axelixlabs.github.io/helm-charts
+helm repo add axelix https://axelixlabs.github.io/axelix
 helm repo update
 helm install axelix axelix/axelix \
   --namespace axelix --create-namespace \
