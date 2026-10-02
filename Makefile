@@ -42,6 +42,9 @@ build:
 master-oss:
 	./gradlew master-oss:build
 
+compile:
+	./gradlew compileJava
+
 master-oss-image: master-oss
 	docker build -t master-oss:local -f master-oss/Dockerfile master-oss
 
