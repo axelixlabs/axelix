@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.api.registration.insights.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 
 /**
  * Bounded in-memory history of scheduled task executions, kept per task. The executions are handed over to the
