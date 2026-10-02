@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardGauge, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { DashboardGauge, DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDashboardSpringFrameworkResponseBody, StatefulRequest } from "@/models";
 import { getDashboardSpringFramework } from "@/services";
@@ -52,13 +52,17 @@ const DashboardSpringFramework = () => {
         <>
             <DashboardPagesFirstSection title="Spring Framework" subtitle={t("Dashboard.SpringFramework.subtitle")} />
 
-            <div className={styles.ChartsWrapper}>
-                <DashboardGauge
-                    data={osiv}
-                    title={t("Dashboard.SpringFramework.osivChartTitle")}
-                    subtitle={t("Dashboard.SpringFramework.osivChartSubtitle")}
-                />
-            </div>
+            {osiv.length === 0 ? (
+                <DashboardNoData />
+            ) : (
+                <div className={styles.ChartsWrapper}>
+                    <DashboardGauge
+                        data={osiv}
+                        title={t("Dashboard.SpringFramework.osivChartTitle")}
+                        subtitle={t("Dashboard.SpringFramework.osivChartSubtitle")}
+                    />
+                </div>
+            )}
         </>
     );
 };

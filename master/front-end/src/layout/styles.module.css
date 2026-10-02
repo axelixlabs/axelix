@@ -24,6 +24,16 @@
     background-color: var(--axelix-primary-white);
 }
 
+/*
+ * DashboardNoData uses flex: 1 to fill all remaining vertical space after DashboardPagesFirstSection.
+ * For flex: 1 to work, the parent (.Content) must be a flex-column container.
+ * We scope this to only pages that render DashboardNoData to avoid affecting other pages.
+ */
+.Content:has([data-dashboard-no-data]) {
+    display: flex;
+    flex-direction: column;
+}
+
 .Content.WithSider {
     /* Set left margin equal to the width of the Sider component */
     margin-left: 270px;
