@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDashboardPersistenceResponse, StatefulRequest } from "@/models";
 import { getDashboardPersistence } from "@/services";
@@ -46,6 +46,7 @@ const DashboardPersistence = () => {
     }
 
     const { nPlusOne, inMemoryPagination } = dashboardPersistenceState.response!;
+    const isEmpty = nPlusOne.length === 0 && inMemoryPagination.length === 0;
 
     return (
         <>
@@ -54,10 +55,14 @@ const DashboardPersistence = () => {
                 subtitle={t("Dashboard.Persistence.subtitle")}
             />
 
-            <div className={styles.ChartsWrapper}>
-                <NPlusOneTreemap nPlusOneEntries={nPlusOne} />
-                <InMemoryPaginationTreemap inMemoryPaginationEntries={inMemoryPagination} />
-            </div>
+            {isEmpty ? (
+                <DashboardNoData />
+            ) : (
+                <div className={styles.ChartsWrapper}>
+                    <NPlusOneTreemap nPlusOneEntries={nPlusOne} />
+                    <InMemoryPaginationTreemap inMemoryPaginationEntries={inMemoryPagination} />
+                </div>
+            )}
         </>
     );
 };
