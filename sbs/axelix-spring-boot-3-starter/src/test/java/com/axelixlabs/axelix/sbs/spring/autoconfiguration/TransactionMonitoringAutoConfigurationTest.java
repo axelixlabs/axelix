@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import jakarta.persistence.EntityManagerFactory;
 
+import feign.Feign;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,6 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileP
 import com.axelixlabs.axelix.sbs.spring.core.persistence.ProxyingDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.entities.DefaultJpaEntitiesProfileProvider;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallFeignCapability;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.http.ExternalCallRestTemplateCustomizer;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
@@ -63,6 +65,7 @@ class TransactionMonitoringAutoConfigurationTest {
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
             assertThat(context).hasSingleBean(ExternalCallRestTemplateCustomizer.class);
+            assertThat(context).hasSingleBean(ExternalCallFeignCapability.class);
             assertThat(context).doesNotHaveBean(LogbackInMemoryPaginationAppenderConfiguration.class);
         });
     }
@@ -77,6 +80,7 @@ class TransactionMonitoringAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
                     assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                    assertThat(context).doesNotHaveBean(ExternalCallFeignCapability.class);
                 });
     }
 
@@ -104,6 +108,14 @@ class TransactionMonitoringAutoConfigurationTest {
     @Test
     void shouldNotRegisterJpaEntitiesProfileProvider_whenEntityManagerFactoryIsMissing() {
         contextRunner.run(context -> assertThat(context).doesNotHaveBean(JpaEntitiesProfileProvider.class));
+    }
+
+    @Test
+    void shouldNotRegisterFeignCapability_whenFeignIsAbsent() {
+        contextRunner.withClassLoader(new FilteredClassLoader(Feign.class)).run(context -> {
+            assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
+            assertThat(context).doesNotHaveBean(ExternalCallFeignCapability.class);
+        });
     }
 
     @Test // GH-1254
