@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.state.auth;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -62,4 +63,24 @@ public interface RoleService {
      * @return Roles of the user.
      */
     Set<Role> findRolesOfUser(String userId) throws IllegalStateException;
+
+    /**
+     * Looks up roles of the given user.
+     *
+     * @throws IllegalStateException in case implementation cannot assemble the {@link Role} due to the fact that
+     *                               its state is corrupted for any reason.
+     *
+     * @param userId the ID of the user whose roles we want to describe.
+     * @return Roles of the user, ordered by name.
+     */
+    List<GrantedRole> findGrantedRolesOfUser(String userId) throws IllegalStateException;
+
+    /**
+     * A role granted to a user.
+     *
+     * @param name        The unique name of the role.
+     * @param description What the role is for, as stored alongside the role.
+     * @param authorities Names of every authority the role grants, directly or through a component role.
+     */
+    record GrantedRole(String name, String description, Set<String> authorities) {}
 }
