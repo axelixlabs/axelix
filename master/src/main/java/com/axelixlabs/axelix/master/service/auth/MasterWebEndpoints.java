@@ -187,8 +187,7 @@ public final class MasterWebEndpoints {
     // Dashboard
     public static final MasterWebEndpoint DASHBOARD_READ_JAVA =
             register("dashboard:read-java", HttpMethod.GET, ApiPaths.DashboardApi.JAVA, null);
-    public static final MasterWebEndpoint DASHBOARD_READ_SPRING_FRAMEWORK =
-            register("dashboard:read-spring-framework", HttpMethod.GET, ApiPaths.DashboardApi.SPRING_FRAMEWORK, null);
+
     public static final MasterWebEndpoint DASHBOARD_READ_PERSISTENCE =
             register("dashboard:read-persistence", HttpMethod.GET, ApiPaths.DashboardApi.PERSISTENCE, null);
     public static final MasterWebEndpoint DASHBOARD_READ_SPRING_PORTFOLIO =
