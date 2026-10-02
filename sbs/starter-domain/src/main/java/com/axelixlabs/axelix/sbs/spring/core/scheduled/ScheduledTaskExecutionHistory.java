@@ -17,20 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import java.util.Comparator;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 
 /**
- * Bounded in-memory history of scheduled task executions, kept per task. The executions are handed over to the
- * strict-majority through the mark/commit protocol:
+ * Bounded in-memory history of scheduled task executions, kept per task. The executions are consumed by the
+ * mark/commit protocol for the purposes of minimizing the chance of losing the execution:
  *
  * <ul>
  *   <li>every {@linkplain #record(ScheduledTaskExecution) recorded} execution receives a monotonically increasing
@@ -42,38 +46,62 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExec
  * </ul>
  *
  * @author Vyacheslav Yanin
+ * @author Mikhail Polivakha
  */
 public class ScheduledTaskExecutionHistory {
 
     private final Map<String, Deque<Entry>> history;
     private final ScheduledTaskHistoryConfigurationProperties properties;
-    private final Object lock;
-    private long insertionCounter;
+    // lock to synchronize the record and the snapshotting of the history
+    private final ReadWriteLock lock;
+    private final AtomicLong insertionCounter;
 
     public ScheduledTaskExecutionHistory(ScheduledTaskHistoryConfigurationProperties properties) {
         this.properties = properties;
-        this.insertionCounter = 0L;
+        this.insertionCounter = new AtomicLong(0L);
         this.history = new ConcurrentHashMap<>();
-        this.lock = new Object();
+        this.lock = new ReentrantReadWriteLock();
     }
 
     /**
      * Records a single execution of a scheduled task. The execution receives the next generation and is stored in the
-     * queue of its task. When the queue grows beyond the configured limit, its oldest entries are evicted.
+     * queue of its task. There're a couple of assumptions regarding this method:
+     * <ol>
+     *    <li>Here is that the amount of contention on this method from the {@code @Scheduled} threads will be low.</li>
+     *    <li>This contention will mainly exist between various tasks, rather than within the task.</li>
+     * </ol>
+     * <p>
+     * Still, we must acknowledge that contention MAY happen within the single task (identified by taskId)
+     * when the both conditions are true:
+     * <p>
+     * <ol>
+     *    <li>The thread pool that backs the scheduling is configured to have size greater than 1, so the
+     *    contention is possible in principle.</li>
+     *    <li>The task itself is fixedRate, so it does not wait for termination of its execution.</li>
+     * </ol>
+     * <p>
+     * So ideally we do not want concurrent invocations of this method of the different {@code Scheduled}
+     * tasks to block each other, and they do not have to. Also, there is a room for contention within
+     * taskId (as explained above), so we must account for that. And finally, the event of marking is going
+     * to be rare,
+     * <p>
+     * With that in mind, read the implementation below.
      *
      * @param execution the execution to record.
      */
     public void record(ScheduledTaskExecution execution) {
-        synchronized (lock) {
-            Deque<Entry> deque = history.computeIfAbsent(execution.getTaskId(), taskId -> new LinkedList<>());
-            deque.addLast(new Entry(execution, ++insertionCounter));
-            evictIfNeeded(deque);
-        }
-    }
+        Lock snapshotLock = null;
+        try {
+            // we get read lock and not write (counterintuitively) so that this lock instance is
+            // locked by corresponding write lock, but sibling read locks do not block each other.
+            snapshotLock = lock.readLock();
+            snapshotLock.lock();
 
-    private void evictIfNeeded(Deque<Entry> deque) {
-        while (deque.size() > properties.getHistoryMaxSize()) {
-            deque.removeFirst();
+            putInternal(execution);
+        } finally {
+            if (snapshotLock != null) {
+                snapshotLock.unlock();
+            }
         }
     }
 
@@ -85,27 +113,60 @@ public class ScheduledTaskExecutionHistory {
      * @return the snapshot of the recorded executions and the current watermark.
      */
     public HistorySnapshot mark() {
-        synchronized (lock) {
-            List<ScheduledTaskExecution> executions = history.values().stream()
-                    .flatMap(Deque::stream)
-                    .sorted(Comparator.comparingLong(Entry::generation))
-                    .map(Entry::execution)
-                    .collect(Collectors.toUnmodifiableList());
-            return new HistorySnapshot(executions, insertionCounter);
+        Lock writeLock = null;
+        try {
+            writeLock = lock.writeLock();
+            writeLock.lock();
+
+            Map<String, List<ScheduledTaskExecution>> copy = new HashMap<>(history.size());
+
+            history.forEach((s, entries) -> {
+                // here, we're risking a bit since we're getting a shallow copy of ScheduledTaskExecution
+                // We cannot make ScheduledTaskExecution immutable since it is auto-generated by openapi generator,
+                // but we can assume that by its nature ScheduledTaskExecution is supposed to be immutable.
+                copy.put(s, entries.stream().map(Entry::execution).collect(Collectors.toUnmodifiableList()));
+            });
+
+            return new HistorySnapshot(copy, insertionCounter.get());
+        } finally {
+            if (writeLock != null) {
+                writeLock.unlock();
+            }
         }
     }
 
     /**
-     * Drops the executions whose generation does not exceed the given watermark. Typically called once the snapshot
+     * Drops the executions whose generation does not exceed the given generation. Typically called once the snapshot
      * obtained from {@link #mark()} has been successfully delivered, so that the delivered executions are not sent
      * again. Executions recorded after the watermark are kept.
      *
-     * @param watermark the generation up to which the executions are considered delivered.
+     * @param generation the generation up to which the executions are considered delivered.
      */
-    public void commit(long watermark) {
-        synchronized (lock) {
-            history.values().forEach(deque -> deque.removeIf(entry -> entry.generation() <= watermark));
+    public void commit(long generation) {
+        Lock writeLock = null;
+        try {
+            writeLock = lock.writeLock();
+            writeLock.lock();
+
+            history.values().forEach(deque -> deque.removeIf(entry -> entry.generation() <= generation));
             history.values().removeIf(Deque::isEmpty);
+        } finally {
+            if (writeLock != null) {
+                writeLock.unlock();
+            }
+        }
+    }
+
+    private void putInternal(ScheduledTaskExecution execution) {
+        Deque<Entry> deque = history.computeIfAbsent(execution.getTaskId(), taskId -> new LinkedList<>());
+        deque.addLast(new Entry(execution, insertionCounter.incrementAndGet()));
+
+        // synchronizing on the deque to prevent the race between concurrent
+        // executions of the same task, which is possible, but quite rare.
+        synchronized (deque) {
+            while (deque.size() > properties.getHistoryMaxSize()) {
+                deque.removeFirst();
+            }
         }
     }
 
@@ -116,20 +177,20 @@ public class ScheduledTaskExecutionHistory {
      */
     public static final class HistorySnapshot {
 
-        private final List<ScheduledTaskExecution> executions;
-        private final long watermark;
+        private final Map<String, List<ScheduledTaskExecution>> executions;
+        private final long generation;
 
-        private HistorySnapshot(List<ScheduledTaskExecution> executions, long watermark) {
+        private HistorySnapshot(Map<String, List<ScheduledTaskExecution>> executions, long generation) {
             this.executions = executions;
-            this.watermark = watermark;
+            this.generation = generation;
         }
 
-        public List<ScheduledTaskExecution> getExecutions() {
+        public Map<String, List<ScheduledTaskExecution>> getExecutions() {
             return executions;
         }
 
-        public long getWatermark() {
-            return watermark;
+        public long getGeneration() {
+            return generation;
         }
 
         @Override
@@ -138,17 +199,17 @@ public class ScheduledTaskExecutionHistory {
                 return false;
             }
             HistorySnapshot that = (HistorySnapshot) o;
-            return watermark == that.watermark && Objects.equals(executions, that.executions);
+            return generation == that.generation && Objects.equals(executions, that.executions);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(executions, watermark);
+            return Objects.hash(executions, generation);
         }
 
         @Override
         public String toString() {
-            return "HistorySnapshot{" + "executions=" + executions + ", watermark=" + watermark + '}';
+            return "HistorySnapshot{" + "executions=" + executions + ", generation=" + generation + '}';
         }
     }
 
@@ -173,18 +234,6 @@ public class ScheduledTaskExecutionHistory {
 
         public long generation() {
             return generation;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            Entry entry = (Entry) o;
-            return generation == entry.generation && Objects.equals(execution, entry.execution);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(execution, generation);
         }
     }
 }
