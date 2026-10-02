@@ -1,15 +1,17 @@
 .MainWrapper {
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
+    background-color: var(--axelix-medium-grey);
 }
 
 .Card {
     display: flex;
     flex-direction: column;
     row-gap: 16px;
-    width: min(100%, 600px);
+    width: min(100%, 450px);
     padding: 20px;
     border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);
