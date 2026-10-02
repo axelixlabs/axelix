@@ -38,6 +38,16 @@ Two rules follow from the window:
   `major.minor` version — bump them in the same change. The window applies between **Master and your services**, not
   inside a service.
 
+## Release cadence
+
+Axelix targets roughly **7–9 minor releases per calendar year** — a new minor roughly every 1.5 months — and one
+**major** lockstep release per year.
+
+Combined with the compatibility window, this turns the abstract window into a concrete time budget: since Master
+supports starters from the last 4 minors, a service that stays inside the window only has to be updated **about once
+every half a year**. And because the client components are deliberately kept dumb, that update is in most cases
+trivial — a dependency version bump and a redeploy.
+
 ## The upgrade procedure
 
 ### 1. Find out how far you can upgrade
