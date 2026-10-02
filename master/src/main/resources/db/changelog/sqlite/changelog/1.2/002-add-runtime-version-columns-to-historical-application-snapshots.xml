@@ -6,24 +6,23 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <!--
-    The instances table holds soft state only: every managed service re-registers itself on the next
-    heartbeat, so the rows are safe to drop instead of backfilling the new mandatory columns. This is
-    also why we can replace the free-form java_version column with the structured JEP 322 coordinate
-    (feature/interim/update/patch) outright.
-  -->
-  <changeSet id="1.2-001-1-postgres-add-starter-version-to-instances" author="Axelix Team">
+  <changeSet id="1.2-002-1-sqlite-add-runtime-version-columns-to-historical-application-snapshots" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
-        <columnExists tableName="instances" columnName="starter_version"/>
+        <columnExists tableName="historical_application_snapshots" columnName="spring_boot_version"/>
       </not>
     </preConditions>
 
-    <delete tableName="instances"/>
+    <!-- We do not render any historical data yet, so it is safe to drop it and add the new columns as mandatory. -->
+    <delete tableName="historical_application_snapshots"/>
 
-    <dropColumn tableName="instances" columnName="java_version"/>
-
-    <addColumn tableName="instances">
+    <addColumn tableName="historical_application_snapshots">
+      <column name="spring_boot_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="spring_framework_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
       <column name="starter_version" type="TEXT">
         <constraints nullable="false"/>
       </column>
@@ -38,6 +37,12 @@
       </column>
       <column name="java_patch" type="INT">
         <constraints nullable="false"/>
+      </column>
+      <column name="jdk_vendor" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="kotlin_version" type="TEXT">
+        <constraints nullable="true"/>
       </column>
     </addColumn>
   </changeSet>

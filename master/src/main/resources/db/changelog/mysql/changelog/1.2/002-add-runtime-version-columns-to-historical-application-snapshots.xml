@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="1.2-002-1-postgres-add-versions-to-historical-application-snapshots" author="Axelix Team">
+  <changeSet id="1.2-002-1-mysql-add-runtime-version-columns-to-historical-application-snapshots" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <columnExists tableName="historical_application_snapshots" columnName="spring_boot_version"/>
@@ -17,10 +17,10 @@
     <delete tableName="historical_application_snapshots"/>
 
     <addColumn tableName="historical_application_snapshots">
-      <column name="spring_boot_version" type="TEXT">
+      <column name="spring_boot_version" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="spring_framework_version" type="TEXT">
+      <column name="spring_framework_version" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
       <column name="starter_version" type="TEXT">
@@ -38,10 +38,10 @@
       <column name="java_patch" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="jdk_vendor" type="TEXT">
+      <column name="jdk_vendor" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="kotlin_version" type="TEXT">
+      <column name="kotlin_version" type="VARCHAR(255)">
         <constraints nullable="true"/>
       </column>
     </addColumn>

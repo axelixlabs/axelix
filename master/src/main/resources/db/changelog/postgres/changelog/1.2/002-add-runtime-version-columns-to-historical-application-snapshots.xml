@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="1.2-002-1-sqlite-add-versions-to-historical-application-snapshots" author="Axelix Team">
+  <changeSet id="1.2-002-1-postgres-add-runtime-version-columns-to-historical-application-snapshots" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <columnExists tableName="historical_application_snapshots" columnName="spring_boot_version"/>

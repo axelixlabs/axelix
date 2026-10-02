@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="1.2-004-1-sqlite-create-scheduled-task-execution-results-table" author="Axelix Team">
+  <changeSet id="1.2-003-1-sqlite-create-scheduled-task-execution-results-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="scheduled_task_execution_results"/>
