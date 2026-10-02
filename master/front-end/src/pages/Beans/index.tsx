@@ -18,12 +18,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 
-import { EmptyHandler, Loader } from "@/components";
+import { Accordion, EmptyHandler, Loader, VirtualList } from "@/components";
 import { fetchData, getEffectiveBeans } from "@/helpers";
 import { type IBeansResponseBody, StatefulRequest } from "@/models";
 import { getBeansData } from "@/services";
 
-import { BeansAccordionsList } from "./BeansAccordionsList";
+import { BeanAccordionChildren } from "./BeanAccordionChildren";
+import { BeanAccordionLabels } from "./BeanAccordionLabels";
 import { BeansFirstSection } from "./BeansFirstSection";
 
 const Beans = () => {
@@ -70,12 +71,22 @@ const Beans = () => {
             />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <BeansAccordionsList
-                    effectiveBeans={effectiveBeans}
-                    beansFeed={beansFeed}
-                    selectedBeanName={selectedBeanName}
-                    selectBean={selectBean}
-                />
+                <div className="AccordionsWrapper">
+                    <VirtualList
+                        items={effectiveBeans}
+                        rowKey="beanName"
+                        // TODO: Fix in the future
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        itemRender={(bean) => (
+                            <Accordion
+                                header={<BeanAccordionLabels bean={bean} />}
+                                accordionExpanded={Boolean(selectedBeanName === bean.beanName)}
+                            >
+                                <BeanAccordionChildren bean={bean} beansFeed={beansFeed} selectBean={selectBean} />
+                            </Accordion>
+                        )}
+                    />
+                </div>
             </EmptyHandler>
         </>
     );
