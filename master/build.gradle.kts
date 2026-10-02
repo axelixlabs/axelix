@@ -26,8 +26,9 @@ val nettyVersion = "4.2.17.Final"
 val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
 val httpcore5Version = "5.4.3"
-val bcprovVersion = "1.81.1"
-val jacksonDatabindVersion = "3.1.5"
+val bcprovVersion = "1.85"
+val jacksonDatabindVersion = "3.1.7"
+val jacksonCoreVersion = "2.21.7"
 
 dependencies {
     // Self
@@ -51,6 +52,7 @@ dependencies {
         implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
         implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
         implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
+        implementation("com.fasterxml.jackson.core:jackson-core:$jacksonCoreVersion")
     }
 
     // Boot Starters
