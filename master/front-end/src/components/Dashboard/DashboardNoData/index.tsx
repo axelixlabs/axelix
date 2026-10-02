@@ -30,7 +30,7 @@ export const DashboardNoData = () => {
 
     return (
         <>
-            <div className={styles.MainWrapper}>
+            <div className={styles.MainWrapper} data-dashboard-no-data>
                 <div className={styles.Card}>
                     <div className={`TextSmall ${styles.Badge}`}>
                         <div className={styles.BadgeDot} />
