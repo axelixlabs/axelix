@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @since 12.03.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 @EnableConfigurationProperties(AxelixMigrationProperties.class)
