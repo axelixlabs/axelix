@@ -51,18 +51,4 @@
             columnNames="id"
             constraintName="pk_scheduled_task_execution_results"/>
   </changeSet>
-
-  <changeSet id="1.2-004-2-postgres-add-unique-index-on-scheduled-task-execution-results" author="Axelix Team">
-    <preConditions onFail="MARK_RAN" onError="HALT">
-      <not>
-        <indexExists tableName="scheduled_task_execution_results" indexName="uq_scheduled_task_execution_results_instance_task_started"/>
-      </not>
-    </preConditions>
-
-    <createIndex tableName="scheduled_task_execution_results" indexName="uq_scheduled_task_execution_results_instance_task_started" unique="true">
-      <column name="instance_id"/>
-      <column name="task_id"/>
-      <column name="started_at"/>
-    </createIndex>
-  </changeSet>
 </databaseChangeLog>

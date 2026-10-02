@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.domain;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 
@@ -51,7 +50,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("scheduled_task_execution_results")
 public record ScheduledTaskExecutionResult(
-        @Id UUID id,
+        @Id String id,
         @Column("group_id") String groupId,
         @Column("artifact_id") String artifactId,
         @Column("instance_id") String instanceId,
@@ -61,10 +60,10 @@ public record ScheduledTaskExecutionResult(
         boolean success,
         @Column("error_type") @Nullable String errorType,
         @Column("error_message") @Nullable String errorMessage)
-        implements Persistable<UUID> {
+        implements Persistable<String> {
 
     @Override
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 

@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
-import java.util.UUID;
-
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -30,4 +28,4 @@ import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
  * @author Vyacheslav Yanin
  */
 @Repository
-public interface ScheduledTaskExecutionResultRepository extends CrudRepository<ScheduledTaskExecutionResult, UUID> {}
+public interface ScheduledTaskExecutionResultRepository extends CrudRepository<ScheduledTaskExecutionResult, String> {}

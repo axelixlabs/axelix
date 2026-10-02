@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -210,31 +209,10 @@ public class PersistenceAutoConfiguration {
         @Override
         protected @NonNull List<?> userConverters() {
             return List.of(
-                    new UuidToStringConverter(),
-                    new StringToUuidConverter(),
                     new RolesWritingConverter(jsonMapper),
                     new RolesReadingConverter(jsonMapper),
                     new PersistenceInsightsWritingConverter(jsonMapper),
                     new PersistenceInsightsReadingConverter(jsonMapper));
-        }
-
-        @WritingConverter
-        public static class UuidToStringConverter implements Converter<UUID, String> {
-
-            @Override
-            public @NonNull String convert(@NonNull UUID source) {
-                return source.toString();
-            }
-        }
-
-        @ReadingConverter
-        public static class StringToUuidConverter implements Converter<String, UUID> {
-
-            @Override
-            @SuppressWarnings("NullAway")
-            public UUID convert(String source) {
-                return UUID.fromString(source);
-            }
         }
 
         @Deprecated(forRemoval = true, since = "1.1") // GH-1515
