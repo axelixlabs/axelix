@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, Loader } from "@/components";
+import { DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDashboardSpringPortfolioResponseBody, StatefulRequest } from "@/models";
 import { getDashboardSpringPortfolioData } from "@/services";
@@ -48,28 +48,40 @@ const DashboardSpringPortfolio = () => {
 
     const portfolio = dashboardSpringPortfolioData.response!;
 
+    if (portfolio.applicationsTotal === 0) {
+        return (
+            <>
+                <DashboardPagesFirstSection
+                    title={t("Dashboard.SpringPortfolio.title")}
+                    subtitle={t("Dashboard.SpringPortfolio.subtitle")}
+                />
+
+                <DashboardNoData />
+            </>
+        );
+    }
+
     return (
         <>
-            <EmptyHandler isEmpty={portfolio.applicationsTotal === 0}>
-                {/* TODO: Improve in future */}
-                <div className={styles.Header}>
-                    <div>
-                        <div className="TextLarge">{t("Dashboard.SpringPortfolio.title")}</div>
-                        <p className={styles.Subtitle}>{t("Dashboard.SpringPortfolio.subtitle")}</p>
-                    </div>
-                    <PortfolioSummary
-                        applicationsTotal={portfolio.applicationsTotal}
-                        applicationsFullyOssSupported={portfolio.applicationsFullyOssSupported}
-                    />
-                </div>
+            {/* TODO: Improve in future */}
+            <div className={styles.Header}>
+                <DashboardPagesFirstSection
+                    title={t("Dashboard.SpringPortfolio.title")}
+                    subtitle={t("Dashboard.SpringPortfolio.subtitle")}
+                />
 
-                <div className={styles.CardsWrapper}>
-                    <PlatformDistributionCard distribution={portfolio.springBoot} />
-                    <PlatformDistributionCard distribution={portfolio.springFramework} />
-                </div>
+                <PortfolioSummary
+                    applicationsTotal={portfolio.applicationsTotal}
+                    applicationsFullyOssSupported={portfolio.applicationsFullyOssSupported}
+                />
+            </div>
 
-                {portfolio.linesInUse.length > 0 && <MaintenanceLadder entries={portfolio.linesInUse} />}
-            </EmptyHandler>
+            <div className={styles.CardsWrapper}>
+                <PlatformDistributionCard distribution={portfolio.springBoot} />
+                <PlatformDistributionCard distribution={portfolio.springFramework} />
+            </div>
+
+            {portfolio.linesInUse.length > 0 && <MaintenanceLadder entries={portfolio.linesInUse} />}
         </>
     );
 };
