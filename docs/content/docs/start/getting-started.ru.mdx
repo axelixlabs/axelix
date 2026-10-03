@@ -6,7 +6,7 @@ description: "Эта страница описывает рекомендуем�
 ---
 
 :::note
-Сниппеты на этой странице используют версию `1.0.0` для наглядности. Проверьте [страницу
+Сниппеты на этой странице используют версию `1.1.0` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
 свои команды.
 :::
@@ -79,7 +79,7 @@ Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#за�
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
@@ -168,11 +168,11 @@ build-плагина — см. [Совместимость и версионир
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.0.0"
+    id("com.axelixlabs.axelix") version "1.1.0"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.0")
 }
 ```
 
@@ -187,7 +187,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 
@@ -196,7 +196,7 @@ dependencies {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
       <executions>
         <execution>
           <goals>
@@ -296,7 +296,7 @@ management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-ca
 :::
 
 Раскатывайте их сервис за сервисом. Как только сервис передеплоивается в тестовое окружение, он появляется в тестовом
-Master, и команда сразу может работать с ним через [UI](../ui-guide/dashboard.mdx) и MCP.
+Master, и команда сразу может работать с ним через [UI](../ui-guide/dashboard/spring-portfolio.mdx) и MCP.
 
 Одну деталь, связанную с production, стоит спланировать заранее. Сервисы обычно продвигают один и тот же артефакт из
 тестовых окружений в production, поэтому стартер попадает в production раньше, чем Master. Если такой сервис работает

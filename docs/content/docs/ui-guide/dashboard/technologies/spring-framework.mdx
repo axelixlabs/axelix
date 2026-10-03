@@ -1,0 +1,29 @@
+---
+title: Spring Framework
+description: "The Spring Framework dashboard shows how many services in the fleet run with Open Session in View
+              enabled."
+---
+
+Open Session in View (OSIV) keeps the Hibernate session and the database connection open until the whole HTTP response
+is rendered. Lazy associations then load silently outside the transaction, and each request holds a connection longer
+than it needs. Spring Boot enables OSIV by default in web applications with JPA, so it often stays on by accident. The
+Spring Framework dashboard shows how widespread it is across the fleet.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## What the page shows
+
+The page shows the share of services that run with OSIV enabled, and the share that run with it disabled.
+
+## How it works
+
+OSIV counts as enabled when the application registers the Open Session in View interceptor or filter. Master records
+this once a day and uses the latest record. A service counts once however many instances it runs.
+
+## See also
+
+- [Persistence](./persistence.mdx)
+- [Transaction Control](../../../features/spring-framework/transaction-control.mdx)

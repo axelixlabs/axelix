@@ -1,47 +1,72 @@
 ---
 title: Properties
-description: "The Properties page lists every property the Spring Boot instance resolves at runtime, grouped by the property source
-              that contributed it. For each property, it shows the value, marks the source that currently wins the resolution, and —
-              where Spring binds the property — links out to the @ConfigurationProperties bean and to the injection points that read
-              it."
+description: "The Properties page shows where every property of a Spring Boot instance comes from, which value the
+              application actually uses, which properties are deprecated, and which beans read them."
 ---
 
-![properties main page](/img/feature/properties/properties-main-page.png) ***Properties as presented in
-Axelix UI***
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
-If the instance has any active or default Spring profiles, they appear on top of the page under **Profiles:** — the
-chips combine `spring.profiles.default` and `spring.profiles.active`. The block is hidden when no profile is set.
+![properties main page](/img/feature/properties/properties-main-page.png)
 
-Below the profiles, a scrollable list of all properties, grouped by their property source. Each source is an expandable
-section (expanded by default), with a search input above the list that filters property sources and entries, and a
-counter in the form `<matching> / <total>`.
+</ScreenshotsNotice>
 
-- **Source Name**:     The name of the property source.
-- **Description**:     Hover the icon <Image src="/img/feature/icons/info-icon.svg" alt="info icon" width={16} height={16}/> next to the source name
-  to see the custom description of this property source, when the source provides one.
-- **Properties**:      The list of property entries within the source.
+***Properties as presented in Axelix UI***
 
-## Properties Details
-![properties details page](/img/feature/properties/properties-details-page.png) ***Properties dropdown as
-presented in Axelix UI***
+The same property can come from many places: `application.yaml`, profile-specific files, environment variables, system
+properties, command-line arguments.
 
-Each property row shows the property name, a copy-to-clipboard control, the resolved value, and a primary-source marker.
-Expanding a row reveals the details panel:
+## What the page shows
 
-- **Name**:                       The property name.
-- **Value**:                      The value resolved from this property source.
-- **Primary value**:               Marked with the crown icon <Image src="/img/feature/icons/crown-icon.svg" alt="crown icon" width={20} height={16}/> in the value column. The crown means this value wins resolution —
-  when the same key exists in multiple property sources, only the source consulted first by the Spring environment is
-  marked primary.
-- **Deprecated**:                 Deprecated properties are highlighted with a red background on the row header, and the
-  details panel shows the deprecation message.
-- **Description**:                The description from `spring-configuration-metadata.json`, when available.
-- **Configuration Properties**:   The `@ConfigurationProperties` bean that binds this property, if any. The bean name is
-  a link <Image src="/img/feature/icons/redirect-icon.png" alt="redirect image" width={15} height={15}/> that jumps to the Configuration Properties
-  page anchored at that bean.
-- **Injected in**:                Beans that consume this property through `@Value` or similar. Each entry is a link
-  <Image src="/img/feature/icons/redirect-icon.png" alt="redirect image" width={15} height={15}/> that jumps to the Beans page anchored at that
-  bean.
+The page lists all properties grouped by property source. The sources go from the highest precedence to the lowest,
+in the order Spring Boot consults them (see [Externalized
+Configuration](https://docs.spring.io/spring-boot/reference/features/external-config.html)). When several sources
+define the same property, the application uses the value from the source higher in the list.
+
+For each property, you can see:
+
+- Whether its value takes effect:
+  - **Active** when the application uses this value.
+  - **Suppressed** when a source with a higher precedence defines it too, so this value never reaches the
+    application.
+- All the sources that define it, from the highest precedence to the lowest, with the winning value marked.
+- The `@ConfigurationProperties` bean that binds it and the beans that inject it through `@Value`, with links to the
+  [Configuration Properties](./configuration-properties.mdx) and [Beans](./beans.mdx) pages.
+- Its description from `spring-configuration-metadata.json`, when available.
+
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![properties details page](/img/feature/properties/properties-details-page.png)
+
+</ScreenshotsNotice>
+
+***Properties dropdown as presented in Axelix UI***
+
+Deprecated properties are highlighted and show the deprecation message, so you can find settings to migrate before
+upgrading.
+
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![deprecated property](/img/feature/properties/properties-deprecated-page.png)
+
+</ScreenshotsNotice>
+
+***Deprecated property as presented in Axelix UI***
+
+The page also shows the active and default profiles of the instance (`spring.profiles.active` and
+`spring.profiles.default`).
+
+## Dangerous property values
+
+Some property values are fine on a developer's machine but often cause trouble in production: lost data, leaked
+internals, or slow queries. Axelix marks properties set to such values. For each of them, it shows why the value is
+risky and which value to use instead. For example, `spring.jpa.hibernate.ddl-auto=update` lets Hibernate change the
+database schema on its own.
+
+Axelix checks only the value the application uses, so a dangerous value in a suppressed property source is not marked.
+The value must match as a whole, in any letter case: `management.endpoints.web.exposure.include=*` is marked,
+but `health,*` is not. Masked values are not checked either, so
+without the `ENV_VALUES_READ` authority you don't see the mark for keys that are masked (see [Value
+sanitization](#value-sanitization)).
 
 :::info
 By default, every value is masked as `******` for callers that do not carry the `ENV_VALUES_READ` authority. See [Value
@@ -50,20 +75,20 @@ sanitization](#value-sanitization) below for how to choose which keys are masked
 
 ## Value sanitization
 
-Axelix never relies on the Spring Boot `management.endpoint.env.show-values` switch — it always asks Spring Boot to
+Axelix never relies on the Spring Boot `management.endpoint.env.show-values` switch. It always asks Spring Boot to
 return raw values (`Show.ALWAYS`) and applies its own masking on top, driven by an authority check.
 
-**Who sees raw values.** Callers carrying the `ENV_VALUES_READ` authority — granted by the built-in **ADMIN** and
-**SUPER_ADMIN** roles — receive the originals. Everyone else gets values replaced with `******`. See [Roles and
+**Who sees raw values.** Callers carrying the `ENV_VALUES_READ` authority (granted by the built-in **ADMIN** and
+**SUPER_ADMIN** roles) receive the originals. Everyone else gets values replaced with `******`. See [Roles and
 authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
-**Which keys are masked.** A single starter property — `axelix.sbs.endpoints.config.sanitized-properties` — controls the
+**Which keys are masked.** A single starter property, `axelix.sbs.endpoints.config.sanitized-properties`, controls the
 set, and it applies to both `axelix-env` (this page) and `axelix-configprops` (the [Configuration
 Properties](./configuration-properties.mdx) page):
 
-- **Empty list (default)** — every value is masked for callers without the authority.
-- **Non-empty list** — only the listed keys are masked, the rest are returned as-is.
+- **Empty list (default)**: every value is masked for callers without the authority.
+- **Non-empty list**: only the listed keys are masked, the rest are returned as-is.
 
 <Tabs groupId="spring-config" items={['application.properties', 'application.yaml']}>
   <Tab value="application.properties">
@@ -96,14 +121,14 @@ values](../../setting-up-spring-boot-service/spring-boot-starter/configuration.m
 in the Spring Boot Starter configuration guide for the same property described alongside the rest of the starter setup.
 
 :::note
-The standard Spring Boot Actuator properties for masking — `management.endpoint.env.show-values`,
-`management.endpoint.env.keys-to-sanitize`, and their `configprops` equivalents — are not consulted. Use
+The standard Spring Boot Actuator properties for masking (`management.endpoint.env.show-values`,
+`management.endpoint.env.keys-to-sanitize`, and their `configprops` equivalents) are not consulted. Use
 `axelix.sbs.endpoints.config.sanitized-properties` instead.
 :::
 
 ## MCP Tools
 
-The full environment of a managed instance — application properties, system properties, and OS environment variables —
+The full environment of a managed instance (application properties, system properties, and OS environment variables)
 is also exposed to AI agents through MCP. See the [MCP Tools
 catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection).
 

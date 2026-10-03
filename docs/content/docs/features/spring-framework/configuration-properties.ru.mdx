@@ -7,7 +7,12 @@ description: "На странице Свойства конфигурации п
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![главная страница конфигурационных свойств](/img/feature/configprops/configprops-main-page.png)
+
+</ScreenshotsNotice>
+
 ***Свойства конфигурации в интерфейсе Axelix***
 
 Прокручиваемый список всех активных бинов `@ConfigurationProperties`, организованных как раскрывающиеся секция (по
@@ -15,9 +20,15 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 <всего>`.
 
 ## Подробности конфигурационных свойств
+
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![страница подробностей конфигурационных
-свойств](/img/feature/configprops/configprops-details-page.png) ***Подробности свойств конфигурации
-в интерфейсе Axelix***
+свойств](/img/feature/configprops/configprops-details-page.png)
+
+</ScreenshotsNotice>
+
+***Подробности свойств конфигурации в интерфейсе Axelix***
 
 В заголовке каждого аккордеона показаны класс бина и его префикс, в каждой строке внутри показаны свойство и значение,
 которое Spring для него разрешил.
@@ -94,11 +105,12 @@ axelix:
 
 ## Включите Нужный Actuator Ендпоинт
 
-:::note
-Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
-actuator-эндпоинты, а эндпоинты `health`/`info` Axelix больше не требуются — он отлично работает и без них. Никакая
-настройка здесь не нужна.
-:::
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-configprops`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек

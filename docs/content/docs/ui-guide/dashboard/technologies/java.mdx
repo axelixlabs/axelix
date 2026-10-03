@@ -1,0 +1,42 @@
+---
+title: Java
+description: "The Java dashboard shows which JVM features the services in the fleet use: Project Leyden, garbage
+              collectors, GC logging, and Project Lilliput."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>The Java dashboard is removed in Axelix 1.2.0.</>}
+/>
+
+In a fleet of dozens of services it is hard to tell which of them already use faster startup with AppCDS or the AOT
+cache, which garbage collector each of them runs, and where GC logging is on. The Java dashboard answers this for the
+whole fleet at once.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## What the page shows
+
+For each JVM feature, the page shows the share of services that use it:
+
+- **Project Leyden**: services that start with AppCDS (`-XX:SharedArchiveFile`) or with the AOT cache (`-XX:AOTCache`),
+  each separately and both together.
+- **Garbage collectors**: which garbage collector what share of services runs, for example G1, Parallel, or ZGC. The
+  most common one is highlighted separately.
+- **GC logging**: services where GC logging is on right now, including services where it was turned on from Axelix. See
+  [Enabling GC logging](../../../features/jvm/garbage-collector.mdx#enabling-gc-logging).
+- **Project Lilliput**: services with compact object headers (`-XX:+UseCompactObjectHeaders`).
+
+## How it works
+
+The dashboard counts what each service reports about its JVM. Master records it once a day and uses the latest record.
+A service counts once however many instances it runs.
+
+## See also
+
+- [Garbage Collector](../../../features/jvm/garbage-collector.mdx)
+- [Languages Profile](../languages-profile.mdx)
+- [Persistence](./persistence.mdx)

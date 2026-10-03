@@ -28,13 +28,23 @@ Each folder has a `meta.json` and a `meta.ru.json`. The order of `pages` is the 
 
 ## Components
 
-Available on every page **without imports** (`docs/src/components/mdx.tsx`): `Tabs`, `Tab`, `Image`, `ReleasedInNotice`, `UpcomingReleaseNotice`, `LegacyNotice`, plus the Fumadocs defaults. Import only co-located files that already exist next to the page (`import styles from './styles.module.css';`, a small `.tsx`). Some older `.ru.mdx` pages still import `Tab, Tabs`; don't copy that, and don't clean it up unless asked.
+Available on every page **without imports** (`docs/src/components/mdx.tsx`): `Tabs`, `Tab`, `Image`, `ReleasedInNotice`, `UpcomingReleaseNotice`, `LegacyNotice`, `ScreenshotsNotice`, plus the Fumadocs defaults. Import only co-located files that already exist next to the page (`import styles from './styles.module.css';`, a small `.tsx`). Some older `.ru.mdx` pages still import `Tab, Tabs`; don't copy that, and don't clean it up unless asked.
 
 ## Images and icons
 
 - Files live in `docs/public/img/`; link them from the site root: `/img/feature/<area>/<file>.png`.
-- Screenshots use Markdown with a caption line: `![scheduled tasks main page](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png) ***Scheduled Tasks as presented in Axelix UI***`. Alt text describes what the image shows in 4–8 words.
-- Icons for UI controls go inline with `<Image src="/img/feature/icons/play-icon.png" alt="play-icon" width={20} height={20}/>`. Sizes in use: action icons 20×20, switches 35×18. Pick from `docs/public/img/feature/icons/`.
+- Screenshots go inside `ScreenshotsNotice`, with the caption line right below it. Alt text describes what the image shows in 4–8 words. The Russian page uses `text="Скриншоты соответствуют последнему минорному релизу Axelix."`.
+
+  ```mdx
+  <ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+  ![properties main page](/img/feature/properties/properties-main-page.png)
+
+  </ScreenshotsNotice>
+
+  ***Properties as presented in Axelix UI***
+  ```
+- Don't put inline icons of UI controls in the prose (§5 of SKILL.md: describe functionality, not design). Older pages still use `<Image src="/img/feature/icons/…"/>`; drop them when you rewrite such a page.
 - Reference only files that exist (`ls`). If a needed screenshot is missing, leave it out and mention it in the handoff.
 
 ## Admonitions
@@ -100,17 +110,31 @@ description: "[1–2 sentences: what the page covers and what the reader can do 
               Plain text, no Markdown, no links. Quoted.]"
 ---
 
-[Lead: what the page is and what the reader gets from it. If the code gates access, say which
-roles/authorities can open it or act on it.]
+[Non-UI pages: the lead and the access paragraph go here, as in the UI screen block below.]
 
 [━━ UI screen ━━]
 
-![[4–8 word alt]](/img/feature/[area]/[file].png) ***[Caption] as presented in Axelix UI***
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
-## [Section named after a UI area]
+![[4–8 word alt]](/img/feature/[area]/[file].png)
 
-- **[UI label, verbatim from en.json]**: [what it shows, with real values].
-- **[UI label]**: [what it does]. [Icon-only control → <Image src="/img/feature/icons/[name].png" alt="[name]" width={20} height={20}/>]
+</ScreenshotsNotice>
+
+***[Caption] as presented in Axelix UI***
+
+[Lead: the problem the page solves, 1–3 sentences.]
+
+[If the code gates access: a separate short paragraph on which roles/authorities can open it or act on it.]
+
+## What the page shows
+
+[What the reader learns from the screen and why it matters, in prose. A short list only for parallel
+facts ("For each property, you can see: …"); bold labels only for named states (**Active**, **Suppressed**).
+No layout, columns, icons, colors, search, or counters.]
+
+## [One distinct function, e.g. Dangerous property values]
+
+[Why the reader needs it → what Axelix does → its limits.]
 
 ## [User action, if the screen has interactive controls]
 

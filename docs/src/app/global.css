@@ -67,6 +67,11 @@
     box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.12);
 }
 
+/* fumadocs-ui's prose renders `strong` at 500, which Golos barely tells apart from the 400 body text. */
+.prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    font-weight: 600;
+}
+
 html {
     font-family: Golos, Helvetica, Arial, sans-serif;
     scrollbar-gutter: stable;

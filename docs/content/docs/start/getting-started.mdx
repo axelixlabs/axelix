@@ -6,7 +6,7 @@ description: "This page describes the recommended way to roll Axelix out across 
 ---
 
 :::note
-The snippets on this page pin version `1.0.0` for illustration. Check the [Releases
+The snippets on this page pin version `1.1.0` for illustration. Check the [Releases
 page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
 commands.
 :::
@@ -77,7 +77,7 @@ The image is published to GitHub Container Registry:
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 See [Run with Docker](./configuring-master.mdx#run-with-docker) for supplying the database connection and the rest of
@@ -167,11 +167,11 @@ Boot major version):
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.0.0"
+    id("com.axelixlabs.axelix") version "1.1.0"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.0")
 }
 ```
 
@@ -186,7 +186,7 @@ Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` 
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 
@@ -195,7 +195,7 @@ Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` 
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
       <executions>
         <execution>
           <goals>
@@ -294,7 +294,7 @@ management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-ca
 :::
 
 Roll them out service by service. As each service redeploys to a test environment, it shows up in the test Master,
-and the team can start using the [UI](../ui-guide/dashboard.mdx) and MCP against it right away.
+and the team can start using the [UI](../ui-guide/dashboard/spring-portfolio.mdx) and MCP against it right away.
 
 One production-related detail is worth planning for. Services usually promote the same artifact from test toward
 production, so the starter reaches production before Master does. If such a service runs with self-registration

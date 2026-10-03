@@ -24,6 +24,8 @@ runtime-компонент, который общается с Master, а пла
 
 ## SBOM зависимостей (Gradle)
 
+<UpcomingReleaseNotice />
+
 Помимо файла `axelix-info.properties`, Gradle-плагин генерирует **SBOM зависимостей** — JSON-документ
 [CycloneDX](https://cyclonedx.org/) 1.6, описывающий граф runtime-зависимостей приложения. Он упаковывается в артефакт
 по пути `META-INF/axelix/dependencies.cdx.json`, рядом с build-информацией. Master читает его, чтобы понять, какие

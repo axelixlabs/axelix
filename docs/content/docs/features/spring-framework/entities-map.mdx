@@ -1,0 +1,71 @@
+---
+title: Entities Map
+description: "The Entities Map page checks the JPA mapping of every entity in a Spring Boot instance and shows the
+              associations that are mapped in a way that costs extra queries: eager fetching, List-backed @ManyToMany,
+              cascade REMOVE or ALL, and unidirectional @OneToMany."
+---
+
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![entities map main page](/img/feature/entity/entity-main-page.png)
+
+</ScreenshotsNotice>
+
+***Entities Map as presented in Axelix UI***
+
+Mistakes in the mapping of JPA associations don't break the application. Instead, they cost extra queries and loads
+every time the entity is used, and they are easy to miss in code review. The Entities Map checks the mapping of all
+entities and shows where such mistakes are.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## What the page shows
+
+A summary on top shows how many entities the instance maps, and how many of them have [problems](#detected-problems)
+and how many are clean. Below, the page lists the entities with problems.
+
+Expand an entity to see:
+
+- The table name from `@Table`, or the entity name when `@Table` doesn't set one.
+- Each problematic association, for example `Owner.pets`, with its problems.
+- The mapping of this association with the effective values, including defaults, for example
+  `@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "owner_id") List<Pet>`.
+
+When no entity has problems, the page says so instead of showing the list.
+
+## Detected problems
+
+- **EAGER fetching**: The association is loaded every time the entity is read, whether or not the data is used. This
+  includes `@ManyToOne` and `@OneToOne` without an explicit `fetch`, because JPA makes them eager by default.
+- **List for @ManyToMany**: A `@ManyToMany` backed by a `List` makes Hibernate clear and re-insert the whole join
+  table on any change.
+- **Bad CascadeType**: On a `@OneToMany` or `@ManyToMany`, `CascadeType.REMOVE` or `CascadeType.ALL` makes Hibernate
+  remove related records one by one, which results in N+1 queries.
+- **Unidirectional @OneToMany**: A `@OneToMany` without `mappedBy` needs an extra join table or a separate `UPDATE`
+  for each record.
+
+## How it works
+
+The Axelix Spring Boot Starter reads the application's JPA metamodel and checks each association. Unlike [Transaction Control](./transaction-control.mdx), the result doesn't depend on traffic: Axelix
+checks how the entities are mapped, not which queries have run. The page needs Hibernate in the application.
+
+## MCP Tools
+
+AI agents can get the entities and their mapping problems through MCP, for the whole application or for one entity.
+See the [MCP Tools catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights).
+
+## Properties
+
+The Entities Map works together with transaction monitoring and is enabled by default. To turn it off, set
+`axelix.sbs.transaction.monitoring.enabled=false`. See [Transaction
+monitoring](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring)
+for details.
+
+## See also
+
+- [Transaction Control](./transaction-control.mdx)
+- [Configuring Spring Boot
+  Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)
