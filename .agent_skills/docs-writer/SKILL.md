@@ -32,7 +32,7 @@ Confirm exactly **one** target: a UI screen, a master subsystem, a starter or bu
 
 **Kind of page.** Decide what the page describes, because that decides what you read in §2 and which template blocks you use. A page can mix kinds.
 
-- **UI screen** — what the user sees and does on one screen. Spine: the main view, then one section per screen area with its fields, then the actions the user can take. Source: backend, front-end, and i18n.
+- **UI screen** — what a feature does for the user, not how its screen is laid out. Spine: a lead naming the problem the feature solves, then `## What the page shows` (what the reader learns from the screen and why it matters), then one section per distinct function (e.g. "Dangerous property values"), then the actions the user can take. `features/spring-framework/properties.mdx` is the reference page. Source: backend, front-end, and i18n.
 - **Configuration / setup** — what the user configures and how. Spine: prerequisites, then one section per task with a property table and a snippet the reader can copy. Source: `@ConfigurationProperties` classes, `application*.yaml`, auto-configurations, build plugins.
 - **Walkthrough** — the path from nothing to a working result. Spine: numbered steps, each with the minimal command or config and a link to the reference for everything else.
 - **Troubleshooting** — a problem the user hits. Spine: symptom, most likely cause, solution. Source: the code that fails or logs the error.
@@ -62,15 +62,17 @@ Before writing a single sentence, gather the truth from the right places. Treat 
 
 For UI screens, the front-end is non-negotiable. The backend tells you what data is *available*; the front-end tells you what is *shown*, *labelled*, and *interactive*. Documenting only from backend code produces docs that name fields the user never sees and miss buttons the user clicks every day.
 
+Read the front-end to understand **behavior** (what is counted, filtered, hidden, or highlighted, and where a click leads), not to transcribe the layout into prose. Accordions, columns, icons, and colors stay in your notes.
+
 - Locate the screen and components under `master/front-end/src/pages/...` and `master/front-end/src/components/...`.
 - Cross-check the API call in `master/front-end/src/api/...` or `master/front-end/src/services/...` to confirm which master endpoint feeds the screen.
-- **Copy UI labels verbatim as the user sees them.** Labels go through `master/front-end/src/i18n/`: the JSX gives you the key (`t('beans.scope.title')`), the displayed string lives in `master/front-end/src/i18n/locales/en.json` — and `ru.json` for the Russian page. Resolve the key before quoting it — never paraphrase, and never quote a translation key as if it were a label.
+- **When the text names a UI label, copy it verbatim** (a state such as **Active** / **Suppressed**, an action button). Name only the labels the reader needs to act or to recognize a state. Labels go through `master/front-end/src/i18n/`: the JSX gives you the key (`t('beans.scope.title')`), the displayed string lives in `master/front-end/src/i18n/locales/en.json` — and `ru.json` for the Russian page. Resolve the key before quoting it — never paraphrase, and never quote a translation key as if it were a label.
 - Note conditional rendering, empty/error/loading states, feature flags, role-gated controls.
 - Note navigation paths: route definitions in `master/front-end/src/routes/` tell you the URL structure to reference.
 
 When the front-end and the backend disagree (e.g. backend exposes a field the UI hides), document what the **user sees**, and only mention the backend field if it's directly user-relevant.
 
-**Existing screenshots — a visual sanity check.** If `docs/public/img/` already contains screenshots for the page, open them with the Read tool and compare them with what you gathered from the code. They catch sections you missed in the JSX, visual groupings that should shape the prose, and states that are hard to enumerate from code. If the screenshot and the source disagree, **trust the source**, and flag the stale screenshot at handoff.
+**Existing screenshots — a visual sanity check.** If `docs/public/img/` already contains screenshots for the page, open them with the Read tool and compare them with what you gathered from the code. They catch functions you missed in the JSX and states that are hard to enumerate from code. If the screenshot and the source disagree, **trust the source**, and flag the stale screenshot at handoff.
 
 **Write down what you confirmed before drafting.** Note the file path next to each fact (e.g. `<UI label> — <repo-relative path>:<line>`). If a claim isn't traceable to a file you read or a screenshot you viewed, don't make it.
 
@@ -86,8 +88,10 @@ A typical UI screen page needs ~2–4 backend files, ~2–4 front-end files, and
 
 Skip this step when creating a page. When updating:
 
-1. **Audit.** Walk the page top to bottom and list every concrete claim: labels, property keys, defaults, roles/authorities, versions, commands, icons, links. Mark each one *confirmed*, *outdated*, or *missing* (the code has something user-relevant the page doesn't mention) against what you read in §2.
+1. **Audit.** Walk the page top to bottom and list every concrete claim: labels, property keys, defaults, roles/authorities, versions, commands, links. Mark each one *confirmed*, *outdated*, or *missing* (the code has something user-relevant the page doesn't mention) against what you read in §2.
 2. **Edit surgically.** Change only the outdated and missing parts. Keep the page's structure, section order, and existing style (§5) — even if you would have written it differently. Don't polish neighbouring sections. One exception: remove em dashes from the prose of the whole English page, not only from the parts you changed (§9).
+
+   **Exception: a UI page in the old, interface-describing style** (sections per screen area, bold lists of columns and labels, inline icons, accordions, search counters) is *outdated* even when every fact is right. Rewrite its UI part into the functional shape from §1 and §5. Keep configuration, sanitization, MCP, and legacy sections as they are, apart from fixing facts and em dashes.
 3. **Protect anchors.** Other pages link to headings (`page.mdx#some-heading`). Before renaming or removing a heading, Grep `docs/content/docs/` for the anchor and fix every incoming link, in both languages.
 4. **Mark releases.** A section that appears in a specific release gets a released-in notice; one that is merged but not released yet gets an upcoming notice; one that no longer applies from some release gets a legacy notice instead of silent deletion, when readers on older versions still need it. Take versions from the code/release history, never guess. Syntax is in the reference.
 5. **Mirror to Russian.** Apply the same corrections to `.ru.mdx` at the same place in the page (§8).
@@ -108,9 +112,15 @@ The site structure changes over time, so read it instead of assuming it: `docs/c
 
 The neighbouring pages you opened in §1 are the style guide. Beyond them:
 
-- **One lead paragraph** right after the frontmatter (and the main screenshot, if any): what the page is and what the reader gets from it. No throat-clearing.
+- **One lead paragraph** right after the frontmatter (and the main screenshot, if any): the problem the feature solves, in one to three sentences ("The same property can come from many places: …"). Don't retell the screen. If the code gates access, say who can open the page in a separate short paragraph.
 - **Section headings** (`##`, `###`) per coherent subtopic. Anchors are generated from heading text, so keep headings short and stable. Write new headings in sentence case: capitalize only the first word and proper names ("Share the JWT signing key with Master", not "Share The JWT Signing Key"). Don't rename existing headings just to change their case or punctuation: other pages link to their anchors.
-- **Fields vs properties.** UI fields go in a bold-label list (`- **Name**: description.`). Configuration properties go in a `Property | Default | Description` table; mark a missing default the same way the neighbouring tables do.
+- **Functionality, not design.** Describe what the reader learns and can do. A short list fits parallel facts ("For each property, you can see: …"); a bold-label list fits only named states or categories (**Active**, **Suppressed**). Don't describe:
+    - layout: accordions, "expanded by default", scrolling, card titles and subtitles, columns;
+    - search inputs and `<matching> / <total>` counters;
+    - icons, colors, and highlighting as such (say what is marked and why: "deprecated properties are highlighted, so you can find settings to migrate");
+    - copy-to-clipboard buttons, `—` placeholders, `×N` / `+N` badges;
+    - navigation to the page ("click Dashboard in the header").
+- **Configuration properties** go in a `Property | Default | Description` table; mark a missing default the same way the neighbouring tables do.
 - **Pair description with example — for things the reader will copy.** When you list configuration keys or code the user pastes into their project, place the snippet **immediately after the list or table, in the same section, before any other heading**. **Do not, however, follow a list of UI-field descriptions with a JSON dump of the underlying API response.** UI pages describe what the user sees, not the contract underneath.
 - **Closing section.** A short list of links to related pages, named the way the neighbouring pages name it.
 - **Hold a single style across the whole page, and a single shape across parallel rows.** Consistency is non-negotiable; a reader who learns the shape of one section should read the next without recalibrating. Two granularities:
@@ -214,8 +224,9 @@ Tell the user: which files you wrote or edited (EN, RU, meta), what source files
 
 - **Plausible-sounding fabrication.** "Master uses an exponential backoff with jitter for retries" — only true if the code says so.
 - **Restating the obvious.** "Click the button to perform the action it labels" adds nothing.
+- **Describing the design instead of the feature.** "A scrollable list of accordions, expanded by default, with a search input and a counter" tells the reader nothing they can't see. Say what the screen answers and why they'd open it.
 - **Padding with structure.** Don't stack "Overview / Details / Configuration / Examples / FAQ" onto a feature with one screen and one property. Match the page size to the topic.
-- **Update turning into a rewrite.** In Update mode, the diff should be as small as the change in the code. Reshuffling sections or restyling untouched prose makes the change impossible to review.
+- **Update turning into a rewrite.** In Update mode, the diff should be as small as the change in the code. Reshuffling sections or restyling untouched prose makes the change impossible to review. The one exception is an old-style UI page (§3).
 - **Walkthrough duplicating the reference.** A step shows the minimal config and links to the reference page; copying the full property table into it means two tables to keep in sync.
 - **Refactoring neighbouring pages.** Stay inside the pages you're documenting. If you spot a real issue elsewhere, mention it to the user — don't silently rewrite it.
 - **Generic boilerplate intros.** "In this guide, we will explore…" — say what the page is in one direct sentence.

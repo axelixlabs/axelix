@@ -1,0 +1,43 @@
+---
+title: Overview
+description: "The Overview dashboard shows which versions of Spring Boot, Spring Framework, Java, and Kotlin the
+              applications in the fleet use."
+---
+
+<LegacyNotice
+  version="1.2.0"
+  reason={<>The Overview dashboard is removed in Axelix 1.2.0. Spring Boot and Spring Framework versions of the fleet
+    are shown on the Spring Portfolio dashboard instead.</>}
+/>
+
+In a fleet of dozens of applications it is hard to tell which versions of the key components are in use and which of
+them is the most common. The Overview dashboard answers this for the whole fleet at once, and lets you jump from a
+version to the list of instances that run on it.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## What the page shows
+
+The page shows which versions of Spring Boot, Spring Framework, Java, and Kotlin the fleet uses and what share of
+instances runs each of them:
+
+- **Spring Boot** and **Spring Framework**: by line, for example `3.5`.
+- **Java**: by version number, for example `21`.
+- **Kotlin**: by line, only among instances that have Kotlin on the classpath. When the fleet has none, Kotlin is not
+  shown.
+
+For each component, the most common version is highlighted separately.
+
+## Opening applications on the Wallboard
+
+Click a version to open the [Wallboard](../wallboard.mdx) filtered to the instances that run this version, for example
+`Spring Boot = 3.5`. Hold Ctrl, Cmd, or Shift while clicking to open it in a new tab.
+
+## See also
+
+- [Spring Portfolio](./spring-portfolio.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Upgrading Axelix](../../more/upgrading.mdx)

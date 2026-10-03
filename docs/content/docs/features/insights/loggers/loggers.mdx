@@ -1,70 +1,67 @@
 ---
 title: Loggers
-description: "The Loggers page provides access to all configured logging mechanisms in a Spring Boot application, logger groups, and allows changing their logging levels."
+description: "The Loggers page shows the logging level of every logger and logger group in a Spring Boot instance and
+              lets you change it at runtime, permanently or for a limited time."
 ---
 
-import {LoggersTable} from './LoggersTable';
-import {LoggersTableReset} from './LoggersTableReset';
 import {TargetThemeIcon} from './TargetThemeIcon';
-import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
+import { INFO, DEBUG, WARN } from './StatePaletteForLoggingLevel';
 
-![loggers main page](/img/feature/loggers/loggers-main-page.png) ***Loggers page as presented in Axelix
-UI***
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
-The page is available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
+![loggers main page](/img/feature/loggers/loggers-main-page.png)
+
+</ScreenshotsNotice>
+
+***Loggers page as presented in Axelix UI***
+
+To investigate a problem on a running service, you often need more detailed logs from one part of it. The Loggers page
+lets you raise the level of a logger right away, without changing the configuration or restarting the service, and
+then bring it back.
+
+The page is available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN** can all open
 it, change levels, and reset levels. See [Roles and
 authorities](../../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
-## Loggers tab
-A scrollable list displaying all active loggers in the application, with an indicator of their logging levels, a search
-function for easy navigation, and a counter of active loggers in the form `<matching> / <total>`.
+## What the page shows
 
-- **Name**:                 The name of the logger.
-- **Logging level**:        The logger's current level. (See **Interactive Features**)
-- **Reset**:                Resets the logging level to its initial value. (See **Interactive Features**)
+The page lists all loggers and logger groups of the instance with their current level. A target mark <TargetThemeIcon /> next
+to a level means the level is set explicitly for this logger or group, in the application configuration or in Axelix.
+A level without the mark is inherited from a parent logger.
 
-## Logger groups tab
-![loggers group main page](/img/feature/loggers/loggers-main-group-page.png) ***Loggers group page as
-presented in Axelix UI***
+You can change the level:
 
-A scrollable list displaying all logger groups, with an indicator of their logging levels, a search function for groups
-and loggers for easy navigation, and a counter of groups.
+- Of a logger. Its children without their own level inherit the new level: when you switch `com.axelixlabs.axelix`
+  from <INFO /> to <DEBUG />, `com.axelixlabs.axelix.sbs` switches to <DEBUG /> as well.
+- Of a logger group. The level applies to every logger in the group: setting the `web` group to <WARN /> sets <WARN /> for
+  all of its loggers.
 
-- **Name**:                 The name of the logger group.
-- **Logging group level**:  The current logging level of the logger group. If no level is highlighted by a color
-  indicator, the loggers within the group have different logging levels. (See **Interactive Features**)
+The reset button <Image src="/img/feature/loggers/reset.svg" alt="reset icon" width={20} height={20}/> returns a logger to the level it had before you first changed it in Axelix. It works for loggers changed at
+runtime: on this page, through MCP, or with a direct request to the `axelix-loggers` actuator endpoint. Logger groups
+cannot be reset.
 
-## Interactive Features
+## Temporary logging level
 
-We provide the ability to change the logging level of an individual logger as well as a logger group.
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
-### Loggers
-For example, the logger `com.axelixlabs.axelix.sbs` has a logging level of <INFO /> (starting point). To change its
-level, click on the desired level, for example <WARN />. The logger will update, and the selected level will be marked
-with an icon <TargetThemeIcon />. Note that when changing the logging level of `com.axelixlabs.axelix` from <INFO /> to
-<DEBUG /> (step 2), it will also be marked with an icon <TargetThemeIcon />, and all loggers with the prefix
-`com.axelixlabs.axelix` will change their level to <DEBUG /> (step 2). However, they will not be marked with an icon
-<TargetThemeIcon />, because their level matches the parent logger `com.axelixlabs.axelix`.
+<Image src="/img/feature/loggers/loggers-edit-time-level-page.png" alt="temporary logging level popup" width={304} height={380}/>
 
-<LoggersTable />
+</ScreenshotsNotice>
 
-We also provide the ability to reset the logging level for a specific logger:
-1. Initially, the `com.axelixlabs.axelix.sbs` logger had the <TRACE /> level (starting point).
-2. It was then changed to the <INFO /> logging level (step 1).
-3. Using the **Reset** button, you can restore the logger to its original <TRACE /> level (step 2).
+***Setting a temporary logging level in Axelix UI***
 
-<LoggersTableReset />
+When you need verbose logs only for a while, for example to catch a bug, set a temporary level instead and don't worry
+about switching it off. Click the timer icon next to the logger, pick the level and the time when it should end. If
+that time has already passed today, the level stays until that time tomorrow.
 
-### Logger groups
-- If the loggers in a group have different levels, the group has no color indicator on the level row.
-- Changing the level of, for example, the `web` group to <WARN /> applies <WARN /> to every logger in that group.
-- Resetting the level of a logger group is not supported — only individual loggers can be reset.
+When the time runs out, the logger returns to the level it had before. To end the temporary level early, reset the
+logger. Temporary levels are not available for logger groups.
 
 ## MCP Tools
 
-Reading the logger tree and changing levels at runtime — for a single logger, a logger group, or resetting an individual
-logger — are also exposed to AI agents through MCP. See the [MCP Tools
+Reading the logger tree and changing levels at runtime (for a single logger, a logger group, or resetting an individual
+logger) are also exposed to AI agents through MCP. See the [MCP Tools
 catalog](../../../setting-up-master-ui/mcp/mcp-tools.mdx#loggers).
 
 ## Enable Dedicated Actuator Endpoint

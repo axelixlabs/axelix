@@ -31,9 +31,12 @@ General-purpose runtime information about the instance.
   logical categories such as JVM, HTTP, and JDBC. Each metric can be drilled into to see its current value and tag
   dimensions.
 - [Loggers](../features/insights/loggers/loggers.mdx): lists every configured logger and logger group in the application with its
-  current level. You can change a level on the fly (for example, push a package to DEBUG while reproducing a bug) and
-  reset it back to the original value when you are done. [Also available as an MCP
+  current level. You can change a level on the fly (for example, push a package to DEBUG while reproducing a bug),
+  set it only until a chosen time, and reset it back to the original value when you are done. [Also available as an MCP
   tool.](../setting-up-master-ui/mcp/mcp-tools.mdx#loggers)
+- [Dependencies Analyzer](../features/insights/dependencies-analyzer.mdx): the dependencies the application resolved,
+  grouped by ecosystem (persistence, web, security, and others), with the maintenance status of each project and the
+  OSS support window of the Spring Boot line the application runs on. The entry appears only when the instance's starter supports it.
 
 ### Spring Framework
 
@@ -41,7 +44,8 @@ Spring-specific introspection.
 
 - [Properties](../features/spring-framework/properties.mdx): the resolved Spring `Environment` of the instance. Every active property is
   grouped by its source (system properties, `application.yaml`, command-line arguments, and so on), so you can see not
-  just the effective value but also which property source supplied it. [Also available as an MCP
+  just the effective value but also which property source supplied it, which values are suppressed by a source with a
+  higher precedence, and which properties are deprecated. [Also available as an MCP
   tool.](../setting-up-master-ui/mcp/mcp-tools.mdx#instance-introspection)
 - [Beans](../features/spring-framework/beans.mdx): every bean in the application context with its scope (Singleton, Prototype, Request,
   Session, and others), dependencies, aliases, qualifiers, and origin (`@Component`, `@Bean` method, `FactoryBean`,
@@ -61,10 +65,14 @@ Spring-specific introspection.
 - [Caches](../features/spring-framework/caches.mdx): Spring caches registered in the instance, grouped by their `CacheManager`. Shows hit and
   miss rates, estimated entry counts, and lets you clear individual caches or every cache at once. [Also available as an
   MCP tool.](../setting-up-master-ui/mcp/mcp-tools.mdx#caches)
-- [Transaction Control](../features/spring-framework/transaction-control.mdx): live view of every transaction the application is running,
-  with the originating class, method, and duration metrics. Each execution opens a timeline of the SQL queries that ran
-  inside the transaction — you see the exact SQL, its start and end time, and its duration — which is how you spot N+1
-  access patterns and other query-level inefficiencies.
+- [Transaction Control](../features/spring-framework/transaction-control.mdx): every `@Transactional` method the
+  application has run, with its execution time and the problems found inside the transaction: blocking network calls,
+  N+1 queries, and in-memory pagination. [Also available as an MCP
+  tool.](../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights)
+- [Entities Map](../features/spring-framework/entities-map.mdx): checks the JPA mapping of every entity and shows the
+  associations mapped in a way that costs extra queries: eager fetching, `List`-backed `@ManyToMany`, cascade `REMOVE`
+  or `ALL`, and unidirectional `@OneToMany`. [Also available as an MCP
+  tool.](../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights)
 
 ### JVM
 
@@ -86,4 +94,4 @@ Tools](../setting-up-master-ui/mcp/mcp-tools.mdx).
 ## Related
 
 - [Wallboard](./wallboard.mdx)
-- [Dashboard](./dashboard.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)

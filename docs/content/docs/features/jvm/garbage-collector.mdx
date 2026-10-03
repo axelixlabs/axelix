@@ -5,8 +5,13 @@ description: "The Garbage Collector page lets you enable JVM GC logging on a man
               on for a focused investigation and then turn it off again."
 ---
 
-![garbage collector main page](/img/feature/garbage-collector/gc-main-page.png) ***Garbage Collector as
-presented in Axelix UI***
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![garbage collector main page](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Garbage Collector as presented in Axelix UI***
 
 ## Access
 
@@ -29,7 +34,11 @@ corresponding message on hover.
 GC logging is off by default. The page shows an empty-state with an **Enable GC Logging** button until logging is turned
 on. Clicking it opens a modal where you pick the JVM log level:
 
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
 <Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="enable-gc-logging" width={490} height={280}/>
+
+</ScreenshotsNotice>
 
 The level list is taken at runtime from `jcmd VM.log list` on the target instance — typically `error`, `warning`,
 `info`, `debug`, `trace`.

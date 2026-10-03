@@ -1,0 +1,5 @@
+{
+    "title": "Технологии",
+    "defaultOpen": false,
+    "pages": ["java", "persistence", "spring-framework"]
+}

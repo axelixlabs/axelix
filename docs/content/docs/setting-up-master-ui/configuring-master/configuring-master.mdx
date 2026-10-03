@@ -14,7 +14,7 @@ A few facts to fix in your head before you copy any of the snippets below — th
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
-- **Front-end assets**: the `axelix-1.0.0.jar` and the published Docker image both bundle the UI — there is nothing
+- **Front-end assets**: the `axelix-1.1.0.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
 - **Authentication**: Master ships with a built-in super-admin account `admin / admin` and an unset JWT signing key. In
   any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
@@ -104,7 +104,7 @@ or, for a container, pass it as an environment variable and mount the file in:
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 ### Loading configuration from a Spring Cloud Config Server
@@ -632,10 +632,10 @@ Master is then reachable at `http://localhost:8080`. Sign in with the super-admi
 
 If you have containerization support, then the recommended way to install Axelix Master is via the docker image. The release
 pipeline publishes the image to GitHub Container Registry, so the name of the image follows the pattern
-`ghcr.io/axelixlabs/axelix:1.0.0`
+`ghcr.io/axelixlabs/axelix:1.1.0`
 
 :::note
-The snippets below pin `1.0.0` for illustration. Check the [Releases
+The snippets below pin `1.1.0` for illustration. Check the [Releases
 page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
 commands.
 :::
@@ -648,7 +648,7 @@ A minimal run, suitable for a first look:
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 A few notes about this command:
@@ -676,7 +676,7 @@ docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 #### System Properties (-D) via `JAVA_TOOL_OPTIONS`
@@ -697,7 +697,7 @@ docker run --rm -p 8080:8080 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 #### External config file
@@ -724,7 +724,7 @@ docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 ## Run with Docker Compose
@@ -732,7 +732,7 @@ docker run --rm -p 8080:8080 \
 Logically, it is fully possible to run Axelix Master in the Docker Compose deployment.
 
 The example below is a complete stack you can drop into a new `docker-compose.yaml`, edit, and start with `docker
-compose up -d`. The `master` service is pinned to `1.0.0` here — swap in the latest tag from the [Releases
+compose up -d`. The `master` service is pinned to `1.1.0` here — swap in the latest tag from the [Releases
 page](https://github.com/axelixlabs/axelix/releases) before shipping.
 
 ```yaml title="docker-compose.yaml"
@@ -752,7 +752,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0
+    image: ghcr.io/axelixlabs/axelix:1.1.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -809,7 +809,7 @@ axelix:
 
 ```yaml title="docker-compose.yaml"
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0
+    image: ghcr.io/axelixlabs/axelix:1.1.0
     volumes:
       - ./master.yaml:/etc/axelix/master.yaml:ro
     environment:
@@ -936,7 +936,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.0.0
+          image: ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 In K8S, a Role is a namespaced object, so repeat the Role and RoleBinding once per namespace in `filters.namespaces`, all referencing

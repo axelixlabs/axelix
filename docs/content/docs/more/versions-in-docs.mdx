@@ -1,0 +1,45 @@
+---
+title: Versions in the docs
+description: "How the documentation marks releases and which release the screenshots show."
+---
+
+This page explains how the documentation marks Axelix releases and which release the screenshots show. Some headings
+have a short notice line right below them. It tells you which Axelix release the section applies to. The documentation is versioned only per major release, so one page describes every minor release
+of that line, and the notices mark where those releases differ.
+
+## Released
+
+<ReleasedInNotice version="1.1.0" />
+
+The section describes something that ships in the given release. On an older release it does not exist yet: upgrade
+to use it.
+
+## Upcoming
+
+<UpcomingReleaseNotice />
+
+The section describes something that is already done but not released yet. It ships in the next minor release. When
+that release comes out, the notice changes to **Released** with the release number.
+
+## Legacy
+
+<LegacyNotice version="1.2.0" />
+
+The section is needed only on releases older than the given one. On that release and later, skip it. Some legacy
+notices also explain why the section is no longer needed.
+
+## Screenshots
+
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix." />
+
+Screenshots show the Axelix UI of the latest minor release. When a minor release changes a screen, we update its
+screenshots, and we try to keep every page in line with the latest minor release. Patch releases do not change the
+UI shown on the screenshots.
+
+If you run an older release, a screen may look different from its screenshot: some controls may be missing or sit in
+another place.
+
+## See also
+
+- [Compatibility & Versioning](./compatibility-and-versioning.mdx)
+- [Upgrading Axelix](./upgrading.mdx)

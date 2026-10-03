@@ -3,6 +3,14 @@ title: Wallboard
 description: "The Wallboard is the default landing page in Axelix."
 ---
 
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![wallboard main page](/img/feature/wallboard/wallboard-main-page.png)
+
+</ScreenshotsNotice>
+
+***Wallboard as presented in Axelix UI***
+
 It shows every Spring Boot instance discovered by Axelix Master as
 a grid of compact cards, each with the instance's live health status and a quick summary of what it runs. Clicking a
 card opens the [Service Profile](./service-profile.mdx) for that instance.
@@ -22,9 +30,11 @@ The card body lists the runtime details Axelix collected when the instance regis
 
 - **Version**: the service's own version (the Maven/Gradle artifact version).
 - **Spring Boot**: the Spring Boot version the instance was built against.
-- **Java**: the major Java version of the running JVM.
-- **Commit**: short Git SHA of the build (from `git-commit-id`-style metadata, when the application exposes it).
-- **Deployed for**: how long the instance has been registered with Master.
+- **Java**: the Java version of the running JVM, for example `21.0.10`.
+
+The bottom line of the card shows the short Git SHA of the build on the left, as **Commit: 315897f** (from
+`git-commit-id`-style metadata, when the application exposes it). On the right, it shows how long the instance has been
+registered with Master, for example `27d 4h`.
 
 Clicking anywhere on the card navigates to the **Details** screen of that instance's [Service
 Profile](./service-profile.mdx).
@@ -44,8 +54,7 @@ The **+ Add filter** button next to the search opens a popover with three fields
 
 Saving the filter adds a removable tag between the search and the grid, narrows the displayed cards, and writes the
 filter into the URL as a `?f=Field:Operator:Value` query parameter. Filtered Wallboard URLs can be bookmarked and
-shared, and the [Dashboard](./dashboard.mdx) generates them automatically when you click a slice of a System's Map chart.
-Add more filters by repeating the action — every active filter has to match for a card to be shown.
+shared. Add more filters by repeating the action — every active filter has to match for a card to be shown.
 
 ## MCP access
 
@@ -56,5 +65,5 @@ catalog.](../setting-up-master-ui/mcp/mcp-tools.mdx#instances)
 ## Related
 
 - [Service Profile](./service-profile.mdx)
-- [Dashboard](./dashboard.mdx)
+- [Spring Portfolio](./dashboard/spring-portfolio.mdx)
 - [MCP](./mcp.mdx)

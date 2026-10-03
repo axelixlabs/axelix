@@ -1,0 +1,57 @@
+---
+title: Spring Portfolio
+description: "The Spring Portfolio dashboard shows which Spring Boot and Spring Framework versions the applications in
+              the fleet use, and how many of them are already past OSS support."
+---
+
+<UpcomingReleaseNotice />
+
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
+
+![spring portfolio dashboard](/img/feature/dashboard/dashboard-spring-portfolio.png)
+
+</ScreenshotsNotice>
+
+***Spring Portfolio as presented in Axelix UI***
+
+Every Spring Boot and Spring Framework line (a minor version branch such as `3.5.x`) has a limited [OSS support](https://spring.io/support-policy) window. Once
+it closes, the line gets no more community releases, security fixes included: new
+[CVEs](https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures) in it are fixed only under a commercial subscription. In a fleet of dozens of applications it
+is hard to tell which of them are already past this date and which will be next. Spring Portfolio answers this for the
+whole fleet at once.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+can all open it. See [Roles and
+authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
+role/authority matrix.
+
+## What the page shows
+
+A summary on top shows how many applications the fleet has and for how many of them the OSS support window has already
+closed. An application counts as supported only when both its Spring Boot and its Spring Framework still receive OSS
+updates.
+
+Below, the page shows Spring Boot and Spring Framework separately. For each of them, you can see:
+
+- How many applications run on an OSS-supported line.
+- How the applications are spread across major versions and lines, for example `3.5.x`.
+- Whether each line still receives OSS updates.
+
+The last part shows the OSS support window of every line in use on a timeline: when the line was released, when its
+OSS support ends or ended, and how many applications run on it. It shows how much time is left before the next lines
+go out of support.
+
+## How it works
+
+Master records the Spring Boot and Spring Framework versions of each application once a day and uses the latest record.
+An application counts once however many instances it runs. An application that stopped reporting stays on the page with
+the versions it last reported.
+
+The support dates come from the schedules published by the Spring team, for example the [Spring Boot support
+window](https://spring.io/projects/spring-boot#support).
+
+## See also
+
+- [Dependencies Analyzer](../../features/insights/dependencies-analyzer.mdx)
+- [Wallboard](../wallboard.mdx)
+- [Upgrading Axelix](../../more/upgrading.mdx)

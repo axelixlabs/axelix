@@ -6,8 +6,13 @@ description: "На странице Условия представлен отч
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-![главная страница условий](/img/feature/conditions/conditions-main-page.png) ***Страница Условия в
-интерфейсе Axelix***
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
+![главная страница условий](/img/feature/conditions/conditions-main-page.png)
+
+</ScreenshotsNotice>
+
+***Страница Условия в интерфейсе Axelix***
 
 Страница доступна только для чтения всем пользователям, прошедшим аутентификацию: ее могут открыть `VIEWER`, `EDITOR`,
 `ADMIN` и `SUPER_ADMIN`. Полную матрицу ролей и полномочий см. в реазделе [Роли и
@@ -38,9 +43,14 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 условия (<span style={{color: '#FF000A', fontWeight: 'bold'}}>✗</span>), так и условия, которые были выполнены (<span
 style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), чтобы вы могли точно увидеть, какая проверка нарушила баланс.
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![страница отрицательных совпадений
-условий](/img/feature/conditions/conditions-not-matches-details-page.png) ***Страница отрицательных
-совпадений условий в интерфейсе Axelix***
+условий](/img/feature/conditions/conditions-not-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Страница отрицательных совпадений условий в интерфейсе Axelix***
 
 ## Вкладка «Положительные совпадения»
 
@@ -48,9 +58,14 @@ style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>), чтобы вы мо
 каждой записи указаны выполненные условия (<span style={{color: '#00ab55', fontWeight: 'bold'}}>✓</span>) и сообщение,
 объясняющее, почему каждое из них было выполнено.
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![страница положительных совпадений
-условий](/img/feature/conditions/conditions-matches-details-page.png) ***Страница положительных
-совпадений условий в интерфейсе Axelix***
+условий](/img/feature/conditions/conditions-matches-details-page.png)
+
+</ScreenshotsNotice>
+
+***Страница положительных совпадений условий в интерфейсе Axelix***
 
 ## MCP-инструменты
 
@@ -59,11 +74,12 @@ MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#ин�
 
 ## Включите Нужный Actuator Ендпоинт
 
-:::note
-Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
-actuator-эндпоинты, а эндпоинты `health`/`info` Axelix больше не требуются — он отлично работает и без них. Никакая
-настройка здесь не нужна.
-:::
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-conditions`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек
