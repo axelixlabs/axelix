@@ -33,6 +33,9 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
+import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -43,6 +46,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 public class ShortPollingInstanceDiscoveryScheduler {
 
@@ -56,6 +60,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final SecurityContextExecutor securityContextExecutor;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
+    private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
+    private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
 
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
@@ -63,13 +69,18 @@ public class ShortPollingInstanceDiscoveryScheduler {
             JwtEncoderService jwtEncoderService,
             SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
+
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
         this.jwtEncoderService = jwtEncoderService;
         this.securityContextExecutor = securityContextExecutor;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
+        this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
+        this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
     }
 
     @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
@@ -95,9 +106,15 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 .map(DiscoveredInstanceProfile::instance)
                 .collect(Collectors.toSet());
 
+        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
+                .map(scheduledTaskExecutionResultConverter::convert)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+
         transactionTemplate.executeWithoutResult(_ -> {
             instanceRegistry.reload(instances);
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
+            scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });
     }
 }
