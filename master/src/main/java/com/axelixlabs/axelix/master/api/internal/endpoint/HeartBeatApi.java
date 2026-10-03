@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,11 @@ import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -43,6 +47,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * The API used for service self-registration.
  *
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @InternalApiRestController
 @ConditionalOnProperty(
@@ -59,18 +64,24 @@ public class HeartBeatApi {
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
     private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
+    private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
+    private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
 
     public HeartBeatApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
-            CompatibilityDetectionStrategy compatibilityDetectionStrategy) {
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy,
+            ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
         this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
+        this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
+        this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
     }
 
     @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
@@ -96,9 +107,13 @@ public class HeartBeatApi {
                     request.getInstanceActuatorUrl(),
                     metadata);
 
+            Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
+                    scheduledTaskExecutionResultConverter.convert(request);
+
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
                 databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
+                scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             });
 
             return ResponseEntity.noContent().build();
