@@ -102,6 +102,10 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    // Guarded via the class name (not Transactional.class): this bean is a BeanPostProcessor, whose
+    // factory-method annotations Spring introspects reflectively and early. A direct class reference
+    // would throw TypeNotPresentException when spring-tx is absent (GH-1708).
+    @ConditionalOnClass(name = "org.springframework.transaction.annotation.Transactional")
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             TransactionAccessor transactionAccessor,
