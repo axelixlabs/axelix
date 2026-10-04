@@ -38,12 +38,12 @@ import org.springframework.boot.micrometer.metrics.actuate.endpoint.MetricsEndpo
 import org.springframework.boot.micrometer.metrics.actuate.endpoint.MetricsEndpoint.MetricDescriptor;
 import org.springframework.lang.Nullable;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile.Measurement;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfileMeasurement;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
@@ -96,12 +96,12 @@ public class AxelixMetricsEndpoint {
         TransformedMeasurements measurements =
                 getMeasurements(emptyIfNull(originalDescriptor.getBaseUnit()), originalDescriptor);
 
-        return new MetricProfile(
-                originalDescriptor.getName(),
-                originalDescriptor.getDescription(),
-                measurements.baseUnit(),
-                measurements.measurements(),
-                getValidTagCombinations(requiredMetricName));
+        return new MetricProfile()
+                .name(originalDescriptor.getName())
+                .description(originalDescriptor.getDescription())
+                .baseUnit(measurements.baseUnit())
+                .measurements(measurements.measurements())
+                .validTagCombinations(getValidTagCombinations(requiredMetricName));
     }
 
     private TransformedMeasurements getMeasurements(String baseUnit, MetricDescriptor originalDescriptor) {
@@ -111,17 +111,17 @@ public class AxelixMetricsEndpoint {
                 .map(baseUnitValueTransformers::get)
                 .orElse(null);
 
-        List<Measurement> resultingMeasurements = new ArrayList<>();
+        List<MetricProfileMeasurement> resultingMeasurements = new ArrayList<>();
         String resultingBaseUnit = baseUnit;
 
         for (var measurement : originalDescriptor.getMeasurements()) {
             if (ACTUAL_VALUE_STATISTICS.contains(measurement.getStatistic())) {
                 if (baseUnitValueTransformer != null) {
                     var transformedMetricValue = baseUnitValueTransformer.transform(measurement.getValue());
-                    resultingMeasurements.add(new Measurement(transformedMetricValue.value()));
+                    resultingMeasurements.add(new MetricProfileMeasurement().value(transformedMetricValue.value()));
                     resultingBaseUnit = transformedMetricValue.baseUnit().getDisplayName();
                 } else {
-                    resultingMeasurements.add(new Measurement(measurement.getValue()));
+                    resultingMeasurements.add(new MetricProfileMeasurement().value(measurement.getValue()));
                 }
             }
         }
@@ -129,7 +129,7 @@ public class AxelixMetricsEndpoint {
         return new TransformedMeasurements(resultingBaseUnit, resultingMeasurements);
     }
 
-    record TransformedMeasurements(String baseUnit, List<Measurement> measurements) {}
+    record TransformedMeasurements(String baseUnit, List<MetricProfileMeasurement> measurements) {}
 
     private List<Map<String, String>> getValidTagCombinations(String metricName) {
         Collection<Meter> meters = this.registry.find(metricName).meters();

@@ -1,0 +1,5 @@
+releases:
+  - version: "1.0.0"
+    features: ["always-on"]
+  - version: "1.3.0"
+    features: ["always-on"]

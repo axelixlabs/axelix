@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { TOCProvider, TOCScrollArea } from "fumadocs-ui/components/toc";
 import { TOCItems, TOCItem } from "fumadocs-ui/components/toc/default";
-import { blog } from "@/lib/source";
+import { blog, getCardImageSrc } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 import { Authors, PlainTag, ReadingTime, ReadProgress, BlogShare } from "@/components";
 import { formatDate } from "@/lib/format";
@@ -30,11 +30,17 @@ export async function generateMetadata({
   const description = page.data.metaDescription ?? page.data.description ?? "";
   const canonical = withBlogBasePath(`/${slug}`);
 
+  // The post's hero image (heroImagePath, falling back to metaImagePath) doubles as its
+  // social-share image. `getCardImageSrc` returns a basePath-relative src; `metadataBase`
+  // (root layout) resolves it to an absolute URL, and Next mirrors it into twitter:image.
+  const coverSrc = getCardImageSrc(page);
+  const images = coverSrc ? [coverSrc] : undefined;
+
   return {
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "article" },
+    openGraph: { title, description, url: canonical, type: "article", images },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -92,7 +98,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           <h1>{page.data.title}</h1>
           {page.data.description && <p className="standfirst">{page.data.description}</p>}
           <div className="art-meta">
-            <Authors authors={page.data.authors} />
+            <Authors authors={page.data.authors} linked />
             <span className="sep" />
             <span className="m">{formatDate(page.data.date)}</span>
             <span className="sep" />

@@ -25,6 +25,45 @@
     --axelix-border-radius-small: 4px;
     --axelix-box-shadow-bold: 4px 6px 14px rgb(15 23 42 / 25%);
     --axelix-box-shadow-light: 0 4px 20px rgb(0 0 0 / 10%);
+
+    /*
+     * Palette of the Properties page. Declared globally rather than scoped to that page because antd
+     * renders tooltips and popovers into a portal on document.body, which a page-scoped block would
+     * never reach.
+     */
+    --prop-text: #101828;
+    --prop-text-muted: #344054;
+    --prop-text-faint: #667085;
+    --prop-text-dim: #98a2b3;
+    --prop-border: #d0d5dd;
+    --prop-border-soft: #eaecf0;
+    --prop-border-faint: #f2f4f7;
+    --prop-panel-border: #e6e9ee;
+    --prop-surface: #fff;
+    --prop-surface-soft: #fcfcfd;
+    --prop-surface-sunken: #f9fafb;
+    --prop-accent: #16a34a;
+    --prop-accent-strong: #067647;
+    --prop-accent-surface: #ecfdf3;
+    --prop-accent-border: #abefc6;
+    --prop-danger: #b42318;
+    --prop-danger-surface: #fef3f2;
+    --prop-danger-border: #fecdca;
+    --prop-danger-on-dark: #fda29b;
+
+    /* Deprecation reported as an error: the value is no longer bound and will break on strict binding. */
+    --prop-dep-error: #b54708;
+    --prop-dep-error-surface: #fffaeb;
+    --prop-dep-error-border: #fec84b;
+    --prop-dep-error-on-dark: #fdb022;
+
+    /* Deprecation reported as a warning: still honoured, but slated for removal. */
+    --prop-dep-warn: #854a0e;
+    --prop-dep-warn-surface: #fefbe8;
+    --prop-dep-warn-border: #fde68a;
+    --prop-dep-warn-on-dark: #fde047;
+    --prop-radius: 10px;
+    --prop-shadow-card: 0 1px 2px rgb(16 24 40 / 4%);
 }
 
 *,
@@ -130,5 +169,64 @@ a {
 
     100% {
         background-color: var(--axelix-primary-light-green);
+    }
+}
+
+/*
+ * Donut entrance animation ("spin and settle"), adapted from the 8C dashboard motion design.
+ * The ring fades in while rotating into place with a slight overshoot and scaling up to full
+ * size; its coloured arcs thicken from a thin line to full width; a surrounding legend fades
+ * in last. Plays once, when the donut first mounts. The end state matches the donut's resting
+ * transform (rotate(-90deg)), so the `both` fill leaves it in place after the animation.
+ */
+.DonutSpinSettle {
+    animation:
+        donut-spin-settle 1000ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both,
+        donut-fade-in 250ms linear 150ms both;
+}
+
+.DonutArc {
+    animation: donut-thicken 750ms cubic-bezier(0.33, 1, 0.68, 1) 400ms both;
+}
+
+.DonutLegendFade {
+    animation: donut-fade-in 400ms ease 750ms both;
+}
+
+@keyframes donut-spin-settle {
+    from {
+        transform: rotate(-210deg) scale(0.86);
+    }
+
+    to {
+        transform: rotate(-90deg) scale(1);
+    }
+}
+
+@keyframes donut-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes donut-thicken {
+    from {
+        stroke-width: 4;
+    }
+
+    to {
+        stroke-width: 22;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DonutSpinSettle,
+    .DonutArc,
+    .DonutLegendFade {
+        animation: none;
     }
 }

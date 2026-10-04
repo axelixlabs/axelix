@@ -47,7 +47,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
@@ -59,6 +58,7 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
 import com.axelixlabs.axelix.common.testfixtures.UserUtils;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
@@ -75,10 +75,10 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilde
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.contract.beans.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricsPublisher;
 import com.axelixlabs.axelix.sbs.spring.core.metrics.DefaultAxelixMetricsPublisher;
 
@@ -175,9 +175,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
@@ -201,9 +198,6 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
                 Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
@@ -267,9 +261,6 @@ class JwtAuthorizationFilterTest {
         return Stream.of(
                 Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
                 Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST));
     }
@@ -422,7 +413,7 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public BeansFeedBuilder noOpBeanFeedBuilder() {
-            return () -> new BeansFeed(List.of());
+            return () -> new BeansFeed();
         }
 
         @Bean

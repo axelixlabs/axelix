@@ -93,6 +93,18 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                       "propertyExpression": "${java.vm.vendor}"
                     }
                   ]
+                },
+                {
+                  "name": "spring.jpa.open-in-view",
+                  "value": "true",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null,
+                  "injectionPoints": null,
+                  "dangerousValue": {
+                    "rationale": "Open Session In View keeps the persistence context open for the whole duration of the request, which hides the transaction boundaries, silently triggers lazy loading in the view layer and, as a consequence, leads to the N+1 problem and to the database connections being held much longer than necessary.",
+                    "alternativeExample": "false"
+                  }
                 }
               ]
             },
@@ -115,7 +127,9 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "message": "Deprecated in favor of logging.file.path property."
+                      "message": "Deprecated in favor of logging.file.path property.",
+                      "level": "ERROR",
+                      "replacedBy": "logging.file.path"
                   },
                   "injectionPoints": null
                 }
@@ -195,6 +209,14 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                       "propertyExpression": "${java.vm.vendor}"
                     }
                   ]
+                },
+                {
+                  "name": "spring.jpa.open-in-view",
+                  "value": "true",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null,
+                  "injectionPoints": null
                 }
               ]
             },
@@ -217,7 +239,9 @@ class EnvironmentApiTest extends AbstractProtectedEndpointTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "message": "Deprecated in favor of logging.file.path property."
+                      "message": "Deprecated in favor of logging.file.path property.",
+                      "level": "ERROR",
+                      "replacedBy": "logging.file.path"
                   },
                   "injectionPoints": null
                 }

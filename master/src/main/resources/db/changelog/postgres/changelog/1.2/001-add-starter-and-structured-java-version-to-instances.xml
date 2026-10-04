@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    The instances table holds soft state only: every managed service re-registers itself on the next
+    heartbeat, so the rows are safe to drop instead of backfilling the new mandatory columns. This is
+    also why we can replace the free-form java_version column with the structured JEP 322 coordinate
+    (feature/interim/update/patch) outright.
+  -->
+  <changeSet id="1.2-001-1-postgres-add-starter-and-structured-java-version-to-instances" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <columnExists tableName="instances" columnName="starter_version"/>
+      </not>
+    </preConditions>
+
+    <delete tableName="instances"/>
+
+    <dropColumn tableName="instances" columnName="java_version"/>
+
+    <addColumn tableName="instances">
+      <column name="starter_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_feature" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_interim" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_update" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_patch" type="INT">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

@@ -20,20 +20,20 @@ package com.axelixlabs.axelix.master.domain.ecosystem.projects;
 import com.axelixlabs.axelix.master.domain.ecosystem.libraries.Library;
 
 /**
- * The area {@link SoftwareProject} covers. This is purely a presentation grouping. As a result of this domain design,
- * it is also assumed that every {@link Library} inside the {@link SoftwareProject} logically belongs to the same {@link Ecosystem}.
- * In practise it may not always be the case, but this is the decision for now.
+ * The area of a running application a {@link SoftwareProject} focuses on. This is purely a presentation grouping.
+ * As a result of this domain design, it is also assumed that every {@link Library} inside the {@link SoftwareProject}
+ * logically belongs to the same {@link Ecosystem}. In practise it may not always be the case, but this is the decision for now.
+ * <p>
+ * A project is classified by what it does in the running application, regardless of who publishes it: Spring Security
+ * belongs to {@link #SECURITY}, Spring Data to {@link #PERSISTENCE}, Spring Cloud Sleuth to {@link #OBSERVABILITY}.
+ * There is deliberately no publisher- or portfolio-level constant here - that would be a second classification axis,
+ * and every project of such a portfolio would then have two equally defensible homes.
  * <p>
  * At Axelix, we keep one manifest file per ecosystem, which is what keeps the classification consistent across entries.
  *
  * @author Mikhail Polivakha
  */
 public enum Ecosystem {
-
-    /**
-     * The Spring portfolio itself, e.g. Spring Framework, Spring Boot, Spring Security, Spring Cloud.
-     */
-    SPRING,
 
     /**
      * ORMs, JDBC drivers, connection pools and schema migration tooling.

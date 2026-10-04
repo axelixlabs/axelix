@@ -31,7 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,7 +74,7 @@ class DefaultGcLogServiceTest {
         subject.enable(level);
         GcLogStatus status = subject.getStatus();
 
-        assertThat(status.isEnabled()).isTrue();
+        assertThat(status.getEnabled()).isTrue();
         assertThat(status.getLevel()).isEqualTo(level);
 
         subject.disable();
@@ -94,7 +94,7 @@ class DefaultGcLogServiceTest {
         GcLogStatus status = subject.getStatus();
 
         // then.
-        assertThat(status.isEnabled()).isTrue();
+        assertThat(status.getEnabled()).isTrue();
         assertThat(status.getLevel()).isEqualTo(level);
     }
 
@@ -131,7 +131,7 @@ class DefaultGcLogServiceTest {
         GcLogStatus status = subject.getStatus();
 
         // then.
-        assertThat(status.isEnabled()).isFalse();
+        assertThat(status.getEnabled()).isFalse();
         assertThat(status.getLevel()).isNull();
     }
 
@@ -202,7 +202,7 @@ class DefaultGcLogServiceTest {
 
         GcLogStatus status = subject.getStatus();
 
-        assertThat(status.isEnabled()).isFalse();
+        assertThat(status.getEnabled()).isFalse();
         assertThat(status.getLevel()).isNull();
     }
 

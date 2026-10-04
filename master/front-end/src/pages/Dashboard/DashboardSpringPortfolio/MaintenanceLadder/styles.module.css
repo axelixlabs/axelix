@@ -1,0 +1,15 @@
+.Header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    color: var(--axelix-bold-grey);
+}
+
+.SectionTitle {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+}

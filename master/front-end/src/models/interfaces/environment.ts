@@ -15,13 +15,36 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EPropertyInjectionType } from "@/models";
+import type { EDeprecationLevel, EPropertyInjectionType } from "@/models";
 
-interface IDeprecation {
+export interface IDeprecation {
     /**
      * The message for deprecation
      */
     message: string;
+
+    /**
+     * The severity with which the deprecation is reported. Absent when the metadata does not state
+     * one, in which case it is treated as a warning.
+     */
+    level?: EDeprecationLevel;
+
+    /**
+     * The name of the property that supersedes the deprecated one, when any.
+     */
+    replacedBy?: string;
+}
+
+export interface IDangerousValue {
+    /**
+     * The reason the resolved value is considered dangerous.
+     */
+    rationale: string;
+
+    /**
+     * A safer value to use instead, when one can be suggested.
+     */
+    alternativeExample?: string;
 }
 
 export interface IInjectionPoint {
@@ -80,6 +103,11 @@ export interface IEnvProperty {
     deprecation?: IDeprecation;
 
     /**
+     * If this property exists, then the master flagged the resolved value as dangerous
+     */
+    dangerousValue?: IDangerousValue;
+
+    /**
      * The injection points list
      */
     injectionPoints?: IInjectionPoint[];
@@ -101,6 +129,25 @@ export interface IEnvironmentPropertySource {
      */
     properties: IEnvProperty[];
 }
+
+export interface IPropertyOccurrence {
+    /**
+     * The name of the property source this occurrence comes from
+     */
+    propertySourceName: string;
+
+    /**
+     * The value that this particular property source assigns to the property
+     */
+    value: string;
+}
+
+/**
+ * Canonicalized property name -> every occurrence of that property across all the property sources,
+ * kept in the precedence order of the sources they come from. The first entry is therefore always
+ * the winning one, and every following entry is suppressed by it.
+ */
+export type TPrecedenceIndex = Map<string, IPropertyOccurrence[]>;
 
 export interface IEnvironmentResponseBody {
     /**

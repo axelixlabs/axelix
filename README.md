@@ -1,5 +1,5 @@
-![Axelix Logo (Light)](docs/static/img/logo.svg#gh-light-mode-only)
-![Axelix Logo (Dark)](docs/static/img/logo-dark.svg#gh-dark-mode-only)
+![Axelix Logo (Light)](docs/public/img/logo.svg#gh-light-mode-only)
+![Axelix Logo (Dark)](docs/public/img/logo-dark.svg#gh-dark-mode-only)
 
 [![License](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](LICENSE)
 [![Nightly Heavy Tests](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml/badge.svg)](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml)
@@ -87,7 +87,7 @@ Master persists its own state in a database (SQLite by default; PostgreSQL or My
 for anything beyond a small deployment). Authentication for both the UI and MCP is available via
 Basic auth or OAuth2/OIDC, with a single role model gating every human and agent identity.
 
-See the [Architecture docs](docs/docs/product/architecture.mdx) for the full picture, including
+See the [Architecture docs](docs/content/docs/product/architecture.mdx) for the full picture, including
 multi-master deployments and the security model.
 
 ## Installation
@@ -95,7 +95,7 @@ multi-master deployments and the security model.
 Getting started is two steps: run **Axelix Master**, then add the **Axelix Starter** and build plugin
 to each Spring Boot service you want to manage.
 
-> The snippets below pin `1.0.0` for illustration. Check the
+> The snippets below pin `1.1.0` for illustration. Check the
 > [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag.
 
 ### 1. Run Axelix Master
@@ -103,14 +103,14 @@ to each Spring Boot service you want to manage.
 Master listens on port `8080` and bundles the UI, so there is nothing extra to build for the web
 interface. Pick whichever shape matches how you ship the rest of your services.
 
-**As a JAR.** Download `axelix-1.0.0.jar` from the
-[Releases page](https://github.com/axelixlabs/axelix/releases) and run:
+**As a JAR.** On the [Releases page](https://github.com/axelixlabs/axelix/releases), expand the
+**Assets** section of the latest release and download `master.jar`, then run:
 
 ```bash
 java \
   -Daxelix.master.auth.jwt.algorithm=HMAC512 \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar axelix-1.0.0.jar
+  -jar master.jar
 ```
 
 **With Docker.** The release image is published to GitHub Container Registry:
@@ -121,7 +121,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
     -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for
@@ -135,10 +135,16 @@ helm install axelix axelix/axelix \
   --values values.yaml
 ```
 
+Here `values.yaml` is your own file holding the chart-property overrides you want to supply (drop
+the `--values` flag to install with the chart defaults). The full set of configurable properties is
+documented on the chart's [Artifact Hub page](https://artifacthub.io/packages/helm/axelix/axelix):
+open it, pick the version matching the Axelix release you are installing (Axelix components share a
+single lockstep version, so this is just the release tag), and read the **Default Values** section.
+
 Master then serves the UI at `http://localhost:8080`. It ships with a built-in super-admin account
 (`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
 else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
-MCP) are in [Configuring Master](docs/docs/installation/configuring-master.mdx).
+MCP) are in [Configuring Master](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx).
 
 ### 2. Add the Axelix Starter and build plugin to your Spring Boot service
 
@@ -150,20 +156,20 @@ First, declare the starter coordinate matching your Spring Boot major version:
 
 ```kotlin
 // Spring Boot 4.x
-implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.0.0")
+implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.0")
 
 // Spring Boot 3.x
-implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.0.0")
+implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0")
 
-// Spring Boot 2.x
-implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.0.0")
+// Spring Boot 2.7.x
+implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.1.0")
 ```
 
 Then apply the Axelix build plugin. With Gradle:
 
 ```kotlin
 plugins {
-    id("com.axelixlabs.axelix") version "1.0.0"
+    id("com.axelixlabs.axelix") version "1.1.0"
 }
 ```
 
@@ -173,7 +179,7 @@ Or, with Maven:
 <plugin>
   <groupId>com.axelixlabs</groupId>
   <artifactId>axelix-maven-plugin</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <executions>
     <execution>
       <goals>
@@ -184,15 +190,27 @@ Or, with Maven:
 </plugin>
 ```
 
-Finally, expose the Axelix actuator endpoints so Master can reach them:
-
-```properties
-management.endpoints.web.exposure.include=health,axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-feign,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
-```
-
 The full setup (sharing the JWT signing key with Master, self-registration, sanitizing sensitive
 property values) is documented in
-[Configuring the Spring Boot Starter](docs/docs/setting-up-spring-boot-service/configuring-axelix-starter/configuring-axelix-starter.mdx).
+[Configuring the Spring Boot Starter](docs/content/docs/setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
+
+### What are these JWT settings anyway?
+
+Master and each managed service authenticate to one another with HMAC-signed JWTs. HMAC is
+symmetric — the *same* secret both signs and verifies a token — so the JWT settings on Master
+(`axelix.master.auth.jwt.signing-key` and `axelix.master.auth.jwt.algorithm`) must be identical to
+the ones configured in the starter on every service (`axelix.sbs.auth.jwt.signing-key` /
+`axelix.sbs.auth.jwt.algorithm`). **These properties are required, for now**.
+
+Depending on the configuration, Axelix Master may talk to spring boot apps and spring boot apps may also talk to Axelix Master. 
+The token is used in both directions. 
+
+During auto-discovery (when Axelix Master itself discovers spring boot apps to manage) Master mints a short-lived token to call a service's `/actuator/axelix-*` endpoints, and the axelix starter on spring boot's side
+verifies it before returning any data. 
+
+With self-registration (your spring boot apps register themselves in Axelix Master) enabled the starter signs its heartbeat and Master verifies it on registration. If the key or algorithm differs between the two
+sides, every such request is rejected with `401` — managed instances never appear in the UI and
+self-registration never succeeds.
 
 ## Building the community distribution from source
 
@@ -241,13 +259,13 @@ Either way Master serves the UI at `http://localhost:8080`, just like the publis
 
 ## Documentation
 
-Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](docs/docs):
+Full documentation lives at [axelix.io](https://axelix.io/) and under [`docs/`](docs/content/docs):
 
-- [Introduction](docs/docs/product/introduction.mdx) and [Motivation](docs/docs/product/motivation.mdx)
-- [Architecture](docs/docs/product/architecture.mdx)
-- [Installation](docs/docs/installation/configuring-master.mdx)
-- [Features reference](docs/docs/features/details.mdx)
-- [UI Guide](docs/docs/ui-guide/dashboard.mdx)
+- [Introduction](docs/content/docs/product/introduction.mdx) and [Motivation](docs/content/docs/product/motivation.mdx)
+- [Architecture](docs/content/docs/product/architecture.mdx)
+- [Installation](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx)
+- [Features reference](docs/content/docs/features/insights/details.mdx)
+- [UI Guide](docs/content/docs/ui-guide/dashboard.mdx)
 
 ## Axelix OSS and Enterprise
 

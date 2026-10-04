@@ -38,12 +38,14 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricResponse;
 import org.springframework.lang.Nullable;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile.Measurement;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfileMeasurement;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
+
+import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
@@ -90,14 +92,15 @@ public class AxelixMetricsEndpoint {
     public MetricProfile metric(@Selector String requiredMetricName, @Nullable List<String> tag) {
         MetricResponse originalDescriptor = delegate.metric(requiredMetricName, tag);
 
-        TransformedMeasurements measurements = getMeasurements(originalDescriptor.getBaseUnit(), originalDescriptor);
+        TransformedMeasurements measurements =
+                getMeasurements(emptyIfNull(originalDescriptor.getBaseUnit()), originalDescriptor);
 
-        return new MetricProfile(
-                originalDescriptor.getName(),
-                originalDescriptor.getDescription(),
-                measurements.baseUnit(),
-                measurements.measurements(),
-                getValidTagCombinations(requiredMetricName));
+        return new MetricProfile()
+                .name(originalDescriptor.getName())
+                .description(originalDescriptor.getDescription())
+                .baseUnit(measurements.baseUnit())
+                .measurements(measurements.measurements())
+                .validTagCombinations(getValidTagCombinations(requiredMetricName));
     }
 
     private TransformedMeasurements getMeasurements(String baseUnit, MetricResponse originalDescriptor) {
@@ -107,17 +110,17 @@ public class AxelixMetricsEndpoint {
                 .map(baseUnitValueTransformers::get)
                 .orElse(null);
 
-        List<Measurement> resultingMeasurements = new ArrayList<>();
+        List<MetricProfileMeasurement> resultingMeasurements = new ArrayList<>();
         String resultingBaseUnit = baseUnit;
 
         for (var measurement : originalDescriptor.getMeasurements()) {
             if (ACTUAL_VALUE_STATISTICS.contains(measurement.getStatistic())) {
                 if (baseUnitValueTransformer != null) {
                     var transformedMetricValue = baseUnitValueTransformer.transform(measurement.getValue());
-                    resultingMeasurements.add(new Measurement(transformedMetricValue.value()));
+                    resultingMeasurements.add(new MetricProfileMeasurement().value(transformedMetricValue.value()));
                     resultingBaseUnit = transformedMetricValue.baseUnit().getDisplayName();
                 } else {
-                    resultingMeasurements.add(new Measurement(measurement.getValue()));
+                    resultingMeasurements.add(new MetricProfileMeasurement().value(measurement.getValue()));
                 }
             }
         }
@@ -127,9 +130,9 @@ public class AxelixMetricsEndpoint {
 
     public static final class TransformedMeasurements {
         private final String baseUnit;
-        private final List<Measurement> measurements;
+        private final List<MetricProfileMeasurement> measurements;
 
-        public TransformedMeasurements(String baseUnit, List<Measurement> measurements) {
+        public TransformedMeasurements(String baseUnit, List<MetricProfileMeasurement> measurements) {
             this.baseUnit = baseUnit;
             this.measurements = measurements;
         }
@@ -138,7 +141,7 @@ public class AxelixMetricsEndpoint {
             return baseUnit;
         }
 
-        public List<Measurement> measurements() {
+        public List<MetricProfileMeasurement> measurements() {
             return measurements;
         }
 

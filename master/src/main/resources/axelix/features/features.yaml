@@ -1,0 +1,15 @@
+# The catalog of Axelix UI features whose availability depends on the Axelix starter version a
+# managed service runs.
+#
+# Not all the features must be listed here - just the ones the UI cares about.
+#
+# The `since` value is the first Axelix lockstep release (major.minor) in which the feature
+# became available on the starter side.
+#
+# `id` is the stable, wire-level, immutable identifier - kke pin mind that it is shared with the front-end
+
+releases:
+  - version: "1.2.0"
+    features: [
+      "dependency-analysis"
+    ]

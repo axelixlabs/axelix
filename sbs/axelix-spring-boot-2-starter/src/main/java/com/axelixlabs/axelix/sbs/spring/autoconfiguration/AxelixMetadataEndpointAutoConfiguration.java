@@ -19,22 +19,23 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.lang.management.ManagementFactory;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultBasicRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultOpenSessionInViewStateProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
@@ -44,6 +45,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvide
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProfileProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.NoOpTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
 
@@ -52,8 +54,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(
+@AxelixAutoConfiguration(
         after = {
             GarbageCollectionAutoConfiguration.class,
             HealthEndpointAutoConfiguration.class,
@@ -84,29 +87,29 @@ public class AxelixMetadataEndpointAutoConfiguration {
             OpenSessionInViewStateProvider openSessionInViewStateProvider,
             ObjectProvider<GcLogService> gcLogServiceProvider,
             VmOptionsAccessor vmOptionsAccessor,
-            TransactionStatsCollector transactionStatsCollector,
-            TransactionAttributesRegistry transactionAttributesRegistry,
+            ObjectProvider<TransactionStatsCollector> transactionStatsCollectorProvider,
+            ObjectProvider<TransactionAttributesRegistry> transactionAttributesRegistryProvider,
             ObjectProvider<JpaEntitiesProfileProvider> entitiesMapProvider) {
 
         return new DefaultInsightsInfoProvider(
                 openSessionInViewStateProvider,
                 gcLogServiceProvider.getIfAvailable(),
                 vmOptionsAccessor,
-                transactionStatsCollector,
-                transactionAttributesRegistry,
+                transactionStatsCollectorProvider.getIfAvailable(NoOpTransactionStatsCollector::new),
+                transactionAttributesRegistryProvider.getIfAvailable(TransactionAttributesRegistry::new),
                 entitiesMapProvider.getIfAvailable(NoOpJpaEntitiesProfileProvider::new));
     }
 
     @Bean
     public BasicRegistrationMetadataAssembler serviceMetadataAssembler(
-            HealthEndpoint healthEndpoint,
+            ObjectProvider<HealthEndpoint> healthEndpoint,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             AxelixInfoProperties axelixInfoProperties,
             LibraryInformationProvider libraryInformationProvider,
             InsightsInfoProvider insightsInfoProvider) {
 
         return new DefaultBasicRegistrationMetadataAssembler(
-                () -> getCurrentHealth(healthEndpoint),
+                () -> getCurrentHealth(healthEndpoint.getIfAvailable()),
                 axelixVersionDiscoverer,
                 libraryInformationProvider,
                 insightsInfoProvider,
@@ -119,18 +122,22 @@ public class AxelixMetadataEndpointAutoConfiguration {
         return new AxelixMetadataEndpoint(basicRegistrationMetadataAssembler);
     }
 
-    private BasicRegistrationMetadata.HealthStatus getCurrentHealth(HealthEndpoint healthEndpoint) {
+    private HealthStatus getCurrentHealth(@Nullable HealthEndpoint healthEndpoint) {
+        if (healthEndpoint == null) {
+            return HealthStatus.UP;
+        }
+
         Status status = healthEndpoint.health().getStatus();
 
         if (status == Status.UP) {
-            return BasicRegistrationMetadata.HealthStatus.UP;
+            return HealthStatus.UP;
         }
 
         if (status == Status.DOWN) {
-            return BasicRegistrationMetadata.HealthStatus.DOWN;
+            return HealthStatus.DOWN;
         }
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
-        return BasicRegistrationMetadata.HealthStatus.UNKNOWN;
+        return HealthStatus.UNKNOWN;
     }
 }

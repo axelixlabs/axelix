@@ -30,11 +30,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 import com.axelixlabs.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricProfile;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 

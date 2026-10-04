@@ -6,6 +6,7 @@ on:
     branches: [master]
     paths:
       - 'website/**'
+      - 'ssl/**'
 
 jobs:
   deploy:
@@ -19,6 +20,16 @@ jobs:
         uses: ./.github/actions/bitwarden
         with:
           bw-access-token: ${{ secrets.BW_ACCESS_TOKEN }}
+
+      - name: Write TLS private key into ssl/
+        run: |
+          set -eu
+          printf '%s\n' "$PRODUCTION_WEBSITE_CERTIFICATE_PRIVATE_KEY" > ssl/certificate.key
+          chmod 600 ssl/certificate.key
+          # Fail fast if the key does not match the leaf cert (public-key compare, no secret output)
+          key_pub=$(openssl pkey -in ssl/certificate.key -pubout -outform der | openssl sha256)
+          crt_pub=$(openssl x509 -in ssl/certificate.crt -pubkey -noout | openssl pkey -pubin -outform der | openssl sha256)
+          test "$key_pub" = "$crt_pub"
 
       - name: Install dependencies
         run: npm ci
@@ -34,7 +45,7 @@ jobs:
           host: ${{ env.PRODUCTION_WEBSITE_HOST }}
           username: ${{ env.PRODUCTION_WEBSITE_USER }}
           key: ${{ env.PRODUCTION_WEBSITE_PRIVATE_KEY }}
-          source: "docker-compose.yml,infra/nginx"
+          source: "docker-compose.yml,infra/nginx,ssl"
           target: "/home/${{ env.PRODUCTION_WEBSITE_USER }}"
 
       - name: Prepare Standalone Folder
@@ -64,3 +75,7 @@ jobs:
             cd /home/${{ env.PRODUCTION_WEBSITE_USER }}
             sudo docker compose rm -f -s website
             sudo docker compose up --build -d website
+            # Reload nginx so it picks up refreshed TLS material / config (bind-mounted,
+            # not re-read until reload). -t first so a bad config aborts before reload.
+            sudo docker compose exec -T nginx nginx -t
+            sudo docker compose exec -T nginx nginx -s reload

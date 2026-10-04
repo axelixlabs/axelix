@@ -30,10 +30,10 @@ import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
+import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;

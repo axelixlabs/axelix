@@ -1,0 +1,491 @@
+ecosystem: WEB
+projects:
+  - id: httpcomponents-4
+    name: Apache HttpComponents 4.x
+    status: MAINTENANCE
+    summary: >-
+      The 4.x series receives fixes for major defects and security issues only, and the async/NIO
+      parts of it are already at end of life. The project strongly encourages migrating to
+      HttpClient 5.x.
+    coordinates:
+      - org.apache.httpcomponents:httpclient
+      - org.apache.httpcomponents:httpmime
+      - org.apache.httpcomponents:httpcore
+      - org.apache.httpcomponents:httpcore-nio
+      - org.apache.httpcomponents:httpasyncclient
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.apache.httpcomponents.client5:httpclient5
+    reference:
+      label: HttpComponents support status
+      url: https://hc.apache.org/status.html
+
+  - id: httpcomponents-5
+    name: Apache HttpComponents 5.x
+    status: ACTIVE
+    summary: Actively developed and supported, with HTTP/2 support. The successor of the 4.x series.
+    coordinates:
+      - org.apache.httpcomponents.client5:httpclient5
+      - org.apache.httpcomponents.client5:httpclient5-cache
+      - org.apache.httpcomponents.client5:httpclient5-fluent
+      - org.apache.httpcomponents.client5:httpclient5-observation
+      - org.apache.httpcomponents.core5:httpcore5
+      - org.apache.httpcomponents.core5:httpcore5-h2
+      - org.apache.httpcomponents.core5:httpcore5-reactive
+    reference:
+      label: HttpComponents support status
+      url: https://hc.apache.org/status.html
+
+  - id: netflix-ribbon
+    name: Netflix Ribbon
+    status: MAINTENANCE
+    summary: >-
+      Netflix placed Ribbon in maintenance mode, and Spring Cloud removed its Ribbon integration in
+      the 2020.0 release. Spring Cloud LoadBalancer is the replacement for client-side load
+      balancing.
+    coordinates:
+      - com.netflix.ribbon:ribbon
+      - com.netflix.ribbon:ribbon-core
+      - com.netflix.ribbon:ribbon-loadbalancer
+      - com.netflix.ribbon:ribbon-httpclient
+      - org.springframework.cloud:spring-cloud-starter-netflix-ribbon
+      - org.springframework.cloud:spring-cloud-netflix-ribbon
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.cloud:spring-cloud-starter-loadbalancer
+    reference:
+      label: Ribbon maintenance-mode notice
+      url: https://github.com/Netflix/ribbon
+
+  - id: spring-cloud-netflix-zuul
+    name: Spring Cloud Netflix Zuul
+    status: SUNSET
+    summary: >-
+      Removed from Spring Cloud in the 2020.0 release. Netflix continues Zuul 2 on its own, but the
+      Spring integration only ever covered Zuul 1 and ended with it; Spring Cloud Gateway is the
+      replacement.
+    coordinates:
+      - org.springframework.cloud:spring-cloud-starter-netflix-zuul
+      - org.springframework.cloud:spring-cloud-netflix-zuul
+    succession:
+      kind: SUPERSEDED_BY
+      value: org.springframework.cloud:spring-cloud-starter-gateway
+    reference:
+      label: Spring Cloud 2020.0 release notes
+      url: https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2020.0-Release-Notes
+
+  - id: netty
+    name: Netty
+    status: ACTIVE
+    summary: >-
+      Actively developed. The asynchronous network framework underneath Reactor Netty and many
+      other clients and servers.
+    coordinates:
+      - io.netty:netty-all
+      - io.netty:netty-buffer
+      - io.netty:netty-codec
+      - io.netty:netty-codec-base
+      - io.netty:netty-codec-classes-quic
+      - io.netty:netty-codec-compression
+      - io.netty:netty-codec-dns
+      - io.netty:netty-codec-haproxy
+      - io.netty:netty-codec-http
+      - io.netty:netty-codec-http2
+      - io.netty:netty-codec-http3
+      - io.netty:netty-codec-marshalling
+      - io.netty:netty-codec-memcache
+      - io.netty:netty-codec-mqtt
+      - io.netty:netty-codec-native-quic
+      - io.netty:netty-codec-protobuf
+      - io.netty:netty-codec-redis
+      - io.netty:netty-codec-smtp
+      - io.netty:netty-codec-socks
+      - io.netty:netty-codec-stomp
+      - io.netty:netty-codec-xml
+      - io.netty:netty-common
+      - io.netty:netty-dev-tools
+      - io.netty:netty-handler
+      - io.netty:netty-handler-proxy
+      - io.netty:netty-handler-ssl-ocsp
+      - io.netty:netty-pkitesting
+      - io.netty:netty-resolver
+      - io.netty:netty-resolver-dns
+      - io.netty:netty-resolver-dns-classes-macos
+      - io.netty:netty-resolver-dns-native-macos
+      - io.netty:netty-tcnative
+      - io.netty:netty-tcnative-boringssl-static
+      - io.netty:netty-tcnative-classes
+      - io.netty:netty-transport
+      - io.netty:netty-transport-classes-epoll
+      - io.netty:netty-transport-classes-io_uring
+      - io.netty:netty-transport-classes-kqueue
+      - io.netty:netty-transport-native-epoll
+      - io.netty:netty-transport-native-io_uring
+      - io.netty:netty-transport-native-kqueue
+      - io.netty:netty-transport-native-unix-common
+      - io.netty:netty-transport-rxtx
+      - io.netty:netty-transport-sctp
+      - io.netty:netty-transport-udt
+    reference:
+      label: Netty
+      url: https://netty.io/
+
+  - id: apache-tomcat
+    name: Apache Tomcat
+    status: ACTIVE
+    summary: >-
+      Actively developed. The embedded servlet container Spring Boot uses by default. The
+      project's JDBC pool is curated as its own entry.
+    coordinates:
+      - org.apache.tomcat.embed:tomcat-embed-core
+      - org.apache.tomcat.embed:tomcat-embed-el
+      - org.apache.tomcat.embed:tomcat-embed-jasper
+      - org.apache.tomcat.embed:tomcat-embed-websocket
+      - org.apache.tomcat:tomcat-annotations-api
+      - org.apache.tomcat:tomcat-jsp-api
+    reference:
+      label: Apache Tomcat
+      url: https://tomcat.apache.org/
+
+  - id: eclipse-jetty
+    name: Eclipse Jetty
+    status: ACTIVE
+    summary: >-
+      Actively developed by the Eclipse Foundation. An embedded servlet container alternative
+      supported by Spring Boot.
+    coordinates:
+      - org.eclipse.jetty.compression:jetty-compression-brotli
+      - org.eclipse.jetty.compression:jetty-compression-client
+      - org.eclipse.jetty.compression:jetty-compression-common
+      - org.eclipse.jetty.compression:jetty-compression-gzip
+      - org.eclipse.jetty.compression:jetty-compression-server
+      - org.eclipse.jetty.compression:jetty-compression-zstandard
+      - org.eclipse.jetty.ee11.osgi:jetty-ee11-osgi-alpn
+      - org.eclipse.jetty.ee11.osgi:jetty-ee11-osgi-boot
+      - org.eclipse.jetty.ee11.osgi:jetty-ee11-osgi-boot-jsp
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-client
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-client-webapp
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-common
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jakarta-server
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jetty-client-webapp
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-jetty-server
+      - org.eclipse.jetty.ee11.websocket:jetty-ee11-websocket-servlet
+      - org.eclipse.jetty.ee11:jetty-ee11-annotations
+      - org.eclipse.jetty.ee11:jetty-ee11-apache-jsp
+      - org.eclipse.jetty.ee11:jetty-ee11-cdi
+      - org.eclipse.jetty.ee11:jetty-ee11-fcgi-proxy
+      - org.eclipse.jetty.ee11:jetty-ee11-glassfish-jstl
+      - org.eclipse.jetty.ee11:jetty-ee11-jaspi
+      - org.eclipse.jetty.ee11:jetty-ee11-jndi
+      - org.eclipse.jetty.ee11:jetty-ee11-jspc-maven-plugin
+      - org.eclipse.jetty.ee11:jetty-ee11-maven-plugin
+      - org.eclipse.jetty.ee11:jetty-ee11-plus
+      - org.eclipse.jetty.ee11:jetty-ee11-proxy
+      - org.eclipse.jetty.ee11:jetty-ee11-quickstart
+      - org.eclipse.jetty.ee11:jetty-ee11-servlet
+      - org.eclipse.jetty.ee11:jetty-ee11-servlets
+      - org.eclipse.jetty.ee11:jetty-ee11-webapp
+      - org.eclipse.jetty.ee:jetty-ee-webapp
+      - org.eclipse.jetty.fcgi:jetty-fcgi-client
+      - org.eclipse.jetty.fcgi:jetty-fcgi-proxy
+      - org.eclipse.jetty.fcgi:jetty-fcgi-server
+      - org.eclipse.jetty.http2:jetty-http2-client
+      - org.eclipse.jetty.http2:jetty-http2-client-transport
+      - org.eclipse.jetty.http2:jetty-http2-common
+      - org.eclipse.jetty.http2:jetty-http2-hpack
+      - org.eclipse.jetty.http2:jetty-http2-server
+      - org.eclipse.jetty.http3:jetty-http3-client
+      - org.eclipse.jetty.http3:jetty-http3-client-transport
+      - org.eclipse.jetty.http3:jetty-http3-common
+      - org.eclipse.jetty.http3:jetty-http3-qpack
+      - org.eclipse.jetty.http3:jetty-http3-server
+      - org.eclipse.jetty.quic:jetty-quic-api
+      - org.eclipse.jetty.quic:jetty-quic-client
+      - org.eclipse.jetty.quic:jetty-quic-common
+      - org.eclipse.jetty.quic:jetty-quic-quiche-client
+      - org.eclipse.jetty.quic:jetty-quic-quiche-common
+      - org.eclipse.jetty.quic:jetty-quic-quiche-foreign
+      - org.eclipse.jetty.quic:jetty-quic-quiche-jna
+      - org.eclipse.jetty.quic:jetty-quic-quiche-server
+      - org.eclipse.jetty.quic:jetty-quic-server
+      - org.eclipse.jetty.quic:jetty-quic-util
+      - org.eclipse.jetty.websocket:jetty-websocket-core-client
+      - org.eclipse.jetty.websocket:jetty-websocket-core-common
+      - org.eclipse.jetty.websocket:jetty-websocket-core-server
+      - org.eclipse.jetty.websocket:jetty-websocket-jetty-api
+      - org.eclipse.jetty.websocket:jetty-websocket-jetty-client
+      - org.eclipse.jetty.websocket:jetty-websocket-jetty-common
+      - org.eclipse.jetty.websocket:jetty-websocket-jetty-server
+      - org.eclipse.jetty:jetty-alpn-bouncycastle-client
+      - org.eclipse.jetty:jetty-alpn-bouncycastle-server
+      - org.eclipse.jetty:jetty-alpn-client
+      - org.eclipse.jetty:jetty-alpn-conscrypt-client
+      - org.eclipse.jetty:jetty-alpn-conscrypt-server
+      - org.eclipse.jetty:jetty-alpn-java-client
+      - org.eclipse.jetty:jetty-alpn-java-server
+      - org.eclipse.jetty:jetty-alpn-server
+      - org.eclipse.jetty:jetty-annotations
+      - org.eclipse.jetty:jetty-client
+      - org.eclipse.jetty:jetty-coreapp
+      - org.eclipse.jetty:jetty-deploy
+      - org.eclipse.jetty:jetty-http
+      - org.eclipse.jetty:jetty-http-spi
+      - org.eclipse.jetty:jetty-http-tools
+      - org.eclipse.jetty:jetty-io
+      - org.eclipse.jetty:jetty-jmx
+      - org.eclipse.jetty:jetty-jndi
+      - org.eclipse.jetty:jetty-keystore
+      - org.eclipse.jetty:jetty-osgi
+      - org.eclipse.jetty:jetty-plus
+      - org.eclipse.jetty:jetty-proxy
+      - org.eclipse.jetty:jetty-reactive-httpclient
+      - org.eclipse.jetty:jetty-rewrite
+      - org.eclipse.jetty:jetty-security
+      - org.eclipse.jetty:jetty-server
+      - org.eclipse.jetty:jetty-session
+      - org.eclipse.jetty:jetty-slf4j-impl
+      - org.eclipse.jetty:jetty-start
+      - org.eclipse.jetty:jetty-staticapp
+      - org.eclipse.jetty:jetty-unixdomain-server
+      - org.eclipse.jetty:jetty-util
+      - org.eclipse.jetty:jetty-util-ajax
+      - org.eclipse.jetty:jetty-xml
+    reference:
+      label: Eclipse Jetty
+      url: https://jetty.org/
+
+  - id: undertow
+    name: Undertow
+    status: ACTIVE
+    summary: >-
+      Actively developed by Red Hat. Spring Boot 4 however no longer supports Undertow as an
+      embedded server and its BOM no longer manages it, so Boot applications on Undertow have
+      to move to Tomcat or Jetty when upgrading to Boot 4.
+    coordinates:
+      - io.undertow:undertow-core
+      - io.undertow:undertow-servlet
+      - io.undertow:undertow-websockets-jsr
+    reference:
+      label: Undertow
+      url: https://undertow.io/
+
+  - id: jersey
+    name: Eclipse Jersey
+    status: ACTIVE
+    summary: >-
+      Actively developed under Eclipse EE4J. The JAX-RS reference implementation.
+    coordinates:
+      - org.glassfish.jersey.connectors:jersey-apache5-connector
+      - org.glassfish.jersey.connectors:jersey-grizzly-connector
+      - org.glassfish.jersey.connectors:jersey-helidon-connector
+      - org.glassfish.jersey.connectors:jersey-jdk-connector
+      - org.glassfish.jersey.connectors:jersey-jetty-connector
+      - org.glassfish.jersey.connectors:jersey-jetty-http2-connector
+      - org.glassfish.jersey.connectors:jersey-jnh-connector
+      - org.glassfish.jersey.connectors:jersey-netty-connector
+      - org.glassfish.jersey.containers.glassfish:jersey-gf-ejb
+      - org.glassfish.jersey.containers:jersey-container-grizzly2-http
+      - org.glassfish.jersey.containers:jersey-container-grizzly2-servlet
+      - org.glassfish.jersey.containers:jersey-container-helidon-http
+      - org.glassfish.jersey.containers:jersey-container-jdk-http
+      - org.glassfish.jersey.containers:jersey-container-jetty-http
+      - org.glassfish.jersey.containers:jersey-container-jetty-http2
+      - org.glassfish.jersey.containers:jersey-container-jetty-servlet
+      - org.glassfish.jersey.containers:jersey-container-netty-http
+      - org.glassfish.jersey.containers:jersey-container-servlet
+      - org.glassfish.jersey.core:jersey-client
+      - org.glassfish.jersey.core:jersey-common
+      - org.glassfish.jersey.core:jersey-server
+      - org.glassfish.jersey.ext.cdi:jersey-cdi-rs-inject
+      - org.glassfish.jersey.ext.cdi:jersey-cdi1x
+      - org.glassfish.jersey.ext.cdi:jersey-cdi1x-ban-custom-hk2-binding
+      - org.glassfish.jersey.ext.cdi:jersey-cdi1x-servlet
+      - org.glassfish.jersey.ext.cdi:jersey-cdi1x-transaction
+      - org.glassfish.jersey.ext.cdi:jersey-cdi1x-validation
+      - org.glassfish.jersey.ext.cdi:jersey-weld2-se
+      - org.glassfish.jersey.ext.microprofile:jersey-mp-config
+      - org.glassfish.jersey.ext.microprofile:jersey-mp-rest-client
+      - org.glassfish.jersey.ext.rx:jersey-rx-client-guava
+      - org.glassfish.jersey.ext.rx:jersey-rx-client-rxjava
+      - org.glassfish.jersey.ext.rx:jersey-rx-client-rxjava2
+      - org.glassfish.jersey.ext:jersey-bean-validation
+      - org.glassfish.jersey.ext:jersey-constants
+      - org.glassfish.jersey.ext:jersey-declarative-linking
+      - org.glassfish.jersey.ext:jersey-entity-filtering
+      - org.glassfish.jersey.ext:jersey-metainf-services
+      - org.glassfish.jersey.ext:jersey-micrometer
+      - org.glassfish.jersey.ext:jersey-mvc
+      - org.glassfish.jersey.ext:jersey-mvc-bean-validation
+      - org.glassfish.jersey.ext:jersey-mvc-freemarker
+      - org.glassfish.jersey.ext:jersey-mvc-jsp
+      - org.glassfish.jersey.ext:jersey-mvc-mustache
+      - org.glassfish.jersey.ext:jersey-proxy-client
+      - org.glassfish.jersey.ext:jersey-spring6
+      - org.glassfish.jersey.ext:jersey-wadl-doclet
+      - org.glassfish.jersey.inject:jersey-cdi2-se
+      - org.glassfish.jersey.inject:jersey-hk2
+      - org.glassfish.jersey.media:jersey-media-jaxb
+      - org.glassfish.jersey.media:jersey-media-json-binding
+      - org.glassfish.jersey.media:jersey-media-json-gson
+      - org.glassfish.jersey.media:jersey-media-json-jackson
+      - org.glassfish.jersey.media:jersey-media-json-jettison
+      - org.glassfish.jersey.media:jersey-media-json-processing
+      - org.glassfish.jersey.media:jersey-media-kryo
+      - org.glassfish.jersey.media:jersey-media-moxy
+      - org.glassfish.jersey.media:jersey-media-multipart
+      - org.glassfish.jersey.media:jersey-media-sse
+      - org.glassfish.jersey.security:oauth1-client
+      - org.glassfish.jersey.security:oauth1-server
+      - org.glassfish.jersey.security:oauth1-signature
+      - org.glassfish.jersey.security:oauth2-client
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-bundle
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-external
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-helidon
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-inmemory
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jdk-http
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty-http2
+      - org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-netty
+      - org.glassfish.jersey.test-framework:jersey-test-framework-core
+      - org.glassfish.jersey.test-framework:jersey-test-framework-util
+    reference:
+      label: Eclipse Jersey
+      url: https://eclipse-ee4j.github.io/jersey/
+
+  - id: thymeleaf
+    name: Thymeleaf
+    status: ACTIVE
+    summary: >-
+      Actively maintained, on a slow release cadence.
+    coordinates:
+      - org.thymeleaf:thymeleaf
+      - org.thymeleaf:thymeleaf-spring6
+      - org.thymeleaf.extras:thymeleaf-extras-springsecurity6
+    reference:
+      label: Thymeleaf
+      url: https://www.thymeleaf.org/
+
+  - id: freemarker
+    name: Apache FreeMarker
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the Apache FreeMarker project.
+    coordinates:
+      - org.freemarker:freemarker
+    reference:
+      label: Apache FreeMarker
+      url: https://freemarker.apache.org/
+
+  - id: grpc
+    name: gRPC Java
+    status: ACTIVE
+    summary: >-
+      Actively developed by Google and the gRPC community.
+    coordinates:
+      - io.grpc:grpc-all
+      - io.grpc:grpc-alts
+      - io.grpc:grpc-api
+      - io.grpc:grpc-auth
+      - io.grpc:grpc-benchmarks
+      - io.grpc:grpc-census
+      - io.grpc:grpc-context
+      - io.grpc:grpc-context-override-opentelemetry
+      - io.grpc:grpc-core
+      - io.grpc:grpc-gcp-csm-observability
+      - io.grpc:grpc-gcp-observability
+      - io.grpc:grpc-googleapis
+      - io.grpc:grpc-grpclb
+      - io.grpc:grpc-inprocess
+      - io.grpc:grpc-interop-testing
+      - io.grpc:grpc-kotlin-stub
+      - io.grpc:grpc-netty
+      - io.grpc:grpc-netty-shaded
+      - io.grpc:grpc-okhttp
+      - io.grpc:grpc-opentelemetry
+      - io.grpc:grpc-protobuf
+      - io.grpc:grpc-protobuf-lite
+      - io.grpc:grpc-rls
+      - io.grpc:grpc-s2a
+      - io.grpc:grpc-services
+      - io.grpc:grpc-servlet
+      - io.grpc:grpc-servlet-jakarta
+      - io.grpc:grpc-stub
+      - io.grpc:grpc-testing
+      - io.grpc:grpc-testing-proto
+      - io.grpc:grpc-util
+      - io.grpc:grpc-xds
+      - io.grpc:protoc-gen-grpc-java
+    reference:
+      label: gRPC
+      url: https://grpc.io/
+
+  - id: jmustache
+    name: JMustache
+    status: ACTIVE
+    summary: >-
+      The repository is actively committed to, but nothing has been released since 1.16 in
+      December 2023.
+    coordinates:
+      - com.samskivert:jmustache
+    reference:
+      label: JMustache on GitHub
+      url: https://github.com/samskivert/jmustache
+
+  - id: webjars-locators
+    name: WebJars Locators
+    status: ACTIVE
+    summary: >-
+      Actively maintained by the WebJars project. Spring Boot 3.4+ resolves WebJars through
+      the lighter webjars-locator-lite.
+    coordinates:
+      - org.webjars:webjars-locator-core
+      - org.webjars:webjars-locator-lite
+    reference:
+      label: WebJars
+      url: https://www.webjars.org/
+
+  - id: graphql-java
+    name: GraphQL Java
+    status: ACTIVE
+    summary: >-
+      Actively developed. The GraphQL engine underneath Spring for GraphQL.
+    coordinates:
+      - com.graphql-java:graphql-java
+    reference:
+      label: GraphQL Java
+      url: https://www.graphql-java.com/
+  - id: springdoc-openapi
+    name: springdoc-openapi
+    status: ACTIVE
+    summary: >-
+      Actively developed. Generates OpenAPI descriptions and serves Swagger UI for Spring Boot
+      applications.
+    coordinates:
+      - org.springdoc:springdoc-openapi-starter-common
+      - org.springdoc:springdoc-openapi-starter-webmvc-api
+      - org.springdoc:springdoc-openapi-starter-webmvc-ui
+      - org.springdoc:springdoc-openapi-starter-webflux-api
+      - org.springdoc:springdoc-openapi-starter-webflux-ui
+    reference:
+      label: springdoc-openapi
+      url: https://springdoc.org/
+
+  - id: swagger
+    name: Swagger Core & UI
+    status: ACTIVE
+    summary: >-
+      Actively developed by SmartBear. The OpenAPI model and annotation library plus the Swagger UI
+      webjar, usually arriving transitively through springdoc-openapi.
+    coordinates:
+      - io.swagger.core.v3:swagger-annotations
+      - io.swagger.core.v3:swagger-annotations-jakarta
+      - io.swagger.core.v3:swagger-core
+      - io.swagger.core.v3:swagger-core-jakarta
+      - io.swagger.core.v3:swagger-models
+      - io.swagger.core.v3:swagger-models-jakarta
+      - org.webjars:swagger-ui
+    reference:
+      label: Swagger
+      url: https://swagger.io/
+

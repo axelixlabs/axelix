@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
 
 /**
  * Enriches environment property information with additional metadata.

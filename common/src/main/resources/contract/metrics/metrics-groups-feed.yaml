@@ -1,0 +1,71 @@
+openapi: 3.1.0
+info:
+  title: metrics-groups-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'metrics-groups-feed' operation.
+    This operation lists the names and descriptions of all metrics of the Spring Boot app, grouped
+    by the metric name prefix, so that Axelix Master can render the metrics overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-metrics:
+    get:
+      operationId: getMetricsGroups
+      summary: Lists all metrics of the service, grouped by the metric name prefix.
+      responses:
+        '200':
+          description: The feed of metrics groups.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsGroupsFeed'
+components:
+  schemas:
+    MetricsGroupsFeed:
+      type: object
+      description: The response returned by the metric groups list endpoint.
+      required:
+        - metricsGroups
+      properties:
+        metricsGroups:
+          type: array
+          description: The list of metrics groups.
+          items:
+            $ref: '#/components/schemas/MetricsGroup'
+          x-axelix-introduced-in: 1.2.0
+    MetricsGroup:
+      type: object
+      description: Information about a metrics group.
+      required:
+        - groupName
+        - metrics
+      properties:
+        groupName:
+          type: string
+          description: The name of the group to which the metrics belong.
+          x-axelix-introduced-in: 1.2.0
+        metrics:
+          type: array
+          description: The names and descriptions of the metrics inside the given group.
+          items:
+            $ref: '#/components/schemas/MetricDescription'
+          x-axelix-introduced-in: 1.2.0
+    MetricDescription:
+      type: object
+      description: Information about a metric.
+      required:
+        - metricName
+      properties:
+        metricName:
+          type: string
+          description: The name of the metric.
+          x-axelix-introduced-in: 1.2.0
+        description:
+          type: string
+          description: The description of the metric.
+          x-axelix-introduced-in: 1.2.0

@@ -7,9 +7,11 @@ import styles from "./styles.module.css";
 
 interface IProps {
   item: BlogCardItem;
+  /** Drop the author byline — redundant on an author's own profile page. */
+  hideAuthors?: boolean;
 }
 
-export const PostRow = ({ item }: IProps) => {
+export const PostRow = ({ item, hideAuthors }: IProps) => {
   return (
     <Link className={styles.PostRow} href={item.href}>
       <div className={styles.Rbody}>
@@ -17,7 +19,7 @@ export const PostRow = ({ item }: IProps) => {
         <DateMeta date={item.date} readingMinutes={item.readingMinutes} />
         <h3>{item.title}</h3>
         {item.description && <p className={styles.Exc}>{item.description}</p>}
-        <Authors authors={item.authors} />
+        {!hideAuthors && <Authors authors={item.authors} />}
       </div>
       {item.coverSrc ? (
         <div className={styles.Rcover}>

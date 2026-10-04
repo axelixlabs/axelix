@@ -1,0 +1,74 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 20px;
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.TotalWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.TotalValue {
+    font-variant-numeric: tabular-nums;
+}
+
+.TotalLabel {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+}
+
+.Breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 20px;
+    border-left: 1px solid var(--axelix-medium-grey);
+}
+
+.BreakdownRow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Count {
+    font-weight: 600;
+    min-width: 30px;
+    font-variant-numeric: tabular-nums;
+}
+
+.CountMuted {
+    color: var(--axelix-bold-grey);
+}
+
+/* TODO: Improve in the future */
+.Badge {
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 5px;
+    padding: 1px 7px;
+    border: 1px solid transparent;
+}
+
+.BadgeLts {
+    color: #15803d;
+    background-color: #ecfdf5;
+    border-color: #bbf7d0;
+}
+
+.BadgeNonLts {
+    color: #b54708;
+    background-color: #fffaeb;
+    border-color: #fedf89;
+}
+
+.Hint {
+    color: var(--axelix-bold-grey);
+}

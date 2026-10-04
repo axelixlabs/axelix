@@ -39,7 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
+import com.axelixlabs.axelix.master.contract.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
@@ -177,7 +177,7 @@ class GcLogFileApiTest {
 
     @Test
     void shouldEnableGcLogging() {
-        GcLogEnableRequest requestBody = new GcLogEnableRequest("info");
+        GcLogEnableRequest requestBody = new GcLogEnableRequest().level("info");
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(

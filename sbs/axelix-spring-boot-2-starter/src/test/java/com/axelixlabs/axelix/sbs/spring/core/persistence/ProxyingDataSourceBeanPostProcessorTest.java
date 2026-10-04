@@ -17,18 +17,35 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
+import java.io.Closeable;
+import java.lang.reflect.Proxy;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAccessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Integration test for {@link ProxyingDataSourceBeanPostProcessor}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitoringSharedContextTest {
 
@@ -39,8 +56,12 @@ class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitor
     private ProxyingDataSourceBeanPostProcessor subject;
 
     @Test
-    void shouldWrapDataSourceWithProxyingDataSource() {
-        assertThat(dataSource).isInstanceOf(ProxyingDataSource.class);
+    void shouldWrapDataSourceWithMonitoringProxy() throws SQLException {
+        assertThat(AopUtils.isCglibProxy(dataSource)).isTrue();
+
+        try (Connection connection = dataSource.getConnection()) {
+            assertThat(connection).isInstanceOf(ProxyingConnection.class);
+        }
     }
 
     @Test
@@ -52,11 +73,105 @@ class ProxyingDataSourceBeanPostProcessorTest extends AbstractTransactionMonitor
     }
 
     @Test
-    void shouldNotDoubleWrapAlreadyProxiedDataSource() {
-        ProxyingDataSource alreadyProxied = (ProxyingDataSource) dataSource;
+    void shouldNotWrapDataSourceWithFinalMethod() {
+        Object result = subject.postProcessAfterInitialization(new FinalMethodDataSource(), "finalMethodDataSource");
 
-        Object result = subject.postProcessAfterInitialization(alreadyProxied, "dataSource");
+        assertThat(AopUtils.isAopProxy(result)).isFalse();
+    }
 
-        assertThat(result).isSameAs(alreadyProxied);
+    @Test
+    void shouldWrapJdkProxiedDataSourceViaInterfaceProxy() throws SQLException {
+        DataSource target = new DriverManagerDataSource("jdbc:h2:mem:jdk-proxy-test;DB_CLOSE_DELAY=-1");
+        DataSource jdkProxiedDataSource = (DataSource) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class<?>[] {DataSource.class, Closeable.class},
+                (proxy, method, args) -> method.invoke(target, args));
+
+        Object result = subject.postProcessAfterInitialization(jdkProxiedDataSource, "jdkProxiedDataSource");
+
+        assertThat(AopUtils.isJdkDynamicProxy(result)).isTrue();
+        assertThat(result).isInstanceOf(Closeable.class);
+
+        try (Connection connection = ((DataSource) result).getConnection()) {
+            assertThat(connection).isInstanceOf(ProxyingConnection.class);
+        }
+    }
+
+    static class FinalMethodDataSource extends DriverManagerDataSource {
+        FinalMethodDataSource() {
+            super("jdbc:h2:mem:final-method-test;DB_CLOSE_DELAY=-1");
+        }
+
+        @Override
+        public final Connection getConnection() throws SQLException {
+            return super.getConnection();
+        }
+    }
+
+    static class RoutingDataSourceTest {
+
+        @Test
+        void staysAssignmentCompatibleAcrossInClassBeanMethodCall() {
+            assertThatCode(() -> {
+                        try (AnnotationConfigApplicationContext context =
+                                new AnnotationConfigApplicationContext(RoutingTestConfig.class)) {
+                            AbstractRoutingDataSource routingDataSource =
+                                    context.getBean(AbstractRoutingDataSource.class);
+                            DataSourceConsumer consumer = context.getBean(DataSourceConsumer.class);
+
+                            assertThat(consumer.dataSource).isSameAs(routingDataSource);
+                        }
+                    })
+                    .doesNotThrowAnyException();
+        }
+
+        static class SingleTargetRoutingDataSource extends AbstractRoutingDataSource {
+            @Override
+            protected Object determineCurrentLookupKey() {
+                return "default";
+            }
+        }
+
+        static class DataSourceConsumer {
+            final AbstractRoutingDataSource dataSource;
+
+            DataSourceConsumer(AbstractRoutingDataSource dataSource) {
+                this.dataSource = dataSource;
+            }
+        }
+
+        @TestConfiguration
+        static class RoutingTestConfig {
+
+            @Bean
+            public TransactionAccessor transactionAccessor() {
+                return new TransactionAccessor();
+            }
+
+            @Bean
+            public ProxyingDataSourceBeanPostProcessor proxyingDataSourceBeanPostProcessor(
+                    TransactionAccessor transactionAccessor) {
+                return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
+            }
+
+            @Bean
+            public AbstractRoutingDataSource routingDataSource() {
+                SingleTargetRoutingDataSource routing = new SingleTargetRoutingDataSource();
+                DataSource target = new DriverManagerDataSource("jdbc:h2:mem:routing-test;DB_CLOSE_DELAY=-1");
+
+                Map<Object, Object> targets = new HashMap<>();
+                targets.put("default", target);
+                routing.setTargetDataSources(targets);
+                routing.setDefaultTargetDataSource(target);
+                routing.afterPropertiesSet();
+
+                return routing;
+            }
+
+            @Bean
+            public DataSourceConsumer dataSourceConsumer() {
+                return new DataSourceConsumer(routingDataSource());
+            }
+        }
     }
 }

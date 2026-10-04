@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.InstanceDetails;
 
 /**
  * Assembles the details about this particular service.

@@ -131,11 +131,6 @@ public final class ApiPaths {
     public static final class DashboardApi {
 
         /**
-         * Base path for dashboard APIs.
-         */
-        public static final String MAIN = "/dashboard";
-
-        /**
          * Endpoint to retrieve the aggregated Java/JVM features adoption across the ecosystem.
          */
         public static final String JAVA = "/dashboard/java";
@@ -149,6 +144,16 @@ public final class ApiPaths {
          * Endpoint to retrieve the aggregated persistence problems (N + 1, in-memory pagination) across the ecosystem.
          */
         public static final String PERSISTENCE = "/dashboard/persistence";
+
+        /**
+         * Endpoint to retrieve the fleet-wide Spring Boot / Spring Framework version portfolio.
+         */
+        public static final String SPRING_PORTFOLIO = "/dashboard/spring-portfolio";
+
+        /**
+         * Endpoint to retrieve the fleet-wide languages profile (Java releases, JDK builds and Kotlin adoption).
+         */
+        public static final String LANGUAGES = "/dashboard/languages";
     }
 
     public static final class LoggersApi {
@@ -215,14 +220,6 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/heapdump/{instanceId}";
     }
 
-    public static final class PropertyManagementApi {
-
-        /**
-         * Endpoint to update property of a given application instance.
-         */
-        public static final String INSTANCE_ID = "/property-management/{instanceId}";
-    }
-
     public static final class CachesApi {
 
         /**
@@ -244,16 +241,6 @@ public final class ApiPaths {
          * Endpoint to disable a specific cache in a cache manager.
          */
         public static final String DISABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable";
-
-        /**
-         * Endpoint to enable all caches in a cache manager.
-         */
-        public static final String ENABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/enable";
-
-        /**
-         * Endpoint to disable all caches in a cache manager.
-         */
-        public static final String DISABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/disable";
     }
 
     public static final class MetricsApi {
@@ -336,14 +323,6 @@ public final class ApiPaths {
                 "/thread-dump/{instanceId}/thread-contention-monitoring/disable";
     }
 
-    public static final class FeignClientApi {
-
-        /**
-         * Feign Client endpoint with instance ID.
-         */
-        public static final String INSTANCE_ID = "/feign/{instanceId}";
-    }
-
     public static final class McpOAuth2Api {
 
         /**
@@ -360,11 +339,34 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/dependencies/{instanceId}";
     }
 
+    public static final class UpgradesApi {
+
+        /**
+         * Endpoint to retrieve how far Axelix Master can be safely upgraded, given the starter versions
+         * currently in use across the fleet.
+         */
+        public static final String MAIN = "/upgrades";
+
+        /**
+         * Endpoint to retrieve how many applications would lose compatibility if Axelix Master were
+         * upgraded to a given version.
+         */
+        public static final String IMPACT = "/upgrades/impact";
+    }
+
     public static final class McpToolApi {
 
         /**
          * The feed of MCP tools configured in the master service.
          */
         public static final String TOOLS_LIST = "/mcp/tools-feed";
+    }
+
+    public static final class InstanceFeaturesApi {
+
+        /**
+         * Endpoint to resolve which features are available for a given application instance.
+         */
+        public static final String INSTANCE_ID = "/features/{instanceId}";
     }
 }

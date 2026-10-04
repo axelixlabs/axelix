@@ -22,8 +22,12 @@ package com.axelixlabs.axelix.master.domain;
  * {@code artifactId} (the G and A inside the GAV coordinate) and is shared by all the instances of the same
  * application. This id is mandatory - an {@link Instance} cannot be registered without a valid {@link ApplicationId}.
  *
- * @param groupId    the group id of the application artifact (the G inside the GAV coordinate)
- * @param artifactId the artifact id of the application artifact (the A inside the GAV coordinate)
+ * @param groupId    the group id of the application artifact (the G inside the GAV coordinate). It may be empty
+ *                   in some cases, e.g. in Gradle projects that might be the case. In this case, the application
+ *                   is effectively identified just by the {@link #artifactId}.
+ *
+ * @param artifactId the artifact id of the application artifact (the A inside the GAV coordinate).
+ *
  * @author Mikhail Polivakha
  */
 public record ApplicationId(String groupId, String artifactId) {

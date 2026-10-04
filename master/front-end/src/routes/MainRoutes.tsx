@@ -23,10 +23,11 @@ import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
 import { DashboardSiderMenu } from "@/layout/siders";
 
+const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
-const DashboardOverview = Loadable(lazy(() => import("@/pages/Dashboard/DashboardOverview")));
-const DashboardJava = Loadable(lazy(() => import("@/pages/Dashboard/DashboardJava")));
+const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
+const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));
@@ -59,9 +60,9 @@ export const MainRoutes = () => {
                 </Route>
 
                 <Route path="/dashboard" element={<MainLayout siderContent={<DashboardSiderMenu />} />}>
-                    <Route index element={<Navigate to="overview" replace />} />
-                    <Route path="overview" element={<DashboardOverview />} />
-                    <Route path="java" element={<DashboardJava />} />
+                    <Route index element={<Navigate to="spring-portfolio" replace />} />
+                    <Route path="spring-portfolio" element={<DashboardSpringPortfolio />} />
+                    <Route path="languages" element={<DashboardLanguages />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
                     <Route path="spring-framework" element={<DashboardSpringFramework />} />
                 </Route>
@@ -74,6 +75,7 @@ export const MainRoutes = () => {
                 <Route element={<MainLayout />}>
                     <Route path="/instance/:instanceId/details" element={<Details />} />
                     <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
+                    <Route path="/instance/:instanceId/dependencies" element={<DependenciesAnalyzer />} />
                     <Route path="/instance/:instanceId/environment" element={<Environment />} />
                     <Route path="/instance/:instanceId/beans" element={<Beans />} />
                     <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />

@@ -1,0 +1,18 @@
+ecosystem: RESILIENCE
+projects:
+  - id: hystrix
+    name: Netflix Hystrix
+    status: MAINTENANCE
+    summary: >-
+      Netflix placed Hystrix in maintenance mode in 2018: no new features, the last release is
+      1.5.18, and Netflix itself recommends adaptive alternatives such as Resilience4j.
+    coordinates:
+      - com.netflix.hystrix:hystrix-core
+      - com.netflix.hystrix:hystrix-javanica
+      - com.netflix.hystrix:hystrix-metrics-event-stream
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.github.resilience4j:resilience4j-circuitbreaker
+    reference:
+      label: Hystrix maintenance-mode notice
+      url: https://github.com/Netflix/Hystrix

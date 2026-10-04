@@ -71,11 +71,34 @@
     },
     "Environments": {
         "activeProfiles": "Профили:",
-        "primaryProperty": "Актуальное значение",
+        "primaryProperty": "Активное",
+        "primaryPropertyHint": "Это значение, которое приложение использует для данного свойства",
+        "suppressedProperty": "Перекрыто",
+        "suppressedPropertyHint": "Свойство определено также в источнике с более высоким приоритетом, поэтому это значение не применяется",
         "deprecated": "Устаревшее",
+        "replacedBy": "Заменено на",
+        "dangerousValue": "Опасное значение",
+        "recommended": "Рекомендуется",
         "description": "Описание",
         "configProps": "Configuration Properties",
-        "injectedIn": "Инжектируется в"
+        "injectedIn": "Инжектируется в",
+        "profilesCount": "Профили: {{value}}",
+        "profilesPrecedenceHint": "Перечислены в порядке убывания приоритета, т.е. чем выше профиль в списке - тем больше его приоритет",
+        "propertiesCount": "Свойства: {{value}}",
+        "flaggedCount": "Отмечено: {{value}}",
+        "clearFilters": "Сбросить",
+        "triageTags": {
+            "DANGEROUS": "Опасное значение",
+            "DEPRECATED_ERROR": "Устаревшее · ошибка",
+            "DEPRECATED_WARNING": "Устаревшее · предупреждение",
+            "SUPPRESSED": "Перекрыто"
+        },
+        "definedInSources": "Определено в источниках: {{value}}",
+        "wins": "Применяется",
+        "highestPrecedence": "Наивысший приоритет",
+        "lowestPrecedence": "Наименьший",
+        "noMatchingProperties": "Нет свойств, соответствующих поиску и фильтрам.",
+        "noPropertiesInSource": "Этот источник не определяет ни одного свойства."
     },
     "Loggers": {
         "loggers": "Логгеры",
@@ -106,6 +129,7 @@
         "scheduledTasks": "Запланированные задачи",
         "conditions": "Условия",
         "loggers": "Логгеры",
+        "dependenciesAnalyzer": "Анализатор зависимостей",
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
@@ -212,7 +236,8 @@
             "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что экземпляр сервиса был передеплоен. Посетите панель сервисов чтобы убедиться.",
             "INVALID_CREDENTIALS" : "Неверное имя пользователя или пароль",
             "USERNAME_ALREADY_EXISTS": "Пользователь с таким именем уже существует. Пожалуйста, выберите другое имя пользователя.",
-            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email."
+            "EMAIL_ALREADY_EXISTS": "Пользователь с таким email уже существует. Пожалуйста, выберите другой email.",
+            "SBOM_NOT_AVAILABLE": "SBOM not found for this project."
         }
     },
     "Metrics": {
@@ -222,21 +247,6 @@
         "disabledTag": "Данное значение тэга не является корретным в контексте значений, выбранных для других тэгов"
     },
     "Dashboard": {
-        "distributions": "Карта Системы",
-        "distributionsSubtitle": "Состояние актуальных версий в рамках экосистемы",
-        "components" : {
-            "subtitle": "Версия Компонента",
-            "SpringBoot" : "Spring Boot",
-            "SpringFramework" : "Spring Framework",
-            "Java" : "Java",
-            "Kotlin": "Kotlin",
-            "JdkVendor": "JDK Vendor"
-        },
-        "mostUsed": "Основная",
-        "healthStatus": "Состояние системы",
-        "totalCount": "Общее кол-во",
-        "statistics": "Статистика",
-        "totalServicesCount": "Общее количество сервисов",
         "enabled": "Включено",
         "disabled": "Отключено",
         "Java": {
@@ -253,6 +263,44 @@
             "gcDistributionChartSubtitle": "Профиль среды выполнения",
             "gcDistributionChartCentreSubtitle": "Основной"
         },
+        "Languages": {
+            "title": "Профиль языков",
+            "subtitle": "Языки JVM, версии Java и сборки JDK, используемые в экосистеме",
+            "applications": "Приложения",
+            "lts": "LTS",
+            "nonLts": "Не LTS",
+            "onLtsRelease": "на LTS-версии",
+            "onNonLtsRelease": "на не-LTS-версии",
+            "javaEyebrow": "Версия Java · на приложение",
+            "javaCardTitle": "Использование Java",
+            "javaTitle": "Java",
+            "jdkEyebrow": "Поставщик JDK · на приложение",
+            "jdkCardTitle": "Поставщики JDK",
+            "languageMixEyebrow": "Состав языков · на приложение",
+            "languageMixTitle": "Использование Kotlin",
+            "kotlinVersionEyebrow": "Версия Kotlin · на приложение",
+            "kotlinCardTitle": "Версии Kotlin",
+            "kotlinTitle": "Kotlin",
+            "javaOnly": "Только Java",
+            "javaAndKotlin": "Java и Kotlin",
+            "ltsReleases": "LTS-версии",
+            "onJava": "на Java {{release}}",
+            "singleJdk": "Один JDK",
+            "useKotlin": "используют Kotlin",
+            "applicationsLower": "приложений",
+            "releasesInUse": "версий в использовании: <0>{{count}}</0> на <1>{{apps}}</1> приложениях",
+            "vendorsAcrossApplications": "<0>{{vendors}}</0> поставщиков на <1>{{apps}}</1> приложениях",
+            "kotlinOfApplications": "<0>{{kotlin}}</0> из <1>{{total}}</1> приложений содержат код на Kotlin",
+            "versionsAcrossApplications": "<0>{{count}}</0> версий в <1>{{apps}}</1> приложениях",
+            "detectedAcrossApplications": "Определено во время выполнения по <0>{{count}}</0> приложениям",
+            "lastScan": "Последнее сканирование {{date}}",
+            "kotlinBadge": "Kotlin",
+            "noKotlin": "Код на Kotlin не обнаружен ни в одном из <0>{{count}}</0> приложений",
+            "noApplicationsTitle": "Приложения не обнаружены",
+            "noApplicationsText": "Профили языков, используемых в экосистеме, определяются во время выполнения. Они появятся здесь, как только первое приложение зарегистрируется в Axelix Master.",
+            "readTheDocs": "Читать документацию",
+            "appsRecorded": "записано приложений: <0>{{count}}</0>"
+        },
         "Persistence": {
             "title": "Работа с Персистетным Хранилищем",
             "subtitle": "Паттерны доступа к БД · Обнаружение N+1 · Pagination в памяти",
@@ -267,6 +315,25 @@
             "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
             "osivChartTitle": "Open Session in View (OSIV)",
             "osivChartSubtitle": "Проблемы с производительностью"
+        },
+        "SpringPortfolio": {
+            "title": "Spring Portfolio",
+            "subtitle": "Используемые версии по всей экосистеме относительно опубликованного графика поддержки OSS",
+            "applications": "Приложения",
+            "ossOk": "OSS ✓",
+            "ossNo": "OSS ✕",
+            "supportedHint": "выпуск обновлений сообществом продолжается",
+            "unsupportedHint": "окно поддержки закрыто",
+            "generation": "Поколение программного компонента",
+            "onSupportedLine": "{{supported}} из {{total}} приложений на поддерживаемой OSS линии",
+            "detectedAtRuntime": "Обнаружено во время выполнения в {{total}} приложениях",
+            "ladderTitle": "Окно поддержки OSS · используемые линии",
+            "ladderHint": "На основе графиков, опубликованных командой Spring",
+            "line": "Линия",
+            "ossEnds": "Конец OSS",
+            "apps": "Прил.",
+            "legendSupported": "Поддерживается OSS — сообщество выпускает исправления для этой линии",
+            "legendUnsupported": "Не поддерживается OSS — после этой даты выпусков от сообщества нет"
         }
     },
     "About": {
@@ -465,6 +532,86 @@
         "clean": {
             "title": "Проблем в маппинге нет",
             "description": "Все {{count}} сопоставленных сущностей чисты — нет жадной загрузки, нет @ManyToMany на основе List, нет опасных каскадов и нет однонаправленных @OneToMany."
+        }
+    },
+    "DependenciesAnalyzer": {
+        "framework": {
+            "caption": "Окно поддержки {{framework}}",
+            "source": "Считано из работающей JVM · {{date}}",
+            "runningLine": "Используется линия {{line}} · последняя известная Axelix линия — {{latest}}",
+            "today": "Сегодня",
+            "released": "Выпущено {{date}}",
+            "ossEnded": "OSS-поддержка завершена {{date}}",
+            "ossEnds": "OSS-поддержка завершится {{date}}",
+            "commercial": "Коммерческая до {{date}}",
+            "consequence": "Последствие",
+            "outOfOssFor": "Без OSS-поддержки уже",
+            "supportedTarget": "Близжайший поддерживаемый таргет",
+            "targetValue": "{{line}} · OSS до {{date}}"
+        },
+        "frameworkStatus": {
+            "OSS_SUPPORTED": "В рамках OSS-поддержки",
+            "OUT_OF_OSS_MAINTENANCE": "Вне OSS-поддержки"
+        },
+        "consequences": {
+            "OSS_SUPPORTED": "Эта линия продолжает получать OSS-релизы, включая исправления безопасности.",
+            "OUT_OF_OSS_MAINTENANCE": "OSS-релизов больше не будет, включая исправления безопасности. CVE в этой линии исправляются только по коммерческой подписке."
+        },
+        "duration": {
+            "years_one": "{{count}} год",
+            "years_few": "{{count}} года",
+            "years_many": "{{count}} лет",
+            "years_other": "{{count}} лет",
+            "months_one": "{{count}} месяц",
+            "months_few": "{{count}} месяца",
+            "months_many": "{{count}} месяцев",
+            "months_other": "{{count}} месяцев",
+            "lessThanAMonth": "менее месяца"
+        },
+        "feed": {
+            "caption": "Обнаруженные зависимости",
+            "clear": "Сбросить"
+        },
+        "ecosystems": {
+            "ALL": "Все",
+            "PERSISTENCE": "Хранение данных",
+            "SERIALIZATION": "Сериализация",
+            "LOGGING": "Логирование",
+            "OBSERVABILITY": "Наблюдаемость",
+            "RESILIENCE": "Отказоустойчивость",
+            "SECURITY": "Безопасность",
+            "MESSAGING": "Обмен сообщениями",
+            "WEB": "Веб",
+            "TESTING": "Тестирование",
+            "OTHER": "Прочее"
+        },
+        "statuses": {
+            "SUNSET": "Официально прекращён",
+            "MAINTENANCE": "В режиме поддержки",
+            "DORMANT": "Неактивный",
+            "ACTIVE": "Активно разрабатывается"
+        },
+        "columns": {
+            "dependency": "Зависимость",
+            "version": "Версия",
+            "scope": "Тип"
+        },
+        "scope": {
+            "direct": "Прямая",
+            "transitive": "Транзитивная"
+        },
+        "detail": {
+            "resolutionPath": "Путь разрешения от корня",
+            "declaredDirectly": "Объявлена напрямую в файле сборки",
+            "levelsBelowRoot_one": "{{count}} уровень ниже корня",
+            "levelsBelowRoot_few": "{{count}} уровня ниже корня",
+            "levelsBelowRoot_many": "{{count}} уровней ниже корня",
+            "levelsBelowRoot_other": "{{count}} уровней ниже корня",
+            "thisApplication": "Это приложение",
+            "resolvedHere": "Разрешена здесь",
+            "projectStatus": "Статус проекта",
+            "detectedFrom": "Определено из",
+            "reference": "Больше информации"
         }
     },
     "Users": {

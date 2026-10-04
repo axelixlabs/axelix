@@ -27,10 +27,10 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
-import com.axelixlabs.axelix.common.api.ConditionsFeed.ConditionMatch;
-import com.axelixlabs.axelix.common.api.ConditionsFeed.NegativeCondition;
-import com.axelixlabs.axelix.common.api.ConditionsFeed.PositiveCondition;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionMatch;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.NegativeCondition;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.PositiveCondition;
 
 /**
  * Class that is capable to assemble the {@link ConditionsFeed}.
@@ -62,10 +62,10 @@ public class DefaultConditionalFeedBuilder implements ConditionalFeedBuilder {
                 for (var entry : context.getPositiveMatches().entrySet()) {
                     UnwrappedTarget unwrappedTarget = targetUnwrapper.unwrap(entry.getKey());
 
-                    positiveConditions.add(new PositiveCondition(
-                            unwrappedTarget.getClassName(),
-                            unwrappedTarget.getMethodName(),
-                            convertMatches(entry.getValue())));
+                    positiveConditions.add(new PositiveCondition()
+                            .className(unwrappedTarget.getClassName())
+                            .methodName(unwrappedTarget.getMethodName())
+                            .matched(convertMatches(entry.getValue())));
                 }
             }
 
@@ -73,23 +73,25 @@ public class DefaultConditionalFeedBuilder implements ConditionalFeedBuilder {
                 for (var entry : context.getNegativeMatches().entrySet()) {
                     UnwrappedTarget unwrappedTarget = targetUnwrapper.unwrap(entry.getKey());
 
-                    negativeConditions.add(new NegativeCondition(
-                            unwrappedTarget.getClassName(),
-                            unwrappedTarget.getMethodName(),
-                            convertMatches(entry.getValue().getNotMatched()),
-                            convertMatches(entry.getValue().getMatched())));
+                    negativeConditions.add(new NegativeCondition()
+                            .className(unwrappedTarget.getClassName())
+                            .methodName(unwrappedTarget.getMethodName())
+                            .notMatched(convertMatches(entry.getValue().getNotMatched()))
+                            .matched(convertMatches(entry.getValue().getMatched())));
                 }
             }
         });
 
-        return new ConditionsFeed(positiveConditions, negativeConditions);
+        return new ConditionsFeed().positiveMatches(positiveConditions).negativeMatches(negativeConditions);
     }
 
     private List<ConditionMatch> convertMatches(List<ConditionsReportEndpoint.MessageAndCondition> matches) {
         return matches.isEmpty()
                 ? Collections.emptyList()
                 : matches.stream()
-                        .map(match -> new ConditionMatch(match.getCondition(), match.getMessage()))
+                        .map(match -> new ConditionMatch()
+                                .condition(match.getCondition())
+                                .message(match.getMessage()))
                         .collect(Collectors.toList());
     }
 }

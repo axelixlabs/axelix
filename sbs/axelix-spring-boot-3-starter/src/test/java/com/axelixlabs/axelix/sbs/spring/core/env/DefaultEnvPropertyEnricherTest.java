@@ -27,12 +27,12 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.core.env.StandardEnvironment;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.PropertySource;
 
 import static com.axelixlabs.axelix.common.testfixtures.UserUtils.fromAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,10 +77,10 @@ class DefaultEnvPropertyEnricherTest extends AbstractEnvSharedContextTest {
         // property from the command line args should win
         // https://docs.spring.io/spring-boot/reference/features/external-config.html
         assertThat(findProperty(environmentFeed, StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, "foo.bar")
-                        .isPrimary())
+                        .getIsPrimary())
                 .isFalse();
 
-        assertThat(findProperty(environmentFeed, "commandLineArgs", "fooBar").isPrimary())
+        assertThat(findProperty(environmentFeed, "commandLineArgs", "fooBar").getIsPrimary())
                 .isTrue();
     }
 

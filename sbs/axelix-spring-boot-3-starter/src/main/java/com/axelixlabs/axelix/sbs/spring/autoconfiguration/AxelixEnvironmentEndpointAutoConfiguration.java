@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -35,7 +35,6 @@ import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtracto
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
 
 /**
@@ -44,8 +43,9 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @since 21.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Ilya Naumov
  */
-@AutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
+@AxelixAutoConfiguration(after = EndpointPropertiesSupportAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 

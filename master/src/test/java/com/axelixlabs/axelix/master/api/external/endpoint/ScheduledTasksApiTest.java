@@ -42,13 +42,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskEnableRequest;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.master.contract.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.auth.MasterWebEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -78,14 +78,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
               },
               "expression": "*/2 * * * * *",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.999631800Z"
-              },
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:48.014578100Z",
-                "status": "STARTED"
-              },
               "enabled": true
             },
             {
@@ -93,9 +85,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/5 * * * * *",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.999631800Z"
-              },
               "enabled": true
             },
             {
@@ -103,11 +92,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/2 * * * * *",
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:48.014578100Z",
-                "status": "SUCCESS"
-              },
               "enabled": true
             }
           ],
@@ -118,14 +102,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 0,
-              "nextExecution": {
-                "time": "2025-10-14T06:33:49.063630700Z"
-              },
-              "lastExecution": {
-                "exception": null,
-                "time": "2025-10-14T06:33:47.001570800Z",
-                "status": "SUCCESS"
-              },
               "enabled": true
             }
           ],
@@ -136,9 +112,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
               },
               "interval": 2000,
               "initialDelay": 100,
-              "nextExecution": {
-                "time": "2025-10-14T06:33:50.086630700Z"
-              },
               "enabled": false
             }
           ],
@@ -148,17 +121,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
               },
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
-              "nextExecution": {
-                "time": "2025-10-14T06:33:50.086630700Z"
-              },
-              "lastExecution": {
-                "exception": {
-                  "type": "java.lang.IllegalStateException",
-                  "message": "Failed while running custom task"
-                },
-                "status": "ERROR",
-                "time": "2025-09-18T15:03:34.132500256Z"
-              },
               "enabled": false
             }
           ]
@@ -197,14 +159,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
                     },
                     "expression": "*/2 * * * * *",
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.999631800Z"
-                    },
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:48.014578100Z",
-                      "status": "STARTED"
-                    },
                     "enabled": true
                 },
                 {
@@ -212,9 +166,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
                     "expression": "*/5 * * * * *",
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.999631800Z"
-                    },
                     "enabled": true
                 },
                 {
@@ -222,11 +173,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
                     "expression": "*/2 * * * * *",
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:48.014578100Z",
-                      "status": "SUCCESS"
-                    },
                     "enabled": true
                 }
               ],
@@ -237,14 +183,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                     },
                     "initialDelay": 0,
                     "interval": 2000,
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:49.063630700Z"
-                    },
-                    "lastExecution": {
-                      "exception": null,
-                      "time": "2025-10-14T06:33:47.001570800Z",
-                      "status": "SUCCESS"
-                    },
                     "enabled": true
                 }
               ],
@@ -255,9 +193,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                     },
                     "initialDelay": 100,
                     "interval": 2000,
-                    "nextExecution": {
-                      "time": "2025-10-14T06:33:50.086630700Z"
-                    },
                     "enabled": false
                 }
               ],
@@ -267,17 +202,6 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
                     },
                     "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
-                    "nextExecution": {
-                       "time": "2025-10-14T06:33:50.086630700Z"
-                    },
-                    "lastExecution": {
-                      "exception": {
-                        "message": "Failed while running custom task",
-                        "type": "java.lang.IllegalStateException"
-                      },
-                      "status": "ERROR",
-                      "time": "2025-09-18T15:03:34.132500256Z"
-                    },
                     "enabled": false
                 }
               ]
@@ -337,8 +261,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @ParameterizedTest
     @MethodSource("managementScheduledTask")
     void shouldEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         var editor = restTemplate.asEditor();
@@ -360,8 +284,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldModifyCronExpressionScheduledTask() {
         // given.
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         var editor = restTemplate.asEditor();
@@ -420,8 +345,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @DisplayName("Should return 400 Bad Request for invalid cron expression")
     void shouldReturnBadRequest_OnModifyCronExpressionWithInvalidExpression(String invalidCronExpression) {
         // given.
-        var requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", invalidCronExpression);
+        var requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression(invalidCronExpression);
 
         // and.
         String expectedResponse = """
@@ -449,8 +375,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldModifyIntervalScheduledTask() {
 
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         var editor = restTemplate.asEditor();
@@ -468,8 +395,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldExecuteScheduledTask() {
 
-        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         var editor = restTemplate.asEditor();
@@ -515,8 +442,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -537,8 +464,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableSingleScheduledTask(
             String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskEnableRequest requestBody = new ScheduledTaskEnableRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -558,8 +485,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnModifyCronExpression() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -578,8 +506,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyCronExpression() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask")
+                .cronExpression("*/5 * * * * *");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -599,8 +528,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnModifyInterval() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -619,8 +549,9 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyInterval() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
+        ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask")
+                .interval(555555L);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -640,8 +571,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError_OnTaskExecute() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         registry.reload(TestInstanceFactory.create(instanceId));
@@ -660,8 +591,8 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnExecuteTask() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest()
+                .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<Void> response = restTemplate

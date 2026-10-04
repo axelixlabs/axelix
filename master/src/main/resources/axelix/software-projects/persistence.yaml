@@ -1,0 +1,702 @@
+ecosystem: PERSISTENCE
+projects:
+  - id: hikaricp
+    name: HikariCP
+    status: ACTIVE
+    summary: >-
+      Actively developed. The JDBC connection pool Spring Boot autoconfigures by default.
+    coordinates:
+      - com.zaxxer:HikariCP
+    reference:
+      label: HikariCP on GitHub
+      url: https://github.com/brettwooldridge/HikariCP
+
+  - id: hibernate-orm
+    name: Hibernate ORM
+    status: ACTIVE
+    summary: >-
+      Actively developed. The JPA provider Spring Boot autoconfigures by default for spring-data-jpa
+      applications.
+    coordinates:
+      - org.hibernate.orm:hibernate-agroal
+      - org.hibernate.orm:hibernate-ant
+      - org.hibernate.orm:hibernate-c3p0
+      - org.hibernate.orm:hibernate-community-dialects
+      - org.hibernate.orm:hibernate-core
+      - org.hibernate.orm:hibernate-envers
+      - org.hibernate.orm:hibernate-graalvm
+      - org.hibernate.orm:hibernate-hikaricp
+      - org.hibernate.orm:hibernate-jcache
+      - org.hibernate.orm:hibernate-micrometer
+      - org.hibernate.orm:hibernate-processor
+      - org.hibernate.orm:hibernate-scan-jandex
+      - org.hibernate.orm:hibernate-spatial
+      - org.hibernate.orm:hibernate-testing
+      - org.hibernate.orm:hibernate-vector
+      - org.hibernate:hibernate-core
+      - org.hibernate.common:hibernate-commons-annotations
+      - org.hibernate.models:hibernate-models
+    reference:
+      label: Hibernate ORM releases
+      url: https://hibernate.org/orm/releases/
+
+  - id: flyway
+    name: Flyway
+    status: ACTIVE
+    summary: >-
+      Actively developed by Redgate. Since Flyway 10, support for individual databases ships as
+      separate flyway-database-* modules on top of flyway-core.
+    coordinates:
+      - org.flywaydb:flyway-command-test-connection
+      - org.flywaydb:flyway-commandline
+      - org.flywaydb:flyway-core
+      - org.flywaydb:flyway-database-cassandra
+      - org.flywaydb:flyway-database-db2
+      - org.flywaydb:flyway-database-derby
+      - org.flywaydb:flyway-database-hsqldb
+      - org.flywaydb:flyway-database-informix
+      - org.flywaydb:flyway-database-nc-couchbase
+      - org.flywaydb:flyway-database-nc-mongodb
+      - org.flywaydb:flyway-database-oracle
+      - org.flywaydb:flyway-database-postgresql
+      - org.flywaydb:flyway-database-redshift
+      - org.flywaydb:flyway-database-saphana
+      - org.flywaydb:flyway-database-snowflake
+      - org.flywaydb:flyway-database-sybasease
+      - org.flywaydb:flyway-firebird
+      - org.flywaydb:flyway-gcp-bigquery
+      - org.flywaydb:flyway-gcp-spanner
+      - org.flywaydb:flyway-mysql
+      - org.flywaydb:flyway-singlestore
+      - org.flywaydb:flyway-sqlserver
+    reference:
+      label: Flyway releases
+      url: https://github.com/flyway/flyway/releases
+
+  - id: liquibase
+    name: Liquibase
+    status: ACTIVE
+    summary: Actively developed.
+    coordinates:
+      - org.liquibase:liquibase-cdi
+      - org.liquibase:liquibase-core
+    reference:
+      label: Liquibase releases
+      url: https://github.com/liquibase/liquibase/releases
+
+  - id: h2
+    name: H2 Database
+    status: ACTIVE
+    summary: >-
+      Actively developed. The embedded database Spring Boot picks up automatically for local
+      development and tests.
+    coordinates:
+      - com.h2database:h2
+    reference:
+      label: H2 releases
+      url: https://github.com/h2database/h2database/releases
+
+  - id: postgresql-jdbc
+    name: PostgreSQL JDBC Driver
+    status: ACTIVE
+    summary: Actively developed by the pgjdbc team.
+    coordinates:
+      - org.postgresql:postgresql
+    reference:
+      label: PostgreSQL JDBC Driver
+      url: https://jdbc.postgresql.org/
+
+  - id: mysql-connector-j
+    name: MySQL Connector/J
+    status: ACTIVE
+    summary: Actively developed by Oracle alongside the MySQL server.
+    coordinates:
+      - com.mysql:mysql-connector-j
+    reference:
+      label: MySQL Connector/J releases
+      url: https://github.com/mysql/mysql-connector-j
+
+  - id: mariadb-connector-j
+    name: MariaDB Connector/J
+    status: ACTIVE
+    summary: Actively developed by MariaDB Corporation.
+    coordinates:
+      - org.mariadb.jdbc:mariadb-java-client
+    reference:
+      label: MariaDB Connector/J releases
+      url: https://github.com/mariadb-corporation/mariadb-connector-j/releases
+
+  - id: mssql-jdbc
+    name: Microsoft JDBC Driver for SQL Server
+    status: ACTIVE
+    summary: Actively developed by Microsoft.
+    coordinates:
+      - com.microsoft.sqlserver:mssql-jdbc
+    reference:
+      label: mssql-jdbc releases
+      url: https://github.com/microsoft/mssql-jdbc/releases
+
+  - id: oracle-jdbc
+    name: Oracle Database JDBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by Oracle alongside the Oracle Database. Covers the ojdbc drivers, the UCP
+      connection pool and the companion jars they pull in.
+    coordinates:
+      - com.oracle.database.jdbc:ojdbc11
+      - com.oracle.database.jdbc:ojdbc11-production
+      - com.oracle.database.jdbc:ojdbc17
+      - com.oracle.database.jdbc:ojdbc17-production
+      - com.oracle.database.jdbc:ojdbc8
+      - com.oracle.database.jdbc:ojdbc8-production
+      - com.oracle.database.jdbc:rsi
+      - com.oracle.database.jdbc:ucp
+      - com.oracle.database.jdbc:ucp11
+      - com.oracle.database.jdbc:ucp17
+      - com.oracle.database.ha:ons
+      - com.oracle.database.ha:simplefan
+      - com.oracle.database.nls:orai18n
+      - com.oracle.database.security:oraclepki
+      - com.oracle.database.xml:xdb
+      - com.oracle.database.xml:xmlparserv2
+    reference:
+      label: Oracle JDBC downloads
+      url: https://www.oracle.com/database/technologies/appdev/jdbc.html
+
+  - id: db2-jcc
+    name: IBM Db2 JCC Driver
+    status: ACTIVE
+    summary: Actively developed by IBM alongside Db2.
+    coordinates:
+      - com.ibm.db2:jcc
+    reference:
+      label: Db2 JDBC driver versions
+      url: https://www.ibm.com/support/pages/db2-jdbc-driver-versions-and-downloads
+
+  - id: sqlite-jdbc
+    name: SQLite JDBC Driver
+    status: ACTIVE
+    summary: Actively developed by the Xerial project.
+    coordinates:
+      - org.xerial:sqlite-jdbc
+    reference:
+      label: sqlite-jdbc releases
+      url: https://github.com/xerial/sqlite-jdbc/releases
+
+  - id: apache-derby
+    name: Apache Derby
+    status: DORMANT
+    summary: >-
+      The last release, 10.17.1.0, dates to November 2023. The repository still sees occasional
+      activity and the project has not been moved to the attic, but nothing has shipped for years.
+    coordinates:
+      - org.apache.derby:derby
+      - org.apache.derby:derbyclient
+      - org.apache.derby:derbynet
+      - org.apache.derby:derbyoptionaltools
+      - org.apache.derby:derbyshared
+      - org.apache.derby:derbytools
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: For embedded use, H2 and HSQLDB are the common actively maintained alternatives
+    reference:
+      label: Apache Derby
+      url: https://db.apache.org/derby/
+
+  - id: hsqldb
+    name: HSQLDB
+    status: ACTIVE
+    summary: >-
+      Developed on a slow but historically steady cadence; the latest release, 2.7.4, dates to
+      November 2024.
+    coordinates:
+      - org.hsqldb:hsqldb
+    reference:
+      label: HSQLDB
+      url: https://hsqldb.org/
+
+  - id: jtds
+    name: jTDS
+    status: DORMANT
+    summary: >-
+      The last release, 1.3.1, was published in 2014 and the project has been inactive since,
+      although it was never formally discontinued. Microsoft's own SQL Server driver is the
+      maintained way to reach the same databases.
+    coordinates:
+      - net.sourceforge.jtds:jtds
+    succession:
+      kind: SUPERSEDED_BY
+      value: com.microsoft.sqlserver:mssql-jdbc
+    reference:
+      label: jTDS on SourceForge
+      url: https://sourceforge.net/projects/jtds/
+
+  - id: jaybird
+    name: Jaybird
+    status: ACTIVE
+    summary: The JDBC driver for Firebird, actively developed by the Firebird project.
+    coordinates:
+      - org.firebirdsql.jdbc:jaybird
+    reference:
+      label: Jaybird releases
+      url: https://github.com/FirebirdSQL/jaybird/releases
+
+  - id: ehcache2
+    name: Ehcache 2
+    status: SUNSET
+    summary: >-
+      The 2.x line is finished and its repository is archived; no further releases are expected.
+      Development moved to Ehcache 3 under the org.ehcache group.
+    coordinates:
+      - net.sf.ehcache:ehcache
+      - net.sf.ehcache:ehcache-core
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: The Ehcache 3 API (org.ehcache:ehcache) is not drop-in compatible, so replacing it is a migration, not a version bump
+    reference:
+      label: Ehcache 2 archived repository
+      url: https://github.com/ehcache/ehcache2
+
+  - id: influxdb-java
+    name: InfluxDB Java Client (influxdb-java)
+    status: MAINTENANCE
+    summary: >-
+      The community-maintained client for InfluxDB 1.x. For InfluxDB 2.x the vendor points users to
+      the separate influxdb-client-java library.
+    coordinates:
+      - org.influxdb:influxdb-java
+    succession:
+      kind: SUPERSEDED_BY
+      value: com.influxdb:influxdb-client-java
+    reference:
+      label: influxdb-java on GitHub
+      url: https://github.com/influxdata/influxdb-java
+
+  - id: caffeine
+    name: Caffeine
+    status: ACTIVE
+    summary: Actively developed. The in-process caching library Spring's cache abstraction defaults to.
+    coordinates:
+      - com.github.ben-manes.caffeine:caffeine
+      - com.github.ben-manes.caffeine:guava
+      - com.github.ben-manes.caffeine:jcache
+      - com.github.ben-manes.caffeine:simulator
+    reference:
+      label: Caffeine on GitHub
+      url: https://github.com/ben-manes/caffeine
+
+  - id: ehcache3
+    name: Ehcache 3
+    status: ACTIVE
+    summary: Actively developed. The current Ehcache line, under different coordinates than the closed 2.x one.
+    coordinates:
+      - org.ehcache:ehcache
+      - org.ehcache:ehcache-clustered
+      - org.ehcache:ehcache-transactions
+    reference:
+      label: Ehcache
+      url: https://www.ehcache.org/
+
+  - id: hazelcast
+    name: Hazelcast
+    status: ACTIVE
+    summary: Actively developed by Hazelcast Inc.
+    coordinates:
+      - com.hazelcast:hazelcast
+      - com.hazelcast:hazelcast-spring
+    reference:
+      label: Hazelcast
+      url: https://github.com/hazelcast/hazelcast
+
+  - id: lettuce
+    name: Lettuce
+    status: ACTIVE
+    summary: >-
+      Actively developed under the Redis organization. The Redis client Spring Data Redis uses by
+      default.
+    coordinates:
+      - io.lettuce:lettuce-core
+    reference:
+      label: Lettuce on GitHub
+      url: https://github.com/redis/lettuce
+
+  - id: jedis
+    name: Jedis
+    status: ACTIVE
+    summary: Actively developed under the Redis organization.
+    coordinates:
+      - redis.clients:jedis
+    reference:
+      label: Jedis on GitHub
+      url: https://github.com/redis/jedis
+
+  - id: commons-dbcp2
+    name: Apache Commons DBCP 2
+    status: ACTIVE
+    summary: Actively maintained by the Apache Commons project.
+    coordinates:
+      - org.apache.commons:commons-dbcp2
+    reference:
+      label: Apache Commons DBCP
+      url: https://commons.apache.org/proper/commons-dbcp/
+
+  - id: tomcat-jdbc-pool
+    name: Tomcat JDBC Pool
+    status: ACTIVE
+    summary: The JDBC connection pool of the Apache Tomcat project, maintained as part of Tomcat.
+    coordinates:
+      - org.apache.tomcat:tomcat-jdbc
+    reference:
+      label: Tomcat JDBC pool documentation
+      url: https://tomcat.apache.org/tomcat-11.0-doc/jdbc-pool.html
+
+  - id: vibur-dbcp
+    name: Vibur DBCP
+    status: DORMANT
+    summary: >-
+      Developed by a single maintainer, historically at roughly one release a year, but quiet since
+      the 26.0 release in January 2025 with no commits since.
+    coordinates:
+      - org.vibur:vibur-dbcp
+      - org.vibur:vibur-object-pool
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: HikariCP is the de facto standard connection pool to move to
+    reference:
+      label: Vibur DBCP
+      url: https://github.com/vibur/vibur-dbcp
+
+  - id: mongodb-java-driver
+    name: MongoDB Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by MongoDB Inc.
+    coordinates:
+      - org.mongodb.scala:mongo-scala-bson_2.11
+      - org.mongodb.scala:mongo-scala-bson_2.12
+      - org.mongodb.scala:mongo-scala-bson_2.13
+      - org.mongodb.scala:mongo-scala-bson_3
+      - org.mongodb.scala:mongo-scala-driver_2.11
+      - org.mongodb.scala:mongo-scala-driver_2.12
+      - org.mongodb.scala:mongo-scala-driver_2.13
+      - org.mongodb.scala:mongo-scala-driver_3
+      - org.mongodb:bson
+      - org.mongodb:bson-kotlin
+      - org.mongodb:bson-kotlinx
+      - org.mongodb:bson-record-codec
+      - org.mongodb:mongodb-crypt
+      - org.mongodb:mongodb-driver-core
+      - org.mongodb:mongodb-driver-kotlin-coroutine
+      - org.mongodb:mongodb-driver-kotlin-extensions
+      - org.mongodb:mongodb-driver-kotlin-sync
+      - org.mongodb:mongodb-driver-reactivestreams
+      - org.mongodb:mongodb-driver-sync
+    reference:
+      label: MongoDB Java drivers
+      url: https://www.mongodb.com/docs/drivers/java-drivers/
+
+  - id: cassandra-java-driver
+    name: Apache Cassandra Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed. Originally the DataStax driver under the com.datastax.oss group,
+      donated to the Apache Cassandra project and republished under org.apache.cassandra.
+    coordinates:
+      - com.datastax.oss:java-driver-core
+      - com.datastax.oss:java-driver-mapper-runtime
+      - com.datastax.oss:java-driver-query-builder
+      - com.datastax.oss:native-protocol
+      - org.apache.cassandra:java-driver-core
+      - org.apache.cassandra:java-driver-core-shaded
+      - org.apache.cassandra:java-driver-guava-shaded
+      - org.apache.cassandra:java-driver-mapper-processor
+      - org.apache.cassandra:java-driver-mapper-runtime
+      - org.apache.cassandra:java-driver-metrics-micrometer
+      - org.apache.cassandra:java-driver-metrics-microprofile
+      - org.apache.cassandra:java-driver-query-builder
+      - org.apache.cassandra:java-driver-test-infra
+    reference:
+      label: Apache Cassandra Java Driver
+      url: https://github.com/apache/cassandra-java-driver
+
+  - id: neo4j-java-driver
+    name: Neo4j Java Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by Neo4j.
+    coordinates:
+      - org.neo4j.driver:neo4j-java-driver
+      - org.neo4j.driver:neo4j-java-driver-all
+      - org.neo4j.driver:neo4j-java-driver-observation-metrics
+      - org.neo4j.driver:neo4j-java-driver-observation-micrometer
+    reference:
+      label: Neo4j Java Driver
+      url: https://github.com/neo4j/neo4j-java-driver
+
+  - id: couchbase-java-client
+    name: Couchbase Java SDK
+    status: ACTIVE
+    summary: >-
+      Actively developed by Couchbase.
+    coordinates:
+      - com.couchbase.client:java-client
+      - com.couchbase.client:core-io
+    reference:
+      label: Couchbase JVM clients
+      url: https://github.com/couchbase/couchbase-jvm-clients
+
+  - id: elasticsearch-java
+    name: Elasticsearch Java Client
+    status: ACTIVE
+    summary: >-
+      Actively developed by Elastic.
+    coordinates:
+      - co.elastic.clients:elasticsearch-java
+      - co.elastic.clients:elasticsearch-rest5-client
+    reference:
+      label: Elasticsearch Java Client
+      url: https://github.com/elastic/elasticsearch-java
+
+  - id: r2dbc
+    name: R2DBC
+    status: ACTIVE
+    summary: >-
+      The reactive relational database connectivity specification and the modules the R2DBC
+      project maintains itself: the SPI, the pool, the proxy and the H2 and SQL Server drivers.
+    coordinates:
+      - io.r2dbc:r2dbc-spi
+      - io.r2dbc:r2dbc-pool
+      - io.r2dbc:r2dbc-proxy
+      - io.r2dbc:r2dbc-h2
+      - io.r2dbc:r2dbc-mssql
+    reference:
+      label: R2DBC
+      url: https://r2dbc.io/
+
+  - id: r2dbc-postgresql
+    name: PostgreSQL R2DBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by the pgjdbc team alongside the JDBC driver.
+    coordinates:
+      - org.postgresql:r2dbc-postgresql
+    reference:
+      label: r2dbc-postgresql on GitHub
+      url: https://github.com/pgjdbc/r2dbc-postgresql
+
+  - id: r2dbc-mysql-asyncer
+    name: MySQL R2DBC Driver (asyncer)
+    status: ACTIVE
+    summary: >-
+      The actively developed community continuation of the abandoned dev.miku MySQL R2DBC
+      driver, and the one Spring Boot manages.
+    coordinates:
+      - io.asyncer:r2dbc-mysql
+    reference:
+      label: r2dbc-mysql on GitHub
+      url: https://github.com/asyncer-io/r2dbc-mysql
+
+  - id: r2dbc-mysql-miku
+    name: MySQL R2DBC Driver (dev.miku)
+    status: SUNSET
+    summary: >-
+      Abandoned: the last release, 0.8.2, was published in 2020 and the repository is archived.
+      Development continued in the community fork under the io.asyncer group.
+    coordinates:
+      - dev.miku:r2dbc-mysql
+    succession:
+      kind: SUPERSEDED_BY
+      value: io.asyncer:r2dbc-mysql
+    reference:
+      label: Archived dev.miku repository
+      url: https://github.com/mirromutth/r2dbc-mysql
+
+  - id: r2dbc-mariadb
+    name: MariaDB R2DBC Driver
+    status: ACTIVE
+    summary: >-
+      Actively developed by MariaDB Corporation.
+    coordinates:
+      - org.mariadb:r2dbc-mariadb
+    reference:
+      label: mariadb-connector-r2dbc on GitHub
+      url: https://github.com/mariadb-corporation/mariadb-connector-r2dbc
+
+  - id: oracle-r2dbc
+    name: Oracle R2DBC Driver
+    status: DORMANT
+    summary: >-
+      Quiet since late 2024: the last release, 1.3.0, dates to November 2024 and the repository has
+      seen no commits since December 2024, although Oracle has declared nothing.
+    coordinates:
+      - com.oracle.database.r2dbc:oracle-r2dbc
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: No alternative R2DBC driver for Oracle Database exists; the Oracle JDBC driver remains actively maintained
+    reference:
+      label: oracle-r2dbc on GitHub
+      url: https://github.com/oracle/oracle-r2dbc
+
+  - id: jooq
+    name: jOOQ
+    status: ACTIVE
+    summary: >-
+      Actively developed by Data Geekery.
+    coordinates:
+      - org.jooq:jooq
+      - org.jooq:jooq-beans-extensions
+      - org.jooq:jooq-checker
+      - org.jooq:jooq-codegen
+      - org.jooq:jooq-codegen-gradle
+      - org.jooq:jooq-codegen-maven
+      - org.jooq:jooq-jackson-extensions
+      - org.jooq:jooq-jackson3-extensions
+      - org.jooq:jooq-jpa-extensions
+      - org.jooq:jooq-kotlin
+      - org.jooq:jooq-kotlin-coroutines
+      - org.jooq:jooq-meta
+      - org.jooq:jooq-meta-extensions
+      - org.jooq:jooq-meta-extensions-hibernate
+      - org.jooq:jooq-meta-extensions-liquibase
+      - org.jooq:jooq-meta-kotlin
+      - org.jooq:jooq-migrations
+      - org.jooq:jooq-migrations-maven
+      - org.jooq:jooq-postgres-extensions
+      - org.jooq:jooq-reactor-extensions
+      - org.jooq:jooq-scala_3.5
+      - org.jooq:jooq-xtend
+    reference:
+      label: jOOQ
+      url: https://www.jooq.org/
+
+  - id: querydsl
+    name: QueryDSL
+    status: DORMANT
+    summary: >-
+      Releases have stalled: the latest, 5.1.0, dates to January 2024, although the repository
+      still sees occasional activity.
+    coordinates:
+      - com.querydsl:codegen-utils
+      - com.querydsl:querydsl-apt
+      - com.querydsl:querydsl-codegen
+      - com.querydsl:querydsl-collections
+      - com.querydsl:querydsl-core
+      - com.querydsl:querydsl-guava
+      - com.querydsl:querydsl-hibernate-search
+      - com.querydsl:querydsl-jdo
+      - com.querydsl:querydsl-jpa
+      - com.querydsl:querydsl-jpa-codegen
+      - com.querydsl:querydsl-kotlin
+      - com.querydsl:querydsl-kotlin-codegen
+      - com.querydsl:querydsl-lucene3
+      - com.querydsl:querydsl-lucene4
+      - com.querydsl:querydsl-lucene5
+      - com.querydsl:querydsl-mongodb
+      - com.querydsl:querydsl-scala
+      - com.querydsl:querydsl-spatial
+      - com.querydsl:querydsl-sql
+      - com.querydsl:querydsl-sql-codegen
+      - com.querydsl:querydsl-sql-spatial
+      - com.querydsl:querydsl-sql-spring
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: The community OpenFeign QueryDSL fork (io.github.openfeign.querydsl) continues releasing; jOOQ or the JPA Criteria API are the common alternatives
+    reference:
+      label: QueryDSL on GitHub
+      url: https://github.com/querydsl/querydsl
+
+  - id: infinispan
+    name: Infinispan
+    status: ACTIVE
+    summary: >-
+      Actively developed by Red Hat.
+    coordinates:
+      - org.infinispan.protostream:protostream
+      - org.infinispan.protostream:protostream-processor
+      - org.infinispan.protostream:protostream-types
+      - org.infinispan:infinispan-anchored-keys
+      - org.infinispan:infinispan-api
+      - org.infinispan:infinispan-cachestore-jdbc
+      - org.infinispan:infinispan-cachestore-jdbc-common
+      - org.infinispan:infinispan-cachestore-remote
+      - org.infinispan:infinispan-cachestore-rocksdb
+      - org.infinispan:infinispan-cachestore-sql
+      - org.infinispan:infinispan-cdi-common
+      - org.infinispan:infinispan-cdi-embedded
+      - org.infinispan:infinispan-cdi-remote
+      - org.infinispan:infinispan-checkstyle
+      - org.infinispan:infinispan-cli-client
+      - org.infinispan:infinispan-client-hotrod
+      - org.infinispan:infinispan-client-rest
+      - org.infinispan:infinispan-clustered-counter
+      - org.infinispan:infinispan-clustered-lock
+      - org.infinispan:infinispan-commons
+      - org.infinispan:infinispan-commons-graalvm
+      - org.infinispan:infinispan-commons-spi
+      - org.infinispan:infinispan-component-annotations
+      - org.infinispan:infinispan-component-processor
+      - org.infinispan:infinispan-console
+      - org.infinispan:infinispan-core
+      - org.infinispan:infinispan-core-graalvm
+      - org.infinispan:infinispan-counter-api
+      - org.infinispan:infinispan-hibernate-cache-commons
+      - org.infinispan:infinispan-hibernate-cache-spi
+      - org.infinispan:infinispan-hibernate-cache-v66
+      - org.infinispan:infinispan-jboss-marshalling
+      - org.infinispan:infinispan-jcache
+      - org.infinispan:infinispan-jcache-commons
+      - org.infinispan:infinispan-jcache-remote
+      - org.infinispan:infinispan-key-value-store-client
+      - org.infinispan:infinispan-logging-annotations
+      - org.infinispan:infinispan-logging-processor
+      - org.infinispan:infinispan-multimap
+      - org.infinispan:infinispan-query
+      - org.infinispan:infinispan-scripting
+      - org.infinispan:infinispan-server-core
+      - org.infinispan:infinispan-server-hotrod
+      - org.infinispan:infinispan-server-memcached
+      - org.infinispan:infinispan-server-resp
+      - org.infinispan:infinispan-server-rest
+      - org.infinispan:infinispan-server-router
+      - org.infinispan:infinispan-server-runtime
+      - org.infinispan:infinispan-server-testdriver-core
+      - org.infinispan:infinispan-server-testdriver-junit5
+      - org.infinispan:infinispan-spring-boot3-starter-embedded
+      - org.infinispan:infinispan-spring-boot3-starter-remote
+      - org.infinispan:infinispan-spring-boot4-starter-embedded
+      - org.infinispan:infinispan-spring-boot4-starter-remote
+      - org.infinispan:infinispan-spring-common
+      - org.infinispan:infinispan-spring-embedded
+      - org.infinispan:infinispan-spring-remote
+      - org.infinispan:infinispan-spring6-embedded
+      - org.infinispan:infinispan-spring6-remote
+      - org.infinispan:infinispan-spring7-embedded
+      - org.infinispan:infinispan-spring7-remote
+      - org.infinispan:infinispan-tasks
+      - org.infinispan:infinispan-tasks-api
+      - org.infinispan:infinispan-testing
+      - org.infinispan:infinispan-tools
+      - org.infinispan:testcontainers-infinispan
+    reference:
+      label: Infinispan
+      url: https://infinispan.org/
+
+  - id: cache2k
+    name: cache2k
+    status: DORMANT
+    summary: >-
+      No release since 2.6.1.Final in February 2022; the repository has seen only sporadic
+      activity since, and the project was never formally discontinued.
+    coordinates:
+      - org.cache2k:cache2k-api
+      - org.cache2k:cache2k-config
+      - org.cache2k:cache2k-core
+      - org.cache2k:cache2k-jcache
+      - org.cache2k:cache2k-micrometer
+      - org.cache2k:cache2k-spring
+    succession:
+      kind: NO_DIRECT_REPLACEMENT
+      value: Caffeine is the common actively developed in-process cache to move to
+    reference:
+      label: cache2k on GitHub
+      url: https://github.com/cache2k/cache2k

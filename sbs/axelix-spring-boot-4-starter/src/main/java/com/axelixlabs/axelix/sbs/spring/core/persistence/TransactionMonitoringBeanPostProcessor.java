@@ -27,10 +27,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
@@ -43,6 +44,7 @@ import org.springframework.core.annotation.RepeatableContainers;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 
@@ -51,6 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyingUtils;
 
 /**
  * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
@@ -63,6 +66,8 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @author Nikita Kirillov
  */
 public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionMonitoringBeanPostProcessor.class);
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
@@ -104,11 +109,30 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
             hasTransactionalMethods |= preloadMethodPropagationCacheForClass(clazz);
         }
 
-        if (hasTransactionalMethods) {
-            return createTransactionalProxy(bean);
-        } else {
+        if (!hasTransactionalMethods) {
             return bean;
         }
+
+        TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
+                propagationCache,
+                targetClass,
+                statsCollector,
+                metricsPublisherObjectProvider.getIfAvailable(),
+                transactionAccessor);
+
+        // Pointcut provides fast filtering at the proxy level and is necessary for performance
+        DefaultPointcutAdvisor advisor =
+                new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(targetClass), interceptor);
+
+        return ProxyingUtils.tryCreateProxy(bean, advisor).orElseGet(() -> {
+            log.warn(
+                    "Cannot enable transaction monitoring for bean '{}' of class {}: CGLIB cannot proxy a final "
+                            + "class or override a final method. Transaction monitoring is skipped for this bean; "
+                            + "the bean itself and every other Axelix feature are unaffected.",
+                    beanName,
+                    ClassUtils.getUserClass(targetClass).getName());
+            return bean;
+        });
     }
 
     /**
@@ -153,26 +177,11 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         return false;
     }
 
-    private Object createTransactionalProxy(Object bean) {
-        ProxyFactory proxyFactory = new ProxyFactory();
-        proxyFactory.setTarget(bean);
-        proxyFactory.setProxyTargetClass(true);
-
-        TransactionMonitoringInterceptor interceptor = new TransactionMonitoringInterceptor(
-                propagationCache, statsCollector, metricsPublisherObjectProvider.getIfAvailable(), transactionAccessor);
-
-        // Pointcut provides fast filtering at the proxy level and is necessary for performance
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);
-
-        proxyFactory.addAdvisor(advisor);
-        return proxyFactory.getProxy();
-    }
-
-    private Pointcut createTransactionMonitoringPointcut() {
+    private Pointcut createTransactionMonitoringPointcut(Class<?> targetClass) {
         return new StaticMethodMatcherPointcut() {
             @Override
             public boolean matches(@NonNull Method method, @NonNull Class<?> clazz) {
-                MethodClassKey key = new MethodClassKey(method, method.getDeclaringClass());
+                MethodClassKey key = resolveMonitoringKey(method, targetClass, propagationCache);
                 Propagation propagation = propagationCache.get(key);
 
                 if (propagation != null) {
@@ -182,6 +191,23 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
                 return false;
             }
         };
+    }
+
+    /**
+     * Resolves the same cache key {@link #preloadMethodPropagationCacheForClass} used for this method, even
+     * when the invoked method comes back from a different class than the one that was preloaded - e.g. the
+     * interface method on a JDK proxy.
+     */
+    static MethodClassKey resolveMonitoringKey(
+            Method method, Class<?> targetClass, Map<MethodClassKey, Propagation> propagationCache) {
+        Method resolvedMethod = AopUtils.getMostSpecificMethod(method, targetClass);
+        MethodClassKey primaryKey = new MethodClassKey(resolvedMethod, targetClass);
+
+        if (propagationCache.containsKey(primaryKey)) {
+            return primaryKey;
+        }
+
+        return new MethodClassKey(method, method.getDeclaringClass());
     }
 
     private MergedAnnotation<Transactional> resolveTransactional(Method method, Class<?> clazz) {

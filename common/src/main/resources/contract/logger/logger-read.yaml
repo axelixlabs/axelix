@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: logger-read
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'logger-read' operation.
+    This operation returns the profile of a single logger of the Spring Boot app, addressed by name.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-loggers/logger/{name}:
+    get:
+      operationId: getSingleLogger
+      summary: Returns the profile of a single logger of the service.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The name of the logger to read.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The profile of the requested logger.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleLoggerProfile'
+        '400':
+          description: No logger with the given name exists.
+components:
+  schemas:
+    SingleLoggerProfile:
+      type: object
+      description: The logging level information of a single logger.
+      required:
+        - name
+        - effectiveLevel
+      properties:
+        name:
+          type: string
+          description: The name of the logger.
+          x-axelix-introduced-in: 1.2.0
+        configuredLevel:
+          type: string
+          description: The explicitly configured logging level, or absent when no level is set.
+          x-axelix-introduced-in: 1.2.0
+        effectiveLevel:
+          type: string
+          description: The operational logging level currently in use, possibly inherited from a parent.
+          x-axelix-introduced-in: 1.2.0
+        fallbackLevel:
+          type: string
+          description: >-
+            The level the logger reverts to when its current level is temporary. Absent when the
+            current level is permanent.
+          x-axelix-introduced-in: 1.2.0
+        temporaryLevelInitiatedAt:
+          type: string
+          description: >-
+            The ISO-8601 timestamp at which the temporary level was activated. Absent when the
+            current level is permanent.
+          x-axelix-introduced-in: 1.2.0
+        temporaryLevelRollsBackAt:
+          type: string
+          description: >-
+            The ISO-8601 timestamp at which the temporary level expires and reverts. Absent when
+            there is no expiration.
+          x-axelix-introduced-in: 1.2.0

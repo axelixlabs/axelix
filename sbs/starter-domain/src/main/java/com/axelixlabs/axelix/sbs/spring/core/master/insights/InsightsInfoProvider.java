@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
 
 /**
  * Provides insights discovered for the current service instance.

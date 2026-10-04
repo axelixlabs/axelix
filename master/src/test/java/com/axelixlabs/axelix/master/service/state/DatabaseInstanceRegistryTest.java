@@ -33,6 +33,7 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
@@ -80,7 +81,8 @@ class DatabaseInstanceRegistryTest {
                 ApplicationId.of("com.axelixlabs", "test-app"),
                 "name",
                 "1.0.0",
-                "java-17",
+                "1.0.0-SNAPSHOT",
+                new JavaVersion(17, 0, 0, 0),
                 "SB-3",
                 "Spring-6",
                 "2.0.0",
@@ -117,7 +119,8 @@ class DatabaseInstanceRegistryTest {
                 ApplicationId.of("com.axelixlabs", "test-app"),
                 "name",
                 "1.0.0",
-                "java-17",
+                "1.0.0-SNAPSHOT",
+                new JavaVersion(17, 0, 0, 0),
                 "SB-3",
                 "Spring-6",
                 "2.0.0",
@@ -137,7 +140,8 @@ class DatabaseInstanceRegistryTest {
                 instance.applicationId(),
                 "updated-name",
                 "1.0.1",
-                "java-21",
+                "1.0.1-SNAPSHOT",
+                new JavaVersion(21, 0, 0, 0),
                 "SB-4",
                 "Spring-7",
                 "2.2.0",
@@ -282,26 +286,6 @@ class DatabaseInstanceRegistryTest {
     }
 
     @Test
-    void getAverageHeapSize_shouldReturnAverage() {
-        // given.
-        instanceRegistry.reload(createInstanceWithHeap("heap-id-1", 100.0));
-        instanceRegistry.reload(createInstanceWithHeap("heap-id-2", 200.0));
-
-        // when. / then.
-        assertThat(instanceRegistry.getAverageHeapSize()).isEqualTo(150.0);
-    }
-
-    @Test
-    void getTotalHeapSize_shouldReturnSum() {
-        // given.
-        instanceRegistry.reload(createInstanceWithHeap("total-id-1", 100.0));
-        instanceRegistry.reload(createInstanceWithHeap("total-id-2", 200.0));
-
-        // when. / then.
-        assertThat(instanceRegistry.getTotalHeapSize()).isEqualTo(300.0);
-    }
-
-    @Test
     void findByQuery_shouldReturnMatchingInstances() {
         // given.
         Instance petclinicInstance = withName("query-id-1", "petclinic-service");
@@ -321,25 +305,5 @@ class DatabaseInstanceRegistryTest {
                 .usingRecursiveComparison()
                 .ignoringFieldsOfTypes(Instant.class)
                 .isEqualTo(petclinicInstance);
-    }
-
-    private Instance createInstanceWithHeap(String instanceId, double heap) {
-        return new Instance(
-                InstanceId.of(instanceId),
-                ApplicationId.of("com.axelixlabs", "test-app"),
-                "updated-name",
-                "1.0.1",
-                "java-21",
-                "SB-4",
-                "Spring-7",
-                "2.2.0",
-                "Axiom JDK",
-                "new-sha",
-                Instant.now(),
-                null,
-                Instance.InstanceStatus.DOWN,
-                new MemoryUsage(heap),
-                "/actuator",
-                null);
     }
 }

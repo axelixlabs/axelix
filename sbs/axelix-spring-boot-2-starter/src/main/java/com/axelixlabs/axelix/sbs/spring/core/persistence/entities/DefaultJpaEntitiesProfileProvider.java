@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.persistence.entities;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.JpaEntities;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.JpaEntitiesProfileProvider;
 
 /**

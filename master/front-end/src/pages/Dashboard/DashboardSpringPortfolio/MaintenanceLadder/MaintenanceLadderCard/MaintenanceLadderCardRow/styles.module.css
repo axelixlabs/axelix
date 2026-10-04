@@ -1,0 +1,74 @@
+.LineCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.DotOk {
+    background-color: var(--axelix-primary-green);
+}
+
+.DotNo {
+    background-color: var(--axelix-primary-orange);
+}
+
+.LineLabel {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Track {
+    position: relative;
+    height: 11px;
+    border-radius: var(--axelix-border-radius-large);
+    background-color: var(--axelix-extra-light-grey);
+    overflow: hidden;
+}
+
+.Supported {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: var(--axelix-primary-green);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.Unsupported {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg, var(--axelix-medium-grey), rgb(217 217 217 / 0%));
+}
+
+.EndsCell {
+    justify-self: end;
+}
+
+.EndsOk {
+    color: var(--axelix-bold-grey);
+}
+
+.EndsNo,
+.AppsNo {
+    color: var(--axelix-primary-red);
+}
+
+.AppsCell {
+    justify-self: end;
+    font-weight: 600;
+}
+
+.AppsOk {
+    color: var(--axelix-primary-green);
+}

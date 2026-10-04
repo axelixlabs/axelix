@@ -31,18 +31,18 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
 
 // TODO: Add icons in future
 const getDashboardItems = (): AntdMenuItem[] => {
-    const overviewItems: ISiderMenuItem[] = [
+    const topLevelItems: ISiderMenuItem[] = [
         {
-            path: "/dashboard/overview",
-            label: "Overview",
+            path: "/dashboard/spring-portfolio",
+            label: "Spring Portfolio",
+        },
+        {
+            path: "/dashboard/languages",
+            label: "Languages Usage",
         },
     ];
 
     const technologiesItems: ISiderMenuItem[] = [
-        {
-            path: "/dashboard/java",
-            label: "Java",
-        },
         {
             path: "/dashboard/persistence",
             label: "Persistence",
@@ -54,7 +54,7 @@ const getDashboardItems = (): AntdMenuItem[] => {
     ];
 
     return [
-        ...createMenuItems(overviewItems),
+        ...createMenuItems(topLevelItems),
         {
             key: "technologies",
             label: "Technologies",
@@ -68,7 +68,7 @@ export const DashboardSiderMenu = () => {
 
     return (
         <Menu
-            defaultSelectedKeys={["/dashboard/overview"]}
+            defaultSelectedKeys={["/dashboard/spring-portfolio"]}
             defaultOpenKeys={["technologies"]}
             selectedKeys={[pathname]}
             mode="inline"

@@ -28,8 +28,8 @@ import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.JpaEntities;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.MappedEntity;
+import com.axelixlabs.axelix.master.contract.metadata.JpaEntities;
+import com.axelixlabs.axelix.master.contract.metadata.MappedEntity;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
@@ -62,9 +62,12 @@ public class EntitiesMcpServerTools {
             table they map to) together with the association-mapping problems detected inside each of them, such as
             eager fetching, list-backed @ManyToMany, cascade REMOVE/ALL and unidirectional @OneToMany.
 
-            The application is identified by its 'groupId' and 'artifactId' (the G and A of the GAV coordinate of
-            the service artifact). You can typically find them in the build file of the project, e.g. in pom.xml or
-            build.gradle or build.gradle.kts. Both must be provided together to identify the application.
+            The application is identified by its 'artifactId' (the A of the GAV coordinate of the service artifact),
+            together with its 'groupId' (the G). You can typically find them in the build file of the
+            project, e.g. in pom.xml or build.gradle or build.gradle.kts. Both 'artifactId' and 'groupId' are required.
+
+            Still, Gradle services may omit 'groupId', and in this case, of 'groupId' is empty for the app, then
+            send the empty String, DO NOT send 'null' literal.
 
             You may optionally narrow the result down by providing the 'entityName' (e.g. 'Order') to get the
             profile of that single entity only. When it is omitted, the profile of every mapped entity of the
@@ -79,24 +82,20 @@ public class EntitiesMcpServerTools {
                             idempotentHint = true,
                             openWorldHint = false))
     public String getApplicationEntitiesProfile(
-            @McpToolParam(required = false, description = """
-                    The groupId of the application (the G of the GAV coordinate). Must be provided together with
-                    'artifactId' to identify the application.
-                    """) @Nullable String groupId,
-            @McpToolParam(required = false, description = """
-                    The artifactId of the application (the A of the GAV coordinate). Must be provided together with
-                    'groupId' to identify the application.
-                    """) @Nullable String artifactId,
+            @McpToolParam(description = """
+                    The groupId of the application (the G of the GAV coordinate). Optional: provide it alongside
+                    'artifactId' when the service declares a group, to disambiguate services that share an
+                    artifactId. Services built with Gradle may omit it.
+                    """) String groupId,
+            @McpToolParam(description = """
+                    The artifactId of the application (the A of the GAV coordinate). Required to identify the
+                    application.
+                    """) String artifactId,
             @McpToolParam(required = false, description = """
                     The name of the entity to inspect (e.g. 'Order'). When provided, only the profile of this single
                     entity is returned; when omitted, the profile of every mapped entity of the application is
                     returned.
                     """) @Nullable String entityName) {
-
-        if (!StringUtils.hasText(groupId) || !StringUtils.hasText(artifactId)) {
-            return "Provide both 'groupId' and 'artifactId' to identify the application whose entities profile you"
-                    + " want.";
-        }
 
         HistoricalApplicationSnapshot snapshot =
                 applicationSnapshotService.getCurrentRecord(ApplicationId.of(groupId, artifactId));

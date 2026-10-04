@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricDescription;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroup;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 
 /**
  * Default implementation of {@link ServiceMetricsGroupsAssembler}.
@@ -50,10 +50,10 @@ public class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroup
                 listNames().stream().collect(Collectors.groupingBy(metric -> extractGroupName(metric.getMetricName())));
 
         List<MetricsGroup> metricsGroup = metricsByGroupName.entrySet().stream()
-                .map(entry -> new MetricsGroup(entry.getKey(), entry.getValue()))
+                .map(entry -> new MetricsGroup().groupName(entry.getKey()).metrics(entry.getValue()))
                 .collect(Collectors.toList());
 
-        return new MetricsGroupsFeed(metricsGroup);
+        return new MetricsGroupsFeed().metricsGroups(metricsGroup);
     }
 
     private List<MetricDescription> listNames() {
@@ -62,7 +62,7 @@ public class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroup
 
         return metricsNameMapping.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .map(entry -> new MetricDescription(entry.getKey(), entry.getValue()))
+                .map(entry -> new MetricDescription().metricName(entry.getKey()).description(entry.getValue()))
                 .collect(Collectors.toList());
     }
 

@@ -18,21 +18,28 @@
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
+import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -40,6 +47,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * The API used for service self-registration.
  *
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @InternalApiRestController
 @ConditionalOnProperty(
@@ -55,20 +63,40 @@ public class HeartBeatApi {
     private final InstanceFactory instanceFactory;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
+    private final CompatibilityDetectionStrategy compatibilityDetectionStrategy;
+    private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
+    private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
 
     public HeartBeatApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            CompatibilityDetectionStrategy compatibilityDetectionStrategy,
+            ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
         this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
+        this.compatibilityDetectionStrategy = compatibilityDetectionStrategy;
+        this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
+        this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
     }
 
     @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
+
+        BasicRegistrationMetadata metadata = request.getBasicRegistrationMetadata();
+        String starterVersion = metadata.getVersion();
+
+        if (!compatibilityDetectionStrategy.isCompatible(starterVersion)) {
+            log.warn(
+                    "Rejecting self-registration request from '{}': its Axelix starter version '{}' is not supported by this Axelix Master",
+                    request.getInstanceName(),
+                    starterVersion);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
 
         try {
             Instance instance = instanceFactory.createInstance(
@@ -77,11 +105,15 @@ public class HeartBeatApi {
                     request.getDeploymentAt(),
                     Instant.now(),
                     request.getInstanceActuatorUrl(),
-                    request.getBasicRegistrationMetadata());
+                    metadata);
+
+            Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
+                    scheduledTaskExecutionResultConverter.convert(request);
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
-                databaseHistoricalApplicationSnapshotService.reloadCurrentState(request.getBasicRegistrationMetadata());
+                databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
+                scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             });
 
             return ResponseEntity.noContent().build();

@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -55,6 +56,7 @@ import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.repository.ProbeStateRepository;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
@@ -63,6 +65,7 @@ import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 /**
  * Integration tests for {@link ShortPollingInstanceDiscoveryScheduler}.
@@ -71,6 +74,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -113,6 +117,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         // TODO: Starting up a new web server on every test? Pretty overpowered for that...
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+        jdbcAggregateTemplate.deleteAll(ScheduledTaskExecutionResult.class);
         instanceRepository.deleteAll();
         probeStateRepository.deleteAll();
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
@@ -150,6 +155,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "%s",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -159,6 +165,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
         """;
@@ -198,6 +215,147 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         assertThat(registeredInstances).hasSize(2);
 
         assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);
+
+        // and then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .isEmpty();
+    }
+
+    @Test
+    void shouldSaveScheduledTaskExecutionsWhenInstancesAreDiscovered() {
+        String serviceWithFailedExecution = "service-with-failed-execution";
+        String serviceWithSuccessfulExecution = "service-with-successful-execution";
+        String failedInstanceId = UUID.randomUUID().toString();
+        String successfulInstanceId = UUID.randomUUID().toString();
+        String groupId = "org.springframework.samples";
+        String artifactId = "petclinic";
+        String failedTaskId = "com.example.OwnerJob#run()";
+        String successfulTaskId = "com.example.OwnerArchivistTask#archive()";
+
+        // language=json
+        String failedExecutions = """
+            [ {
+              "taskId" : "com.example.OwnerJob#run()",
+              "startedAt" : "2026-09-27T10:00:00.123Z",
+              "durationMillis" : 1500,
+              "success" : false,
+              "errorType" : "NullPointerException",
+              "errorMessage" : "boom"
+            } ]""";
+
+        // language=json
+        String successfulExecutions = """
+            [ {
+              "taskId" : "com.example.OwnerArchivistTask#archive()",
+              "startedAt" : "2026-09-27T10:05:00.500Z",
+              "durationMillis" : 42,
+              "success" : true
+            } ]""";
+
+        // language=json
+        String metadata = """
+            {
+              "version" : "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "groupId" : "%s",
+              "artifactId" : "%s",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
+              "softwareVersions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                },
+                "scheduledTaskExecutions" : %s
+              }
+            }
+            """;
+
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(metadata.formatted(groupId, artifactId, failedExecutions))
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(metadata.formatted(groupId, artifactId, successfulExecutions))
+                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        ServiceInstance instanceWithFailedExecution = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), failedInstanceId)
+                .set(Select.field("serviceId"), serviceWithFailedExecution)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        ServiceInstance instanceWithSuccessfulExecution = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), successfulInstanceId)
+                .set(Select.field("serviceId"), serviceWithSuccessfulExecution)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices())
+                .thenReturn(List.of(serviceWithFailedExecution, serviceWithSuccessfulExecution));
+        Mockito.when(discoveryClient.getInstances(serviceWithFailedExecution))
+                .thenReturn(List.of(instanceWithFailedExecution));
+        Mockito.when(discoveryClient.getInstances(serviceWithSuccessfulExecution))
+                .thenReturn(List.of(instanceWithSuccessfulExecution));
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        assertThat(instanceRegistry.getAll()).hasSize(2);
+
+        // and then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .hasSize(2)
+                .extracting(
+                        ScheduledTaskExecutionResult::instanceId,
+                        ScheduledTaskExecutionResult::taskId,
+                        ScheduledTaskExecutionResult::startedAt,
+                        ScheduledTaskExecutionResult::durationMillis,
+                        ScheduledTaskExecutionResult::success,
+                        ScheduledTaskExecutionResult::errorType,
+                        ScheduledTaskExecutionResult::errorMessage)
+                .containsExactlyInAnyOrder(
+                        tuple(
+                                failedInstanceId,
+                                failedTaskId,
+                                Instant.parse("2026-09-27T10:00:00.123Z"),
+                                1500L,
+                                false,
+                                "NullPointerException",
+                                "boom"),
+                        tuple(
+                                successfulInstanceId,
+                                successfulTaskId,
+                                Instant.parse("2026-09-27T10:05:00.500Z"),
+                                42L,
+                                true,
+                                null,
+                                null));
+
+        // and then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .extracting(ScheduledTaskExecutionResult::groupId, ScheduledTaskExecutionResult::artifactId)
+                .containsOnly(tuple(groupId, artifactId));
     }
 
     @Test
@@ -214,6 +372,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
@@ -223,6 +382,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -236,6 +406,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -245,6 +416,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -292,6 +474,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -301,6 +484,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -357,6 +551,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "artifactId" : "petclinic",
              "commitShortSha" : "a8b0929",
              "jdkVendor" : "BellSoft",
+             "gcInUse" : "G1",
              "softwareVersions" : {
                "springBoot" : "3.5.0",
                "java" : "25",
@@ -366,6 +561,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
+             },
+             "insights" : {
+               "hotSpot" : {
+                 "projectLeyden" : [ ],
+                 "gc" : [ ],
+                 "projectLilliputh" : [ ]
+               },
+               "springFramework" : [ ],
+               "persistenceInsights" : {
+                 "transactions" : [ ]
+               }
              }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
@@ -401,6 +607,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "artifactId" : "petclinic",
              "commitShortSha" : "a8b0929",
              "jdkVendor" : "BellSoft",
+             "gcInUse" : "G1",
              "softwareVersions" : {
                "springBoot" : "3.5.0",
                "java" : "25",
@@ -410,6 +617,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
              "healthStatus" : "UP",
              "memoryDetails" : {
                "heap" : 12000
+             },
+             "insights" : {
+               "hotSpot" : {
+                 "projectLeyden" : [ ],
+                 "gc" : [ ],
+                 "projectLilliputh" : [ ]
+               },
+               "springFramework" : [ ],
+               "persistenceInsights" : {
+                 "transactions" : [ ]
+               }
              }
            },
              "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
@@ -436,6 +654,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
@@ -445,6 +664,17 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memoryDetails" : {
                 "heap" : 12000
+              },
+              "insights" : {
+                "hotSpot" : {
+                  "projectLeyden" : [ ],
+                  "gc" : [ ],
+                  "projectLilliputh" : [ ]
+                },
+                "springFramework" : [ ],
+                "persistenceInsights" : {
+                  "transactions" : [ ]
+                }
               }
             }
             """;
@@ -507,6 +737,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "artifactId" : "petclinic",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
+              "gcInUse" : "G1",
               "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",

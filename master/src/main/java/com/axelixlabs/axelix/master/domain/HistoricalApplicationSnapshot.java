@@ -20,7 +20,10 @@ package com.axelixlabs.axelix.master.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -31,13 +34,16 @@ import org.springframework.data.relational.core.mapping.Table;
  * than 24 hours.
  *
  * @param insights the actual insights.
+ * @param versions the important versions in the app that we care about.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Table("historical_application_snapshots")
 public record HistoricalApplicationSnapshot(
         @Id @Embedded.Empty SnapshotId snapshotId,
-        @Embedded.Empty Insights insights) {
+        @Embedded.Empty Insights insights,
+        @Embedded.Empty Versions versions) {
 
     /**
      * The composite key ID.
@@ -50,6 +56,26 @@ public record HistoricalApplicationSnapshot(
     //  We should use the ApplicationId here, but we cannot now do that since we need Spring Data JDBC 4.1
     //  that supports embedded fields in the composite keys
     public record SnapshotId(String groupId, String artifactId, LocalDate date) {}
+
+    /**
+     * The versions reported at the time of this snapshot.
+     *
+     * @param starterVersion the version of the Axelix starter reported at the time of this snapshot.
+     * @param springBootVersion the Spring Boot version the application ran on.
+     * @param springFrameworkVersion the Spring Framework version the application ran on.
+     * @param javaVersion the full Java version the application ran on, as the JEP 322 coordinate
+     *                    (feature/interim/update/patch); see {@link JavaVersion}.
+     * @param jdkVendor the vendor of the JDK distribution the application ran on, or {@link JdkVendor#UNKNOWN}
+     *                  if the reported vendor could not be recognised.
+     * @param kotlinVersion the Kotlin version the application ran on, or {@code null} if the application does not use Kotlin.
+     */
+    public record Versions(
+            @Column("starter_version") String starterVersion,
+            @Column("spring_boot_version") String springBootVersion,
+            @Column("spring_framework_version") String springFrameworkVersion,
+            @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) JavaVersion javaVersion,
+            @Column("jdk_vendor") JdkVendor jdkVendor,
+            @Column("kotlin_version") @Nullable String kotlinVersion) {}
 
     // Intentionally based on snapshotId only: in k8s the same application can run as several
     // instances with differing insights, but they must still collapse to one snapshotId.

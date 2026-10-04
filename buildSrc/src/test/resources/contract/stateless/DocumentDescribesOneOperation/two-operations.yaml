@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: loggers
+  version: 1.0.0
+  x-axelix-introduced-in: 1.0.0
+  x-axelix-server: starter
+# INVALID: two operations in one document — the document is the unit of versioning, so its
+# version could not honestly represent a change to just one of them.
+paths:
+  /actuator/axelix-loggers:
+    get:
+      operationId: getLoggers
+      responses:
+        '200':
+          description: The loggers of the service.
+  /actuator/axelix-loggers/logger/{name}/reset:
+    post:
+      operationId: resetLogLevelByLoggerName
+      responses:
+        '204':
+          description: The logging level was reset.

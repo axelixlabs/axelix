@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.metrics;
 
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metrics.MetricsGroupsFeed;
 
 /**
  * Assembles the metrics groups about this particular service.

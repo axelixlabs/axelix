@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.utils.TestMetadataFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +56,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.applicationId()).isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
         assertThat(instance.name()).isEqualTo("petclinic");
         assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(instance.javaVersion()).isEqualTo("25");
+        assertThat(instance.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
         assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
         assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
         assertThat(instance.kotlinVersion()).isNull();
@@ -69,7 +70,22 @@ public class DefaultInstanceFactoryTest {
     }
 
     @Test
-    void createInstance_shouldRejectRegistrationWhenApplicationIdIsBlank() {
+    void createInstance_shouldAcceptBlankGroupId() {
+        // when. group is omitted (allowed for Gradle services); the application is identified by its name alone.
+        Instance instance = instanceFactory.createInstance(
+                "3c994958-924f-4a12-87d0-a8782e97af10",
+                "petclinic",
+                "2025-02-03T13:29:29Z",
+                Instant.parse("2025-04-03T13:29:29Z"),
+                "http://localhost:8080/actuator",
+                TestMetadataFactory.create("", "petclinic"));
+
+        // then.
+        assertThat(instance.applicationId()).isEqualTo(ApplicationId.of("", "petclinic"));
+    }
+
+    @Test
+    void createInstance_shouldRejectRegistrationWhenArtifactIdIsBlank() {
         // when / then.
         assertThatThrownBy(() -> instanceFactory.createInstance(
                         "3c994958-924f-4a12-87d0-a8782e97af10",
@@ -77,7 +93,7 @@ public class DefaultInstanceFactoryTest {
                         "2025-02-03T13:29:29Z",
                         Instant.parse("2025-04-03T13:29:29Z"),
                         "http://localhost:8080/actuator",
-                        TestMetadataFactory.create("", "petclinic")))
+                        TestMetadataFactory.create("org.springframework.samples", "")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

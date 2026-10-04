@@ -85,3 +85,49 @@ export function getAuthors(names: string[]): Author[] {
     })
     .map(getAuthor);
 }
+
+/** A social/profile link shown on an author's profile page. `kind` selects the
+ *  icon (see `AUTHOR_LINK_ICONS` in the profile page). */
+export interface AuthorLink {
+  kind: "github" | "x" | "linkedin" | "rss";
+  label: string;
+  url: string;
+}
+
+/** The only author facts that can't be derived from a name + their posts: an
+ *  editorial role, bio, and social links. Everything else (avatar, slug,
+ *  article count, topics, dates, reading time) stays derived. */
+export interface AuthorProfile {
+  /** Role/affiliation shown under the name, e.g. "Core team · Axelix Labs". */
+  title: string;
+  bio: string;
+  links: AuthorLink[];
+}
+
+/** Editorial profiles, keyed by author slug. An author without an entry still
+ *  gets a profile page — just without the bio/role/links. */
+const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
+  "mikhail-polivakha": {
+    title: "Founder & CEO of Axelix Labs",
+    bio: "Founder & CEO of Axelix Labs. Programming nerd & Software Engineer. Dedicated to Java & Spring Boot. Contributor to various OSS projects, including Spring Data & Spring Boot. Enthusiast of Open Source & public speaker on Spring I/O and Devoxx.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/mipo256" },
+      { kind: "x", label: "X", url: "https://x.com/mpolivaha" },
+      { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
+    ],
+  },
+  "dmitry-mazurov": {
+    title: "Senior Software Engineer",
+    bio: "Contributor to Axelix OSS. Backend engineer working with Java and Spring Boot. Interested in everything around the code: architecture, security, infrastructure, and automation. Likes understanding how the whole system works, not just a single component.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/dima-bzz" },
+      // { kind: "x", label: "X", url: "https://x.com/mpolivaha" },
+      // { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
+    ],
+  },
+};
+
+/** The editorial profile for an author slug, or `null` if there isn't one. */
+export function getAuthorProfile(slug: string): AuthorProfile | null {
+  return AUTHOR_PROFILES[slug] ?? null;
+}

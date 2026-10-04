@@ -1,0 +1,11 @@
+{
+    "title": "More",
+    "pages": [
+        "glossary",
+        "why-not-spring-boot-admin",
+        "compatibility-and-versioning",
+        "upgrading",
+        "troubleshooting",
+        "development"
+    ]
+}

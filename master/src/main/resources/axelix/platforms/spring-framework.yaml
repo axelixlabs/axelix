@@ -1,0 +1,31 @@
+# The curated support policy of Spring Framework: every release line Axelix knows about and its maintenance window.
+#
+# OSS support dates follow the upstream policy (https://spring.io/blog/2025/02/13/support-policy-updates/ and
+# https://spring.io/blog/2024/03/01/support-timeline-announcement-for-spring-framework-6-0-x-and-5-3-x/).
+# Commercial support is the extended window offered by the upstream vendor (Tanzu Spring), cross-checked against
+# https://endoflife.date/spring-framework. Only 6.2.x, the last minor before 7.0, received the +5-year enterprise
+# extension announced in the Feb 2025 policy update (to 2032-06-30); Tanzu Spring applies that same end date across
+# the whole 6.x generation (6.0.x/6.1.x/6.2.x), which is why 7.0.x's current commercial window (2028-07-31)
+# ends earlier than 6.x's despite being the newer line.
+platform: spring-framework
+lines:
+  - line: 5.3.x
+    releasedAt: 2020-10-27
+    ossSupportEndsAt: 2024-08-31
+    commercialSupportEndsAt: 2029-06-30
+  - line: 6.0.x
+    releasedAt: 2022-11-24
+    ossSupportEndsAt: 2024-08-31
+    commercialSupportEndsAt: 2032-06-30
+  - line: 6.1.x
+    releasedAt: 2023-11-23
+    ossSupportEndsAt: 2025-06-30
+    commercialSupportEndsAt: 2032-06-30
+  - line: 6.2.x
+    releasedAt: 2024-11-21
+    ossSupportEndsAt: 2026-06-30
+    commercialSupportEndsAt: 2032-06-30
+  - line: 7.0.x
+    releasedAt: 2025-11-20
+    ossSupportEndsAt: 2027-07-31
+    commercialSupportEndsAt: 2028-07-31

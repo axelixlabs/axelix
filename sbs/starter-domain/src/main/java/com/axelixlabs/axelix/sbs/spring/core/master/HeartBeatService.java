@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.api.registration.HeartBeatMetadata;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
@@ -41,6 +40,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**

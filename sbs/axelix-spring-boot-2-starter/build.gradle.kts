@@ -7,6 +7,7 @@ val springBootVersion = "2.7.18"
 val springCloudVersion = "2021.0.9"
 
 val jsonUnitAssertJVersion = "2.40.1"
+val archUnitVersion = "0.23.1"
 
 dependencies {
     // Self
@@ -48,6 +49,14 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+
+    // ArchUnit 0.23.1 is the last release on slf4j-api 1.7.x (1.0.0+ requires slf4j 2.x).
+    // Spring Boot 2.7.x transitively brings slf4j-api 1.7.36 + logback 1.2.x, which slf4j 2.x
+    // does not detect, so test logging silently falls back to NOP.
+    // - https://github.com/TNG/ArchUnit/releases/tag/v1.0.0
+    // - https://github.com/spring-projects/spring-boot/issues/34708
+    // - https://www.slf4j.org/codes.html#ignoredBindings
+    testImplementation("com.tngtech.archunit:archunit:${archUnitVersion}")
 
     // Test Runtime
 

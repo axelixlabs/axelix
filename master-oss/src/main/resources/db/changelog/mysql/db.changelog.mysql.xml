@@ -24,6 +24,9 @@
   <include file="db/changelog/mysql/changelog/1.1/010-migrate-user-roles-to-users-roles.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/011-drop-not-null-on-users-roles.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/012-add-oidc-subject-to-users.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/001-add-starter-and-structured-java-version-to-instances.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/002-add-runtime-version-columns-to-historical-application-snapshots.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/003-create-scheduled-task-execution-results-table.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/013-add-discovery-key-to-instances.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/014-create-probe-state-table.xml"/>
   <include file="db/changelog/mysql/changelog/1.1/015-create-discovery-lock-table.xml"/>

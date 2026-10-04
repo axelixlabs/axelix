@@ -54,8 +54,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHE =
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/clear", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_ALL_CACHES = endpoint("/axelix-caches/clear", HttpMethod.DELETE);
-    public static final ActuatorEndpoint CLEAR_SINGLE_CACHE_MANAGER =
-            endpoint("/axelix-caches/{cacheManagerName}/clear-all", HttpMethod.DELETE);
     public static final ActuatorEndpoint GET_ALL_CACHES = endpoint("/axelix-caches", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_CACHE =
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}", HttpMethod.GET);
@@ -63,10 +61,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_CACHE =
             endpoint("/axelix-caches/{cacheManagerName}/{cacheName}/disable", HttpMethod.POST);
-    public static final ActuatorEndpoint ENABLE_CACHE_MANAGER =
-            endpoint("/axelix-caches/{cacheManagerName}/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_CACHES_MANAGER =
-            endpoint("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
 
     // Conditions
     public static final ActuatorEndpoint GET_CONDITIONS = endpoint("/axelix-conditions", HttpMethod.GET);

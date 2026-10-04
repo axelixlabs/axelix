@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import com.axelixlabs.axelix.sbs.spring.core.metrics.AxelixMetricNames;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.hibernate.LazyLoadingTarget;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * of Axelix detecting various problems during persistence, such as N + 1 and so on.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoringSharedContextTest {
 
@@ -57,6 +59,9 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
 
     @Autowired
     private MeterRegistry meterRegistry;
+
+    @Autowired
+    private PropagationTestHelper propagationTestHelper;
 
     @BeforeEach
     void setUp() {
@@ -92,6 +97,65 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
             assertThat(stats.getInMemoryPaginatedEntities()).isEmpty();
             // INSERT owner + findByLastName + count.
             assertMetersRecordedFor("executeMultipleSimpleQueries", 3);
+        }
+    }
+
+    /**
+     * These methods aren't declared on {@code OwnerRepository} - their {@code @Transactional} lives on
+     * {@link SimpleJpaRepository}, so preload and lookup must still agree on the same cache key.
+     */
+    @Nested
+    class InheritedRepositoryMethods {
+
+        @Test
+        void shouldRecordTransactionForDirectSaveCall() throws Exception {
+            // given.
+            Method save = SimpleJpaRepository.class.getMethod("save", Object.class);
+            MethodClassKey key = new MethodClassKey(save, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.save(new Owner().setLastName("Evans"));
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
+            assertThat(meterRegistry
+                            .find(AxelixMetricNames.TRANSACTION_DURATION)
+                            .tag("class", "SimpleJpaRepository")
+                            .tag("method", "save")
+                            .timer())
+                    .isNotNull();
+        }
+
+        @Test
+        void shouldRecordTransactionForDirectFindByIdCall() throws Exception {
+            // given.
+            Owner saved = ownerRepository.save(new Owner().setLastName("Evans"));
+            transactionStatsCollector.clear();
+
+            Method findById = SimpleJpaRepository.class.getMethod("findById", Object.class);
+            MethodClassKey key = new MethodClassKey(findById, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.findById(saved.getId());
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
+        }
+
+        @Test
+        void shouldRecordTransactionForDirectDeleteByIdCall() throws Exception {
+            // given.
+            Owner saved = ownerRepository.save(new Owner().setLastName("Evans"));
+            transactionStatsCollector.clear();
+
+            Method deleteById = SimpleJpaRepository.class.getMethod("deleteById", Object.class);
+            MethodClassKey key = new MethodClassKey(deleteById, SimpleJpaRepository.class);
+
+            // when.
+            ownerRepository.deleteById(saved.getId());
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKey(key);
         }
     }
 
@@ -206,6 +270,25 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
         }
     }
 
+    @Nested
+    class NestedTransactions {
+
+        @Test
+        void shouldIsolateQueriesBetweenOuterAndRequiresNewTransaction() throws Exception {
+            // given.
+            MethodClassKey outerKey = keyFor(PropagationTestHelper.class, "outerRequiredMethod", String.class);
+            MethodClassKey innerKey = keyFor(PropagationTestHelper.class, "saveRequiresNew", String.class);
+
+            // when.
+            propagationTestHelper.outerRequiredMethod("Nested");
+
+            // then.
+            assertThat(transactionStatsCollector.getCopyOfStats()).containsKeys(outerKey, innerKey);
+            assertMetersRecordedFor(PropagationTestHelper.class, "outerRequiredMethod", 2);
+            assertMetersRecordedFor(PropagationTestHelper.class, "saveRequiresNew", 1);
+        }
+    }
+
     private TransactionStats statsFor(MethodClassKey key) {
         Map<MethodClassKey, TransactionStats> stats = transactionStatsCollector.getCopyOfStats();
         assertThat(stats).containsKey(key);
@@ -219,7 +302,11 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
      * actuator endpoint, so their tags and values form a contract worth asserting precisely.
      */
     private void assertMetersRecordedFor(String methodName, int expectedQueries) {
-        String className = OwnerRepository.class.getSimpleName();
+        assertMetersRecordedFor(OwnerRepository.class, methodName, expectedQueries);
+    }
+
+    private void assertMetersRecordedFor(Class<?> declaringClass, String methodName, int expectedQueries) {
+        String className = declaringClass.getSimpleName();
 
         Timer durationTimer = meterRegistry
                 .find(AxelixMetricNames.TRANSACTION_DURATION)
@@ -240,7 +327,12 @@ class TransactionMonitoringInterceptorTest extends AbstractTransactionMonitoring
     }
 
     private static MethodClassKey keyFor(String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        Method method = OwnerRepository.class.getMethod(methodName, parameterTypes);
-        return new MethodClassKey(method, OwnerRepository.class);
+        return keyFor(OwnerRepository.class, methodName, parameterTypes);
+    }
+
+    private static MethodClassKey keyFor(Class<?> declaringClass, String methodName, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
+        Method method = declaringClass.getMethod(methodName, parameterTypes);
+        return new MethodClassKey(method, declaringClass);
     }
 }

@@ -51,6 +51,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.gradle.plugin.AxelixGradlePlugin;
 import com.axelixlabs.axelix.gradle.plugin.BuildDirAccessor;
+import com.axelixlabs.axelix.gradle.plugin.ConfigurationCacheSupport;
 import com.axelixlabs.axelix.gradle.plugin.GeneratedResourcesPackager;
 import com.axelixlabs.axelix.gradle.plugin.properties.ProjectInfoGenerator;
 
@@ -106,6 +107,9 @@ public final class DependencySbomGenerator {
         generateTask.setGroup("build");
         generateTask.setDescription(
                 "Generates META-INF/axelix/dependencies.cdx.json - a CycloneDX SBOM of the runtime dependency graph.");
+        ConfigurationCacheSupport.markNotCompatible(
+                generateTask,
+                "Dependency SBOM generation resolves the project dependency graph during task execution.");
 
         // Tracking the resolved classpath as an input invalidates the SBOM whenever a dependency is
         // added, removed or its resolved version changes. Resolution is deferred to input

@@ -29,12 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata.HealthStatus;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
 /**
@@ -62,7 +63,8 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 resolveApplicationId(instanceId, metadata),
                 instanceName,
                 metadata.getServiceVersion(),
-                metadata.getSoftwareVersions().getJava(),
+                metadata.getVersion(),
+                JavaVersion.parse(metadata.getSoftwareVersions().getJava()),
                 metadata.getSoftwareVersions().getSpringBoot(),
                 metadata.getSoftwareVersions().getSpringFramework(),
                 metadata.getSoftwareVersions().getKotlin(),
@@ -77,9 +79,10 @@ public class DefaultInstanceFactory implements InstanceFactory {
     }
 
     private ApplicationId resolveApplicationId(String instanceId, BasicRegistrationMetadata metadata) {
-        if (!StringUtils.hasText(metadata.getGroupId()) || !StringUtils.hasText(metadata.getArtifactId())) {
+        // groupId is optional (Gradle services may omit it);
+        if (!StringUtils.hasText(metadata.getArtifactId())) {
             throw new IllegalArgumentException(
-                    "Instance %s cannot be registered without a valid application id (both groupId and artifactId are mandatory)"
+                    "Instance %s cannot be registered without a valid application id (artifactId is mandatory)"
                             .formatted(instanceId));
         }
 

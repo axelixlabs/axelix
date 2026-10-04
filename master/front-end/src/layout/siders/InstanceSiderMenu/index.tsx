@@ -16,10 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Menu } from "antd";
+import type { AxiosResponse } from "axios";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
 import { findOpenInstanceKeys } from "@/helpers";
+import { EInstanceFeature, type IInstanceFeaturesResponse } from "@/models";
+import { getInstanceFeatures } from "@/services";
 import { getInstanceItems } from "@/utils";
 
 import styles from "./styles.module.css";
@@ -30,12 +34,32 @@ export const InstanceSiderMenu = () => {
     const { pathname } = useLocation();
     const { instanceId } = useParams();
 
+    const [features, setFeatures] = useState<EInstanceFeature[]>([]);
+
+    useEffect(() => {
+        if (!instanceId) {
+            return;
+        }
+
+        getInstanceFeatures(instanceId)
+            .then((response: AxiosResponse<IInstanceFeaturesResponse>) => setFeatures(response.data.features ?? []))
+            // safe fallback in case of problems
+            .catch(() => {
+                console.warn(
+                    `The feature set of instance '${instanceId}' is not available. Performing a safe fallback`,
+                );
+                setFeatures([]);
+            });
+    }, [instanceId]);
+
+    const items = getInstanceItems(instanceId!, t, features);
+
     return (
         <Menu
             mode="inline"
-            items={getInstanceItems(instanceId!, t)}
+            items={items}
             selectedKeys={[pathname]}
-            defaultOpenKeys={findOpenInstanceKeys(getInstanceItems(instanceId!, t), pathname)}
+            defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
             className={styles.Menu}
         />
     );

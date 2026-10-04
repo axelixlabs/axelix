@@ -25,7 +25,6 @@ import javax.servlet.DispatcherType;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -71,7 +70,7 @@ import static org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.IN
  * @author Ilya Naumov
  * @author Vyacheslav Yanin
  */
-@AutoConfiguration(
+@AxelixAutoConfiguration(
         after = {AxelixMetricsPublisherAutoConfiguration.class, ValidationListenerAutoConfiguration.class},
         afterName = "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration")
 @ConditionalOnProperty(

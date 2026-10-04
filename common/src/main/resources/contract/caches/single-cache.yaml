@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: single-cache
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'single-cache' operation.
+    This operation returns the detailed information (target implementation, cache manager,
+    lookup history and enabled state) of a single cache of the Spring Boot app, addressed by
+    its cache manager and cache name.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-caches/{cacheManagerName}/{cacheName}:
+    get:
+      operationId: getSingleCache
+      summary: Returns the detailed information of a single cache, addressed by cache manager and cache name.
+      parameters:
+        - name: cacheManagerName
+          in: path
+          required: true
+          description: The name of the cache manager.
+          schema:
+            type: string
+        - name: cacheName
+          in: path
+          required: true
+          description: The name of the cache.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The single cache information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleCache'
+components:
+  schemas:
+    SingleCache:
+      type: object
+      description: The details of the requested cache.
+      required:
+        - name
+        - target
+        - cacheManager
+        - lookupHistory
+        - enabled
+      properties:
+        name:
+          type: string
+          description: The cache name.
+          x-axelix-introduced-in: 1.2.0
+        target:
+          type: string
+          description: The fully qualified name of the native cache.
+          x-axelix-introduced-in: 1.2.0
+        cacheManager:
+          type: string
+          description: The name of the cache manager that manages the current cache.
+          x-axelix-introduced-in: 1.2.0
+        lookupHistory:
+          type: array
+          description: The array of all recorded cache lookups. May be empty if unknown.
+          items:
+            $ref: '#/components/schemas/CacheLookup'
+          x-axelix-introduced-in: 1.2.0
+        estimatedEntrySize:
+          type: integer
+          format: int64
+          description: The estimated number of entries in the cache, or absent if unknown.
+          x-axelix-introduced-in: 1.2.0
+        enabled:
+          type: boolean
+          description: Whether the cache is enabled (true) or disabled (false).
+          x-axelix-introduced-in: 1.2.0
+    CacheLookup:
+      type: object
+      description: A recorded cache lookup.
+      required:
+        - timestamp
+        - outcome
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          description: Timestamp when the cache operation occurred, in milliseconds from the Unix epoch.
+          x-axelix-introduced-in: 1.2.0
+        outcome:
+          description: The outcome of the cache lookup.
+          x-axelix-introduced-in: 1.2.0
+          $ref: '#/components/schemas/LookupOutcome'
+    LookupOutcome:
+      type: string
+      description: The outcome of a cache lookup.
+      enum:
+        - HIT
+        - MISS

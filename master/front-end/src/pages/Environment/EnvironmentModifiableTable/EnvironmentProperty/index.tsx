@@ -16,11 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Copy } from "@/components";
-import type { IEnvProperty } from "@/models";
+import { type TPropertyRiskKind, propertyRisks } from "@/helpers";
+import { EPropertyTriageTag, type IEnvProperty } from "@/models";
 
 import { EnvironmentPropertyValue } from "../../EnvironmentPropertyValue";
-import sharedStyles from "../shared.module.css";
 
+import { RiskChip } from "./RiskChip";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -28,36 +29,42 @@ interface IProps {
      * Single property
      */
     property: IEnvProperty;
-
-    /**
-     * Whether this row is in an even position in the shared list
-     */
-    isEvenElement: boolean;
-
-    /**
-     * Adds left padding to align with accordion rows that have an expand arrow
-     */
-    accordionAligned?: boolean;
 }
 
-export const EnvironmentProperty = ({ property, isEvenElement, accordionAligned }: IProps) => {
-    const { name } = property;
+const RISK_ROW_STYLES: Record<TPropertyRiskKind, string> = {
+    [EPropertyTriageTag.DANGEROUS]: styles.DangerousRow,
+    [EPropertyTriageTag.DEPRECATED_ERROR]: styles.DeprecatedErrorRow,
+    [EPropertyTriageTag.DEPRECATED_WARNING]: styles.DeprecatedWarningRow,
+};
 
-    const rowBackgroundStyle = isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement;
+export const EnvironmentProperty = ({ property }: IProps) => {
+    const { name, isPrimary } = property;
+
+    const risks = propertyRisks(property);
+    const primaryRisk = risks[0];
+
+    const rowStyles = [
+        styles.MainWrapper,
+        primaryRisk ? RISK_ROW_STYLES[primaryRisk.kind] : "",
+        !primaryRisk && !isPrimary ? styles.SuppressedRow : "",
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
         <>
-            <div
-                className={`${styles.MainWrapper} ${rowBackgroundStyle} ${accordionAligned ? styles.AccordionAligned : ""}`}
-            >
+            <div className={rowStyles}>
+                <span className={styles.CaretCell} />
+
                 <div className={styles.KeyChunk}>
-                    <div className={styles.CopyableValue}>
-                        {name} <Copy text={name} />
-                    </div>
+                    <span className={styles.Key}>{name}</span>
+                    <Copy text={name} />
+                    {risks.map((risk) => (
+                        <RiskChip risk={risk} key={risk.kind} />
+                    ))}
                 </div>
-                <div className={styles.ValueChunk}>
-                    <EnvironmentPropertyValue property={property} />
-                </div>
+
+                <EnvironmentPropertyValue property={property} />
             </div>
         </>
     );

@@ -46,7 +46,7 @@ import org.springframework.data.jdbc.core.dialect.JdbcPostgresDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.OssRdbms;
 import com.axelixlabs.axelix.master.domain.iam.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @since 12.03.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 @EnableConfigurationProperties(AxelixMigrationProperties.class)
@@ -277,7 +278,7 @@ public class PersistenceAutoConfiguration {
             @Override
             public PersistenceInsights convert(String source) {
                 if (source.isBlank()) {
-                    return new PersistenceInsights(List.of());
+                    return new PersistenceInsights().transactions(List.of());
                 }
                 return jsonMapper.readValue(source, PersistenceInsights.class);
             }

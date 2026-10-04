@@ -35,6 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
 import com.axelixlabs.axelix.master.service.discovery.DiscoveryLock;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
@@ -44,6 +45,7 @@ import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDisc
 import com.axelixlabs.axelix.master.service.discovery.probe.ProbeStateService;
 import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoff;
 import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoffProperties;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -52,6 +54,7 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * Auto-configuration for K8S related components.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "axelix.master.discovery.auto", name = "enabled", havingValue = "true")
@@ -65,6 +68,9 @@ public class DiscoveryAutoConfiguration {
             SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
+            ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
+            TransactionTemplate transactionTemplate,
             DiscoveryLock discoveryLock) {
         return new ShortPollingInstanceDiscoveryScheduler(
                 instancesDiscoverer,
@@ -72,6 +78,9 @@ public class DiscoveryAutoConfiguration {
                 jwtEncoderService,
                 securityContextExecutor,
                 databaseHistoricalApplicationSnapshotService,
+                transactionTemplate,
+                scheduledTaskExecutionResultConverter,
+                scheduledTaskExecutionHistoryService);
                 transactionTemplate,
                 discoveryLock);
     }

@@ -18,8 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.info.InfoEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.details.AxelixDetailsEndpoint;
@@ -33,10 +31,11 @@ import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
  *
  * @since 30.10.2025
  * @author Nikita Kirillov, Sergey Cherkasov
+ * @author Ilya Naumov
  */
-@AutoConfiguration(
+@AxelixAutoConfiguration(
         after = {AxelixInfoPropertiesAutoConfiguration.class, LibraryInformationProviderAutoConfiguration.class})
-@ConditionalOnAvailableEndpoint(endpoint = InfoEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = AxelixDetailsEndpoint.class)
 public class AxelixDetailsEndpointAutoConfiguration {
 
     @Bean

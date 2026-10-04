@@ -7,6 +7,7 @@ val springBootVersion = "4.0.6"
 val springCloudVersion = "2025.1.0"
 
 val jsonUnitAssertJVersion = "2.40.1"
+val archUnitVersion = "1.4.2"
 
 dependencies {
     // Self
@@ -56,6 +57,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:okhttp")
 
     testImplementation("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+    testImplementation("com.tngtech.archunit:archunit:${archUnitVersion}")
 }
 
 tasks.withType<JavaCompile>().configureEach {

@@ -34,7 +34,8 @@ import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
  *                                all the instances of the same application. Mandatory.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
- * @param javaVersion             Version of the Java Platform used inside the service
+ * @param starterVersion          Version of the Axelix starter used inside the service
+ * @param javaVersion             Version of the Java Platform used inside the service, as the JEP 322 coordinate (see {@link JavaVersion})
  * @param springBootVersion       Version of the Spring Boot used inside the service
  * @param springFrameworkVersion  Version of the Spring Framework used inside the service
  * @param kotlinVersion           Version of the Kotlin used inside the service. Might be {@code null}.
@@ -54,7 +55,8 @@ public record Instance(
         @Embedded.Empty ApplicationId applicationId,
         String name,
         String serviceVersion,
-        String javaVersion,
+        String starterVersion,
+        @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY) JavaVersion javaVersion,
         String springBootVersion,
         String springFrameworkVersion,
         @Nullable String kotlinVersion,
@@ -73,6 +75,7 @@ public record Instance(
                 this.applicationId,
                 this.name,
                 this.serviceVersion,
+                this.starterVersion,
                 this.javaVersion,
                 this.springBootVersion,
                 this.springFrameworkVersion,

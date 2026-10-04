@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
-import com.axelixlabs.axelix.common.api.registration.insights.InsightFeature;
-import com.axelixlabs.axelix.common.api.registration.insights.Insights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.common.domain.insights.FeatureId;
 import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
@@ -276,7 +276,8 @@ class DefaultInsightsInfoProviderTest {
                 insights.getPersistenceInsights().getTransactions();
         assertThat(transactions).hasSize(1);
         assertThat(transactions.get(0).getExternalCalls()).singleElement().satisfies(call -> {
-            assertThat(call.getType()).isEqualTo(TypeExternalCall.HTTP_CLIENT);
+            assertThat(call.getType())
+                    .isEqualTo(com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TypeExternalCall.HTTP_CLIENT);
             assertThat(call.getTarget()).isEqualTo("GET https://payments/charge");
             assertThat(call.getStats().getMinMs()).isEqualTo(15L);
             assertThat(call.getStats().getMaxMs()).isEqualTo(15L);
@@ -312,7 +313,7 @@ class DefaultInsightsInfoProviderTest {
                 .satisfies(transaction -> {
                     assertThat(transaction.getPropagation()).isEqualTo("REQUIRES_NEW");
                     assertThat(transaction.getIsolation()).isEqualTo("SERIALIZABLE");
-                    assertThat(transaction.isReadOnly()).isTrue();
+                    assertThat(transaction.getReadOnly()).isTrue();
                 });
     }
 
@@ -320,7 +321,7 @@ class DefaultInsightsInfoProviderTest {
         InsightFeature feature = findByFeatureId(features, featureId);
 
         assertThat(feature).isNotNull();
-        assertThat(feature.isEnabled()).isEqualTo(enabled);
+        assertThat(feature.getEnabled()).isEqualTo(enabled);
     }
 
     private static InsightFeature findByFeatureId(List<InsightFeature> features, FeatureId featureId) {
@@ -351,15 +352,18 @@ class DefaultInsightsInfoProviderTest {
     }
 
     private static GcLogService gcLogDisabled() {
-        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), false);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(false).level(null).availableLevels(List.of("debug", "info")), false);
     }
 
     private static GcLogService gcLogEnabled() {
-        return new TestGcLogService(new GcLogStatus(true, "debug", List.of("debug", "info")), false);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(true).level("debug").availableLevels(List.of("debug", "info")), false);
     }
 
     private static GcLogService gcLogFileSpecified() {
-        return new TestGcLogService(new GcLogStatus(false, null, List.of("debug", "info")), true);
+        return new TestGcLogService(
+                new GcLogStatus().enabled(false).level(null).availableLevels(List.of("debug", "info")), true);
     }
 
     private static GcLogService throwingGcLogService() {

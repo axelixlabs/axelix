@@ -1,0 +1,5 @@
+{
+    "title": "Аналитика",
+    "defaultOpen": false,
+    "pages": ["details", "metrics", "...loggers"]
+}

@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogEnableRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 
 /**
  * Custom Actuator endpoint for managing and inspecting JVM GC logging.

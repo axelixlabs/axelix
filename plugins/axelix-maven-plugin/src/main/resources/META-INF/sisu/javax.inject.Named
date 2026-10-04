@@ -1,3 +1,2 @@
-com.axelixlabs.axelix.maven.plugin.AxelixLifecycleParticipant
-com.axelixlabs.axelix.maven.plugin.DependencyResolver
-com.axelixlabs.axelix.maven.plugin.SpringTestProfilerDetector
+com.axelixlabs.axelix.maven.plugin.ProjectInfoGenerator
+com.axelixlabs.axelix.maven.plugin.DependenciesSbomGenerator

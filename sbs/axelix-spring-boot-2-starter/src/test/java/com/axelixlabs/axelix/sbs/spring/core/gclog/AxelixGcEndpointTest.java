@@ -37,9 +37,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogEnableRequest;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.AxelixGcEndpointTest.AxelixGcEndpointTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
@@ -79,7 +79,7 @@ class AxelixGcEndpointTest {
         assertThat(response.getBody()).isNotNull();
 
         GcLogStatus gcLogStatus = response.getBody();
-        assertThat(gcLogStatus.isEnabled()).isFalse();
+        assertThat(gcLogStatus.getEnabled()).isFalse();
         assertThat(gcLogStatus.getLevel()).isNull();
         assertThat(gcLogStatus.getAvailableLevels()).isNotEmpty().doesNotContain("off");
     }
@@ -88,7 +88,7 @@ class AxelixGcEndpointTest {
     void enable_shouldEnableGcLogging() {
         List<String> availableLevels = getStatus().getAvailableLevels();
 
-        GcLogEnableRequest request = new GcLogEnableRequest(availableLevels.get(0));
+        GcLogEnableRequest request = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> response =
                 restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
@@ -96,14 +96,14 @@ class AxelixGcEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         GcLogStatus status = getStatus();
-        assertThat(status.isEnabled()).isTrue();
+        assertThat(status.getEnabled()).isTrue();
         assertThat(status.getLevel()).isEqualTo(request.getLevel());
     }
 
     @Test
     void disable_shouldDisableGcLogging() {
         List<String> availableLevels = getStatus().getAvailableLevels();
-        GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
+        GcLogEnableRequest enableRequest = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
                 restTemplate.asAdmin().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
@@ -116,14 +116,14 @@ class AxelixGcEndpointTest {
         assertThat(disableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         GcLogStatus status = getStatus();
-        assertThat(status.isEnabled()).isFalse();
+        assertThat(status.getEnabled()).isFalse();
         assertThat(status.getLevel()).isNull();
     }
 
     @Test
     void gcLogfile_shouldReturnFileWhenLoggingEnabled() throws InterruptedException {
         List<String> availableLevels = getStatus().getAvailableLevels();
-        GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
+        GcLogEnableRequest enableRequest = new GcLogEnableRequest().level(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
                 restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
@@ -152,7 +152,7 @@ class AxelixGcEndpointTest {
 
     @Test
     void enable_shouldReturnErrorForInvalidLevel() {
-        GcLogEnableRequest request = new GcLogEnableRequest("invalid-level");
+        GcLogEnableRequest request = new GcLogEnableRequest().level("invalid-level");
 
         ResponseEntity<String> response =
                 restTemplate.asEditor().postForEntity("/actuator/axelix-gc/log/enable", request, String.class);

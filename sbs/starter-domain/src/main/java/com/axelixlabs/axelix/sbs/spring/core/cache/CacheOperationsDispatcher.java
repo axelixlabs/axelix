@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.CachesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.caches.SingleCache;
 
 /**
  * Dispatcher interface for executing cache operations across different CacheManagers.
@@ -73,41 +73,9 @@ public interface CacheOperationsDispatcher {
     void clear(String cacheManagerName, String cacheName, Object key) throws CacheManagerNotFoundException;
 
     /**
-     * Clears all caches managed by the specified {@code CacheManager}.
-     *
-     * @param cacheManagerName the name (bean name) of the {@code CacheManager}
-     * @throws CacheManagerNotFoundException in case the requested CacheManager is not found.
-     */
-    void clear(String cacheManagerName) throws CacheManagerNotFoundException;
-
-    /**
      * Clears all cache managers in the application {@code CacheManager}.
      */
     void clearAll() throws CacheManagerNotFoundException;
-
-    /**
-     * Enables all caches in the specified cache manager by name.
-     * This activates caching operations for all caches in the given cache manager.
-     *
-     * @param cacheManagerName the name of the cache manager to enable.
-     * @throws CacheManagerNotFoundException in case the requested CacheManager is not found.
-     */
-    void enableCacheManager(String cacheManagerName) throws CacheManagerNotFoundException;
-
-    /**
-     * Disables all caches in the specified cache manager by name.
-     * This deactivates caching operations for all caches in the given cache manager.
-     * <p>
-     * Please note, that this API disabled all the caches inside the given cache manager
-     * that are only known by the time of this exact invocation. Some underlying CacheManager
-     * implementations (such as ConcurrentMapCacheManager for instance) support the dynamic
-     * addition of org.springframework.cache.Cache caches. The caches that are going to be added
-     * dynamically later after the given invocation of this method will not be disabled.
-     *
-     * @param cacheManagerName the name of the cache manager to disable.
-     * @throws CacheManagerNotFoundException in case the requested CacheManager is not found.
-     */
-    void disableCacheManager(String cacheManagerName) throws CacheManagerNotFoundException;
 
     /**
      * Enables a specific cache within the specified cache manager.

@@ -30,12 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
+import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
+import com.axelixlabs.axelix.master.service.scheduled.ScheduledTaskExecutionHistoryService;
 import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -47,6 +50,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Vyacheslav Yanin
  */
 public class ShortPollingInstanceDiscoveryScheduler {
 
@@ -60,6 +64,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final SecurityContextExecutor securityContextExecutor;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
+    private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
+    private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
     private final DiscoveryLock discoveryLock;
 
     public ShortPollingInstanceDiscoveryScheduler(
@@ -69,6 +75,9 @@ public class ShortPollingInstanceDiscoveryScheduler {
             SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
+            ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService,
+            TransactionTemplate transactionTemplate,
             DiscoveryLock discoveryLock) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
@@ -76,6 +85,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
         this.securityContextExecutor = securityContextExecutor;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
+        this.scheduledTaskExecutionResultConverter = scheduledTaskExecutionResultConverter;
+        this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
         this.discoveryLock = discoveryLock;
     }
 
@@ -108,11 +119,17 @@ public class ShortPollingInstanceDiscoveryScheduler {
             freshMetadata.add(profile.metadata());
         });
 
+        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
+                .map(scheduledTaskExecutionResultConverter::convert)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+
         transactionTemplate.executeWithoutResult(_ -> {
             // Serializes the reconciliation and the snapshots between Master replicas until the commit
             discoveryLock.acquire();
             instanceRegistry.reconcile(freshInstances, discoveredInstances.retained());
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(freshMetadata);
+            scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });
     }
 }

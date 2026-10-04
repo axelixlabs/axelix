@@ -1,0 +1,33 @@
+.ToolbarWrapper {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e9edec;
+}
+
+.ToolbarRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.SearchWrapper {
+    flex: 1;
+    min-width: 280px;
+}
+
+.NoResults {
+    padding: 50px;
+    text-align: center;
+    color: var(--prop-text-faint);
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-panel-border);
+    border-radius: var(--prop-radius);
+}
+
+.ContentWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}

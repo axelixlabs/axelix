@@ -41,14 +41,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -60,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(CapturingIamWebInterceptor.class)
@@ -71,7 +74,7 @@ public class HeartBeatApiTest {
     private static final String JSON_REQUEST = """
         {
            "basicRegistrationMetadata" : {
-             "version": "1.0.0-SNAPSHOT",
+             "version" : "1.0.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",
              "artifactId" : "petclinic",
@@ -142,7 +145,17 @@ public class HeartBeatApiTest {
                      }
                    }
                  ]
-               }
+               },
+               "scheduledTaskExecutions" : [
+                 {
+                   "taskId" : "com.example.OwnerJob#run()",
+                   "startedAt" : "2026-09-27T10:00:00.123Z",
+                   "durationMillis" : 1500,
+                   "success" : false,
+                   "errorType" : "NullPointerException",
+                   "errorMessage" : "boom"
+                 }
+               ]
              }
            },
            "instanceId" : "%s",
@@ -169,6 +182,7 @@ public class HeartBeatApiTest {
     void cleanDatabase() {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+        jdbcAggregateTemplate.deleteAll(ScheduledTaskExecutionResult.class);
         capturingIamWebInterceptor.reset();
     }
 
@@ -190,7 +204,8 @@ public class HeartBeatApiTest {
                     .isEqualTo(ApplicationId.of("org.springframework.samples", "petclinic"));
             assertThat(instance.name()).isEqualTo("petclinic");
             assertThat(instance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-            assertThat(instance.javaVersion()).isEqualTo("25");
+            assertThat(instance.starterVersion()).isEqualTo("1.0.0-SNAPSHOT");
+            assertThat(instance.javaVersion()).isEqualTo(new JavaVersion(25, 0, 0, 0));
             assertThat(instance.springBootVersion()).isEqualTo("3.5.0");
             assertThat(instance.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(instance.kotlinVersion()).isNull();
@@ -230,9 +245,72 @@ public class HeartBeatApiTest {
                     assertThat(profile.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
                 });
 
+        // and then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .singleElement()
+                .satisfies(result -> {
+                    assertThat(result.instanceId()).isEqualTo(TEST_INSTANCE_ID);
+                    assertThat(result.groupId()).isEqualTo("org.springframework.samples");
+                    assertThat(result.artifactId()).isEqualTo("petclinic");
+                    assertThat(result.taskId()).isEqualTo("com.example.OwnerJob#run()");
+                    assertThat(result.startedAt()).isEqualTo(Instant.parse("2026-09-27T10:00:00.123Z"));
+                    assertThat(result.durationMillis()).isEqualTo(1500L);
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.errorType()).isEqualTo("NullPointerException");
+                    assertThat(result.errorMessage()).isEqualTo("boom");
+                });
+
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
+    }
+
+    @Test
+    void shouldRegisterServiceInstanceWithEmptyGroupId() {
+        // given. a Gradle service that does not declare a 'group' self-registers with an empty groupId.
+        String requestWithEmptyGroupId =
+                JSON_REQUEST.replace("\"groupId\" : \"org.springframework.samples\"", "\"groupId\" : \"\"");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(requestWithEmptyGroupId), Void.class);
+
+        // then. the instance is accepted and identified by its artifactId alone.
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
+
+        Optional<Instance> registeredInstance = instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID));
+        assertThat(registeredInstance)
+                .get()
+                .extracting(Instance::applicationId)
+                .isEqualTo(ApplicationId.of("", "petclinic"));
+
+        // and then. the historical snapshot is persisted under the empty-group application id.
+        var snapshot = jdbcAggregateTemplate.findById(
+                new SnapshotId("", "petclinic", LocalDate.now(ZoneOffset.UTC)), HistoricalApplicationSnapshot.class);
+        assertThat(snapshot).isNotNull();
+    }
+
+    @Test
+    void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
+        // given.
+        String requestWithIncompatibleStarter =
+                JSON_REQUEST.replace("\"version\" : \"1.0.0-SNAPSHOT\"", "\"version\" : \"1.99.0\"");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register",
+                        defaultJsonEntity(requestWithIncompatibleStarter),
+                        Void.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        // and then.
+        assertThat(instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID))).isEmpty();
     }
 
     @ParameterizedTest(name = "{0}")

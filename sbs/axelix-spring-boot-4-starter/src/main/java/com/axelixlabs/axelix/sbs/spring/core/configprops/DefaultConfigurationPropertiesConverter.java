@@ -24,8 +24,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed.ConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeedBean;
 import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 
 /**
@@ -48,19 +48,19 @@ public class DefaultConfigurationPropertiesConverter implements ConfigurationPro
     // shared ConfigurationPropertiesFlattener API accepts Map<String, Object>. The values are handled null-safely.
     @SuppressWarnings("NullAway")
     public ConfigurationPropertiesFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
-        List<ConfigurationProperties> configurationProperties = new ArrayList<>();
+        List<ConfigurationPropertiesFeedBean> configurationProperties = new ArrayList<>();
 
         originalDescriptor.getContexts().values().forEach(context -> {
             if (context != null && context.getBeans() != null) {
                 context.getBeans()
-                        .forEach((beanName, bean) -> configurationProperties.add(new ConfigurationProperties(
-                                BeanNameUtils.stripConfigPropsPrefix(beanName),
-                                bean.getPrefix(),
-                                configPropsFlattener.flatten(bean.getProperties()),
-                                configPropsFlattener.flatten(bean.getInputs()))));
+                        .forEach((beanName, bean) -> configurationProperties.add(new ConfigurationPropertiesFeedBean()
+                                .beanName(BeanNameUtils.stripConfigPropsPrefix(beanName))
+                                .prefix(bean.getPrefix())
+                                .properties(configPropsFlattener.flatten(bean.getProperties()))
+                                .inputs(configPropsFlattener.flatten(bean.getInputs()))));
             }
         });
 
-        return new ConfigurationPropertiesFeed(configurationProperties);
+        return new ConfigurationPropertiesFeed().beans(configurationProperties);
     }
 }

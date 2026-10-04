@@ -18,7 +18,9 @@
 }
 .PostRow .Rcover {
   width: 100%;
-  aspect-ratio: 16/10;
+  /* Match the 2400×1260 preview art so object-fit:cover shows the full
+     composition (full-bleed title + diagram) instead of slicing the sides. */
+  aspect-ratio: 40 / 21;
   border-radius: 14px;
   overflow: hidden;
   position: relative;
@@ -52,6 +54,7 @@
   color: var(--ink);
   transition: color 0.15s;
   text-wrap: pretty;
+  overflow-wrap: break-word;
 }
 .PostRow p.Exc {
   margin: 0;
@@ -60,6 +63,7 @@
   color: var(--ink-3);
   text-wrap: pretty;
   max-width: 54ch;
+  overflow-wrap: break-word;
 }
 .PostRow :global(.authors) {
   margin-top: 6px;

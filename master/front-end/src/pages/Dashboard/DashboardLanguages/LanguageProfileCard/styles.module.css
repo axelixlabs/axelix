@@ -1,0 +1,122 @@
+.Card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.Header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.Eyebrow {
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--axelix-bold-grey);
+    text-transform: uppercase;
+}
+
+.TitleRow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.Title {
+    font-weight: 600;
+}
+
+.Descriptor {
+    color: var(--axelix-bold-grey);
+}
+
+.Body {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.Legend {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.SummaryRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+}
+
+.SummaryLabel {
+    font-weight: 600;
+}
+
+.SummaryValue {
+    color: var(--axelix-bold-grey);
+}
+
+.Row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 12px;
+    align-items: center;
+    min-height: 25px;
+}
+
+.LabelCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.Label {
+    color: var(--axelix-bold-grey);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Cell {
+    justify-self: end;
+    color: var(--axelix-bold-grey);
+}
+
+.CellStrong {
+    font-weight: 600;
+    color: var(--axelix-primary-black);
+}
+
+.FooterWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--axelix-medium-grey);
+    margin-top: auto;
+    color: var(--axelix-bold-grey);
+}
+
+.FooterMono {
+    font-variant-numeric: tabular-nums;
+}

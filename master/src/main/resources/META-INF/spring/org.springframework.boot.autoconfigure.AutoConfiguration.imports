@@ -9,3 +9,4 @@ com.axelixlabs.axelix.master.autoconfiguration.database.PersistenceAutoConfigura
 com.axelixlabs.axelix.master.autoconfiguration.metrics.PrometheusMetricsAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.metrics.OtlpTransportMetricsAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.ecosystem.EcosystemAutoConfiguration
+com.axelixlabs.axelix.master.autoconfiguration.features.FeaturesAutoConfiguration

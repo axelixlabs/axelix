@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 
 import java.io.File;
 
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 
 /**
  * Service for managing JVM GC logging at runtime.

@@ -21,7 +21,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ApplicationConfigurationProperties;
 
-import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesFeed;
 
 /**
  * Interface that is capable to convert values from type {@code ConfigurationPropertiesDescriptor}

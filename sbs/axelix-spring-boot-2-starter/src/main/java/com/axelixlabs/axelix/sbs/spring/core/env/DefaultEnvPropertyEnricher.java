@@ -33,13 +33,14 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.api.KeyValue;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
+import com.axelixlabs.axelix.common.utils.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.Deprecation;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.InjectionPoint;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.PropertySource;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
 
 /**
@@ -84,10 +85,10 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
                 .collect(Collectors.toList());
 
-        return new EnvironmentFeed(
-                originalDescriptor.getActiveProfiles(),
-                Arrays.stream(environment.getDefaultProfiles()).collect(Collectors.toList()),
-                enrichedSources);
+        return new EnvironmentFeed()
+                .activeProfiles(originalDescriptor.getActiveProfiles())
+                .defaultProfiles(Arrays.stream(environment.getDefaultProfiles()).collect(Collectors.toList()))
+                .propertySources(enrichedSources);
     }
 
     private Map<String, String> buildPrimarySourceMap(EnvironmentDescriptor descriptor) {
@@ -125,22 +126,25 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                     List<InjectionPoint> injectionPoints =
                             valueInjectionTracker.getInjectionPointsForProperty(normalizedName);
 
-                    return new Property(
-                            propertyName,
-                            stringValue,
-                            isPrimary,
-                            configPropsBeanName,
-                            Optional.ofNullable(metadata)
+                    return new Property()
+                            .name(propertyName)
+                            .value(stringValue)
+                            .isPrimary(isPrimary)
+                            .configPropsBeanName(configPropsBeanName)
+                            .description(Optional.ofNullable(metadata)
                                     .map(PropertyMetadata::getDescription)
-                                    .orElse(null),
-                            buildFromMetadata(metadata),
-                            injectionPoints);
+                                    .orElse(null))
+                            .deprecation(buildFromMetadata(metadata))
+                            .injectionPoints(injectionPoints);
                 })
                 .collect(Collectors.toList());
 
         PropertySourceDisplayData displayData = PropertySourceDescription.resolveDisplayData(source.getName());
 
-        return new PropertySource(displayData.getDisplayName(), displayData.getDescription(), enrichedProperties);
+        return new PropertySource()
+                .name(displayData.getDisplayName())
+                .description(displayData.getDescription())
+                .properties(enrichedProperties);
     }
 
     @Nullable
@@ -149,7 +153,11 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
             return null;
         }
 
-        return new Deprecation(propertyMetadata.getDeprecation().getMessage());
+        PropertyMetadata.Deprecation deprecation = propertyMetadata.getDeprecation();
+        return new Deprecation()
+                .message(deprecation.getMessage())
+                .level(deprecation.getLevel())
+                .replacedBy(deprecation.getReplacedBy());
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
@@ -169,7 +177,10 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private void applyPrefixAndProperty(
-            String prefix, List<KeyValue> properties, Map<String, String> configPropsMapping, String beanName) {
+            String prefix,
+            List<ConfigurationPropertiesEntry> properties,
+            Map<String, String> configPropsMapping,
+            String beanName) {
         for (var property : properties) {
             String fullProperty = propertyNameNormalizer.normalize(prefix + property.getKey());
             configPropsMapping.put(fullProperty, beanName);

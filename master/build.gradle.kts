@@ -1,3 +1,4 @@
+import net.ltgt.gradle.errorprone.errorprone
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.kotlin.dsl.axelix
 
@@ -6,6 +7,7 @@ plugins {
     id("com.axelixlabs.axelix-internal")
     id("com.axelixlabs.axelix-nodejs")
     id("java-test-fixtures")
+    id("contracts")
 }
 
 val springBootVersion = "4.1.0"
@@ -26,7 +28,8 @@ val nettyVersion = "4.2.17.Final"
 val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
 val httpcore5Version = "5.4.3"
-val bcprovVersion = "1.81.1"
+val httpclient5Version = "5.6.3"
+val bcprovVersion = "1.84"
 val jacksonDatabindVersion = "3.1.5"
 
 dependencies {
@@ -49,6 +52,7 @@ dependencies {
         implementation("org.apache.tomcat.embed:tomcat-embed-websocket:$tomcatVersion")
         implementation("org.apache.httpcomponents.core5:httpcore5:$httpcore5Version")
         implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
+        implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
         implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
         implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
@@ -110,6 +114,7 @@ dependencies {
     testFixturesApi("digital.pragmatech.testing:spring-test-profiler:0.1.2")
     testFixturesApi("org.instancio:instancio-core:${instancioVersion}")
     testFixturesApi("net.javacrumbs.json-unit:json-unit-assertj:${jsonUnitAssertJVersion}")
+    testFixturesApi("org.awaitility:awaitility")
 
     // annotation processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
@@ -133,6 +138,19 @@ tasks.processResources {
     }
 
     exclude("application-local.yaml")
+}
+
+contracts {
+    modelBasePackage.set("com.axelixlabs.axelix.master.contract")
+}
+
+// The generated contract classes cannot pass NullAway: a required property is non-null under
+// JSpecify, yet the generator emits a Jackson-friendly no-arg constructor that leaves its field
+// uninitialized.
+tasks.named<JavaCompile>("compileJava") {
+    options.errorprone {
+        option("NullAway:UnannotatedSubPackages", "com.axelixlabs.axelix.master.contract(\\..*)?")
+    }
 }
 
 axelix {

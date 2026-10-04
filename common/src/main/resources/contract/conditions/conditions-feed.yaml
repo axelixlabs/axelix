@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: conditions-feed
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'conditions-feed' operation.
+    This operation returns the flattened conditions report of the Spring Boot app: the configuration
+    classes where all conditions matched and those where some did not, so that Axelix Master can
+    render the conditions overview.
+  # The API itself exists since 1.0.0, but the marker deliberately says 1.2.0: the release in
+  # which this contract document was born and the compatibility checks started guarding it.
+  # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
+  # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
+  x-axelix-introduced-in: 1.2.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-conditions:
+    get:
+      operationId: getConditions
+      summary: Returns the conditions report of the service.
+      responses:
+        '200':
+          description: The feed of positively and negatively matched conditions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionsFeed'
+components:
+  schemas:
+    ConditionsFeed:
+      type: object
+      description: The flattened version of the conditions response from the actuator endpoint.
+      required:
+        - positiveMatches
+        - negativeMatches
+      properties:
+        positiveMatches:
+          type: array
+          description: The list of configuration classes where all conditions matched successfully.
+          items:
+            $ref: '#/components/schemas/PositiveCondition'
+          x-axelix-introduced-in: 1.2.0
+        negativeMatches:
+          type: array
+          description: The list of configuration classes where some conditions did not match.
+          items:
+            $ref: '#/components/schemas/NegativeCondition'
+          x-axelix-introduced-in: 1.2.0
+    PositiveCondition:
+      type: object
+      description: A configuration class where all conditions matched successfully.
+      required:
+        - className
+        - matched
+      properties:
+        className:
+          type: string
+          description: >-
+            The name of the class on which either the conditional annotation resided, or that
+            contained the method on which the conditional annotation resided.
+          x-axelix-introduced-in: 1.2.0
+        methodName:
+          type: string
+          description: The name of the method on which the conditional annotation was put.
+          x-axelix-introduced-in: 1.2.0
+        matched:
+          type: array
+          description: The list of conditions that were evaluated and matched.
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+          x-axelix-introduced-in: 1.2.0
+    NegativeCondition:
+      type: object
+      description: A configuration class where some conditions did not match.
+      required:
+        - className
+        - notMatched
+        - matched
+      properties:
+        className:
+          type: string
+          description: >-
+            The name of the class on which either the conditional annotation resided, or that
+            contained the method on which the conditional annotation resided.
+          x-axelix-introduced-in: 1.2.0
+        methodName:
+          type: string
+          description: The name of the method on which the conditional annotation was put.
+          x-axelix-introduced-in: 1.2.0
+        notMatched:
+          type: array
+          description: The list of conditions that were not matched.
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+          x-axelix-introduced-in: 1.2.0
+        matched:
+          type: array
+          description: The list of conditions that were evaluated and matched.
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+          x-axelix-introduced-in: 1.2.0
+    ConditionMatch:
+      type: object
+      description: The result of evaluating a single condition.
+      required:
+        - condition
+        - message
+      properties:
+        condition:
+          type: string
+          description: The simple name of the condition class that was evaluated.
+          x-axelix-introduced-in: 1.2.0
+        message:
+          type: string
+          description: The descriptive message explaining why the condition matched or did not match.
+          x-axelix-introduced-in: 1.2.0

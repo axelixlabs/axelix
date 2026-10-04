@@ -26,18 +26,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
-import com.axelixlabs.axelix.common.api.LazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.CountedLazyLoadingTarget;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.ExecutionStats;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.PersistenceInsights;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionAggregatedProfile;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionOrigin;
-import com.axelixlabs.axelix.common.api.registration.insights.persistence.TransactionalKey;
 import com.axelixlabs.axelix.common.domain.insights.GarbageCollector;
+import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
+import com.axelixlabs.axelix.master.contract.metadata.LazyLoadingTarget;
+import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionAggregatedProfile;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionOrigin;
+import com.axelixlabs.axelix.master.contract.metadata.TransactionalKey;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Insights;
+import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.JdkVendor;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -76,8 +78,8 @@ class TransactionsMcpServerToolsTest {
                     profile(CLASS_NAME, "loadOwners", List.of(), Map.of("owners", 2));
             TransactionAggregatedProfile cleanTransaction =
                     profile("com.example.ReportService", "buildReport", List.of(nPlusOne("logs", 1)), Map.of());
-            stubApplication(
-                    new PersistenceInsights(List.of(nPlusOneTransaction, paginationTransaction, cleanTransaction)));
+            stubApplication(new PersistenceInsights()
+                    .transactions(List.of(nPlusOneTransaction, paginationTransaction, cleanTransaction)));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, null, null);
@@ -99,7 +101,7 @@ class TransactionsMcpServerToolsTest {
                     profile(CLASS_NAME, METHOD_NAME, List.of(nPlusOne("items", 42)), Map.of("orders", 3));
             TransactionAggregatedProfile other =
                     profile(CLASS_NAME, "loadOwners", List.of(nPlusOne("pets", 7)), Map.of());
-            stubApplication(new PersistenceInsights(List.of(placeOrder, other)));
+            stubApplication(new PersistenceInsights().transactions(List.of(placeOrder, other)));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, CLASS_NAME, METHOD_NAME);
@@ -125,7 +127,7 @@ class TransactionsMcpServerToolsTest {
             // given. an association lazily loaded exactly once is legitimate and is not an N+1.
             TransactionAggregatedProfile placeOrder =
                     profile(CLASS_NAME, METHOD_NAME, List.of(nPlusOne("items", 1)), Map.of());
-            stubApplication(new PersistenceInsights(List.of(placeOrder)));
+            stubApplication(new PersistenceInsights().transactions(List.of(placeOrder)));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, CLASS_NAME, METHOD_NAME);
@@ -138,8 +140,8 @@ class TransactionsMcpServerToolsTest {
         @Test
         void shouldReturnMessageWhenNoMatchingTransaction() {
             // given.
-            stubApplication(new PersistenceInsights(
-                    List.of(profile("com.example.OwnerService", "loadOwners", List.of(), Map.of()))));
+            stubApplication(new PersistenceInsights()
+                    .transactions(List.of(profile("com.example.OwnerService", "loadOwners", List.of(), Map.of()))));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, CLASS_NAME, METHOD_NAME);
@@ -151,7 +153,7 @@ class TransactionsMcpServerToolsTest {
         @Test
         void shouldReturnMessageWhenOnlyMethodNameProvided() {
             // given.
-            stubApplication(new PersistenceInsights(List.of()));
+            stubApplication(new PersistenceInsights().transactions(List.of()));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, null, METHOD_NAME);
@@ -175,7 +177,8 @@ class TransactionsMcpServerToolsTest {
                     profile(CLASS_NAME, "findOrder", List.of(nPlusOne("logs", 1)), Map.of());
             TransactionAggregatedProfile otherClass =
                     profile("com.example.OwnerService", "loadOwners", List.of(nPlusOne("pets", 9)), Map.of());
-            stubApplication(new PersistenceInsights(List.of(placeOrder, cancelOrder, cleanOrderMethod, otherClass)));
+            stubApplication(new PersistenceInsights()
+                    .transactions(List.of(placeOrder, cancelOrder, cleanOrderMethod, otherClass)));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, CLASS_NAME, null);
@@ -208,7 +211,7 @@ class TransactionsMcpServerToolsTest {
         @Test
         void shouldReturnMessageWhenNoTransactionsRecorded() {
             // given.
-            stubApplication(new PersistenceInsights(null));
+            stubApplication(new PersistenceInsights().transactions(null));
 
             // when.
             String result = subject.getApplicationTransactionsProfile(GROUP_ID, ARTIFACT_ID, null, null);
@@ -228,20 +231,25 @@ class TransactionsMcpServerToolsTest {
             String methodName,
             List<CountedLazyLoadingTarget> lazyLoadingTargets,
             Map<String, Integer> inMemoryPagination) {
-        return new TransactionAggregatedProfile(
-                TransactionOrigin.APPLICATION_DECLARATIVE,
-                new TransactionalKey(className, methodName),
-                new ExecutionStats(1, 10, 5),
-                lazyLoadingTargets,
-                inMemoryPagination,
-                List.of(),
-                "REQUIRED",
-                "DEFAULT",
-                false);
+        return new TransactionAggregatedProfile()
+                .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
+                .transactionalKey(new TransactionalKey().className(className).methodName(methodName))
+                .transactionOverallStats(
+                        new ExecutionStats().minMs(1L).maxMs(10L).averageMs(5L))
+                .lazyLoadingTargets(lazyLoadingTargets)
+                .inMemoryPagination(inMemoryPagination)
+                .externalCalls(List.of())
+                .propagation("REQUIRED")
+                .isolation("DEFAULT")
+                .readOnly(false);
     }
 
     private static CountedLazyLoadingTarget nPlusOne(String associationPropertyName, int count) {
-        return new CountedLazyLoadingTarget(new LazyLoadingTarget("com.example.Order", associationPropertyName), count);
+        return new CountedLazyLoadingTarget()
+                .target(new LazyLoadingTarget()
+                        .ownerEntityClass("com.example.Order")
+                        .associationPropertyName(associationPropertyName))
+                .count(count);
     }
 
     private static HistoricalApplicationSnapshot snapshot(PersistenceInsights persistenceInsights) {
@@ -253,6 +261,8 @@ class TransactionsMcpServerToolsTest {
                                 new Insights.HotSpot.GarbageCollector(false, GarbageCollector.G1),
                                 new Insights.HotSpot.ProjectLilliput(false)),
                         new Insights.SpringFramework(false),
-                        persistenceInsights));
+                        persistenceInsights),
+                new HistoricalApplicationSnapshot.Versions(
+                        "1.0.0", "3.5.0", "6.2.0", new JavaVersion(21, 0, 0, 0), JdkVendor.ADOPTIUM, null));
     }
 }

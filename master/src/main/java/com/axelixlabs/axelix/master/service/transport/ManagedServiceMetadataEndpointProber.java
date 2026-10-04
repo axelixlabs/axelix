@@ -23,10 +23,10 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoffProperties;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;

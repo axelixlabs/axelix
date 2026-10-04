@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.conditions.ConditionsFeed;
 
 /**
  * Interface that is capable to assemble the {@link ConditionsFeed}.

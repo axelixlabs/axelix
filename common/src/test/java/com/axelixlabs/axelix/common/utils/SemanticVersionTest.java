@@ -67,6 +67,45 @@ class SemanticVersionTest {
     }
 
     @ParameterizedTest
+    @MethodSource("invalidMajorMinorVersions")
+    void tryParseMajorMinorReturnsEmpty(String input) {
+        // when
+        Optional<SemanticVersion> actual = SemanticVersion.tryParseMajorMinor(input);
+
+        // then
+        assertThat(actual).isEmpty();
+    }
+
+    static Stream<Arguments> invalidMajorMinorVersions() {
+        return Stream.of(
+                Arguments.of((String) null),
+                Arguments.of(""),
+                Arguments.of("   "),
+                Arguments.of("abc"),
+                Arguments.of("1"),
+                Arguments.of("1.2.3"),
+                Arguments.of("1.2-SNAPSHOT"),
+                Arguments.of("1.2.3.4"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validMajorMinorVersions")
+    void tryParseMajorMinorParsesMajorAndMinor(String input, int expectedMajor, int expectedMinor) {
+        // when
+        SemanticVersion actual = SemanticVersion.tryParseMajorMinor(input).orElseThrow();
+
+        // then
+        assertThat(actual.major()).isEqualTo(expectedMajor);
+        assertThat(actual.minor()).isEqualTo(expectedMinor);
+        assertThat(actual.patch()).isZero();
+        assertThat(actual.qualifier()).isNull();
+    }
+
+    static Stream<Arguments> validMajorMinorVersions() {
+        return Stream.of(Arguments.of("1.2", 1, 2), Arguments.of(" 3.10 ", 3, 10));
+    }
+
+    @ParameterizedTest
     @MethodSource("majorCases")
     void major(String input, int expected) {
         // when

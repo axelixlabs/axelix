@@ -26,14 +26,17 @@ import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
-import com.axelixlabs.axelix.common.api.loggers.LoggersFeed;
-import com.axelixlabs.axelix.common.api.loggers.LoggersGroupProfile;
-import com.axelixlabs.axelix.common.api.loggers.SingleLoggerProfile;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.contract.logger.GroupLogLevelChangeRequest;
+import com.axelixlabs.axelix.master.contract.logger.LogLevelChangeRequest;
+import com.axelixlabs.axelix.master.contract.logger.LoggersFeed;
+import com.axelixlabs.axelix.master.contract.logger.LoggersFeedGroup;
+import com.axelixlabs.axelix.master.contract.logger.LoggersFeedLogger;
+import com.axelixlabs.axelix.master.contract.logger.LoggersGroupProfile;
+import com.axelixlabs.axelix.master.contract.logger.SingleLoggerProfile;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
@@ -179,7 +182,7 @@ public class LoggersMcpServerTools {
         } catch (EndpointInvocationException | BadRequestException e) {
             return getAllLoggers(instanceId).getLoggers().stream()
                     .filter(logger -> logger.getName().contains(loggerName))
-                    .collect(Collectors.toMap(SingleLoggerProfile::getName, SingleLoggerProfile::toString));
+                    .collect(Collectors.toMap(LoggersFeedLogger::getName, LoggersFeedLogger::toString));
         }
     }
 
@@ -227,7 +230,7 @@ public class LoggersMcpServerTools {
         } catch (EndpointInvocationException | BadRequestException e) {
             return getAllLoggers(instanceId).getGroups().stream()
                     .filter(group -> group.getName().contains(groupName))
-                    .collect(Collectors.toMap(LoggersGroupProfile::getName, LoggersGroupProfile::toString));
+                    .collect(Collectors.toMap(LoggersFeedGroup::getName, LoggersFeedGroup::toString));
         }
     }
 
@@ -282,7 +285,8 @@ public class LoggersMcpServerTools {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("name", loggerName),
-                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel, ttlSeconds)));
+                jacksonMessageSerializationStrategy.serialize(
+                        new LogLevelChangeRequest().configuredLevel(loggerLevel).ttlSeconds(ttlSeconds)));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
@@ -329,7 +333,8 @@ public class LoggersMcpServerTools {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("name", groupName),
-                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest(loggerLevel, null)));
+                jacksonMessageSerializationStrategy.serialize(
+                        new GroupLogLevelChangeRequest().configuredLevel(loggerLevel)));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 

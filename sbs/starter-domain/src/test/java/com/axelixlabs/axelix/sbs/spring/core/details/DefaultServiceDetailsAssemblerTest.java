@@ -24,12 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.core.SpringVersion;
 
-import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.BuildDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.GitDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.InstanceDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.OsDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.RuntimeDetails;
+import com.axelixlabs.axelix.sbs.spring.core.contract.details.SpringDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

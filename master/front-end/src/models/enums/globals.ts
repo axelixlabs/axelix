@@ -49,12 +49,17 @@ export enum EIgnoredErrors {
     LICENSE_SIGNATURE_INVALID = "LICENSE_SIGNATURE_INVALID",
 }
 
+/**
+ * Mirrors the {@code PlatformName} enum on the Master backend. Jackson serializes
+ * the enum by its constant name, so the wire values are the upper-cased constants.
+ */
+export type PlatformName = "SPRING_BOOT" | "SPRING_FRAMEWORK";
+
 export enum EAuthorities {
     SCHEDULED_TASKS_MODIFY = "SCHEDULED_TASKS_MODIFY",
     CACHES_CLEAR = "CACHES_CLEAR",
     CACHES_TOGGLE = "CACHES_TOGGLE",
     GARBAGE_COLLECTOR = "GARBAGE_COLLECTOR",
     USERS_VIEW = "USERS_VIEW",
-    USERS_MANAGEMENT = "USERS_MANAGEMENT",
     LICENSE_ENTER = "license:enter",
 }

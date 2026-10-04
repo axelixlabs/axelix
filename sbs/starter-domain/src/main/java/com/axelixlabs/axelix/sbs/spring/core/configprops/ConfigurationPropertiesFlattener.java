@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.List;
 import java.util.Map;
 
-import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.sbs.spring.core.contract.configprops.ConfigurationPropertiesEntry;
 
 /**
  * Flattens nested configuration properties into a linear list of key-value pairs.
@@ -40,7 +40,7 @@ public interface ConfigurationPropertiesFlattener {
      *
      * @return flattened key-value pairs, or an empty list when there is nothing to flatten.
      */
-    default List<KeyValue> flatten(Map<String, Object> map) {
+    default List<ConfigurationPropertiesEntry> flatten(Map<String, Object> map) {
         return flatten("", map);
     }
 
@@ -55,5 +55,5 @@ public interface ConfigurationPropertiesFlattener {
      *
      * @return flattened key-value pairs, or an empty list when there is nothing to flatten.
      */
-    List<KeyValue> flatten(String key, Map<String, Object> map);
+    List<ConfigurationPropertiesEntry> flatten(String key, Map<String, Object> map);
 }

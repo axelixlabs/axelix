@@ -35,10 +35,11 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.testfixtures.TestRoles;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.EnvironmentFeed;
+import com.axelixlabs.axelix.sbs.spring.core.contract.env.Property;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
@@ -89,7 +90,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
                 .isNotEmpty()
-                .filteredOn(e -> e.getValue().isPrimary())
+                .filteredOn(e -> e.getValue().getIsPrimary())
                 .hasSize(1)
                 .first()
                 .extracting(e -> e.getValue().getValue())
@@ -228,7 +229,7 @@ class AxelixEnvironmentEndpointTest extends AbstractEnvSharedContextTest {
                         "Contains the 'server.port' property from 'application.*', which defines the web server port (8080 by default)."));
     }
 
-    private static List<Map.Entry<String, EnvironmentFeed.Property>> findPropertyAppearances(
+    private static List<Map.Entry<String, Property>> findPropertyAppearances(
             String propertyName, ResponseEntity<EnvironmentFeed> response) {
 
         return response.getBody().getPropertySources().stream()

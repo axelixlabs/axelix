@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.BasicRegistrationMetadata;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides access to basic build information

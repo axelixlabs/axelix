@@ -34,8 +34,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
+import com.axelixlabs.axelix.sbs.spring.core.contract.feign.FeignHttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.contract.feign.FeignIntegration;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
 
 /**
@@ -83,16 +84,20 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
         List<String> networkAddresses = extractNetworkAddresses(feignClient, serviceName);
 
-        List<FeignIntegration.FeignHttpMethod> httpMethods = Arrays.stream(feignType.getMethods())
+        List<FeignHttpMethod> httpMethods = Arrays.stream(feignType.getMethods())
                 .filter(m -> m.getDeclaringClass() != Object.class)
                 .map(method -> createHttpMethod(method, feignClient.path()))
                 .filter(Objects::nonNull)
                 .toList();
 
-        return new FeignIntegration(serviceName, networkAddresses, HttpVersion.V1_1.getDisplay(), httpMethods);
+        return new FeignIntegration()
+                .serviceName(serviceName)
+                .networkAddresses(networkAddresses)
+                .protocol(HttpVersion.V1_1.getDisplay())
+                .httpMethods(httpMethods);
     }
 
-    private FeignIntegration.@Nullable FeignHttpMethod createHttpMethod(Method method, String feignPath) {
+    private @Nullable FeignHttpMethod createHttpMethod(Method method, String feignPath) {
 
         RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 
@@ -102,7 +107,7 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
         String httpMethod = mapping.method().length == 0 ? UNKNOWN : mapping.method()[0].name();
 
-        return new FeignIntegration.FeignHttpMethod(httpMethod, pickPath(mapping.path(), feignPath));
+        return new FeignHttpMethod().httpMethod(httpMethod).path(pickPath(mapping.path(), feignPath));
     }
 
     private @Nullable Class<?> extractFeignClientClass(String beanName) {

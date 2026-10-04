@@ -1,34 +1,65 @@
 .MainWrapper {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 26px minmax(0, 1fr) minmax(0, auto) 104px;
     align-items: center;
+    column-gap: 14px;
+    min-height: 44px;
+    padding: 7px 16px;
+    background-color: var(--prop-surface);
+    border-left: 3px solid transparent;
+    transition: background-color 0.12s;
+
+    &:hover {
+        background-color: var(--prop-surface-soft);
+    }
 }
 
-.KeyChunk,
-.ValueChunk {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    word-break: break-all;
+.DangerousRow {
+    background-color: var(--prop-danger-surface);
+    border-left-color: var(--prop-danger);
+
+    &:hover {
+        background-color: #fee4e2;
+    }
+}
+
+.DeprecatedErrorRow {
+    background-color: var(--prop-dep-error-surface);
+    border-left-color: var(--prop-dep-error);
+
+    &:hover {
+        background-color: #fef0c7;
+    }
+}
+
+.DeprecatedWarningRow {
+    background-color: var(--prop-dep-warn-surface);
+    border-left-color: var(--prop-dep-warn);
+
+    &:hover {
+        background-color: #fef7c3;
+    }
+}
+
+.SuppressedRow {
+    background-color: var(--prop-surface-soft);
+}
+
+.CaretCell {
+    display: block;
 }
 
 .KeyChunk {
-    padding-right: 16px;
-    border-right: 1px solid var(--axelix-light-grey);
-}
-
-.CopyableValue {
     display: flex;
     align-items: center;
-    column-gap: 6px;
+    flex-wrap: wrap;
+    gap: 4px 9px;
+    min-width: 0;
 }
 
-.ValueChunk {
-    justify-content: flex-end;
-    padding-left: 16px;
-}
-
-/* Adds left padding to align with accordion rows that have an expand arrow */
-.AccordionAligned {
-    padding-left: 45px;
+.Key {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--prop-text);
+    overflow-wrap: anywhere;
 }

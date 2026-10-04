@@ -1,0 +1,27 @@
+.MainWrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.SVG {
+    transform: rotate(-90deg);
+}
+
+.Centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.CentreTop {
+    font-weight: 600;
+}
+
+.CentreBottom {
+    color: var(--axelix-bold-grey);
+}
