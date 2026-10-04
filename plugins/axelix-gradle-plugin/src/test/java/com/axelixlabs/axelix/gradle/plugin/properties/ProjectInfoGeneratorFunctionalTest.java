@@ -79,24 +79,18 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
 
     @ParameterizedTest
     @MethodSource("gradleVersionsUnderTest")
-    void failsOnlyWhenProjectInfoIsActuallyGeneratedWithoutGroupSet(String gradleVersion) throws IOException {
+    void generatesProjectInfoWithAnEmptyGroupWhenGroupIsNotSet(String gradleVersion) throws IOException {
         // given.
         setupProject("properties/no-group.gradle.kts");
 
-        // when. an unrelated task must succeed even though group is unset.
-        BuildResult unrelated =
-                createRunner(gradleVersion, "tasks", "--stacktrace").build();
+        // when. generating project info succeeds even though group is unset.
+        BuildResult result =
+                createRunner(gradleVersion, GENERATE_TASK_NAME, "--stacktrace").build();
 
-        // then.
-        assertThat(unrelated.task(":tasks").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
-
-        // when. only generating project info itself must fail, and only then; git info is never
-        // even attempted since build-info validation runs first.
-        BuildResult projectInfo =
-                createRunner(gradleVersion, GENERATE_TASK_NAME).buildAndFail();
-
-        // then.
-        assertThat(projectInfo.getOutput()).contains("Axelix requires 'group' to be set");
+        // then. it warns and falls back to an empty group id.
+        assertThat(result.task(":" + GENERATE_TASK_NAME).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(result.getOutput()).contains("'group' is not set");
+        assertThat(loadProperties().getProperty("build.group")).isNotNull().isEmpty();
     }
 
     @ParameterizedTest

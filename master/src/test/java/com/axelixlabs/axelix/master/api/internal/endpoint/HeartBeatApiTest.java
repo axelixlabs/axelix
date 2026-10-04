@@ -266,6 +266,33 @@ public class HeartBeatApiTest {
     }
 
     @Test
+    void shouldRegisterServiceInstanceWithEmptyGroupId() {
+        // given. a Gradle service that does not declare a 'group' self-registers with an empty groupId.
+        String requestWithEmptyGroupId =
+                JSON_REQUEST.replace("\"groupId\" : \"org.springframework.samples\"", "\"groupId\" : \"\"");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(requestWithEmptyGroupId), Void.class);
+
+        // then. the instance is accepted and identified by its artifactId alone.
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
+
+        Optional<Instance> registeredInstance = instanceRegistry.get(InstanceId.of(TEST_INSTANCE_ID));
+        assertThat(registeredInstance)
+                .get()
+                .extracting(Instance::applicationId)
+                .isEqualTo(ApplicationId.of("", "petclinic"));
+
+        // and then. the historical snapshot is persisted under the empty-group application id.
+        var snapshot = jdbcAggregateTemplate.findById(
+                new SnapshotId("", "petclinic", LocalDate.now(ZoneOffset.UTC)), HistoricalApplicationSnapshot.class);
+        assertThat(snapshot).isNotNull();
+    }
+
+    @Test
     void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
         // given.
         String requestWithIncompatibleStarter =

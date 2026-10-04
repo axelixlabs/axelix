@@ -132,11 +132,11 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     private boolean hasApplicationId(IntermediateInstanceProfile profile) {
         BasicRegistrationMetadata metadata = profile.metadata();
-        if (StringUtils.hasText(metadata.getGroupId()) && StringUtils.hasText(metadata.getArtifactId())) {
+        if (StringUtils.hasText(metadata.getArtifactId())) {
             return true;
         } else {
             logger.warn(
-                    "Service instance: {} does not expose a valid application id (both groupId and artifactId are mandatory). Skipping registration",
+                    "Service instance: {} does not expose a valid application id (artifactId is mandatory). Skipping registration",
                     profile.serviceInstance().getInstanceId());
             return false;
         }

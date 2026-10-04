@@ -61,7 +61,8 @@ components:
           description: >-
             The group id of the managed service artifact (the G inside GAV coordinate). Together
             with the artifactId it forms the application id shared by all instances of the same
-            application. Mandatory - an instance cannot be registered without it.
+            application. May be empty when the build does not define a group (e.g. a Gradle service
+            without 'group'); the application is then identified by its artifactId alone.
           x-axelix-introduced-in: 1.2.0
         artifactId:
           type: string

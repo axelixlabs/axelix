@@ -21,7 +21,7 @@ plugins {
   id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
 }
 
-group = "org.springframework.samples"
+// no group id
 version = "3.5.0-SNAPSHOT"
 
 java {

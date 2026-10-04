@@ -52,8 +52,8 @@ import static com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector.PRO
  * — and packages it into the project's archive: {@code jar} for plain Java projects, {@code
  * bootJar} for Spring Boot ones.
  *
- * <p>The build-info is mandatory: {@code group} and {@code name} must be set (Axelix uses them
- * to tell applications apart).
+ * <p>The build-info is mandatory: {@code name} must be set. {@code group} is optional - when it is
+ * unset the application is identified by its {@code name} alone.
  *
  * @author Nikita Kirillov
  */
@@ -143,8 +143,12 @@ public final class ProjectInfoGenerator {
 
     private static void validateCoordinates(Project project) {
         if (String.valueOf(project.getGroup()).isBlank()) {
-            throw new GradleException("Axelix requires 'group' to be set on project '" + project.getPath()
-                    + "' (e.g. group = \"com.example\") to tell applications apart. Please set it in your build.");
+            project.getLogger()
+                    .warn(
+                            "Axelix: 'group' is not set on project '{}', so this application will be identified by its"
+                                    + " name alone. If services in your organization can share a name, set 'group'"
+                                    + " (e.g. group = \"com.example\") to tell them apart.",
+                            project.getPath());
         }
         if (project.getName().isBlank()) {
             throw new GradleException(

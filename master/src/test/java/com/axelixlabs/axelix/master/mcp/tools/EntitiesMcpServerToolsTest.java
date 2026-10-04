@@ -128,25 +128,17 @@ class EntitiesMcpServerToolsTest {
     class ApplicationLookup {
 
         @Test
-        void shouldReturnMessageWhenApplicationNotIdentified() {
-            // given. no group / artifact provided.
+        void shouldLookUpApplicationByEmptyGroupId() {
+            // given. an application registered with an empty group id (e.g. a Gradle service without 'group').
+            when(snapshotService.getCurrentRecord(ApplicationId.of("", ARTIFACT_ID)))
+                    .thenReturn(snapshot(
+                            new JpaEntities().entities(List.of(entity("Customer", "customers", 0, List.of())))));
 
-            // when.
-            String result = subject.getApplicationEntitiesProfile(null, null, "Order");
-
-            // then.
-            assertThat(result).contains("Provide both 'groupId' and 'artifactId'");
-        }
-
-        @Test
-        void shouldReturnMessageWhenOnlyGroupIdProvided() {
-            // given. artifactId missing.
-
-            // when.
-            String result = subject.getApplicationEntitiesProfile(GROUP_ID, null, null);
+            // when. the groupId is sent as an empty string, as the tool instructs.
+            String result = subject.getApplicationEntitiesProfile("", ARTIFACT_ID, null);
 
             // then.
-            assertThat(result).contains("Provide both 'groupId' and 'artifactId'");
+            assertThat(result).contains("Customer");
         }
 
         @Test

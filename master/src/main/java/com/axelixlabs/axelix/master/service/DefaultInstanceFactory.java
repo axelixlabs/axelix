@@ -78,9 +78,10 @@ public class DefaultInstanceFactory implements InstanceFactory {
     }
 
     private ApplicationId resolveApplicationId(String instanceId, BasicRegistrationMetadata metadata) {
-        if (!StringUtils.hasText(metadata.getGroupId()) || !StringUtils.hasText(metadata.getArtifactId())) {
+        // groupId is optional (Gradle services may omit it);
+        if (!StringUtils.hasText(metadata.getArtifactId())) {
             throw new IllegalArgumentException(
-                    "Instance %s cannot be registered without a valid application id (both groupId and artifactId are mandatory)"
+                    "Instance %s cannot be registered without a valid application id (artifactId is mandatory)"
                             .formatted(instanceId));
         }
 
