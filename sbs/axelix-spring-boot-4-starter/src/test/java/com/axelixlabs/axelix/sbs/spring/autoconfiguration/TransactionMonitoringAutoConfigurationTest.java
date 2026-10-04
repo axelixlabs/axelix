@@ -29,6 +29,7 @@ import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
 import org.springframework.boot.restclient.RestTemplateCustomizer;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
@@ -98,6 +99,20 @@ class TransactionMonitoringAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ExternalCallRestTemplateCustomizer.class);
+                });
+    }
+
+    @Test // GH-1708
+    void shouldNotRegisterTransactionMonitoringBeanPostProcessor_whenSpringTxIsAbsent() {
+        contextRunner
+                .withClassLoader(new FilteredClassLoader(Transactional.class))
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
+                    // the remaining monitoring infrastructure stays available without spring-tx
+                    assertThat(context).hasSingleBean(TransactionStatsCollector.class);
+                    assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
                 });
     }
 
