@@ -9,7 +9,7 @@
   <!--
     The key under which the auto-discovery sees the instance. Null for self-registered instances.
   -->
-  <changeSet id="1.1-013-sqlite-add-discovery-key-to-instances" author="Axelix Team">
+  <changeSet id="1.2-004-1-mysql-add-discovery-key-to-instances" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <columnExists tableName="instances" columnName="service_id"/>
@@ -17,9 +17,9 @@
     </preConditions>
 
     <addColumn tableName="instances">
-      <column name="service_id" type="TEXT"/>
-      <column name="host" type="TEXT"/>
-      <column name="port" type="INTEGER"/>
+      <column name="service_id" type="VARCHAR(256)"/>
+      <column name="host" type="VARCHAR(256)"/>
+      <column name="port" type="INT"/>
     </addColumn>
   </changeSet>
 </databaseChangeLog>

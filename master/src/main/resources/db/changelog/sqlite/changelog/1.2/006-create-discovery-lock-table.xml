@@ -10,7 +10,7 @@
     A single-row table: updating the row inside a transaction serializes the registry reconciliation
     between Master replicas. A row lock works the same way on every supported RDBMS.
   -->
-  <changeSet id="1.1-015-mysql-create-discovery-lock-table" author="Axelix Team">
+  <changeSet id="1.2-006-1-sqlite-create-discovery-lock-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="discovery_lock"/>
@@ -18,10 +18,10 @@
     </preConditions>
 
     <createTable tableName="discovery_lock">
-      <column name="id" type="INT">
+      <column name="id" type="INTEGER">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_discovery_lock"/>
       </column>
-      <column name="version" type="BIGINT" defaultValueNumeric="0">
+      <column name="version" type="INTEGER" defaultValueNumeric="0">
         <constraints nullable="false"/>
       </column>
     </createTable>

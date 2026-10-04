@@ -96,6 +96,7 @@ public record Instance(
                 this.applicationId,
                 this.name,
                 this.serviceVersion,
+                this.starterVersion,
                 this.javaVersion,
                 this.springBootVersion,
                 this.springFrameworkVersion,

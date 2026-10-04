@@ -10,7 +10,7 @@
     Probing state of the auto-discovered instances. next_attempt_at serves both as the backoff after failures
     and as the lease while some Master replica is probing the instance.
   -->
-  <changeSet id="1.1-014-sqlite-create-probe-state-table" author="Axelix Team">
+  <changeSet id="1.2-005-1-postgres-create-probe-state-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="probe_state"/>
@@ -32,17 +32,17 @@
       </column>
       <column name="last_verdict" type="TEXT"/>
       <column name="last_status" type="INTEGER"/>
-      <column name="next_attempt_at" type="TEXT">
+      <column name="next_attempt_at" type="TIMESTAMP WITH TIME ZONE">
         <constraints nullable="false"/>
       </column>
-      <column name="last_success_at" type="TEXT"/>
-      <column name="version" type="INTEGER" defaultValueNumeric="0">
+      <column name="last_success_at" type="TIMESTAMP WITH TIME ZONE"/>
+      <column name="version" type="BIGINT" defaultValueNumeric="0">
         <constraints nullable="false"/>
       </column>
     </createTable>
   </changeSet>
 
-  <changeSet id="1.1-014-sqlite-index-probe-state-next-attempt-at" author="Axelix Team">
+  <changeSet id="1.2-005-2-postgres-index-probe-state-next-attempt-at" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <indexExists tableName="probe_state" indexName="idx_probe_state_next_attempt_at"/>

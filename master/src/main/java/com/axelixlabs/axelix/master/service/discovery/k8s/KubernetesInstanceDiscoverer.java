@@ -35,8 +35,8 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.ProbeState;
 import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
@@ -201,8 +201,9 @@ public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
             return rejected("Axelix starter version " + metadata.getVersion() + " is not supported by this Master");
         }
 
-        if (!StringUtils.hasText(metadata.getGroupId()) || !StringUtils.hasText(metadata.getArtifactId())) {
-            return rejected("no valid application id (both groupId and artifactId are mandatory)");
+        // groupId is optional (Gradle services may omit it)
+        if (!StringUtils.hasText(metadata.getArtifactId())) {
+            return rejected("no valid application id (artifactId is mandatory)");
         }
 
         try {

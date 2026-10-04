@@ -27,7 +27,7 @@
   <include file="db/changelog/mysql/changelog/1.2/001-add-starter-and-structured-java-version-to-instances.xml"/>
   <include file="db/changelog/mysql/changelog/1.2/002-add-runtime-version-columns-to-historical-application-snapshots.xml"/>
   <include file="db/changelog/mysql/changelog/1.2/003-create-scheduled-task-execution-results-table.xml"/>
-  <include file="db/changelog/mysql/changelog/1.1/013-add-discovery-key-to-instances.xml"/>
-  <include file="db/changelog/mysql/changelog/1.1/014-create-probe-state-table.xml"/>
-  <include file="db/changelog/mysql/changelog/1.1/015-create-discovery-lock-table.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/004-add-discovery-key-to-instances.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/005-create-probe-state-table.xml"/>
+  <include file="db/changelog/mysql/changelog/1.2/006-create-discovery-lock-table.xml"/>
 </databaseChangeLog>

@@ -10,7 +10,7 @@
     Probing state of the auto-discovered instances. next_attempt_at serves both as the backoff after failures
     and as the lease while some Master replica is probing the instance.
   -->
-  <changeSet id="1.1-014-mysql-create-probe-state-table" author="Axelix Team">
+  <changeSet id="1.2-005-1-mysql-create-probe-state-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="probe_state"/>
@@ -42,7 +42,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="1.1-014-mysql-index-probe-state-next-attempt-at" author="Axelix Team">
+  <changeSet id="1.2-005-2-mysql-index-probe-state-next-attempt-at" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <indexExists tableName="probe_state" indexName="idx_probe_state_next_attempt_at"/>

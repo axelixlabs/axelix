@@ -324,7 +324,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
         Mockito.when(discoveryClient.getInstances(activeInstanceId)).thenReturn(List.of(serviceInstance));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         // the instance is discovered and identified by its artifactId alone.
         assertThat(profiles).hasSize(1);

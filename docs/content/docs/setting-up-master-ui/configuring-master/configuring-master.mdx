@@ -454,7 +454,7 @@ failed:
 - **`429`** — the instance is alive, but asks to back off. Master honors `Retry-After` (up to `throttled-cap`, or
   `throttled-default` without the header) and treats it like a recoverable failure.
 - **Other `3xx`/`4xx`, or a `2xx` the instance can't be managed with** (unreadable metadata, incompatible starter
-  version, missing `groupId`/`artifactId`) — most likely not an Axelix-enabled service. It is dropped right away and
+  version, missing `artifactId`) — most likely not an Axelix-enabled service. It is dropped right away and
   probed again only after `permanent`.
 
 The probe state is stored in the database, so it survives restarts and is shared by all Master replicas: every

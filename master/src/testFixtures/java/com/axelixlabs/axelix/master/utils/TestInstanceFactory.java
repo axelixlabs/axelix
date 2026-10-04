@@ -97,7 +97,8 @@ public final class TestInstanceFactory {
                 Instant.now(),
                 DEFAULT_STATUS,
                 new MemoryUsage(1000L),
-                DEFAULT_URL);
+                DEFAULT_URL,
+                null);
     }
 
     public static Instance withName(String id, String name) {

@@ -9,7 +9,7 @@
   <!--
     The key under which the auto-discovery sees the instance. Null for self-registered instances.
   -->
-  <changeSet id="1.1-013-postgres-add-discovery-key-to-instances" author="Axelix Team">
+  <changeSet id="1.2-004-1-postgres-add-discovery-key-to-instances" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <columnExists tableName="instances" columnName="service_id"/>

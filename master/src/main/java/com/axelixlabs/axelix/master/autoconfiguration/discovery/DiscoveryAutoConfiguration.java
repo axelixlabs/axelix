@@ -69,8 +69,7 @@ public class DiscoveryAutoConfiguration {
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
             TransactionTemplate transactionTemplate,
             ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter,
-            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService) {
-            TransactionTemplate transactionTemplate,
+            ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService,
             DiscoveryLock discoveryLock) {
         return new ShortPollingInstanceDiscoveryScheduler(
                 instancesDiscoverer,
@@ -80,8 +79,7 @@ public class DiscoveryAutoConfiguration {
                 databaseHistoricalApplicationSnapshotService,
                 transactionTemplate,
                 scheduledTaskExecutionResultConverter,
-                scheduledTaskExecutionHistoryService);
-                transactionTemplate,
+                scheduledTaskExecutionHistoryService,
                 discoveryLock);
     }
 

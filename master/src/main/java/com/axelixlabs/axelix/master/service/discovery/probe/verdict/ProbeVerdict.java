@@ -44,7 +44,7 @@ public enum ProbeVerdict {
 
     /**
      * 2xx response, but the instance is not manageable: unreadable metadata, incompatible starter version,
-     * missing groupId/artifactId, or failed conversion to the internal representation.
+     * missing artifactId, or failed conversion to the internal representation.
      */
     REJECTED;
 
