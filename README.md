@@ -194,6 +194,24 @@ The full setup (sharing the JWT signing key with Master, self-registration, sani
 property values) is documented in
 [Configuring the Spring Boot Starter](docs/content/docs/setting-up-spring-boot-service/spring-boot-starter/configuration.mdx).
 
+### What are these JWT settings anyway?
+
+Master and each managed service authenticate to one another with HMAC-signed JWTs. HMAC is
+symmetric — the *same* secret both signs and verifies a token — so the JWT settings on Master
+(`axelix.master.auth.jwt.signing-key` and `axelix.master.auth.jwt.algorithm`) must be identical to
+the ones configured in the starter on every service (`axelix.sbs.auth.jwt.signing-key` /
+`axelix.sbs.auth.jwt.algorithm`). **These properties are required, for now**.
+
+Depending on the configuration, Axelix Master may talk to spring boot apps and spring boot apps may also talk to Axelix Master. 
+The token is used in both directions. 
+
+During auto-discovery (when Axelix Master itself discovers spring boot apps to manage) Master mints a short-lived token to call a service's `/actuator/axelix-*` endpoints, and the axelix starter on spring boot's side
+verifies it before returning any data. 
+
+With self-registration (your spring boot apps register themselves in Axelix Master) enabled the starter signs its heartbeat and Master verifies it on registration. If the key or algorithm differs between the two
+sides, every such request is rejected with `401` — managed instances never appear in the UI and
+self-registration never succeeds.
+
 ## Building the community distribution from source
 
 The releases above are the easiest way to run Master, but you can also assemble the **community
