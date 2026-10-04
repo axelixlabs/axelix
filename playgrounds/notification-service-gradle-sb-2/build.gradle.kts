@@ -20,11 +20,14 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.0.0"
     id("org.cyclonedx.bom") version "3.4.1"
-    // Pinned to 1.1 until Axelix reaches 1.5 (compatibility window)
-    id("com.axelixlabs.axelix") version "1.1.0"
+    // Tracks the current Axelix snapshot so this playground exercises the latest starter/plugin,
+    // including group-less support (note the missing 'group' below).
+    id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
 }
 
-group = "com.sivalabs.ft"
+// Intentionally no 'group': exercises Axelix support for group-less Gradle services (identified by
+// artifactId alone). This project does not use Spring Boot AOT/native, so Spring's groupId assertion
+// does not apply here.
 version = "0.0.2-SNAPSHOT"
 
 java {
@@ -60,8 +63,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    // Pinned to 1.1 until Axelix reaches 1.5 (compatibility window)
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.1.0")
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.0-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-validation")

@@ -17,11 +17,14 @@ plugins {
   id("org.cyclonedx.bom") version "3.4.1"
   id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
-  // TODO: pin to 1.3 on the next-but-one Axelix upgrade (compatibility window playground)
-  id("com.axelixlabs.axelix") version "1.2.0-SNAPSHOT"
+  // Pinned to the released 1.1.0 (compatibility window playground): verifies the current master still
+  // manages services built with an older Axelix starter/plugin.
+  id("com.axelixlabs.axelix") version "1.1.0"
 }
 
-// no group id
+// Spring Boot AOT / GraalVM native (enabled by the org.graalvm.buildtools.native plugin) requires a
+// non-empty 'group': its processAot/processTestAot tasks derive the generated-sources package from it.
+group = "org.springframework.samples"
 version = "3.5.0-SNAPSHOT"
 
 java {
@@ -52,10 +55,8 @@ configurations.all {
 }
 
 dependencies {
-  // TODO: pin to 1.3 on the next-but-one Axelix upgrade (compatibility window playground)
-  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.0-SNAPSHOT") {
-    isChanging = true
-  }
+  // Pinned to the released 1.1.0 (compatibility window playground).
+  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0")
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
