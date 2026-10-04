@@ -36,10 +36,14 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
+import com.axelixlabs.axelix.master.service.discovery.DiscoveryLock;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.probe.ProbeStateService;
+import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoff;
+import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoffProperties;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -60,14 +64,16 @@ public class DiscoveryAutoConfiguration {
             JwtEncoderService jwtEncoderService,
             SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            DiscoveryLock discoveryLock) {
         return new ShortPollingInstanceDiscoveryScheduler(
                 instancesDiscoverer,
                 instanceRegistry,
                 jwtEncoderService,
                 securityContextExecutor,
                 databaseHistoricalApplicationSnapshotService,
-                transactionTemplate);
+                transactionTemplate,
+                discoveryLock);
     }
 
     @AutoConfiguration
@@ -99,15 +105,21 @@ public class DiscoveryAutoConfiguration {
 
         @Bean
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
+                InstanceFactory instanceFactory,
                 DiscoveryClient discoveryClient,
                 ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
                 CompatibilityDetectionStrategy compatibilityDetectionStrategy,
-                InstanceFactory instanceFactory) {
+                ProbeStateService probeStateService,
+                ProbeBackoff probeBackoff,
+                ProbeBackoffProperties probeBackoffProperties) {
             return new KubernetesInstanceDiscoverer(
+                    instanceFactory,
                     discoveryClient,
                     managedServiceMetadataEndpointProber,
                     compatibilityDetectionStrategy,
-                    instanceFactory);
+                    probeStateService,
+                    probeBackoff,
+                    probeBackoffProperties);
         }
     }
 }

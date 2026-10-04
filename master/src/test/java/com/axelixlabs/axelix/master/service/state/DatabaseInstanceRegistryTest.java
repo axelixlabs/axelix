@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.state;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,11 +28,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
 import com.axelixlabs.axelix.master.domain.ApplicationId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.utils.TestInstanceFactory;
 import com.axelixlabs.axelix.master.utils.database.DatabaseMatrixTest;
@@ -57,6 +60,9 @@ class DatabaseInstanceRegistryTest {
 
     @Autowired
     private InstanceRepository instanceRepository;
+
+    @Autowired
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     @BeforeEach
     @AfterEach
@@ -84,7 +90,8 @@ class DatabaseInstanceRegistryTest {
                 instant,
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
-                "Http://localhost:8080/actuator");
+                "Http://localhost:8080/actuator",
+                null);
 
         // when.
         instanceRegistry.reload(instance);
@@ -120,7 +127,8 @@ class DatabaseInstanceRegistryTest {
                 instant,
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
-                "Http://localhost:8080/actuator");
+                "Http://localhost:8080/actuator",
+                null);
         instanceRegistry.reload(instance);
 
         // when.
@@ -139,7 +147,8 @@ class DatabaseInstanceRegistryTest {
                 Instant.now(),
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(1200d),
-                instance.actuatorUrl());
+                instance.actuatorUrl(),
+                null);
 
         instanceRegistry.reload(updated);
 
@@ -156,18 +165,79 @@ class DatabaseInstanceRegistryTest {
     }
 
     @Test
-    void registerAll_shouldPersistAllInstances() {
+    void reconcile_shouldReplaceFreshKeepRetainedAndRemoveVanishedInstances() {
         // given.
-        List<Instance> instances = List.of(
-                TestInstanceFactory.create("batch-id-1"),
-                TestInstanceFactory.create("batch-id-2"),
-                TestInstanceFactory.create("batch-id-3"));
+        InstanceKey freshKey = new InstanceKey("service", "10.0.0.1", 8080);
+        InstanceKey retainedKey = new InstanceKey("service", "10.0.0.2", 8080);
+        InstanceKey vanishedKey = new InstanceKey("service", "10.0.0.3", 8080);
 
-        // when
-        instanceRegistry.reload(instances);
+        jdbcAggregateTemplate.insertAll(List.of(
+                discovered("fresh-id", freshKey),
+                discovered("retained-id", retainedKey),
+                discovered("vanished-id", vanishedKey)));
+
+        Instance updated = discovered("fresh-id", freshKey).copy(Instance.InstanceStatus.DOWN);
+
+        // when.
+        instanceRegistry.reconcile(Map.of(freshKey, updated), Set.of(retainedKey));
 
         // then.
-        assertThat(instanceRegistry.getAll()).hasSize(3);
+        assertThat(instanceRegistry.getAll())
+                .extracting(it -> it.id().instanceId())
+                .containsOnly("fresh-id", "retained-id");
+        assertThat(instanceRegistry.get(InstanceId.of("fresh-id")))
+                .get()
+                .extracting(Instance::status)
+                .isEqualTo(Instance.InstanceStatus.DOWN);
+    }
+
+    @Test
+    void reconcile_shouldKeepSelfRegisteredInstances() {
+        // given.
+        instanceRegistry.reload(TestInstanceFactory.create("self-registered-id"));
+
+        // when.
+        instanceRegistry.reconcile(Map.of(), Set.of());
+
+        // then.
+        assertThat(instanceRegistry.getAll())
+                .extracting(it -> it.id().instanceId())
+                .containsOnly("self-registered-id");
+    }
+
+    @Test
+    void reconcile_shouldInsertPodVisibleUnderSeveralServicesOnce() {
+        // given.
+        InstanceKey first = new InstanceKey("service-1", "10.0.0.1", 8080);
+        InstanceKey second = new InstanceKey("service-2", "10.0.0.1", 8080);
+
+        // when.
+        instanceRegistry.reconcile(
+                Map.of(first, discovered("pod-id", first), second, discovered("pod-id", second)), Set.of());
+
+        // then.
+        assertThat(instanceRegistry.getAll()).hasSize(1);
+    }
+
+    @Test
+    void reconcile_shouldNotInsertFreshInstanceWhosePodIsRetainedUnderAnotherService() {
+        // given.
+        InstanceKey retained = new InstanceKey("service-1", "10.0.0.1", 8080);
+        InstanceKey fresh = new InstanceKey("service-2", "10.0.0.1", 8080);
+        jdbcAggregateTemplate.insert(discovered("pod-id", retained));
+
+        // when.
+        instanceRegistry.reconcile(Map.of(fresh, discovered("pod-id", fresh)), Set.of(retained));
+
+        // then.
+        assertThat(instanceRegistry.get(InstanceId.of("pod-id")))
+                .get()
+                .extracting(Instance::discoveryKey)
+                .isEqualTo(retained);
+    }
+
+    private static Instance discovered(String id, InstanceKey key) {
+        return TestInstanceFactory.create(id, (Instant) null).withDiscoveryKey(key);
     }
 
     @Test
@@ -269,6 +339,7 @@ class DatabaseInstanceRegistryTest {
                 null,
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(heap),
-                "/actuator");
+                "/actuator",
+                null);
     }
 }

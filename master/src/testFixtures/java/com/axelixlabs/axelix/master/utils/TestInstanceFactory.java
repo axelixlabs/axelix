@@ -68,7 +68,8 @@ public final class TestInstanceFactory {
                 Instant.now(),
                 DEFAULT_STATUS,
                 new MemoryUsage(1000L),
-                DEFAULT_URL);
+                DEFAULT_URL,
+                null);
     }
 
     public static Instance create(String id, @Nullable Instant instant) {
@@ -129,7 +130,8 @@ public final class TestInstanceFactory {
                 Instant.now(),
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(memoryUsage),
-                "url");
+                "url",
+                null);
     }
 
     public static Instance create(String id, String url, Instance.InstanceStatus status) {
@@ -152,7 +154,8 @@ public final class TestInstanceFactory {
                 instant,
                 DEFAULT_STATUS,
                 new MemoryUsage(1000L),
-                DEFAULT_URL);
+                DEFAULT_URL,
+                null);
     }
 
     public static Instance create(
@@ -180,6 +183,7 @@ public final class TestInstanceFactory {
                 Instant.now().minusSeconds(60),
                 status,
                 new MemoryUsage(1000L),
-                url);
+                url,
+                null);
     }
 }

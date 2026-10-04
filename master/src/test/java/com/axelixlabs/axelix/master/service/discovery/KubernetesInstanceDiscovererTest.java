@@ -19,8 +19,12 @@ package com.axelixlabs.axelix.master.service.discovery;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -49,9 +53,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ProbeState;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
+import com.axelixlabs.axelix.master.service.discovery.probe.ProbeStateService;
+import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoff;
+import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoffProperties;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -59,6 +68,7 @@ import com.axelixlabs.axelix.master.utils.auth.StaticTestSecurityContextExecutor
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Integration tests for {@link KubernetesInstanceDiscoverer}.
@@ -70,6 +80,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = KubernetesInstanceDiscovererTest.CurrentConfig.class)
 class KubernetesInstanceDiscovererTest {
+
+    private static final ProbeBackoffProperties PROBE_PROPERTIES = new ProbeBackoffProperties(
+            Duration.ofSeconds(5),
+            Duration.ofMinutes(1),
+            Duration.ofMinutes(1),
+            Duration.ofMinutes(30),
+            Duration.ofMinutes(5),
+            Duration.ofHours(1),
+            Duration.ofHours(1),
+            5);
 
     private static MockWebServer mockWebServer;
 
@@ -106,7 +126,7 @@ class KubernetesInstanceDiscovererTest {
                 MetadataJacksonMessageDeserializationStrategy deserializationStrategy,
                 SecurityContextExecutor securityContextExecutor) {
             return new ManagedServiceMetadataEndpointProber(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor);
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, PROBE_PROPERTIES);
         }
 
         @Bean
@@ -138,7 +158,30 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, compatibilityDetectionStrategy, instanceFactory);
+                instanceFactory,
+                discoveryClient,
+                managedServiceMetadataEndpointProber,
+                compatibilityDetectionStrategy,
+                inMemoryProbeStateService(),
+                new ProbeBackoff(PROBE_PROPERTIES),
+                PROBE_PROPERTIES);
+    }
+
+    /**
+     * Every registered instance is always due, so that each test run probes all the visible instances.
+     */
+    private static ProbeStateService inMemoryProbeStateService() {
+        Map<InstanceKey, ProbeState> registered = new LinkedHashMap<>();
+        ProbeStateService probeStateService = Mockito.mock(ProbeStateService.class);
+
+        Mockito.when(probeStateService.registerAndClaimDue(any(), any())).thenAnswer(invocation -> {
+            Collection<InstanceKey> keys = invocation.getArgument(0);
+            Instant now = invocation.getArgument(1);
+            keys.forEach(key -> registered.putIfAbsent(key, ProbeState.initial(key, now)));
+            return Map.copyOf(registered);
+        });
+
+        return probeStateService;
     }
 
     @AfterEach
@@ -198,7 +241,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
         Mockito.when(discoveryClient.getInstances(activeInstanceId)).thenReturn(List.of(serviceInstance));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles).hasSize(1);
         Instance instance = profiles.iterator().next().instance();
@@ -256,7 +300,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
         Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(serviceInstance));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
@@ -343,7 +388,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(firstServiceId)).thenReturn(List.of(firstServiceBadVersion));
         Mockito.when(discoveryClient.getInstances(secondServiceId)).thenReturn(List.of(secondServiceGoodVersion));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
@@ -354,7 +400,8 @@ class KubernetesInstanceDiscovererTest {
     void shouldIgnoreWhenDiscoveryClientReturnsEmpty() {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of());
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles).isEmpty();
     }
@@ -380,7 +427,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
@@ -463,7 +511,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(healthyK8sPod, timeoutK8sPod));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
@@ -511,14 +560,18 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
         Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sPod));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles).isEmpty();
     }
 
     @Test
     void shouldRegisterOnlyInstanceWithApplicationId() {
-        String testServiceId = "test-service";
+        // Both pods are served by the same mock server, i.e. share host and port, so they are
+        // placed under different services to remain distinct instances for the discovery
+        String serviceWithoutApplicationId = "test-service-1";
+        String serviceWithApplicationId = "test-service-2";
         String instanceWithoutApplicationId = UUID.randomUUID().toString();
         String instanceWithApplicationId = UUID.randomUUID().toString();
 
@@ -574,7 +627,7 @@ class KubernetesInstanceDiscovererTest {
 
         ServiceInstance instanceMissingApplicationId = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceWithoutApplicationId)
-                .set(Select.field("serviceId"), testServiceId)
+                .set(Select.field("serviceId"), serviceWithoutApplicationId)
                 .set(Select.field("secure"), false)
                 .set(Select.field("host"), uri.getHost())
                 .set(Select.field("port"), uri.getPort())
@@ -582,17 +635,21 @@ class KubernetesInstanceDiscovererTest {
 
         ServiceInstance instanceHavingApplicationId = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceWithApplicationId)
-                .set(Select.field("serviceId"), testServiceId)
+                .set(Select.field("serviceId"), serviceWithApplicationId)
                 .set(Select.field("secure"), false)
                 .set(Select.field("host"), uri.getHost())
                 .set(Select.field("port"), uri.getPort())
                 .create();
 
-        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
-        Mockito.when(discoveryClient.getInstances(testServiceId))
-                .thenReturn(List.of(instanceMissingApplicationId, instanceHavingApplicationId));
+        Mockito.when(discoveryClient.getServices())
+                .thenReturn(List.of(serviceWithoutApplicationId, serviceWithApplicationId));
+        Mockito.when(discoveryClient.getInstances(serviceWithoutApplicationId))
+                .thenReturn(List.of(instanceMissingApplicationId));
+        Mockito.when(discoveryClient.getInstances(serviceWithApplicationId))
+                .thenReturn(List.of(instanceHavingApplicationId));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())
@@ -651,7 +708,8 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(testServiceId))
                 .thenReturn(List.of(healthyK8SPod, connectionRefusedPod));
 
-        Set<DiscoveredInstanceProfile> profiles = subject.discover();
+        Collection<DiscoveredInstanceProfile> profiles =
+                subject.discover().fresh().values();
 
         assertThat(profiles)
                 .extracting(profile -> profile.instance().id().instanceId())

@@ -18,8 +18,11 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 import com.axelixlabs.axelix.master.service.state.DatabaseHistoricalApplicationSnapshotService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -56,6 +60,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private final SecurityContextExecutor securityContextExecutor;
     private final DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService;
     private final TransactionTemplate transactionTemplate;
+    private final DiscoveryLock discoveryLock;
 
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
@@ -63,13 +68,15 @@ public class ShortPollingInstanceDiscoveryScheduler {
             JwtEncoderService jwtEncoderService,
             SecurityContextExecutor securityContextExecutor,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate,
+            DiscoveryLock discoveryLock) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
         this.jwtEncoderService = jwtEncoderService;
         this.securityContextExecutor = securityContextExecutor;
         this.databaseHistoricalApplicationSnapshotService = databaseHistoricalApplicationSnapshotService;
         this.transactionTemplate = transactionTemplate;
+        this.discoveryLock = discoveryLock;
     }
 
     @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
@@ -77,8 +84,14 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));
 
-        Set<DiscoveredInstanceProfile> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
+        Optional<DiscoveryResult> result = securityContextExecutor.callWithinSecurityContext(
                 instancesDiscoverer::discoverSafely, new DefaultSecurityContext(TECH_USER, token));
+
+        if (result.isEmpty()) {
+            return;
+        }
+
+        DiscoveryResult discoveredInstances = result.get();
 
         if (discoveredInstances.isEmpty()) {
             logger.error("""
@@ -87,17 +100,19 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<BasicRegistrationMetadata> collectiveMetadata = discoveredInstances.stream()
-                .map(DiscoveredInstanceProfile::metadata)
-                .collect(Collectors.toSet());
+        Map<InstanceKey, Instance> freshInstances = new HashMap<>();
+        Set<BasicRegistrationMetadata> freshMetadata = new HashSet<>();
 
-        Set<Instance> instances = discoveredInstances.stream()
-                .map(DiscoveredInstanceProfile::instance)
-                .collect(Collectors.toSet());
+        discoveredInstances.fresh().forEach((key, profile) -> {
+            freshInstances.put(key, profile.instance());
+            freshMetadata.add(profile.metadata());
+        });
 
         transactionTemplate.executeWithoutResult(_ -> {
-            instanceRegistry.reload(instances);
-            databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
+            // Serializes the reconciliation and the snapshots between Master replicas until the commit
+            discoveryLock.acquire();
+            instanceRegistry.reconcile(freshInstances, discoveredInstances.retained());
+            databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(freshMetadata);
         });
     }
 }

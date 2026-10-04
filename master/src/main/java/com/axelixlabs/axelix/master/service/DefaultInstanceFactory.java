@@ -72,7 +72,8 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 latestHeartBeat,
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
-                instanceActuatorUrl);
+                instanceActuatorUrl,
+                null);
     }
 
     private ApplicationId resolveApplicationId(String instanceId, BasicRegistrationMetadata metadata) {

@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import java.time.Duration;
+
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.service.discovery.probe.backoff.ProbeBackoffProperties;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -37,11 +40,23 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 @Service
 public class ManagedServiceMetadataEndpointProber extends AbstractEndpointProber<BasicRegistrationMetadata> {
 
+    private final ProbeBackoffProperties probeBackoffProperties;
+
     public ManagedServiceMetadataEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<BasicRegistrationMetadata> messageDeserializationStrategy,
-            SecurityContextExecutor securityContextExecutor) {
+            SecurityContextExecutor securityContextExecutor,
+            ProbeBackoffProperties probeBackoffProperties) {
         super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor);
+        this.probeBackoffProperties = probeBackoffProperties;
+    }
+
+    /**
+     * The metadata endpoint is probed during auto-discovery, and the probe lease is sized after this timeout.
+     */
+    @Override
+    protected Duration requestTimeout() {
+        return probeBackoffProperties.timeout();
     }
 
     @Override

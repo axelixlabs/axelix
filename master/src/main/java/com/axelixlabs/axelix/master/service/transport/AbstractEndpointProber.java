@@ -47,6 +47,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  *
  * @param <O> the type of the response body (output).
  * @author Mikhail Polivakha
+ * @author Marsel Semenov
  */
 public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
 
@@ -85,26 +86,54 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     }
 
     private O invokeInternal(String instanceIdentity, HttpRequest request) {
-        try {
-            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        HttpResponse<byte[]> response = send(request);
 
-            int statusCode = response.statusCode();
-            if (statusCode >= 200 && statusCode < 300) {
+        int statusCode = response.statusCode();
+
+        if (statusCode >= 200 && statusCode < 300) {
+            try {
                 return messageDeserializationStrategy.deserialize(response.body());
-            } else if (statusCode == 400) {
-                throw new BadRequestException("Endpoint '%s' on instance identified by '%s' responded with %d"
-                        .formatted(supports(), instanceIdentity, statusCode));
-            } else {
-                throw new EndpointInvocationException("Endpoint '%s' on instance identified by '%s' responded with %d"
-                        .formatted(supports(), instanceIdentity, statusCode));
+            } catch (DeserializationException e) {
+                throw new EndpointInvocationException(
+                        "Endpoint '%s' on instance identified by '%s' responded with %d, but the body could not be read"
+                                .formatted(supports(), instanceIdentity, statusCode),
+                        e,
+                        statusCode,
+                        null);
             }
+        }
 
-            // TODO:
-            //  write integration test to check that correct exception is thrown from AbstractEndpointProber
-            //  when deserializationStrategy fails
-        } catch (IOException | InterruptedException | DeserializationException e) {
+        String message = "Endpoint '%s' on instance identified by '%s' responded with %d"
+                .formatted(supports(), instanceIdentity, statusCode);
+
+        if (statusCode == 400) {
+            throw new BadRequestException(message);
+        }
+
+        throw new EndpointInvocationException(
+                message,
+                null,
+                statusCode,
+                response.headers().firstValue("Retry-After").orElse(null));
+    }
+
+    private HttpResponse<byte[]> send(HttpRequest request) {
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new EndpointInvocationException(e);
+        } catch (IOException e) {
+            // No response at all: connection refused, timeout, DNS failure.
             throw new EndpointInvocationException(e);
         }
+    }
+
+    /**
+     * The timeout of a single request to the endpoint.
+     */
+    protected Duration requestTimeout() {
+        return Duration.ofSeconds(5);
     }
 
     private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, HttpPayload httpPayload, String baseOrActuatorUrl) {
@@ -116,7 +145,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
                 httpPayload.hasBody() ? BodyPublishers.ofByteArray(httpPayload.requestBody()) : BodyPublishers.noBody();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .timeout(Duration.ofSeconds(5))
+                .timeout(requestTimeout())
                 .method(endpoint.httpMethod().name(), bodyPublisher)
                 .uri(URI.create(url));
 

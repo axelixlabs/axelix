@@ -56,6 +56,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot;
 import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.SnapshotId;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
+import com.axelixlabs.axelix.master.repository.ProbeStateRepository;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -101,6 +102,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
 
+    @Autowired
+    private ProbeStateRepository probeStateRepository;
+
     @BeforeEach
     void setUp() throws IOException {
         if (mockWebServer != null) {
@@ -110,6 +114,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         instanceRepository.deleteAll();
+        probeStateRepository.deleteAll();
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }

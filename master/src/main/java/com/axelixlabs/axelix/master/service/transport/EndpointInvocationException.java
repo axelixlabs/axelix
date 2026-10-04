@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 
 /**
@@ -28,11 +30,38 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
  */
 public class EndpointInvocationException extends RuntimeException {
 
+    private final @Nullable Integer statusCode;
+    private final @Nullable String retryAfter;
+
     public EndpointInvocationException(Throwable cause) {
         super(cause);
+        this.statusCode = null;
+        this.retryAfter = null;
     }
 
     public EndpointInvocationException(String message) {
         super(message);
+        this.statusCode = null;
+        this.retryAfter = null;
+    }
+
+    /**
+     * @param statusCode the HTTP status of the response, or {@code null} if no response was received
+     *                   (connection refused, timeout, DNS failure)
+     * @param retryAfter the raw value of the {@code Retry-After} response header, if present
+     */
+    public EndpointInvocationException(
+            String message, @Nullable Throwable cause, @Nullable Integer statusCode, @Nullable String retryAfter) {
+        super(message, cause);
+        this.statusCode = statusCode;
+        this.retryAfter = retryAfter;
+    }
+
+    public @Nullable Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public @Nullable String getRetryAfter() {
+        return retryAfter;
     }
 }
