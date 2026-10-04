@@ -50,6 +50,7 @@ import com.axelixlabs.axelix.master.domain.HistoricalApplicationSnapshot.Snapsho
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.JavaVersion;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.CapturingIamWebInterceptor;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -61,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  * @author Nikita Kirillov
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(CapturingIamWebInterceptor.class)
@@ -72,7 +74,7 @@ public class HeartBeatApiTest {
     private static final String JSON_REQUEST = """
         {
            "basicRegistrationMetadata" : {
-             "version": "1.0.0-SNAPSHOT",
+             "version" : "1.0.0-SNAPSHOT",
              "serviceVersion" : "3.5.0-SNAPSHOT",
              "groupId" : "org.springframework.samples",
              "artifactId" : "petclinic",
@@ -143,7 +145,17 @@ public class HeartBeatApiTest {
                      }
                    }
                  ]
-               }
+               },
+               "scheduledTaskExecutions" : [
+                 {
+                   "taskId" : "com.example.OwnerJob#run()",
+                   "startedAt" : "2026-09-27T10:00:00.123Z",
+                   "durationMillis" : 1500,
+                   "success" : false,
+                   "errorType" : "NullPointerException",
+                   "errorMessage" : "boom"
+                 }
+               ]
              }
            },
            "instanceId" : "%s",
@@ -170,6 +182,7 @@ public class HeartBeatApiTest {
     void cleanDatabase() {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.deleteAll(HistoricalApplicationSnapshot.class);
+        jdbcAggregateTemplate.deleteAll(ScheduledTaskExecutionResult.class);
         capturingIamWebInterceptor.reset();
     }
 
@@ -232,6 +245,21 @@ public class HeartBeatApiTest {
                     assertThat(profile.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
                 });
 
+        // and then.
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .singleElement()
+                .satisfies(result -> {
+                    assertThat(result.instanceId()).isEqualTo(TEST_INSTANCE_ID);
+                    assertThat(result.groupId()).isEqualTo("org.springframework.samples");
+                    assertThat(result.artifactId()).isEqualTo("petclinic");
+                    assertThat(result.taskId()).isEqualTo("com.example.OwnerJob#run()");
+                    assertThat(result.startedAt()).isEqualTo(Instant.parse("2026-09-27T10:00:00.123Z"));
+                    assertThat(result.durationMillis()).isEqualTo(1500L);
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.errorType()).isEqualTo("NullPointerException");
+                    assertThat(result.errorMessage()).isEqualTo("boom");
+                });
+
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.successfulEndpoint()).isNull();
@@ -241,7 +269,7 @@ public class HeartBeatApiTest {
     void shouldRejectRegistrationWhenStarterVersionIsOutsideTheCompatibilityWindow() {
         // given.
         String requestWithIncompatibleStarter =
-                JSON_REQUEST.replace("\"version\": \"1.0.0-SNAPSHOT\"", "\"version\": \"1.99.0\"");
+                JSON_REQUEST.replace("\"version\" : \"1.0.0-SNAPSHOT\"", "\"version\" : \"1.99.0\"");
 
         // when.
         ResponseEntity<Void> response = restTemplate
