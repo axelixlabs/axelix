@@ -135,6 +135,12 @@ helm install axelix axelix/axelix \
   --values values.yaml
 ```
 
+Here `values.yaml` is your own file holding the chart-property overrides you want to supply (drop
+the `--values` flag to install with the chart defaults). The full set of configurable properties is
+documented on the chart's [Artifact Hub page](https://artifacthub.io/packages/helm/axelix/axelix):
+open it, pick the version matching the Axelix release you are installing (Axelix components share a
+single lockstep version, so this is just the release tag), and read the **Default Values** section.
+
 Master then serves the UI at `http://localhost:8080`. It ships with a built-in super-admin account
 (`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
 else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
