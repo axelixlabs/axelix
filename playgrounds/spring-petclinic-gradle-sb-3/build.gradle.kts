@@ -7,7 +7,7 @@ plugins {
   id("org.cyclonedx.bom") version "2.3.1"
   id("com.diffplug.spotless") version "8.6.0"
   id("io.spring.nohttp") version "0.0.11"
-  id("com.axelixlabs.axelix") version "1.1.0"
+  id("com.axelixlabs.axelix") version "1.1.1"
 }
 
 group = "org.springframework.samples"
@@ -41,9 +41,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0") {
-    isChanging = true
-  }
+  implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.1")
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
