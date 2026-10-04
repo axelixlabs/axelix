@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  ref: "1.2.0-SNAPSHOT"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+profiles: ""
+
+# Axelix starter settings. The signing key is injected at deploy time (helm --set), see
+# .github/actions/deploy-playground.
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        signingKey: ""
+
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  # This stateless gateway listens on 8096 (see application.properties).
+  port: 8096
+
+resources: {}
+
+liveness:
+  delay: 15
+  timeout: 10
+  path: /actuator/health
+
+readiness:
+  delay: 15
+  timeout: 10
+  path: /actuator/health
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

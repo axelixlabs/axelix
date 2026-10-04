@@ -207,3 +207,13 @@ jobs:
           cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:4.0.7-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
+
+      - name: Deploy Playground Api Gateway Gradle SB 4 (no database)
+        env:
+          APP_NAME: api-gateway-gradle-sb-4
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/${{ env.APP_NAME }}
+          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          image-tag: ${{ env.APP_NAME }}:1.2.0-SNAPSHOT
+          helm-release: ${{ env.APP_NAME }}
