@@ -63,10 +63,26 @@ A property with no dashes maps more directly: `axelix.master.metrics.prometheus.
 
 :::note
 A `-Daxelix.master.auth.jwt.signing-key=...` flag and an `AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=...` environment variable are
-interchangeable — the same value reaches Master either way, so use whichever your platform makes easier. For **secrets**,
-prefer environment variables: the Docker and Docker Compose examples below use them because the JVM echoes the full
-`JAVA_TOOL_OPTIONS` value (the usual carrier for `-D` flags in a container) to stderr on startup, which would leak
-anything sensitive into the logs.
+interchangeable — the same value reaches Master either way, so use whichever your platform makes easier.
+:::
+
+:::warning[Supplying secrets safely]
+The three sources are **not** equally safe for **secret** values — the JWT signing key, the super-admin password, the
+database password, a Vault token. The `-D` and config-file snippets on this page are written for a quick first run; the
+moment a real secret is involved, know how each source can leak and pick accordingly:
+
+- **`-D` on the `java` command line** — a process's full command line is readable by any other user on the host
+  (`ps -ef`, `/proc/<pid>/cmdline`) and is often captured by process monitors and crash reports. A secret passed as `-D`
+  is exposed to all of them. Fine for a throwaway launch on your own machine, **never for a secret in production**.
+- **`JAVA_TOOL_OPTIONS`** (the usual carrier for `-D` flags in a container) — the JVM echoes its full value to stderr on
+  startup (`Picked up JAVA_TOOL_OPTIONS: ...`), so anything in it lands in `docker logs` and every log collector. Keep
+  secrets out of it.
+- **A config file** — fine for non-secret settings. For a secret, keep the file out of version control and off the
+  image, restrict its permissions, and prefer sourcing the value from a secret store (see
+  [Vault](#loading-configuration-from-hashicorp-vault)).
+- **Environment variables** — the pragmatic default for secrets, and the option the Docker and Docker Compose examples
+  below use because it keeps secrets off the command line and out of the startup log. For the strongest posture in
+  production, hand the secret to Master from a dedicated secret manager rather than a static variable.
 :::
 
 ### Pointing Master at a config file
@@ -132,6 +148,12 @@ point Master at the server with the `uri` property.
 
 </div>
 
+:::warning
+The `uri` examples use plain `http://` for brevity. When the Config Server requires `username`/`password`, those
+credentials — and every value the server sends back, secrets included — travel in cleartext over plain HTTP. Point
+`uri` at an `https://` endpoint in any environment where the network between Master and the server is not fully trusted.
+:::
+
 Like the config-file location above, these properties decide *where* configuration is read from, so they must be known
 before that reading starts. Supply them as **JVM system properties** or **environment variables** — not from a file the
 Config Server would itself serve. A minimal launch looks like this:
@@ -187,6 +209,13 @@ vault kv put secret/axelix \
 
 </div>
 
+:::warning
+The `uri` examples use plain `http://` for brevity. The Vault token Master presents, and every secret Vault returns,
+travel in cleartext over plain HTTP. Point `uri` at an `https://` endpoint and supply Vault's CA under
+`axelix.master.external-config.spring-cloud-vault.ssl.*` in any environment where the network between Master and Vault
+is not fully trusted.
+:::
+
 Under the hood Master acts as a [Spring Cloud Vault](https://docs.spring.io/spring-cloud-vault/reference/) client. As a
 result, the whole Spring Cloud Vault connection surface is available under the same
 `axelix.master.external-config.spring-cloud-vault.*` prefix: TLS trust material under `ssl.*`, `namespace` for Vault
@@ -217,6 +246,10 @@ java \
   -Daxelix.master.external-config.spring-cloud-vault.token=hvs.6j4cuewowBGit65rheNoceI7 \
   -jar master.jar
 ```
+
+The token is itself a secret, and the `-D` form above puts it on the command line. That is acceptable for a quick local
+trial, but anywhere its process list could be read, pass it as an environment variable
+(`AXELIX_MASTER_EXTERNALCONFIG_SPRINGCLOUDVAULT_TOKEN`) instead — see [Supplying secrets safely](#supplying-properties).
 
 #### Authenticating with AppRole
 
@@ -312,6 +345,13 @@ The database engine is picked from the JDBC URL prefix. Which properties you mus
 - **MySQL** (`jdbc:mysql://...`) — same as PostgreSQL: `url`, `username`, and `password` are all **required**, and the
   user needs schema-migration privileges.
 
+:::warning
+SQLite is the zero-config default so a first run works with nothing to set up, but it is **not a production database for
+Master**. The file lives in the working directory — lost on container restart without a mounted volume — and a single
+file cannot be shared by more than one Master replica, so it rules out a highly available deployment. Point
+`axelix.master.database.url` at PostgreSQL or MySQL for anything beyond a single-node trial.
+:::
+
 <div className={styles.ConfigTable}>
 
 | Property                          | Default                 | Description                                                                                                                                                                                                       |
@@ -380,6 +420,13 @@ When `axelix.master.auth.options.oauth2.enabled=true`, the following properties 
 | `axelix.master.auth.options.oauth2.role-attribute-path` | *(unset)*                                            | JMESPath expression evaluated against the userinfo response to resolve an Axelix role. If unset, every OIDC user becomes a `VIEWER`. |
 
 </div>
+
+:::warning
+Leaving `role-attribute-path` unset is convenient for a first look, but it maps **every user who can authenticate with
+your IdP** to the `VIEWER` role — read access to all monitoring data for every discovered service. Unless the IdP
+population is exactly the set of people who should see Master, set `role-attribute-path` before production so that users
+without an explicit Axelix role are not silently granted access.
+:::
 
 ### Authentication — session cookie
 
@@ -456,6 +503,13 @@ properties that go *into* the heartbeat (`master-url`, `instance-actuator-url`, 
 | `axelix.master.mcp-server.enabled` | `true`  | Expose the bundled Model Context Protocol server at `/api/mcp`. |
 
 </div>
+
+:::note
+The MCP server is **enabled by default**. It is gated by the same authentication and role checks as the UI (see
+[MCP server authentication](../authentication/authentication.mdx#mcp-server-authentication)), so it is not an open door,
+but it is an additional remotely reachable surface. If no AI agent consumes it, set `axelix.master.mcp-server.enabled=false`
+in production; if you keep it on, restrict `/api/mcp` to trusted clients the same way you would the UI.
+:::
 
 ### Structured logging
 
@@ -606,6 +660,12 @@ java \
   -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
   -jar master.jar
 ```
+
+:::warning
+The signing key is a secret, and a `-D` flag is visible to any user who can read the process list on the host. This form
+is fine for a local trial; for a real deployment pass secrets as environment variables or from a secret store — see
+[Supplying secrets safely](#supplying-properties).
+:::
 
 #### External config file
 <ReleasedInNotice version="1.1.0" />
@@ -785,6 +845,10 @@ AXELIX_JWT_SIGNING_KEY=...
 AXELIX_ADMIN_USERNAME=admin
 AXELIX_ADMIN_PASSWORD=...
 ```
+
+That file holds the signing key and passwords in plaintext, so keep it out of version control (add it to `.gitignore`)
+and restrict its file permissions. For production, prefer injecting these values from your platform's secret store over
+a long-lived `.env` file on disk.
 
 `AXELIX_MASTER_AUTH_COOKIE_SECURE` is `false` in this example because the snippet exposes Master over plain HTTP for
 local testing. Put Master behind a TLS-terminating proxy and flip it to `true` for any real deployment.

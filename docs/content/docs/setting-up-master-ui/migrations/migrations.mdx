@@ -98,10 +98,25 @@ java \
   -jar axelix-1.0.0.jar
 ```
 
+:::warning
+A process's full command line is readable by any other user on the host (`ps -ef`, `/proc/<pid>/cmdline`), so the
+passwords in the `-D` form above are exposed to every local process. Use it only for a local trial; keep the passwords
+in a config file sourced from the environment (as in the `application.yaml` example above) or pass them as environment
+variables for anything else — see [Supplying secrets safely](../configuring-master/configuring-master.mdx#supplying-properties).
+:::
+
 ### Run with Docker
 
 The image applies `JAVA_TOOL_OPTIONS` to the JVM automatically, so it is the hook for passing `-D` properties into the
 container.
+
+:::warning
+`JAVA_TOOL_OPTIONS` is echoed in full to stderr on startup (`Picked up JAVA_TOOL_OPTIONS: ...`), so every `-D` value in
+it — the database and migration passwords included — lands in `docker logs` and any log collector. Put only non-secret
+`-D` flags here, and supply the passwords as discrete `-e` environment variables instead
+(`AXELIX_MASTER_DATABASE_PASSWORD`, `AXELIX_MASTER_MIGRATIONS_PASSWORD`), which bind through the same relaxed-binding
+rules. See [Supplying secrets safely](../configuring-master/configuring-master.mdx#supplying-properties).
+:::
 
 ```bash
 docker run --rm -p 8080:8080 \

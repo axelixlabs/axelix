@@ -140,6 +140,13 @@ username already belongs to a non-OIDC account, Master rejects the sign-in rathe
 
 </div>
 
+:::warning
+Mapping every signed-in user to `VIEWER` is convenient for a first look, but in production it means **anyone who can
+authenticate with your IdP gets read access to all monitoring data** for every discovered service. Unless the IdP
+population is exactly the set of people who should see Master, set `role-attribute-path` so that users without an
+explicit Axelix role are not silently granted `VIEWER`.
+:::
+
 ## The session: cookies and JWT
 
 Every sign-in path ends the same way: Master mints a JWT and hands it back as a cookie. The same cookie gates every
