@@ -18,10 +18,16 @@
 package com.axelixlabs.axelix.master.service.convert;
 
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
@@ -39,6 +45,8 @@ import com.axelixlabs.axelix.master.service.discovery.DiscoveredInstanceProfile;
  */
 @Component
 public class ScheduledTaskExecutionResultConverter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ScheduledTaskExecutionResultConverter.class);
 
     public Set<ScheduledTaskExecutionResult> convert(DiscoveredInstanceProfile discoveredInstanceProfile) {
         return convert(
@@ -61,17 +69,37 @@ public class ScheduledTaskExecutionResultConverter {
         }
 
         return scheduledTaskExecutions.stream()
-                .map(scheduledTaskExecution -> new ScheduledTaskExecutionResult(
-                        UUID.randomUUID().toString(),
-                        groupId,
-                        artifactId,
-                        instanceId,
-                        scheduledTaskExecution.getTaskId(),
-                        Instant.parse(scheduledTaskExecution.getStartedAt()),
-                        scheduledTaskExecution.getDurationMillis(),
-                        scheduledTaskExecution.getSuccess(),
-                        scheduledTaskExecution.getErrorType(),
-                        scheduledTaskExecution.getErrorMessage()))
+                .map(scheduledTaskExecution -> convert(scheduledTaskExecution, groupId, artifactId, instanceId))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Nullable
+    private ScheduledTaskExecutionResult convert(
+            ScheduledTaskExecution scheduledTaskExecution, String groupId, String artifactId, String instanceId) {
+        Instant startedAt;
+        try {
+            startedAt = Instant.parse(scheduledTaskExecution.getStartedAt());
+        } catch (DateTimeParseException e) {
+            logger.warn(
+                    "Unable to parse the startedAt timestamp '{}' of the scheduled task {} reported by the instance {}. Skipping this execution result.",
+                    scheduledTaskExecution.getStartedAt(),
+                    scheduledTaskExecution.getTaskId(),
+                    instanceId,
+                    e);
+            return null;
+        }
+
+        return new ScheduledTaskExecutionResult(
+                UUID.randomUUID().toString(),
+                groupId,
+                artifactId,
+                instanceId,
+                scheduledTaskExecution.getTaskId(),
+                startedAt,
+                scheduledTaskExecution.getDurationMillis(),
+                scheduledTaskExecution.getSuccess(),
+                scheduledTaskExecution.getErrorType(),
+                scheduledTaskExecution.getErrorMessage());
     }
 }

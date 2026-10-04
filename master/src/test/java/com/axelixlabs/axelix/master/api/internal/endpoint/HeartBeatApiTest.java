@@ -71,19 +71,6 @@ public class HeartBeatApiTest {
     private static final String TEST_INSTANCE_ID = "3c994958-924f-4a12-87d0-a8782e97af10";
 
     // language=json
-    private static final String SCHEDULED_TASK_EXECUTIONS_JSON = """
-                  "scheduledTaskExecutions" : [
-                    {
-                      "taskId" : "com.example.OwnerJob#run()",
-                      "startedAt" : "2026-09-27T10:00:00.123Z",
-                      "durationMillis" : 1500,
-                      "success" : false,
-                      "errorType" : "NullPointerException",
-                      "errorMessage" : "boom"
-                    }
-                  ]""";
-
-    // language=json
     private static final String JSON_REQUEST = """
         {
            "basicRegistrationMetadata" : {
@@ -158,7 +145,17 @@ public class HeartBeatApiTest {
                      }
                    }
                  ]
-               },%s
+               },
+               "scheduledTaskExecutions" : [
+                 {
+                   "taskId" : "com.example.OwnerJob#run()",
+                   "startedAt" : "2026-09-27T10:00:00.123Z",
+                   "durationMillis" : 1500,
+                   "success" : false,
+                   "errorType" : "NullPointerException",
+                   "errorMessage" : "boom"
+                 }
+               ]
              }
            },
            "instanceId" : "%s",
@@ -166,7 +163,7 @@ public class HeartBeatApiTest {
            "instanceActuatorUrl" : "http://localhost:8080/actuator",
            "deploymentAt" : "2025-02-03T13:29:29Z"
      }
-    """.formatted(SCHEDULED_TASK_EXECUTIONS_JSON, TEST_INSTANCE_ID);
+    """.formatted(TEST_INSTANCE_ID);
 
     @Autowired
     private TestRestTemplateBuilder restTemplate;

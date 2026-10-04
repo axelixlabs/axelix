@@ -28,8 +28,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * The append-only record of a single {@code @Scheduled} method invocation delivered by a managed instance.
- * Rows are never updated nor merged: the execution result is identified by its {@code id}, so two
- * results of the same {@code (instanceId, taskId, startedAt)} tuple with different ids are allowed.
+ * Rows are never updated nor merged.
  *
  * <p>Since the rows are never updated, the aggregate always reports itself as new
  * ({@link Persistable#isNew()} is {@code true}): therefore {@code save()} always issues an INSERT

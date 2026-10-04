@@ -32,8 +32,7 @@ import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 public interface ScheduledTaskExecutionHistoryService {
 
     /**
-     * Appends the given execution results to the history. The rows are always inserted and never
-     * updated, so every call results in an {@code INSERT} regardless of the stored contents.
+     * Appends the given execution results to the history.
      *
      * @param scheduledTaskExecutionResults the execution results to persist.
      */
