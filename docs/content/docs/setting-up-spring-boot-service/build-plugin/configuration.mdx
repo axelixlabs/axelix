@@ -103,6 +103,27 @@ Neither plugin exposes any configuration options. The Gradle plugin only needs t
 `version` to be set (it fails the build if `group` is blank, since Axelix needs it to tell applications apart); Maven
 always has its GAV coordinates, so nothing else is required.
 
+## Optional `group` coordinate
+
+<UpcomingReleaseNotice />
+
+In the early days, Axelix required all the Java apps that it manages to have the `groupId` (the G part of the GAV). But
+since `1.2.0` release it is no longer the case.
+
+Technically speaking, every Java application that is packaged and deployed is supposed to be a Maven Artifact. However, there are
+cases when the application is not really supposed to be deployed to the Maven-compatible binary repository. It might be, for example,
+if the application is just assembled as the docker image on the flight and deployed to K8S cluster.
+
+In this case, the Java application is not required to be a complete Maven artifact (since it is not technically deployed
+to Nexus/Artifactory), and in particular, it is not really required to have `groupId`. Specifically because of this,
+Gradle allows the Java applications that are not supposed to be deployed as Maven Artifacts to omit the `groupId`.
+
+Thus, Axelix is now capable to handle projects with no groupId. In this case, Axelix simply assumes that
+such applications have the empty `groupId` (i.e. `""`). As a result, if you omit the usage of `groupId` in your organization for your
+Java microservices, then you must ensure that the names your microservices (i.e. the `name` attribute in your `build.gradle.kts` files,
+ which resolves to `artifactId`) are unique. If the names will not be unique, then Axelix Master's behavior with your spring boot
+ applications is undefined.
+
 ## Related
 
 - [What is the Axelix build plugin?](../../setting-up-spring-boot-service/build-plugin/what-is-build-plugin.mdx) — what the plugin generates and why registration
