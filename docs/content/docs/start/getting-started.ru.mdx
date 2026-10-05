@@ -6,7 +6,7 @@ description: "Эта страница описывает рекомендуем�
 ---
 
 :::note
-Сниппеты на этой странице используют версию `1.1.0` для наглядности. Проверьте [страницу
+Сниппеты на этой странице используют версию `1.1.1` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
 свои команды.
 :::
@@ -73,13 +73,14 @@ Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#за�
 <Tabs items={['Docker', 'Kubernetes (Helm)', 'JAR']}>
   <Tab value="Docker">
 
-Образ публикуется в GitHub Container Registry:
+Образ публикуется в GitHub Container Registry. Без тега Docker скачивает `latest` — последний релиз, чтобы
+зафиксировать версию, допишите тег, например `:1.1.1`:
 
 ```bash
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
@@ -168,11 +169,11 @@ build-плагина — см. [Совместимость и версионир
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.0"
+    id("com.axelixlabs.axelix") version "1.1.1"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.0")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.1")
 }
 ```
 
@@ -187,7 +188,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
   </dependency>
 </dependencies>
 
@@ -196,7 +197,7 @@ dependencies {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1</version>
       <executions>
         <execution>
           <goals>
