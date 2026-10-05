@@ -52,8 +52,8 @@
 .ColumnHeader,
 .Row {
     display: grid;
-    grid-template-columns: 132px 70px minmax(0, 1fr);
-    column-gap: 14px;
+    grid-template-columns: 84px minmax(0, 160px) 70px minmax(0, 1fr);
+    column-gap: 16px;
     padding: 8px 20px;
     border-top: 1px solid var(--prop-border-faint);
 }
@@ -78,13 +78,6 @@
 
 .RowFailed {
     background-color: var(--prop-danger-surface);
-}
-
-.Started {
-    display: flex;
-    flex-direction: column;
-    row-gap: 2px;
-    min-width: 0;
 }
 
 .StartedTime {

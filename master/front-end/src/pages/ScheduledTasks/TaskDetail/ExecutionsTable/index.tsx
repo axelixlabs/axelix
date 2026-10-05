@@ -92,7 +92,8 @@ export const ExecutionsTable = ({ task, onlyFailed, onOnlyFailedChange, page, on
             </div>
 
             <div className={styles.ColumnHeader}>
-                <span>{t("ScheduledTasks.startedInstance")}</span>
+                <span>{t("ScheduledTasks.started")}</span>
+                <span>{t("ScheduledTasks.instance")}</span>
                 <span className={styles.ColumnHeaderDuration}>{t("ScheduledTasks.duration")}</span>
                 <span>{t("ScheduledTasks.result")}</span>
             </div>
@@ -102,12 +103,10 @@ export const ExecutionsTable = ({ task, onlyFailed, onOnlyFailedChange, page, on
                     key={`${currentPage}-${index}`}
                     className={`${styles.Row} ${run.succeeded ? "" : styles.RowFailed}`}
                 >
-                    <span className={styles.Started}>
-                        <span className={`${shared.Mono} ${styles.StartedTime}`}>
-                            {formatTimeOfDay(NOW_SECONDS - run.agoSeconds)}
-                        </span>
-                        <span className={`${shared.Mono} ${styles.Instance}`}>{run.instance}</span>
+                    <span className={`${shared.Mono} ${styles.StartedTime}`}>
+                        {formatTimeOfDay(NOW_SECONDS - run.agoSeconds)}
                     </span>
+                    <span className={`${shared.Mono} ${styles.Instance}`}>{run.instance}</span>
                     <span className={`${shared.Mono} ${styles.Duration}`}>{formatDuration(run.durationMs)}</span>
                     {renderResult(run)}
                 </div>
