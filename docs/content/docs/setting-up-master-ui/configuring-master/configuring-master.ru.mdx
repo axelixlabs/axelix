@@ -16,7 +16,7 @@ import styles from './styles.module.css';
 - **База данных**: Master поддерживает три движка, которые выбираются автоматически по префиксу URL-адреса JDBC —
   **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), **MySQL** (`jdbc:mysql:`). По умолчанию используется
   SQLite с файлом `axelix.db` в рабочем каталоге. Liquibase выполняет миграцию схемы при каждом запуске.
-- **Веб-интерфейс**: `axelix-1.1.0.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
+- **Веб-интерфейс**: `axelix-1.1.1.jar` и опубликованный образ Docker содержат пользовательский интерфейс — для
   подключения веб-интерфейса ничего дополнительно настраивать не нужно.
 - **Аутентификация**: в Master встроена учётная запись суперадминистратора `admin / admin` и не заданный ключ для
   подписи JWT. В любой среде, кроме тестовой, необходимо изменить оба параметра — см. [Справочник по
@@ -128,7 +128,7 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 ### Загрузка конфигурации из Spring Cloud Config Server
@@ -702,13 +702,27 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 ## Запуск с Docker
 
 Если у вас есть поддержка контейнеризации, то рекомендуемый способ установки Axelix Master — через Docker-образ.
-Мы публикуем образ в GitHub Container Registry, поэтому имя образа соответствует шаблону
-`ghcr.io/axelixlabs/axelix:1.1.0`.
+Мы публикуем образ в GitHub Container Registry и ставим на последний релиз тег `latest`, поэтому скачать его можно
+без указания версии:
+
+```bash
+docker pull ghcr.io/axelixlabs/axelix
+```
 
 :::note
-Приведённые ниже фрагменты кода содержат `1.1.0` для наглядности. Проверьте [страницу
-релизов](https://github.com/axelixlabs/axelix/releases) на актуальную опубликованную метку и подставьте её в свои
-команды.
+Чтобы запустить конкретную версию, допишите её тег к имени образа, например:
+
+```
+ghcr.io/axelixlabs/axelix:1.1.1
+```
+
+Опубликованные теги — на [странице релизов](https://github.com/axelixlabs/axelix/releases).
+
+В продакшене подтягивайте образ по дайджесту, а не по тегу:
+
+```
+ghcr.io/axelixlabs/axelix@sha256:<digest>
+```
 :::
 
 ### Команда запуска
@@ -719,7 +733,7 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 Несколько примечаний об этой команде:
@@ -747,7 +761,7 @@ docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 #### Системные свойства (-D) через `JAVA_TOOL_OPTIONS`
@@ -768,7 +782,7 @@ docker run --rm -p 8080:8080 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 #### Внешний конфиг-файл
@@ -793,7 +807,7 @@ docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
-  ghcr.io/axelixlabs/axelix:1.1.0
+  ghcr.io/axelixlabs/axelix
 ```
 
 ## Запуск с Docker Compose
@@ -801,9 +815,8 @@ docker run --rm -p 8080:8080 \
 По сути, Axelix Master вполне можно запустить и в развёртывании через Docker Compose.
 
 Приведённый ниже пример представляет собой готовый стек, который можно положить в новый `docker-compose.yaml`,
-отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь зафиксирован на `1.1.0` —
-подставьте актуальную метку со [страницы релизов](https://github.com/axelixlabs/axelix/releases) перед отправкой в
-продакшен.
+отредактировать и запустить с помощью `docker compose up -d`. Сервис `master` здесь использует образ `latest` —
+зафиксируйте конкретный тег (см. [Запуск с Docker](#запуск-с-docker)) перед отправкой в продакшен.
 
 ```yaml title="docker-compose.yaml"
 services:
@@ -822,7 +835,7 @@ services:
       retries: 10
 
   master:
-    image: ghcr.io/axelixlabs/axelix:1.1.0
+    image: ghcr.io/axelixlabs/axelix
     depends_on:
       postgres:
         condition: service_healthy
@@ -884,7 +897,7 @@ axelix:
 
 ```yaml title="docker-compose.yaml"
   master:
-    image: ghcr.io/axelixlabs/axelix:1.1.0
+    image: ghcr.io/axelixlabs/axelix
     volumes:
       - ./master.yaml:/etc/axelix/master.yaml:ro
     environment:
@@ -1013,7 +1026,7 @@ spec:
       serviceAccountName: axelix-master
       containers:
         - name: axelix-master
-          image: ghcr.io/axelixlabs/axelix:1.1.0
+          image: ghcr.io/axelixlabs/axelix
 ```
 
 В Kubernetes Role — это объект, привязанный к пространству имён, поэтому повторите Role и RoleBinding по одному разу на
