@@ -1,10 +1,28 @@
 .MainWrapper {
-    display: flex;
+    display: grid;
     flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.SkeletonBackground,
+.Overlay,
+.CardContainer {
+    grid-area: 1 / 1;
+}
+
+.Overlay {
+    background-color: var(--axelix-bold-grey);
+    opacity: 0.5;
+}
+
+.CardContainer {
+    position: relative;
+    z-index: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
-    background-color: var(--axelix-medium-grey);
 }
 
 .Card {

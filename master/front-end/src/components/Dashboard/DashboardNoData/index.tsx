@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 
 import { DOCS_URL, ISO_DATE_FORMAT } from "@/utils";
 
+import { DashboardNoDataSkeleton } from "./DashboardNoDataSkeleton";
 import styles from "./styles.module.css";
 
 export const DashboardNoData = () => {
@@ -31,24 +32,30 @@ export const DashboardNoData = () => {
     return (
         <>
             <div className={styles.MainWrapper} data-dashboard-no-data>
-                <div className={styles.Card}>
-                    <div className={`TextSmall ${styles.Badge}`}>
-                        <div className={styles.BadgeDot} />
-                        {t("Dashboard.NoData.badge")}
-                    </div>
+                <div className={styles.SkeletonBackground}>
+                    <DashboardNoDataSkeleton />
+                </div>
+                <div className={styles.Overlay} />
+                <div className={styles.CardContainer}>
+                    <div className={styles.Card}>
+                        <div className={`TextSmall ${styles.Badge}`}>
+                            <div className={styles.BadgeDot} />
+                            {t("Dashboard.NoData.badge")}
+                        </div>
 
-                    <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.NoData.title")}</div>
+                        <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.NoData.title")}</div>
 
-                    <div className="TextSmall">{t("Dashboard.NoData.noApplications")}</div>
-                    <div className="TextSmall">{t("Dashboard.NoData.oldStarter")}</div>
+                        <div className="TextSmall">{t("Dashboard.NoData.noApplications")}</div>
+                        <div className="TextSmall">{t("Dashboard.NoData.oldStarter")}</div>
 
-                    <div className={styles.Footer}>
-                        <Button type="primary" href={DOCS_URL} target="_blank" rel="noopener noreferrer">
-                            {t("Dashboard.NoData.readTheDocs")}
-                        </Button>
+                        <div className={styles.Footer}>
+                            <Button type="primary" href={DOCS_URL} target="_blank" rel="noopener noreferrer">
+                                {t("Dashboard.NoData.readTheDocs")}
+                            </Button>
 
-                        <div className={`TextSmall ${styles.LastScan}`}>
-                            {t("Dashboard.NoData.lastScan", { date: lastScan })}
+                            <div className={`TextSmall ${styles.LastScan}`}>
+                                {t("Dashboard.NoData.lastScan", { date: lastScan })}
+                            </div>
                         </div>
                     </div>
                 </div>
