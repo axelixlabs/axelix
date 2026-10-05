@@ -6,9 +6,14 @@ description: "На странице Запланированные задачи 
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![главная страница запланированных
-задач](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png) ***Запланированные задачи в
-интерфейсе Axelix***
+задач](/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
+
+</ScreenshotsNotice>
+
+***Запланированные задачи в интерфейсе Axelix***
 
 Прокручиваемый список, в котором отображаются все настроенные Scheduled Tasks в сервисе задачи, сгруппированные по типам
 свойств: фиксированная задержка, фиксированная частота и cron, с функцией поиска запланированных задач для удобства
@@ -17,7 +22,13 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 ## Подробности запланированных задач
 
 ### Cron
+
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![подробности cron-выражения](/img/feature/scheduled-tasks/cron-expression-page-details.png)
+
+</ScreenshotsNotice>
+
 ***Запланированные задачи в интерфейсе Axelix***
 
 *Запланированная задача с точной конфигурацией выполнения.*
@@ -31,7 +42,13 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 - **Запуск**:                   принудительно запускает задачу немедленно. (См. **Интерактивные возможности**)
 
 ### Fixed delay
+
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![подробности fixed delay](/img/feature/scheduled-tasks/fixed-delay-page-details.png)
+
+</ScreenshotsNotice>
+
 ***Запланированные задачи в интерфейсе Axelix***
 
 *Планирует задачи с интервалом между завершениями, отсчитываемым от конца предыдущей задачи.*
@@ -46,7 +63,13 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 - **Запуск**:                   принудительно запускает задачу немедленно. (См. **Интерактивные возможности**)
 
 ### Fixed rate
+
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![подробности fixed rate](/img/feature/scheduled-tasks/fixed-rate-page-details.png)
+
+</ScreenshotsNotice>
+
 ***Запланированные задачи в интерфейсе Axelix***
 
 *Планирует задачи с интервалом, отсчитываемым от начала предыдущей задачи.*
@@ -101,11 +124,12 @@ MCP-инструментов](../../setting-up-master-ui/mcp/mcp-tools.mdx#ин�
 
 ## Включите Нужный Actuator Ендпоинт
 
-:::note
-Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
-actuator-эндпоинты, а эндпоинты `health`/`info` Axelix больше не требуются — он отлично работает и без них. Никакая
-настройка здесь не нужна.
-:::
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-scheduled-tasks`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек

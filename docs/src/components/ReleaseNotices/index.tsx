@@ -97,6 +97,40 @@ export const UpcomingReleaseNotice = () => {
     );
 };
 
+type ScreenshotsNoticeProps = {
+    /**
+     * Notice line, localized at the call site. Written in the MDX rather than here so that the Markdown export
+     * for LLMs, which keeps component attributes but never runs component code, carries it too.
+     */
+    text: string;
+    children?: ReactNode;
+};
+
+/** Frames the screenshot passed as children, with the notice line as its header. */
+export const ScreenshotsNotice = ({ text, children }: ScreenshotsNoticeProps) => {
+    const { locale } = useI18n();
+    const label = translate({ en: "Screenshots", ru: "Скриншоты" }, locale);
+
+    // Slate blue reads as neutral context, apart from the green, purple and amber notices.
+    const accent = "[--accent:#4a6a8a] dark:[--accent:#9db7d1]";
+    const line = (
+        <div className="text-[0.85rem] text-fd-muted-foreground" role="note" aria-label={`${label} — ${text}`}>
+            <NoticeLine label={label} detail={text} />
+        </div>
+    );
+
+    if (children == null) {
+        return <div className={`-mt-1 mb-5 ${accent}`}>{line}</div>;
+    }
+
+    return (
+        <div className={`-mt-1 mb-5 rounded-lg border border-fd-border bg-fd-card p-[10px] pt-[9px] ${accent}`}>
+            {line}
+            <div className="mt-[7px] [&_p]:my-0 [&_img]:my-0">{children}</div>
+        </div>
+    );
+};
+
 type LegacyNoticeProps = VersionProps & {
     /**
      * Why the section below is obsolete. Rendered as a muted aside hung with the line on a shared

@@ -56,5 +56,7 @@ const llmsSource = loader({
 export const docsLlms = llms(llmsSource, {
     renderPage: async (page) => `# ${page.data.title} (${page.url})
 
+${page.data.description ?? ""}
+
 ${await page.data.getText("processed")}`,
 });

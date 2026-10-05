@@ -8,6 +8,7 @@
         "scheduled-tasks",
         "conditions",
         "caches",
-        "transaction-control"
+        "transaction-control",
+        "entities-map"
     ]
 }

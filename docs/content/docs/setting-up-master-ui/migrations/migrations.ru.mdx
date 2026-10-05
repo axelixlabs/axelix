@@ -99,7 +99,7 @@ java \
   -Daxelix.master.database.password=... \
   -Daxelix.master.migrations.username=axelix_migrator \
   -Daxelix.master.migrations.password=... \
-  -jar axelix-1.0.0.jar
+  -jar axelix-1.1.0.jar
 ```
 
 :::warning
@@ -132,7 +132,7 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.database.password=... \
     -Daxelix.master.migrations.username=axelix_migrator \
     -Daxelix.master.migrations.password=..." \
-  ghcr.io/axelixlabs/axelix:1.0.0
+  ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
 ### Запуск с Docker Compose
@@ -142,7 +142,7 @@ docker run --rm -p 8080:8080 \
 ```yaml title="docker-compose.yaml"
 services:
   master:
-    image: ghcr.io/axelixlabs/axelix:1.0.0
+    image: ghcr.io/axelixlabs/axelix:1.1.0
     ports:
       - "8080:8080"
     environment:

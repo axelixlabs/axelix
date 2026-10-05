@@ -1,72 +1,80 @@
 ---
 title: Transaction Control
-description: "The Transaction Control page lists every @Transactional method the managed Spring Boot instance has executed at
-              least once, with execution timings and the SQL queries run inside each invocation. Use it to spot slow transactions and
-              inspect the queries they issued."
+description: "The Transaction Control page finds @Transactional methods that keep a database connection busy longer than
+              they should: blocking network calls, N+1 queries, and in-memory pagination inside the transaction. For each
+              problem, it shows where it happens, so you can find the place in the code."
 ---
 
-![transaction control main page](/img/feature/transaction/transaction-main-page.png) ***Transaction Control
-as presented in Axelix UI***
+<ScreenshotsNotice text="Screenshots show the latest minor release of Axelix.">
 
-The page is read-only and available to every authenticated user — **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
+![transaction control main page](/img/feature/transaction/transaction-control-main-page.png)
+
+</ScreenshotsNotice>
+
+***Transaction Control as presented in Axelix UI***
+
+While a transaction is open, it holds a database connection from the pool. When the transaction does extra work, such
+as calling another service, running one query per record, or loading a whole table to show one page, connections run
+out and the application slows down under load. The code rarely makes this obvious. Transaction Control shows which
+`@Transactional` methods do this and where exactly.
+
+The page is read-only and available to every authenticated user: **VIEWER**, **EDITOR**, **ADMIN**, and **SUPER_ADMIN**
 can all open it. See [Roles and
 authorities](../../setting-up-master-ui/authentication/authentication.mdx#roles-and-authorities) for the full
 role/authority matrix.
 
-A scrollable list of every transactional entry point the instance has seen, with a search input above the list and a
-counter in the form `<matching> / <total>`. Each row is an accordion, its header shows:
+## What the page shows
 
-- **Class:** the fully qualified class declaring the `@Transactional` method.
-- **Method:** the name of the `@Transactional` method.
+The page lists every `@Transactional` method the instance has run, with its average, fastest, and slowest execution
+time and the [problems](#detected-problems) found in it. A summary on top shows how many transactions have problems and
+how many are clean, and you can narrow the list to one type of problem.
 
-## Execution chart
+Expand a transaction to see:
 
-Expanding a row reveals a scatter chart of every recorded execution of that method.
+- Where each problem happened: the called URL, the entity and association, or the entity paginated in memory.
+- The propagation and isolation level of the transaction.
+- The access: read-only or read-write.
 
-![transaction details page](/img/feature/transaction/transaction-details-page.png) ***Transaction details as
-presented in Axelix UI***
+When no transaction has problems, the page says so instead of showing the list.
 
-- **X axis** — the start time of each execution.
-- **Y axis** — the execution duration in milliseconds.
-- **Hovering** a point shows the **Timestamp** and **Duration** of that execution.
-- **Clicking** a point opens the [Execution details](#execution-details) panel for that run.
+## Detected problems
 
-Below the chart, the **Duration** row summarises all recorded executions of this method:
+- **Blocking network call**: The transaction makes an HTTP call and keeps its connection while waiting for the answer.
+  Axelix shows the request method and URL. Axelix currently detects calls
+  made through `RestTemplate`.
+- **N+1 queries**: A lazy association is loaded with a separate query for each record. Axelix shows the entity and
+  the association, and counts it only when the association was loaded more than once.
+- **In-memory pagination**: `Pageable` is combined with `JOIN FETCH`, so Hibernate loads the whole result set and
+  cuts the page in memory. Axelix shows the entity or table.
 
-- **Max** — the longest execution duration in milliseconds.
-- **Average** — the arithmetic mean in milliseconds.
-- **Median** — the median in milliseconds.
+## How it works
 
-## Execution details
+The Axelix Spring Boot Starter watches every `@Transactional` method call inside the application and measures how long
+it takes. While the transaction is open, it records HTTP calls made through `RestTemplate` and lazy loads of Hibernate
+associations, and catches the Hibernate warning about in-memory pagination in the application logs (Logback or Log4j2).
+No agent or APM tool is required.
 
-Clicking any point on the chart opens a side panel with the chosen execution's detail.
+## MCP Tools
 
-- **Queries count** — number of JDBC queries this execution issued. If the count is zero, a warning icon is shown.
-- **Start time** — when the `@Transactional` method was entered and the transaction began, captured on the monitored JVM
-  in millisecond precision.
-- **End time** — when the `@Transactional` method returned and the transaction was committed or rolled back, captured on
-  the monitored JVM in millisecond precision. The difference between **End time** and **Start time** equals the
-  **Duration** value shown for this point on the chart.
-- **Queries timeline** — a horizontal bar for each query, laid out against the execution's timeline so you can see which
-  query ran when and for how long. **Each bar exposes a preview of the SQL statement on hover.**
-
-How this data is collected: the starter wraps `@Transactional` proxies with a monitoring interceptor and the
-application's `DataSource` with a query-recording proxy, so timings and SQL are captured on the JVM at runtime — no
-agent or APM tool is required.
+AI agents can get the N+1 queries and in-memory pagination found in an application's transactions through MCP, for the
+whole application or for one class or method. Blocking network calls are not included. See the [MCP Tools
+catalog](../../setting-up-master-ui/mcp/mcp-tools.mdx#persistence-insights).
 
 ## Properties
 
-The page is not backed by a dedicated actuator endpoint. The Axelix Spring Boot Starter aggregates the transaction
-insights on the JVM and ships them to Master as part of the instance's registration metadata — the same payload
-exposed through the `axelix-metadata` endpoint that Master already probes. As long as `axelix-metadata` is exposed (see
-[Configuring Spring Boot
-Starter](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx)), this page works
-with no extra endpoint to enable.
-
 Transaction monitoring is enabled by default. To turn it off entirely, set
-`axelix.sbs.transaction.monitoring.enabled=false` — see [Transaction
+`axelix.sbs.transaction.monitoring.enabled=false`. See [Transaction
 monitoring](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#transaction-monitoring)
 for details.
+
+## Expose the metadata endpoint
+
+The page is not backed by a dedicated actuator endpoint. The Axelix Spring Boot Starter aggregates the transaction
+insights on the JVM and ships them to Master as part of the instance's registration metadata: the same payload
+exposed through the `axelix-metadata` endpoint that Master already probes. As long as `axelix-metadata` is exposed (see
+[Exposing the endpoints on Axelix below
+1.2.0](../../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#exposing-the-endpoints-on-axelix-below-120)),
+this page works with no extra endpoint to enable.
 
 ## See also
 

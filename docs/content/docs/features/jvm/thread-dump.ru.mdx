@@ -7,8 +7,13 @@ description: "На странице Дамп потоков в режиме ре
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-![главная страница дампа потоков](/img/feature/thread-dump/thread-dump-main-page.png) ***Страница
-«Дамп потоков» в интерфейсе Axelix***
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
+![главная страница дампа потоков](/img/feature/thread-dump/thread-dump-main-page.png)
+
+</ScreenshotsNotice>
+
+***Страница «Дамп потоков» в интерфейсе Axelix***
 
 Страница доступна любому аутентифицированному пользователю — `VIEWER`, `EDITOR`, `ADMIN` и `SUPER_ADMIN` могут её
 открыть и переключать **Мониторинг конфликтов между потоками**. Полную матрицу ролей и полномочий см. в разделе [Роли и
@@ -29,7 +34,12 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Подробности дампа потоков
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 ![страница подробностей дампа потоков](/img/feature/thread-dump/thread-dump-details-page.png)
+
+</ScreenshotsNotice>
+
 ***Страница подробностей дампа потоков в интерфейсе Axelix***
 
 Раскройте поток, чтобы увидеть его подробный снимок за временной диапазон, выбранный на шкале:
@@ -82,11 +92,12 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Включите Нужный Actuator Ендпоинт
 
-:::note
-Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
-actuator-эндпоинты, а эндпоинты `health`/`info` Axelix больше не требуются — он отлично работает и без них. Никакая
-настройка здесь не нужна.
-:::
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-thread-dump`, который добавляет Axelix Spring Boot Starter. Она
 доступна через стандартные свойства Spring Boot Actuator. Полный список конечных точек Axelix и сопутствующих настроек

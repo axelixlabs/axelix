@@ -7,8 +7,13 @@ description: "Страница Сборщик мусора позволяет в
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-![главная страница сборщика мусора](/img/feature/garbage-collector/gc-main-page.png) ***Сборщик
-мусора в интерфейсе Axelix***
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
+![главная страница сборщика мусора](/img/feature/garbage-collector/gc-main-page.png)
+
+</ScreenshotsNotice>
+
+***Сборщик мусора в интерфейсе Axelix***
 
 ## Доступ
 
@@ -30,7 +35,11 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 GC-логирование выключено по умолчанию. Пока логирование не включено, страница показывает пустой стейт с кнопкой
 **Включить Лог Сборщика Мусора**. Клик по ней открывает модальное окно, где выбирается уровень логирования JVM:
 
+<ScreenshotsNotice text="Скриншоты соответствуют последнему минорному релизу Axelix.">
+
 <Image src="/img/feature/garbage-collector/enable-gc-logging.png" alt="enable-gc-logging" width={490} height={280}/>
+
+</ScreenshotsNotice>
 
 Список уровней берётся во время работы по `jcmd VM.log list` на целевом сервисе — как правило, это `error`, `warning`,
 `info`, `debug`, `trace`.
@@ -65,11 +74,12 @@ GC-логирование выключено по умолчанию. Пока �
 
 ## Включите Нужный Actuator Ендпоинт
 
-:::note
-Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
-actuator-эндпоинты, а эндпоинты `health`/`info` Axelix больше не требуются — он отлично работает и без них. Никакая
-настройка здесь не нужна.
-:::
+<LegacyNotice
+  version="1.2.0"
+  reason={<>Если вы используете Axelix 1.2.0 или новее, ничего из этого не требуется: стартер сам регистрирует свои
+    actuator-эндпоинты, а эндпоинты <code>health</code>/<code>info</code> Axelix больше не требуются — он отлично
+    работает и без них. Никакая настройка здесь не нужна.</>}
+/>
 
 Страница работает поверх actuator-эндпоинта `axelix-gc`, который добавляет Axelix Spring Boot Starter. Откройте его
 через стандартные свойства Spring Boot Actuator — полный список эндпоинтов Axelix и сопутствующие настройки см. в

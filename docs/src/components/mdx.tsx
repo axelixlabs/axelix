@@ -4,7 +4,7 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import NextImage, { type ImageProps } from "next/image";
 
-import { LegacyNotice, ReleasedInNotice, UpcomingReleaseNotice } from "@/components/ReleaseNotices";
+import { LegacyNotice, ReleasedInNotice, ScreenshotsNotice, UpcomingReleaseNotice } from "@/components/ReleaseNotices";
 import { BASE_PATH } from "@/lib/constants.mjs";
 
 /**
@@ -35,6 +35,7 @@ export function getMDXComponents(components?: MDXComponents) {
         ReleasedInNotice,
         UpcomingReleaseNotice,
         LegacyNotice,
+        ScreenshotsNotice,
         ...components,
     } satisfies MDXComponents;
 }
