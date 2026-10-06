@@ -42,6 +42,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeat.HeartBeatMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 /**
  * Self-registration service that automatically registers with master.
@@ -49,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  * @since 05.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 public class HeartBeatService implements Closeable {
 
@@ -63,6 +65,7 @@ public class HeartBeatService implements Closeable {
     private final ScheduledExecutorService executor;
     private final Logger logger;
     private final JwtEncoderService jwtEncoderService;
+    private final ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
 
     @SuppressWarnings("NullAway.Init")
     private volatile String currentToken;
@@ -72,7 +75,8 @@ public class HeartBeatService implements Closeable {
             JsonSerializationFunction serializationFunction,
             HeartBeatConfigurationProperties properties,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
-            JwtEncoderService jwtEncoderService) {
+            JwtEncoderService jwtEncoderService,
+            ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
 
         this.logger = logger;
         this.jwtEncoderService = jwtEncoderService;
@@ -81,6 +85,7 @@ public class HeartBeatService implements Closeable {
         this.properties = properties;
         this.serializationFunction = serializationFunction;
         this.heartBeatMetadataAssembler = heartBeatMetadataAssembler;
+        this.scheduledTaskExecutionHistory = scheduledTaskExecutionHistory;
 
         this.executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable);
@@ -105,14 +110,18 @@ public class HeartBeatService implements Closeable {
 
             if (is2xxSuccessful(statusCode)) {
                 logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
+                scheduledTaskExecutionHistory.commit();
             } else if (isUnauthorized(statusCode)) {
                 logger.debug("Master heartbeat failed. Token expired. Re-generating token");
                 currentToken = jwtEncoderService.generateToken(TECH_USER);
+                scheduledTaskExecutionHistory.rollback();
             } else {
                 logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
+                scheduledTaskExecutionHistory.rollback();
             }
         } catch (IOException | InterruptedException e) {
             logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
+            scheduledTaskExecutionHistory.rollback();
         }
     }
 

@@ -56,7 +56,10 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesLoader.AXELIX_INFO_LOCATION;
@@ -69,6 +72,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(classes = HeartBeatServiceTest.TestApplication.class)
 @TestPropertySource(
@@ -90,6 +94,9 @@ class HeartBeatServiceTest {
 
     @Autowired
     private JwtDecoderService jwtDecoderService;
+
+    @Autowired
+    private ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
 
     @TestConfiguration
     static class HeartBeatServiceTestConfiguration {
@@ -123,16 +130,24 @@ class HeartBeatServiceTest {
         }
 
         @Bean
+        public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+            return new ScheduledTaskExecutionHistory(
+                    new ScheduledTaskHistoryConfigurationProperties(30), new NoOpLogger());
+        }
+
+        @Bean
         public HeartBeatService heartBeatService(
                 HeartBeatConfigurationProperties properties,
                 HeartBeatMetadataAssembler metadataAssembler,
-                JwtEncoderService jwtEncoderService) {
+                JwtEncoderService jwtEncoderService,
+                ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
             return new HeartBeatService(
                     new NoOpLogger(),
                     HeartBeatServiceTest::serialize,
                     properties,
                     metadataAssembler,
-                    jwtEncoderService);
+                    jwtEncoderService,
+                    scheduledTaskExecutionHistory);
         }
 
         @Bean
@@ -240,6 +255,63 @@ class HeartBeatServiceTest {
                 authHeader.substring(AuthenticationSchemes.BEARER.prefix().length());
 
         assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldCommitScheduledTaskExecutionsWhenHeartbeatSucceeds() throws Exception {
+        ScheduledTaskExecution execution = scheduledTaskExecution();
+        scheduledTaskExecutionHistory.record(execution);
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS)).isNotNull();
+
+        assertThat(waitUntilCommitted(execution)).isTrue();
+    }
+
+    @Test
+    void shouldKeepScheduledTaskExecutionsWhenHeartbeatFails() throws Exception {
+        ScheduledTaskExecution execution = scheduledTaskExecution();
+        scheduledTaskExecutionHistory.record(execution);
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS)).isNotNull();
+
+        assertThat(waitUntilRolledBack()).isTrue();
+        assertThat(scheduledTaskExecutionHistory.mark()).containsExactly(execution);
+    }
+
+    private static ScheduledTaskExecution scheduledTaskExecution() {
+        return new ScheduledTaskExecution()
+                .taskId("com.example.Job#run()")
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true)
+                .errorType(null)
+                .errorMessage(null);
+    }
+
+    private boolean waitUntilCommitted(ScheduledTaskExecution execution) throws InterruptedException {
+        return waitUntil(() -> scheduledTaskExecutionHistory.mark().isEmpty() && !holds(execution));
+    }
+
+    private boolean waitUntilRolledBack() throws InterruptedException {
+        return waitUntil(() -> scheduledTaskExecutionHistory.mark().size() == 1);
+    }
+
+    private boolean holds(ScheduledTaskExecution execution) {
+        return scheduledTaskExecutionHistory.mark().stream()
+                .anyMatch(candidate -> candidate.getTaskId().equals(execution.getTaskId()));
+    }
+
+    private static boolean waitUntil(java.util.function.BooleanSupplier condition) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+        while (System.nanoTime() < deadline) {
+            if (condition.getAsBoolean()) {
+                return true;
+            }
+            Thread.sleep(20);
+        }
+        return condition.getAsBoolean();
     }
 
     @Test

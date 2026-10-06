@@ -19,12 +19,12 @@ package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,7 +43,8 @@ class TaskTrackingRunnableTest {
 
     @BeforeEach
     void setUp() {
-        history = new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30));
+        history = new ScheduledTaskExecutionHistory(
+                new ScheduledTaskHistoryConfigurationProperties(30), new NoOpLogger());
     }
 
     @Test
@@ -95,10 +96,9 @@ class TaskTrackingRunnableTest {
     }
 
     private ScheduledTaskExecution recordedExecution() {
-        Map<String, List<ScheduledTaskExecution>> executions = history.mark().getExecutions();
-        assertThat(executions).containsOnlyKeys(TASK_ID);
-        assertThat(executions.get(TASK_ID)).hasSize(1);
-        return executions.get(TASK_ID).get(0);
+        List<ScheduledTaskExecution> executions = history.mark();
+        assertThat(executions).hasSize(1);
+        return executions.get(0);
     }
 
     private static final class NoOpTask implements Runnable {

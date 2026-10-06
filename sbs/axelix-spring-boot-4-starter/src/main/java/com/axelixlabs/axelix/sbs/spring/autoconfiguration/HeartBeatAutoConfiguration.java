@@ -32,6 +32,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.DefaultHeartBeatMetadataAsse
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -39,6 +41,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
  * @since 04.02.2026
  * @author Nikita Kirillov
  * @author Ilya Naumov
+ * @author Vyacheslav Yanin
  */
 @AxelixAutoConfiguration(after = ValidationListenerAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "self-registration", havingValue = "true")
@@ -48,6 +51,20 @@ public class HeartBeatAutoConfiguration {
     @ConfigurationProperties(prefix = HeartBeatConfigurationProperties.CONFIG_PROPS_PREFIX)
     public HeartBeatConfigurationProperties heartBeatConfigurationProperties() {
         return new HeartBeatConfigurationProperties();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = ScheduledTaskHistoryConfigurationProperties.CONFIG_PROPS_PREFIX)
+    public ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties() {
+        return new ScheduledTaskHistoryConfigurationProperties(0);
+    }
+
+    @Bean
+    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory(
+            ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties) {
+        return new ScheduledTaskExecutionHistory(
+                scheduledTaskHistoryConfigurationProperties,
+                new SLF4JLogger(LoggerFactory.getLogger(ScheduledTaskExecutionHistory.class)));
     }
 
     @Bean
@@ -63,13 +80,15 @@ public class HeartBeatAutoConfiguration {
             HeartBeatConfigurationProperties properties,
             ObjectMapper objectMapper,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
-            JwtEncoderService jwtEncoderService) {
+            JwtEncoderService jwtEncoderService,
+            ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
         return new HeartBeatService(
                 new SLF4JLogger(LoggerFactory.getLogger(HeartBeatService.class)),
                 objectMapper::writeValueAsString,
                 properties,
                 heartBeatMetadataAssembler,
-                jwtEncoderService);
+                jwtEncoderService,
+                scheduledTaskExecutionHistory);
     }
 
     @Bean

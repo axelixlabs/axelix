@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.NoOpTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 /**
  * Auto-configuration for the {@link AxelixMetadataEndpoint}.
@@ -55,6 +56,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @since 18.09.2025
  * @author Nikita Kirillov
  * @author Ilya Naumov
+ * @author Vyacheslav Yanin
  */
 @AxelixAutoConfiguration(
         after = {
@@ -89,7 +91,8 @@ public class AxelixMetadataEndpointAutoConfiguration {
             VmOptionsAccessor vmOptionsAccessor,
             ObjectProvider<TransactionStatsCollector> transactionStatsCollectorProvider,
             ObjectProvider<TransactionAttributesRegistry> transactionAttributesRegistryProvider,
-            ObjectProvider<JpaEntitiesProfileProvider> entitiesMapProvider) {
+            ObjectProvider<JpaEntitiesProfileProvider> entitiesMapProvider,
+            ObjectProvider<ScheduledTaskExecutionHistory> scheduledTaskExecutionHistoryProvider) {
 
         return new DefaultInsightsInfoProvider(
                 openSessionInViewStateProvider,
@@ -97,7 +100,8 @@ public class AxelixMetadataEndpointAutoConfiguration {
                 vmOptionsAccessor,
                 transactionStatsCollectorProvider.getIfAvailable(NoOpTransactionStatsCollector::new),
                 transactionAttributesRegistryProvider.getIfAvailable(TransactionAttributesRegistry::new),
-                entitiesMapProvider.getIfAvailable(NoOpJpaEntitiesProfileProvider::new));
+                entitiesMapProvider.getIfAvailable(NoOpJpaEntitiesProfileProvider::new),
+                scheduledTaskExecutionHistoryProvider.getIfAvailable());
     }
 
     @Bean
