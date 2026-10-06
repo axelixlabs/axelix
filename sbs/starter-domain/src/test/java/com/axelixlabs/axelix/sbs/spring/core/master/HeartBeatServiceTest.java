@@ -20,7 +20,9 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -52,8 +54,13 @@ import com.axelixlabs.axelix.sbs.spring.core.config.HeartBeatConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.contract.heartbeatv2.HeartBeatMetadataV2;
 import com.axelixlabs.axelix.sbs.spring.core.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.sbom.ClasspathDependencySbom;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestInsightsInfoProvider;
 
@@ -67,6 +74,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
  * @since 06.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 @SpringBootTest(classes = HeartBeatServiceTest.TestApplication.class)
 @TestPropertySource(
@@ -98,6 +106,9 @@ class HeartBeatServiceTest {
     @Autowired
     private JwtDecoderService jwtDecoderService;
 
+    @Autowired
+    private ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
+
     @TestConfiguration
     static class HeartBeatServiceTestConfiguration {
 
@@ -127,6 +138,12 @@ class HeartBeatServiceTest {
                     new DefaultAuthoritiesManager(null),
                     authProperties.getJwt().getAlgorithm(),
                     authProperties.getJwt().getSigningKey());
+        }
+
+        @Bean
+        public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+            return new ScheduledTaskExecutionHistory(
+                    new ScheduledTaskHistoryConfigurationProperties(30), new NoOpLogger());
         }
 
         @Bean
@@ -161,8 +178,25 @@ class HeartBeatServiceTest {
         }
 
         @Bean
-        InsightsInfoProvider insightsInfoProvider() {
-            return new TestInsightsInfoProvider();
+        InsightsInfoProvider insightsInfoProvider(ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
+            TestInsightsInfoProvider delegate = new TestInsightsInfoProvider();
+
+            return new InsightsInfoProvider() {
+                @Override
+                public Insights getInsight() {
+                    return delegate.getInsight();
+                }
+
+                @Override
+                public List<TransactionAggregatedProfile> getTransactions() {
+                    return delegate.getTransactions();
+                }
+
+                @Override
+                public List<ScheduledTaskExecution> getScheduledTaskExecutions() {
+                    return scheduledTaskExecutionHistory.mark();
+                }
+            };
         }
 
         @Bean
@@ -195,6 +229,7 @@ class HeartBeatServiceTest {
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+        scheduledTaskExecutionHistory.rollback();
     }
 
     @AfterEach
@@ -207,7 +242,12 @@ class HeartBeatServiceTest {
         properties.setMasterUrl(
                 "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + masterUrlPath);
         heartBeatService = new HeartBeatService(
-                new NoOpLogger(), HeartBeatServiceTest::serialize, properties, metadataAssembler, jwtEncoderService);
+                new NoOpLogger(),
+                HeartBeatServiceTest::serialize,
+                properties,
+                metadataAssembler,
+                jwtEncoderService,
+                scheduledTaskExecutionHistory);
         heartBeatService.scheduleHeartBeat();
     }
 
@@ -233,6 +273,54 @@ class HeartBeatServiceTest {
                 authHeader.substring(AuthenticationSchemes.BEARER.prefix().length());
 
         assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldNotDeliverScheduledTaskExecutionsAgainOnceHeartbeatSucceeds() throws Exception {
+        scheduledTaskExecutionHistory.record(scheduledTaskExecution("com.example.Delivered#run()"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
+
+        RecordedRequest registration = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
+        assertThat(registration.getPath()).isEqualTo("/service/register");
+        assertThat(registration.getBody().readUtf8()).doesNotContain("com.example.Delivered#run()");
+
+        RecordedRequest firstHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(firstHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
+        assertThat(firstHeartbeat.getBody().readUtf8()).contains("com.example.Delivered#run()");
+
+        RecordedRequest secondHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(secondHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
+        assertThat(secondHeartbeat.getBody().readUtf8()).doesNotContain("com.example.Delivered#run()");
+    }
+
+    @Test
+    void shouldDeliverScheduledTaskExecutionsAgainWhenHeartbeatFails() throws Exception {
+        scheduledTaskExecutionHistory.record(scheduledTaskExecution("com.example.Retried#run()"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+        startHeartBeating("/service/register");
+
+        assertThat(mockWebServer.takeRequest(2, TimeUnit.SECONDS).getPath()).isEqualTo("/service/register");
+
+        RecordedRequest failedHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(failedHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
+        assertThat(failedHeartbeat.getBody().readUtf8()).contains("com.example.Retried#run()");
+
+        RecordedRequest retriedHeartbeat = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        assertThat(retriedHeartbeat.getPath()).isEqualTo("/service/heartbeat/v2");
+        assertThat(retriedHeartbeat.getBody().readUtf8()).contains("com.example.Retried#run()");
+    }
+
+    private static ScheduledTaskExecution scheduledTaskExecution(String taskId) {
+        return new ScheduledTaskExecution()
+                .taskId(taskId)
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true);
     }
 
     @Test
@@ -331,7 +419,14 @@ class HeartBeatServiceTest {
 
     private static String serialize(Object payload) {
         if (payload instanceof HeartBeatMetadataV2) {
-            return "{\"instanceId\":\"" + ((HeartBeatMetadataV2) payload).getInstanceId() + "\"}";
+            HeartBeatMetadataV2 heartBeat = (HeartBeatMetadataV2) payload;
+            String taskIds = heartBeat.getScheduledTaskExecutions() == null
+                    ? ""
+                    : heartBeat.getScheduledTaskExecutions().stream()
+                            .map(execution -> "\"" + execution.getTaskId() + "\"")
+                            .collect(Collectors.joining(","));
+            return "{\"instanceId\":\"" + heartBeat.getInstanceId() + "\",\"scheduledTaskExecutions\":[" + taskIds
+                    + "]}";
         }
 
         InitialSelfRegistrationRequest metadata = (InitialSelfRegistrationRequest) payload;

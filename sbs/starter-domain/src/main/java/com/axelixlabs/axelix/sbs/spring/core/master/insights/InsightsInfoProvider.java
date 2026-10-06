@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master.insights;
 import java.util.List;
 
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 
 /**
@@ -39,4 +40,9 @@ public interface InsightsInfoProvider {
      * @return the aggregated information about the transactions inside the instance.
      */
     List<TransactionAggregatedProfile> getTransactions();
+
+    /**
+     * @return the scheduled task executions that are not yet delivered to master.
+     */
+    List<ScheduledTaskExecution> getScheduledTaskExecutions();
 }

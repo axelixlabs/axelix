@@ -234,6 +234,7 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(heartBeat.getHealthStatus()).isEqualTo(HealthStatus.UP);
         assertThat(heartBeat.getMemoryDetails().getHeap()).isPositive();
         assertThat(heartBeat.getTransactions()).isEmpty();
+        assertThat(heartBeat.getScheduledTaskExecutions()).isEmpty();
     }
 
     @Test // GH-1292

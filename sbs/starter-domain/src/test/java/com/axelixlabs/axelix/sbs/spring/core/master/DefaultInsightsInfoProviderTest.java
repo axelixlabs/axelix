@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.common.domain.insights.TypeExternalCall;
 import com.axelixlabs.axelix.sbs.spring.core.contract.gclog.GcLogStatus;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.InsightFeature;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.TransactionAggregatedProfile;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogException;
 import com.axelixlabs.axelix.sbs.spring.core.gclog.GcLogService;
@@ -42,6 +43,9 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionDefinitionAttributes;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionExecutionProfile;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.testutils.NoOpLogger;
 
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.AOT_CACHE;
 import static com.axelixlabs.axelix.common.domain.insights.FeatureId.APP_CDS;
@@ -60,6 +64,65 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultInsightsInfoProviderTest {
 
     @Test
+    void reportsScheduledTaskExecutions_whenHistoryIsNotEmpty() {
+        // given.
+        ScheduledTaskExecution first = scheduledTaskExecution("com.example.First#run()");
+        ScheduledTaskExecution second = scheduledTaskExecution("com.example.Second#run()");
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                historyWith(first, second));
+
+        // when.
+        List<ScheduledTaskExecution> executions = subject.getScheduledTaskExecutions();
+
+        // then.
+        assertThat(executions).containsExactly(first, second);
+    }
+
+    @Test
+    void doesNotReportScheduledTaskExecutionsInInsights_whenHistoryIsNotEmpty() {
+        // given.
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                historyWith(scheduledTaskExecution("com.example.First#run()")));
+
+        // when.
+        Insights insights = subject.getInsight();
+
+        // then.
+        assertThat(insights.getScheduledTaskExecutions()).isEmpty();
+    }
+
+    @Test
+    void reportsNoScheduledTaskExecutions_whenHistoryIsEmpty() {
+        // given.
+        var subject = new DefaultInsightsInfoProvider(
+                osivDisabled(),
+                gcLogDisabled(),
+                emptyVmOptions(),
+                emptyTransactionStatsCollector(),
+                emptyTransactionAttributesRegistry(),
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
+
+        // when.
+        List<ScheduledTaskExecution> executions = subject.getScheduledTaskExecutions();
+
+        // then.
+        assertThat(executions).isEmpty();
+    }
+
+    @Test
     void returnsDisabledInsights_whenOptionsAreEmptyAndOsivDisabled() {
         // given.
         var subject = new DefaultInsightsInfoProvider(
@@ -68,7 +131,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -91,7 +155,8 @@ class DefaultInsightsInfoProviderTest {
                 vmOptions("-XX:SharedArchiveFile=/path/to/archive.jsa", "-XX:AOTCache=/path/to/cache"),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -110,7 +175,8 @@ class DefaultInsightsInfoProviderTest {
                 vmOptions("-Xmx256m", "-XX:SharedArchiveFile=/path/to/archive.jsa"),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -128,7 +194,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -147,7 +214,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -166,7 +234,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -185,7 +254,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -204,7 +274,8 @@ class DefaultInsightsInfoProviderTest {
                 vmOptions("-XX:+UseCompactObjectHeaders"),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -222,7 +293,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -240,7 +312,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 emptyTransactionStatsCollector(),
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -266,7 +339,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 collector,
                 emptyTransactionAttributesRegistry(),
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -302,7 +376,8 @@ class DefaultInsightsInfoProviderTest {
                 emptyVmOptions(),
                 collector,
                 registry,
-                noOpJpaEntitiesProfileProvider());
+                noOpJpaEntitiesProfileProvider(),
+                emptyScheduledTaskExecutionHistory());
 
         // when.
         Insights insights = subject.getInsight();
@@ -341,6 +416,28 @@ class DefaultInsightsInfoProviderTest {
 
     private static JpaEntitiesProfileProvider noOpJpaEntitiesProfileProvider() {
         return new NoOpJpaEntitiesProfileProvider();
+    }
+
+    private static ScheduledTaskExecutionHistory emptyScheduledTaskExecutionHistory() {
+        return new ScheduledTaskExecutionHistory(new ScheduledTaskHistoryConfigurationProperties(30), new NoOpLogger());
+    }
+
+    private static ScheduledTaskExecutionHistory historyWith(ScheduledTaskExecution... executions) {
+        ScheduledTaskExecutionHistory history = emptyScheduledTaskExecutionHistory();
+        for (ScheduledTaskExecution execution : executions) {
+            history.record(execution);
+        }
+        return history;
+    }
+
+    private static ScheduledTaskExecution scheduledTaskExecution(String taskId) {
+        return new ScheduledTaskExecution()
+                .taskId(taskId)
+                .startedAt("2026-01-01T00:00:00Z")
+                .durationMillis(100L)
+                .success(true)
+                .errorType(null)
+                .errorMessage(null);
     }
 
     private static VmOptionsAccessor emptyVmOptions() {
