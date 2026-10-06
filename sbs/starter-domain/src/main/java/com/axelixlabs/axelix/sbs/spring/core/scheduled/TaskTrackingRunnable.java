@@ -17,10 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
-import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
-
 import java.time.Duration;
 import java.time.Instant;
+
+import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
 
 /**
  * Wrapper around a scheduled task that reports every invocation to the {@link ScheduledTaskExecutionHistory}.
@@ -74,12 +74,12 @@ public class TaskTrackingRunnable implements Runnable {
             long durationMillis = Duration.between(start, Instant.now()).toMillis();
 
             var taskExecution = new ScheduledTaskExecution()
-                .taskId(trackingTask.toString())
-                .startedAt(start.toString())
-                .durationMillis(durationMillis)
-                .success(success)
-                .errorMessage(errorMessage)
-                .errorType(errorType);
+                    .taskId(trackingTask.toString())
+                    .startedAt(start.toString())
+                    .durationMillis(durationMillis)
+                    .success(success)
+                    .errorMessage(errorMessage)
+                    .errorType(errorType);
 
             taskExecutionHistory.record(taskExecution);
         }
