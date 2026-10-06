@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { AutoComplete, type AutoCompleteProps, Input, Space } from "antd";
-import { type Dispatch, type SetStateAction, useRef } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
@@ -56,6 +56,14 @@ export const PageSearch = ({
     const { t } = useTranslation();
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, []);
 
     const scheduleSetSearch = (value: string): void => {
         if (debounceRef.current) {

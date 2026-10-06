@@ -35,6 +35,7 @@ const Beans = () => {
 
     const selectedBeanName = searchParams.get("name");
     const selectBean = (beanNameToSelect: string | null) => {
+        setSearch("");
         setSearchParams(
             beanNameToSelect
                 ? {
