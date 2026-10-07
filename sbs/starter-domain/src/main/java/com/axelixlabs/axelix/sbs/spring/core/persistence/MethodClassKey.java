@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * Key for caching method-specific transaction metadata per target class.
+ * Key for caching method-specific transaction metadata per class the method is attributed to.
  * Similar to Spring's org.springframework.core.MethodClassKey.
  *
  * @author Nikita Kirillov
@@ -30,23 +30,23 @@ import java.util.Objects;
  */
 public final class MethodClassKey {
     private final Method method;
-    private final Class<?> targetClass;
+    private final Class<?> identityClass;
 
     /**
-     * @param method      the method being analyzed
-     * @param targetClass the class where the method is invoked
+     * @param method        the method being analyzed
+     * @param identityClass the class the method is attributed to
      */
-    public MethodClassKey(Method method, Class<?> targetClass) {
+    public MethodClassKey(Method method, Class<?> identityClass) {
         this.method = method;
-        this.targetClass = targetClass;
+        this.identityClass = identityClass;
     }
 
     public Method getMethod() {
         return method;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public Class<?> getIdentityClass() {
+        return identityClass;
     }
 
     @Override
@@ -58,16 +58,16 @@ public final class MethodClassKey {
             return false;
         }
         var that = (MethodClassKey) obj;
-        return Objects.equals(this.method, that.method) && Objects.equals(this.targetClass, that.targetClass);
+        return Objects.equals(this.method, that.method) && Objects.equals(this.identityClass, that.identityClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(method, targetClass);
+        return Objects.hash(method, identityClass);
     }
 
     @Override
     public String toString() {
-        return "MethodClassKey[" + "method=" + method + ", " + "targetClass=" + targetClass + ']';
+        return "MethodClassKey[" + "method=" + method + ", " + "identityClass=" + identityClass + ']';
     }
 }

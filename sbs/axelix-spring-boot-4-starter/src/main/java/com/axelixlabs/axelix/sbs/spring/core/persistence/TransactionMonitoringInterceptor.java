@@ -86,7 +86,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
                 if (metricsPublisher != null) {
                     metricsPublisher.publishTransactionMetrics(
-                            key.getTargetClass().getSimpleName(), method.getName(), transactionExecutionProfile);
+                            key.getIdentityClass().getSimpleName(), method.getName(), transactionExecutionProfile);
                 }
             }
         }
