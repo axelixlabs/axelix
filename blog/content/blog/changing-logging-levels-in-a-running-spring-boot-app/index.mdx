@@ -11,7 +11,7 @@ description: "How to temporarily change the logging level in a running Spring Bo
 metaDescription: "Comparing three ways to change the logging level in Spring Boot without restarting: Actuator, Spring Boot Admin, and Axelix with an automatic timer-based reset."
 ---
 
-Hello everyone! My name is Sergey Cherkasov, and I am a developer on the [Axelix](https://github.com/axelixlabs/axelix) project. It is an open-source product for tracking various problems and inefficiencies in Spring Boot applications.
+Hello everyone! My name is Sergey Cherkasov, and I am a Developer Advocate in Axelix Labs, working at [Axelix project](https://github.com/axelixlabs/axelix) project. It is an open-source product that, among other things, provides the ability to debug the running Spring Boot application.
 
 When investigating an incident, `INFO` logs are often not enough, `DEBUG` needs to be temporarily enabled for a specific package or class.
 
@@ -19,11 +19,11 @@ Spring Boot allows the logging level to be changed directly in a running process
 
 Let's compare these approaches using a single example, temporarily enabling `DEBUG` for the `com.example.orderservice` package and restoring the previous level after diagnostics.
 
-## Why a restart is not needed
+## Changing Logging Level On The Fly. Technical Implementation.
 
 Spring Boot sets the initial logging levels from `logging.level.*` and the configuration of Logback, Log4j2, or another supported logging system. While the application is running, these levels can be changed through [`LoggingSystem`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/logging/LoggingSystem.html). The assigned logging level applies to subsequent events and is stored in the process's memory. Configuration files remain unchanged, and the value is usually lost after a restart.
 
-It is worth noting that the change applies only to the application instance that received the request. If a service runs in multiple replicas, the other instances have to be configured separately. Spring Boot Admin and Axelix simplify this process but do not fundamentally change it, although I have heard that the team behind one of these products is considering how to address this.
+It is worth noting that the change applies only to the application instance that received the request. If a service runs in multiple replicas, the other instances have to be configured separately. Spring Boot Admin and Axelix simplify this process but do not fundamentally change it. However, Axelix [is on the way](https://github.com/axelixlabs/axelix/issues/1160) to deliver the ability to send the logging level across all the instances of the app .
 
 ## 1. Spring Boot Actuator: a direct request to the application
 
@@ -33,7 +33,7 @@ The [`/actuator/loggers`](https://docs.spring.io/spring-boot/api/rest/actuator/l
 management.endpoints.web.exposure.include=health,loggers
 ```
 
-The logging level can then be changed by sending requests to the running application. The address and authentication method depend on the configuration of the management interface:
+The logging level can then be changed by sending requests to the running application. The authentication method depend on the configuration of the management interface:
 
 ```bash
 # Retrieves the explicitly configured and effective logging levels.
@@ -69,6 +69,7 @@ If `INFO` is explicitly configured for the logger, the response to `GET` looks l
 Before changing the logging level, it is best to remember the original value of `configuredLevel`. If no level was configured, sending an empty object `{}` after diagnostics makes the logger inherit its parent's level again. If the `configuredLevel` field contained a specific level, such as `INFO`, it can be set with another `POST` request. Actuator does not keep a history of changes and cannot automatically restore the previous value.
 
 ## 2. Spring Boot Admin: managing instances through a web interface
+
 [Spring Boot Admin](https://docs.spring-boot-admin.com/4.1.2/docs/reference/actuator-endpoints/) allows all the same operations to be performed through a web interface: finding `com.example.orderservice` and selecting `DEBUG` is enough, without composing a request manually. After diagnostics, Spring Boot Admin allows the logging level to be reset manually.
 
 <video src="/blog/posts/changing-logging-levels-in-a-running-spring-boot-app/SpringBootAdminChangeLoggersLevel.mp4" controls muted playsInline preload="metadata" />
