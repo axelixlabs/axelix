@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,15 +118,18 @@ public class ScheduledTaskExecutionHistory {
     }
 
     /**
-     * Returns the recorded executions ordered by generation, remembering the watermark of this snapshot so that
-     * {@link #commit()} is able to drop them once the caller has delivered them. Nothing is removed from the history
-     * here.
+     * Returns the recorded executions ordered by generation and remembers the watermark of this snapshot, so that
+     * {@link #commit()} is able to drop them once the caller has delivered them. Nothing is removed from the history here.
      *
-     * <p>When a previously marked snapshot is still pending, the remembered watermark is kept as is and a message is
-     * logged, since overwriting it would let a later {@link #commit()} drop the executions that no delivered snapshot
-     * has ever carried.
+     * <p>Only one watermark is remembered at a time, so a mark made while the previous one is still pending cannot
+     * advance it: the pending watermark is kept as is and the situation is logged. Overwriting it would let a later
+     * {@link #commit()} drop the executions that no delivered snapshot has ever carried, which loses data instead of
+     * merely duplicating a delivery.
      *
-     * @return the recorded executions ordered by generation.
+     * <p>The caller is expected to close every {@code mark()} with either {@link #commit()} or {@link #rollback()},
+     * depending on the delivery outcome.
+     *
+     * @return the immutable list of the recorded executions ordered by generation.
      */
     public List<ScheduledTaskExecution> mark() {
         Lock writeLock = null;
@@ -212,6 +216,7 @@ public class ScheduledTaskExecutionHistory {
         // but we can assume that by its nature ScheduledTaskExecution is supposed to be immutable.
         return history.values().stream()
                 .flatMap(Collection::stream)
+                .sorted(Comparator.comparing(Entry::generation))
                 .map(Entry::execution)
                 .collect(Collectors.toUnmodifiableList());
     }
