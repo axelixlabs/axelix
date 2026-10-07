@@ -125,6 +125,15 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
       // { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
     ],
   },
+  "sergey-cherkasov": {
+    title: "Software Engineer · Axelix Core Team",
+    bio: "Software engineer on the Axelix Core Team. Works with Java and Spring Boot across Axelix Master and the Spring Boot starters.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
+      { kind: "x", label: "X", url: "https://x.com/iamcherkasov" },
+      { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/sergei-cherkasov-968721210" },
+    ],
+  },
 };
 
 /** The editorial profile for an author slug, or `null` if there isn't one. */
