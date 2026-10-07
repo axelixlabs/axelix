@@ -7,15 +7,14 @@
 }
 
 .Title {
-    font-size: 12.5px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--prop-text);
 }
 
 .Row {
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 110px;
-    column-gap: 12px;
+    grid-template-columns: 45px minmax(0, 1fr) 110px;
+    column-gap: 16px;
     align-items: baseline;
     padding: 10px 12px;
     background-color: var(--prop-danger-surface);
@@ -24,31 +23,26 @@
 }
 
 .Count {
-    font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--prop-danger);
 }
 
 .Details {
     display: flex;
     flex-direction: column;
-    row-gap: 2px;
     min-width: 0;
 }
 
 .ErrorType {
-    font-size: 12.5px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--prop-text);
 }
 
 .ErrorMessage {
-    font-size: 12px;
     color: var(--prop-text-muted);
 }
 
 .Last {
-    font-size: 11.5px;
     text-align: right;
     color: var(--prop-text-faint);
 }

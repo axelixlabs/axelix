@@ -3,65 +3,14 @@
     flex-direction: column;
 }
 
-.Header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-}
-
-.Title {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--prop-text);
-}
-
-.Filter {
-    display: flex;
-    overflow: hidden;
-    font-size: 12px;
-    border: 1px solid var(--prop-border);
-    border-radius: var(--axelix-border-radius-small);
-}
-
-.FilterOption {
-    padding: 4px 10px;
-    font: inherit;
-    cursor: pointer;
-    background-color: var(--prop-surface);
-    border: none;
-}
-
-.FilterOption + .FilterOption {
-    border-left: 1px solid var(--prop-border);
-}
-
-.FilterActive {
-    background-color: var(--prop-border-faint);
-    font-weight: 700;
-}
-
-.FilterFailed {
-    color: var(--prop-danger);
-}
-
-.FilterFailedActive {
-    background-color: var(--prop-danger-surface);
-}
-
-.ColumnHeader,
-.Row {
+.ColumnHeader {
     display: grid;
-    grid-template-columns: 84px minmax(0, 160px) 70px minmax(0, 1fr);
+    grid-template-columns: 85px minmax(0, 160px) 70px minmax(0, 1fr);
     column-gap: 16px;
     padding: 8px 20px;
     border-top: 1px solid var(--prop-border-faint);
-}
-
-.ColumnHeader {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--prop-text-faint);
     background-color: var(--prop-surface-soft);
@@ -71,116 +20,16 @@
     text-align: right;
 }
 
-.Row {
-    align-items: baseline;
-    font-size: 12.5px;
-}
-
-.RowFailed {
-    background-color: var(--prop-danger-surface);
-}
-
-.StartedTime {
-    font-size: 12px;
-    color: var(--prop-text);
-}
-
-.Instance {
-    font-size: 10.5px;
-    color: var(--prop-text-faint);
-    overflow-wrap: anywhere;
-}
-
-.Duration {
-    font-size: 12px;
-    text-align: right;
-    color: var(--prop-text);
-}
-
-.Result {
-    display: flex;
-    flex-direction: column;
-    row-gap: 2px;
-    min-width: 0;
-    overflow-wrap: anywhere;
-}
-
-.ResultLine {
-    display: flex;
-    align-items: center;
-    column-gap: 7px;
-}
-
-.ResultSucceeded {
-    font-weight: 700;
-    color: var(--prop-accent-strong);
-}
-
-.ResultFailed {
-    font-weight: 700;
-    color: var(--prop-danger);
-}
-
-.ManualChip {
-    padding: 0 6px;
-    font-size: 10.5px;
-    font-weight: 700;
-    line-height: 16px;
-    color: var(--prop-text-muted);
-    background-color: var(--prop-border-faint);
-    border-radius: var(--axelix-border-radius-small);
-}
-
-.ResultMessage {
-    font-size: 12px;
-    color: var(--prop-text-muted);
-}
-
 .Footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    column-gap: 12px;
+    column-gap: 20px;
     padding: 10px 20px;
-    font-size: 12px;
     color: var(--prop-text-faint);
     border-top: 1px solid var(--prop-border-faint);
 }
 
 .Shown {
     font-variant-numeric: tabular-nums;
-}
-
-.Pager {
-    display: flex;
-    align-items: center;
-    column-gap: 4px;
-}
-
-.PagerButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
-    padding: 0 6px;
-    font: inherit;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: var(--prop-text-muted);
-    cursor: pointer;
-    background-color: var(--prop-surface);
-    border: 1px solid var(--prop-border-soft);
-    border-radius: var(--axelix-border-radius-small);
-}
-
-.PagerButton:disabled {
-    cursor: default;
-    opacity: 0.4;
-}
-
-.PageActive {
-    color: var(--prop-accent-strong);
-    background-color: var(--prop-accent-surface);
-    border-color: #86efac;
 }

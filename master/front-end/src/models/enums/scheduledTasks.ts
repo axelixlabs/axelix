@@ -15,26 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EScheduledTasksTriggerType, IScheduledTask } from "@/models";
-
-type ClassMap = { [key: string]: string };
-
-export const triggerTypeClass = (shared: ClassMap, type: EScheduledTasksTriggerType): string => {
-    if (type === "Cron") {
-        return shared.TypeCron;
-    }
-
-    return type === "Fixed delay" ? shared.TypeFixedDelay : shared.TypeFixedRate;
-};
-
-export const successRateClass = (shared: ClassMap, task: IScheduledTask): string => {
-    if (!task.enabled || !task.hasHistory) {
-        return shared.RateOff;
-    }
-
-    if (task.successRate === 100) {
-        return shared.RateGood;
-    }
-
-    return task.successRate >= 90 ? shared.RateWarn : shared.RateBad;
-};
+export enum EScheduledTasksTriggerType {
+    CRON = "Cron",
+    FIXED_DELAY = "Fixed delay",
+    FIXED_RATE = "Fixed rate",
+}

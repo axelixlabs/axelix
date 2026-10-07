@@ -16,88 +16,58 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Input } from "antd";
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-import shared from "../shared.module.css";
-import type { ETriggerType, IScheduledTask } from "../taskModel";
-import { successRateClass } from "../taskStyles";
+import type { IScheduledTasksTaskGroup } from "@/models";
+import { SCHEDULED_TASKS_GROUP_LABEL_KEY } from "@/utils";
 
+import { ScheduledTasksTaskListRow } from "./ScheduledTasksTaskListRow";
 import styles from "./styles.module.css";
 
 interface IProps {
-    groups: { type: ETriggerType; tasks: IScheduledTask[] }[];
+    groups: IScheduledTasksTaskGroup[];
     selectedKey: string;
     onSelect: (key: string) => void;
     search: string;
-    onSearch: (value: string) => void;
+    onSearch: Dispatch<SetStateAction<string>>;
 }
-
-const GROUP_LABEL_KEY: Record<ETriggerType, string> = {
-    Cron: "ScheduledTasks.cron",
-    "Fixed delay": "ScheduledTasks.fixedDelay",
-    "Fixed rate": "ScheduledTasks.fixedRate",
-};
 
 export const TaskList = ({ groups, selectedKey, onSelect, search, onSearch }: IProps) => {
     const { t } = useTranslation();
 
-    const dotClass = (task: IScheduledTask): string => {
-        if (!task.enabled) {
-            return styles.DotOff;
-        }
-
-        if (!task.hasHistory) {
-            return styles.DotEmpty;
-        }
-
-        return task.lastRun?.succeeded ? styles.DotOk : styles.DotBad;
-    };
-
-    const rateLabel = (task: IScheduledTask): string => {
-        if (!task.enabled) {
-            return t("off");
-        }
-
-        return task.hasHistory ? `${task.successRate}%` : "—";
-    };
-
     return (
-        <div className={styles.MainWrapper}>
-            <Input
-                allowClear
-                value={search}
-                placeholder={t("ScheduledTasks.searchTasks")}
-                onChange={(event) => onSearch(event.target.value)}
-            />
+        <>
+            <div className={styles.MainWrapper}>
+                <Input
+                    allowClear
+                    value={search}
+                    placeholder={t("ScheduledTasks.searchTasks")}
+                    onChange={(event) => onSearch(event.target.value)}
+                />
 
-            <div className={styles.Groups}>
-                {groups.map((group) => (
-                    <div className={styles.Group} key={group.type}>
-                        <span className={styles.GroupTitle}>
-                            {t(GROUP_LABEL_KEY[group.type])} · {group.tasks.length}
-                        </span>
+                <div className={styles.GroupsWrapper}>
+                    {groups.map(({ type, tasks }) => {
+                        return (
+                            <div className={styles.Group} key={type}>
+                                <div className={`TextUltraSmall ${styles.GroupTitle}`}>
+                                    {t(SCHEDULED_TASKS_GROUP_LABEL_KEY[type])} · {tasks.length}
+                                </div>
 
-                        {group.tasks.map((task) => (
-                            <button
-                                type="button"
-                                key={task.key}
-                                title={task.fqn}
-                                onClick={() => onSelect(task.key)}
-                                className={`${styles.Row} ${task.key === selectedKey ? styles.Selected : ""}`}
-                            >
-                                <span className={`${styles.Dot} ${dotClass(task)}`} />
-                                <span className={styles.Labels}>
-                                    <span className={`${shared.Mono} ${styles.Method}`}>{task.method}</span>
-                                    <span className={`${shared.Mono} ${styles.ClassName}`}>{task.simpleClassName}</span>
-                                </span>
-                                <span className={`${shared.Mono} ${styles.Rate} ${successRateClass(shared, task)}`}>
-                                    {rateLabel(task)}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                ))}
+                                {tasks.map((task) => {
+                                    return (
+                                        <ScheduledTasksTaskListRow
+                                            task={task}
+                                            selectedKey={selectedKey}
+                                            onSelect={onSelect}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </>
     );
 };

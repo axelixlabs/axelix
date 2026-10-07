@@ -17,7 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { type IScheduledTaskExecution, formatRelative } from "../../mock";
+import type { IScheduledTaskExecution } from "@/models";
+
+import { formatRelative } from "../../mock";
 import shared from "../../shared.module.css";
 
 import styles from "./styles.module.css";
@@ -66,21 +68,23 @@ export const FailuresByType = ({ runs }: IProps) => {
     }
 
     return (
-        <div className={styles.MainWrapper}>
-            <span className={styles.Title}>{t("ScheduledTasks.failuresByType")}</span>
+        <>
+            <div className={styles.MainWrapper}>
+                <span className={`TextUltraSmall ${styles.Title}`}>{t("ScheduledTasks.failuresByType")}</span>
 
-            {groups.map((group) => (
-                <div className={styles.Row} key={group.errorType}>
-                    <span className={`${shared.Mono} ${styles.Count}`}>×{group.count}</span>
-                    <span className={styles.Details}>
-                        <span className={`${shared.Mono} ${styles.ErrorType}`}>{group.errorType}</span>
-                        <span className={styles.ErrorMessage}>{group.errorMessage}</span>
-                    </span>
-                    <span className={styles.Last}>
-                        {t("ScheduledTasks.last")} {formatRelative(group.lastAgoSeconds)}
-                    </span>
-                </div>
-            ))}
-        </div>
+                {groups.map((group) => (
+                    <div className={`TextUltraSmall ${styles.Row}`} key={group.errorType}>
+                        <div className={`TextSmall ${shared.Mono} ${styles.Count}`}>x{group.count}</div>
+                        <div className={styles.Details}>
+                            <div className={`${shared.Mono} ${styles.ErrorType}`}>{group.errorType}</div>
+                            <div className={styles.ErrorMessage}>{group.errorMessage}</div>
+                        </div>
+                        <div className={styles.Last}>
+                            {t("ScheduledTasks.last")} {formatRelative(group.lastAgoSeconds)}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </>
     );
 };

@@ -15,26 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EScheduledTasksTriggerType, IScheduledTask } from "@/models";
+import { EScheduledTasksTriggerType } from "@/models";
 
-type ClassMap = { [key: string]: string };
+export const SCHEDULED_TASKS_RUN_DURATION_MS = 1600;
+export const CRON_INVALID = "Invalid cron expression";
 
-export const triggerTypeClass = (shared: ClassMap, type: EScheduledTasksTriggerType): string => {
-    if (type === "Cron") {
-        return shared.TypeCron;
-    }
-
-    return type === "Fixed delay" ? shared.TypeFixedDelay : shared.TypeFixedRate;
+export const SCHEDULED_TASKS_GROUP_LABEL_KEY: Record<EScheduledTasksTriggerType, string> = {
+    [EScheduledTasksTriggerType.CRON]: "ScheduledTasks.cron",
+    [EScheduledTasksTriggerType.FIXED_DELAY]: "ScheduledTasks.fixedDelay",
+    [EScheduledTasksTriggerType.FIXED_RATE]: "ScheduledTasks.fixedRate",
 };
 
-export const successRateClass = (shared: ClassMap, task: IScheduledTask): string => {
-    if (!task.enabled || !task.hasHistory) {
-        return shared.RateOff;
-    }
-
-    if (task.successRate === 100) {
-        return shared.RateGood;
-    }
-
-    return task.successRate >= 90 ? shared.RateWarn : shared.RateBad;
-};
+// TODO: Fix in the future
+export const PAGE_SIZE = 8;

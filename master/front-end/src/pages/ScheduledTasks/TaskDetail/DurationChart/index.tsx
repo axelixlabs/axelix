@@ -17,7 +17,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { type IScheduledTaskExecution, NOW_SECONDS, formatDuration, formatTimeOfDay } from "../../mock";
+import type { IScheduledTaskExecution } from "@/models";
+
+import { NOW_SECONDS, formatDuration, formatTimeOfDay } from "../../mock";
 import shared from "../../shared.module.css";
 
 import styles from "./styles.module.css";
@@ -30,31 +32,35 @@ interface IProps {
 export const DurationChart = ({ runs, maxDurationMs }: IProps) => {
     const { t } = useTranslation();
 
-    const barHeight = (durationMs: number): number => 4 + Math.round(90 * Math.sqrt(durationMs / maxDurationMs));
+    const barHeight = (durationMs: number): number => {
+        return 4 + Math.round(90 * Math.sqrt(durationMs / maxDurationMs));
+    };
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.Header}>
-                <span>{t("ScheduledTasks.durationTitle")}</span>
-                <span className={`${shared.Mono} ${styles.Max}`}>
-                    {t("ScheduledTasks.max")} {formatDuration(maxDurationMs)}
-                </span>
-            </div>
+        <>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <div className={styles.Header}>
+                    <span>{t("ScheduledTasks.durationTitle")}</span>
+                    <span className={`${shared.Mono} ${styles.Max}`}>
+                        {t("ScheduledTasks.max")} {formatDuration(maxDurationMs)}
+                    </span>
+                </div>
 
-            <div className={styles.Bars}>
-                {runs.map((run, index) => (
-                    <span
-                        key={index}
-                        className={`${styles.Bar} ${run.succeeded ? styles.BarOk : styles.BarBad}`}
-                        style={{ height: `${barHeight(run.durationMs)}px` }}
-                    />
-                ))}
-            </div>
+                <div className={styles.Bars}>
+                    {runs.map((run, index) => (
+                        <span
+                            key={index}
+                            className={`${styles.Bar} ${run.succeeded ? styles.BarOk : styles.BarBad}`}
+                            style={{ height: `${barHeight(run.durationMs)}px` }}
+                        />
+                    ))}
+                </div>
 
-            <div className={`${shared.Mono} ${styles.Axis}`}>
-                <span>{formatTimeOfDay(NOW_SECONDS - runs[0].agoSeconds)}</span>
-                <span>{formatTimeOfDay(NOW_SECONDS - runs[runs.length - 1].agoSeconds)}</span>
+                <div className={`${shared.Mono} ${styles.Axis}`}>
+                    <span>{formatTimeOfDay(NOW_SECONDS - runs[0].agoSeconds)}</span>
+                    <span>{formatTimeOfDay(NOW_SECONDS - runs[runs.length - 1].agoSeconds)}</span>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

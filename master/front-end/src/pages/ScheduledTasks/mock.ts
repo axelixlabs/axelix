@@ -15,95 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
-/*
- * Mock data for the redesigned Scheduled Tasks page. The backend that will feed execution history
- * (runs, durations, failures, success rate) does not exist yet, so every value here is generated
- * deterministically on the client. Replace this module with real service calls once the API lands.
- */
-
-export type ETriggerType = "Cron" | "Fixed delay" | "Fixed rate";
-
-export interface IScheduledTaskExecution {
-    /**
-     * Seconds before "now" the execution started. Times on the page are rendered as a time of day.
-     */
-    agoSeconds: number;
-    durationMs: number;
-    succeeded: boolean;
-    errorType: string | null;
-    errorMessage: string;
-    instance: string;
-    manual: boolean;
-}
-
-/**
- * The static definition of a scheduled task, before any user interaction is layered on top.
- */
-export interface IScheduledTaskSeed {
-    key: string;
-    method: string;
-    className: string;
-    type: ETriggerType;
-
-    /**
-     * Raw trigger expression (cron expression, or the "delay/rate · initial" summary).
-     */
-    raw: string;
-
-    /**
-     * Human-friendly schedule, e.g. "Every 2 s" or "Monthly, day 1 at 03:00".
-     */
-    human: string;
-
-    /**
-     * Seconds between runs - drives the generated timestamps of the history.
-     */
-    period: number;
-
-    /**
-     * Baseline duration in ms, plus the random spread added on top of it.
-     */
-    base: number;
-    spread: number;
-
-    /**
-     * Indexes (0..29) of the generated runs that failed.
-     */
-    fails: number[];
-
-    /**
-     * Default error type for failed runs, optionally overridden per run index via errorOverrides.
-     */
-    error?: string;
-    errorOverrides?: Record<number, string>;
-
-    /**
-     * Runs before this index ran on the previous instance (shows an instance roll-over).
-     */
-    previousInstanceBefore?: number;
-
-    /**
-     * When set, the task was switched off this many seconds ago and starts disabled.
-     */
-    stoppedSecondsAgo?: number;
-
-    /**
-     * When set, the task runs once a day at this time of day (seconds since midnight), so every
-     * generated run lands on that clock time one day apart. Overrides period-based spacing.
-     */
-    dailyAtSeconds?: number;
-
-    /**
-     * Seed for the deterministic pseudo-random generator.
-     */
-    seed: number;
-
-    /**
-     * When false, the task has no recorded executions - the detail pane shows the 11a empty state.
-     */
-    hasHistory: boolean;
-}
+import { EScheduledTasksTriggerType, type IScheduledTaskExecution, type IScheduledTaskSeed } from "@/models";
 
 /**
  * "Now" expressed as seconds since midnight (14:32:10). Timestamps are rendered as a time of day,
@@ -127,7 +39,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "processPendingPayments",
         method: "processPendingPayments",
         className: `${PACKAGE}payments.PaymentBatchJob`,
-        type: "Cron",
+        type: EScheduledTasksTriggerType.CRON,
         raw: "0 0 2 * * *",
         human: "Daily at 02:00",
         period: 86400,
@@ -143,7 +55,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "publishHeartbeat",
         method: "publishHeartbeatToServiceRegistry",
         className: `${PACKAGE}scheduled.registry.ServiceRegistryHeartbeatScheduler`,
-        type: "Cron",
+        type: EScheduledTasksTriggerType.CRON,
         raw: "*/2 * * * * *",
         human: "Every 2 s",
         period: 2,
@@ -157,7 +69,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "evictReservations",
         method: "evictExpiredAppointmentReservations",
         className: `${PACKAGE}scheduling.ClinicMaintenanceScheduler`,
-        type: "Cron",
+        type: EScheduledTasksTriggerType.CRON,
         raw: "*/5 * * * * *",
         human: "Every 5 s",
         period: 5,
@@ -171,7 +83,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "generateInvoiceReport",
         method: "generateMonthlyInvoiceReport",
         className: `${PACKAGE}billing.BillingReportScheduler`,
-        type: "Cron",
+        type: EScheduledTasksTriggerType.CRON,
         raw: "0 0 3 1 * *",
         human: "Monthly, day 1 at 03:00",
         period: 0,
@@ -185,7 +97,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "exportPetImages",
         method: "exportPetImagesToObjectStorage",
         className: `${PACKAGE}scheduling.ClinicMaintenanceScheduler`,
-        type: "Fixed delay",
+        type: EScheduledTasksTriggerType.FIXED_DELAY,
         raw: "delay 2000 · initial 0",
         human: "2 s after each run ends",
         period: 3.3,
@@ -200,7 +112,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "runConsistencyQueries",
         method: "runTestDataConsistencyQueries",
         className: `${PACKAGE}testdata.consistency.TestDataConsistencyQueryRunner`,
-        type: "Fixed rate",
+        type: EScheduledTasksTriggerType.FIXED_RATE,
         raw: "rate 60000 · initial 10000",
         human: "Every 60 s",
         period: 60,
@@ -217,7 +129,7 @@ export const SCHEDULED_TASK_SEEDS: IScheduledTaskSeed[] = [
         key: "refreshSpecialtiesCache",
         method: "refreshVeterinarianSpecialtiesCache",
         className: `${PACKAGE}scheduling.ClinicMaintenanceScheduler`,
-        type: "Fixed rate",
+        type: EScheduledTasksTriggerType.FIXED_RATE,
         raw: "rate 2000 · initial 100",
         human: "Every 2 s",
         period: 2,

@@ -15,29 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
+import type { IScheduledTask } from "@/models";
+
+import sharedStyles from "../../shared.module.css";
+import { triggerTypeClass } from "../../taskStyles";
 
 import styles from "./styles.module.css";
 
-export const EmptyExecutionHistory = () => {
-    const { t } = useTranslation();
+interface IProps {
+    task: IScheduledTask;
+}
+
+export const TaskDetailTitleBlock = ({ task }: IProps) => {
+    const { method, className, type, human, showRaw, raw } = task;
 
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={`TextMedium ${styles.Icon}`}>◷</div>
-                <div className={styles.Title}>{t("ScheduledTasks.noHistoryTitle")}</div>
-                <div className={`TextSmall ${styles.Description}`}>{t("ScheduledTasks.noHistoryDescription")}</div>
-                <a
-                    className={`TextSmall ${styles.DocsLink}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-
-                    // TODO: Improve in future
-                    href="https://axelix.io/docs"
-                >
-                    {t("ScheduledTasks.readDocs")}
-                </a>
+                <div className={`${sharedStyles.Mono} ${styles.Method}`}>{method}</div>
+                <div className={`TextUltraSmall ${sharedStyles.Mono} ${styles.ClassName}`}>{className}</div>
+                <div className={`TextUltraSmall ${styles.TriggerLine}`}>
+                    <div className={`${sharedStyles.TypeBadge} ${triggerTypeClass(sharedStyles, type)}`}>{type}</div>
+                    {human}
+                    {showRaw && <span className={`TextUltraSmall ${sharedStyles.Mono} ${styles.Raw}`}>{raw}</span>}
+                </div>
             </div>
         </>
     );

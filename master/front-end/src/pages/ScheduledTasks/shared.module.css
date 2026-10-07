@@ -1,9 +1,4 @@
-/*
- * Shared primitives for the Scheduled Tasks page: the monospace treatment for code-like tokens,
- * the trigger-type badges and the success-rate colours. The hex values match the Scheduled Tasks
- * design and the --prop-* palette already declared globally for the Properties page.
- */
-
+/* TODO: Fix in future */
 .Mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, "Roboto Mono", Consolas, monospace;
 }

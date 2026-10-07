@@ -1,13 +1,12 @@
-.Layout {
+.MainWrapper {
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
-    column-gap: 20px;
+    gap: 20px;
     align-items: start;
-}
 
-@media (width <= 900px) {
-    .Layout {
+
+    @media (width <=900px) {
         grid-template-columns: 1fr;
-        row-gap: 20px;
+        gap: 20px;
     }
 }

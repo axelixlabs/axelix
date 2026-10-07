@@ -19,46 +19,50 @@ import { App } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { groupTasksByType } from "@/helpers";
+import type { IScheduledTaskExecution, ITriggerOverride } from "@/models";
+import { SCHEDULED_TASKS_RUN_DURATION_MS } from "@/utils";
+
 import { TaskDetail } from "./TaskDetail";
 import { TaskList } from "./TaskList";
-import { type IScheduledTaskExecution, createManualRun, formatDuration } from "./mock";
+import { createManualRun, formatDuration } from "./mock";
 import styles from "./styles.module.css";
-import { type ITriggerOverride, SEED_ORDER, buildTask, groupTasksByType } from "./taskModel";
-
-/*
- * The redesigned Scheduled Tasks page (design 9b "task list + task detail", with the 11a empty
- * state for tasks without execution history). Everything here is driven by mock data - the backend
- * API that will supply real execution history does not exist yet, so all interactions (toggle,
- * edit trigger, run now, filter, pagination) operate on local state only.
- */
-
-const RUN_DURATION_MS = 1600;
+import { SEED_ORDER, buildTask } from "./taskModel";
 
 const ScheduledTasks = () => {
     const { t } = useTranslation();
     const { message } = App.useApp();
 
-    const [selectedKey, setSelectedKey] = useState("processPendingPayments");
-    const [search, setSearch] = useState("");
-    const [disabled, setDisabled] = useState<Record<string, boolean>>({ refreshSpecialtiesCache: true });
+    const [selectedKey, setSelectedKey] = useState<string>("processPendingPayments");
+    const [search, setSearch] = useState<string>("");
+    const [disabled, setDisabled] = useState<Record<string, boolean>>({
+        refreshSpecialtiesCache: true,
+    });
     const [triggers, setTriggers] = useState<Record<string, ITriggerOverride>>({});
     const [manualRuns, setManualRuns] = useState<Record<string, IScheduledTaskExecution[]>>({});
     const [running, setRunning] = useState<Record<string, boolean>>({});
-    const [onlyFailed, setOnlyFailed] = useState(false);
-    const [page, setPage] = useState(0);
+    const [onlyFailed, setOnlyFailed] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
 
-    const tasks = SEED_ORDER.map((seed) =>
-        buildTask(seed, {
+    const tasks = SEED_ORDER.map((seed) => {
+        const taskState = {
             enabled: !disabled[seed.key],
             triggerOverride: triggers[seed.key],
             manualRuns: manualRuns[seed.key] ?? [],
             running: Boolean(running[seed.key]),
-        }),
-    );
+        };
 
-    const selectedTask = tasks.find((task) => task.key === selectedKey) ?? tasks[0];
+        return buildTask(seed, taskState);
+    });
+
+    const foundTask = tasks.find(({ key }) => {
+        return key === selectedKey;
+    });
+
+    const selectedTask = foundTask ?? tasks[0];
 
     const query = search.trim().toLowerCase();
+
     const visibleTasks = query
         ? tasks.filter(
               (task) => task.method.toLowerCase().includes(query) || task.className.toLowerCase().includes(query),
@@ -100,31 +104,33 @@ const ScheduledTasks = () => {
             setOnlyFailed(false);
             setPage(0);
             message.success(t("ScheduledTasks.runFinishedToast", { duration: formatDuration(run.durationMs) }));
-        }, RUN_DURATION_MS);
+        }, SCHEDULED_TASKS_RUN_DURATION_MS);
     };
 
     return (
-        <div className={styles.Layout}>
-            <TaskList
-                groups={groupTasksByType(visibleTasks)}
-                selectedKey={selectedTask.key}
-                onSelect={selectTask}
-                search={search}
-                onSearch={setSearch}
-            />
+        <>
+            <div className={styles.MainWrapper}>
+                <TaskList
+                    groups={groupTasksByType(visibleTasks)}
+                    selectedKey={selectedTask.key}
+                    onSelect={selectTask}
+                    search={search}
+                    onSearch={setSearch}
+                />
 
-            <TaskDetail
-                key={selectedTask.key}
-                task={selectedTask}
-                onToggleEnabled={toggleEnabled}
-                onRunNow={runNow}
-                onEditTrigger={editTrigger}
-                onlyFailed={onlyFailed}
-                onOnlyFailedChange={setOnlyFailed}
-                page={page}
-                onPageChange={setPage}
-            />
-        </div>
+                <TaskDetail
+                    key={selectedTask.key}
+                    task={selectedTask}
+                    onToggleEnabled={toggleEnabled}
+                    onRunNow={runNow}
+                    onEditTrigger={editTrigger}
+                    onlyFailed={onlyFailed}
+                    setOnlyFailed={setOnlyFailed}
+                    page={page}
+                    setPage={setPage}
+                />
+            </div>
+        </>
     );
 };
 
