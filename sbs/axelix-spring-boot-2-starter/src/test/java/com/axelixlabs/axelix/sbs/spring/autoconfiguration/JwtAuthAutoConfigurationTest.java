@@ -24,12 +24,14 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.WebIdentityAccessManager;
+import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,28 +66,17 @@ class JwtAuthAutoConfigurationTest {
     }
 
     @Test
-    void shouldFail_whenAlgorithmPropertyIsMissing() {
+    void shouldUseDefaults_whenAlgorithmAndSigningKeyAreMissing() {
         new ApplicationContextRunner()
-                // "axelix.sbs.auth.jwt.algorithm" is missing
-                .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.signing-key=secret")
                 .withConfiguration(AutoConfigurations.of(
                         JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
                 .run(context -> {
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
-                });
-    }
+                    assertThat(context).hasNotFailed();
 
-    @Test
-    void shouldFail_whenSigningKeyPropertyIsMissing() {
-        new ApplicationContextRunner()
-                // "axelix.sbs.auth.jwt.signing-key" is missing
-                .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.algorithm=HMAC512")
-                .withConfiguration(AutoConfigurations.of(
-                        JwtAuthAutoConfiguration.class, SecurityContextExecutorAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+                    AuthProperties.Jwt jwt =
+                            context.getBean(AuthProperties.class).getJwt();
+                    assertThat(jwt.getAlgorithm()).isEqualTo(JwtDefaults.DEFAULT_ALGORITHM);
+                    assertThat(jwt.getSigningKey()).isEqualTo(JwtDefaults.DEFAULT_SIGNING_KEY);
                 });
     }
 

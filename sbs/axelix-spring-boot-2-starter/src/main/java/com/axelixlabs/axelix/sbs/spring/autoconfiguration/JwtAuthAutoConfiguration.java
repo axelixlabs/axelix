@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,6 +30,7 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthoritiesManager;
@@ -55,6 +59,8 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthAutoConfiguration.class);
+
     @Bean
     @ConfigurationProperties(prefix = AuthProperties.CONFIG_PROPS_PREFIX)
     public AuthProperties authProperties() {
@@ -71,6 +77,9 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
+        if (JwtDefaults.isDefaultSigningKey(authProperties.getJwt().getSigningKey())) {
+            log.warn(JwtDefaults.STARTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
+        }
         return new DefaultJwtEncoderService(
                 authProperties.getJwt().getAlgorithm(),
                 authProperties.getJwt().getSigningKey(),
