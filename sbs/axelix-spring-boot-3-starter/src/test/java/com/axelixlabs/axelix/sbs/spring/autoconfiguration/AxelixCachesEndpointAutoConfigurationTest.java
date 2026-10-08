@@ -21,11 +21,14 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.sbs.spring.core.cache.AxelixCachesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheManagerBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
+import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,6 +65,36 @@ class AxelixCachesEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(AxelixCachesEndpoint.class);
                     assertThat(context).doesNotHaveBean(CacheManagerBeanPostProcessor.class);
                 });
+    }
+
+    @Test
+    void shouldBackOffCompletely_whenCacheManagementDisabled() {
+        contextRunner
+                .withPropertyValues("axelix.sbs.cache.management.enabled=false")
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(AxelixCachesEndpointAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(CacheSizeProvider.class);
+                    assertThat(context).doesNotHaveBean(CacheOperationsDispatcher.class);
+                    assertThat(context).doesNotHaveBean(AxelixCachesEndpoint.class);
+                    assertThat(context).doesNotHaveBean(CacheManagerBeanPostProcessor.class);
+                });
+    }
+
+    @Test
+    void shouldEnhanceCacheManager_whenCacheManagementEnabled() {
+        contextRunner
+                .withBean(CacheManager.class, ConcurrentMapCacheManager::new)
+                .run(context ->
+                        assertThat(context.getBean(CacheManager.class)).isInstanceOf(EnhancedCacheManager.class));
+    }
+
+    @Test
+    void shouldLeaveCacheManagerUntouched_whenCacheManagementDisabled() {
+        contextRunner
+                .withPropertyValues("axelix.sbs.cache.management.enabled=false")
+                .withBean(CacheManager.class, ConcurrentMapCacheManager::new)
+                .run(context ->
+                        assertThat(context.getBean(CacheManager.class)).isNotInstanceOf(EnhancedCacheManager.class));
     }
 
     @Test

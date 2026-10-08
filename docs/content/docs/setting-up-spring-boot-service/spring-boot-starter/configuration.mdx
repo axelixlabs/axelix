@@ -623,6 +623,53 @@ heartbeats are rejected with `401`.
 
 </div>
 
+### Cache management
+
+<UpcomingReleaseNotice />
+
+Cache management is what powers the Caches page and the `axelix_cache_*` meters: the starter wraps every `CacheManager`
+bean of your application in a proxy that records cache lookups and lets you enable, disable, and clear caches at
+runtime, and it exposes that data through the `axelix-caches` actuator endpoint. It is **on by default** once the
+starter is on the classpath.
+
+Set `axelix.sbs.cache.management.enabled` to `false` to turn it off entirely — no `CacheManager` proxying, no
+`axelix-caches` endpoint, and no cache meters. Your `CacheManager` beans are then left exactly as your application
+defined them.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    cache:
+      management:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.cache.management.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Property                              | Default | Description                                                                                                                                                                  |
+|---------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.cache.management.enabled` | `true`  | Master switch for cache management. Set to `false` to make the whole cache management auto-configuration back off. Behaves identically on the Spring Boot 2, 3, and 4 starters. |
+
+</div>
+
+:::note
+With cache management disabled, the Caches page in Master has no data to show for this instance, and the cache MCP
+tools fail for it.
+:::
+
 ### Transaction monitoring
 
 Transaction monitoring is what powers the Transaction Control page and the related meters: it wraps your
