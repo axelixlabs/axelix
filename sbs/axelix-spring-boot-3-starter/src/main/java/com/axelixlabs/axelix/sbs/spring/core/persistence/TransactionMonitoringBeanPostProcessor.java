@@ -43,7 +43,7 @@ import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -72,7 +72,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
-public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
+public class TransactionMonitoringBeanPostProcessor implements SmartInstantiationAwareBeanPostProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionMonitoringBeanPostProcessor.class);
 
@@ -93,6 +93,17 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         this.metricsPublisherObjectProvider = metricsPublisherObjectProvider;
         this.transactionAttributesRegistry = transactionAttributesRegistry;
         this.applicationContext = applicationContext;
+    }
+
+    /**
+     * Called when a bean of a circular reference has to be handed over to other beans before it is initialized.
+     * Spring builds the transactional proxy of such a bean at this point and caches it. Later it passes the raw
+     * bean, not the proxy, to {@link #postProcessAfterInitialization}, and only after that puts the cached proxy
+     * in its place.
+     */
+    @Override
+    public Object getEarlyBeanReference(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+        return postProcessAfterInitialization(bean, beanName);
     }
 
     @Override
@@ -268,7 +279,7 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
     private @Nullable Class<?> findDeclaredType(String beanName) {
         try {
-            return applicationContext.getType(beanName);
+            return applicationContext.getType(beanName, false);
         } catch (NoSuchBeanDefinitionException e) {
             return null;
         }

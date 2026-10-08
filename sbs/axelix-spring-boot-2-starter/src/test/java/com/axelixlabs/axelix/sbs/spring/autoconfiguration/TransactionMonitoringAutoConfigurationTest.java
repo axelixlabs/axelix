@@ -28,7 +28,6 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration.Log4j2InMemoryPaginationAppenderConfiguration;
@@ -94,7 +93,7 @@ class TransactionMonitoringAutoConfigurationTest {
     @Test // GH-1708
     void shouldNotRegisterTransactionMonitoringBeanPostProcessor_whenSpringTxIsAbsent() {
         contextRunner
-                .withClassLoader(new FilteredClassLoader(Transactional.class))
+                .withClassLoader(new FilteredClassLoader("org.springframework.transaction"))
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
