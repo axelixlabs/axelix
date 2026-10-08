@@ -23,6 +23,8 @@ import java.util.Set;
 import jakarta.annotation.PostConstruct;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
@@ -47,6 +49,11 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
      */
     public static final String SUPER_ADMIN_USER_ID = "AXELIX.SUPER_ADMIN";
 
+    private static final Logger log = LoggerFactory.getLogger(SuperAdminUserAuthenticator.class);
+
+    private static final String DEFAULT_USERNAME = "admin";
+    private static final String DEFAULT_PASSWORD = "admin";
+
     private final SuperAdminConfigurationProperties superAdminConfiguration;
     private final SuperAdminPasswordEncoder passwordEncoder;
     private final AuthoritiesManager authoritiesManager;
@@ -70,6 +77,11 @@ public class SuperAdminUserAuthenticator implements UserAuthenticator {
 
         if (Objects.equals(superAdminConfiguration.getUsername(), username)
                 && passwordEncoder.matches(password, superAdminConfiguration.getPassword())) {
+
+            if (DEFAULT_USERNAME.equals(username) && DEFAULT_PASSWORD.equals(password)) {
+                log.warn("Super Admin has logged in with the default credentials. Change "
+                        + "axelix.master.auth.options.super-admin.credentials before using Axelix in production");
+            }
 
             return new DefaultUser(
                     SUPER_ADMIN_USER_ID,

@@ -22,7 +22,9 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Unit tests for {@link JwtProperties}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class JwtPropertiesTest {
 
@@ -48,5 +51,42 @@ class JwtPropertiesTest {
         // when. // then.
         assertThatThrownBy(() -> new JwtProperties(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1)))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldUseDefaults_whenAlgorithmAndSigningKeyAreMissing() {
+        // when.
+        JwtProperties properties = new JwtProperties(null, null, Duration.ofHours(1));
+
+        // then.
+        assertThat(properties.algorithm()).isEqualTo(JwtDefaults.DEFAULT_ALGORITHM);
+        assertThat(properties.signingKey()).isEqualTo(JwtDefaults.DEFAULT_SIGNING_KEY);
+    }
+
+    @Test
+    void shouldUseDefaultLifespan_whenLifespanIsMissing() {
+        // when.
+        JwtProperties properties = new JwtProperties(JwtAlgorithm.HMAC512, null, null);
+
+        // then.
+        assertThat(properties.lifespan()).isEqualTo(JwtDefaults.MASTER_DEFAULT_LIFESPAN);
+    }
+
+    @Test
+    void shouldKeepConfiguredLifespan() {
+        // when.
+        JwtProperties properties = new JwtProperties(JwtAlgorithm.HMAC512, null, Duration.ofMinutes(30));
+
+        // then.
+        assertThat(properties.lifespan()).isEqualTo(Duration.ofMinutes(30));
+    }
+
+    @Test
+    void shouldAcceptDefaultSigningKeyForEveryAlgorithm() {
+        // when. // then.
+        for (JwtAlgorithm algorithm : JwtAlgorithm.values()) {
+            assertThatCode(() -> new JwtProperties(algorithm, null, Duration.ofHours(1)))
+                    .doesNotThrowAnyException();
+        }
     }
 }

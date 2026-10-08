@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerStreamableHttpProperties;
@@ -35,6 +37,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthoritiesManager;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
@@ -158,8 +161,13 @@ public class SecurityAutoConfiguration {
     @EnableConfigurationProperties(JwtProperties.class)
     public static class JwtAutoConfiguration {
 
+        private static final Logger log = LoggerFactory.getLogger(JwtAutoConfiguration.class);
+
         @Bean
         public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
+            if (JwtDefaults.isDefaultSigningKey(jwtProperties.signingKey())) {
+                log.warn(JwtDefaults.MASTER_DEFAULT_SIGNING_KEY_IN_USE_WARNING_MESSAGE);
+            }
             return new DefaultJwtEncoderService(
                     jwtProperties.algorithm(), jwtProperties.signingKey(), jwtProperties.lifespan());
         }
