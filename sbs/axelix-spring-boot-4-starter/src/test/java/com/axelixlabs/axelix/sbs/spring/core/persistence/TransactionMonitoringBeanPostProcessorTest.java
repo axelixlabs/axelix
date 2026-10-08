@@ -392,7 +392,7 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
     void testUnexpectedFailureLeavesBeanUntouchedInsteadOfBreakingStartup() {
         TransactionMonitoringBeanPostProcessor processor = newStandaloneProcessor(new StaticApplicationContext() {
             @Override
-            public Class<?> getType(String name) {
+            public Class<?> getType(String name, boolean allowFactoryBeanInit) {
                 throw new IllegalStateException("boom");
             }
         });
@@ -414,6 +414,34 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
     @Test
     void testBeanWithoutMethodsStartingTransactionIsLeftUntouched() {
         assertThat(adviceTypes((Advised) supportsOnlyService)).containsExactly(TransactionInterceptor.class);
+    }
+
+    /**
+     * To resolve a circular reference Spring builds the proxy of one of the beans ahead of its initialization.
+     */
+    @Test
+    void testBeansOfCircularReferenceAreMonitored() {
+        new ApplicationContextRunner()
+                .withAllowCircularReferences(true)
+                .withUserConfiguration(MonitoringConfiguration.class, CglibProxyConfiguration.class)
+                .withBean(CircularFirst.class)
+                .withBean(CircularSecond.class)
+                .run(context -> {
+                    CircularFirst first = context.getBean(CircularFirst.class);
+                    CircularSecond second = context.getBean(CircularSecond.class);
+
+                    assertMonitoringAdvisorIsRightBeforeTransactionAdvisor((Advised) first);
+                    assertMonitoringAdvisorIsRightBeforeTransactionAdvisor((Advised) second);
+
+                    first.work();
+                    second.work();
+
+                    assertThat(context.getBean(TransactionStatsCollector.class)
+                                    .getCopyOfStats()
+                                    .keySet())
+                            .extracting(MethodClassKey::getIdentityClass)
+                            .containsExactlyInAnyOrder(CircularFirst.class, CircularSecond.class);
+                });
     }
 
     /**
@@ -744,6 +772,22 @@ class TransactionMonitoringBeanPostProcessorTest extends AbstractTransactionMoni
             return Proxy.newProxyInstance(
                     bean.getClass().getClassLoader(), bean.getClass().getInterfaces(), handler);
         }
+    }
+
+    static class CircularFirst {
+        @Autowired
+        CircularSecond second;
+
+        @Transactional
+        public void work() {}
+    }
+
+    static class CircularSecond {
+        @Autowired
+        CircularFirst first;
+
+        @Transactional
+        public void work() {}
     }
 
     static class NoOpTransactionManager implements PlatformTransactionManager {

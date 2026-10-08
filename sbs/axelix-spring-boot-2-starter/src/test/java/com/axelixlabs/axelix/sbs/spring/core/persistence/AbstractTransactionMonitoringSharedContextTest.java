@@ -17,8 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.persistence;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -32,27 +37,41 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.jpa.boot.spi.IntegratorProvider;
 
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +114,14 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
     @TestConfiguration
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
     @EntityScan(basePackageClasses = {Owner.class, Pet.class})
+    // Caching goes first, as it usually does: a cache hit then never reaches the transaction interceptor.
+    @EnableCaching(order = Ordered.HIGHEST_PRECEDENCE)
     static class SharedTransactionTestConfiguration {
+
+        @Bean
+        public CacheManager cacheManager() {
+            return new ConcurrentMapCacheManager("owners", "cachedService");
+        }
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
@@ -112,19 +138,216 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
                 TransactionStatsCollector transactionStatsCollector,
                 TransactionAccessor transactionAccessor,
                 TransactionAttributesRegistry transactionAttributesRegistry,
-                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider) {
+                ObjectProvider<AxelixMetricsPublisher> axelixMetricsPublisherObjectProvider,
+                ApplicationContext applicationContext) {
 
             return new TransactionMonitoringBeanPostProcessor(
                     transactionStatsCollector,
                     axelixMetricsPublisherObjectProvider,
                     transactionAccessor,
-                    transactionAttributesRegistry);
+                    transactionAttributesRegistry,
+                    applicationContext);
         }
 
         @Bean
         public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
                 TransactionAccessor transactionAccessor) {
             return new ProxyingDataSourceBeanPostProcessor(transactionAccessor);
+        }
+
+        @Bean
+        public OverloadedService overloadedService() {
+            return new OverloadedService();
+        }
+
+        @Bean
+        public DiamondService diamondService() {
+            return new DiamondService();
+        }
+
+        @Bean
+        public TransactionalOnInterface transactionalOnInterface() {
+            return new TransactionalOnInterfaceImpl();
+        }
+
+        @Bean
+        public TransactionalDefaultMethodOnlyImpl transactionalDefaultMethodOnlyImpl() {
+            return new TransactionalDefaultMethodOnlyImpl();
+        }
+
+        @Bean
+        public ConcreteFromAbstract concreteFromAbstract() {
+            return new ConcreteFromAbstract();
+        }
+
+        @Bean
+        public FirstImplementation firstImplementation() {
+            return new FirstImplementation();
+        }
+
+        @Bean
+        public SecondImplementation secondImplementation() {
+            return new SecondImplementation();
+        }
+
+        @Bean
+        public JdkProxiedService jdkProxiedService() {
+            ProxyFactory factory = new ProxyFactory(new JdkProxiedServiceImpl());
+            factory.setProxyTargetClass(false);
+            factory.setInterfaces(JdkProxiedService.class);
+            return (JdkProxiedService) factory.getProxy();
+        }
+
+        @Bean
+        public ThrowingService throwingService() {
+            return new ThrowingService();
+        }
+
+        @Bean
+        public VisibilityService visibilityService() {
+            return new VisibilityService();
+        }
+
+        @Bean
+        public FinalMethodService finalMethodService() {
+            return new FinalMethodService();
+        }
+
+        @Bean
+        @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE, proxyMode = ScopedProxyMode.TARGET_CLASS)
+        public ScopedService scopedService() {
+            return new ScopedService();
+        }
+
+        @Bean
+        public ImplementationOnlyAnnotated implementationOnlyAnnotatedProxy() {
+            ProxyFactory factory = new ProxyFactory(new ImplementationOnlyAnnotatedImpl());
+            factory.setProxyTargetClass(false);
+            factory.setInterfaces(ImplementationOnlyAnnotated.class);
+            return (ImplementationOnlyAnnotated) factory.getProxy();
+        }
+
+        @Bean
+        public BothAnnotatedImpl bothAnnotatedImpl() {
+            return new BothAnnotatedImpl();
+        }
+
+        @Bean
+        public ClassLevelConcrete classLevelConcrete() {
+            return new ClassLevelConcrete();
+        }
+
+        @Bean
+        public MarkedService multiInterfaceProxy() {
+            ProxyFactory factory = new ProxyFactory(new MultiInterfaceImpl());
+            factory.setProxyTargetClass(false);
+            factory.setInterfaces(UnmarkedInterface.class, MarkedService.class);
+            return (MarkedService) factory.getProxy();
+        }
+
+        @Bean
+        public IntegerIdLookupImpl integerIdLookupImpl() {
+            return new IntegerIdLookupImpl();
+        }
+
+        @Bean
+        public ChildOverridesWithoutAnnotation childOverridesWithoutAnnotation() {
+            return new ChildOverridesWithoutAnnotation();
+        }
+
+        @Bean
+        public ClassLevelService classLevelService() {
+            return new ClassLevelService();
+        }
+
+        @Bean
+        public ClassLevelChildOfPlainParent classLevelChildOfPlainParent() {
+            return new ClassLevelChildOfPlainParent();
+        }
+
+        @Bean
+        public ClassLevelInterfaceImpl classLevelInterfaceImpl() {
+            return new ClassLevelInterfaceImpl();
+        }
+
+        @Bean
+        public ImplementsTransactionalAbstractMethod implementsTransactionalAbstractMethod() {
+            return new ImplementsTransactionalAbstractMethod();
+        }
+
+        @Bean
+        public ChildOverridesClassLevelParentMethod childOverridesClassLevelParentMethod() {
+            return new ChildOverridesClassLevelParentMethod();
+        }
+
+        @Bean
+        public ClassLevelWithMethodOverride classLevelWithMethodOverride() {
+            return new ClassLevelWithMethodOverride();
+        }
+
+        @Bean
+        public MetaAnnotatedService metaAnnotatedService() {
+            return new MetaAnnotatedService();
+        }
+
+        @Bean
+        public JavaxAnnotatedService javaxAnnotatedService() {
+            return new JavaxAnnotatedService();
+        }
+
+        @Bean
+        public SelfInvokingService selfInvokingService() {
+            return new SelfInvokingService();
+        }
+
+        @Bean
+        public ChildInterfaceImpl childInterfaceImpl() {
+            return new ChildInterfaceImpl();
+        }
+
+        @Bean
+        public OverridesTransactionalDefaultMethod overridesTransactionalDefaultMethod() {
+            return new OverridesTransactionalDefaultMethod();
+        }
+
+        @Bean
+        public ImplementationOnlyAnnotatedImpl implementationOnlyAnnotatedImpl() {
+            return new ImplementationOnlyAnnotatedImpl();
+        }
+
+        @Bean
+        public ThreeLevelImplementation threeLevelImplementation() {
+            return new ThreeLevelImplementation();
+        }
+
+        @Bean
+        public SupportsOnlyService supportsOnlyService() {
+            return new SupportsOnlyService();
+        }
+
+        @Bean
+        public CachedService cachedService() {
+            return new CachedService();
+        }
+
+        @Bean
+        public FactoryBean<FactoryMadeService> factoryMadeService() {
+            return new FactoryMadeServiceFactoryBean();
+        }
+
+        @Bean
+        public JpaRepositoryFactoryBean<ManuallyRegisteredRepository, Category, Long> manuallyRegisteredRepository() {
+            JpaRepositoryFactoryBean<ManuallyRegisteredRepository, Category, Long> factoryBean =
+                    new JpaRepositoryFactoryBean<>(ManuallyRegisteredRepository.class);
+
+            // Puts an advice into the repository proxy itself, ahead of its transaction interceptor: it answers
+            // existsById() on its own, so that call never reaches the transaction interceptor.
+            MethodInterceptor answeringExistsById = invocation ->
+                    invocation.getMethod().getName().equals("existsById") ? Boolean.FALSE : invocation.proceed();
+            factoryBean.addRepositoryFactoryCustomizer(factory -> factory.addRepositoryProxyPostProcessor(
+                    (proxyFactory, repositoryInformation) -> proxyFactory.addAdvice(0, answeringExistsById)));
+
+            return factoryBean;
         }
 
         @Bean
@@ -299,6 +522,8 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
 
     interface OwnerRepository extends JpaRepository<Owner, Long> {
 
+        // @Cacheable makes Spring wrap the repository proxy into one more, caching, proxy.
+        @Cacheable("owners")
         @Transactional
         Owner findByLastName(String lastName);
 
@@ -381,9 +606,359 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
         }
     }
 
+    static class OverloadedService {
+        public void process(String id) {}
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void process(String id, boolean force) {}
+    }
+
+    interface NonTransactionalDefaultMethod {
+        default void process(String id) {}
+    }
+
+    interface TransactionalDefaultMethod {
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        default void process(String id, boolean force) {}
+    }
+
+    static class DiamondService implements NonTransactionalDefaultMethod, TransactionalDefaultMethod {}
+
+    interface TransactionalOnInterface {
+        @Transactional
+        void doWork();
+    }
+
+    static class TransactionalOnInterfaceImpl implements TransactionalOnInterface {
+        @Override
+        public void doWork() {}
+    }
+
+    interface TransactionalDefaultMethodOnly {
+        @Transactional
+        default void doWork() {}
+    }
+
+    static class TransactionalDefaultMethodOnlyImpl implements TransactionalDefaultMethodOnly {}
+
+    abstract static class AbstractTransactionalBase {
+        @Transactional
+        public void doWork() {}
+    }
+
+    static class ConcreteFromAbstract extends AbstractTransactionalBase {}
+
+    interface TwoImplementations {
+        @Transactional
+        void doWork();
+    }
+
+    static class FirstImplementation implements TwoImplementations {
+        @Override
+        public void doWork() {}
+    }
+
+    static class SecondImplementation implements TwoImplementations {
+        @Override
+        public void doWork() {}
+    }
+
+    static class ThrowingService {
+        @Transactional
+        public void fail() {
+            throw new IllegalStateException("boom");
+        }
+    }
+
+    static class VisibilityService {
+        @Transactional
+        protected void protectedWork() {}
+
+        @Transactional
+        void packageWork() {}
+    }
+
+    static class FinalMethodService {
+        @Transactional
+        public final void work() {}
+    }
+
+    static class ScopedService {
+        @Transactional
+        public void work() {}
+    }
+
+    interface JdkProxiedService {
+        @Transactional
+        void doWork();
+    }
+
+    static class JdkProxiedServiceImpl implements JdkProxiedService {
+        @Override
+        public void doWork() {}
+    }
+
+    interface ImplementationOnlyAnnotated {
+        void run();
+    }
+
+    static class ImplementationOnlyAnnotatedImpl implements ImplementationOnlyAnnotated {
+        @Override
+        @Transactional
+        public void run() {}
+    }
+
+    interface BothAnnotated {
+        @Transactional
+        void doWork();
+    }
+
+    static class BothAnnotatedImpl implements BothAnnotated {
+        @Override
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void doWork() {}
+    }
+
+    @Transactional(readOnly = true)
+    abstract static class ClassLevelAbstractBase {
+        public void inherited() {}
+    }
+
+    static class ClassLevelConcrete extends ClassLevelAbstractBase {}
+
+    interface UnmarkedInterface {
+        void mark();
+    }
+
+    interface MarkedService {
+        @Transactional
+        void doWork();
+    }
+
+    static class MultiInterfaceImpl implements UnmarkedInterface, MarkedService {
+        @Override
+        public void mark() {}
+
+        @Override
+        public void doWork() {}
+    }
+
+    interface IdLookup<T, ID> {
+        T findById(ID id);
+    }
+
+    interface IntegerIdLookup extends IdLookup<Owner, Integer> {
+        @Override
+        @Transactional
+        Owner findById(Integer id);
+    }
+
+    static class IntegerIdLookupImpl implements IntegerIdLookup {
+        @Override
+        public Owner findById(Integer id) {
+            return null;
+        }
+    }
+
+    static class ParentWithTransactionalMethod {
+        @Transactional
+        public void doWork() {}
+    }
+
+    static class ChildOverridesWithoutAnnotation extends ParentWithTransactionalMethod {
+        @Override
+        public void doWork() {}
+    }
+
+    @Transactional(readOnly = true)
+    static class ClassLevelService {
+        public void first() {}
+
+        public void second() {}
+    }
+
+    static class ParentWithoutAnnotation {
+        public void inherited() {}
+    }
+
+    @Transactional
+    static class ClassLevelChildOfPlainParent extends ParentWithoutAnnotation {}
+
+    abstract static class AbstractWithTransactionalAbstractMethod {
+        @Transactional
+        public abstract void doWork();
+    }
+
+    static class ImplementsTransactionalAbstractMethod extends AbstractWithTransactionalAbstractMethod {
+        @Override
+        public void doWork() {}
+    }
+
+    @Transactional
+    static class ClassLevelParent {
+        public void doWork() {}
+    }
+
+    static class ChildOverridesClassLevelParentMethod extends ClassLevelParent {
+        @Override
+        public void doWork() {}
+    }
+
+    @Transactional
+    static class ClassLevelWithMethodOverride {
+        public void classLevel() {}
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void methodLevel() {}
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Transactional(readOnly = true)
+    @interface ReadOnlyTransactional {}
+
+    static class MetaAnnotatedService {
+        @ReadOnlyTransactional
+        public void doWork() {}
+    }
+
+    static class JavaxAnnotatedService {
+        @javax.transaction.Transactional
+        public void doWork() {}
+    }
+
+    static class SelfInvokingService {
+        public void outer() {
+            inner();
+        }
+
+        @Transactional
+        public void inner() {}
+    }
+
+    interface ParentInterface {
+        @Transactional
+        void doWork();
+    }
+
+    interface ChildInterface extends ParentInterface {}
+
+    static class ChildInterfaceImpl implements ChildInterface {
+        @Override
+        public void doWork() {}
+    }
+
+    static class OverridesTransactionalDefaultMethod implements TransactionalDefaultMethodOnly {
+        @Override
+        public void doWork() {}
+    }
+
+    /**
+     * Annotated on every level - interface, abstract class, implementation - each time with another propagation,
+     * so that the propagation that ends up applied tells which level has won.
+     */
+    interface ThreeLevelContract {
+        @Transactional(propagation = Propagation.SUPPORTS)
+        void annotatedOnEveryLevel();
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        void annotatedOnInterfaceAndAbstractClass();
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        void annotatedOnInterfaceOnly();
+    }
+
+    abstract static class ThreeLevelAbstractClass implements ThreeLevelContract {
+        @Override
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        public void annotatedOnEveryLevel() {}
+
+        @Override
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void annotatedOnInterfaceAndAbstractClass() {}
+
+        @Override
+        public void annotatedOnInterfaceOnly() {}
+    }
+
+    static class ThreeLevelImplementation extends ThreeLevelAbstractClass {
+        @Override
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void annotatedOnEveryLevel() {}
+
+        @Override
+        public void annotatedOnInterfaceAndAbstractClass() {}
+
+        @Override
+        public void annotatedOnInterfaceOnly() {}
+    }
+
+    static class SupportsOnlyService {
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void doWork() {}
+    }
+
+    static class CachedService {
+        @Cacheable("cachedService")
+        @Transactional
+        public String load(String key) {
+            return key;
+        }
+    }
+
+    @Transactional
+    interface ClassLevelInterface {
+        void work();
+    }
+
+    static class ClassLevelInterfaceImpl implements ClassLevelInterface {
+        @Override
+        public void work() {}
+    }
+
     interface PetRepository extends JpaRepository<Pet, Long> {}
 
-    interface CategoryRepository extends JpaRepository<Category, Long> {}
+    interface CategoryRepository extends JpaRepository<Category, Long> {
+
+        @Override
+        Optional<Category> findById(Long id);
+
+        @Override
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        List<Category> findAll();
+    }
+
+    @Transactional(readOnly = true)
+    interface TransactionalCategoryRepository extends JpaRepository<Category, Long> {
+
+        List<Category> findByName(String name);
+    }
+
+    /** Kept away from repository scanning, to be registered by hand through its factory bean. */
+    @NoRepositoryBean
+    interface ManuallyRegisteredRepository extends JpaRepository<Category, Long> {}
+
+    interface FactoryMadeService {
+        @Transactional
+        void doWork();
+    }
+
+    static class FactoryMadeServiceImpl implements FactoryMadeService {
+        @Override
+        public void doWork() {}
+    }
+
+    static class FactoryMadeServiceFactoryBean implements FactoryBean<FactoryMadeService> {
+        @Override
+        public FactoryMadeService getObject() {
+            return new FactoryMadeServiceImpl();
+        }
+
+        @Override
+        public Class<?> getObjectType() {
+            return FactoryMadeService.class;
+        }
+    }
 
     static class PropagationTestHelper {
 
@@ -504,8 +1079,9 @@ abstract class AbstractTransactionMonitoringSharedContextTest {
             this.helperService = helperService;
         }
 
+        // public: Spring Framework 5 applies @Transactional to public methods only
         @Transactional(propagation = Propagation.REQUIRED)
-        void testRequired(String lastName) {
+        public void testRequired(String lastName) {
             ownerRepository.findByLastName(lastName);
             helperService.testNestedRequiresNew();
         }
