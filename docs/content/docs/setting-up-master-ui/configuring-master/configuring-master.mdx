@@ -16,7 +16,7 @@ A few facts to fix in your head before you copy any of the snippets below — th
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
 - **Front-end assets**: the `axelix-1.1.1.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
-- **Authentication**: Master ships with a built-in super-admin account `admin / admin` and a built-in, publicly known
+- **Authentication**: Master ships with a built-in super-admin account `admin / admin` and (since Axelix 1.2) a built-in, publicly known
   JWT signing key. In any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
 
 ## Configuration reference
@@ -404,7 +404,7 @@ key on every service, before Master is reachable by anyone other than you.
 
 <UpcomingReleaseNotice />
 
-Starting with Axelix 1.2.0, Master logs a warning every time the super-admin signs in with the default `admin / admin`
+Beware that starting with Axelix 1.2.0, Master logs a warning every time the super-admin signs in with the default `admin / admin`
 credentials, so a forgotten default password shows up in the logs.
 
 ### Authentication — local users
@@ -656,8 +656,8 @@ else to build.
 
 ### 2. Configure and start Master
 
-For a local trial on Axelix 1.2.0 and later, `java -jar master.jar` is enough: Master falls back to a built-in JWT
-signing key. For anything else, provide your own signing key and algorithm; everything else can stay on defaults for a
+For a local playing around on Axelix 1.2.0 and later, `java -jar master.jar` is enough: Master falls back to a built-in JWT
+signing key. If you're setting up Axelix in a real environment (even non-production), please, provide your own signing key and algorithm; everything else can stay on defaults for a
 first run. You can hand Master that configuration in any of three interchangeable ways — Axelix Master reads them all identically (see
 [Supplying properties](#supplying-properties)): as **environment variables** or **`-D` JVM system properties** on the
 command line (both shown next), or from an **external config file** such as `application.yaml` / `application.properties`.
