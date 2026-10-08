@@ -1,6 +1,20 @@
+.MainWrapper {
+    position: relative;
+}
+
 .FirstSection {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     column-gap: 20px;
+}
+
+.Overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--axelix-primary-white);
 }
