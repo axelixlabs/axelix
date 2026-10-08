@@ -25,10 +25,10 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.MethodClassKey;
 
 /**
- * Holds the {@link TransactionDefinitionAttributes} (propagation, isolation, read-only) declared on each monitored
+ * Holds the {@link TransactionDefinitionAttributes} (propagation, isolation, read-only) of each monitored
  * transactional method, keyed by its {@link MethodClassKey}.
  *
- * <p>Entries are registered once, during bean post-processing, while the transactional beans are being scanned, and
+ * <p>Entries are registered once, during bean post-processing, and
  * read back later when the aggregated transaction insights are assembled. Because bean creation may happen
  * concurrently, the backing map is a {@link ConcurrentHashMap}.
  *

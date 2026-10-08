@@ -127,7 +127,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                     return new TransactionAggregatedProfile()
                             .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
                             .transactionalKey(new TransactionalKey()
-                                    .className(key.getTargetClass().getName())
+                                    .className(key.getIdentityClass().getName())
                                     .methodName(key.getMethod().getName()))
                             .transactionOverallStats(new ExecutionStats()
                                     .minMs(performanceStats.getMinMs())
