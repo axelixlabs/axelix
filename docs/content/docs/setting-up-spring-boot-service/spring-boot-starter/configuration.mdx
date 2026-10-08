@@ -400,13 +400,26 @@ axelix.sbs.auth.jwt.duration=5m
   </Tab>
 </Tabs>
 
-`algorithm` and `signing-key` are mandatory — startup fails fast with a clear message if either is missing. `duration`
-controls how long the starter-issued token used for self-registration heartbeats is valid, the default is five minutes,
+`duration` controls how long the starter-issued token used for self-registration heartbeats is valid, the default is five minutes,
 after which the starter rotates it automatically.
 
 :::warning
 A signing key shared between Master and every monitored service is a sensitive secret. Inject it through an environment
 variable, mounted file, or secret manager — not a checked-in YAML.
+:::
+
+### Running without a signing key
+
+<UpcomingReleaseNotice />
+
+Starting with Axelix 1.2.0, `algorithm` and `signing-key` are optional. When they are not set, the starter uses
+`HMAC512` and the same built-in key that Master uses by default, so the service connects to a Master with default
+settings without any key setup. While the built-in key is in use, the starter logs a warning at startup.
+
+:::warning
+The built-in key is publicly known. Anyone who can reach the service's actuator endpoints can sign a token with it and
+call the Axelix endpoints, for example to read the environment or take a heap dump. Set your own
+`axelix.sbs.auth.jwt.signing-key`, the same as on Master, before using Axelix beyond a local trial.
 :::
 
 ## Let Master find the instance
@@ -579,8 +592,8 @@ fail, and self-registration heartbeats stop, so the instance disappears from the
 <div className={styles.SharedTable}>
 | Property                          | Default                                              | Description                                                                                                                  |
 |-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.auth.jwt.algorithm`   | *(unset)* <span className="Required">required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
-| `axelix.sbs.auth.jwt.signing-key` | *(unset)* <span className="Required">required</span> | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
+| `axelix.sbs.auth.jwt.algorithm`   | `HMAC512` (1.2.0+; required before) | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
+| `axelix.sbs.auth.jwt.signing-key` | built-in key (1.2.0+; required before) | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
 | `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.           |
 </div>
 

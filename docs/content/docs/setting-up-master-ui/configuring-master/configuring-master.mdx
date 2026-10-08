@@ -16,8 +16,8 @@ A few facts to fix in your head before you copy any of the snippets below — th
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
 - **Front-end assets**: the `axelix-1.1.1.jar` and the published Docker image both bundle the UI — there is nothing
   extra to wire up for the web interface.
-- **Authentication**: Master ships with a built-in super-admin account `admin / admin` and an unset JWT signing key. In
-  any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
+- **Authentication**: Master ships with a built-in super-admin account `admin / admin` and (since Axelix 1.2) a built-in, publicly known
+  JWT signing key. In any non-throwaway environment you must change both — see [Configuration reference](#configuration-reference).
 
 ## Configuration reference
 
@@ -27,7 +27,7 @@ start.
 
 :::warning
 The default super-admin credentials (`admin / admin`) grant full control over every service Master has discovered, and
-the JWT signing key has no default at all. Override both — together with `axelix.master.auth.cookie.secure` when serving
+the built-in JWT signing key is publicly known, so anyone can use it to forge a session. Override both — together with `axelix.master.auth.cookie.secure` when serving
 over HTTPS — before exposing Master to anyone other than yourself.
 :::
 
@@ -368,11 +368,26 @@ file cannot be shared by more than one Master replica, so it rules out a highly 
 
 | Property                             | Default                                              | Description                                                                                                             |
 |--------------------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| `axelix.master.auth.jwt.algorithm`   | *(unset)* <span className="Required">required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. `HMAC512` is the value used in the bundled local profile. |
-| `axelix.master.auth.jwt.signing-key` | *(unset)* <span className="Required">required</span> | Secret used to sign and verify session tokens. Use a long random value. Rotate it to invalidate all sessions.           |
+| `axelix.master.auth.jwt.algorithm`   | `HMAC512` (1.2.0+; required before) | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. `HMAC512` is the value used in the bundled local profile. |
+| `axelix.master.auth.jwt.signing-key` | built-in key (1.2.0+; required before) | Secret used to sign and verify session tokens. Use a long random value. Rotate it to invalidate all sessions.           |
 | `axelix.master.auth.jwt.lifespan`    | `12h`                                                | Token lifetime as a Spring `Duration` (e.g. `30m`, `12h`, `7d`).                                                        |
 
 </div>
+
+#### Running without a signing key
+
+<UpcomingReleaseNotice />
+
+Starting with Axelix 1.2.0, `algorithm` and `signing-key` are optional. When they are not set, Master uses `HMAC512`
+and a built-in signing key. The starter has the same key built in, so Master and your services work together without
+any key setup, which is handy for a first local run. While the built-in key is in use, Master logs a warning at
+startup.
+
+:::warning
+The built-in key is publicly known. Anyone who has it can sign a session token for any user, including the
+super-admin, and sign in to Master without a password. Set your own `axelix.master.auth.jwt.signing-key`, and the same
+key on every service, before Master is reachable by anyone other than you.
+:::
 
 ### Authentication — super-admin
 
@@ -384,6 +399,13 @@ file cannot be shared by more than one Master replica, so it rules out a highly 
 | `axelix.master.auth.options.super-admin.credentials.password` | `admin` | Built-in super-admin password. Pick a long, random value.                        |
 
 </div>
+
+#### Signing in with the default credentials
+
+<UpcomingReleaseNotice />
+
+Beware that starting with Axelix 1.2.0, Master logs a warning every time the super-admin signs in with the default `admin / admin`
+credentials, so a forgotten default password shows up in the logs.
 
 ### Authentication — local users
 
@@ -634,8 +656,9 @@ else to build.
 
 ### 2. Configure and start Master
 
-At minimum, provide a JWT signing key and an algorithm; everything else can stay on defaults for a first run. You can
-hand Master that configuration in any of three interchangeable ways — Axelix Master reads them all identically (see
+For a local playing around on Axelix 1.2.0 and later, `java -jar master.jar` is enough: Master falls back to a built-in JWT
+signing key. If you're setting up Axelix in a real environment (even non-production), please, provide your own signing key and algorithm; everything else can stay on defaults for a
+first run. You can hand Master that configuration in any of three interchangeable ways — Axelix Master reads them all identically (see
 [Supplying properties](#supplying-properties)): as **environment variables** or **`-D` JVM system properties** on the
 command line (both shown next), or from an **external config file** such as `application.yaml` / `application.properties`.
 
@@ -643,12 +666,28 @@ command line (both shown next), or from an **external config file** such as `app
 
 Handy when your shell or process manager already exports the values:
 
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+java -jar master.jar
+```
+
+With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
+a signing key](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Your own key">
+
 ```bash
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 
 java -jar master.jar
 ```
+
+  </Tab>
+</Tabs>
 
 #### JVM system properties (-D)
 
@@ -718,12 +757,28 @@ ghcr.io/axelixlabs/axelix@sha256:<digest>
 
 A minimal run, suitable for a first look:
 
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
+```
+
+With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
+a signing key](#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Your own key">
+
 ```bash
 docker run --rm -p 8080:8080 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+</Tabs>
 
 A few notes about this command:
 
