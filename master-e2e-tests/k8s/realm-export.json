@@ -687,13 +687,15 @@
       "redirectUris": [
         "http://axelix-master.default.svc.cluster.local:8080/*",
         "http://localhost:8080/*",
+        "http://localhost:2935/*",
         "http://localhost:3000/*",
         "http://master.local/*",
         "http://master/*",
         "http://axelix-master.default.svc.cluster.local:3000/*"
       ],
       "webOrigins": [
-        "http://localhost:8080"
+        "http://localhost:8080",
+        "http://localhost:2935"
       ],
       "notBefore": 0,
       "bearerOnly": false,

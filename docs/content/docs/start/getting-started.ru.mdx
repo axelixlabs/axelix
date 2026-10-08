@@ -77,7 +77,7 @@ Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#за�
 зафиксировать версию, допишите тег, например `:1.1.1`:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -123,7 +123,7 @@ java -jar master.jar
   </Tab>
 </Tabs>
 
-После этого Master доступен на `http://localhost:8080` (или за вашим Ingress в Kubernetes). Войдите под учётной
+После этого Master доступен на `http://localhost:2935` (или за вашим Ingress в Kubernetes). Войдите под учётной
 записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
 
 Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл

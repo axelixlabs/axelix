@@ -75,7 +75,7 @@ The image is published to GitHub Container Registry. Without a tag Docker pulls 
 tag such as `:1.1.1` to pin a version:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -122,7 +122,7 @@ See [Run as a JAR](./configuring-master.mdx#run-as-a-jar) for the other ways to 
   </Tab>
 </Tabs>
 
-Master is then reachable at `http://localhost:8080` (or behind your Ingress on Kubernetes). Sign in with the
+Master is then reachable at `http://localhost:2935` (or behind your Ingress on Kubernetes). Sign in with the
 [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account.
 
 Then configure it. Master accepts configuration from many sources — environment variables, an external config file, a

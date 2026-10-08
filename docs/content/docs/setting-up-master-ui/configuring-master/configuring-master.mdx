@@ -10,7 +10,8 @@ import styles from './styles.module.css';
 
 A few facts to fix in your head before you copy any of the snippets below — they save debugging time later.
 
-- **HTTP port**: Master listens on `8080` by default (`server.port`).
+- **HTTP port**: Master listens on `2935` by default (`axelix.master.port`). Before Axelix `1.2.0` the default was
+  `8080` — see [General](#general) for the full story and how to get the old port back.
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
@@ -117,7 +118,7 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 or, for a container, pass it as an environment variable and mount the file in:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
   ghcr.io/axelixlabs/axelix
@@ -328,9 +329,24 @@ contacts Vault and boots normally.
 
 | Property                    | Default | Description                                                                             |
 |-------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `axelix.master.port`        | `2935`  | HTTP port Master listens on — the UI, the REST API, and the MCP server all share it. Before Axelix `1.2.0` the default was `8080`; see the note below. |
 | `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. Currently only used to populate the ECS `service.environment` field when [structured logging](#structured-logging) is enabled. |
 
 </div>
+
+:::note[The default port: why 2935, and what happened to 8080]
+Up to and including Axelix `1.1.0`, Master listened on `8080` — the very port every Spring Boot application binds by
+default. That default turned out to be a trap: the services Master manages are themselves Spring Boot applications, so
+the moment you tried Master locally next to one of them, the two collided on `8080`. Since Axelix `1.2.0` Master
+therefore listens on `2935` by default. The number is not random: `2935` spells **AXEL** — the stem of *Axelix* — on a
+phone keypad (2&nbsp;=&nbsp;A, 9&nbsp;=&nbsp;X, 3&nbsp;=&nbsp;E, 5&nbsp;=&nbsp;L), and it is claimed by none of the
+tools commonly running next to a Spring stack (Prometheus, Grafana, Kafka, Elasticsearch, and friends all live on other
+ports).
+
+If you adopted Axelix before `1.2.0` and your environment relies on the old port — bookmarks, firewall rules,
+`axelix.sbs.discovery.master-url` values in your services — you can restore the previous behavior at any time by
+setting the port back explicitly: `axelix.master.port=8080`.
+:::
 
 ### Database
 
@@ -686,7 +702,7 @@ axelix:
 java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.jar
 ```
 
-Master is then reachable at `http://localhost:8080`. Sign in with the super-admin credentials you configured.
+Master is then reachable at `http://localhost:2935`. Sign in with the super-admin credentials you configured.
 
 ## Run with Docker
 
@@ -719,7 +735,7 @@ ghcr.io/axelixlabs/axelix@sha256:<digest>
 A minimal run, suitable for a first look:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -744,7 +760,7 @@ Supplying configuration via individual environment variables follows the relaxed
 properties](#supplying-properties), passed with `-e`. This is what the run command above uses:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
   -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
@@ -767,7 +783,7 @@ password, or database credentials in it — pass those as discrete `-e` environm
 The example of using it can be found below:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
@@ -793,7 +809,7 @@ axelix:
 And then passing it as the volume to the docker command:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
@@ -831,7 +847,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "2935:2935"
     environment:
       AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
       AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}

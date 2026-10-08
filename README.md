@@ -100,7 +100,7 @@ to each Spring Boot service you want to manage.
 
 ### 1. Run Axelix Master
 
-Master listens on port `8080` and bundles the UI, so there is nothing extra to build for the web
+Master listens on port `2935` (overridable with `axelix.master.port`) and bundles the UI, so there is nothing extra to build for the web
 interface. Pick whichever shape matches how you ship the rest of your services.
 
 **As a JAR.** On the [Releases page](https://github.com/axelixlabs/axelix/releases), expand the
@@ -116,7 +116,7 @@ java \
 **With Docker.** The release image is published to GitHub Container Registry:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e JAVA_OTHER_ARGS="\
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
@@ -141,7 +141,7 @@ documented on the chart's [Artifact Hub page](https://artifacthub.io/packages/he
 open it, pick the version matching the Axelix release you are installing (Axelix components share a
 single lockstep version, so this is just the release tag), and read the **Default Values** section.
 
-Master then serves the UI at `http://localhost:8080`. It ships with a built-in super-admin account
+Master then serves the UI at `http://localhost:2935`. It ships with a built-in super-admin account
 (`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
 else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
 MCP) are in [Configuring Master](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx).
@@ -248,14 +248,14 @@ This first builds the jar (the target depends on `master-oss`) and then builds a
 `master-oss:local` from [`master-oss/Dockerfile`](master-oss/Dockerfile). Run it with:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e JAVA_OTHER_ARGS="\
     -Daxelix.master.auth.jwt.algorithm=HMAC512 \
     -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret" \
   master-oss:local
 ```
 
-Either way Master serves the UI at `http://localhost:8080`, just like the published artifacts.
+Either way Master serves the UI at `http://localhost:2935`, just like the published artifacts.
 
 ## Documentation
 
