@@ -33,7 +33,6 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
-import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 
 /**
  * Auto-configuration for instance self-registration.
@@ -51,20 +50,6 @@ public class HeartBeatAutoConfiguration {
     @ConfigurationProperties(prefix = HeartBeatConfigurationProperties.CONFIG_PROPS_PREFIX)
     public HeartBeatConfigurationProperties heartBeatConfigurationProperties() {
         return new HeartBeatConfigurationProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = ScheduledTaskHistoryConfigurationProperties.CONFIG_PROPS_PREFIX)
-    public ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties() {
-        return new ScheduledTaskHistoryConfigurationProperties(0);
-    }
-
-    @Bean
-    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory(
-            ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties) {
-        return new ScheduledTaskExecutionHistory(
-                scheduledTaskHistoryConfigurationProperties,
-                new SLF4JLogger(LoggerFactory.getLogger(ScheduledTaskExecutionHistory.class)));
     }
 
     @Bean

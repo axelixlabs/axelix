@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAss
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,6 +109,11 @@ class HeartBeatAutoConfigurationTest {
         @Bean
         public JwtEncoderService jwtEncoderService() {
             return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
+        }
+
+        @Bean
+        public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+            return mock(ScheduledTaskExecutionHistory.class);
         }
     }
 }
