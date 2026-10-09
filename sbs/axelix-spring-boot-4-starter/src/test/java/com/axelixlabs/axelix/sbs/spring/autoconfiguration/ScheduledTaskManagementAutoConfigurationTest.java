@@ -95,6 +95,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(ScheduledTaskService.class);
                     assertThat(context).doesNotHaveBean(AxelixScheduledTasksEndpoint.class);
                     assertThat(context).doesNotHaveBean(ScheduledTaskExecutionHistory.class);
+                    assertThat(context).doesNotHaveBean(ScheduledTaskHistoryConfigurationProperties.class);
                     assertThat(context).doesNotHaveBean(ThreadPoolTaskExecutor.class);
                 });
     }
