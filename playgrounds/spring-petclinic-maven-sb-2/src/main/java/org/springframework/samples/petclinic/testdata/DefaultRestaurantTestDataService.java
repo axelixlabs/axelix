@@ -7,27 +7,29 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Transactions declared on methods: of the class itself, of its interface and of its
+ * abstract parent.
+ */
 @Service
 @Profile({ "default", "local" })
-public class RestaurantTestDataService {
+public class DefaultRestaurantTestDataService extends AbstractRestaurantTestDataService
+		implements InterfaceRestaurantTestDataService {
 
 	private final RestaurantRepository restaurantRepository;
 
-	private final ChefRepository chefRepository;
-
 	private final DishRepository dishRepository;
 
-	public RestaurantTestDataService(RestaurantRepository restaurantRepository, ChefRepository chefRepository,
+	public DefaultRestaurantTestDataService(RestaurantRepository restaurantRepository, ChefRepository chefRepository,
 			DishRepository dishRepository) {
+		super(chefRepository);
 		this.restaurantRepository = restaurantRepository;
-		this.chefRepository = chefRepository;
 		this.dishRepository = dishRepository;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void runNplusOne_1() {
+	@Override
+	public void loadRestaurantsWithChefs() {
 		List<Restaurant> restaurants = restaurantRepository.findAll();
 		restaurants.forEach(r -> r.getChefs().size());
 
@@ -35,37 +37,18 @@ public class RestaurantTestDataService {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void runNplusOne_2() {
-		List<Chef> chefs = chefRepository.findAll();
-		chefs.forEach(c -> c.getDishes().size());
-
-		sleepRandom();
-	}
-
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void runNplusOne_3() {
+	public void txOnClassMethod_runNplusOne_3() {
 		List<Dish> dishes = dishRepository.findAll();
 		dishes.forEach(d -> d.getIngredients().size());
 
 		sleepRandom();
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void runPagination_1(PageRequest page) {
+	@javax.transaction.Transactional(javax.transaction.Transactional.TxType.REQUIRES_NEW)
+	public void txJavax_runPagination_1(PageRequest page) {
 		chefRepository.findAllWithDishesPaged(page);
 
 		sleepRandom();
-	}
-
-	private void sleepRandom() {
-		try {
-			long delay = ThreadLocalRandom.current().nextLong(10, 50 + 1);
-			Thread.sleep(delay);
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new RuntimeException(e);
-		}
 	}
 
 }

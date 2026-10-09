@@ -137,7 +137,7 @@ tasks.processResources {
         )
     }
 
-    exclude("application-local.yaml")
+    //exclude("application-local.yaml")
 }
 
 contracts {

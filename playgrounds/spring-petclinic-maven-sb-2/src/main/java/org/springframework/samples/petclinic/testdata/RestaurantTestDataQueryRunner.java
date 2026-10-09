@@ -11,20 +11,20 @@ import org.springframework.stereotype.Component;
 @Profile({ "default", "local" })
 public class RestaurantTestDataQueryRunner {
 
-	private final RestaurantTestDataService restaurantTestDataService;
+	private final DefaultRestaurantTestDataService restaurantTestDataService;
 
-	public RestaurantTestDataQueryRunner(RestaurantTestDataService restaurantTestDataService) {
+	public RestaurantTestDataQueryRunner(DefaultRestaurantTestDataService restaurantTestDataService) {
 		this.restaurantTestDataService = restaurantTestDataService;
 	}
 
 	@Scheduled(initialDelay = 10000, fixedRate = 60000)
 	public void runTests() {
-		restaurantTestDataService.runNplusOne_1();
-		restaurantTestDataService.runNplusOne_2();
-		restaurantTestDataService.runNplusOne_3();
+		restaurantTestDataService.txOnInterfaceDefaultMethod_runNplusOne_1();
+		restaurantTestDataService.txOnAbstractClassMethod_runNplusOne_2();
+		restaurantTestDataService.txOnClassMethod_runNplusOne_3();
 
 		PageRequest pageRequest = PageRequest.of(0, 2);
-		restaurantTestDataService.runPagination_1(pageRequest);
+		restaurantTestDataService.txJavax_runPagination_1(pageRequest);
 	}
 
 }
