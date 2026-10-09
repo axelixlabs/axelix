@@ -52,7 +52,7 @@ class HeartBeatAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("axelix.sbs.discovery.self-registration=true")
-            .withUserConfiguration(RequiredDependenciesConfig.class)
+            .withUserConfiguration(RequiredDependenciesConfig.class, ScheduledTaskExecutionHistoryConfig.class)
             .withConfiguration(
                     AutoConfigurations.of(HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
 
@@ -95,6 +95,20 @@ class HeartBeatAutoConfigurationTest {
                 });
     }
 
+    @Test // the heart-beating must not fail when the scheduled task execution history is absent.
+    void shouldCreateAllBeans_whenScheduledTaskExecutionHistoryIsAbsent() {
+        new ApplicationContextRunner()
+                .withPropertyValues("axelix.sbs.discovery.self-registration=true")
+                .withUserConfiguration(RequiredDependenciesConfig.class)
+                .withConfiguration(AutoConfigurations.of(
+                        HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(ScheduledTaskExecutionHistory.class);
+                    assertThat(context).hasSingleBean(HeartBeatService.class);
+                    assertThat(context).hasSingleBean(HeartBeatLifecycleIgnitor.class);
+                });
+    }
+
     @TestConfiguration
     static class RequiredDependenciesConfig {
 
@@ -122,6 +136,10 @@ class HeartBeatAutoConfigurationTest {
         public JwtEncoderService jwtEncoderService() {
             return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
         }
+    }
+
+    @TestConfiguration
+    static class ScheduledTaskExecutionHistoryConfig {
 
         @Bean
         public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {

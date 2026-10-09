@@ -66,7 +66,7 @@ public class HeartBeatService implements Closeable {
     private final ScheduledExecutorService executor;
     private final Logger logger;
     private final JwtEncoderService jwtEncoderService;
-    private final ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
+    private final @Nullable ScheduledTaskExecutionHistory scheduledTaskExecutionHistory;
 
     @Nullable
     private volatile String heartbeatUrl;
@@ -82,7 +82,7 @@ public class HeartBeatService implements Closeable {
             HeartBeatConfigurationProperties properties,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
             JwtEncoderService jwtEncoderService,
-            ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
+            @Nullable ScheduledTaskExecutionHistory scheduledTaskExecutionHistory) {
 
         this.logger = logger;
         this.jwtEncoderService = jwtEncoderService;
@@ -117,25 +117,33 @@ public class HeartBeatService implements Closeable {
 
                 if (is2xxSuccessful(statusCode)) {
                     logger.trace("Heartbeat successful. Master URL: {}", heartbeatUrl);
-                    scheduledTaskExecutionHistory.commit();
+                    if (scheduledTaskExecutionHistory != null) {
+                        scheduledTaskExecutionHistory.commit();
+                    }
                 } else if (isUnauthorized(statusCode)) {
                     logger.debug("Master heartbeat failed. Token expired. Re-generating token");
                     currentToken = jwtEncoderService.generateToken(TECH_USER);
-                    scheduledTaskExecutionHistory.rollback();
+                    rollbackScheduledTaskHistoryMarker();
                 } else if (isConflict(statusCode)) {
                     logger.info("Master does not know this instance. Registering again");
-                    scheduledTaskExecutionHistory.rollback();
+                    rollbackScheduledTaskHistoryMarker();
                     registered = false;
                     register();
                 } else {
                     logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
-                    scheduledTaskExecutionHistory.rollback();
+                    rollbackScheduledTaskHistoryMarker();
                 }
             } else {
                 register();
             }
         } catch (IOException | InterruptedException e) {
             logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
+            rollbackScheduledTaskHistoryMarker();
+        }
+    }
+
+    private void rollbackScheduledTaskHistoryMarker() {
+        if (scheduledTaskExecutionHistory != null) {
             scheduledTaskExecutionHistory.rollback();
         }
     }
