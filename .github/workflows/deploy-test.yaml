@@ -165,8 +165,8 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:2.7.18-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-2.7.18-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Notification Service Gradle SB 2
@@ -176,8 +176,8 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Feature Service Maven SB 3
@@ -187,8 +187,8 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Spring Petclinic Gradle SB 3
@@ -198,8 +198,8 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:3.5.0-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-3.5.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Spring Petclinic Maven SB 4
@@ -209,8 +209,8 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:4.0.7-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-4.0.7-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
       - name: Deploy Playground Api Gateway Gradle SB 4 (no database)
@@ -220,6 +220,6 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
-          image-tag: ${{ env.APP_NAME }}:1.2.0-SNAPSHOT
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}
+          image-tag: playgrounds:${{ env.APP_NAME }}-1.2.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
