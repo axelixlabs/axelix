@@ -23,7 +23,7 @@ runs:
     - name: Build Docker Image
       working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run: docker build --provenance=false --tag ${{ inputs.cr-url }}/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} --file docker/Dockerfile .
+      run: docker build --provenance=false --tag ${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} --file docker/Dockerfile .
 
     - name: Docker login to Cloud CR
       shell: bash
@@ -31,7 +31,7 @@ runs:
 
     - name: Docker push to Cloud CR
       shell: bash
-      run: docker push ${{ inputs.cr-url }}/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }}
+      run: docker push ${{ inputs.cr-repository-path }}/${{ inputs.image-tag }}
 
     - name: Docker logout
       shell: bash
@@ -45,6 +45,6 @@ runs:
         echo "$SANDBOX_KUBE_CONFIG" > ~/.kube/config
         chmod 600 ~/.kube/config
         helm upgrade --install ${{ inputs.helm-release }} . \
-          --set image.ref=${{ inputs.cr-url }}/${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} \
+          --set image.ref=${{ inputs.cr-repository-path }}/${{ inputs.image-tag }} \
           --set axelix.sbs.auth.jwt.algorithm=HMAC512 \
           --set axelix.sbs.auth.jwt.signingKey=$SANDBOX_JWT_SIGNING_KEY
