@@ -45,9 +45,9 @@ jobs:
   build-deploy-source:
     runs-on: ubuntu-latest
     env:
-      YANDEX_CLOUD_OAUTH2_TOKEN: ${{ secrets.YANDEX_CLOUD_OAUTH2_TOKEN }}
-      CR_URL: ${{ vars.CR_URL }}
-      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
+      CLOUD_CONTAINER_REGISTRY_TOKEN: ${{ secrets.CLOUD_CONTAINER_REGISTRY_TOKEN }}
+      CLOUD_CONTAINER_REGISTRY_URL: ${{ vars.CLOUD_CONTAINER_REGISTRY_URL }}
+      IMAGE_REPOSITORY: ${{ vars.CLOUD_CONTAINER_REGISTRY_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: axelix
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
@@ -89,10 +89,10 @@ jobs:
         run: |
           docker build --provenance=false --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.version }} --file master-oss/Dockerfile master-oss
 
-      - name: Docker login to Yandex Cloud CR
-        run: echo $YANDEX_CLOUD_OAUTH2_TOKEN | docker login --username oauth --password-stdin $CR_URL
+      - name: Docker login to Cloud CR
+        run: echo $CLOUD_CONTAINER_REGISTRY_TOKEN | docker login --username oauth --password-stdin $CLOUD_CONTAINER_REGISTRY_URL
 
-      - name: Docker push to Yandex Cloud CR
+      - name: Docker push to Cloud CR
         run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.version }}
 
       - name: Docker logout
@@ -164,7 +164,8 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:2.7.18-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -174,7 +175,8 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -184,7 +186,8 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -194,7 +197,8 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:3.5.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -204,7 +208,8 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:4.0.7-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -214,6 +219,7 @@ jobs:
         uses: ./.github/actions/deploy-playground
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
-          cr-repository-path: ${{ vars.CR_PLAYGROUND_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
+          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:1.2.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
