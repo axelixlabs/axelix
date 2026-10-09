@@ -335,13 +335,16 @@ contacts Vault and boots normally.
 </div>
 
 :::note[The default port: why 2935, and what happened to 8080]
-Up to and including Axelix `1.1.0`, Master listened on `8080` — the very port every Spring Boot application binds by
-default. That default turned out to be a trap: the services Master manages are themselves Spring Boot applications, so
-the moment you tried Master locally next to one of them, the two collided on `8080`. Since Axelix `1.2.0` Master
-therefore listens on `2935` by default. The number is not random: `2935` spells **AXEL** — the stem of *Axelix* — on a
-phone keypad (2&nbsp;=&nbsp;A, 9&nbsp;=&nbsp;X, 3&nbsp;=&nbsp;E, 5&nbsp;=&nbsp;L), and it is claimed by none of the
-tools commonly running next to a Spring stack (Prometheus, Grafana, Kafka, Elasticsearch, and friends all live on other
-ports).
+Before Axelix `1.2.x`, Master listened on `8080` — the very port every Spring Boot application binds by
+default. That default is, of course, problematic for a number of reasons:
+
+- The services Master manages are themselves Spring Boot applications, so
+the moment you tried Master locally next to one of them, the two collided on `8080`.
+
+- The 8080 port is the default port of the [Tomcat webserver](https://tomcat.apache.org/tomcat-11.0-doc/RUNNING.txt). So while visiting `domain:8080` it might've create
+some confusion around what app the user actually tries to access via the UI - Tomcat or Axelix. It is unclear.
+
+Since Axelix `1.2.0` Master therefore listens on `2935` by default.
 
 If you adopted Axelix before `1.2.0` and your environment relies on the old port — bookmarks, firewall rules,
 `axelix.sbs.discovery.master-url` values in your services — you can restore the previous behavior at any time by
