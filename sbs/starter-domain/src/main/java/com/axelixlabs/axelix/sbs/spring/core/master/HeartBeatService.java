@@ -116,8 +116,8 @@ public class HeartBeatService implements Closeable {
                 }
             } else if (isUnauthorized(statusCode)) {
                 logger.debug("Master heartbeat failed. Token expired. Re-generating token");
-                currentToken = jwtEncoderService.generateToken(TECH_USER);
                 rollbackScheduledTaskHistoryMarker();
+                currentToken = jwtEncoderService.generateToken(TECH_USER);
             } else {
                 logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
                 rollbackScheduledTaskHistoryMarker();
