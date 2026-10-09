@@ -88,7 +88,7 @@ a signing key](./configuring-master.mdx#running-without-a-signing-key).
   <Tab value="Your own key">
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -154,8 +154,13 @@ See [Run as a JAR](./configuring-master.mdx#run-as-a-jar) for the other ways to 
   </Tab>
 </Tabs>
 
-Master is then reachable at `http://localhost:8080` (or behind your Ingress on Kubernetes). Sign in with the
+Master is then reachable at `http://localhost:2935` (or behind your Ingress on Kubernetes). Sign in with the
 [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account.
+
+:::note
+`2935` is the default port since Axelix `1.2.0`. Before that release Master listened on `8080` — see
+[General](./configuring-master.mdx#general) for the reasoning and how to get the old port back.
+:::
 
 Then configure it. Master accepts configuration from many sources — environment variables, an external config file, a
 Spring Cloud Config Server, or HashiCorp Vault — so fitting it into your existing configuration pipeline should not

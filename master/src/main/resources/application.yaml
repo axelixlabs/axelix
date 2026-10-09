@@ -1,6 +1,6 @@
 # These are the default settings for Axelix Master for ANY distribution of Axelix.
 server:
-  port: 8080
+  port: ${axelix.master.port}
 
 spring:
   cloud:
@@ -36,6 +36,7 @@ management:
 
 axelix:
   master:
+    port: 2935
     external-config:
       spring-cloud-config:
         enabled: false

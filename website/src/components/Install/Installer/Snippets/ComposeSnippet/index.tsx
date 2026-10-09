@@ -58,7 +58,7 @@ export const ComposeSnippet = ({ refEl, axelixVersionData }: IProps) => {
                     <span className={styles.At}>ports</span>:
                 </span>
                 <span className={styles.Line}>
-                    {"      "}- <span className={styles.St}>&quot;9444:8080&quot;</span>
+                    {"      "}- <span className={styles.St}>&quot;9444:2935&quot;</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}

@@ -42,7 +42,7 @@ export const DockerSnippet = ({ refEl, axelixVersionData }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.Ar}>--publish</span> <span className={styles.St}>8080:8080</span>{" "}
+                    <span className={styles.Ar}>--publish</span> <span className={styles.St}>2935:2935</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>

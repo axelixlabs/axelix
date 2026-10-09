@@ -90,7 +90,7 @@ docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
   <Tab value="Свой ключ">
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -155,8 +155,13 @@ java -jar master.jar
   </Tab>
 </Tabs>
 
-После этого Master доступен на `http://localhost:8080` (или за вашим Ingress в Kubernetes). Войдите под учётной
+После этого Master доступен на `http://localhost:2935` (или за вашим Ingress в Kubernetes). Войдите под учётной
 записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
+
+:::note
+`2935` — порт по умолчанию начиная с Axelix `1.2.0`. До этого релиза Master слушал порт `8080` — причины и способ
+вернуть старый порт описаны в разделе [Общие настройки](../setting-up-master-ui/configuring-master/configuring-master.mdx#общие-настройки).
+:::
 
 Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл
 конфигурации, Spring Cloud Config Server или HashiCorp Vault — так что встроить его в существующий конвейер

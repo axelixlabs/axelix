@@ -12,7 +12,9 @@ import styles from './styles.module.css';
 Несколько фактов, которые нужно усвоить, прежде чем копировать приведённые ниже фрагменты кода, — они сэкономят вам
 время на отладку.
 
-- **HTTP-порт**: по умолчанию Master прослушивает `8080` (`server.port`).
+- **HTTP-порт**: по умолчанию Master прослушивает `2935` (`axelix.master.port`). До Axelix `1.2.0` портом по
+  умолчанию был `8080` — полная история и способ вернуть старый порт описаны в разделе
+  [HTTP-порт](#http-порт).
 - **База данных**: Master поддерживает три движка, которые выбираются автоматически по префиксу URL-адреса JDBC —
   **SQLite** (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), **MySQL** (`jdbc:mysql:`). По умолчанию используется
   SQLite с файлом `axelix.db` в рабочем каталоге. Liquibase выполняет миграцию схемы при каждом запуске.
@@ -125,7 +127,7 @@ java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.ja
 или, для контейнера, передайте его как переменную окружения и смонтируйте файл внутрь:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
   ghcr.io/axelixlabs/axelix
@@ -326,6 +328,36 @@ env:
 Когда функция включена, Master стартует в режиме fail-fast. Если Vault недоступен при запуске, Master не загрузится,
 вместо того чтобы стартовать с неполной конфигурацией. Пока функция выключена (по умолчанию), Master не обращается к
 Vault и запускается штатно.
+:::
+
+### HTTP-порт
+
+<UpcomingReleaseNotice />
+
+<div className={styles.ConfigTable}>
+
+| Свойство             | По умолчанию | Описание                                                                                                                                                      |
+|----------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.port` | `2935`       | HTTP-порт, который прослушивает Master — его совместно используют UI, REST API и MCP-сервер. До Axelix `1.2.0` по умолчанию был `8080`; см. примечание ниже. |
+
+</div>
+
+:::note[Порт по умолчанию: почему 2935 и что случилось с 8080]
+До Axelix `1.2.x` Master слушал порт `8080` — тот самый порт, который каждое Spring Boot-приложение занимает по
+умолчанию. Такой выбор, разумеется, проблематичен по ряду причин:
+
+- Сервисы, которыми управляет Master, сами являются Spring Boot-приложениями, поэтому при локальном запуске Master
+рядом с любым из них оба претендовали на `8080`.
+
+- Порт 8080 — это порт по умолчанию [веб-сервера Tomcat](https://tomcat.apache.org/tomcat-11.0-doc/RUNNING.txt). Поэтому
+при переходе на `domain:8080` могла возникать путаница: к какому приложению пользователь на самом деле обращается через
+UI — к Tomcat или к Axelix. Это неочевидно.
+
+Поэтому начиная с Axelix `1.2.0` Master по умолчанию слушает порт `2935`.
+
+Если вы начали использовать Axelix до версии `1.2.0` и ваше окружение завязано на старый порт — закладки, правила
+файрвола, значения `axelix.sbs.discovery.master-url` в сервисах — прежнее поведение всегда можно вернуть, явно задав
+порт: `axelix.master.port=8080`.
 :::
 
 ### Общие настройки
@@ -736,7 +768,7 @@ axelix:
 java -Daxelix.master.config.location=file:/etc/axelix/master.yaml -jar master.jar
 ```
 
-После этого Master доступен по адресу `http://localhost:8080`. Войдите с учётными данными суперадминистратора, которые
+После этого Master доступен по адресу `http://localhost:2935`. Войдите с учётными данными суперадминистратора, которые
 вы настроили.
 
 ## Запуск с Docker
@@ -783,7 +815,7 @@ docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
   <Tab value="Свой ключ">
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
@@ -811,7 +843,7 @@ docker run --rm -p 8080:8080 \
 свойств](#способы-задания-свойств), передаются они через `-e`. Именно их использует команда запуска выше:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_DATABASE_URL=jdbc:postgresql://db.internal:5432/axelix \
   -e AXELIX_MASTER_DATABASE_USERNAME=axelix \
   -e AXELIX_MASTER_DATABASE_PASSWORD=... \
@@ -834,7 +866,7 @@ JVM печатает полное значение `JAVA_TOOL_OPTIONS` в stderr
 Пример использования приведён ниже:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="-Xmx512m -Daxelix.master.metrics.prometheus.enabled=true" \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
@@ -858,7 +890,7 @@ axelix:
 А затем передайте его как том в команду docker:
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -v /host/config/master.yaml:/etc/axelix/master.yaml:ro \
   -e AXELIX_MASTER_CONFIG_LOCATION=file:/etc/axelix/master.yaml \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
@@ -896,7 +928,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "2935:2935"
     environment:
       AXELIX_MASTER_DATABASE_URL: jdbc:postgresql://postgres:5432/axelix
       AXELIX_MASTER_DATABASE_USERNAME: ${AXELIX_DB_USERNAME}

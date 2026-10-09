@@ -125,7 +125,7 @@ java \
 :::
 
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 2935:2935 \
   -e JAVA_TOOL_OPTIONS="\
     -Daxelix.master.database.url=jdbc:postgresql://db.internal:5432/axelix \
     -Daxelix.master.database.username=axelix_app \
@@ -134,6 +134,11 @@ docker run --rm -p 8080:8080 \
     -Daxelix.master.migrations.password=..." \
   ghcr.io/axelixlabs/axelix:1.1.0
 ```
+
+:::note
+Начиная с Axelix `1.2.0` Master по умолчанию слушает порт `2935`. До этого релиза портом по умолчанию был `8080`,
+поэтому для более старого образа публикуйте `8080` — см. [Общие настройки](../configuring-master/configuring-master.mdx#общие-настройки).
+:::
 
 ### Запуск с Docker Compose
 
@@ -144,7 +149,7 @@ services:
   master:
     image: ghcr.io/axelixlabs/axelix:1.1.0
     ports:
-      - "8080:8080"
+      - "2935:2935"
     environment:
       JAVA_TOOL_OPTIONS: >-
         -Daxelix.master.database.url=jdbc:postgresql://postgres:5432/axelix
