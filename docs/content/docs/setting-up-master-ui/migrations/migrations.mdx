@@ -129,6 +129,11 @@ docker run --rm -p 2935:2935 \
   ghcr.io/axelixlabs/axelix:1.1.0
 ```
 
+:::note
+Master listens on `2935` by default since Axelix `1.2.0`. Before that release the default port was `8080`, so publish
+`8080` instead when you run an older image — see [General](../configuring-master/configuring-master.mdx#general).
+:::
+
 ### Run with Docker Compose
 
 Add the migration properties to the `master` service's `JAVA_TOOL_OPTIONS`, alongside the database settings.

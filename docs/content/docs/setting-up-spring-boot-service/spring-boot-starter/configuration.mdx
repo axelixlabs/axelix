@@ -462,6 +462,8 @@ A few details that catch people out:
 - `instance-actuator-url` is the **base** URL of the service as Master will reach it from its own network — host and
   port only.
 - `master-url` is the **full** URL including `/api/internal/service/register`. The starter posts to it verbatim.
+  Master listens on `2935` by default since Axelix `1.2.0`; before that release the default port was `8080` — see
+  [General](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
 - `instance-name` is the label Master shows for this instance in the UI and in MCP responses. Pick a name that survives
   restarts and replicas — typically the service name, not the pod name.
 - Self-registration is accepted by Master out of the box (`axelix.master.discovery.self-registration.enabled` is `true`

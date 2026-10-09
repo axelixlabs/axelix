@@ -11,7 +11,7 @@ import styles from './styles.module.css';
 A few facts to fix in your head before you copy any of the snippets below — they save debugging time later.
 
 - **HTTP port**: Master listens on `2935` by default (`axelix.master.port`). Before Axelix `1.2.0` the default was
-  `8080` — see [General](#general) for the full story and how to get the old port back.
+  `8080` — see [HTTP port](#http-port) for the full story and how to get the old port back.
 - **Database**: Master supports three engines, picked automatically from the JDBC URL prefix — **SQLite**
   (`jdbc:sqlite:`), **PostgreSQL** (`jdbc:postgresql:`), and **MySQL** (`jdbc:mysql:`). The default is SQLite, with a
   file named `axelix.db` next to the working directory. Liquibase runs schema migrations on every startup.
@@ -321,16 +321,15 @@ boot rather than starting with incomplete configuration. While the feature stays
 contacts Vault and boots normally.
 :::
 
-### General
+### HTTP port
 
-<ReleasedInNotice version="1.1.0" />
+<UpcomingReleaseNotice />
 
 <div className={styles.ConfigTable}>
 
-| Property                    | Default | Description                                                                             |
-|-------------------------------|---------|--------------------------------------------------------------------------------------------|
-| `axelix.master.port`        | `2935`  | HTTP port Master listens on — the UI, the REST API, and the MCP server all share it. Before Axelix `1.2.0` the default was `8080`; see the note below. |
-| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. Currently only used to populate the ECS `service.environment` field when [structured logging](#structured-logging) is enabled. |
+| Property             | Default | Description                                                                                                                                            |
+|----------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.master.port` | `2935`  | HTTP port Master listens on — the UI, the REST API, and the MCP server all share it. Before Axelix `1.2.0` the default was `8080`; see the note below. |
 
 </div>
 
@@ -350,6 +349,18 @@ If you adopted Axelix before `1.2.0` and your environment relies on the old port
 `axelix.sbs.discovery.master-url` values in your services — you can restore the previous behavior at any time by
 setting the port back explicitly: `axelix.master.port=8080`.
 :::
+
+### General
+
+<ReleasedInNotice version="1.1.0" />
+
+<div className={styles.ConfigTable}>
+
+| Property                    | Default | Description                                                                             |
+|-------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `axelix.master.environment` | empty   | Name of the environment this Master instance runs in, for example `production` or `staging`. Currently only used to populate the ECS `service.environment` field when [structured logging](#structured-logging) is enabled. |
+
+</div>
 
 ### Database
 

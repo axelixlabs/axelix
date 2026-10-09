@@ -126,6 +126,11 @@ java -jar master.jar
 После этого Master доступен на `http://localhost:2935` (или за вашим Ingress в Kubernetes). Войдите под учётной
 записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
 
+:::note
+`2935` — порт по умолчанию начиная с Axelix `1.2.0`. До этого релиза Master слушал порт `8080` — причины и способ
+вернуть старый порт описаны в разделе [Общие настройки](../setting-up-master-ui/configuring-master/configuring-master.mdx#общие-настройки).
+:::
+
 Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл
 конфигурации, Spring Cloud Config Server или HashiCorp Vault — так что встроить его в существующий конвейер
 конфигурации не составит большого труда. См. [Передача свойств](../setting-up-master-ui/configuring-master/configuring-master.mdx#способы-задания-свойств).

@@ -125,6 +125,11 @@ See [Run as a JAR](./configuring-master.mdx#run-as-a-jar) for the other ways to 
 Master is then reachable at `http://localhost:2935` (or behind your Ingress on Kubernetes). Sign in with the
 [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account.
 
+:::note
+`2935` is the default port since Axelix `1.2.0`. Before that release Master listened on `8080` — see
+[General](./configuring-master.mdx#general) for the reasoning and how to get the old port back.
+:::
+
 Then configure it. Master accepts configuration from many sources — environment variables, an external config file, a
 Spring Cloud Config Server, or HashiCorp Vault — so fitting it into your existing configuration pipeline should not
 be a big deal. See [Supplying properties](./configuring-master.mdx#supplying-properties).
