@@ -176,7 +176,7 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -187,7 +187,7 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:0.0.2-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -198,7 +198,7 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:3.5.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -209,7 +209,7 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:4.0.7-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
 
@@ -220,6 +220,6 @@ jobs:
         with:
           working-directory: playgrounds/${{ env.APP_NAME }}
           cr-url: ${{ env.CLOUD_CONTAINER_REGISTRY_URL }}
-          cr-repository-path: ${{ vars.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
+          cr-repository-path: ${{ env.IMAGE_REPOSITORY }}/${{ env.APP_NAME }}
           image-tag: ${{ env.APP_NAME }}:1.2.0-SNAPSHOT
           helm-release: ${{ env.APP_NAME }}
