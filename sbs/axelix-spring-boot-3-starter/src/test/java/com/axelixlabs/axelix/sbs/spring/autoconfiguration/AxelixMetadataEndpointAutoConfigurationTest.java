@@ -88,15 +88,12 @@ class AxelixMetadataEndpointAutoConfigurationTest {
                 });
     }
 
-    @Test // regression: the absent tracking bean must not break the metadata endpoint.
-    void shouldReportNoScheduledTaskExecutions_whenHistoryIsAbsent() {
+    @Test // regression: the absent ScheduledTaskExecutionHistory bean must not break the metadata endpoint.
+    void shouldCreateMetadataEndpoint_whenScheduledTaskExecutionHistoryIsAbsent() {
         contextRunner.run(context -> {
             assertThat(context).doesNotHaveBean(ScheduledTaskExecutionHistory.class);
-
-            BasicRegistrationMetadata metadata =
-                    context.getBean(BasicRegistrationMetadataAssembler.class).assemble();
-
-            assertThat(metadata.getInsights().getScheduledTaskExecutions()).isEmpty();
+            assertThat(context).hasSingleBean(BasicRegistrationMetadataAssembler.class);
+            assertThat(context).hasSingleBean(AxelixMetadataEndpoint.class);
         });
     }
 }

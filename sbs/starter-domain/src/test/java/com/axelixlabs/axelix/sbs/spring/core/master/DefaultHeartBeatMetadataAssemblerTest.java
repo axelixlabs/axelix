@@ -46,7 +46,12 @@ import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HealthStatus;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.HotSpotInsights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.Insights;
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.PersistenceInsights;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.DefaultInsightsInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.NoOpJpaEntitiesProfileProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.insights.VmOptionsAccessor;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 
 import static com.axelixlabs.axelix.sbs.spring.core.master.AxelixInfoPropertiesLoader.AXELIX_INFO_LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +86,18 @@ class DefaultHeartBeatMetadataAssemblerTest {
 
     @Autowired
     private HeartBeatConfigurationProperties properties;
+
+    @Autowired
+    private HealthDetectionFunction healthDetectionFunction;
+
+    @Autowired
+    private AxelixVersionDiscoverer axelixVersionDiscoverer;
+
+    @Autowired
+    private LibraryInformationProvider libraryInformationProvider;
+
+    @Autowired
+    private AxelixInfoProperties axelixInfoProperties;
 
     @TestConfiguration
     static class CurrentConfig {
@@ -197,5 +214,35 @@ class DefaultHeartBeatMetadataAssemblerTest {
         assertThat(metadata1.getInstanceName()).startsWith("testApp-");
         assertThat(metadata2.getInstanceName()).startsWith("testApp-");
         assertThat(metadata1.getInstanceName()).isNotEqualTo(metadata2.getInstanceName());
+    }
+
+    @Test // the heartbeat metadata assembling must not fail when the scheduled task execution history is absent.
+    void shouldReportNoScheduledTaskExecutions_whenHistoryIsAbsent() {
+        // given.
+        DefaultBasicRegistrationMetadataAssembler basicAssembler = new DefaultBasicRegistrationMetadataAssembler(
+                healthDetectionFunction,
+                axelixVersionDiscoverer,
+                libraryInformationProvider,
+                insightsInfoProviderWithoutHistory(),
+                axelixInfoProperties);
+        DefaultHeartBeatMetadataAssembler assembler = new DefaultHeartBeatMetadataAssembler(basicAssembler, properties);
+
+        // when.
+        HeartBeatMetadata metadata = assembler.assemble();
+
+        // then.
+        assertThat(metadata.getBasicRegistrationMetadata().getInsights().getScheduledTaskExecutions())
+                .isEmpty();
+    }
+
+    private static DefaultInsightsInfoProvider insightsInfoProviderWithoutHistory() {
+        return new DefaultInsightsInfoProvider(
+                () -> false,
+                null,
+                new VmOptionsAccessor(List.of()),
+                new DefaultTransactionStatsCollector(),
+                new TransactionAttributesRegistry(),
+                new NoOpJpaEntitiesProfileProvider(),
+                null);
     }
 }

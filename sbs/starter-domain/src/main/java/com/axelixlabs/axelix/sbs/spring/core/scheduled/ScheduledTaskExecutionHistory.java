@@ -139,6 +139,7 @@ public class ScheduledTaskExecutionHistory {
 
             List<ScheduledTaskExecution> executions = snapshotOrderedByGeneration();
 
+            // race here is possible, since snapshot is received earlier, but still is highly unlikely
             if (markedGeneration.compareAndSet(null, insertionCounter.get())) {
                 return executions;
             }
