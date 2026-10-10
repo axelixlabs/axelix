@@ -19,30 +19,34 @@ package com.axelixlabs.axelix.master.repository;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.ProbeState;
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
 
 /**
- * Repository for {@link Instance} aggregate.
+ * Repository for {@link ProbeState}.
  *
- * @author Nikita Kirillov
- * @author Mikhail Polivakha
- * @author Sergey Cherkasov
+ * @author Marsel Semenov
  */
-public interface InstanceRepository extends ListCrudRepository<Instance, InstanceId> {
+public interface ProbeStateRepository extends ListCrudRepository<ProbeState, InstanceKey> {
 
-    Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
+    List<ProbeState> findAllByNextAttemptAtLessThanEqual(Instant now);
 
+    /**
+     * Leases all the states that are due, i.e. the ones {@link #findAllByNextAttemptAtLessThanEqual} returns.
+     * Must be called under the {@link com.axelixlabs.axelix.master.service.discovery.DiscoveryLock}, so that
+     * both calls see the same rows.
+     */
     @Modifying
-    @Query("DELETE FROM instances WHERE latest_heart_beat IS NOT NULL AND latest_heart_beat < :threshold")
-    int deleteWhereHeartbeatOlderThan(@Param("threshold") Instant threshold);
-
-    List<Instance> findAllByLatestHeartBeatIsNull();
+    @Query("""
+            UPDATE probe_state
+            SET next_attempt_at = :leaseUntil, version = version + 1
+            WHERE next_attempt_at <= :now
+            """)
+    void leaseDue(@Param("now") Instant now, @Param("leaseUntil") Instant leaseUntil);
 }

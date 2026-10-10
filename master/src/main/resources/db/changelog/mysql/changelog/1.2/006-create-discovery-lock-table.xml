@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    A single-row table: updating the row inside a transaction serializes the registry reconciliation
+    between Master replicas. A row lock works the same way on every supported RDBMS.
+  -->
+  <changeSet id="1.2-006-1-mysql-create-discovery-lock-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="discovery_lock"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="discovery_lock">
+      <column name="id" type="INT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_discovery_lock"/>
+      </column>
+      <column name="version" type="BIGINT" defaultValueNumeric="0">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <insert tableName="discovery_lock">
+      <column name="id" valueNumeric="1"/>
+      <column name="version" valueNumeric="0"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>

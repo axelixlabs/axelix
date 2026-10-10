@@ -25,6 +25,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
 
+import com.axelixlabs.axelix.master.domain.ProbeState.InstanceKey;
+
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
  *                                managed by this Axelix Master.
@@ -44,6 +46,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param memoryUsage             Memory usage of the given instance
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
+ * @param discoveryKey            The key under which the auto-discovery sees this instance, and {@code null} for
+ *                                self-registered instances
  */
 @Table("instances")
 public record Instance(
@@ -62,7 +66,8 @@ public record Instance(
         @Nullable Instant latestHeartBeat,
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
-        String actuatorUrl) {
+        String actuatorUrl,
+        @Embedded.Nullable @Nullable InstanceKey discoveryKey) {
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
@@ -81,7 +86,29 @@ public record Instance(
                 this.latestHeartBeat,
                 instanceStatus,
                 this.memoryUsage,
-                this.actuatorUrl);
+                this.actuatorUrl,
+                this.discoveryKey);
+    }
+
+    public Instance withDiscoveryKey(InstanceKey discoveryKey) {
+        return new Instance(
+                this.id,
+                this.applicationId,
+                this.name,
+                this.serviceVersion,
+                this.starterVersion,
+                this.javaVersion,
+                this.springBootVersion,
+                this.springFrameworkVersion,
+                this.kotlinVersion,
+                this.jdkVendor,
+                this.commitShaShort,
+                this.deployedAt,
+                this.latestHeartBeat,
+                this.status,
+                this.memoryUsage,
+                this.actuatorUrl,
+                discoveryKey);
     }
 
     public enum InstanceStatus {

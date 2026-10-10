@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    Probing state of the auto-discovered instances. next_attempt_at serves both as the backoff after failures
+    and as the lease while some Master replica is probing the instance.
+  -->
+  <changeSet id="1.2-005-1-sqlite-create-probe-state-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="probe_state"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="probe_state">
+      <column name="service_id" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_probe_state"/>
+      </column>
+      <column name="host" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_probe_state"/>
+      </column>
+      <column name="port" type="INTEGER">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_probe_state"/>
+      </column>
+      <column name="consecutive_failures" type="INTEGER" defaultValueNumeric="0">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_verdict" type="TEXT"/>
+      <column name="last_status" type="INTEGER"/>
+      <column name="next_attempt_at" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_success_at" type="TEXT"/>
+      <column name="version" type="INTEGER" defaultValueNumeric="0">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="1.2-005-2-sqlite-index-probe-state-next-attempt-at" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <indexExists tableName="probe_state" indexName="idx_probe_state_next_attempt_at"/>
+      </not>
+    </preConditions>
+
+    <createIndex tableName="probe_state" indexName="idx_probe_state_next_attempt_at">
+      <column name="next_attempt_at"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>
