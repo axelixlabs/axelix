@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -41,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Functional tests for {@link ProjectInfoGenerator}.
  *
  * @author Nikita Kirillov
+ * @author Aleksei Ermakov
  */
 class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalTest {
 
@@ -145,6 +147,76 @@ class ProjectInfoGeneratorFunctionalTest extends AbstractAxelixPluginFunctionalT
         // then.
         assertThat(result.task(":processResources").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
         assertGitBuildProperties(loadPropertiesFromMainResources(), true);
+    }
+
+    @ParameterizedTest // GH-1729
+    @MethodSource("gradleVersionsUnderTest")
+    void generatesGitInfoFromLinkedWorktree(String gradleVersion) throws IOException, InterruptedException {
+        assertWorktreeProperties(gradleVersion, false);
+    }
+
+    @ParameterizedTest // GH-1729
+    @MethodSource("gradleVersionsUnderTest")
+    void generatesGitInfoFromDetachedWorktreeWithAbsoluteCommonDir(String gradleVersion)
+            throws IOException, InterruptedException {
+        assertWorktreeProperties(gradleVersion, true);
+    }
+
+    private void assertWorktreeProperties(String gradleVersion, boolean detached)
+            throws IOException, InterruptedException {
+        // given.
+        setupProject("properties/build-info.gradle.kts");
+        initGitRepository();
+        Path mainProjectDir = projectDir;
+        Path worktree = mainProjectDir.resolve("linked-worktree");
+        runGit("worktree", "add", "-b", "worktree-test", worktree.toString());
+        projectDir = worktree;
+        runGit(
+                "-c",
+                "user.name=Worktree User",
+                "-c",
+                "user.email=worktree@example.com",
+                "commit",
+                "--allow-empty",
+                "-m",
+                "worktree commit");
+        runGit("pack-refs", "--all");
+        String expectedCommit = runGit("rev-parse", "HEAD");
+        String expectedTime = runGit("show", "-s", "--format=%cI", "HEAD");
+        if (detached) {
+            runGit("checkout", "--detach");
+            Path gitDir = Path.of(runGit("rev-parse", "--absolute-git-dir"));
+            Files.writeString(
+                    gitDir.resolve("commondir"), mainProjectDir.resolve(".git").toString());
+        }
+
+        // when.
+        BuildResult result =
+                createRunner(gradleVersion, GENERATE_TASK_NAME, "--stacktrace").build();
+
+        // then.
+        assertThat(result.task(":" + GENERATE_TASK_NAME).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        Properties properties = loadProperties();
+        assertThat(properties.getProperty("build.name")).isEqualTo("axelix-plugin-test");
+        assertThat(properties.getProperty("git.commit.id")).isEqualTo(expectedCommit);
+        assertThat(properties.getProperty("git.commit.id.abbrev")).isEqualTo(expectedCommit.substring(0, 7));
+        assertThat(properties.getProperty("git.branch")).isEqualTo(detached ? expectedCommit : "worktree-test");
+        assertThat(properties.getProperty("git.commit.user.name")).isEqualTo("Worktree User");
+        assertThat(properties.getProperty("git.commit.user.email")).isEqualTo("worktree@example.com");
+        assertThat(OffsetDateTime.parse(properties.getProperty("git.commit.time")))
+                .isEqualTo(OffsetDateTime.parse(expectedTime));
+
+        // given. a new commit must invalidate the generated properties on the next build.
+        runGit("commit", "--allow-empty", "-m", "another worktree commit");
+        String nextCommit = runGit("rev-parse", "HEAD");
+
+        // when.
+        BuildResult nextBuild =
+                createRunner(gradleVersion, GENERATE_TASK_NAME, "--stacktrace").build();
+
+        // then.
+        assertThat(nextBuild.task(":" + GENERATE_TASK_NAME).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        assertThat(loadProperties().getProperty("git.commit.id")).isEqualTo(nextCommit);
     }
 
     private void setupProject(String buildGradleFixture) throws IOException {

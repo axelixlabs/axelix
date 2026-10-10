@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,8 @@ import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.axelixlabs.axelix.maven.plugin.ProjectInfoGenerator.AXELIX_INFO_PROPERTIES_LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Artemiy Degtyarev
  * @author Mikhail Polivakha
+ * @author Aleksei Ermakov
  */
 class ProjectInfoGeneratorTest {
 
@@ -121,6 +125,58 @@ class ProjectInfoGeneratorTest {
         assertGitPropertiesAreAbsent(axelixInfoProperties);
     }
 
+    @ParameterizedTest // GH-1729
+    @ValueSource(booleans = {false, true})
+    void shouldGenerateGitInfoFromLinkedWorktree(boolean detached)
+            throws VerificationException, IOException, InterruptedException {
+        assertWorktreeProperties(detached);
+    }
+
+    private void assertWorktreeProperties(boolean detached)
+            throws IOException, InterruptedException, VerificationException {
+        // given.
+        writePom(POM_CONTENT);
+        initGitRepository();
+        Path mainProjectDir = projectDir;
+        Path worktree = mainProjectDir.resolve("linked-worktree");
+        runGit("worktree", "add", "-b", "worktree-test", worktree.toString());
+        projectDir = worktree;
+        runGit(
+                "-c",
+                "user.name=Worktree User",
+                "-c",
+                "user.email=worktree@example.com",
+                "commit",
+                "--allow-empty",
+                "-m",
+                "worktree commit");
+        runGit("pack-refs", "--all");
+        String expectedCommit = runGit("rev-parse", "HEAD");
+        String expectedTime = runGit("show", "-s", "--format=%cI", "HEAD");
+        if (detached) {
+            runGit("checkout", "--detach");
+            Path gitDir = Path.of(runGit("rev-parse", "--absolute-git-dir"));
+            Files.writeString(
+                    gitDir.resolve("commondir"), mainProjectDir.resolve(".git").toString());
+        }
+
+        // when.
+        Verifier verifier = new Verifier(projectDir.toString());
+        verifier.executeGoal("install");
+        verifier.verify(true);
+
+        // then.
+        Properties properties = loadProperties(infoFile());
+        assertThat(properties.getProperty("build.name")).isEqualTo("axelix-plugin-test");
+        assertThat(properties.getProperty("git.commit.id")).isEqualTo(expectedCommit);
+        assertThat(properties.getProperty("git.commit.id.abbrev")).isEqualTo(expectedCommit.substring(0, 7));
+        assertThat(properties.getProperty("git.branch")).isEqualTo(detached ? expectedCommit : "worktree-test");
+        assertThat(properties.getProperty("git.commit.user.name")).isEqualTo("Worktree User");
+        assertThat(properties.getProperty("git.commit.user.email")).isEqualTo("worktree@example.com");
+        assertThat(OffsetDateTime.parse(properties.getProperty("git.commit.time")))
+                .isEqualTo(OffsetDateTime.parse(expectedTime));
+    }
+
     private Path infoFile() {
         return projectDir.resolve("target/classes/" + AXELIX_INFO_PROPERTIES_LOCATION);
     }
@@ -139,17 +195,20 @@ class ProjectInfoGeneratorTest {
         runGit("commit", "-m", "initial commit");
     }
 
-    private void runGit(String... args) throws IOException, InterruptedException {
+    private String runGit(String... args) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add("git");
         command.addAll(Arrays.asList(args));
-        Process process =
-                new ProcessBuilder(command).directory(projectDir.toFile()).start();
+        Process process = new ProcessBuilder(command)
+                .directory(projectDir.toFile())
+                .redirectErrorStream(true)
+                .start();
+        String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            String output = new String(process.getInputStream().readAllBytes());
             throw new IllegalStateException("Git command failed with exit code " + exitCode + ": " + output);
         }
+        return output;
     }
 
     private void assertBuildProperties(Properties properties) {
