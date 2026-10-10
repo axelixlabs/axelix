@@ -179,6 +179,70 @@ the Axelix build plugin?](../../setting-up-spring-boot-service/build-plugin/what
 plugin](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
 :::
 
+### Transitive dependencies
+
+The starter is built to add as little as possible to your classpath. Everything it integrates with — Spring Boot,
+Actuator, Spring Cloud OpenFeign, Spring Kafka, Micrometer, Caffeine, Jackson — is compiled against but **not** brought
+in: the starter uses whatever your application already has. The only libraries it brings in transitively are:
+
+| Dependency | Why it is there |
+|---|---|
+| `org.slf4j:slf4j-api` | Logging. Already present in every Spring Boot application. |
+| `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` | Verifying the JWT that Master sends with every request. |
+| `org.jspecify:jspecify` | Nullness annotations. |
+
+This list is meant to shrink. The starter is the one Axelix component that runs inside your services, and every
+library it brings in is one more thing on your classpath to scan, patch, and keep compatible with the rest of your
+application. The Axelix core team's position is that the starter should have **no external dependencies at all**, and
+we are removing the remaining ones step by step — follow
+[axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748) for the progress.
+
+#### JsonPath is no longer included
+
+<UpcomingReleaseNotice />
+
+Up to and including Axelix 1.1.x, the starter also brought in `com.jayway.jsonpath:json-path`, although it never used
+it. Starting with Axelix 1.2.0, that dependency is removed — the first step towards the dependency-free starter
+described in [axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+If your application uses JsonPath in its own code and has been getting it only through the Axelix starter, declare it
+explicitly when you upgrade. The version is managed by Spring Boot, so you do not need to specify one:
+
+<Tabs groupId="build-tool" items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.jayway.jsonpath:json-path")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.jayway.jsonpath:json-path'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.jayway.jsonpath</groupId>
+    <artifactId>json-path</artifactId>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+Tests are not affected: `spring-boot-starter-test` brings in JsonPath on its own.
+
 ## Actuator endpoints
 
 Starting with Axelix **1.2.0** there is nothing to configure by hand: on application startup the starter adds its own

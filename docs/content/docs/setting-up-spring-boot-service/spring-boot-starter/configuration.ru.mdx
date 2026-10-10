@@ -185,6 +185,71 @@ Actuator](https://mvnrepository.com/artifact/org.springframework.boot/spring-boo
 сборки](../../setting-up-spring-boot-service/build-plugin/configuration.mdx).
 :::
 
+### Транзитивные зависимости
+
+Стартер устроен так, чтобы добавлять в ваш classpath как можно меньше. Всё, с чем он интегрируется, — Spring Boot,
+Actuator, Spring Cloud OpenFeign, Spring Kafka, Micrometer, Caffeine, Jackson — используется только при компиляции
+стартера и **не** подтягивается вместе с ним: стартер работает с тем, что уже есть в вашем сервисе. Транзитивно он
+приносит только следующие библиотеки:
+
+| Зависимость | Зачем она нужна |
+|---|---|
+| `org.slf4j:slf4j-api` | Логирование. Уже есть в любом приложении на Spring Boot. |
+| `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` | Проверка JWT, который Master отправляет с каждым запросом. |
+| `org.jspecify:jspecify` | Аннотации nullness. |
+
+Этот список будет сокращаться. Стартер — единственный компонент Axelix, который работает внутри ваших сервисов, и
+каждая библиотека, которую он приносит, — это ещё одна зависимость в вашем classpath, которую нужно сканировать на
+уязвимости, обновлять и поддерживать совместимой с остальным приложением. Позиция core-команды Axelix такова: у
+стартера **не должно быть внешних зависимостей вообще**, и мы шаг за шагом убираем оставшиеся — за ходом работы можно
+следить в [axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+#### JsonPath больше не подключается
+
+<UpcomingReleaseNotice />
+
+До Axelix 1.1.x включительно стартер также подтягивал `com.jayway.jsonpath:json-path`, хотя сам его не использовал.
+Начиная с Axelix 1.2.0 эта зависимость удалена — это первый шаг к стартеру без внешних зависимостей, описанному в
+[axelixlabs/axelix#1748](https://github.com/axelixlabs/axelix/issues/1748).
+
+Если ваш сервис использует JsonPath в собственном коде и получал его только через стартер Axelix, при обновлении
+объявите зависимость явно. Версией управляет Spring Boot, поэтому указывать её не нужно:
+
+<Tabs items={['Gradle (Kotlin DSL)', 'Gradle (Groovy)', 'Maven']}>
+  <Tab value="Gradle (Kotlin DSL)">
+
+```kotlin title="build.gradle.kts"
+dependencies {
+    implementation("com.jayway.jsonpath:json-path")
+}
+```
+
+  </Tab>
+  <Tab value="Gradle (Groovy)">
+
+```groovy title="build.gradle"
+dependencies {
+    implementation 'com.jayway.jsonpath:json-path'
+}
+```
+
+  </Tab>
+  <Tab value="Maven">
+
+```xml title="pom.xml"
+<dependencies>
+  <dependency>
+    <groupId>com.jayway.jsonpath</groupId>
+    <artifactId>json-path</artifactId>
+  </dependency>
+</dependencies>
+```
+
+  </Tab>
+</Tabs>
+
+Тесты это не затрагивает: `spring-boot-starter-test` подключает JsonPath самостоятельно.
+
 ## Actuator-эндпоинты
 
 Начиная с Axelix **1.2.0** ничего настраивать вручную не нужно: стартер сам добавляет свои actuator-эндпоинты в
