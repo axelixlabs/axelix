@@ -129,11 +129,13 @@ class LoggersMcpServerToolsTest {
                     .thenReturn(objectMapper.writeValueAsBytes(appLogger));
 
             // when.
-            Map<String, String> result = subject.findLoggersByName(INSTANCE_ID, "com.example.app");
+            String result = subject.findLoggersByName(INSTANCE_ID, "com.example.app");
 
             // then.
-            assertThat(result).containsOnlyKeys("com.example.app");
-            assertThat(result.get("com.example.app")).contains("DEBUG");
+            assertThatJson(result).isObject().containsOnlyKeys("com.example.app");
+            assertThatJson(result).node("com\\.example\\.app.name").isEqualTo("com.example.app");
+            assertThatJson(result).node("com\\.example\\.app.configuredLevel").isEqualTo("DEBUG");
+            assertThatJson(result).node("com\\.example\\.app.effectiveLevel").isEqualTo("DEBUG");
 
             ArgumentCaptor<HttpPayload> payloadCaptor = ArgumentCaptor.forClass(HttpPayload.class);
             verify(endpointInvoker)
@@ -159,10 +161,13 @@ class LoggersMcpServerToolsTest {
                     .groups(List.of()));
 
             // when.
-            Map<String, String> result = subject.findLoggersByName(INSTANCE_ID, "com.example.app");
+            String result = subject.findLoggersByName(INSTANCE_ID, "com.example.app");
 
             // then.
-            assertThat(result).containsOnlyKeys("com.example.app.service", "com.example.app.repository");
+            assertThatJson(result).isObject().containsOnlyKeys("com.example.app.service", "com.example.app.repository");
+            assertThatJson(result)
+                    .node("com\\.example\\.app\\.service.effectiveLevel")
+                    .isEqualTo("INFO");
         }
 
         @Test
@@ -176,10 +181,10 @@ class LoggersMcpServerToolsTest {
                     .groups(List.of()));
 
             // when.
-            Map<String, String> result = subject.findLoggersByName(INSTANCE_ID, "does-not-exist");
+            String result = subject.findLoggersByName(INSTANCE_ID, "does-not-exist");
 
             // then.
-            assertThat(result).isEmpty();
+            assertThatJson(result).isObject().isEmpty();
         }
     }
 
@@ -194,11 +199,12 @@ class LoggersMcpServerToolsTest {
                     .thenReturn(objectMapper.writeValueAsBytes(web));
 
             // when.
-            Map<String, String> result = subject.findGroupsByName(INSTANCE_ID, "web");
+            String result = subject.findGroupsByName(INSTANCE_ID, "web");
 
             // then.
-            assertThat(result).containsOnlyKeys("web");
-            assertThat(result.get("web")).contains("WARN");
+            assertThatJson(result).isObject().containsOnlyKeys("web");
+            assertThatJson(result).node("web.name").isEqualTo("web");
+            assertThatJson(result).node("web.configuredLevel").isEqualTo("WARN");
 
             ArgumentCaptor<HttpPayload> payloadCaptor = ArgumentCaptor.forClass(HttpPayload.class);
             verify(endpointInvoker)
@@ -220,10 +226,11 @@ class LoggersMcpServerToolsTest {
                     new LoggersFeed().levels(List.of()).loggers(List.of()).groups(List.of(web, sql)));
 
             // when.
-            Map<String, String> result = subject.findGroupsByName(INSTANCE_ID, "w");
+            String result = subject.findGroupsByName(INSTANCE_ID, "w");
 
             // then.
-            assertThat(result).containsOnlyKeys("web");
+            assertThatJson(result).isObject().containsOnlyKeys("web");
+            assertThatJson(result).node("web.configuredLevel").isEqualTo("INFO");
         }
 
         @Test
@@ -237,10 +244,10 @@ class LoggersMcpServerToolsTest {
                     .groups(List.of(feedGroup("web", "INFO", List.of()))));
 
             // when.
-            Map<String, String> result = subject.findGroupsByName(INSTANCE_ID, "does-not-exist");
+            String result = subject.findGroupsByName(INSTANCE_ID, "does-not-exist");
 
             // then.
-            assertThat(result).isEmpty();
+            assertThatJson(result).isObject().isEmpty();
         }
     }
 

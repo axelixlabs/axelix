@@ -166,7 +166,7 @@ public class LoggersMcpServerTools {
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public Map<String, String> findLoggersByName(
+    public String findLoggersByName(
             @McpToolParam(description = "The instance ID") String instanceId,
             @McpToolParam(description = """
                 The Logger Name. The exact or approximate name of the logger.
@@ -178,11 +178,11 @@ public class LoggersMcpServerTools {
             byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
             SingleLoggerProfile logger = objectMapper.readValue(body, SingleLoggerProfile.class);
 
-            return Map.of(loggerName, logger.toString());
+            return objectMapper.writeValueAsString(Map.of(loggerName, logger));
         } catch (EndpointInvocationException | BadRequestException e) {
-            return getAllLoggers(instanceId).getLoggers().stream()
+            return objectMapper.writeValueAsString(getAllLoggers(instanceId).getLoggers().stream()
                     .filter(logger -> logger.getName().contains(loggerName))
-                    .collect(Collectors.toMap(LoggersFeedLogger::getName, LoggersFeedLogger::toString));
+                    .collect(Collectors.toMap(LoggersFeedLogger::getName, logger -> logger)));
         }
     }
 
@@ -214,7 +214,7 @@ public class LoggersMcpServerTools {
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public Map<String, String> findGroupsByName(
+    public String findGroupsByName(
             @McpToolParam(description = "The instance ID") String instanceId,
             @McpToolParam(description = """
                 The Group Name. The exact or approximate name of the group loggers.
@@ -226,11 +226,11 @@ public class LoggersMcpServerTools {
                     endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
             LoggersGroupProfile logger = objectMapper.readValue(body, LoggersGroupProfile.class);
 
-            return Map.of(groupName, logger.toString());
+            return objectMapper.writeValueAsString(Map.of(groupName, logger));
         } catch (EndpointInvocationException | BadRequestException e) {
-            return getAllLoggers(instanceId).getGroups().stream()
+            return objectMapper.writeValueAsString(getAllLoggers(instanceId).getGroups().stream()
                     .filter(group -> group.getName().contains(groupName))
-                    .collect(Collectors.toMap(LoggersFeedGroup::getName, LoggersFeedGroup::toString));
+                    .collect(Collectors.toMap(LoggersFeedGroup::getName, group -> group)));
         }
     }
 
