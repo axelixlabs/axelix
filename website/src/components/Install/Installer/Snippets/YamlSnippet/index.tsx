@@ -39,23 +39,6 @@ export const YamlSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.At}>auth</span>:
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>jwt</span>:
-                </span>
-                <span className={styles.Line}>
-                    {"        "}
-                    <span className={styles.At}>algorithm</span>: <span className={styles.St}>HMAC256</span>
-                </span>
-                <span className={styles.Line}>
-                    {"        "}
-                    <span className={styles.At}>signing-key</span>:{" "}
-                    <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
                     <span className={styles.At}>discovery</span>:
                 </span>
                 <span className={styles.Line}>

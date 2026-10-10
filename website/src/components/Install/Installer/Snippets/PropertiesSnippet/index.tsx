@@ -31,14 +31,6 @@ export const PropertiesSnippet = ({ refEl }: IProps) => {
         >
             <code>
                 <span className={styles.Line}>
-                    <span className={styles.At}>axelix.sbs.auth.jwt.algorithm</span>=
-                    <span className={styles.St}>HMAC256</span>
-                </span>
-                <span className={styles.Line}>
-                    <span className={styles.At}>axelix.sbs.auth.jwt.signing-key</span>=
-                    <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
-                </span>
-                <span className={styles.Line}>
                     <span className={styles.At}>axelix.sbs.discovery.self-registration</span>=
                     <span className={styles.St}>true</span>
                 </span>

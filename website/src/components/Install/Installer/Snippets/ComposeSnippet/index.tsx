@@ -35,6 +35,11 @@ export const ComposeSnippet = ({ refEl, axelixVersionData }: IProps) => {
         >
             <code>
                 <span className={styles.Line}>
+                    <span className={styles.Co}>
+                        # Uses the built-in JWT key: fine for a trial, set your own for production
+                    </span>
+                </span>
+                <span className={styles.Line}>
                     <span className={styles.At}>services</span>:
                 </span>
                 <span className={styles.Line}>
@@ -59,24 +64,6 @@ export const ComposeSnippet = ({ refEl, axelixVersionData }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"      "}- <span className={styles.St}>&quot;9444:2935&quot;</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.At}>environment</span>:
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.Co}># Important: change for production use</span>
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>AXELIX_MASTER_AUTH_JWT_ALGORITHM</span>:{" "}
-                    <span className={styles.St}>HMAC256</span>
-                </span>
-                <span className={styles.Line}>
-                    {"      "}
-                    <span className={styles.At}>AXELIX_MASTER_AUTH_JWT_SIGNING_KEY</span>:{" "}
-                    <span className={styles.Kw}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}

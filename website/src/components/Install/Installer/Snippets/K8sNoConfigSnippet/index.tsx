@@ -21,7 +21,7 @@ interface IProps {
     refEl: any;
 }
 
-export const K8sPropertiesSnippet = ({ refEl }: IProps) => {
+export const K8sNoConfigSnippet = ({ refEl }: IProps) => {
     return (
         <pre
             className={styles.Snippet}
@@ -31,12 +31,12 @@ export const K8sPropertiesSnippet = ({ refEl }: IProps) => {
         >
             <code>
                 <span className={styles.Line}>
-                    <span className={styles.At}>axelix.sbs.auth.jwt.algorithm</span>=
-                    <span className={styles.St}>HMAC256</span>
+                    <span className={styles.Co}># Nothing to configure.</span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.At}>axelix.sbs.auth.jwt.signing-key</span>=
-                    <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>
+                    <span className={styles.Co}>
+                        # Axelix Master discovers the services in your cluster on its own.
+                    </span>
                 </span>
             </code>
         </pre>

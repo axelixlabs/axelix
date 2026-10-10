@@ -38,22 +38,16 @@ export const DockerSnippet = ({ refEl, axelixVersionData }: IProps) => {
                     <span className={styles.Co}># Run the docker image (optionally pulls an image)</span>
                 </span>
                 <span className={styles.Line}>
+                    <span className={styles.Co}>
+                        # Uses the built-in JWT key: fine for a trial, set your own for production
+                    </span>
+                </span>
+                <span className={styles.Line}>
                     <span className={styles.Cm}>docker run</span> <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}
                     <span className={styles.Ar}>--publish</span> <span className={styles.St}>2935:2935</span>{" "}
-                    <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.Ar}>-e</span> AXELIX_MASTER_AUTH_JWT_ALGORITHM=
-                    <span className={styles.St}>HMAC256</span> <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.Ar}>-e</span> AXELIX_MASTER_AUTH_JWT_SIGNING_KEY=
-                    <span className={styles.St}>8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn</span>{" "}
                     <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>

@@ -41,26 +41,11 @@ export const BareMetal = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     <span className={styles.Co}>
-                        # Important: Please, change the algorithm and the key for production use
+                        # Uses the built-in JWT key: fine for a trial, set your own for production
                     </span>
                 </span>
                 <span className={styles.Line}>
-                    <span className={styles.Cm}>java -jar master.jar</span> <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.St}>--axelix.master.port=2935</span> <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.St}>--axelix.master.auth.jwt.algorithm=HMAC256</span>{" "}
-                    <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.St}>
-                        --axelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
-                    </span>
+                    <span className={styles.Cm}>java -jar master.jar</span>
                 </span>
             </code>
         </pre>

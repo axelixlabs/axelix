@@ -40,7 +40,7 @@ export const K8sSnippet = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     <span className={styles.Co}>
-                        # Important: Please, change the algorithm and the key for production use
+                        # Uses the built-in JWT key: fine for a trial, set your own for production
                     </span>
                 </span>
                 <span className={styles.Line}>
@@ -59,21 +59,7 @@ export const K8sSnippet = ({ refEl }: IProps) => {
                     <span className={styles.Ar}>--version</span>{" "}
                     <span className={styles.St}>
                         <AxelixVersion axelixVersionData={axelixVersionData} />
-                    </span>{" "}
-                    <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.Ar}>--set</span>{" "}
-                    <span className={styles.St}>axelix.master.auth.jwt.algorithm=HMAC256</span>{" "}
-                    <span className={styles.Nl}>\</span>
-                </span>
-                <span className={styles.Line}>
-                    {"    "}
-                    <span className={styles.Ar}>--set</span>{" "}
-                    <span className={styles.St}>
-                        axelix.master.auth.jwt.signingKey=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
-                    </span>{" "}
+                    </span>
                 </span>
             </code>
         </pre>

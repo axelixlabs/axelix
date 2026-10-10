@@ -17,8 +17,7 @@
  */
 import { EInstallConfigurationVariant, EInstallMethod } from "@/models";
 
-import { K8sPropertiesSnippet } from "../Snippets/K8sPropertiesSnippet";
-import { K8sYamlSnippet } from "../Snippets/K8sYamlSnippet";
+import { K8sNoConfigSnippet } from "../Snippets/K8sNoConfigSnippet";
 import { PropertiesSnippet } from "../Snippets/PropertiesSnippet";
 import { YamlSnippet } from "../Snippets/YamlSnippet";
 
@@ -29,12 +28,8 @@ interface IProps {
 }
 
 export const InstallThirdStep = ({ installMethod, installConfiguration, activeSnippetRef }: IProps) => {
-    if (installMethod === EInstallMethod.K8S && installConfiguration === EInstallConfigurationVariant.YAML) {
-        return <K8sYamlSnippet refEl={activeSnippetRef} />;
-    }
-
-    if (installMethod === EInstallMethod.K8S && installConfiguration === EInstallConfigurationVariant.PROPERTIES) {
-        return <K8sPropertiesSnippet refEl={activeSnippetRef} />;
+    if (installMethod === EInstallMethod.K8S) {
+        return <K8sNoConfigSnippet refEl={activeSnippetRef} />;
     }
 
     if (installConfiguration === EInstallConfigurationVariant.YAML) {
