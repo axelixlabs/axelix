@@ -17,32 +17,38 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.sbs.spring.core.contract.metadata.ScheduledTaskExecution;
+import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
  * Bounded in-memory history of scheduled task executions, kept per task. The executions are consumed by the
- * mark/commit protocol for the purposes of minimizing the chance of losing the execution:
+ * mark/commit/rollback protocol for the purposes of minimizing the chance of losing the execution:
  *
  * <ul>
  *   <li>every {@linkplain #record(ScheduledTaskExecution) recorded} execution receives a monotonically increasing
  *   generation based on the insertion order;</li>
- *   <li>{@link #mark()} returns an immutable snapshot of the recorded executions together with the watermark equal to
- *   the generation of the last recorded execution. It is a pure read and never changes the history;</li>
- *   <li>{@link #commit(long)} drops the executions whose generation does not exceed the watermark once the snapshot
- *   has been successfully delivered;</li>
+ *   <li>{@link #mark()} returns the recorded executions ordered by generation and remembers the watermark of that
+ *   snapshot. It never drops anything;</li>
+ *   <li>{@link #commit()} drops the executions whose generation does not exceed the remembered watermark once the
+ *   snapshot has been successfully delivered;</li>
+ *   <li>{@link #rollback()} releases the remembered watermark without dropping anything, for the case when the
+ *   delivery has failed and the executions have to stay in the history for the next attempt.</li>
  * </ul>
  *
  * @author Vyacheslav Yanin
@@ -55,12 +61,18 @@ public class ScheduledTaskExecutionHistory {
     // lock to synchronize the record and the snapshotting of the history
     private final ReadWriteLock lock;
     private final AtomicLong insertionCounter;
+    // the watermark of the snapshot that has been marked but neither committed nor rolled back yet, null if there is
+    // none
+    private final AtomicReference<@Nullable Long> markedGeneration;
+    private final Logger logger;
 
-    public ScheduledTaskExecutionHistory(ScheduledTaskHistoryConfigurationProperties properties) {
+    public ScheduledTaskExecutionHistory(ScheduledTaskHistoryConfigurationProperties properties, Logger logger) {
         this.properties = properties;
         this.insertionCounter = new AtomicLong(0L);
         this.history = new ConcurrentHashMap<>();
         this.lock = new ReentrantReadWriteLock();
+        this.markedGeneration = new AtomicReference<>();
+        this.logger = logger;
     }
 
     /**
@@ -106,28 +118,37 @@ public class ScheduledTaskExecutionHistory {
     }
 
     /**
-     * Returns an immutable snapshot of the recorded executions without modifying the history. The executions are
-     * ordered by generation. The watermark carried by the snapshot equals the generation of the last recorded
-     * execution and is meant to be passed to {@link #commit(long)} once the snapshot has been delivered.
+     * Returns the recorded executions ordered by generation and remembers the watermark of this snapshot, so that
+     * {@link #commit()} is able to drop them once the caller has delivered them. Nothing is removed from the history here.
      *
-     * @return the snapshot of the recorded executions and the current watermark.
+     * <p>Only one watermark is remembered at a time, so a mark made while the previous one is still pending cannot
+     * advance it: the pending watermark is kept as is and the situation is logged. Overwriting it would let a later
+     * {@link #commit()} drop the executions that no delivered snapshot has ever carried, which loses data instead of
+     * merely duplicating a delivery.
+     *
+     * <p>The caller is expected to close every {@code mark()} with either {@link #commit()} or {@link #rollback()},
+     * depending on the delivery outcome.
+     *
+     * @return the immutable list of the recorded executions ordered by generation.
      */
-    public HistorySnapshot mark() {
+    public List<ScheduledTaskExecution> mark() {
         Lock writeLock = null;
         try {
             writeLock = lock.writeLock();
             writeLock.lock();
 
-            Map<String, List<ScheduledTaskExecution>> copy = new HashMap<>(history.size());
+            List<ScheduledTaskExecution> executions = snapshotOrderedByGeneration();
 
-            history.forEach((s, entries) -> {
-                // here, we're risking a bit since we're getting a shallow copy of ScheduledTaskExecution
-                // We cannot make ScheduledTaskExecution immutable since it is auto-generated by openapi generator,
-                // but we can assume that by its nature ScheduledTaskExecution is supposed to be immutable.
-                copy.put(s, entries.stream().map(Entry::execution).collect(Collectors.toUnmodifiableList()));
-            });
+            // race here is possible, since snapshot is received earlier, but still is highly unlikely
+            if (markedGeneration.compareAndSet(null, insertionCounter.get())) {
+                return executions;
+            }
 
-            return new HistorySnapshot(copy, insertionCounter.get());
+            logger.info("The scheduled task executions are marked while the previous mark has neither been committed "
+                    + "nor rolled back yet. The previous watermark is kept, therefore the executions recorded in "
+                    + "between are delivered once again on the next attempt.");
+
+            return executions;
         } finally {
             if (writeLock != null) {
                 writeLock.unlock();
@@ -136,13 +157,25 @@ public class ScheduledTaskExecutionHistory {
     }
 
     /**
-     * Drops the executions whose generation does not exceed the given generation. Typically called once the snapshot
-     * obtained from {@link #mark()} has been successfully delivered, so that the delivered executions are not sent
-     * again. Executions recorded after the watermark are kept.
+     * Drops the executions whose generation does not exceed the watermark remembered by the last {@link #mark()}, and
+     * releases that watermark.
+     */
+    public void commit() {
+        Long watermark = markedGeneration.getAndSet(null);
+        if (watermark == null) {
+            return;
+        }
+        commit(watermark);
+    }
+
+    /**
+     * Drops the executions whose generation does not exceed the given generation. Called by {@link #commit()} once the
+     * snapshot obtained from {@link #mark()} has been successfully delivered, so that the delivered executions are not
+     * sent again. Executions recorded after the watermark are kept.
      *
      * @param generation the generation up to which the executions are considered delivered.
      */
-    public void commit(long generation) {
+    private void commit(long generation) {
         Lock writeLock = null;
         try {
             writeLock = lock.writeLock();
@@ -155,6 +188,14 @@ public class ScheduledTaskExecutionHistory {
                 writeLock.unlock();
             }
         }
+    }
+
+    /**
+     * Releases the watermark remembered by the last {@link #mark()} without dropping anything, for the case when the
+     * delivery has failed.
+     */
+    public void rollback() {
+        markedGeneration.set(null);
     }
 
     private void putInternal(ScheduledTaskExecution execution) {
@@ -170,47 +211,15 @@ public class ScheduledTaskExecutionHistory {
         }
     }
 
-    /**
-     * An immutable snapshot of the {@link ScheduledTaskExecutionHistory} state, produced by {@link #mark()}.
-     *
-     * @author Vyacheslav Yanin
-     */
-    public static final class HistorySnapshot {
-
-        private final Map<String, List<ScheduledTaskExecution>> executions;
-        private final long generation;
-
-        private HistorySnapshot(Map<String, List<ScheduledTaskExecution>> executions, long generation) {
-            this.executions = executions;
-            this.generation = generation;
-        }
-
-        public Map<String, List<ScheduledTaskExecution>> getExecutions() {
-            return executions;
-        }
-
-        public long getGeneration() {
-            return generation;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            HistorySnapshot that = (HistorySnapshot) o;
-            return generation == that.generation && Objects.equals(executions, that.executions);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(executions, generation);
-        }
-
-        @Override
-        public String toString() {
-            return "HistorySnapshot{" + "executions=" + executions + ", generation=" + generation + '}';
-        }
+    private List<ScheduledTaskExecution> snapshotOrderedByGeneration() {
+        // here, we're risking a bit since we're getting a shallow copy of ScheduledTaskExecution
+        // We cannot make ScheduledTaskExecution immutable since it is auto-generated by openapi generator,
+        // but we can assume that by its nature ScheduledTaskExecution is supposed to be immutable.
+        return history.values().stream()
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparing(Entry::generation))
+                .map(Entry::execution)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     /**

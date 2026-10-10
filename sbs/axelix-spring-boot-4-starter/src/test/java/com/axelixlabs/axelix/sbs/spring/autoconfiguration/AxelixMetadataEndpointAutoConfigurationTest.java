@@ -31,6 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.insights.InsightsInfoProvide
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionAttributesRegistry;
 import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.TransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link AxelixMetadataEndpointAutoConfiguration}.
  *
  * @author Mikhail Polivakha
+ * @author Vyacheslav Yanin
  */
 class AxelixMetadataEndpointAutoConfigurationTest {
 
@@ -84,5 +86,14 @@ class AxelixMetadataEndpointAutoConfigurationTest {
                     assertThat(metadata.getInsights().getPersistenceInsights().getTransactions())
                             .isEmpty();
                 });
+    }
+
+    @Test // regression: the absent ScheduledTaskExecutionHistory bean must not break the metadata endpoint.
+    void shouldCreateMetadataEndpoint_whenScheduledTaskExecutionHistoryIsAbsent() {
+        contextRunner.run(context -> {
+            assertThat(context).doesNotHaveBean(ScheduledTaskExecutionHistory.class);
+            assertThat(context).hasSingleBean(BasicRegistrationMetadataAssembler.class);
+            assertThat(context).hasSingleBean(AxelixMetadataEndpoint.class);
+        });
     }
 }

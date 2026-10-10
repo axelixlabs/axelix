@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.BasicRegistrationMetadataAss
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ class HeartBeatAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("axelix.sbs.discovery.self-registration=true")
-            .withUserConfiguration(RequiredDependenciesConfig.class)
+            .withUserConfiguration(RequiredDependenciesConfig.class, ScheduledTaskExecutionHistoryConfig.class)
             .withConfiguration(
                     AutoConfigurations.of(HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class));
 
@@ -92,6 +93,20 @@ class HeartBeatAutoConfigurationTest {
                 });
     }
 
+    @Test // the heart-beating must not fail when the scheduled task execution history is absent.
+    void shouldCreateAllBeans_whenScheduledTaskExecutionHistoryIsAbsent() {
+        new ApplicationContextRunner()
+                .withPropertyValues("axelix.sbs.discovery.self-registration=true")
+                .withUserConfiguration(RequiredDependenciesConfig.class)
+                .withConfiguration(AutoConfigurations.of(
+                        HeartBeatAutoConfiguration.class, ValidationListenerAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(ScheduledTaskExecutionHistory.class);
+                    assertThat(context).hasSingleBean(HeartBeatService.class);
+                    assertThat(context).hasSingleBean(HeartBeatLifecycleIgnitor.class);
+                });
+    }
+
     @TestConfiguration
     static class RequiredDependenciesConfig {
 
@@ -108,6 +123,15 @@ class HeartBeatAutoConfigurationTest {
         @Bean
         public JwtEncoderService jwtEncoderService() {
             return new DefaultJwtEncoderService(JwtAlgorithm.HMAC512, "secret", Duration.ofHours(1));
+        }
+    }
+
+    @TestConfiguration
+    static class ScheduledTaskExecutionHistoryConfig {
+
+        @Bean
+        public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory() {
+            return mock(ScheduledTaskExecutionHistory.class);
         }
     }
 }

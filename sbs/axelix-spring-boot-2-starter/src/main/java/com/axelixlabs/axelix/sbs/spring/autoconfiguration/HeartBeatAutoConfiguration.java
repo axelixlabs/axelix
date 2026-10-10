@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.DefaultHeartBeatMetadataAsse
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatLifecycleIgnitor;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
 
 /**
  * Autoconfiguration for heart-beating of the Instance.
@@ -40,6 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.HeartBeatService;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Ilya Naumov
+ * @author Vyacheslav Yanin
  */
 @AxelixAutoConfiguration(after = ValidationListenerAutoConfiguration.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.self-registration", havingValue = "true")
@@ -65,13 +68,15 @@ public class HeartBeatAutoConfiguration {
             HeartBeatConfigurationProperties properties,
             ObjectMapper objectMapper,
             HeartBeatMetadataAssembler heartBeatMetadataAssembler,
-            JwtEncoderService jwtEncoderService) {
+            JwtEncoderService jwtEncoderService,
+            ObjectProvider<ScheduledTaskExecutionHistory> scheduledTaskExecutionHistory) {
         return new HeartBeatService(
                 new SLF4JLogger(LoggerFactory.getLogger(HeartBeatService.class)),
                 objectMapper::writeValueAsString,
                 properties,
                 heartBeatMetadataAssembler,
-                jwtEncoderService);
+                jwtEncoderService,
+                scheduledTaskExecutionHistory.getIfAvailable());
     }
 
     @Bean

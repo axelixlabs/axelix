@@ -20,18 +20,24 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.DefaultScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.IntervalBasedTaskRescheduler;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskExecutionHistory;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskHistoryConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTaskService;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.scheduled.ScheduledTasksRegistry;
@@ -82,6 +88,20 @@ public class ScheduledTaskManagementAutoConfiguration {
     public AxelixScheduledTasksEndpoint axelixScheduledTasksEndpoint(
             ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
         return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = ScheduledTaskHistoryConfigurationProperties.CONFIG_PROPS_PREFIX)
+    public ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties() {
+        return new ScheduledTaskHistoryConfigurationProperties(0);
+    }
+
+    @Bean
+    public ScheduledTaskExecutionHistory scheduledTaskExecutionHistory(
+            ScheduledTaskHistoryConfigurationProperties scheduledTaskHistoryConfigurationProperties) {
+        return new ScheduledTaskExecutionHistory(
+                scheduledTaskHistoryConfigurationProperties,
+                new SLF4JLogger(LoggerFactory.getLogger(ScheduledTaskExecutionHistory.class)));
     }
 
     @Bean
