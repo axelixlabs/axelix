@@ -6,7 +6,7 @@ description: "This page describes the recommended way to roll Axelix out across 
 ---
 
 :::note
-The snippets on this page pin version `1.1.1` for illustration. Check the [Releases
+The snippets on this page pin version `1.2.0` for illustration. Check the [Releases
 page](https://github.com/axelixlabs/axelix/releases) for the latest published tag and substitute it in your own
 commands.
 :::
@@ -72,13 +72,13 @@ chart](./configuring-master.mdx#run-on-kubernetes). The minimal launch for each:
   <Tab value="Docker">
 
 The image is published to GitHub Container Registry. Without a tag Docker pulls `latest`, the newest release, append a
-tag such as `:1.1.1` to pin a version:
+tag such as `:1.2.0` to pin a version:
 
 <Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
   <Tab value="Built-in key (local trial)">
 
 ```bash
-docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix
 ```
 
 With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
@@ -211,11 +211,11 @@ Boot major version):
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.1"
+    id("com.axelixlabs.axelix") version "1.2.0"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.1")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.0")
 }
 ```
 
@@ -230,7 +230,7 @@ Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` 
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
   </dependency>
 </dependencies>
 
@@ -239,7 +239,7 @@ Because the plugin is not on the Gradle Plugin Portal yet, add `mavenCentral()` 
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
       <executions>
         <execution>
           <goals>

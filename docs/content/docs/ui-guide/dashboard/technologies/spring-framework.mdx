@@ -4,6 +4,11 @@ description: "The Spring Framework dashboard shows how many services in the flee
               enabled."
 ---
 
+<LegacyNotice
+  version="1.2.0"
+  reason={<>The Spring Framework dashboard is removed in Axelix 1.2.0.</>}
+/>
+
 Open Session in View (OSIV) keeps the Hibernate session and the database connection open until the whole HTTP response
 is rendered. Lazy associations then load silently outside the transaction, and each request holds a connection longer
 than it needs. Spring Boot enables OSIV by default in web applications with JPA, so it often stays on by accident. The

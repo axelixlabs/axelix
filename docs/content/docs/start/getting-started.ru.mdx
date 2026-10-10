@@ -6,7 +6,7 @@ description: "Эта страница описывает рекомендуем�
 ---
 
 :::note
-Сниппеты на этой странице используют версию `1.1.1` для наглядности. Проверьте [страницу
+Сниппеты на этой странице используют версию `1.2.0` для наглядности. Проверьте [страницу
 релизов](https://github.com/axelixlabs/axelix/releases), чтобы узнать последний опубликованный тег, и подставьте его в
 свои команды.
 :::
@@ -74,13 +74,13 @@ Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#за�
   <Tab value="Docker">
 
 Образ публикуется в GitHub Container Registry. Без тега Docker скачивает `latest` — последний релиз, чтобы
-зафиксировать версию, допишите тег, например `:1.1.1`:
+зафиксировать версию, допишите тег, например `:1.2.0`:
 
 <Tabs groupId="jwt-key" items={['Встроенный ключ (локально)', 'Свой ключ']}>
   <Tab value="Встроенный ключ (локально)">
 
 ```bash
-docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix
 ```
 
 Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
@@ -214,11 +214,11 @@ build-плагина — см. [Совместимость и версионир
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.1"
+    id("com.axelixlabs.axelix") version "1.2.0"
 }
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.1")
+    implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.0")
 }
 ```
 
@@ -233,7 +233,7 @@ dependencies {
   <dependency>
     <groupId>com.axelixlabs</groupId>
     <artifactId>axelix-spring-boot-4-starter</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
   </dependency>
 </dependencies>
 
@@ -242,7 +242,7 @@ dependencies {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
       <executions>
         <execution>
           <goals>

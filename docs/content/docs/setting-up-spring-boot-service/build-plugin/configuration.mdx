@@ -44,7 +44,7 @@ Then apply the plugin in `build.gradle.kts`:
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.1"
+    id("com.axelixlabs.axelix") version "1.2.0"
 }
 ```
 
@@ -67,7 +67,7 @@ Then apply the plugin in `build.gradle`:
 
 ```groovy title="build.gradle"
 plugins {
-    id 'com.axelixlabs.axelix' version '1.1.1'
+    id 'com.axelixlabs.axelix' version '1.2.0'
 }
 ```
 
@@ -80,7 +80,7 @@ plugins {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
       <executions>
         <execution>
           <goals>
@@ -99,9 +99,9 @@ a normal `package`/`install` build — no extra phase configuration is needed.
   </Tab>
 </Tabs>
 
-Neither plugin exposes any configuration options. The Gradle plugin only needs the standard project `group` and
-`version` to be set (it fails the build if `group` is blank, since Axelix needs it to tell applications apart); Maven
-always has its GAV coordinates, so nothing else is required.
+Neither plugin exposes any configuration options. The Gradle plugin only needs the standard project `version` to be
+set (before Axelix `1.2.0` it also failed the build if `group` was blank — see the next section); Maven always has its
+GAV coordinates, so nothing else is required.
 
 ## Optional `group` coordinate
 

@@ -46,7 +46,7 @@ pluginManagement {
 
 ```kotlin title="build.gradle.kts"
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.1"
+    id("com.axelixlabs.axelix") version "1.2.0"
 }
 ```
 
@@ -69,7 +69,7 @@ pluginManagement {
 
 ```groovy title="build.gradle"
 plugins {
-    id 'com.axelixlabs.axelix' version '1.1.1'
+    id 'com.axelixlabs.axelix' version '1.2.0'
 }
 ```
 
@@ -82,7 +82,7 @@ plugins {
     <plugin>
       <groupId>com.axelixlabs</groupId>
       <artifactId>axelix-maven-plugin</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
       <executions>
         <execution>
           <goals>
@@ -101,9 +101,9 @@ plugins {
   </Tab>
 </Tabs>
 
-Ни один из плагинов не имеет параметров конфигурации. Gradle-плагину нужно лишь, чтобы были заданы стандартные `group`
-и `version` проекта (он завершает сборку с ошибкой, если `group` пуст, поскольку Axelix использует его, чтобы различать
-приложения); в Maven координаты GAV есть всегда, поэтому ничего дополнительно настраивать не нужно.
+Ни один из плагинов не имеет параметров конфигурации. Gradle-плагину нужно лишь, чтобы была задана стандартная
+`version` проекта (до Axelix `1.2.0` он также завершал сборку с ошибкой, если `group` был пуст — см. следующий раздел);
+в Maven координаты GAV есть всегда, поэтому ничего дополнительно настраивать не нужно.
 
 ## Необязательная координата `group`
 
