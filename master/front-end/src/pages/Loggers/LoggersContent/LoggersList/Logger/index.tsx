@@ -26,7 +26,7 @@ import { TooltipWithCopy } from "@/components";
 import type { ILogger, TChangeLoggerLevel } from "@/models";
 import { resetLogger, setLoggerLevel } from "@/services";
 
-import { Levels } from "../Levels";
+import { Levels } from "../../Levels";
 
 import { LoggerScheduler } from "./LoggerScheduler";
 import styles from "./styles.module.css";
@@ -46,10 +46,14 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * Sets the loading state.
+     */
+    setLoading: (loading: boolean) => void;
 }
 
-export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
-    // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
+export const Logger = ({ levels, logger, fetchLoggersData, setLoading }: IProps) => {
     const { t } = useTranslation();
     const { effectiveLevel, configuredLevel, name, temporaryLevelInitiatedAt, temporaryLevelRollsBackAt } = logger;
     const { instanceId } = useParams();
@@ -103,25 +107,33 @@ export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
             return;
         }
 
+        setLoading(true);
+
         setLoggerLevel({
             instanceIds: [instanceId!],
             loggerName: logger.name,
             configuredLevel: level,
             ttlSeconds: ttlSeconds,
-        }).then(() => {
-            message.success(t("Loggers.loggerLevelUpdated"));
-            fetchLoggersData();
-        });
+        })
+            .then(() => {
+                message.success(t("Loggers.loggerLevelUpdated"));
+                fetchLoggersData();
+            })
+            .catch(() => setLoading(false));
     };
 
     const handleLoggerReset = (loggerName: string): void => {
+        setLoading(true);
+
         resetLogger({
             instanceId: instanceId!,
             loggerName: loggerName,
-        }).then(() => {
-            message.success(t("Loggers.reset"));
-            fetchLoggersData();
-        });
+        })
+            .then(() => {
+                message.success(t("Loggers.reset"));
+                fetchLoggersData();
+            })
+            .catch(() => setLoading(false));
     };
 
     return (

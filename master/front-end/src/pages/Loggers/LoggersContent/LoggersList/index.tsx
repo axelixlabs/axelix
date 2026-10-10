@@ -21,8 +21,7 @@ import { useRef } from "react";
 
 import type { ILogger } from "@/models";
 
-import { Logger } from "../Logger";
-
+import { Logger } from "./Logger";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -40,9 +39,14 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * Sets the loading state.
+     */
+    setLoading: (loading: boolean) => void;
 }
 
-export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData }: IProps) => {
+export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData, setLoading }: IProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
 
     const rowVirtualizer = useVirtualizer({
@@ -73,7 +77,12 @@ export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData }: IPro
                                 }}
                                 key={key}
                             >
-                                <Logger logger={logger} levels={levels} fetchLoggersData={fetchLoggersData} />
+                                <Logger
+                                    logger={logger}
+                                    levels={levels}
+                                    fetchLoggersData={fetchLoggersData}
+                                    setLoading={setLoading}
+                                />
                             </div>
                         );
                     })}
