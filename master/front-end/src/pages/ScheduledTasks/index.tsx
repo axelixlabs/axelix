@@ -15,51 +15,121 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CronTasks } from "./Cron/CronTasks";
-import { FixedTasks } from "./FixedTasks/FixedTask";
-import { useEffect, useState } from "react";
+import { App } from "antd";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 
-import { EmptyHandler, Loader, PageSearch } from "@/components";
-import { fetchData, filterScheduledTasks, isEmpty } from "@/helpers";
-import { type IScheduledTasksResponseBody, StatefulRequest } from "@/models";
-import { getScheduledTasksData } from "@/services";
+import { groupTasksByType } from "@/helpers";
+import type { IScheduledTaskExecution, ITriggerOverride } from "@/models";
+import { SCHEDULED_TASKS_RUN_DURATION_MS } from "@/utils";
+
+import { TaskDetail } from "./TaskDetail";
+import { TaskList } from "./TaskList";
+import { createManualRun, formatDuration } from "./mock";
+import styles from "./styles.module.css";
+import { SEED_ORDER, buildTask } from "./taskModel";
 
 const ScheduledTasks = () => {
-    const { instanceId } = useParams();
     const { t } = useTranslation();
+    const { message } = App.useApp();
 
-    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<IScheduledTasksResponseBody>());
+    const [selectedKey, setSelectedKey] = useState<string>("processPendingPayments");
     const [search, setSearch] = useState<string>("");
+    const [disabled, setDisabled] = useState<Record<string, boolean>>({
+        refreshSpecialtiesCache: true,
+    });
+    const [triggers, setTriggers] = useState<Record<string, ITriggerOverride>>({});
+    const [manualRuns, setManualRuns] = useState<Record<string, IScheduledTaskExecution[]>>({});
+    const [running, setRunning] = useState<Record<string, boolean>>({});
+    const [onlyFailed, setOnlyFailed] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
 
-    useEffect(() => {
-        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId!));
-    }, []);
+    const tasks = SEED_ORDER.map((seed) => {
+        const taskState = {
+            enabled: !disabled[seed.key],
+            triggerOverride: triggers[seed.key],
+            manualRuns: manualRuns[seed.key] ?? [],
+            running: Boolean(running[seed.key]),
+        };
 
-    if (scheduledTasks.loading) {
-        return <Loader />;
-    }
+        return buildTask(seed, taskState);
+    });
 
-    if (scheduledTasks.error) {
-        return <EmptyHandler isEmpty />;
-    }
+    const foundTask = tasks.find(({ key }) => {
+        return key === selectedKey;
+    });
 
-    const scheduledTasksData = scheduledTasks.response!;
+    const selectedTask = foundTask ?? tasks[0];
 
-    const effectiveScheduledTasks = search ? filterScheduledTasks(scheduledTasksData, search) : scheduledTasksData;
+    const query = search.trim().toLowerCase();
+
+    const visibleTasks = query
+        ? tasks.filter(
+              (task) => task.method.toLowerCase().includes(query) || task.className.toLowerCase().includes(query),
+          )
+        : tasks;
+
+    const selectTask = (key: string): void => {
+        setSelectedKey(key);
+        setOnlyFailed(false);
+        setPage(0);
+    };
+
+    const toggleEnabled = (enabled: boolean): void => {
+        setDisabled((previous) => ({ ...previous, [selectedKey]: !enabled }));
+        message.success(
+            enabled
+                ? t("ScheduledTasks.resumedToast", { schedule: selectedTask.human })
+                : t("ScheduledTasks.pausedToast"),
+        );
+    };
+
+    const editTrigger = (override: ITriggerOverride): void => {
+        setTriggers((previous) => ({ ...previous, [selectedKey]: override }));
+        message.success(t("ScheduledTasks.triggerUpdatedToast", { schedule: override.human }));
+    };
+
+    const runNow = (): void => {
+        if (running[selectedKey]) {
+            return;
+        }
+
+        const { key, seed } = selectedTask;
+        setRunning((previous) => ({ ...previous, [key]: true }));
+
+        setTimeout(() => {
+            const run = createManualRun(seed);
+            setRunning((previous) => ({ ...previous, [key]: false }));
+            setManualRuns((previous) => ({ ...previous, [key]: [run, ...(previous[key] ?? [])] }));
+            setOnlyFailed(false);
+            setPage(0);
+            message.success(t("ScheduledTasks.runFinishedToast", { duration: formatDuration(run.durationMs) }));
+        }, SCHEDULED_TASKS_RUN_DURATION_MS);
+    };
+
     return (
         <>
-            <PageSearch setSearch={setSearch} />
-
-            <EmptyHandler isEmpty={isEmpty(effectiveScheduledTasks)}>
-                <CronTasks cronTasks={effectiveScheduledTasks.cron} />
-                <FixedTasks
-                    taskTitle={t("ScheduledTasks.fixedDelay")}
-                    fixedTasks={effectiveScheduledTasks.fixedDelay}
+            <div className={styles.MainWrapper}>
+                <TaskList
+                    groups={groupTasksByType(visibleTasks)}
+                    selectedKey={selectedTask.key}
+                    onSelect={selectTask}
+                    search={search}
+                    onSearch={setSearch}
                 />
-                <FixedTasks taskTitle={t("ScheduledTasks.fixedRate")} fixedTasks={effectiveScheduledTasks.fixedRate} />
-            </EmptyHandler>
+
+                <TaskDetail
+                    key={selectedTask.key}
+                    task={selectedTask}
+                    onToggleEnabled={toggleEnabled}
+                    onRunNow={runNow}
+                    onEditTrigger={editTrigger}
+                    onlyFailed={onlyFailed}
+                    setOnlyFailed={setOnlyFailed}
+                    page={page}
+                    setPage={setPage}
+                />
+            </div>
         </>
     );
 };

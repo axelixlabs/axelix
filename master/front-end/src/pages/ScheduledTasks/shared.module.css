@@ -1,0 +1,44 @@
+/* TODO: Fix in future */
+.Mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, "Roboto Mono", Consolas, monospace;
+}
+
+.TypeBadge {
+    flex-shrink: 0;
+    padding: 0 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 16px;
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.TypeCron {
+    color: #026aa2;
+    background-color: #f0f9ff;
+}
+
+.TypeFixedDelay {
+    color: #5925dc;
+    background-color: #f4f3ff;
+}
+
+.TypeFixedRate {
+    color: #c11574;
+    background-color: #fdf2fa;
+}
+
+.RateGood {
+    color: #15803d;
+}
+
+.RateWarn {
+    color: var(--prop-dep-error);
+}
+
+.RateBad {
+    color: var(--prop-danger);
+}
+
+.RateOff {
+    color: var(--prop-text-dim);
+}

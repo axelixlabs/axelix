@@ -1,0 +1,37 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+    width: 360px;
+}
+
+.TypeNote {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    color: var(--prop-text-muted);
+}
+
+.Preview {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.PreviewOk {
+    color: var(--axelix-primary-green);
+    background-color: var(--prop-accent-surface);
+}
+
+.PreviewBad {
+    color: var(--prop-danger);
+    background-color: var(--prop-danger-surface);
+}
+
+.Footer {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 8px;
+}

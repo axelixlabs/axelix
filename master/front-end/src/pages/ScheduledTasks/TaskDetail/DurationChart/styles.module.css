@@ -1,0 +1,48 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    column-gap: 20px;
+    font-weight: 600;
+    color: var(--prop-text);
+}
+
+.Max {
+    color: var(--prop-text-faint);
+}
+
+.Bars {
+    display: flex;
+    align-items: flex-end;
+    column-gap: 4px;
+    height: 95px;
+    border-bottom: 1px solid var(--prop-border-soft);
+}
+
+.Bar {
+    flex: 1;
+    border-radius: var(--axelix-border-radius-small) var(--axelix-border-radius-small) 0 0;
+}
+
+.BarOk {
+    background-color: #4ade80;
+}
+
+.BarBad {
+    background-color: #ef4444;
+}
+
+.Axis {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+    color: var(--prop-text-faint);
+}

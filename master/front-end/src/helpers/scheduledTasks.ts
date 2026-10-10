@@ -17,7 +17,12 @@
  */
 import cronstrue from "cronstrue";
 
-import type { IScheduledTasksResponseBody } from "@/models";
+import {
+    EScheduledTasksTriggerType,
+    type IGroupTasksByType,
+    type IScheduledTask,
+    type IScheduledTasksResponseBody,
+} from "@/models";
 
 export const filterScheduledTasks = (
     scheduledTasksResponse: IScheduledTasksResponseBody,
@@ -50,4 +55,16 @@ export const getCronDescription = (cron: string): string => {
     } catch {
         return "Invalid cron expression";
     }
+};
+
+export const groupTasksByType = (tasks: IScheduledTask[]): IGroupTasksByType[] => {
+    const order: EScheduledTasksTriggerType[] = [
+        EScheduledTasksTriggerType.CRON,
+        EScheduledTasksTriggerType.FIXED_DELAY,
+        EScheduledTasksTriggerType.FIXED_RATE,
+    ];
+
+    return order
+        .map((type) => ({ type, tasks: tasks.filter((task) => task.type === type) }))
+        .filter((group) => group.tasks.length > 0);
 };

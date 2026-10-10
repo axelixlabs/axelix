@@ -1,0 +1,26 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.GroupsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.Group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.GroupTitle {
+    padding-inline: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--prop-text-dim);
+}

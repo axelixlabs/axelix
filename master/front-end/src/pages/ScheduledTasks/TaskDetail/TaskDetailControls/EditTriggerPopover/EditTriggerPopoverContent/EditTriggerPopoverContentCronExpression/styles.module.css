@@ -1,0 +1,16 @@
+.Field {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+}
+
+.Label {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--prop-text-faint);
+}
+
+.Help {
+    color: var(--prop-text-faint);
+}

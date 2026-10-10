@@ -1,0 +1,35 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.ColumnHeader {
+    display: grid;
+    grid-template-columns: 85px minmax(0, 160px) 70px minmax(0, 1fr);
+    column-gap: 16px;
+    padding: 8px 20px;
+    border-top: 1px solid var(--prop-border-faint);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--prop-text-faint);
+    background-color: var(--prop-surface-soft);
+}
+
+.ColumnHeaderDuration {
+    text-align: right;
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 20px;
+    padding: 10px 20px;
+    color: var(--prop-text-faint);
+    border-top: 1px solid var(--prop-border-faint);
+}
+
+.Shown {
+    font-variant-numeric: tabular-nums;
+}

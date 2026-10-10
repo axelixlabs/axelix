@@ -1,0 +1,42 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    column-gap: 20px;
+}
+
+.Title {
+    font-weight: 600;
+    color: var(--prop-text);
+}
+
+.Filter {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--prop-border);
+    border-radius: var(--axelix-border-radius-small);
+}
+
+.FilterOption {
+    padding: 4px 10px;
+    cursor: pointer;
+    background-color: var(--prop-surface);
+}
+
+.FilterOption + .FilterOption {
+    border-left: 1px solid var(--prop-border);
+}
+
+.FilterActive {
+    background-color: var(--prop-border-faint);
+    font-weight: 600;
+}
+
+.FilterFailed {
+    color: var(--prop-danger);
+}
+
+.FilterFailedActive {
+    background-color: var(--prop-danger-surface);
+}
