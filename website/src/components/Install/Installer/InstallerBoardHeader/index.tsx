@@ -26,6 +26,7 @@ import styles from "./styles.module.css";
 interface IProps {
     installStep: 1 | 2 | 3 | 4;
     setInstallStep: Dispatch<SetStateAction<1 | 2 | 3 | 4>>;
+    installStepsCount: 3 | 4;
     selectRef: any;
     openSelect: EInstallOpenSelect;
     setOpenSelect: Dispatch<SetStateAction<EInstallOpenSelect>>;
@@ -38,6 +39,7 @@ interface IProps {
 export const InstallerBoardHeader = ({
     installStep,
     setInstallStep,
+    installStepsCount,
     selectRef,
     openSelect,
     setOpenSelect,
@@ -49,7 +51,7 @@ export const InstallerBoardHeader = ({
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.TabsWrapper}>
-                {([1, 2, 3, 4] as const).map((step) => (
+                {([1, 2, 3, 4] as const).slice(0, installStepsCount).map((step) => (
                     <button
                         key={step}
                         type="button"

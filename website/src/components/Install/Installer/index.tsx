@@ -51,6 +51,17 @@ export const Installer = () => {
 
     const selectRef = useRef<HTMLDivElement>(null);
 
+    // On Kubernetes Master discovers the services on its own, so there is no "Configure" step.
+    const installStepsCount = installMethod === EInstallMethod.K8S ? 3 : 4;
+
+    const changeInstallMethod = (method: EInstallMethod) => {
+        setInstallMethod(method);
+
+        if (method === EInstallMethod.K8S && installStep === 4) {
+            setInstallStep(3);
+        }
+    };
+
     useEffect(() => {
         function onClick(e: MouseEvent) {
             if (!selectRef.current) {
@@ -69,13 +80,14 @@ export const Installer = () => {
     return (
         <>
             <div className={styles.InstallerWrapper}>
-                <InstallerMethods installMethod={installMethod} setInstallMethod={setInstallMethod} />
+                <InstallerMethods installMethod={installMethod} setInstallMethod={changeInstallMethod} />
 
                 <div className={styles.InstallerBoardWrapper}>
                     <div className={styles.InstallerBoardInnerWrapper}>
                         <InstallerBoardHeader
                             installStep={installStep}
                             setInstallStep={setInstallStep}
+                            installStepsCount={installStepsCount}
                             selectRef={selectRef}
                             openSelect={openSelect}
                             setOpenSelect={setOpenSelect}
@@ -114,14 +126,17 @@ export const Installer = () => {
 
                             {installStep === 4 && (
                                 <InstallThirdStep
-                                    installMethod={installMethod}
                                     installConfiguration={installConfiguration}
                                     activeSnippetRef={activeSnippetRef}
                                 />
                             )}
                         </div>
 
-                        <InstallerBoardFooter installStep={installStep} setInstallStep={setInstallStep} />
+                        <InstallerBoardFooter
+                            installStep={installStep}
+                            setInstallStep={setInstallStep}
+                            installStepsCount={installStepsCount}
+                        />
                     </div>
                 </div>
             </div>

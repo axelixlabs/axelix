@@ -18,8 +18,6 @@
 import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
 import { EInstallMethod, IInstallMethods, TInstallMethodData } from "@/models";
 
-import { Dispatch, SetStateAction } from "react";
-
 import styles from "./styles.module.css";
 
 const METHODS: IInstallMethods[] = [
@@ -70,7 +68,7 @@ const METHODS_DATA: TInstallMethodData = {
 
 interface IProps {
     installMethod: EInstallMethod;
-    setInstallMethod: Dispatch<SetStateAction<EInstallMethod>>;
+    setInstallMethod: (method: EInstallMethod) => void;
 }
 
 export const InstallerMethods = ({ installMethod, setInstallMethod }: IProps) => {

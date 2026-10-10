@@ -15,23 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { EInstallConfigurationVariant, EInstallMethod } from "@/models";
+import { EInstallConfigurationVariant } from "@/models";
 
-import { K8sNoConfigSnippet } from "../Snippets/K8sNoConfigSnippet";
 import { PropertiesSnippet } from "../Snippets/PropertiesSnippet";
 import { YamlSnippet } from "../Snippets/YamlSnippet";
 
 interface IProps {
-    installMethod: EInstallMethod;
     installConfiguration: EInstallConfigurationVariant;
     activeSnippetRef: any;
 }
 
-export const InstallThirdStep = ({ installMethod, installConfiguration, activeSnippetRef }: IProps) => {
-    if (installMethod === EInstallMethod.K8S) {
-        return <K8sNoConfigSnippet refEl={activeSnippetRef} />;
-    }
-
+export const InstallThirdStep = ({ installConfiguration, activeSnippetRef }: IProps) => {
     if (installConfiguration === EInstallConfigurationVariant.YAML) {
         return <YamlSnippet refEl={activeSnippetRef} />;
     }
