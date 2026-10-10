@@ -17,4 +17,3 @@
  */
 export const APP_CDS_FEATURE_ID = "AppCDS";
 export const AOT_CACHE_FEATURE_ID = "AotCache";
-export const OSIV_FEATURE_ID = "OSIV";

@@ -47,10 +47,6 @@ const getDashboardItems = (): AntdMenuItem[] => {
             path: "/dashboard/persistence",
             label: "Persistence",
         },
-        {
-            path: "/dashboard/spring-framework",
-            label: "Spring Framework",
-        },
     ];
 
     return [

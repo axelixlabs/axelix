@@ -309,11 +309,6 @@
             "inMemoryPaginationChartTitle": "In-Memory Pagination",
             "inMemoryPaginationChartSubtitle": "Persistence · memory pressure"
         },
-        "SpringFramework": {
-            "subtitle": "Ecosystem-wide Spring Framework insights · Open Session in View",
-            "osivChartTitle": "Open Session in View (OSIV)",
-            "osivChartSubtitle": "Enabled services coverage"
-        },
         "SpringPortfolio": {
             "title": "Spring Portfolio",
             "subtitle": "Versions in use across the estate, against the published OSS maintenance schedule",

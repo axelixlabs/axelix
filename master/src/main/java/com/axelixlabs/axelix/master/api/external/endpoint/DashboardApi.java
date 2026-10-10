@@ -24,7 +24,6 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.LanguagesProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
-import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringPortfolioResponse;
 import com.axelixlabs.axelix.master.service.ecosystem.LanguagesProfileService;
 import com.axelixlabs.axelix.master.service.ecosystem.SpringPortfolioService;
@@ -58,14 +57,6 @@ public class DashboardApi {
     @GetMapping(path = ApiPaths.DashboardApi.JAVA)
     public JavaDashboardResponse getJavaDashboard() {
         return databaseHistoricalApplicationSnapshotService.getJavaDashboard();
-    }
-
-    /**
-     * Retrieve the aggregated Spring Framework features adoption across the entire ecosystem.
-     */
-    @GetMapping(path = ApiPaths.DashboardApi.SPRING_FRAMEWORK)
-    public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
-        return databaseHistoricalApplicationSnapshotService.getSpringFrameworkDashboard();
     }
 
     /**

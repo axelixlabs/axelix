@@ -37,7 +37,6 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFe
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
-import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.PersistenceInsights;
 import com.axelixlabs.axelix.master.domain.ApplicationId;
@@ -48,7 +47,6 @@ import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepo
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.JavaInsightsAggregate;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.LatestStarterVersion;
 import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.ServicePersistenceInsights;
-import com.axelixlabs.axelix.master.repository.HistoricalApplicationSnapshotRepository.SpringFrameworkInsightsAggregate;
 import com.axelixlabs.axelix.master.service.convert.HistoricalApplicationSnapshotConverter;
 
 /**
@@ -100,22 +98,6 @@ public class DatabaseHistoricalApplicationSnapshotService {
                 adoptionPercentage(aggregate.compactObjectHeadersEnabledCount(), total)));
 
         return new JavaDashboardResponse(projectLeyden, gc, garbageCollectorDistribution, projectLilliput);
-    }
-
-    /**
-     * Builds the aggregated, ecosystem-wide Spring Framework features adoption view used to render the
-     * Spring Framework dashboard.
-     *
-     * @return the {@link SpringFrameworkDashboardResponse} with the adoption percentage of every tracked
-     *         Spring Framework feature.
-     */
-    @Transactional(readOnly = true)
-    public SpringFrameworkDashboardResponse getSpringFrameworkDashboard() {
-        SpringFrameworkInsightsAggregate aggregate = repository.aggregateLatestSpringFrameworkInsights();
-        long total = aggregate.totalServices();
-
-        return new SpringFrameworkDashboardResponse(List.of(new AggregatedFeature(
-                FeatureId.OSIV.getId(), adoptionPercentage(aggregate.osivEnabledCount(), total))));
     }
 
     /**
