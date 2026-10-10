@@ -247,6 +247,14 @@
     "Dashboard": {
         "enabled": "Enabled",
         "disabled": "Disabled",
+        "NoData": {
+            "badge": "No data yet",
+            "title": "No data to render this dashboard",
+            "noApplications": "It seems that we have no data currently to render this dashboard. It might be because there are no apps registered in Axelix Master at all.",
+            "oldStarter": "In some rare cases it might be because all applications that got registered in Axelix Master use an old version of Starter & Plugin, in which data for this dashboard is not transferred at all.",
+            "readTheDocs": "Read the docs",
+            "lastScan": "Last scan {{date}}"
+        },
         "Java": {
             "subtitle": "Real-time JVM insights · Project Leyden · Garbage Collection",
             "gcLoggingChartTitle": "Garbage Collector Logging",

@@ -15,30 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { SkeletonCard } from "./SkeletonCard";
 import styles from "./styles.module.css";
 
-// TODO: Fix types in future
-interface IProps {
-    active?: boolean;
-    payload?: any[];
-}
-
-// TODO: Improve this component in future
-export const DashboardChartTooltip = ({ active, payload }: IProps) => {
-    const entry = payload?.[0]?.payload;
-
-    if (!active || !entry) {
-        return null;
-    }
-
-    const { name, value, fill } = entry;
+export const DashboardNoDataSkeleton = () => {
+    const cards = new Array(4).fill(null);
 
     return (
-        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-            <span style={{ color: fill }}>&#9673;</span>
-            <span>
-                {name}: <b>{value}%</b>
-            </span>
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                {cards.map((_, index) => {
+                    return <SkeletonCard key={index} />;
+                })}
+            </div>
+        </>
     );
 };

@@ -25,8 +25,8 @@ import { DashboardSiderMenu } from "@/layout/siders";
 
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
-const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
+const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const GarbageCollector = Loadable(lazy(() => import("@/pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("@/pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("@/pages/Transactional")));

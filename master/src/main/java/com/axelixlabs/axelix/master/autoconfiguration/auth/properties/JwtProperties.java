@@ -24,6 +24,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties.PROPERTIES_PREFIX;
+
 /**
  * JWT configuration properties.
  *
@@ -32,10 +34,10 @@ import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@ConfigurationProperties(prefix = "axelix.master.auth.jwt")
+@ConfigurationProperties(prefix = PROPERTIES_PREFIX)
 public record JwtProperties(JwtAlgorithm algorithm, String signingKey, Duration lifespan) {
 
-    private static final String PROPERTIES_PREFIX = "axelix.master.auth.jwt";
+    public static final String PROPERTIES_PREFIX = "axelix.master.auth.jwt";
 
     public JwtProperties {
         if (algorithm == null) {

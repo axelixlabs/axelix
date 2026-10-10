@@ -1,0 +1,76 @@
+.MainWrapper {
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.SkeletonBackground,
+.Overlay,
+.CardContainer {
+    grid-area: 1 / 1;
+}
+
+.Overlay {
+    background-color: var(--axelix-bold-grey);
+    opacity: 0.15;
+}
+
+.CardContainer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.Card {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+    width: min(100%, 450px);
+    padding: 20px;
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    box-shadow: var(--axelix-box-shadow-bold);
+    color: var(--axelix-bold-grey);
+    background-color: var(--axelix-primary-white);
+}
+
+/* TODO: Improve in the future */
+.Badge {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.BadgeDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--axelix-bold-grey);
+}
+
+.Title {
+    font-weight: 600;
+    color: var(--axelix-primary-black);
+}
+
+.Footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--axelix-medium-grey);
+}
+
+.LastScan {
+    color: var(--axelix-bold-grey);
+    font-variant-numeric: tabular-nums;
+}

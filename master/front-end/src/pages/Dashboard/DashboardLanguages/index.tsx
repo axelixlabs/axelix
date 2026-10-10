@@ -19,7 +19,7 @@ import { type TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
 import { fetchData } from "@/helpers";
 import { type ILanguagesProfileResponseBody, StatefulRequest } from "@/models";
 import { getLanguagesProfileData } from "@/services";
@@ -71,6 +71,20 @@ const DashboardLanguages = () => {
     } = languagesProfile.response!;
 
     const applicationsTotal = applicationsOnLts + applicationsOnNonLts;
+
+    if (applicationsTotal === 0) {
+        return (
+            <>
+                <DashboardPagesFirstSection
+                    title={t("Dashboard.Languages.title")}
+                    subtitle={t("Dashboard.Languages.subtitle")}
+                />
+
+                <DashboardNoData />
+            </>
+        );
+    }
+
     const kotlinDetected = kotlinReleases.length > 0;
 
     const lastScan = formatLastScan(t, lastScannedAt);
