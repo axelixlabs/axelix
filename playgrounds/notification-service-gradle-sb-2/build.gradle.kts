@@ -22,7 +22,7 @@ plugins {
     id("org.cyclonedx.bom") version "3.4.1"
     // Tracks the current Axelix snapshot so this playground exercises the latest starter/plugin,
     // including group-less support (note the missing 'group' below).
-    id("com.axelixlabs.axelix") version "1.2.0"
+    id("com.axelixlabs.axelix") version "1.3.0-SNAPSHOT"
 }
 
 // Intentionally no 'group': exercises Axelix support for group-less Gradle services (identified by
@@ -63,7 +63,7 @@ extra["springCloudVersion"] = "2021.0.9"
 extra["testcontainers.version"] = "1.20.4"
 
 dependencies {
-    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.0")
+    implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.3.0-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-validation")

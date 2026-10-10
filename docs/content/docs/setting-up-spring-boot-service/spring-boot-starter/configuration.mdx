@@ -199,7 +199,7 @@ we are removing the remaining ones step by step — follow
 
 #### JsonPath is no longer included
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 Up to and including Axelix 1.1.x, the starter also brought in `com.jayway.jsonpath:json-path`, although it never used
 it. Starting with Axelix 1.2.0, that dependency is removed — the first step towards the dependency-free starter
@@ -474,7 +474,7 @@ variable, mounted file, or secret manager — not a checked-in YAML.
 
 ### Running without a signing key
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 Starting with Axelix 1.2.0, `algorithm` and `signing-key` are optional. When they are not set, the starter uses
 `HMAC512` and the same built-in key that Master uses by default, so the service connects to a Master with default
@@ -607,7 +607,7 @@ Every starter property lives under the `axelix.sbs.*` namespace.
 
 ### Disabling the starter
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 `axelix.sbs.enabled` is the global switch for the whole starter. It is `true` by default, so adding the dependency is
 enough to activate everything described on this page. Set it to `false` and every Axelix auto-configuration backs off:
@@ -704,7 +704,7 @@ heartbeats are rejected with `401`.
 
 ### Cache management
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 Cache management is what powers the Caches page and the `axelix_cache_*` meters: the starter wraps every `CacheManager`
 bean of your application in a proxy that records cache lookups and lets you enable, disable, and clear caches at

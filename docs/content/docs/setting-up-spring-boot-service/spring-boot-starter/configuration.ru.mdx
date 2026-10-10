@@ -206,7 +206,7 @@ Actuator, Spring Cloud OpenFeign, Spring Kafka, Micrometer, Caffeine, Jackson �
 
 #### JsonPath больше не подключается
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 До Axelix 1.1.x включительно стартер также подтягивал `com.jayway.jsonpath:json-path`, хотя сам его не использовал.
 Начиная с Axelix 1.2.0 эта зависимость удалена — это первый шаг к стартеру без внешних зависимостей, описанному в
@@ -478,7 +478,7 @@ axelix.sbs.auth.jwt.duration=5m
 
 ### Запуск без ключа подписи
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 Начиная с Axelix 1.2.0, `algorithm` и `signing-key` необязательны. Если они не заданы, стартер использует `HMAC512` и
 тот же встроенный ключ, что и Master по умолчанию, поэтому сервис подключается к Master с настройками по умолчанию без
@@ -614,7 +614,7 @@ axelix.sbs.endpoints.config.sanitized-properties[2]=jwt.signing-key
 
 ### Отключение стартера
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 `axelix.sbs.enabled` — глобальный переключатель всего стартера. По умолчанию он равен `true`, то есть достаточно
 добавить зависимость, чтобы активировать всё описанное на этой странице. Установите его в `false` — и каждая
@@ -714,7 +714,7 @@ heartbeat-сигналы будут отклоняться с `401`.
 
 ### Управление кэшами
 
-<UpcomingReleaseNotice />
+<ReleasedInNotice version="1.2.0" />
 
 Управление кэшами - это то, что обеспечивает работу страницы «Кэши» и метрик `axelix_cache_*`. Под капотом стартер
 оборачивает каждый бин `CacheManager` вашего приложения в прокси, который записывает обращения к кэшам и позволяет
