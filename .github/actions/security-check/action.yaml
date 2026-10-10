@@ -51,6 +51,10 @@ runs:
         scan-type: 'rootfs'
         scan-ref: '.'
         vuln-type: 'library'
+        # Test and demo fixtures, not something Axelix ships: an SBOM that deliberately lists old library
+        # versions, and the throwaway mTLS client key of the petclinic playground. The SBOM is matched by a
+        # glob because Gradle copies it into master/build/resources/test, which is scanned as well.
+        skip-files: '**/axelix/sbom/dependencies.cdx.json,playgrounds/spring-petclinic-maven-sb-4/src/main/resources/ssl/paygrid/client.key'
         format: 'sarif'
         output: 'trivy-axelix-artifacts.sarif'
 
@@ -71,6 +75,8 @@ runs:
         scan-type: 'rootfs'
         scan-ref: '.'
         vuln-type: 'library'
+        # Keep in sync with the scan step above.
+        skip-files: '**/axelix/sbom/dependencies.cdx.json,playgrounds/spring-petclinic-maven-sb-4/src/main/resources/ssl/paygrid/client.key'
         format: 'table'
         severity: 'HIGH,CRITICAL'
         ignore-unfixed: true
