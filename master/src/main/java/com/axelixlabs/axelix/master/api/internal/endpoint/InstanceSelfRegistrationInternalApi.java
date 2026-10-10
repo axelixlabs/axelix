@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  *
  * @author Sergey Cherkasov
  * @author Vyacheslav Yanin
+ * @author Mikhail Polivakha
  */
 @InternalApiRestController
 @ConditionalOnProperty(
@@ -87,6 +89,7 @@ public class InstanceSelfRegistrationInternalApi {
 
     @PostMapping(path = ApiPaths.SelfRegistrationApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
+        log.debug("Received registration request for {}", request.getInstanceId());
 
         BasicRegistrationMetadata metadata = request.getBasicRegistrationMetadata();
         String starterVersion = metadata.getVersion();
@@ -125,7 +128,18 @@ public class InstanceSelfRegistrationInternalApi {
     }
 
     @PostMapping(path = ApiPaths.SelfRegistrationApi.HEARTBEAT)
-    public ResponseEntity<Void> heartbeatV2(HeartBeatMetadataV2 heartBeatMetadataV2 ) {
+    public ResponseEntity<Void> heartbeatV2(HeartBeatMetadataV2 heartBeatMetadataV2) {
+        log.debug("Received heartbeat for {}", heartBeatMetadataV2.getInstanceId());
 
+        instanceRegistry.refresh(
+            InstanceId.of(heartBeatMetadataV2.getInstanceId()),
+            switch (heartBeatMetadataV2.getHealthStatus()) {
+                case UP -> Instance.InstanceStatus.UP;
+                case DOWN -> Instance.InstanceStatus.DOWN;
+                case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
+            }
+        );
+
+        return ResponseEntity.accepted().build();
     }
 }

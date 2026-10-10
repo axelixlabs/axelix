@@ -27,6 +27,8 @@ import org.jspecify.annotations.NullMarked;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 
+import static com.axelixlabs.axelix.master.domain.Instance.*;
+
 /**
  * Central registry of all the {@link Instance instances} that this Master deployment is aware about.
  * It is guaranteed that all the instances inside this registry have the unique instance id. The implementations
@@ -42,13 +44,18 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 public interface InstanceRegistry {
 
     /**
-     * Reloads the given instance inside the registry. In case the {@link Instance} with this ID
+     * Registers the given instance inside the registry. In case the {@link Instance} with this ID
      * is already present, it will be updated with the new data (upsert semantics), if case it is
      * not present - it is going to be created.
      *
      * @param instance the instance to be registered or updated
      */
     void register(Instance instance);
+
+    /**
+     * Refreshes the status of the given {@link Instance}.
+     */
+    void refresh(InstanceId instanceId, InstanceStatus status);
 
     /**
      * Reloads the registry, by removing all previously auto-discovered Instances,

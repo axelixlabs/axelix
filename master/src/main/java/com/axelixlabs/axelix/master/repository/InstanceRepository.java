@@ -28,6 +28,8 @@ import org.springframework.data.repository.query.Param;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 
+import static com.axelixlabs.axelix.master.domain.Instance.*;
+
 /**
  * Repository for {@link Instance} aggregate.
  *
@@ -46,4 +48,15 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Modifying
     @Query("DELETE FROM instances WHERE latest_heart_beat IS NULL")
     void deleteAllWithoutHeartbeat();
+
+    @Modifying
+    @Query("""
+        UPDATE instances
+        SET
+            latest_heart_beat = NOW(),
+            status = :status
+        WHERE
+            instance_id := instanceId
+        """)
+    void refreshInstanceStatus(@Param("instanceId") String instanceId, @Param("status") InstanceStatus status);
 }

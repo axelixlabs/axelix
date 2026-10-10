@@ -61,6 +61,11 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
+    public void refresh(InstanceId instanceId, Instance.InstanceStatus status) {
+        instanceRepository.refreshInstanceStatus(instanceId.instanceId(), status);
+    }
+
+    @Override
     public void register(Collection<Instance> instances) {
         // The assumption is that every Instance without the heartbeat has come from auto-discovery
         instanceRepository.deleteAllWithoutHeartbeat();
