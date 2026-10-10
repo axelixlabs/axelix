@@ -107,13 +107,16 @@ public class HeartBeatApi {
                     request.getInstanceActuatorUrl(),
                     metadata);
 
-            Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
-                    scheduledTaskExecutionResultConverter.convert(request);
+            // Scheduled-task execution history recording is switched off for the 1.2 release: the starters do
+            // not send executions yet and Master has no read side or retention (GH-1617, GH-1714). Re-enable
+            // once those land.
+            // Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
+            //         scheduledTaskExecutionResultConverter.convert(request);
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
                 databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
-                scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+                // scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             });
 
             return ResponseEntity.noContent().build();

@@ -106,15 +106,18 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 .map(DiscoveredInstanceProfile::instance)
                 .collect(Collectors.toSet());
 
-        Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
-                .map(scheduledTaskExecutionResultConverter::convert)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        // Scheduled-task execution history recording is switched off for the 1.2 release: the starters do
+        // not send executions yet and Master has no read side or retention (GH-1617, GH-1714). Re-enable
+        // once those land.
+        // Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults = discoveredInstances.stream()
+        //         .map(scheduledTaskExecutionResultConverter::convert)
+        //         .flatMap(Set::stream)
+        //         .collect(Collectors.toSet());
 
         transactionTemplate.executeWithoutResult(_ -> {
             instanceRegistry.reload(instances);
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
-            scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+            // scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });
     }
 }
