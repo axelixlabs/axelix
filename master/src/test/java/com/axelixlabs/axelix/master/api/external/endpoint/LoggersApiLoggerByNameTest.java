@@ -116,7 +116,7 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
@@ -178,7 +178,7 @@ public class LoggersApiLoggerByNameTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "com.example";
 
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate

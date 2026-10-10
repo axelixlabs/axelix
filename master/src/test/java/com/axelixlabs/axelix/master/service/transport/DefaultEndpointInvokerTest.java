@@ -146,7 +146,7 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 
@@ -167,7 +167,7 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invoke_shouldReturnEndpointInvocationException_OnUnavailableInstance() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         assertThatThrownBy(
                         () -> endpointInvoker.invoke(InstanceId.of(instanceId), METHOD_INVOKE, NoHttpPayload.INSTANCE))
@@ -216,7 +216,7 @@ public class DefaultEndpointInvokerTest {
     @Test
     void invokeNoValue_shouldReturnEndpointInvocationException() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         assertThatThrownBy(() -> endpointInvoker.invoke(
                         InstanceId.of(instanceId), METHOD_INVOKE_NO_VALUE, NoHttpPayload.INSTANCE))

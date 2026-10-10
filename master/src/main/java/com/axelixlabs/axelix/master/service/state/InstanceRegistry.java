@@ -48,7 +48,7 @@ public interface InstanceRegistry {
      *
      * @param instance the instance to be registered or updated
      */
-    void reload(Instance instance);
+    void register(Instance instance);
 
     /**
      * Reloads the registry, by removing all previously auto-discovered Instances,
@@ -57,7 +57,7 @@ public interface InstanceRegistry {
      *
      * @param instances Instances to register as a replacement of previously auto-discovered instances.
      */
-    void reload(Collection<Instance> instances);
+    void register(Collection<Instance> instances);
 
     /**
      * Deregisters the {@link Instance} by the instanceId.

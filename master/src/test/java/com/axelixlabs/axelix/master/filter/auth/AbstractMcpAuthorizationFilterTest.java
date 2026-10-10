@@ -167,7 +167,7 @@ abstract class AbstractMcpAuthorizationFilterTest {
             }
         });
 
-        instanceRegistry.reload(
+        instanceRegistry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 

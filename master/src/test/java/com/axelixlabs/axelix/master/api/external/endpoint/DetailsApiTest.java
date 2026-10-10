@@ -262,10 +262,10 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
 
         historicalApplicationSnapshotService.reloadCurrentState(
@@ -314,7 +314,7 @@ public class DetailsApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/details/{instanceId}", String.class, instanceId);
 

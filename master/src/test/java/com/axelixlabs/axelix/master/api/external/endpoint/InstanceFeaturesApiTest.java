@@ -59,8 +59,8 @@ class InstanceFeaturesApiTest extends AbstractProtectedEndpointTest {
 
     @BeforeEach
     void prepare() {
-        registry.reload(TestInstanceFactory.withStarterVersion(instanceOn12, "1.2.0"));
-        registry.reload(TestInstanceFactory.withStarterVersion(instanceOn11, "1.1.4"));
+        registry.register(TestInstanceFactory.withStarterVersion(instanceOn12, "1.2.0"));
+        registry.register(TestInstanceFactory.withStarterVersion(instanceOn11, "1.1.4"));
     }
 
     @AfterEach

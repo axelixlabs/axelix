@@ -69,7 +69,7 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
                 registry.deRegister(instance.id());
             });
 
-            registry.reload(TestInstanceFactory.create(
+            registry.register(TestInstanceFactory.create(
                     instance1Id,
                     "http://example.com/1",
                     "app-one",
@@ -80,7 +80,7 @@ public class WallboardApiTest extends AbstractProtectedEndpointTest {
                     "BellSoft",
                     "2.0.0"));
 
-            registry.reload(TestInstanceFactory.create(
+            registry.register(TestInstanceFactory.create(
                     instance2Id,
                     "http://example.com/2",
                     "app-two",

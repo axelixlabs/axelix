@@ -235,7 +235,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -412,7 +412,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorOnGetAllScheduledTasks() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate
@@ -446,7 +446,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -490,7 +490,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .cronExpression("*/5 * * * * *");
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -533,7 +533,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .interval(555555L);
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(
@@ -575,7 +575,7 @@ public class ScheduledTasksApiTest extends AbstractProtectedEndpointTest {
                 .trigger("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<Void> response = restTemplate
                 .asEditor()
                 .postForEntity(

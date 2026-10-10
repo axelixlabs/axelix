@@ -56,12 +56,12 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void reload(Instance instance) {
+    public void register(Instance instance) {
         jdbcAggregateTemplate.upsert(instance);
     }
 
     @Override
-    public void reload(Collection<Instance> instances) {
+    public void register(Collection<Instance> instances) {
         // The assumption is that every Instance without the heartbeat has come from auto-discovery
         instanceRepository.deleteAllWithoutHeartbeat();
         jdbcAggregateTemplate.insertAll(instances);

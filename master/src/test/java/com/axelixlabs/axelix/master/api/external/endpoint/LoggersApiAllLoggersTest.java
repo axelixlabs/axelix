@@ -204,7 +204,7 @@ public class LoggersApiAllLoggersTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
@@ -232,7 +232,7 @@ public class LoggersApiAllLoggersTest extends AbstractProtectedEndpointTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError_OnAllLoggers() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response =

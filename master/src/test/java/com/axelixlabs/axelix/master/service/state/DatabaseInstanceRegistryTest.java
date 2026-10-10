@@ -89,7 +89,7 @@ class DatabaseInstanceRegistryTest {
                 "Http://localhost:8080/actuator");
 
         // when.
-        instanceRegistry.reload(instance);
+        instanceRegistry.register(instance);
 
         // then.
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
@@ -124,7 +124,7 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator");
-        instanceRegistry.reload(instance);
+        instanceRegistry.register(instance);
 
         // when.
         Instance updated = new Instance(
@@ -145,7 +145,7 @@ class DatabaseInstanceRegistryTest {
                 new MemoryUsage(1200d),
                 instance.actuatorUrl());
 
-        instanceRegistry.reload(updated);
+        instanceRegistry.register(updated);
 
         // then.
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
@@ -168,7 +168,7 @@ class DatabaseInstanceRegistryTest {
                 TestInstanceFactory.create("batch-id-3"));
 
         // when
-        instanceRegistry.reload(instances);
+        instanceRegistry.register(instances);
 
         // then.
         assertThat(instanceRegistry.getAll()).hasSize(3);
@@ -178,7 +178,7 @@ class DatabaseInstanceRegistryTest {
     void deRegister_shouldRemoveInstance() {
         // given.
         Instance instance = TestInstanceFactory.create("deregister-id-1");
-        instanceRegistry.reload(instance);
+        instanceRegistry.register(instance);
         assertThat(instanceRegistry.get(InstanceId.of("deregister-id-1"))).isNotEmpty();
 
         // when.
@@ -191,8 +191,8 @@ class DatabaseInstanceRegistryTest {
     @Test
     void deRegisterAll_shouldRemoveAllInstances() {
         // given.
-        instanceRegistry.reload(TestInstanceFactory.create("deregister-all-1"));
-        instanceRegistry.reload(TestInstanceFactory.create("deregister-all-2"));
+        instanceRegistry.register(TestInstanceFactory.create("deregister-all-1"));
+        instanceRegistry.register(TestInstanceFactory.create("deregister-all-2"));
 
         assertThat(instanceRegistry.getAll()).hasSize(2);
 
@@ -206,8 +206,8 @@ class DatabaseInstanceRegistryTest {
     @Test
     void getAll_shouldReturnAllInstances() {
         // given.
-        instanceRegistry.reload(TestInstanceFactory.create("test-id-1"));
-        instanceRegistry.reload(TestInstanceFactory.create("test-id-2"));
+        instanceRegistry.register(TestInstanceFactory.create("test-id-1"));
+        instanceRegistry.register(TestInstanceFactory.create("test-id-2"));
 
         // when. / then.
         assertThat(instanceRegistry.getAll())
@@ -221,8 +221,8 @@ class DatabaseInstanceRegistryTest {
         Instance petclinicInstance = withName("query-id-1", "petclinic-service");
         Instance featureServiceInstance = withName("query-id-2", "feature-service");
 
-        instanceRegistry.reload(petclinicInstance);
-        instanceRegistry.reload(featureServiceInstance);
+        instanceRegistry.register(petclinicInstance);
+        instanceRegistry.register(featureServiceInstance);
 
         // when.
         Set<Instance> result = instanceRegistry.findByQuery("petclinic");

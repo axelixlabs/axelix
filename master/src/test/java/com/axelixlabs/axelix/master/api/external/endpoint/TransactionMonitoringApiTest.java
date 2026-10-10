@@ -144,7 +144,7 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
                 .readOnly(false);
         BasicRegistrationMetadata metadata = TestMetadataFactory.withPersistenceInsights(
                 groupId, artifactId, new PersistenceInsights().transactions(List.of(profile)));
-        registry.reload(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));
+        registry.register(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));
         historicalApplicationSnapshotService.reloadCurrentState(metadata);
 
         // when.
@@ -162,7 +162,7 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyPersistenceInsights() {
         // given.
-        registry.reload(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));
+        registry.register(TestInstanceFactory.create(activeInstanceId, groupId, artifactId));
         historicalApplicationSnapshotService.reloadCurrentState(TestMetadataFactory.create(groupId, artifactId));
 
         // when.
@@ -180,7 +180,7 @@ class TransactionMonitoringApiTest extends AbstractProtectedEndpointTest {
     @Test
     void shouldReturnEmptyPersistenceInsightsWhenNoSnapshotExists() {
         // given.
-        registry.reload(TestInstanceFactory.create(activeInstanceId));
+        registry.register(TestInstanceFactory.create(activeInstanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate

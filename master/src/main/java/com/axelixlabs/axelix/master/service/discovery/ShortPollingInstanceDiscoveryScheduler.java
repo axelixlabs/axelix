@@ -112,7 +112,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 .collect(Collectors.toSet());
 
         transactionTemplate.executeWithoutResult(_ -> {
-            instanceRegistry.reload(instances);
+            instanceRegistry.register(instances);
             databaseHistoricalApplicationSnapshotService.reloadCurrentStateBulk(collectiveMetadata);
             scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
         });

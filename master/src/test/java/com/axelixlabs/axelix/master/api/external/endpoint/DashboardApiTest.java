@@ -92,7 +92,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
         deRegisterAll();
 
         // Register instances with different versions and statuses
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 instance1Id,
                 "http://example.com/1",
                 "test-name",
@@ -103,7 +103,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 "BellSoft",
                 null));
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 instance2Id,
                 "http://example.com/2",
                 "test-name",
@@ -114,7 +114,7 @@ public class DashboardApiTest extends AbstractProtectedEndpointTest {
                 "BellSoft",
                 "1.9.0"));
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 instance3Id,
                 "http://example.com/3",
                 "test-name",

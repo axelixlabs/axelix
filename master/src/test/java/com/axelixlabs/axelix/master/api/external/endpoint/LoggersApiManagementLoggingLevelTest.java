@@ -117,11 +117,11 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
             }
         });
 
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 siblingInstanceId, mockWebServer.url(siblingInstanceId).toString()));
-        registry.reload(TestInstanceFactory.create(
+        registry.register(TestInstanceFactory.create(
                 failingInstanceId, mockWebServer.url(failingInstanceId).toString()));
     }
 
@@ -216,7 +216,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
         String instanceId = UUID.randomUUID().toString();
         String groupName = "groupName";
         GroupLogLevelChangeRequest requestBody = new GroupLogLevelChangeRequest().configuredLevel("INFO");
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate
@@ -237,7 +237,7 @@ public class LoggersApiManagementLoggingLevelTest extends AbstractProtectedEndpo
     void shouldReturnInternalServerError_WhenResettingOnUnknonInstance() {
         String instanceId = UUID.randomUUID().toString();
         String loggerName = "reset.logger.name";
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate

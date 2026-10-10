@@ -121,6 +121,6 @@ class DeadInstancesEvictorTest {
 
     private void registerInstance(String instanceId, Instant latestHeartBeat) {
         Instance instance = TestInstanceFactory.create(instanceId, latestHeartBeat);
-        instanceRegistry.reload(instance);
+        instanceRegistry.register(instance);
     }
 }

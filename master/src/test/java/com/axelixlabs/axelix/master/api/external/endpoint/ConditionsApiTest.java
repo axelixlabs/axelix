@@ -213,7 +213,7 @@ class ConditionsApiTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -241,7 +241,7 @@ class ConditionsApiTest extends AbstractProtectedEndpointTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         // when.
         ResponseEntity<String> response = restTemplate

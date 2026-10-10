@@ -57,7 +57,7 @@ import com.axelixlabs.axelix.master.filter.FiltersOrder;
 public class HeartBeatJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String HEART_BEAT_REQUEST_PATH =
-            WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.HeartBeatApi.SERVICE_REGISTER;
+            WebAutoConfiguration.INTERNAL_API_PATH + ApiPaths.SelfRegistrationApi.SERVICE_REGISTER;
 
     private final SecurityContextExecutor securityContextExecutor;
     private final JwtDecoderService jwtDecoderService;

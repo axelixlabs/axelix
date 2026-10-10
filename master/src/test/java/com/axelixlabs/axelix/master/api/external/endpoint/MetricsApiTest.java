@@ -206,7 +206,7 @@ public class MetricsApiTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -235,7 +235,7 @@ public class MetricsApiTest extends AbstractProtectedEndpointTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
         ResponseEntity<String> response =
                 restTemplate.asViewer().getForEntity("/api/external/metrics/{instanceId}", String.class, instanceId);
 

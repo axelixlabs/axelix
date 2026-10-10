@@ -183,9 +183,9 @@ class DependenciesApiTest extends AbstractProtectedEndpointTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(instanceWithSbom, mockWebServer.url(instanceWithSbom) + "/actuator"));
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(instanceWithoutSbom, mockWebServer.url(instanceWithoutSbom) + "/actuator"));
     }
 

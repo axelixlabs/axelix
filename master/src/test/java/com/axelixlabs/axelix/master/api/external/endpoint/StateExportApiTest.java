@@ -361,7 +361,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
 
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
@@ -403,7 +403,7 @@ class StateExportApiTest extends AbstractProtectedEndpointTest {
 
     @Test
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         HttpHeaders headers = new HttpHeaders();

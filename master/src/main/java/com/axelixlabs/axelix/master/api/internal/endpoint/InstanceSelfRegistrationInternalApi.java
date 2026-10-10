@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.internal.endpoint;
 import java.time.Instant;
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +56,9 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
         name = "enabled",
         havingValue = "true",
         matchIfMissing = true)
-public class HeartBeatApi {
+public class InstanceSelfRegistrationInternalApi {
 
-    private static final Logger log = LoggerFactory.getLogger(HeartBeatApi.class);
+    private static final Logger log = LoggerFactory.getLogger(InstanceSelfRegistrationInternalApi.class);
 
     private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
@@ -67,7 +68,7 @@ public class HeartBeatApi {
     private final ScheduledTaskExecutionResultConverter scheduledTaskExecutionResultConverter;
     private final ScheduledTaskExecutionHistoryService scheduledTaskExecutionHistoryService;
 
-    public HeartBeatApi(
+    public InstanceSelfRegistrationInternalApi(
             InstanceRegistry instanceRegistry,
             InstanceFactory instanceFactory,
             DatabaseHistoricalApplicationSnapshotService databaseHistoricalApplicationSnapshotService,
@@ -84,7 +85,7 @@ public class HeartBeatApi {
         this.scheduledTaskExecutionHistoryService = scheduledTaskExecutionHistoryService;
     }
 
-    @PostMapping(path = ApiPaths.HeartBeatApi.SERVICE_REGISTER)
+    @PostMapping(path = ApiPaths.SelfRegistrationApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
 
         BasicRegistrationMetadata metadata = request.getBasicRegistrationMetadata();
@@ -111,7 +112,7 @@ public class HeartBeatApi {
                     scheduledTaskExecutionResultConverter.convert(request);
 
             transactionTemplate.executeWithoutResult(_ -> {
-                instanceRegistry.reload(instance);
+                instanceRegistry.register(instance);
                 databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
                 scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             });
@@ -121,5 +122,10 @@ public class HeartBeatApi {
             log.warn("Unable to process self-registration request from '{}'", request.getInstanceName(), iae);
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping(path = ApiPaths.SelfRegistrationApi.HEARTBEAT)
+    public ResponseEntity<Void> heartbeatV2(HeartBeatMetadataV2 heartBeatMetadataV2 ) {
+
     }
 }

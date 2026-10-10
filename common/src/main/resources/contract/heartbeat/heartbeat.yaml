@@ -11,6 +11,7 @@ info:
   # Backdating it to 1.0.0 would make the birth-time shape of the document look like a years-old
   # promise, outlawing legitimate changes (e.g. new required fields) that are perfectly safe here.
   x-axelix-introduced-in: 1.2.0
+  x-axelix-deprecated-in: 1.3.0
   x-axelix-server: master
 paths:
   /service/register:

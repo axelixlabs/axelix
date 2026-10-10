@@ -69,7 +69,7 @@ public class InstanceDetailsConverterTest {
 
     @BeforeEach
     void prepare() {
-        instanceRegistry.reload(TestInstanceFactory.create(activeInstanceId));
+        instanceRegistry.register(TestInstanceFactory.create(activeInstanceId));
         applicationSnapshotService.reloadCurrentState(
                 TestMetadataFactory.create("org.springframework.samples", "spring-petclinic", GarbageCollector.G1));
         converter = new InstanceDetailsConverter(instanceRegistry, applicationSnapshotService);

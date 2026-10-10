@@ -130,7 +130,7 @@ class GcLogFileApiTest {
             }
         });
 
-        registry.reload(
+        registry.register(
                 TestInstanceFactory.create(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
@@ -207,7 +207,7 @@ class GcLogFileApiTest {
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
 
-        registry.reload(TestInstanceFactory.create(instanceId));
+        registry.register(TestInstanceFactory.create(instanceId));
 
         ResponseEntity<String> response = restTemplate
                 .asViewer()

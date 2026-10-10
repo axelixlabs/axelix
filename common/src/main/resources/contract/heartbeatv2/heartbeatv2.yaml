@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: heartbeat-v2
+  version: 1.0.0
+  description: |
+    Version 2 of the heartbeat. This version is a more lightweight version of the heartbeat that 
+    does not include all the information needed in order for the service to register itself. Version 2
+    includes minimal information so the Master can assume the other peer is alive.
+  x-axelix-introduced-in: 1.3.0
+  x-axelix-server: master
+paths:
+  /service/heartbeat/v2:
+    post:
+      operationId: heartbeatV2
+      summary: Accepts the heartbeat of a service instance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartBeatMetadataV2'
+      responses:
+        '204':
+          description: The heartbeat was accepted.
+        '400':
+          description: The heartbeat request could not be processed.
+        '409':
+          description: The starter version of the instance is not supported by this Axelix Master.
+components:
+  schemas:
+    HeartBeatMetadataV2:
+      type: object
+      description: Represents lightweight service instance metadata supplied as part of the continues heartbeat process.
+      required:
+        - instanceId
+        - healthStatus
+      properties:
+        healthStatus:
+          description: >-
+            The health status of the given instance that is reported by started infrastructure.
+            Never absent.
+          x-axelix-introduced-in: 1.3.0
+          $ref: '#/components/schemas/HealthStatus'
+        instanceId:
+          type: string
+          description: Unique identifier (uid) of the service.
+          x-axelix-introduced-in: 1.3.0
+    HealthStatus:
+      type: string
+      description: The health status of the given instance during registration.
+      enum:
+        - UP
+        - DOWN
+        - UNKNOWN
