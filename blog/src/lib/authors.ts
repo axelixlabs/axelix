@@ -121,8 +121,15 @@ const AUTHOR_PROFILES: Record<string, AuthorProfile> = {
     bio: "Contributor to Axelix OSS. Backend engineer working with Java and Spring Boot. Interested in everything around the code: architecture, security, infrastructure, and automation. Likes understanding how the whole system works, not just a single component.",
     links: [
       { kind: "github", label: "GitHub", url: "https://github.com/dima-bzz" },
-      // { kind: "x", label: "X", url: "https://x.com/mpolivaha" },
-      // { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/mikhail-polivakha-7995571ab/" },
+    ],
+  },
+  "sergey-cherkasov": {
+    title: "Developer Advocate · Axelix Core Team",
+    bio: "Developer Advocate in the Axelix Core Team. Actively involved in development of the Axelix's core.",
+    links: [
+      { kind: "github", label: "GitHub", url: "https://github.com/sergeycherkasovv" },
+      { kind: "x", label: "X", url: "https://x.com/iamcherkasov" },
+      { kind: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/in/sergei-cherkasov-968721210" },
     ],
   },
 };
