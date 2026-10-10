@@ -35,7 +35,6 @@ import org.instancio.Select;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -218,8 +217,6 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    @Disabled("Scheduled-task execution history recording is switched off for the 1.2 release (GH-1617, GH-1714)."
-            + " Re-enable together with the write path in ShortPollingInstanceDiscoveryScheduler.")
     void shouldSaveScheduledTaskExecutionsWhenInstancesAreDiscovered() {
         String serviceWithFailedExecution = "service-with-failed-execution";
         String serviceWithSuccessfulExecution = "service-with-successful-execution";

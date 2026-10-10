@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
 import java.time.Instant;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.convert.ScheduledTaskExecutionResultConverter;
 import com.axelixlabs.axelix.master.service.discovery.CompatibilityDetectionStrategy;
@@ -105,16 +107,13 @@ public class HeartBeatApi {
                     request.getInstanceActuatorUrl(),
                     metadata);
 
-            // Scheduled-task execution history recording is switched off for the 1.2 release: the starters do
-            // not send executions yet and Master has no read side or retention (GH-1617, GH-1714). Re-enable
-            // once those land.
-            // Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
-            //         scheduledTaskExecutionResultConverter.convert(request);
+            Set<ScheduledTaskExecutionResult> scheduledTaskExecutionResults =
+                    scheduledTaskExecutionResultConverter.convert(request);
 
             transactionTemplate.executeWithoutResult(_ -> {
                 instanceRegistry.reload(instance);
                 databaseHistoricalApplicationSnapshotService.reloadCurrentState(metadata);
-                // scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
+                scheduledTaskExecutionHistoryService.append(scheduledTaskExecutionResults);
             });
 
             return ResponseEntity.noContent().build();

@@ -245,24 +245,20 @@ public class HeartBeatApiTest {
                     assertThat(profile.getInMemoryPagination()).containsEntry("com.example.Pet", 2);
                 });
 
-        // and then. Scheduled-task execution history recording is switched off for the 1.2 release
-        // (GH-1617, GH-1714), so nothing must be written. Restore the commented expectations below when
-        // the write path in HeartBeatApi is re-enabled.
+        // and then.
         assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
-                .isEmpty();
-        // assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
-        //         .singleElement()
-        //         .satisfies(result -> {
-        //             assertThat(result.instanceId()).isEqualTo(TEST_INSTANCE_ID);
-        //             assertThat(result.groupId()).isEqualTo("org.springframework.samples");
-        //             assertThat(result.artifactId()).isEqualTo("petclinic");
-        //             assertThat(result.taskId()).isEqualTo("com.example.OwnerJob#run()");
-        //             assertThat(result.startedAt()).isEqualTo(Instant.parse("2026-09-27T10:00:00.123Z"));
-        //             assertThat(result.durationMillis()).isEqualTo(1500L);
-        //             assertThat(result.success()).isFalse();
-        //             assertThat(result.errorType()).isEqualTo("NullPointerException");
-        //             assertThat(result.errorMessage()).isEqualTo("boom");
-        //         });
+                .singleElement()
+                .satisfies(result -> {
+                    assertThat(result.instanceId()).isEqualTo(TEST_INSTANCE_ID);
+                    assertThat(result.groupId()).isEqualTo("org.springframework.samples");
+                    assertThat(result.artifactId()).isEqualTo("petclinic");
+                    assertThat(result.taskId()).isEqualTo("com.example.OwnerJob#run()");
+                    assertThat(result.startedAt()).isEqualTo(Instant.parse("2026-09-27T10:00:00.123Z"));
+                    assertThat(result.durationMillis()).isEqualTo(1500L);
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.errorType()).isEqualTo("NullPointerException");
+                    assertThat(result.errorMessage()).isEqualTo("boom");
+                });
 
         assertThat(capturingIamWebInterceptor.accessDeniedEndpoint()).isNull();
         assertThat(capturingIamWebInterceptor.authenticationFailureEndpoint()).isNull();
