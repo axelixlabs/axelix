@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.ScheduledTaskExecution;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.discovery.DiscoveredInstanceProfile;
@@ -55,6 +56,10 @@ public class ScheduledTaskExecutionResultConverter {
     }
 
     public Set<ScheduledTaskExecutionResult> convert(HeartBeatMetadata heartBeatMetadata) {
+        return Set.of();
+    }
+
+    public Set<ScheduledTaskExecutionResult> convert(InitialSelfRegistrationRequest heartBeatMetadata) {
         return convert(heartBeatMetadata.getBasicRegistrationMetadata(), heartBeatMetadata.getInstanceId());
     }
 

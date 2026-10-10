@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Set;
 
 import com.axelixlabs.axelix.master.contract.heartbeatv2.HeartBeatMetadataV2;
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.BasicRegistrationMetadata;
+import com.axelixlabs.axelix.master.contract.initialregistrationrequest.InitialSelfRegistrationRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
-import com.axelixlabs.axelix.master.contract.heartbeat.HeartBeatMetadata;
-import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.ScheduledTaskExecutionResult;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
@@ -88,7 +88,7 @@ public class InstanceSelfRegistrationInternalApi {
     }
 
     @PostMapping(path = ApiPaths.SelfRegistrationApi.SERVICE_REGISTER)
-    public ResponseEntity<Void> registryServiceInstance(@RequestBody HeartBeatMetadata request) {
+    public ResponseEntity<Void> registryServiceInstance(@RequestBody InitialSelfRegistrationRequest request) {
         log.debug("Received registration request for {}", request.getInstanceId());
 
         BasicRegistrationMetadata metadata = request.getBasicRegistrationMetadata();
