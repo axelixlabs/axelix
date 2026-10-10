@@ -37,6 +37,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Artemiy Degtyarev
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Aleksei Ermakov
  */
 public abstract class AbstractAxelixPluginFunctionalTest {
 
@@ -87,15 +88,19 @@ public abstract class AbstractAxelixPluginFunctionalTest {
         runGit("commit", "-m", "initial commit");
     }
 
-    private void runGit(String... args) throws IOException, InterruptedException {
+    protected String runGit(String... args) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add("git");
         command.addAll(Arrays.asList(args));
-        Process process =
-                new ProcessBuilder(command).directory(projectDir.toFile()).start();
+        Process process = new ProcessBuilder(command)
+                .directory(projectDir.toFile())
+                .redirectErrorStream(true)
+                .start();
+        String output = new String(process.getInputStream().readAllBytes(), UTF_8).trim();
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new IllegalStateException("Git command failed with exit code: " + exitCode);
+            throw new IllegalStateException("Git command failed with exit code: " + exitCode + ": " + output);
         }
+        return output;
     }
 }

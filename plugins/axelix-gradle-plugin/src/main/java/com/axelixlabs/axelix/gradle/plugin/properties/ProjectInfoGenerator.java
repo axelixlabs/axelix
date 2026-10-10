@@ -56,6 +56,7 @@ import static com.axelixlabs.axelix.gradle.plugin.SpringTestProfilerDetector.PRO
  * unset the application is identified by its {@code name} alone.
  *
  * @author Nikita Kirillov
+ * @author Aleksei Ermakov
  */
 public final class ProjectInfoGenerator {
 
@@ -97,7 +98,19 @@ public final class ProjectInfoGenerator {
                 new FileRepositoryBuilder().findGitDir(project.getProjectDir()).getGitDir();
         if (gitDir != null) {
             generateTask.getInputs().file(new File(gitDir, "HEAD")).optional(true);
-            generateTask.getInputs().dir(new File(gitDir, "refs")).optional(true);
+            generateTask.getInputs().files(new File(gitDir, "commondir")).optional(true);
+            try (Repository repository = openGitRepository(gitDir)) {
+                generateTask
+                        .getInputs()
+                        .dir(new File(repository.getDirectory(), "refs"))
+                        .optional(true);
+                generateTask
+                        .getInputs()
+                        .files(new File(repository.getDirectory(), "packed-refs"))
+                        .optional(true);
+            } catch (IOException e) {
+                project.getLogger().warn("Failed to track git repository inputs at {}", gitDir, e);
+            }
         }
 
         generateTask.getOutputs().dir(generatedDir);
@@ -165,9 +178,8 @@ public final class ProjectInfoGenerator {
             return;
         }
 
-        try (Repository repository =
-                new FileRepositoryBuilder().setGitDir(gitDir).build()) {
-            if (!addGitProperties(repository, properties)) {
+        try (Repository repository = openGitRepository(gitDir)) {
+            if (!addGitProperties(repository, properties, gitDir)) {
                 project.getLogger().info("Skipping git info: '{}' has no commits yet", gitDir);
             }
         } catch (IOException e) {
@@ -175,8 +187,32 @@ public final class ProjectInfoGenerator {
         }
     }
 
-    private static boolean addGitProperties(Repository repository, Properties properties) throws IOException {
-        ObjectId head = repository.resolve("HEAD");
+    // JGit 6.x does not follow a linked worktree's commondir file.
+    private static Repository openGitRepository(File gitDir) throws IOException {
+        File commonDirFile = new File(gitDir, "commondir");
+        File repositoryDir = gitDir;
+        if (commonDirFile.isFile()) {
+            String commonDir = Files.readString(commonDirFile.toPath()).trim();
+            if (commonDir.isEmpty()) {
+                throw new IOException("Empty commondir file at " + commonDirFile);
+            }
+            repositoryDir = gitDir.toPath().resolve(commonDir).normalize().toFile();
+        }
+        return new FileRepositoryBuilder().setGitDir(repositoryDir).build();
+    }
+
+    private static boolean addGitProperties(Repository repository, Properties properties, File gitDir)
+            throws IOException {
+        String headRef = "HEAD";
+        String branch = null;
+        if (new File(gitDir, "commondir").isFile()) {
+            // The common repository's HEAD belongs to the main checkout, not this worktree.
+            String worktreeHead =
+                    Files.readString(new File(gitDir, "HEAD").toPath()).trim();
+            headRef = worktreeHead.startsWith("ref: ") ? worktreeHead.substring(5) : worktreeHead;
+            branch = headRef.startsWith("refs/heads/") ? headRef.substring(11) : headRef;
+        }
+        ObjectId head = repository.resolve(headRef);
         if (head == null) {
             return false;
         }
@@ -190,7 +226,7 @@ public final class ProjectInfoGenerator {
 
             properties.setProperty("git.commit.id", head.getName());
             properties.setProperty("git.commit.id.abbrev", abbreviated.name());
-            properties.setProperty("git.branch", repository.getBranch());
+            properties.setProperty("git.branch", branch != null ? branch : repository.getBranch());
             properties.setProperty("git.commit.user.name", author.getName());
             properties.setProperty("git.commit.user.email", author.getEmailAddress());
             properties.setProperty(
