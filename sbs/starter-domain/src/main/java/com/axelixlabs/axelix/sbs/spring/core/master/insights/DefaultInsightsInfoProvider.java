@@ -111,6 +111,10 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         .featureId(FeatureId.OSIV.getId())
                         .enabled(openSessionInViewStateProvider.isOpenSessionInViewEnabled())))
                 .persistenceInsights(assemblePersistenceInsights())
+                // Scheduled-task execution history is switched off for the 1.2 release: the capture side
+                // (TaskTrackingRunnable / ScheduledTaskExecutionHistory) is deliberately not wired into any
+                // starter, and Master does not record the field either (GH-1617). Keep this list empty until
+                // the feature ships end-to-end.
                 .scheduledTaskExecutions(List.of());
     }
 

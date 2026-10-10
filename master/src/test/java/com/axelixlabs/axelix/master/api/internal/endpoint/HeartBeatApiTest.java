@@ -248,7 +248,8 @@ public class HeartBeatApiTest {
         // and then. Scheduled-task execution history recording is switched off for the 1.2 release
         // (GH-1617, GH-1714), so nothing must be written. Restore the commented expectations below when
         // the write path in HeartBeatApi is re-enabled.
-        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class)).isEmpty();
+        assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
+                .isEmpty();
         // assertThat(jdbcAggregateTemplate.findAll(ScheduledTaskExecutionResult.class))
         //         .singleElement()
         //         .satisfies(result -> {
