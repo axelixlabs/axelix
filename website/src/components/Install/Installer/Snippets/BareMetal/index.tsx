@@ -49,7 +49,7 @@ export const BareMetal = ({ refEl }: IProps) => {
                 </span>
                 <span className={styles.Line}>
                     {"    "}
-                    <span className={styles.St}>--server.port=8080</span> <span className={styles.Nl}>\</span>
+                    <span className={styles.St}>--axelix.master.port=2935</span> <span className={styles.Nl}>\</span>
                 </span>
                 <span className={styles.Line}>
                     {"    "}

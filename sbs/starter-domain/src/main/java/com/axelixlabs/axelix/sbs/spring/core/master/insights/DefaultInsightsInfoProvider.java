@@ -119,11 +119,11 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                         .featureId(FeatureId.OSIV.getId())
                         .enabled(openSessionInViewStateProvider.isOpenSessionInViewEnabled())))
                 .persistenceInsights(assemblePersistenceInsights())
-                .scheduledTaskExecutions(collectScheduledTaskExecutions());
-    }
-
-    private List<ScheduledTaskExecution> collectScheduledTaskExecutions() {
-        return scheduledTaskExecutionHistory != null ? scheduledTaskExecutionHistory.mark() : List.of();
+                // Scheduled-task execution history is switched off for the 1.2 release: the capture side
+                // (TaskTrackingRunnable / ScheduledTaskExecutionHistory) is deliberately not wired into any
+                // starter, and Master does not record the field either (GH-1617). Keep this list empty until
+                // the feature ships end-to-end.
+                .scheduledTaskExecutions(List.of());
     }
 
     private PersistenceInsights assemblePersistenceInsights() {
@@ -139,7 +139,7 @@ public class DefaultInsightsInfoProvider implements InsightsInfoProvider {
                     return new TransactionAggregatedProfile()
                             .transactionOrigin(TransactionOrigin.APPLICATION_DECLARATIVE)
                             .transactionalKey(new TransactionalKey()
-                                    .className(key.getTargetClass().getName())
+                                    .className(key.getIdentityClass().getName())
                                     .methodName(key.getMethod().getName()))
                             .transactionOverallStats(new ExecutionStats()
                                     .minMs(performanceStats.getMinMs())

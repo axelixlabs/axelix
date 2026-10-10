@@ -311,11 +311,6 @@
             "inMemoryPaginationChartTitle": "Pagination в памяти",
             "inMemoryPaginationChartSubtitle": "Персистентность · нагрузка на память"
         },
-        "SpringFramework": {
-            "subtitle": "Обзор Spring Framework по всей экосистеме · Open Session in View",
-            "osivChartTitle": "Open Session in View (OSIV)",
-            "osivChartSubtitle": "Проблемы с производительностью"
-        },
         "SpringPortfolio": {
             "title": "Spring Portfolio",
             "subtitle": "Используемые версии по всей экосистеме относительно опубликованного графика поддержки OSS",

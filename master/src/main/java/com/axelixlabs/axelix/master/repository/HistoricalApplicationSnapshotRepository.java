@@ -100,28 +100,6 @@ public interface HistoricalApplicationSnapshotRepository
     PersistenceInsights findLatestPersistenceInsightsForInstance(@Param("instanceId") String instanceId);
 
     /**
-     * Aggregates the adoption of the tracked Spring Framework features across the entire ecosystem. For
-     * every service (identified by its {@code group_id} + {@code artifact_id}) only the most recent
-     * snapshot is taken into account, so that a service is counted exactly once. The query is intentionally
-     * kept vendor-agnostic so that it runs identically on all RDBMS vendors.
-     *
-     * @return the single-row aggregate with the total number of services and per-feature usage counters.
-     */
-    @Query("""
-            SELECT
-                COUNT(*) AS total_services,
-                COALESCE(SUM(CASE WHEN s.osiv_enabled = TRUE THEN 1 ELSE 0 END), 0) AS osiv_enabled_count
-            FROM historical_application_snapshots s
-            WHERE s.date = (
-                SELECT MAX(latest.date)
-                FROM historical_application_snapshots latest
-                WHERE latest.group_id = s.group_id
-                  AND latest.artifact_id = s.artifact_id
-            )
-            """)
-    SpringFrameworkInsightsAggregate aggregateLatestSpringFrameworkInsights();
-
-    /**
      * Returns the latest persistence insights of every service in the ecosystem. For every service (identified
      * by its {@code group_id} + {@code artifact_id}) only the most recent snapshot is taken into account, so that
      * a service is represented exactly once. The N + 1 / in-memory pagination counters are aggregated in Java
@@ -281,14 +259,6 @@ public interface HistoricalApplicationSnapshotRepository
      */
     record ApplicationLanguages(
             int javaVersion, JdkVendor jdkVendor, @Nullable String kotlinVersion, LocalDate date) {}
-
-    /**
-     * Aggregated, ecosystem-wide adoption counters for the tracked Spring Framework features.
-     *
-     * @param totalServices the total number of distinct services that reported at least one snapshot.
-     * @param osivEnabledCount how many services have OSIV enabled.
-     */
-    record SpringFrameworkInsightsAggregate(long totalServices, long osivEnabledCount) {}
 
     /**
      * The latest starter version reported by a single service within a time window.

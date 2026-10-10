@@ -10,13 +10,16 @@ import org.springframework.stereotype.Component
 @Profile("default", "local")
 @EnableScheduling
 class AirportTestDataQueryRunner(
-    private val airportTestDataService: AirportTestDataService,
+    private val airportTestDataService: DefaultAirportTestDataService,
+    private val transactionalAirportTestDataService: TransactionalAirportTestDataService,
 ) {
     @Scheduled(initialDelay = 10000, fixedRate = 60000)
     fun runTests() {
-        airportTestDataService.runNplusOne1()
+        airportTestDataService.txOnClassMethod_runNplusOne1()
+        airportTestDataService.txOnAbstractClassMethod_runNplusOne2()
 
         val pageRequest = PageRequest.of(0, 2)
-        airportTestDataService.runPagination1(pageRequest)
+        airportTestDataService.txOnInterfaceMethod_runPagination1(pageRequest)
+        transactionalAirportTestDataService.txOnClass_runPagination2(pageRequest)
     }
 }

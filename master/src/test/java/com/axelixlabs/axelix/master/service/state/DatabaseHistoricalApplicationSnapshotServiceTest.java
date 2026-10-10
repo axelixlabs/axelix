@@ -36,7 +36,6 @@ import com.axelixlabs.axelix.master.api.external.response.dashboard.AggregatedFe
 import com.axelixlabs.axelix.master.api.external.response.dashboard.JavaDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.dashboard.PersistenceDashboardResponse.TreemapEntry;
-import com.axelixlabs.axelix.master.api.external.response.dashboard.SpringFrameworkDashboardResponse;
 import com.axelixlabs.axelix.master.contract.metadata.BasicRegistrationMetadata;
 import com.axelixlabs.axelix.master.contract.metadata.CountedLazyLoadingTarget;
 import com.axelixlabs.axelix.master.contract.metadata.ExecutionStats;
@@ -426,41 +425,6 @@ class DatabaseHistoricalApplicationSnapshotServiceTest {
 
             // then.
             assertThat(result).isNull();
-        }
-    }
-
-    @Nested
-    class GetSpringAppFrameworkInfoDashboard {
-
-        @Test
-        void shouldAggregateSpringFrameworkFeaturesAdoptionAcrossServices() {
-            // given three services, two of which have OSIV enabled.
-            BasicRegistrationMetadata first =
-                    TestMetadataFactory.withFeatures("com.example", "service-a", false, false, false, false, true);
-            BasicRegistrationMetadata second =
-                    TestMetadataFactory.withFeatures("com.example", "service-b", false, false, false, false, true);
-            BasicRegistrationMetadata third =
-                    TestMetadataFactory.withFeatures("com.example", "service-c", false, false, false, false, false);
-            subject.reloadCurrentStateBulk(List.of(first, second, third));
-
-            // when.
-            SpringFrameworkDashboardResponse dashboard = subject.getSpringFrameworkDashboard();
-
-            // then.
-            assertThat(dashboard.features())
-                    .extracting(AggregatedFeature::featureId, AggregatedFeature::adoptionPercentage)
-                    .containsExactly(tuple(FeatureId.OSIV.getId(), 200.0 / 3));
-        }
-
-        @Test
-        void shouldReturnZeroAdoptionWhenNoSnapshotsExist() {
-            // when.
-            SpringFrameworkDashboardResponse dashboard = subject.getSpringFrameworkDashboard();
-
-            // then.
-            assertThat(dashboard.features())
-                    .extracting(AggregatedFeature::featureId, AggregatedFeature::adoptionPercentage)
-                    .containsExactly(tuple(FeatureId.OSIV.getId(), 0.0));
         }
     }
 

@@ -74,12 +74,28 @@ chart](./configuring-master.mdx#run-on-kubernetes). The minimal launch for each:
 The image is published to GitHub Container Registry. Without a tag Docker pulls `latest`, the newest release, append a
 tag such as `:1.1.1` to pin a version:
 
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
+```
+
+With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
+a signing key](./configuring-master.mdx#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Your own key">
+
+```bash
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+</Tabs>
 
 See [Run with Docker](./configuring-master.mdx#run-with-docker) for supplying the database connection and the rest of
 the configuration, and [Run with Docker Compose](./configuring-master.mdx#run-with-docker-compose) for the Compose
@@ -110,6 +126,19 @@ Kubernetes](./configuring-master.mdx#run-on-kubernetes).
 Download the Master JAR from the [Releases page](https://github.com/axelixlabs/axelix/releases) — it already bundles
 the UI — and start it:
 
+<Tabs groupId="jwt-key" items={['Built-in key (local trial)', 'Your own key']}>
+  <Tab value="Built-in key (local trial)">
+
+```bash
+java -jar master.jar
+```
+
+With no JWT properties set, Master uses the built-in signing key. Use this only for a local trial, see [Running without
+a signing key](./configuring-master.mdx#running-without-a-signing-key).
+
+  </Tab>
+  <Tab value="Your own key">
+
 ```bash
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
@@ -117,23 +146,37 @@ export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 java -jar master.jar
 ```
 
+  </Tab>
+</Tabs>
+
 See [Run as a JAR](./configuring-master.mdx#run-as-a-jar) for the other ways to pass configuration.
 
   </Tab>
 </Tabs>
 
-Master is then reachable at `http://localhost:8080` (or behind your Ingress on Kubernetes). Sign in with the
+Master is then reachable at `http://localhost:2935` (or behind your Ingress on Kubernetes). Sign in with the
 [super-admin](../setting-up-master-ui/authentication/authentication.mdx#super-admin) account.
+
+:::note
+`2935` is the default port since Axelix `1.2.0`. Before that release Master listened on `8080` — see
+[General](./configuring-master.mdx#general) for the reasoning and how to get the old port back.
+:::
 
 Then configure it. Master accepts configuration from many sources — environment variables, an external config file, a
 Spring Cloud Config Server, or HashiCorp Vault — so fitting it into your existing configuration pipeline should not
 be a big deal. See [Supplying properties](./configuring-master.mdx#supplying-properties).
 
-The two JWT values in the launch snippets above are the only properties Master requires to start:
-`axelix.master.auth.jwt.algorithm` and `axelix.master.auth.jwt.signing-key` — see [Authentication —
-JWT](./configuring-master.mdx#authentication--jwt). Treat the signing key with care from day one: it is the shared
-secret every managed service will later present to Master, so generate a long random value and keep it in your secret
-manager rather than in a checked-in file.
+The two JWT values in the launch snippets above are `axelix.master.auth.jwt.algorithm` and
+`axelix.master.auth.jwt.signing-key` — see [Authentication — JWT](./configuring-master.mdx#authentication--jwt). Treat
+the signing key with care from day one: it is the shared secret every managed service will later present to Master, so
+generate a long random value and keep it in your secret manager rather than in a checked-in file.
+
+:::warning[On Axelix 1.2.0 and later]
+Both JWT values are optional. Without them, Master and your services fall back to a built-in signing key, so you can
+try Axelix locally without generating one. That key is publicly known, so anyone can use it to sign in to Master and
+call your services' Axelix endpoints. Use it only for a local trial, and set your own key everywhere else. See
+[Running without a signing key](./configuring-master.mdx#running-without-a-signing-key).
+:::
 
 Beyond the database connection and the signing key, two decisions are worth making consciously at this step:
 
@@ -222,7 +265,9 @@ mandatory piece of configuration — see the note below the snippets.
 - **Set the shared JWT signing key** from step 2 under `axelix.sbs.auth.jwt.*`. A key mismatch between Master and
   the service is the most common cause of `401` responses — see [Share the JWT signing key with
   Master](./configuring-spring-boot-starter.mdx#share-the-jwt-signing-key-with-master) and
-  [Troubleshooting](../more/troubleshooting.mdx).
+  [Troubleshooting](../more/troubleshooting.mdx). On Axelix 1.2.0 and later you can skip it for a local trial, and the
+  service uses the built-in key, see [Running without a signing
+  key](./configuring-spring-boot-starter.mdx#running-without-a-signing-key).
 - **Configure discovery — only if you chose self-registration.** Point the `axelix.sbs.discovery.*` properties at
   your Master, as shown in [Let Master find the
   instance](./configuring-spring-boot-starter.mdx#let-master-find-the-instance). With Master-side auto-discovery,

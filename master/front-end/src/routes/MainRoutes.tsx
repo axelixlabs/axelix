@@ -24,7 +24,6 @@ import { MainLayout } from "@/layout";
 import { DashboardSiderMenu } from "@/layout/siders";
 
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
-const DashboardSpringFramework = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringFramework")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
 const DependenciesAnalyzer = Loadable(lazy(() => import("@/pages/DependenciesAnalyzer")));
 const DashboardLanguages = Loadable(lazy(() => import("@/pages/Dashboard/DashboardLanguages")));
@@ -64,7 +63,6 @@ export const MainRoutes = () => {
                     <Route path="spring-portfolio" element={<DashboardSpringPortfolio />} />
                     <Route path="languages" element={<DashboardLanguages />} />
                     <Route path="persistence" element={<DashboardPersistence />} />
-                    <Route path="spring-framework" element={<DashboardSpringFramework />} />
                 </Route>
 
                 <Route path="/" element={<MainLayout hideSider />}>

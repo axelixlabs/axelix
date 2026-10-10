@@ -403,13 +403,27 @@ axelix.sbs.auth.jwt.duration=5m
   </Tab>
 </Tabs>
 
-`algorithm` и `signing-key` обязательны — старт сервиса упадёт с понятным сообщением, если любого из них не хватает.
 `duration` определяет, как долго действителен выпущенный стартером токен для heartbeat-сигналов саморегистрации, по
 умолчанию он равен пяти минутам, после чего стартер автоматически его ротирует.
 
 :::warning
 Ключ подписи, общий для Master и каждого мониторируемого сервиса, — конфиденциальный секрет. Инжектируйте его через
 переменную окружения, монтируемый файл или менеджер секретов, а не через YAML, закоммиченный в репозиторий.
+:::
+
+### Запуск без ключа подписи
+
+<UpcomingReleaseNotice />
+
+Начиная с Axelix 1.2.0, `algorithm` и `signing-key` необязательны. Если они не заданы, стартер использует `HMAC512` и
+тот же встроенный ключ, что и Master по умолчанию, поэтому сервис подключается к Master с настройками по умолчанию без
+настройки ключа. Пока используется встроенный ключ, стартер при старте пишет в лог предупреждение.
+
+:::warning
+Встроенный ключ общеизвестен. Любой, у кого есть доступ к actuator-эндпоинтам сервиса, может подписать им токен и
+вызвать эндпоинты Axelix, например прочитать окружение или снять heap dump. Задайте собственный
+`axelix.sbs.auth.jwt.signing-key`, такой же, как в Master, прежде чем использовать Axelix не только для локального
+знакомства.
 :::
 
 ## Дайте Master найти сервис
@@ -440,7 +454,7 @@ axelix:
   sbs:
     discovery:
       self-registration: true
-      master-url: http://master.internal:8080/api/internal/service/register
+      master-url: http://master.internal:2935/api/internal/service/register
       instance-actuator-url: http://my-app.internal:8080/actuator
       instance-name: orders-service
       heartbeat-interval: 15s
@@ -451,7 +465,7 @@ axelix:
 
 ```properties
 axelix.sbs.discovery.self-registration=true
-axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
+axelix.sbs.discovery.master-url=http://master.internal:2935/api/internal/service/register
 axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
 axelix.sbs.discovery.instance-name=orders-service
 axelix.sbs.discovery.heartbeat-interval=15s
@@ -465,7 +479,8 @@ axelix.sbs.discovery.heartbeat-interval=15s
 - `instance-actuator-url` — это **базовый** URL-адрес сервиса, поскольку Master будет обращаться к нему из своей
   собственной сети — только по имени хоста и порту.
 - `master-url` — это **полный** URL-адрес, включая `/api/internal/service/register`. Стартер отправляет его без
-  изменений.
+  изменений. Начиная с Axelix `1.2.0` Master по умолчанию слушает порт `2935`; до этого релиза портом по умолчанию
+  был `8080` — см. [Общие настройки](../../setting-up-master-ui/configuring-master/configuring-master.mdx#общие-настройки).
 - `instance-name` — это имя, которое Master показывает для этого сервиса в пользовательском интерфейсе и в MCP-ответах.
   Выбирайте имя, которое переживает рестарты и реплики, — как правило, имя сервиса, а не имя пода.
 - Саморегистрация принимается Master из коробки (`axelix.master.discovery.self-registration.enabled` по умолчанию
@@ -587,8 +602,8 @@ axelix.sbs.enabled=false
 
 | Свойство                          | По умолчанию                                                 | Описание                                                                                                                                                |
 |-----------------------------------|--------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.auth.jwt.algorithm`   | *(не задано)* <span className="Required">обязательное</span> | Алгоритм подписи. Один из `HMAC256`, `HMAC384` или `HMAC512`. Должен совпадать с `axelix.master.auth.jwt.algorithm` на Master.                          |
-| `axelix.sbs.auth.jwt.signing-key` | *(не задано)* <span className="Required">обязательное</span> | Общий секрет, которым проверяются выпущенные Master токены и подписываются heartbeat-сигналы саморегистрации. Должен совпадать с ключом подписи Master. |
+| `axelix.sbs.auth.jwt.algorithm`   | `HMAC512` (с 1.2.0, раньше обязательно) | Алгоритм подписи. Один из `HMAC256`, `HMAC384` или `HMAC512`. Должен совпадать с `axelix.master.auth.jwt.algorithm` на Master.                          |
+| `axelix.sbs.auth.jwt.signing-key` | встроенный ключ (с 1.2.0, раньше обязательно) | Общий секрет, которым проверяются выпущенные Master токены и подписываются heartbeat-сигналы саморегистрации. Должен совпадать с ключом подписи Master. |
 | `axelix.sbs.auth.jwt.duration`    | `5m`                                                         | Срок действия токена саморегистрации, который стартер выпускает сам себе. Токены автоматически ротируются до истечения.                                 |
 
 </div>
@@ -615,7 +630,7 @@ heartbeat-сигналы будут отклоняться с `401`.
 | Свойство                                     | По умолчанию                                                 | Описание                                                                                                                                           |
 |----------------------------------------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.self-registration`     | `false`                                                      | Главный переключатель. Установите `true`, чтобы включить саморегистрацию; оставьте `false`, чтобы полагаться на автообнаружение на стороне Master. |
-| `axelix.sbs.discovery.master-url`            | *(не задано)* <span className="Required">обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:8080/api/internal/service/register`. Обязательно при `self-registration=true`.    |
+| `axelix.sbs.discovery.master-url`            | *(не задано)* <span className="Required">обязательное</span> | Полный URL-адрес эндпоинта саморегистрации на Master, например `http://master:2935/api/internal/service/register`. Обязательно при `self-registration=true`.    |
 | `axelix.sbs.discovery.instance-actuator-url` | *(не задано)* <span className="Required">обязательное</span> | Базовый URL-адрес этого сервиса, доступный из Master (необходимо указать постфикс `/actuator`). Обязательно при `self-registration=true`.                       |
 | `axelix.sbs.discovery.instance-name`         | *(не задано)* <span className="Required">обязательное</span> | Отображаемое имя, показываемое в Axelix UI и в MCP-ответах. Обязательно при `self-registration=true`.                                                           |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                        | Интервал между heartbeat-сигналами. Должен быть меньше `heartbeat-timeout` выселения на Master.                                                    |
@@ -631,6 +646,54 @@ heartbeat-сигналы будут отклоняться с `401`.
 | `axelix.sbs.endpoints.config.sanitized-properties` | *(пустой список)* | Ключи свойств, чьи значения маскируются как `******` для вызывающих без `ENV_VALUES_READ` (для `axelix-env`) или `CONFIG_PROPS_VALUES_READ` (для `axelix-configprops`). Пустой список означает, что маскируются **все** значения. См. [Маскирование чувствительных значений свойств](#маскирование-чувствительных-значений-свойств) для правил сопоставления. |
 
 </div>
+
+### Управление кэшами
+
+<UpcomingReleaseNotice />
+
+Управление кэшами - это то, что обеспечивает работу страницы «Кэши» и метрик `axelix_cache_*`. Под капотом стартер
+оборачивает каждый бин `CacheManager` вашего приложения в прокси, который записывает обращения к кэшам и позволяет
+включать, выключать и очищать кэши во время работы приложения, а данные отдаёт через actuator-эндпоинт `axelix-caches`.
+
+Эта функция **включена по умолчанию**, как только стартер оказывается в classpath.
+
+Установите значение свойства `axelix.sbs.cache.management.enabled` в `false`, чтобы полностью её отключить, без
+проксирования `CacheManager`, без эндпоинта `axelix-caches` и без метрик кэшей. Ваши бины `CacheManager` при этом остаются
+ровно такими, какими их определило ваше приложение.
+
+<Tabs items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    cache:
+      management:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.cache.management.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Свойство                              | По умолчанию | Описание                                                                                                                                                                              |
+|---------------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.cache.management.enabled` | `true`       | Главный переключатель управления кэшами. Установите `false`, чтобы вся автоконфигурация управления кэшами отключилась. Работает одинаково на стартерах Spring Boot 2, 3 и 4. |
+
+</div>
+
+:::note
+При отключённом управлении кэшами странице «Кэши» в Master нечего показывать для этого сервиса, а MCP-инструменты для
+кэшей завершаются для него ошибкой.
+:::
 
 ### Мониторинг транзакций
 

@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
 /**
  * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
  *
- * <p>This interceptor tracks execution of @Transactional methods and records metrics
+ * <p>This interceptor tracks execution of transactional methods and records metrics
  * when new transactions are created.
  *
  * @since 22.01.2026
@@ -43,20 +43,22 @@ import com.axelixlabs.axelix.sbs.spring.core.persistence.transaction.Transaction
  */
 public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
-    private final Map<MethodClassKey, Propagation> propagationCache;
-    private final Class<?> targetClass;
+    /**
+     * All the methods monitored by this interceptor,
+     * i.e. the transactional methods of the single bean it is attached to.
+     */
+    private final Map<Method, MonitoredMethod> monitoredMethods;
+
     private final TransactionStatsCollector statsCollector;
     private final @Nullable AxelixMetricsPublisher metricsPublisher;
     private final TransactionAccessor transactionAccessor;
 
     public TransactionMonitoringInterceptor(
-            Map<MethodClassKey, Propagation> propagationCache,
-            Class<?> targetClass,
+            Map<Method, MonitoredMethod> monitoredMethods,
             TransactionStatsCollector statsCollector,
             @Nullable AxelixMetricsPublisher metricsPublisher,
             TransactionAccessor transactionAccessor) {
-        this.propagationCache = propagationCache;
-        this.targetClass = targetClass;
+        this.monitoredMethods = monitoredMethods;
         this.statsCollector = statsCollector;
         this.metricsPublisher = metricsPublisher;
         this.transactionAccessor = transactionAccessor;
@@ -66,12 +68,11 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     @Nullable
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
+        MonitoredMethod monitoredMethod = monitoredMethods.get(method);
 
-        MethodClassKey key =
-                TransactionMonitoringBeanPostProcessor.resolveMonitoringKey(method, targetClass, propagationCache);
-        Propagation propagation = propagationCache.get(key);
+        if (monitoredMethod != null && shouldCreateNewTransaction(monitoredMethod.getPropagation())) {
+            MethodClassKey key = monitoredMethod.getKey();
 
-        if (propagation != null && shouldCreateNewTransaction(propagation)) {
             transactionAccessor.recordNewTransactionStarted();
 
             try {
@@ -83,7 +84,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
                 if (metricsPublisher != null) {
                     metricsPublisher.publishTransactionMetrics(
-                            key.getTargetClass().getSimpleName(), method.getName(), transactionProfile);
+                            key.getIdentityClass().getSimpleName(), method.getName(), transactionProfile);
                 }
             }
         }
@@ -103,5 +104,24 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         }
 
         return false;
+    }
+
+    static final class MonitoredMethod {
+
+        private final MethodClassKey key;
+        private final Propagation propagation;
+
+        MonitoredMethod(MethodClassKey key, Propagation propagation) {
+            this.key = key;
+            this.propagation = propagation;
+        }
+
+        MethodClassKey getKey() {
+            return key;
+        }
+
+        Propagation getPropagation() {
+            return propagation;
+        }
     }
 }

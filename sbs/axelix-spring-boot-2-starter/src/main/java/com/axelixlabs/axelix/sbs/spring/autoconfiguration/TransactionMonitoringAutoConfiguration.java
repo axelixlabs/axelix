@@ -32,6 +32,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomi
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -105,20 +106,23 @@ public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    // Guarded via the class name (not Transactional.class): this bean is a BeanPostProcessor, whose
+    // The post-processor works off the transaction interceptor Spring puts on a bean, so it needs spring-tx.
+    // Guarded via the class name (not a class literal): this bean is a BeanPostProcessor, whose
     // factory-method annotations Spring introspects reflectively and early. A direct class reference
     // would throw TypeNotPresentException when spring-tx is absent (GH-1708).
-    @ConditionalOnClass(name = "org.springframework.transaction.annotation.Transactional")
+    @ConditionalOnClass(name = "org.springframework.transaction.interceptor.TransactionAspectSupport")
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
             TransactionStatsCollector transactionStatsCollector,
             TransactionAccessor transactionAccessor,
             TransactionAttributesRegistry transactionAttributesRegistry,
-            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider) {
+            ObjectProvider<AxelixMetricsPublisher> metricsPublisherObjectProvider,
+            ApplicationContext applicationContext) {
         return new TransactionMonitoringBeanPostProcessor(
                 transactionStatsCollector,
                 metricsPublisherObjectProvider,
                 transactionAccessor,
-                transactionAttributesRegistry);
+                transactionAttributesRegistry,
+                applicationContext);
     }
 
     @Bean

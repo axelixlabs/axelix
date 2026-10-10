@@ -10,7 +10,7 @@ plugins {
     id("contracts")
 }
 
-val springBootVersion = "4.1.0"
+val springBootVersion = "4.1.1"
 val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0"
 
@@ -29,8 +29,9 @@ val tomcatVersion = "11.0.25"
 val vertxVersion = "4.5.31"
 val httpcore5Version = "5.4.3"
 val httpclient5Version = "5.6.3"
-val bcprovVersion = "1.84"
-val jacksonDatabindVersion = "3.1.5"
+val bcprovVersion = "1.85"
+val jacksonVersion = "3.1.7"
+val jackson2Version = "2.21.7"
 
 dependencies {
     // Self
@@ -44,6 +45,8 @@ dependencies {
     // Security Patches
     implementation(platform("io.netty:netty-bom:${nettyVersion}"))
     implementation(platform("io.vertx:vertx-stack-depchain:${vertxVersion}"))
+    implementation(platform("tools.jackson:jackson-bom:${jacksonVersion}"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:${jackson2Version}"))
 
     constraints {
         implementation("org.postgresql:postgresql:$postgresqlVersion")
@@ -54,7 +57,6 @@ dependencies {
         implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpcore5Version")
         implementation("org.apache.httpcomponents.client5:httpclient5:$httpclient5Version")
         implementation("org.bouncycastle:bcprov-jdk18on:$bcprovVersion")
-        implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
     }
 
     // Boot Starters

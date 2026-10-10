@@ -20,9 +20,9 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.util.Assert;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 
 /**
  * JWT configuration properties.
@@ -30,6 +30,7 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
  * @since 11.12.2025
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @ConfigurationProperties(prefix = "axelix.master.auth.jwt")
 public record JwtProperties(JwtAlgorithm algorithm, String signingKey, Duration lifespan) {
@@ -37,8 +38,15 @@ public record JwtProperties(JwtAlgorithm algorithm, String signingKey, Duration 
     private static final String PROPERTIES_PREFIX = "axelix.master.auth.jwt";
 
     public JwtProperties {
-        Assert.notNull(algorithm, "JWT algorithm is required. Set " + PROPERTIES_PREFIX + ".algorithm");
-        Assert.notNull(signingKey, "JWT signing-key is required. Set " + PROPERTIES_PREFIX + ".signing-key");
+        if (algorithm == null) {
+            algorithm = JwtDefaults.DEFAULT_ALGORITHM;
+        }
+        if (signingKey == null) {
+            signingKey = JwtDefaults.DEFAULT_SIGNING_KEY;
+        }
+        if (lifespan == null) {
+            lifespan = JwtDefaults.MASTER_DEFAULT_LIFESPAN;
+        }
 
         algorithm.validateSigningKey(signingKey, PROPERTIES_PREFIX + ".signing-key");
     }

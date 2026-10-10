@@ -25,7 +25,7 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig(() => {
     // we have to load the .env file manually here since vite interprets the .env after the config getting loaded
     const env = loadEnv("", process.cwd(), "");
-    const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:8080";
+    const apiTarget = env.VITE_LOCAL_API_URL ?? "http://localhost:2935";
 
     return {
         plugins: [

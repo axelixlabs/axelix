@@ -34,10 +34,6 @@ export interface IDashboardJavaResponseBody {
     projectLilliput: IJavaFeatureAdoption[];
 }
 
-export interface IDashboardSpringFrameworkResponseBody {
-    features: IFeatureAdoption[];
-}
-
 export interface IGCDistributionData {
     [gcName: string]: number;
 }

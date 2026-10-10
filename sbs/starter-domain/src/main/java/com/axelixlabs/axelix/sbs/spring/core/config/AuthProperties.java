@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.config;
 import java.time.Duration;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.JwtDefaults;
 import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
@@ -48,12 +49,13 @@ public class AuthProperties implements Validatable {
         /**
          * The algorithm used for JWS creation inside the authentication tokens. Cannot be {@code null}.
          */
-        private JwtAlgorithm algorithm;
+        private JwtAlgorithm algorithm = JwtDefaults.DEFAULT_ALGORITHM;
 
         /**
-         * The key that should be used when verifying the JWS. Cannot be {@code null}.
+         * The key that should be used when verifying the JWS. Cannot be {@code null}. Defaults to the publicly known
+         * {@link JwtDefaults#DEFAULT_SIGNING_KEY}, which must be overridden in production.
          */
-        private String signingKey;
+        private String signingKey = JwtDefaults.DEFAULT_SIGNING_KEY;
 
         /**
          * JWT token validity duration to be set when constructing the token.

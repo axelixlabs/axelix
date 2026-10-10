@@ -76,12 +76,28 @@ Compose](../setting-up-master-ui/configuring-master/configuring-master.mdx#за�
 Образ публикуется в GitHub Container Registry. Без тега Docker скачивает `latest` — последний релиз, чтобы
 зафиксировать версию, допишите тег, например `:1.1.1`:
 
+<Tabs groupId="jwt-key" items={['Встроенный ключ (локально)', 'Свой ключ']}>
+  <Tab value="Встроенный ключ (локально)">
+
 ```bash
-docker run --rm -p 8080:8080 \
+docker run --rm -p 8080:8080 ghcr.io/axelixlabs/axelix
+```
+
+Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
+[Запуск без ключа подписи](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-без-ключа-подписи).
+
+  </Tab>
+  <Tab value="Свой ключ">
+
+```bash
+docker run --rm -p 2935:2935 \
   -e AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512 \
   -e AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret \
   ghcr.io/axelixlabs/axelix
 ```
+
+  </Tab>
+</Tabs>
 
 Как передать подключение к базе и остальную конфигурацию — см. [Запуск с
 Docker](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-с-docker), а вариант с Compose — в разделе [Запуск с Docker
@@ -111,6 +127,19 @@ Kubernetes](../setting-up-master-ui/configuring-master/configuring-master.mdx#з
 Скачайте JAR Master со [страницы релизов](https://github.com/axelixlabs/axelix/releases) — UI уже включён в него — и
 запустите:
 
+<Tabs groupId="jwt-key" items={['Встроенный ключ (локально)', 'Свой ключ']}>
+  <Tab value="Встроенный ключ (локально)">
+
+```bash
+java -jar master.jar
+```
+
+Если JWT-свойства не заданы, Master использует встроенный ключ подписи. Подходит только для локального знакомства, см.
+[Запуск без ключа подписи](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-без-ключа-подписи).
+
+  </Tab>
+  <Tab value="Свой ключ">
+
 ```bash
 export AXELIX_MASTER_AUTH_JWT_ALGORITHM=HMAC512
 export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
@@ -118,23 +147,39 @@ export AXELIX_MASTER_AUTH_JWT_SIGNINGKEY=replace-with-a-long-random-secret
 java -jar master.jar
 ```
 
+  </Tab>
+</Tabs>
+
 Другие способы передать конфигурацию — см. [Запуск как JAR](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-как-jar).
 
   </Tab>
 </Tabs>
 
-После этого Master доступен на `http://localhost:8080` (или за вашим Ingress в Kubernetes). Войдите под учётной
+После этого Master доступен на `http://localhost:2935` (или за вашим Ingress в Kubernetes). Войдите под учётной
 записью [суперадминистратора](../setting-up-master-ui/authentication/authentication.mdx#суперадминистратор).
+
+:::note
+`2935` — порт по умолчанию начиная с Axelix `1.2.0`. До этого релиза Master слушал порт `8080` — причины и способ
+вернуть старый порт описаны в разделе [Общие настройки](../setting-up-master-ui/configuring-master/configuring-master.mdx#общие-настройки).
+:::
 
 Затем сконфигурируйте его. Master принимает конфигурацию из многих источников — переменные окружения, внешний файл
 конфигурации, Spring Cloud Config Server или HashiCorp Vault — так что встроить его в существующий конвейер
 конфигурации не составит большого труда. См. [Передача свойств](../setting-up-master-ui/configuring-master/configuring-master.mdx#способы-задания-свойств).
 
-Два значения JWT из сниппетов запуска выше — единственные свойства, без которых Master не стартует:
-`axelix.master.auth.jwt.algorithm` и `axelix.master.auth.jwt.signing-key` — см. [Аутентификация —
+Два значения JWT из сниппетов запуска выше — это `axelix.master.auth.jwt.algorithm` и
+`axelix.master.auth.jwt.signing-key` — см. [Аутентификация —
 JWT](../setting-up-master-ui/configuring-master/configuring-master.mdx#аутентификация--jwt). С первого дня относитесь к ключу подписи бережно: это общий
 секрет, который позже будет предъявлять Master каждый управляемый сервис, поэтому сгенерируйте длинное случайное
 значение и храните его в менеджере секретов, а не в закоммиченном файле.
+
+:::warning[На Axelix 1.2.0 и новее]
+Оба значения JWT необязательны. Без них Master и ваши сервисы используют встроенный ключ подписи, поэтому Axelix можно
+попробовать локально, не генерируя ключ. Этот ключ общеизвестен: с ним любой может войти в Master и вызвать
+эндпоинты Axelix ваших сервисов. Используйте его только для локального знакомства, а во всех остальных случаях задайте свой
+ключ. См. [Запуск без ключа
+подписи](../setting-up-master-ui/configuring-master/configuring-master.mdx#запуск-без-ключа-подписи).
+:::
 
 Помимо подключения к базе и ключа подписи, на этом шаге стоит осознанно принять два решения:
 
@@ -223,7 +268,9 @@ dependencies {
 - **Задайте общий ключ подписи JWT** из шага 2 в свойствах `axelix.sbs.auth.jwt.*`. Несовпадение ключей между
   Master и сервисом — самая частая причина ответов `401` — см. [Поделитесь JWT-ключом подписи с
   Master](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#поделитесь-jwt-ключом-подписи-с-master) и [Решение
-  проблем](../more/troubleshooting.mdx).
+  проблем](../more/troubleshooting.mdx). В Axelix 1.2.0 и новее для локального знакомства этот шаг можно пропустить,
+  тогда сервис использует встроенный ключ, см. [Запуск без ключа
+  подписи](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#запуск-без-ключа-подписи).
 - **Настройте обнаружение — только если вы выбрали саморегистрацию.** Направьте свойства `axelix.sbs.discovery.*`
   на ваш Master, как показано в разделе [Дайте Master найти
   сервис](../setting-up-spring-boot-service/spring-boot-starter/configuration.mdx#дайте-master-найти-сервис). При автоматическом обнаружении на

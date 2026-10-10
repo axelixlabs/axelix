@@ -100,8 +100,11 @@ axelix.sbs.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn
 axelix.sbs.discovery.self-registration=true
 axelix.sbs.discovery.instance-name=your-application-name
 axelix.sbs.discovery.instance-actuator-url=http://localhost:9444/actuator
-axelix.sbs.discovery.master-url=http://localhost:8080/api/internal/service/register
+axelix.sbs.discovery.master-url=http://localhost:2935/api/internal/service/register
 ```
+
+`2935` is Master's default port since Axelix `1.2.0`. Before that release the default was `8080`, so use `8080` in
+`master-url` if your Master is older — see [General](../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
 
 On Axelix versions below 1.2.0 (exclusive), one more property is required — older starters do not expose their
 endpoints themselves, and without `axelix-metadata` Master cannot probe the instance:

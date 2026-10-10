@@ -400,13 +400,26 @@ axelix.sbs.auth.jwt.duration=5m
   </Tab>
 </Tabs>
 
-`algorithm` and `signing-key` are mandatory — startup fails fast with a clear message if either is missing. `duration`
-controls how long the starter-issued token used for self-registration heartbeats is valid, the default is five minutes,
+`duration` controls how long the starter-issued token used for self-registration heartbeats is valid, the default is five minutes,
 after which the starter rotates it automatically.
 
 :::warning
 A signing key shared between Master and every monitored service is a sensitive secret. Inject it through an environment
 variable, mounted file, or secret manager — not a checked-in YAML.
+:::
+
+### Running without a signing key
+
+<UpcomingReleaseNotice />
+
+Starting with Axelix 1.2.0, `algorithm` and `signing-key` are optional. When they are not set, the starter uses
+`HMAC512` and the same built-in key that Master uses by default, so the service connects to a Master with default
+settings without any key setup. While the built-in key is in use, the starter logs a warning at startup.
+
+:::warning
+The built-in key is publicly known. Anyone who can reach the service's actuator endpoints can sign a token with it and
+call the Axelix endpoints, for example to read the environment or take a heap dump. Set your own
+`axelix.sbs.auth.jwt.signing-key`, the same as on Master, before using Axelix beyond a local trial.
 :::
 
 ## Let Master find the instance
@@ -437,7 +450,7 @@ axelix:
   sbs:
     discovery:
       self-registration: true
-      master-url: http://master.internal:8080/api/internal/service/register
+      master-url: http://master.internal:2935/api/internal/service/register
       instance-actuator-url: http://my-app.internal:8080/actuator
       instance-name: orders-service
       heartbeat-interval: 15s
@@ -448,7 +461,7 @@ axelix:
 
 ```properties
 axelix.sbs.discovery.self-registration=true
-axelix.sbs.discovery.master-url=http://master.internal:8080/api/internal/service/register
+axelix.sbs.discovery.master-url=http://master.internal:2935/api/internal/service/register
 axelix.sbs.discovery.instance-actuator-url=http://my-app.internal:8080/actuator
 axelix.sbs.discovery.instance-name=orders-service
 axelix.sbs.discovery.heartbeat-interval=15s
@@ -462,6 +475,8 @@ A few details that catch people out:
 - `instance-actuator-url` is the **base** URL of the service as Master will reach it from its own network — host and
   port only.
 - `master-url` is the **full** URL including `/api/internal/service/register`. The starter posts to it verbatim.
+  Master listens on `2935` by default since Axelix `1.2.0`; before that release the default port was `8080` — see
+  [General](../../setting-up-master-ui/configuring-master/configuring-master.mdx#general).
 - `instance-name` is the label Master shows for this instance in the UI and in MCP responses. Pick a name that survives
   restarts and replicas — typically the service name, not the pod name.
 - Self-registration is accepted by Master out of the box (`axelix.master.discovery.self-registration.enabled` is `true`
@@ -579,8 +594,8 @@ fail, and self-registration heartbeats stop, so the instance disappears from the
 <div className={styles.SharedTable}>
 | Property                          | Default                                              | Description                                                                                                                  |
 |-----------------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `axelix.sbs.auth.jwt.algorithm`   | *(unset)* <span className="Required">required</span> | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
-| `axelix.sbs.auth.jwt.signing-key` | *(unset)* <span className="Required">required</span> | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
+| `axelix.sbs.auth.jwt.algorithm`   | `HMAC512` (1.2.0+; required before) | Signing algorithm. One of `HMAC256`, `HMAC384`, or `HMAC512`. Must match Master's `axelix.master.auth.jwt.algorithm`.        |
+| `axelix.sbs.auth.jwt.signing-key` | built-in key (1.2.0+; required before) | Shared secret used to verify Master-issued tokens and to sign self-registration heartbeats. Must match Master's signing key. |
 | `axelix.sbs.auth.jwt.duration`    | `5m`                                                 | Validity of the self-registration token the starter issues itself. Tokens are rotated automatically before expiry.           |
 </div>
 
@@ -606,7 +621,7 @@ heartbeats are rejected with `401`.
 | Property                                     | Default                                              | Description                                                                                                                          |
 |----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `axelix.sbs.discovery.self-registration`     | `false`                                              | Master switch. Set to `true` to enable self-registration; leave `false` to rely on Master-side autodiscovery.                                  |
-| `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:8080/api/internal/service/register`. Required when `self-registration=true`. |
+| `axelix.sbs.discovery.master-url`            | *(unset)* <span className="Required">required</span> | Full URL of Master's self-registration endpoint, e.g. `http://master:2935/api/internal/service/register`. Required when `self-registration=true`. |
 | `axelix.sbs.discovery.instance-actuator-url` | *(unset)* <span className="Required">required</span> | Base URL of this service as reachable from Master (It is necessary to specify the postfix `/actuator`). Required when `self-registration=true`.   |
 | `axelix.sbs.discovery.instance-name`         | *(unset)* <span className="Required">required</span> | Display name shown in Axelix UI and MCP responses. Required when `self-registration=true`.                                                        |
 | `axelix.sbs.discovery.heartbeat-interval`    | `15s`                                                | Interval between heartbeats. Should be smaller than Master's eviction `heartbeat-timeout`.                                           |
@@ -622,6 +637,53 @@ heartbeats are rejected with `401`.
 | `axelix.sbs.endpoints.config.sanitized-properties` | *(empty list)* | Property keys whose values are masked as `******` for callers without `ENV_VALUES_READ` (for `axelix-env`) or `CONFIG_PROPS_VALUES_READ` (for `axelix-configprops`). Empty list means **all** values are masked. See [Sanitize sensitive property values](#sanitize-sensitive-property-values) for the matching rules. |
 
 </div>
+
+### Cache management
+
+<UpcomingReleaseNotice />
+
+Cache management is what powers the Caches page and the `axelix_cache_*` meters: the starter wraps every `CacheManager`
+bean of your application in a proxy that records cache lookups and lets you enable, disable, and clear caches at
+runtime, and it exposes that data through the `axelix-caches` actuator endpoint. It is **on by default** once the
+starter is on the classpath.
+
+Set `axelix.sbs.cache.management.enabled` to `false` to turn it off entirely — no `CacheManager` proxying, no
+`axelix-caches` endpoint, and no cache meters. Your `CacheManager` beans are then left exactly as your application
+defined them.
+
+<Tabs groupId="spring-config" items={['application.yaml', 'application.properties']}>
+  <Tab value="application.yaml">
+
+```yaml
+axelix:
+  sbs:
+    cache:
+      management:
+        enabled: false
+```
+
+  </Tab>
+  <Tab value="application.properties">
+
+```properties
+axelix.sbs.cache.management.enabled=false
+```
+
+  </Tab>
+</Tabs>
+
+<div className={styles.SharedTable}>
+
+| Property                              | Default | Description                                                                                                                                                                  |
+|---------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `axelix.sbs.cache.management.enabled` | `true`  | Master switch for cache management. Set to `false` to make the whole cache management auto-configuration back off. Behaves identically on the Spring Boot 2, 3, and 4 starters. |
+
+</div>
+
+:::note
+With cache management disabled, the Caches page in Master has no data to show for this instance, and the cache MCP
+tools fail for it.
+:::
 
 ### Transaction monitoring
 
