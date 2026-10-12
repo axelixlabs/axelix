@@ -42,24 +42,32 @@ interface IProps {
      * Fetches loggers data.
      */
     fetchLoggersData: () => void;
+
+    /**
+     * Sets the loading state.
+     */
+    setLoading: (loading: boolean) => void;
 }
 
-export const LoggerGroups = ({ loggerGroups, levels, fetchLoggersData }: IProps) => {
-    // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
+export const LoggerGroups = ({ loggerGroups, levels, fetchLoggersData, setLoading }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
 
     const { instanceId } = useParams();
 
     const handleChange = (level: string, groupName: string): void => {
+        setLoading(true);
+
         changeLoggerGroupLevel({
             instanceId: instanceId!,
             configuredLevel: level,
             groupName: groupName,
-        }).then(() => {
-            message.success(t("Loggers.loggerLevelUpdated"));
-            fetchLoggersData();
-        });
+        })
+            .then(() => {
+                message.success(t("Loggers.loggerLevelUpdated"));
+                fetchLoggersData();
+            })
+            .catch(() => setLoading(false));
     };
 
     return (

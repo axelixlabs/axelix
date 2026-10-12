@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tabs } from "antd";
-import { Activity, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
@@ -26,8 +26,7 @@ import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest } from "@/mode
 import { getLoggersData } from "@/services";
 import { loggersTabs } from "@/utils";
 
-import { LoggerGroups } from "./LoggerGroups";
-import { LoggersList } from "./LoggersList";
+import { LoggersContent } from "./LoggersContent";
 import styles from "./styles.module.css";
 
 const Loggers = () => {
@@ -38,17 +37,22 @@ const Loggers = () => {
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggersResponseBody>());
     const [search, setSearch] = useState<string>("");
 
+    const setLoading = (loading: boolean): void => {
+        setLoggersData((prev) => new StatefulRequest<ILoggersResponseBody>(loading, prev.error, prev.response));
+    };
+
     const fetchLoggersData = (): void => {
-        // TODO: Remove this after refactoring fetchData and StatefulRequest
-        setLoggersData(StatefulRequest.loading());
+        setLoading(true);
         fetchData(setLoggersData, () => getLoggersData(instanceId!));
     };
+
+    const isLoading = loggersData.loading;
 
     useEffect(() => {
         fetchLoggersData();
     }, []);
 
-    if (loggersData.loading) {
+    if (isLoading && !loggersData.response) {
         return <Loader />;
     }
 
@@ -76,30 +80,27 @@ const Loggers = () => {
 
     return (
         <>
-            <div className={styles.FirstSection}>
-                <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeTab} />
-                <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
+            <div className={styles.MainWrapper}>
+                {isLoading && (
+                    <div className={styles.Overlay}>
+                        <Loader />
+                    </div>
+                )}
+
+                <div className={styles.FirstSection}>
+                    <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeTab} />
+                    <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
+                </div>
+
+                <LoggersContent
+                    activeTab={activeTab}
+                    effectiveLoggerGroups={effectiveLoggerGroups}
+                    effectiveLoggers={effectiveLoggers}
+                    fetchLoggersData={fetchLoggersData}
+                    levels={levels}
+                    setLoading={setLoading}
+                />
             </div>
-
-            <Activity mode={isLoggersTab ? "visible" : "hidden"}>
-                <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
-                    <LoggersList
-                        effectiveLoggers={effectiveLoggers}
-                        levels={levels}
-                        fetchLoggersData={fetchLoggersData}
-                    />
-                </EmptyHandler>
-            </Activity>
-
-            <Activity mode={isLoggerGroupsTab ? "visible" : "hidden"}>
-                <EmptyHandler isEmpty={effectiveLoggerGroups.length === 0}>
-                    <LoggerGroups
-                        loggerGroups={effectiveLoggerGroups}
-                        levels={levels}
-                        fetchLoggersData={fetchLoggersData}
-                    />
-                </EmptyHandler>
-            </Activity>
         </>
     );
 };
