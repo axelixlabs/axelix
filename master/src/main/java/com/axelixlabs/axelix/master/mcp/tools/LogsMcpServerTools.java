@@ -17,9 +17,10 @@
  */
 package com.axelixlabs.axelix.master.mcp.tools;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpTool.McpAnnotations;
@@ -29,8 +30,10 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.SingleValueQueryParameter;
+import com.axelixlabs.axelix.master.contract.logs.LogEntriesTail;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.mcp.McpEndpoints;
+import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -42,18 +45,28 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class LogsMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
+    private final ObjectMapper objectMapper;
+    private final Converter<LogEntriesTail, String> logEntriesTailConverter;
 
-    public LogsMcpServerTools(EndpointInvoker endpointInvoker) {
+    public LogsMcpServerTools(
+            EndpointInvoker endpointInvoker,
+            ObjectMapper objectMapper,
+            Converter<LogEntriesTail, String> logEntriesTailConverter) {
         this.endpointInvoker = endpointInvoker;
+        this.objectMapper = objectMapper;
+        this.logEntriesTailConverter = logEntriesTailConverter;
     }
 
     @McpTool(
             name = McpEndpoints.LOG_ENTRIES_TAIL_TOOL_NAME,
             title = "Logs",
             description = """
-            Get the most recent log entries of a specific instance, in chronological order (the last
-            entry is the most recent one). Each entry has the timestamp (milliseconds since the Unix epoch),
-            level, logger name, thread name, message and, if an exception was logged, its stack trace.
+            Get the most recent log entries of a specific instance as the plain text, in chronological order
+            (the last entry is the most recent one). Each entry is a line of the following format:
+
+            <timestamp, ISO-8601, UTC> <level> [<thread name>] <logger name> - <message>
+
+            If an exception was logged, its stack trace follows on the next lines.
             Use this when user asks about the logs, errors, exceptions or the recent activity of an instance.
 
             The instance keeps only a bounded amount of the most recent entries in memory (since its startup),
@@ -72,12 +85,11 @@ public class LogsMcpServerTools {
     public String getInstanceLogs(
             @McpToolParam(description = "The instance ID") String instanceId,
             @McpToolParam(description = "The maximum amount of the most recent log entries to return") int limit) {
-        return new String(
-                endpointInvoker.invoke(
-                        InstanceId.of(instanceId),
-                        ActuatorEndpoints.GET_LOG_ENTRIES_TAIL,
-                        new DefaultHttpPayload(
-                                List.of(new SingleValueQueryParameter("limit", String.valueOf(limit))), Map.of())),
-                StandardCharsets.UTF_8);
+        byte[] body = endpointInvoker.invoke(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.GET_LOG_ENTRIES_TAIL,
+                new DefaultHttpPayload(
+                        List.of(new SingleValueQueryParameter("limit", String.valueOf(limit))), Map.of()));
+        return logEntriesTailConverter.convertInternal(objectMapper.readValue(body, LogEntriesTail.class));
     }
 }

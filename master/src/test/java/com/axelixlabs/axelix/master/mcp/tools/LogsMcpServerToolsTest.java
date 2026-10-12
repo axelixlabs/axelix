@@ -21,10 +21,12 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import tools.jackson.databind.json.JsonMapper;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.convert.response.logs.LogEntriesTailConverter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,12 +47,16 @@ class LogsMcpServerToolsTest {
 
     private final EndpointInvoker endpointInvoker = mock(EndpointInvoker.class);
 
-    private final LogsMcpServerTools subject = new LogsMcpServerTools(endpointInvoker);
+    private final LogsMcpServerTools subject =
+            new LogsMcpServerTools(endpointInvoker, JsonMapper.builder().build(), new LogEntriesTailConverter());
 
     @Test
-    void shouldSendTheLimitAsTheQueryParameter() {
+    void shouldSendTheLimitAsTheQueryParameterAndReturnTheLogsAsThePlainText() {
         // given.
-        String logEntries = "{\"entries\":[]}";
+        String logEntries = """
+                {"entries":[{"timestamp":1760264130123,"level":"INFO","logger":"com.example.OrderService",\
+                "thread":"main","message":"Order created"}]}
+                """;
         when(endpointInvoker.invoke(eq(InstanceId.of(INSTANCE_ID)), eq(ActuatorEndpoints.GET_LOG_ENTRIES_TAIL), any()))
                 .thenReturn(logEntries.getBytes(StandardCharsets.UTF_8));
 
@@ -65,7 +71,7 @@ class LogsMcpServerToolsTest {
                         eq(ActuatorEndpoints.GET_LOG_ENTRIES_TAIL),
                         payloadCaptor.capture());
 
-        assertThat(result).isEqualTo(logEntries);
+        assertThat(result).isEqualTo("2025-10-12T10:15:30.123Z INFO [main] com.example.OrderService - Order created\n");
         assertThat(payloadCaptor.getValue().queryParameters())
                 .singleElement()
                 .satisfies(parameter -> assertThat(parameter.toEncodedString()).isEqualTo("limit=25"));
