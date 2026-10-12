@@ -1,0 +1,83 @@
+openapi: 3.1.0
+info:
+  title: log-entries-tail
+  version: 1.0.0
+  description: |
+    The Axelix Master <-> starter contract of the 'log-entries-tail' operation.
+    This operation returns the most recent log entries of the Spring Boot app, taken from the
+    bounded in-memory buffer the starter keeps. The entries are returned in chronological order,
+    i.e. the last entry of the response is the most recent one.
+  x-axelix-introduced-in: 1.3.0
+  x-axelix-server: starter
+paths:
+  /actuator/axelix-logs:
+    get:
+      operationId: getLogEntriesTail
+      summary: Returns the most recent log entries of the service.
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          description: >-
+            The maximum amount of the most recent log entries to return. Fewer entries are returned
+            if the starter has buffered less than that.
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+      responses:
+        '200':
+          description: The most recent log entries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogEntriesTail'
+components:
+  schemas:
+    LogEntriesTail:
+      type: object
+      description: The most recent log entries of the service, in chronological order.
+      required:
+        - entries
+      properties:
+        entries:
+          type: array
+          description: The log entries, the oldest one first.
+          items:
+            $ref: '#/components/schemas/LogEntry'
+          x-axelix-introduced-in: 1.3.0
+    LogEntry:
+      type: object
+      description: A single log entry (log event) of the service.
+      required:
+        - timestamp
+        - level
+        - logger
+        - thread
+        - message
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          description: The moment the entry was logged at, in milliseconds since the Unix epoch.
+          x-axelix-introduced-in: 1.3.0
+        level:
+          type: string
+          description: The level the entry was logged with (e.g. "INFO", "ERROR").
+          x-axelix-introduced-in: 1.3.0
+        logger:
+          type: string
+          description: The name of the logger the entry was logged by.
+          x-axelix-introduced-in: 1.3.0
+        thread:
+          type: string
+          description: The name of the thread the entry was logged from.
+          x-axelix-introduced-in: 1.3.0
+        message:
+          type: string
+          description: The formatted message of the entry.
+          x-axelix-introduced-in: 1.3.0
+        stackTrace:
+          type: string
+          description: The stack trace of the exception logged along with the entry. Absent if there is none.
+          x-axelix-introduced-in: 1.3.0

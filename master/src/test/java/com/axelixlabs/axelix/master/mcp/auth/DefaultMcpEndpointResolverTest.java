@@ -138,6 +138,7 @@ class DefaultMcpEndpointResolverTest {
                 Arguments.of(McpEndpoints.CACHES_FEED_TOOL_NAME, McpEndpoints.ALL_CACHES),
                 Arguments.of(McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME, McpEndpoints.CLEAR_ALL_CACHES),
                 Arguments.of(McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME, McpEndpoints.CLEAR_SPECIFIC_CACHE),
-                Arguments.of(McpEndpoints.TRANSACTIONS_PROFILE_TOOL_NAME, McpEndpoints.TRANSACTIONS_PROFILE));
+                Arguments.of(McpEndpoints.TRANSACTIONS_PROFILE_TOOL_NAME, McpEndpoints.TRANSACTIONS_PROFILE),
+                Arguments.of(McpEndpoints.LOG_ENTRIES_TAIL_TOOL_NAME, McpEndpoints.LOG_ENTRIES_TAIL));
     }
 }

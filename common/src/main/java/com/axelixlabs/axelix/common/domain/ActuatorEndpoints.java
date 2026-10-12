@@ -98,6 +98,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint RESET_FOR_LOGGER =
             endpoint("/axelix-loggers/logger/{name}/reset", HttpMethod.POST);
 
+    // Logs
+    public static final ActuatorEndpoint GET_LOG_ENTRIES_TAIL = endpoint("/axelix-logs", HttpMethod.GET);
+
     // Metadata
     public static final ActuatorEndpoint METADATA = endpoint("/axelix-metadata", HttpMethod.GET);
 

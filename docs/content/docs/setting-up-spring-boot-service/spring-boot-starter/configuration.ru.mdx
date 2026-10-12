@@ -321,6 +321,11 @@ Axelix ниже 1.2.0](#открытие-эндпоинтов-на-axelix-ниж
         <td><code>1.0.0</code></td>
     </tr>
     <tr>
+        <td><code>axelix-logs</code></td>
+        <td>Последние записи лога</td>
+        <td><code>1.3.0</code> <em>скоро</em></td>
+    </tr>
+    <tr>
         <td><code>axelix-metrics</code></td>
         <td>Метрики</td>
         <td><code>1.0.0</code></td>
@@ -415,6 +420,7 @@ management:
           - axelix-gc
           - axelix-heap-dump
           - axelix-loggers
+          - axelix-logs
           - axelix-metrics
           - axelix-scheduled-tasks
           - axelix-thread-dump
@@ -424,7 +430,7 @@ management:
   <Tab value="application.properties">
 
 ```properties
-management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
+management.endpoints.web.exposure.include=axelix-metadata,axelix-beans,axelix-caches,axelix-conditions,axelix-configprops,axelix-details,axelix-env,axelix-gc,axelix-heap-dump,axelix-loggers,axelix-logs,axelix-metrics,axelix-scheduled-tasks,axelix-thread-dump
 ```
 
   </Tab>
