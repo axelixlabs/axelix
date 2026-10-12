@@ -51,6 +51,7 @@ class AxelixEndpointsEnvironmentPostProcessorTest {
             "axelix-gc",
             "axelix-heap-dump",
             "axelix-loggers",
+            "axelix-logs",
             "axelix-metadata",
             "axelix-metrics",
             "axelix-scheduled-tasks",

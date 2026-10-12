@@ -81,6 +81,7 @@ class McpToolsE2ETest {
                         "changeLoggingLevelByLoggerName",
                         "changeLoggingLevelByGroupName",
                         "resetLoggingLevelByLoggerName",
-                        "getApplicationTransactionsProfile");
+                        "getApplicationTransactionsProfile",
+                        "getInstanceLogs");
     }
 }

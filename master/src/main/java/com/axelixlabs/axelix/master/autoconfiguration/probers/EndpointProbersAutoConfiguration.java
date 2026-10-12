@@ -57,6 +57,13 @@ public class EndpointProbersAutoConfiguration {
         this.securityContextExecutor = securityContextExecutor;
     }
 
+    // Logs
+    @Bean
+    public ProxyingEndpointProber getLogEntriesTailEndpointProber() {
+        return new ProxyingEndpointProber(
+                instanceRegistry, ActuatorEndpoints.GET_LOG_ENTRIES_TAIL, securityContextExecutor);
+    }
+
     // Loggers
     @Bean
     public DiscardingAbstractEndpointProber setOneLoggerEndpointProber() {
