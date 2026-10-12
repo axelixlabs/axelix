@@ -95,7 +95,7 @@ multi-master deployments and the security model.
 Getting started is two steps: run **Axelix Master**, then add the **Axelix Starter** and build plugin
 to each Spring Boot service you want to manage.
 
-> The snippets below pin `1.1.0` for illustration. Check the
+> The snippets below pin `1.2.0` for illustration. Check the
 > [Releases page](https://github.com/axelixlabs/axelix/releases) for the latest published tag.
 
 ### 1. Run Axelix Master
@@ -103,25 +103,28 @@ to each Spring Boot service you want to manage.
 Master listens on port `2935` (overridable with `axelix.master.port`) and bundles the UI, so there is nothing extra to build for the web
 interface. Pick whichever shape matches how you ship the rest of your services.
 
+**Configuration used in the examples.** The JAR and Docker commands in this README use the default JWT
+settings and super-admin credentials (`admin / admin`). These defaults are for local use, not
+production. Before deploying to production:
+
+- Set a private JWT signing key with `axelix.master.auth.jwt.signing-key` and configure the same key
+  in every managed service with `axelix.sbs.auth.jwt.signing-key`.
+- Change both super-admin credentials with `axelix.master.auth.options.super-admin.credentials.username`
+  and `axelix.master.auth.options.super-admin.credentials.password`.
+- If you override `axelix.master.auth.jwt.algorithm`, set the same algorithm in every managed service
+  with `axelix.sbs.auth.jwt.algorithm`.
+
 **As a JAR.** On the [Releases page](https://github.com/axelixlabs/axelix/releases), expand the
 **Assets** section of the latest release and download `master.jar`, then run:
 
 ```bash
-java \
-  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
-  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar master.jar
+java -jar master.jar
 ```
 
 **With Docker.** The release image is published to GitHub Container Registry:
 
 ```bash
-docker run --rm -p 2935:2935 \
-  -e JAVA_OTHER_ARGS="\
-    -Daxelix.master.auth.jwt.algorithm=HMAC512 \
-    -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-    -Daxelix.master.auth.options.super-admin.credentials.password=replace-me" \
-  ghcr.io/axelixlabs/axelix:1.1.0
+docker run --rm -p 2935:2935 ghcr.io/axelixlabs/axelix:1.2.0
 ```
 
 **On Kubernetes.** Install the first-party Helm chart, which also wires the RBAC needed for
@@ -141,10 +144,9 @@ documented on the chart's [Artifact Hub page](https://artifacthub.io/packages/he
 open it, pick the version matching the Axelix release you are installing (Axelix components share a
 single lockstep version, so this is just the release tag), and read the **Default Values** section.
 
-Master then serves the UI at `http://localhost:2935`. It ships with a built-in super-admin account
-(`admin / admin`) and an unset JWT signing key, so **change both before exposing Master to anyone
-else.** A Docker Compose example and the full configuration reference (database, auth, discovery,
-MCP) are in [Configuring Master](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx).
+Master then serves the UI at `http://localhost:2935`. A Docker Compose example and the full
+configuration reference (database, auth, discovery, MCP) are in
+[Configuring Master](docs/content/docs/setting-up-master-ui/configuring-master/configuring-master.mdx).
 
 ### 2. Add the Axelix Starter and build plugin to your Spring Boot service
 
@@ -156,20 +158,20 @@ First, declare the starter coordinate matching your Spring Boot major version:
 
 ```kotlin
 // Spring Boot 4.x
-implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.1.0")
+implementation("com.axelixlabs:axelix-spring-boot-4-starter:1.2.0")
 
 // Spring Boot 3.x
-implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.1.0")
+implementation("com.axelixlabs:axelix-spring-boot-3-starter:1.2.0")
 
 // Spring Boot 2.7.x
-implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.1.0")
+implementation("com.axelixlabs:axelix-spring-boot-2-starter:1.2.0")
 ```
 
 Then apply the Axelix build plugin. With Gradle:
 
 ```kotlin
 plugins {
-    id("com.axelixlabs.axelix") version "1.1.0"
+    id("com.axelixlabs.axelix") version "1.2.0"
 }
 ```
 
@@ -179,7 +181,7 @@ Or, with Maven:
 <plugin>
   <groupId>com.axelixlabs</groupId>
   <artifactId>axelix-maven-plugin</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <executions>
     <execution>
       <goals>
@@ -200,7 +202,7 @@ Master and each managed service authenticate to one another with HMAC-signed JWT
 symmetric — the *same* secret both signs and verifies a token — so the JWT settings on Master
 (`axelix.master.auth.jwt.signing-key` and `axelix.master.auth.jwt.algorithm`) must be identical to
 the ones configured in the starter on every service (`axelix.sbs.auth.jwt.signing-key` /
-`axelix.sbs.auth.jwt.algorithm`). **These properties are required, for now**.
+`axelix.sbs.auth.jwt.algorithm`). Both have defaults for local use.
 
 Depending on the configuration, Axelix Master may talk to spring boot apps and spring boot apps may also talk to Axelix Master. 
 The token is used in both directions. 
@@ -232,10 +234,7 @@ This runs `./gradlew master-oss:build` and produces the fat jar at
 `master-oss/build/libs/master.jar`. Run it exactly like the released jar:
 
 ```bash
-java \
-  -Daxelix.master.auth.jwt.algorithm=HMAC512 \
-  -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret \
-  -jar master-oss/build/libs/master.jar
+java -jar master-oss/build/libs/master.jar
 ```
 
 **Build the Docker image:**
@@ -248,11 +247,7 @@ This first builds the jar (the target depends on `master-oss`) and then builds a
 `master-oss:local` from [`master-oss/Dockerfile`](master-oss/Dockerfile). Run it with:
 
 ```bash
-docker run --rm -p 2935:2935 \
-  -e JAVA_OTHER_ARGS="\
-    -Daxelix.master.auth.jwt.algorithm=HMAC512 \
-    -Daxelix.master.auth.jwt.signing-key=replace-with-a-long-random-secret" \
-  master-oss:local
+docker run --rm -p 2935:2935 master-oss:local
 ```
 
 Either way Master serves the UI at `http://localhost:2935`, just like the published artifacts.
