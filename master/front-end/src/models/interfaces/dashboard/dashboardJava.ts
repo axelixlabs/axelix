@@ -20,18 +20,16 @@ export interface IFeatureAdoption {
     adoptionPercentage: number;
 }
 
-export type IJavaFeatureAdoption = IFeatureAdoption;
-
 export interface IChartData {
     categoryName: string;
     value: number;
 }
 
 export interface IDashboardJavaResponseBody {
-    projectLeyden: IJavaFeatureAdoption[];
-    gc: IJavaFeatureAdoption[];
+    projectLeyden: IFeatureAdoption[];
+    gc: IFeatureAdoption[];
     garbageCollectorDistribution: IGCDistributionData;
-    projectLilliput: IJavaFeatureAdoption[];
+    projectLilliput: IFeatureAdoption[];
 }
 
 export interface IGCDistributionData {

@@ -25,3 +25,9 @@ export enum EUserOrigin {
     LOCAL = "LOCAL",
     OIDC = "OIDC",
 }
+
+export enum EUserProfileEditableValueField {
+    USERNAME = "username",
+    EMAIL = "email",
+    PASSWORD = "password",
+}

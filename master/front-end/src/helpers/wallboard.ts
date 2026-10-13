@@ -22,7 +22,7 @@ import {
     EWallboardFilterOperator,
     type IInstanceCard,
     type IWallboardSingleOperandFilter,
-    type WallboardParsedFilter,
+    type TWallboardParsedFilter,
 } from "@/models";
 import { SEARCH_PARAMS_FILTER, getWallboardFilterDefinitions } from "@/utils";
 
@@ -202,7 +202,7 @@ export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboard
     const parsedFilters: IWallboardSingleOperandFilter[] = [];
 
     filtersFromUrl.forEach((filter) => {
-        const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+        const [key, operator, operand] = filter.split(":") as TWallboardParsedFilter;
 
         if (!key || !operator || !operand) {
             return;
@@ -229,7 +229,7 @@ export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboard
  */
 export const removeFilterById = (searchParams: URLSearchParams, targetId: string) => {
     const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
-        const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+        const [key, operator, operand] = filter.split(":") as TWallboardParsedFilter;
 
         if (!key || !operator || !operand) {
             return;

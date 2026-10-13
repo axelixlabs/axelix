@@ -21,7 +21,7 @@ import { Navigate, Route, Routes } from "react-router";
 import Loadable from "@/components";
 import { useAppSelector } from "@/hooks";
 import { MainLayout } from "@/layout";
-import { DashboardSiderMenu } from "@/layout/siders";
+import { DashboardSiderMenu, InstanceSiderMenu } from "@/layout/siders";
 
 const DashboardSpringPortfolio = Loadable(lazy(() => import("@/pages/Dashboard/DashboardSpringPortfolio")));
 const DashboardPersistence = Loadable(lazy(() => import("@/pages/Dashboard/DashboardPersistence")));
@@ -70,7 +70,7 @@ export const MainRoutes = () => {
                     <Route path="/users/:userId" element={<UserProfile />} />
                 </Route>
 
-                <Route element={<MainLayout />}>
+                <Route element={<MainLayout siderContent={<InstanceSiderMenu />} />}>
                     <Route path="/instance/:instanceId/details" element={<Details />} />
                     <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
                     <Route path="/instance/:instanceId/dependencies" element={<DependenciesAnalyzer />} />

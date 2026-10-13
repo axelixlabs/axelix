@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { useAppSelector } from "@/hooks";
-import type { LoginOption, OIDCLoginOption } from "@/models";
+import type { TLoginOption, TOIDCLoginOption } from "@/models";
 import { LOCAL_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME, SUPER_ADMIN_AUTH_OPTION_TYPE_NAME } from "@/utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
@@ -44,7 +44,7 @@ export const LoginContent = () => {
 
     const settings = useAppSelector((state) => state.settings);
 
-    const getAuthOption = (optionName: string): LoginOption | undefined => {
+    const getAuthOption = (optionName: string): TLoginOption | undefined => {
         return settings?.authenticationOptions?.find(({ type }) => optionName === type);
     };
 
@@ -64,7 +64,7 @@ export const LoginContent = () => {
                 {displayUsernamePasswordLoginForm && oidcOptionPresent && <SeparatorLine />}
 
                 {ifFound(oidcOptionPresent, (value) => (
-                    <LoginOidcForm option={value as OIDCLoginOption} />
+                    <LoginOidcForm option={value as TOIDCLoginOption} />
                 ))}
             </div>
         </>

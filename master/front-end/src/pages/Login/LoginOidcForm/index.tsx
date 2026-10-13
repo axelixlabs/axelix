@@ -19,13 +19,13 @@ import { Button } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { LockIcon } from "@/assets";
-import { type OIDCLoginOption } from "@/models";
+import { type TOIDCLoginOption } from "@/models";
 import { authorize } from "@/services";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    option: OIDCLoginOption;
+    option: TOIDCLoginOption;
 }
 
 export const LoginOidcForm = ({ option }: IProps) => {

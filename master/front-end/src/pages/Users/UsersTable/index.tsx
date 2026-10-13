@@ -24,7 +24,7 @@ import type { IUser } from "@/models";
 
 import styles from "./styles.module.css";
 
-export interface IProps {
+interface IProps {
     /**
      * List of users
      */

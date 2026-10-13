@@ -15,4 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export type UserProfileEditableValueField = "username" | "email" | "password";
+import styles from "./styles.module.css";
+
+interface IProps {
+    title: string;
+    subtitle: string;
+}
+
+export const PagesFirstSection = ({ title, subtitle }: IProps) => {
+    return (
+        <>
+            <div className={styles.MainWrapper}>
+                <div className="TextLarge">{title}</div>
+                <p className={styles.Subtitle}>{subtitle}</p>
+            </div>
+        </>
+    );
+};

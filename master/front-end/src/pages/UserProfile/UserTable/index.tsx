@@ -18,7 +18,7 @@
 import { useTranslation } from "react-i18next";
 
 import { EmailIcon, LockOutlinedIcon, ProfileIcon, ShieldIcon } from "@/assets";
-import type { IEditableUser, IUser } from "@/models";
+import { EUserProfileEditableValueField, type IEditableUser, type IUser } from "@/models";
 
 import { EditableValue } from "../EditableValue";
 import { RolesSelect } from "../RolesSelect";
@@ -57,7 +57,11 @@ export const UserTable = ({ user, reLoadUser }: IProps) => {
                     <ProfileIcon /> <span className={styles.Label}>{t("username")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="username" reLoadUser={reLoadUser} />
+                    <EditableValue
+                        user={editableUser}
+                        field={EUserProfileEditableValueField.USERNAME}
+                        reLoadUser={reLoadUser}
+                    />
                 </div>
             </div>
             <div className="TableRow">
@@ -65,7 +69,11 @@ export const UserTable = ({ user, reLoadUser }: IProps) => {
                     <EmailIcon /> <span className={styles.Label}>Email</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="email" reLoadUser={reLoadUser} />
+                    <EditableValue
+                        user={editableUser}
+                        field={EUserProfileEditableValueField.EMAIL}
+                        reLoadUser={reLoadUser}
+                    />
                 </div>
             </div>
             <div className="TableRow">
@@ -82,7 +90,11 @@ export const UserTable = ({ user, reLoadUser }: IProps) => {
                     <LockOutlinedIcon /> <span className={styles.Label}>{t("password")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={editableUser} field="password" reLoadUser={reLoadUser} />
+                    <EditableValue
+                        user={editableUser}
+                        field={EUserProfileEditableValueField.PASSWORD}
+                        reLoadUser={reLoadUser}
+                    />
                 </div>
             </div>
         </div>

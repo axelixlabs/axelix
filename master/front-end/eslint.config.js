@@ -81,6 +81,11 @@ export default [
                     prefix: ["I"],
                 },
                 {
+                    selector: "typeAlias",
+                    format: ["PascalCase"],
+                    prefix: ["T"],
+                },
+                {
                     selector: "enum",
                     format: ["PascalCase"],
                     prefix: ["E"],

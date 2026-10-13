@@ -31,7 +31,7 @@ import { disableGCLogging, getGCLogFile, triggerGC } from "@/services";
 import { GCActionButton } from "./GCActionButton";
 import styles from "./styles.module.css";
 
-export interface IProps {
+interface IProps {
     /**
      * Loads the GC logging status
      */

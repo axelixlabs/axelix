@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { apiFetch } from "@/api";
-import type { ILoginSubmitRequestData, OIDCLoginOption } from "@/models";
+import type { ILoginSubmitRequestData, TOIDCLoginOption } from "@/models";
 
 export const login = (data: ILoginSubmitRequestData) => {
     return apiFetch.post("users/login", data);
@@ -29,7 +29,7 @@ export const logout = () => {
 /**
  * Invoke OIDC '/authorize' endpoint
  */
-export const authorize = (option: OIDCLoginOption) => {
+export const authorize = (option: TOIDCLoginOption) => {
     const params = new URLSearchParams();
     params.append("client_id", option.clientId);
     params.append("scope", option.scope);

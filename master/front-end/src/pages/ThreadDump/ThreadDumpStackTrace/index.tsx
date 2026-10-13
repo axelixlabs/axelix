@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
+import { StyledTag } from "@/components";
 import type { IThread } from "@/models";
 
 import styles from "./styles.module.css";
@@ -50,7 +50,7 @@ export const ThreadDumpStackTrace = ({ threadDump }: IProps) => {
                         return (
                             <div key={`${traceLine}${index}`} className={styles.TraceLine}>
                                 <p>{traceLine}</p>
-                                {trace.nativeMethod && <Tag className={styles.NativeTag}>NATIVE</Tag>}
+                                {trace.nativeMethod && <StyledTag className={styles.NativeTag}>NATIVE</StyledTag>}
                             </div>
                         );
                     })}

@@ -18,7 +18,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { DashboardNoData, EmptyHandler, Loader, PagesFirstSection } from "@/components";
 import { fetchData } from "@/helpers";
 import { type IDashboardSpringPortfolioResponseBody, StatefulRequest } from "@/models";
 import { getDashboardSpringPortfolioData } from "@/services";
@@ -51,7 +51,7 @@ const DashboardSpringPortfolio = () => {
     if (portfolio.applicationsTotal === 0) {
         return (
             <>
-                <DashboardPagesFirstSection
+                <PagesFirstSection
                     title={t("Dashboard.SpringPortfolio.title")}
                     subtitle={t("Dashboard.SpringPortfolio.subtitle")}
                 />
@@ -65,7 +65,7 @@ const DashboardSpringPortfolio = () => {
         <>
             {/* TODO: Improve in future */}
             <div className={styles.Header}>
-                <DashboardPagesFirstSection
+                <PagesFirstSection
                     title={t("Dashboard.SpringPortfolio.title")}
                     subtitle={t("Dashboard.SpringPortfolio.subtitle")}
                 />

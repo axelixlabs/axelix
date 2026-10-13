@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, Popover, Tag } from "antd";
+import { Button, Popover } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { SetURLSearchParams } from "react-router";
 
-import { PageSearch } from "@/components";
+import { PageSearch, StyledTag } from "@/components";
 import { removeFilterById } from "@/helpers";
 import type { IInstanceCard, IWallboardSingleOperandFilter } from "@/models";
 
@@ -87,9 +87,9 @@ export const WallboardFirstSection = ({
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
                 <div className={styles.FiltersWrapper}>
                     {parsedFilters.map(({ key, operator, operand, id }) => (
-                        <Tag closeIcon color="#838383" variant="outlined" onClose={() => removeFilter(id)} key={id}>
+                        <StyledTag closeIcon onClose={() => removeFilter(id)} key={id}>
                             {key} {operator} {operand}
-                        </Tag>
+                        </StyledTag>
                     ))}
 
                     <Popover

@@ -19,4 +19,4 @@ import type { Dispatch, SetStateAction } from "react";
 
 import type { StatefulRequest } from "../interfaces/globals";
 
-export type SetRequestState<S> = Dispatch<SetStateAction<StatefulRequest<S>>>;
+export type TSetRequestState<S> = Dispatch<SetStateAction<StatefulRequest<S>>>;

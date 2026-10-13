@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EDependencyEcosystem, ESupportStatus, PlatformName } from "@/models";
+import type { EDependencyEcosystem, EPlatformName, ESupportStatus } from "@/models";
 
 export interface ILineWindow {
     line: string;
@@ -25,7 +25,7 @@ export interface ILineWindow {
 }
 
 export interface IFrameworkSupportWindow {
-    name: PlatformName;
+    name: EPlatformName;
     version: string;
     line: ILineWindow;
     latestKnownLine: ILineWindow;

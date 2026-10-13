@@ -65,7 +65,7 @@ export const OSSLicenseDetails = ({ licensing }: IProps) => {
                                     href={LGPL_LINK}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={styles.LicenseLink}
+                                    className="AccentedLink"
                                 />
                             ),
                         }}

@@ -18,8 +18,6 @@
 import { Select } from "antd";
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
-
 export const LanguageSwitcher = () => {
     const { i18n } = useTranslation();
 
@@ -36,7 +34,6 @@ export const LanguageSwitcher = () => {
                     { value: "en", label: "English" },
                     { value: "ru", label: "Русский" },
                 ]}
-                className={styles.LanguageSwitcherSelect}
             />
         </>
     );

@@ -17,4 +17,4 @@
  */
 import type { ESupportStatus } from "@/models";
 
-export type EProblemSupportStatus = Exclude<ESupportStatus, ESupportStatus.ACTIVE>;
+export type TProblemSupportStatus = Exclude<ESupportStatus, ESupportStatus.ACTIVE>;

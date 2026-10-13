@@ -37,9 +37,9 @@ import {
     ThreadDumpIcon,
     TransactionIcon,
 } from "@/assets";
-import { type MenuItem as AntdMenuItem, EInstanceFeature, type ISiderMenuItem } from "@/models";
+import { EInstanceFeature, type ISiderMenuItem, type TMenuItem } from "@/models";
 
-const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
+const createMenuItems = (items: ISiderMenuItem[]): TMenuItem[] => {
     return items.map(({ path, icon, label }) => ({
         key: path,
         icon: icon,
@@ -51,7 +51,7 @@ export const getInstanceItems = (
     instanceId: string,
     t: TFunction,
     availableFeatures: EInstanceFeature[],
-): AntdMenuItem[] => {
+): TMenuItem[] => {
     const basePath = `/instance/${instanceId}`;
 
     const insightsMenuItemsData: ISiderMenuItem[] = [

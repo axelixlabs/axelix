@@ -50,10 +50,13 @@ export enum EIgnoredErrors {
 }
 
 /**
- * Mirrors the {@code PlatformName} enum on the Master backend. Jackson serializes
+ * Mirrors the {@code EPlatformName} enum on the Master backend. Jackson serializes
  * the enum by its constant name, so the wire values are the upper-cased constants.
  */
-export type PlatformName = "SPRING_BOOT" | "SPRING_FRAMEWORK";
+export enum EPlatformName {
+    SPRING_BOOT = "SPRING_BOOT",
+    SPRING_FRAMEWORK = "SPRING_FRAMEWORK",
+}
 
 export enum EAuthorities {
     SCHEDULED_TASKS_MODIFY = "SCHEDULED_TASKS_MODIFY",

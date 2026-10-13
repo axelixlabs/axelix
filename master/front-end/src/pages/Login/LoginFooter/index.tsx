@@ -27,18 +27,20 @@ export const LoginFooter = () => {
     const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
 
     return (
-        <>
-            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
-                    {t("Authentication.docs")}
-                </a>
-                <div className={styles.Divider}>|</div>
-                <a href={blogLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
-                    {t("blog")}
-                </a>
-                <div className={styles.Divider}>|</div>
-                <div className={styles.Version}>{version}</div>
-            </div>
-        </>
+        <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+            <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer">
+                {t("Authentication.docs")}
+            </a>
+            <div className={styles.Divider}>|</div>
+            <a href={blogLink} target="_blank" rel="noopener noreferrer">
+                {t("blog")}
+            </a>
+            {version && (
+                <>
+                    <div className={styles.Divider}>|</div>
+                    <div className={styles.Version}>{version}</div>
+                </>
+            )}
+        </div>
     );
 };

@@ -17,4 +17,4 @@
  */
 import type { IConditionBeanNegative, IConditionBeanPositive } from "@/models";
 
-export type ConditionBeanCollection = IConditionBeanNegative[] | IConditionBeanPositive[];
+export type TConditionBeanCollection = IConditionBeanNegative[] | IConditionBeanPositive[];

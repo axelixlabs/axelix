@@ -23,10 +23,10 @@ import { useTranslation } from "react-i18next";
 
 import { emptyStringToNull, extractErrorCode } from "@/helpers";
 import {
+    type EUserProfileEditableValueField,
     type IEditUserRequestData,
     type IEditableUser,
     StatelessRequest,
-    type UserProfileEditableValueField,
 } from "@/models";
 import { editUser } from "@/services";
 import { userProfileInputTypeMap } from "@/utils";
@@ -42,7 +42,7 @@ interface IProps {
     /**
      * Field that determines which user field is being changed
      */
-    field: UserProfileEditableValueField;
+    field: EUserProfileEditableValueField;
 
     /**
      * Callback for re-loading the user.

@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Popover, Tag } from "antd";
+import { Popover } from "antd";
 import { Fragment } from "react";
 
 import { BurgerIcon } from "@/assets";
-import type { IMCPAnnotation } from "@/models";
+import { StyledTag } from "@/components";
+import { type IMCPAnnotation } from "@/models";
 
 import styles from "./styles.module.css";
 
@@ -47,8 +48,8 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
     return (
         <div className={styles.Footer}>
             <div className={styles.FooterDisplayedAnnotations}>
-                <Tag className={getTagClass(readOnlyHint)}>Read-only</Tag>
-                <Tag className={getTagClass(idempotentHint)}>Idempotent</Tag>
+                <StyledTag className={`TextUltraSmall ${getTagClass(readOnlyHint)}`}>Read-only</StyledTag>
+                <StyledTag className={`TextUltraSmall ${getTagClass(idempotentHint)}`}>Idempotent</StyledTag>
             </div>
 
             <Popover
@@ -60,9 +61,11 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
                             <Fragment key={label}>
                                 <div>{label}</div>
                                 <div className={styles.HiddenAnnotationValue}>
-                                    <Tag className={`${getTagClass(value)} ${styles.AnnotationTag}`}>
+                                    <StyledTag
+                                        className={`TextUltraSmall ${getTagClass(value)} ${styles.AnnotationTag}`}
+                                    >
                                         {String(value)}
-                                    </Tag>
+                                    </StyledTag>
                                 </div>
                             </Fragment>
                         ))}

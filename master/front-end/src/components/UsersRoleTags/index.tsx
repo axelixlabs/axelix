@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
-
 import { ERoles } from "@/models";
+
+import { StyledTag } from "../StyledTag";
 
 import styles from "./styles.module.css";
 
@@ -30,12 +30,12 @@ interface IProps {
 
 export const UserRoleTags = ({ roles }: IProps) => {
     return (
-        <div>
-            {roles.map((role) => (
-                <Tag variant="outlined" color="blue" key={role} className={styles.Tag}>
-                    {role}
-                </Tag>
-            ))}
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                {roles.map((role) => (
+                    <StyledTag key={role}>{role}</StyledTag>
+                ))}
+            </div>
+        </>
     );
 };

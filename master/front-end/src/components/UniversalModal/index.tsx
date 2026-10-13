@@ -19,7 +19,7 @@ import { Modal } from "antd";
 import type { PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
 
-export interface IProps {
+interface IProps {
     /** Whether the modal is visible */
     open: boolean;
 

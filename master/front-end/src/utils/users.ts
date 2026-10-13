@@ -17,12 +17,12 @@
  */
 import type { InputProps } from "antd";
 
-import { ERoles, type UserProfileEditableValueField } from "@/models";
+import { ERoles, EUserProfileEditableValueField } from "@/models";
 
-export const userProfileInputTypeMap: Record<UserProfileEditableValueField, InputProps["type"]> = {
-    username: "text",
-    email: "email",
-    password: "password",
+export const userProfileInputTypeMap: Record<EUserProfileEditableValueField, InputProps["type"]> = {
+    [EUserProfileEditableValueField.USERNAME]: "text",
+    [EUserProfileEditableValueField.EMAIL]: "email",
+    [EUserProfileEditableValueField.PASSWORD]: "password",
 };
 
 export const roleOptions = Object.values(ERoles).map((role) => {

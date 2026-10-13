@@ -90,7 +90,6 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                         value={filters.roles}
                         onChange={rolesHandleChange}
                         options={roleOptions}
-                        className={styles.FilterSelect}
                     />
                     <Select
                         mode="multiple"
@@ -101,7 +100,6 @@ export const UsersFirstSection = ({ addonAfter, setSearch, filters, setFilters, 
                         value={filters.userOrigins}
                         onChange={userOriginsHandleChange}
                         options={userOriginOptions}
-                        className={styles.FilterSelect}
                     />
                 </div>
             </div>

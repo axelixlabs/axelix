@@ -17,4 +17,4 @@
  */
 import type { EWallboardFilterKey, EWallboardFilterOperator } from "@/models";
 
-export type WallboardParsedFilter = [EWallboardFilterKey, EWallboardFilterOperator, string];
+export type TWallboardParsedFilter = [EWallboardFilterKey, EWallboardFilterOperator, string];

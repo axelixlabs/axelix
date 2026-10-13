@@ -9,6 +9,7 @@
 :root {
     --axelix-header-height: 65px;
     --axelix-primary-green: #00ab55;
+    --axelix-primary-dark-green: #1db865;
     --axelix-primary-light-green: #00ab551a;
     --axelix-extra-light-grey: #fafafa;
     --axelix-light-grey: #f0f0f0;
@@ -82,6 +83,7 @@ html {
 
 body {
     font-family: Golos, Helvetica, Arial, sans-serif;
+    color: var(--axelix-primary-black);
 }
 
 ul,
@@ -92,9 +94,18 @@ ol {
 a {
     text-decoration: none;
     color: inherit;
+    transition: color 0.3s;
 
     &:hover {
         color: var(--axelix-primary-green);
+    }
+}
+
+.AccentedLink {
+    color: var(--axelix-primary-green);
+
+    &:hover {
+        color: var(--axelix-primary-dark-green);
     }
 }
 

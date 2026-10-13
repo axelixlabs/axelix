@@ -17,4 +17,4 @@
  */
 import type { IDetailsBuild, IDetailsGit, IDetailsOS, IDetailsRuntime, IDetailsSpring } from "@/models";
 
-export type DetailsBuildValuesData = IDetailsGit | IDetailsBuild | IDetailsSpring | IDetailsRuntime | IDetailsOS;
+export type TDetailsBuildValuesData = IDetailsGit | IDetailsBuild | IDetailsSpring | IDetailsRuntime | IDetailsOS;

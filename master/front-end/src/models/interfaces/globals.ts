@@ -17,7 +17,7 @@
  */
 import type { JSX } from "react";
 
-import type { LoginOption } from "../types/auth.ts";
+import type { TLoginOption } from "../types/auth.ts";
 
 /**
  * The {@link IRequest} implementation that is stateful, meaning, that it produces
@@ -177,7 +177,7 @@ export interface IAxelixSettings {
     /**
      * Authentication options configured on the backend
      */
-    authenticationOptions: LoginOption[];
+    authenticationOptions: TLoginOption[];
 
     licensing: ILicensing;
 }

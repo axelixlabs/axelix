@@ -18,11 +18,9 @@
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router";
 
-import type { MenuItem as AntdMenuItem, ISiderMenuItem } from "@/models";
+import type { ISiderMenuItem, TMenuItem } from "@/models";
 
-import styles from "./styles.module.css";
-
-const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
+const createMenuItems = (items: ISiderMenuItem[]): TMenuItem[] => {
     return items.map(({ path, label }) => ({
         key: path,
         label: <Link to={path}>{label}</Link>,
@@ -30,7 +28,7 @@ const createMenuItems = (items: ISiderMenuItem[]): AntdMenuItem[] => {
 };
 
 // TODO: Add icons in future
-const getDashboardItems = (): AntdMenuItem[] => {
+const getDashboardItems = (): TMenuItem[] => {
     const topLevelItems: ISiderMenuItem[] = [
         {
             path: "/dashboard/spring-portfolio",
@@ -63,13 +61,6 @@ export const DashboardSiderMenu = () => {
     const { pathname } = useLocation();
 
     return (
-        <Menu
-            defaultSelectedKeys={["/dashboard/spring-portfolio"]}
-            defaultOpenKeys={["technologies"]}
-            selectedKeys={[pathname]}
-            mode="inline"
-            items={getDashboardItems()}
-            className={styles.Menu}
-        />
+        <Menu defaultOpenKeys={["technologies"]} selectedKeys={[pathname]} mode="inline" items={getDashboardItems()} />
     );
 };

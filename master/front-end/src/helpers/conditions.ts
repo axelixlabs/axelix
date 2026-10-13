@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ConditionBeanCollection } from "@/models";
+import type { TConditionBeanCollection } from "@/models";
 
-export const filterMatches = (conditions: ConditionBeanCollection, search: string): ConditionBeanCollection => {
+export const filterMatches = (conditions: TConditionBeanCollection, search: string): TConditionBeanCollection => {
     const formattedSearch = search.toLowerCase().trim();
 
     return conditions.filter(({ className, methodName }) => {

@@ -1,0 +1,7 @@
+.ErrorAlert {
+    color: var(--axelix-primary-red);
+}
+
+.InfoAlert {
+    color: var(--axelix-primary-blue);
+}

@@ -20,8 +20,3 @@
     padding-bottom: 8px;
     border-bottom: 1px solid var(--prop-border-faint);
 }
-
-.LinkIcon {
-    flex-shrink: 0;
-    color: var(--prop-accent);
-}

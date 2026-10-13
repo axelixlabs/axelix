@@ -23,12 +23,12 @@ import { useLocation, useParams } from "react-router";
 import { EmptyHandler, HashNavigable, Loader, PageSearch } from "@/components";
 import { fetchData, filterMatches } from "@/helpers";
 import {
-    type ConditionBeanCollection,
     EConditionsTabs,
     type IConditionBeanNegative,
     type IConditionBeanPositive,
     type IConditionsResponseBody,
     StatefulRequest,
+    type TConditionBeanCollection,
 } from "@/models";
 import { getConditionsData } from "@/services";
 
@@ -65,9 +65,9 @@ const Conditions = () => {
 
     const isNegativeTab = activeKey === EConditionsTabs.NEGATIVE_MATCHES;
 
-    const matches: ConditionBeanCollection = isNegativeTab ? negativeMatches : positiveMatches;
+    const matches: TConditionBeanCollection = isNegativeTab ? negativeMatches : positiveMatches;
 
-    const effectiveMatches: ConditionBeanCollection = search ? filterMatches(matches, search) : matches;
+    const effectiveMatches: TConditionBeanCollection = search ? filterMatches(matches, search) : matches;
     const addonAfter = `${effectiveMatches.length} / ${matches.length}`;
 
     const tabs: TabsProps["items"] = [

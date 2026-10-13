@@ -22,13 +22,13 @@ import { t } from "i18next";
 import {
     EAuthorities,
     EMimeTypes,
+    EPlatformName,
     EWallboardFilterKey,
     EWallboardFilterOperator,
     type IConfigPropsBean,
     type IEnvironmentPropertySource,
-    type PlatformName,
-    type SetRequestState,
     StatefulRequest,
+    type TSetRequestState,
 } from "@/models";
 import { UNKNOWN_ERROR } from "@/utils";
 
@@ -39,7 +39,7 @@ import { UNKNOWN_ERROR } from "@/utils";
  * @param dataFetcher - the actual data fetcher function, i.e. the function that
  *                      executes an http request to the backend
  */
-export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher: () => Promise<AxiosResponse>) {
+export async function fetchData<S>(setDataState: TSetRequestState<S>, dataFetcher: () => Promise<AxiosResponse>) {
     try {
         const result = await dataFetcher();
 
@@ -118,12 +118,12 @@ export const toFormattedTime = (value: number): string => {
     });
 };
 
-export const platformFullName = (platform: PlatformName): string => {
-    return platform === "SPRING_BOOT" ? "Spring Boot" : "Spring Framework";
+export const platformFullName = (platform: EPlatformName): string => {
+    return platform === EPlatformName.SPRING_BOOT ? "Spring Boot" : "Spring Framework";
 };
 
-export const platformShortName = (platform: PlatformName): string => {
-    return platform === "SPRING_BOOT" ? "Boot" : "Framework";
+export const platformShortName = (platform: EPlatformName): string => {
+    return platform === EPlatformName.SPRING_BOOT ? "Boot" : "Framework";
 };
 
 export const createWallboardFilterSearchParam = (

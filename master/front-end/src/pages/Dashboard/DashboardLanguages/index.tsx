@@ -19,7 +19,7 @@ import { type TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DashboardNoData, DashboardPagesFirstSection, EmptyHandler, Loader } from "@/components";
+import { DashboardNoData, EmptyHandler, Loader, PagesFirstSection } from "@/components";
 import { fetchData } from "@/helpers";
 import { type ILanguagesProfileResponseBody, StatefulRequest } from "@/models";
 import { getLanguagesProfileData } from "@/services";
@@ -75,7 +75,7 @@ const DashboardLanguages = () => {
     if (applicationsTotal === 0) {
         return (
             <>
-                <DashboardPagesFirstSection
+                <PagesFirstSection
                     title={t("Dashboard.Languages.title")}
                     subtitle={t("Dashboard.Languages.subtitle")}
                 />
@@ -92,10 +92,11 @@ const DashboardLanguages = () => {
     return (
         <>
             <div className={styles.FirstSectionWrapper}>
-                <DashboardPagesFirstSection
+                <PagesFirstSection
                     title={t("Dashboard.Languages.title")}
                     subtitle={t("Dashboard.Languages.subtitle")}
                 />
+
                 <LanguagesSummaryCard
                     applicationsTotal={applicationsTotal}
                     applicationsOnLts={applicationsOnLts}

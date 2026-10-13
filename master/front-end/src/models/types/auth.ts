@@ -21,15 +21,15 @@ import type {
     SUPER_ADMIN_AUTH_OPTION_TYPE_NAME,
 } from "@/utils";
 
-export type LocalLoginOption = {
+type TLocalLoginOption = {
     type: typeof LOCAL_AUTH_OPTION_TYPE_NAME;
 };
 
-export type SuperAdminLoginOption = {
+type TSuperAdminLoginOption = {
     type: typeof SUPER_ADMIN_AUTH_OPTION_TYPE_NAME;
 };
 
-export type OIDCLoginOption = {
+export type TOIDCLoginOption = {
     type: typeof OIDC_AUTH_OPTION_TYPE_NAME;
 
     /**
@@ -61,4 +61,4 @@ export type OIDCLoginOption = {
 /**
  * Possible auth option from the backend.
  */
-export type LoginOption = LocalLoginOption | OIDCLoginOption | SuperAdminLoginOption;
+export type TLoginOption = TLocalLoginOption | TOIDCLoginOption | TSuperAdminLoginOption;

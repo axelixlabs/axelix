@@ -26,8 +26,6 @@ import { EInstanceFeature, type IInstanceFeaturesResponse } from "@/models";
 import { getInstanceFeatures } from "@/services";
 import { getInstanceItems } from "@/utils";
 
-import styles from "./styles.module.css";
-
 export const InstanceSiderMenu = () => {
     const { t } = useTranslation();
 
@@ -60,7 +58,6 @@ export const InstanceSiderMenu = () => {
             items={items}
             selectedKeys={[pathname]}
             defaultOpenKeys={findOpenInstanceKeys(items, pathname)}
-            className={styles.Menu}
         />
     );
 };

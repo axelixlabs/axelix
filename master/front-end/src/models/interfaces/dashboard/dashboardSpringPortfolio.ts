@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { PlatformName } from "@/models";
+import { EPlatformName } from "@/models";
 
 /**
  * A single Spring release line (e.g. {@code 3.5.x}) and how many applications run it.
@@ -42,7 +42,7 @@ export interface IPlatformMajorGroup {
  * across its major generations and release lines.
  */
 export interface IPlatformDistribution {
-    platform: PlatformName;
+    platform: EPlatformName;
     applicationsOnOssSupportedLine: number;
     applicationsTotal: number;
     majors: IPlatformMajorGroup[];
@@ -53,7 +53,7 @@ export interface IPlatformDistribution {
  * open-source maintenance schedule. Dates are ISO {@code YYYY-MM-DD} strings.
  */
 export interface IMaintenanceWindowEntry {
-    platform: PlatformName;
+    platform: EPlatformName;
     line: string;
     releasedAt: string;
     ossSupportEndsAt: string;

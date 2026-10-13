@@ -22,10 +22,10 @@ import { BuildIcon, GitIcon, SpringIcon } from "@/assets";
 import { Copy, EmptyHandler, Loader } from "@/components";
 import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "@/helpers";
 import {
-    type DetailsBuildValuesData,
     type IDetailsCardRecord,
     type IDetailsResponseBody,
     StatefulRequest,
+    type TDetailsBuildValuesData,
 } from "@/models";
 import { getDetailsData } from "@/services";
 import { VALUE_TRANSFORMERS } from "@/utils";
@@ -51,7 +51,7 @@ const Details = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const buildValues = (data: DetailsBuildValuesData): IDetailsCardRecord[] => {
+    const buildValues = (data: TDetailsBuildValuesData): IDetailsCardRecord[] => {
         return Object.entries(data)
             .filter(([, value]) => value !== undefined)
             .map(([key, value]) => {
