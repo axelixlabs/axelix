@@ -18,6 +18,11 @@ spec:
   #  nor it supports the HPA. The reason is the internal design of Axelix Master. We're gonna
   #  address that if we're going to see the need from the community.
   replicas: 1
+  # Axelix Master applies database migrations on startup and is not built to run next to another Master version
+  # against the same database. The default RollingUpdate strategy briefly runs the old and the new pod side by
+  # side (even with a single replica), so the old pod must be gone before the new one starts.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "master.selectorLabels" $ | nindent 6 }}
@@ -46,8 +51,13 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ $.Values.axelix.master.port }}
               protocol: TCP
+            {{- if and $.Values.axelix.master.metrics.prometheus.enabled $.Values.axelix.master.metrics.prometheus.port }}
+            - name: prometheus
+              containerPort: {{ $.Values.axelix.master.metrics.prometheus.port }}
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             initialDelaySeconds: {{ $.Values.liveness.delay }}
             periodSeconds: {{ $.Values.liveness.period }}
@@ -73,13 +83,20 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+            - name: AXELIX_MASTER_PORT
+              value: {{ $.Values.axelix.master.port | quote }}
+
             - name: AXELIX_MASTER_AUTH_COOKIE_SECURE
               value: {{ $.Values.axelix.master.auth.cookie.secure | quote }}
 
+            {{- with $.Values.axelix.master.auth.jwt.algorithm }}
             - name: AXELIX_MASTER_AUTH_JWT_ALGORITHM
-              value: {{ $.Values.axelix.master.auth.jwt.algorithm | quote }}
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.auth.jwt.signingKey }}
             - name: AXELIX_MASTER_AUTH_JWT_SIGNING_KEY
-              value: {{ $.Values.axelix.master.auth.jwt.signingKey | quote }}
+              value: {{ . | quote }}
+            {{- end }}
             - name: AXELIX_MASTER_AUTH_JWT_LIFESPAN
               value: {{ $.Values.axelix.master.auth.jwt.lifespan | quote }}
 
@@ -133,6 +150,104 @@ spec:
                         
             - name: AXELIX_MASTER_MCP_SERVER_ENABLED
               value: {{ $.Values.axelix.master.mcpServer.enabled | quote }}
+
+            - name: AXELIX_MASTER_ENVIRONMENT
+              value: {{ $.Values.axelix.master.environment | quote }}
+            - name: AXELIX_MASTER_LOGGING_JSON_ENABLED
+              value: {{ $.Values.axelix.master.logging.json.enabled | quote }}
+
+            {{- if $.Values.axelix.master.externalConfig.springCloudConfig.enabled }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_ENABLED
+              value: "true"
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_URI
+              value: {{ $.Values.axelix.master.externalConfig.springCloudConfig.uri | quote }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudConfig.label }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_LABEL
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudConfig.name }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_NAME
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudConfig.username }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_USERNAME
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudConfig.password }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_CONFIG_PASSWORD
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+
+            {{- if $.Values.axelix.master.externalConfig.springCloudVault.enabled }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_ENABLED
+              value: "true"
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_FAIL_FAST
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.failFast | quote }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudVault.uri }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_URI
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudVault.authentication }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_AUTHENTICATION
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.externalConfig.springCloudVault.token }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_TOKEN
+              value: {{ . | quote }}
+            {{- end }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KV_ENABLED
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.kv.enabled | quote }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KV_BACKEND
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.kv.backend | quote }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KV_DEFAULT_CONTEXT
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.kv.defaultContext | quote }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KV_PROFILE_SEPARATOR
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.kv.profileSeparator | quote }}
+            - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KV_APPLICATION_NAME
+              value: {{ $.Values.axelix.master.externalConfig.springCloudVault.kv.applicationName | quote }}
+            {{- end }}
+
+            {{- if $.Values.axelix.master.metrics.otlp.enabled }}
+            - name: AXELIX_MASTER_METRICS_OTLP_ENABLED
+              value: "true"
+            - name: AXELIX_MASTER_METRICS_OTLP_URL
+              value: {{ $.Values.axelix.master.metrics.otlp.url | quote }}
+            - name: AXELIX_MASTER_METRICS_OTLP_STEP
+              value: {{ $.Values.axelix.master.metrics.otlp.step | quote }}
+            - name: AXELIX_MASTER_METRICS_OTLP_COMPRESSION_MODE
+              value: {{ $.Values.axelix.master.metrics.otlp.compressionMode | quote }}
+            {{- range $k, $v := $.Values.axelix.master.metrics.otlp.headers }}
+            - name: AXELIX_MASTER_METRICS_OTLP_HEADERS_{{ $k | upper | replace "-" "_" | replace "." "_" }}
+              value: {{ $v | quote }}
+            {{- end }}
+            {{- end }}
+
+            {{- if $.Values.axelix.master.metrics.prometheus.enabled }}
+            - name: AXELIX_MASTER_METRICS_PROMETHEUS_ENABLED
+              value: "true"
+            {{- with $.Values.axelix.master.metrics.prometheus.port }}
+            - name: AXELIX_MASTER_METRICS_PROMETHEUS_PORT
+              value: {{ . | quote }}
+            {{- end }}
+            {{- range $k, $v := $.Values.axelix.master.metrics.prometheus.tags }}
+            - name: AXELIX_MASTER_METRICS_PROMETHEUS_TAGS_{{ $k | upper | replace "-" "_" | replace "." "_" }}
+              value: {{ $v | quote }}
+            {{- end }}
+            {{- end }}
+
+            {{- with $.Values.axelix.master.migrations.username }}
+            - name: AXELIX_MASTER_MIGRATIONS_USERNAME
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with $.Values.axelix.master.migrations.password }}
+            - name: AXELIX_MASTER_MIGRATIONS_PASSWORD
+              value: {{ . | quote }}
+            {{- end }}
+
+            {{- with $.Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

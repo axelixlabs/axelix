@@ -44,7 +44,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 ```console
 helm install my-release axelixlabs/axelix \
   --set image.name=myregistry/axelix \
-  --set image.ref=1.1.0
+  --set image.ref=1.2.0
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
@@ -55,13 +55,45 @@ helm install my-release axelixlabs/axelix -f values.yaml
 
 ## App Configuration
 
-By default, axelix-master container runs on port 8080 and handles both API endpoints and the UI. The service is exposed at `/` path when ingress is enabled.
+By default, axelix-master container runs on port 2935 and handles both API endpoints and the UI. The service is exposed at `/` path when ingress is enabled.
+
+### HTTP Port
+
+The port Axelix Master listens on is set via `axelix.master.port`. The chart uses it for the container port, the probes and, unless `service.port.target` is set explicitly, for the target port of the Service.
+
+Since Axelix 1.2.0 the default is `2935`; before that it was `8080`. If your environment relies on the old port (e.g. the `axelix.sbs.discovery.master-url` of self-registering services, or network policies), you can keep it:
+
+```yaml
+axelix:
+  master:
+    port: 8080
+service:
+  port:
+    source: 8080
+```
+
+### JWT
+
+`axelix.master.auth.jwt.algorithm` and `axelix.master.auth.jwt.signingKey` are optional since Axelix 1.2.0. When they are left empty, Axelix Master falls back to `HMAC512` and a built-in signing key, and logs a warning at startup. The built-in key is publicly known, so it is suitable for a trial only - in any real environment set your own key, and the same key in every managed service:
+
+```yaml
+axelix:
+  master:
+    auth:
+      jwt:
+        algorithm: "HMAC512"
+        signingKey: "<long-random-value>"
+```
+
+### Upgrades
+
+The Axelix Master Deployment uses the `Recreate` strategy: on `helm upgrade` the running pod is stopped before the new one starts. Axelix Master applies database migrations on startup, and two different Master versions must never run against the same database at the same time. This means a short downtime of the Axelix Master UI and API during an upgrade; the managed services are not affected and re-register on their own.
 
 ### Discovery
 
 When `axelix.master.discovery.auto.enabled` is `true`, Axelix Master discovers services by querying the Kubernetes API. The namespaces to scan are configured via `rbac.targetNamespaces`.
 
-By default, `axelix.master.discovery.auto.enabled` is `false`. Enable automatic discovery only when you want Axelix Master to discover services from the cluster instead of relying on self-registration.
+Unlike a standalone Axelix Master (where self-registration is the default), this chart enables automatic discovery by default: `axelix.master.discovery.auto.enabled` is `true` and `axelix.master.discovery.selfRegistration.enabled` is `false`. Set them the other way around if you want the services to self-register instead of being discovered from the cluster.
 
 ### Health Checks
 
@@ -71,13 +103,100 @@ The axelix-master includes health check endpoints:
 
 Probe timing (initial delay, period, failure threshold, timeout) is configurable via `liveness` and `readiness` in values.
 
+### External Configuration
+
+Axelix Master can load part (or all) of its configuration from an external source at startup. Two sources are supported and can be enabled independently via `axelix.master.externalConfig`.
+
+#### Spring Cloud Config Server
+
+Set `axelix.master.externalConfig.springCloudConfig.enabled` to `true` and point `uri` at your Config Server:
+
+```yaml
+axelix:
+  master:
+    externalConfig:
+      springCloudConfig:
+        enabled: true
+        uri: "http://config-server:8888"
+        label: main          # git branch/tag (default: master)
+        name: axelix-master  # application name to fetch (default: the Axelix application name)
+        username: ""         # optional HTTP Basic auth
+        password: ""
+```
+
+#### HashiCorp Vault
+
+Set `axelix.master.externalConfig.springCloudVault.enabled` to `true`. The most common connection options (`uri`, `authentication`, `token`) and the KV secrets-engine settings (`kv.*`) are exposed as first-class values:
+
+```yaml
+axelix:
+  master:
+    externalConfig:
+      springCloudVault:
+        enabled: true
+        uri: "https://vault:8200"
+        authentication: "TOKEN"   # TOKEN | KUBERNETES | APPROLE | ...
+        token: "s.xxxxxxxx"
+        kv:
+          enabled: true
+          backend: secret          # KV mount name
+          defaultContext: application
+```
+
+Vault exposes a large connection/authentication surface (approle, Kubernetes auth, TLS, namespace, ...). Only the common options are first-class; any other Spring Cloud Vault property can be supplied through the top-level `extraEnv` using the `AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_*` prefix — see [Additional Environment Variables](#additional-environment-variables).
+
+### Metrics and Observability
+
+Axelix Master can export metrics to an OpenTelemetry (OTLP) collector and/or expose a Prometheus scrape endpoint. Both are disabled by default and configured under `axelix.master.metrics`.
+
+```yaml
+axelix:
+  master:
+    metrics:
+      otlp:
+        enabled: true
+        url: "http://otel-collector:4318/v1/metrics"   # required when enabled
+        step: 1m
+        compressionMode: none        # none | gzip
+        headers:                     # added to every export request
+          x-scope-orgid: tenant-1
+      prometheus:
+        enabled: true
+        # port: 9090                 # optional dedicated port; defaults to the Axelix Master port
+        tags:
+          region: eu
+```
+
+When `prometheus.enabled` is `true`, metrics are exposed at `/api/actuator/prometheus`. If `prometheus.port` is set, the endpoint is served by a dedicated HTTP server on that port and the chart also declares a matching container port named `prometheus` (you are responsible for exposing it via a Service if you scrape it externally). `headers` and `tags` keys should be simple (letters/digits); for keys containing other characters, set them via `extraEnv`.
+
+### Structured Logging
+
+Set `axelix.master.logging.json.enabled` to `true` to emit logs as ECS-structured JSON (useful for log aggregation). The logical environment name set via `axelix.master.environment` (e.g. `production`) is attached to the structured output.
+
+### Additional Environment Variables
+
+Any Axelix Master property that is not surfaced as a first-class value can be injected directly through `extraEnv`, a list of standard Kubernetes environment entries. This is the recommended escape hatch for advanced HashiCorp Vault settings:
+
+```yaml
+extraEnv:
+  - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_AUTHENTICATION
+    value: "KUBERNETES"
+  - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KUBERNETES_ROLE
+    value: "axelix-master"
+  - name: AXELIX_MASTER_DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: axelix-db
+        key: password
+```
+
 ## Service
 
-When `service.create` is `true` (default), the chart creates a ClusterIP Service for the Axelix Master (ports 8080:8080 by default). Port name, target, and source are configurable via `service.port`. Set `service.create` to `false` if you manage the service yourself.
+When `service.create` is `true` (default), the chart creates a ClusterIP Service for the Axelix Master (ports 2935:2935 by default). Port name, target, and source are configurable via `service.port`; the target port follows `axelix.master.port` unless set explicitly. Set `service.create` to `false` if you manage the service yourself.
 
 ## Ingress Configuration
 
-When `ingress.enabled` is set to `true`, the chart creates an Ingress resource that routes traffic to the Axelix Master service (into service, port 8080). By default, the ingress is created in the same namespace as the release. You can override this by setting `ingress.namespace`. The ingress resource name is set via `ingress.name` (default: `axelix-master`).
+When `ingress.enabled` is set to `true`, the chart creates an Ingress resource that routes traffic to the Axelix Master service (into service, port 2935). By default, the ingress is created in the same namespace as the release. You can override this by setting `ingress.namespace`. The ingress resource name is set via `ingress.name` (default: `axelix-master`).
 
 ### Example Ingress Configuration
 
@@ -185,7 +304,7 @@ Configure the container image:
 ```yaml
 image:
   name: "ghcr.io/axelixlabs/axelix"
-  ref: "1.1.0"
+  ref: "1.2.0"
   pullPolicy: "IfNotPresent"
 ```
 
