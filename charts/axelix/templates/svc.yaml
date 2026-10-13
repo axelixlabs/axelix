@@ -1,5 +1,4 @@
----
-{{- if $.Values.service.create }}
+{{- if $.Values.service.create -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,7 +9,7 @@ spec:
   type: ClusterIP
   ports:
     - port: {{ $.Values.service.port.source }}
-      targetPort: {{ $.Values.service.port.target }}
+      targetPort: {{ $.Values.service.port.target | default $.Values.axelix.master.port }}
       name: {{ $.Values.service.port.name }}
   selector:
     {{- include "master.selectorLabels" $ | nindent 4 }}

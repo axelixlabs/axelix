@@ -4,3 +4,10 @@ Done! Thank you for installing the Axelix K8S chart!
 Axelix UI is now available under the following URL:
   http{{ if $.Values.ingress.tls.enabled }}s{{ end }}://{{ $.Values.ingress.host }}:{{ if $.Values.ingress.tls.enabled }}443{{ else }}80{{ end }}
 {{- end }}
+
+{{- if not $.Values.axelix.master.auth.jwt.signingKey }}
+
+WARNING: 'axelix.master.auth.jwt.signingKey' is not set, so Axelix Master uses its built-in JWT signing key.
+That key is publicly known - anyone can use it to forge a session. Set your own signing key (and the same key
+in every managed service) before exposing Axelix Master to anyone but yourself.
+{{- end }}

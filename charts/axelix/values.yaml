@@ -45,6 +45,18 @@ rbac:
 # -- Array of secret names to be used when pulling the Axelix images
 imagePullSecrets: []
 
+# -- Additional raw environment variables to inject into the Axelix Master container, as a list of standard
+# Kubernetes env entries (each with a "name" and a "value" or "valueFrom"). Use this to configure any Axelix Master
+# property that is not surfaced as a first-class value below. This is especially useful for the full HashiCorp Vault
+# connection/authentication surface (approle, kubernetes, TLS, namespace, ...), which binds under the
+# AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_* prefix. For example:
+#   extraEnv:
+#     - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_AUTHENTICATION
+#       value: "KUBERNETES"
+#     - name: AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_KUBERNETES_ROLE
+#       value: "axelix-master"
+extraEnv: []
+
 # -- The name to be given to deployment and container inside pods.
 name: "axelix-master"
 
@@ -93,7 +105,7 @@ deployment:
 
 image:
 
-  # -- Reference to the axelix master image to be used. Can either be a human-readable "tag" like 1.1.0, or
+  # -- Reference to the axelix master image to be used. Can either be a human-readable "tag" like 1.2.0, or
   # might be the sha256 image hash, like sha256:<SHA_VALUE>. If not set, defaults to the appVersion of the chart.
   ref: ""
 
@@ -144,21 +156,27 @@ service:
   # -- The name of the service to be used.
   name: "axelix-master"
 
-  # -- Port configuration of the K8S service allocated for the Axelix Master. 8080 by default.
+  # -- Port configuration of the K8S service allocated for the Axelix Master. 2935 by default.
   port:
 
     # -- The name of the port.
     name: http
 
-    # -- The target port of the ClusterIP service.
-    target: 8080
+    # -- The target port of the ClusterIP service. If left unset, defaults to the port the Axelix Master listens
+    # on, i.e. to 'axelix.master.port'.
+    target: "" # @schema type:[integer, string]
 
     # -- The source port of the ClusterIP service.
-    source: 8080
+    source: 2935
 
 # -- The Axelix application-related settings.
 axelix:
   master:
+    # -- The HTTP port the Axelix Master listens on inside the container - the UI, the REST API and the MCP server
+    # all share it. Since Axelix 1.2.0 the default is 2935 (it used to be 8080). The chart uses this value for the
+    # container port, the probes and, unless 'service.port.target' is set, for the target port of the service.
+    port: 2935
+
     # -- The auth-related settings.
     auth:
       # -- The auth cookie-related settings.
@@ -169,10 +187,14 @@ axelix:
 
       # -- The JWT-related Axelix settings.
       jwt:
-        # -- The algorithm to be used for signing the JWTs.
-        algorithm: "" # @schema required: true
-        # -- The algorithm to be used for signing the JWTs.
-        signingKey: "" # @schema required: true
+        # -- The algorithm to be used for signing the JWTs. One of 'HMAC256', 'HMAC384' or 'HMAC512'. Optional since
+        # Axelix 1.2.0: if left empty, Axelix Master falls back to 'HMAC512'.
+        algorithm: ""
+        # -- The key to be used for signing the JWTs. Optional since Axelix 1.2.0: if left empty, Axelix Master falls
+        # back to a built-in signing key. Beware that the built-in key is publicly known, so anyone can use it to forge
+        # a session. It is acceptable for a trial only - in any real environment set your own key here (and the same key
+        # in every managed service).
+        signingKey: ""
         # -- The lifespan of the created JWTs.
         lifespan: 12h
 
@@ -234,9 +256,7 @@ axelix:
 
       # -- Settings related to automatic discovery mechanism.
       auto:
-        # TODO: README.md says that 'axelix.master.discovery.auto.enabled' is 'false' by default, while here it is 'true'.
-
-        # -- Whether the self-registration is enabled in master. By default, automatic discovery is enabled.
+        # -- Whether the automatic discovery is enabled in master. By default, automatic discovery is enabled.
         enabled: true
         # -- Settings related to automatic discovery job. Make sense only in case the automatic discovery is enabled.
         broadcast:
@@ -263,3 +283,106 @@ axelix:
         # -- Whether the MCP Server is enabled. When enabled, Axelix Master exposes an MCP-compatible
         # endpoint at /api/mcp that can be used by MCP clients. Default is 'true'.
         enabled: true
+
+    # -- External configuration settings. When enabled, Axelix Master imports part (or all) of its configuration
+    # from an external source at startup. Two sources are supported and may be enabled independently.
+    externalConfig:
+
+      # -- Spring Cloud Config Server settings. When enabled, Axelix Master fetches its configuration from a
+      # Spring Cloud Config Server at startup.
+      springCloudConfig:
+        # -- Whether Axelix Master should fetch its configuration from a Spring Cloud Config Server. Default is 'false'.
+        enabled: false
+        # -- URI of the Spring Cloud Config Server, e.g. "http://config-server:8888". Required when enabled.
+        uri: ""
+        # -- The label (e.g. the git branch/tag) of the configuration to fetch. Default is 'master'.
+        label: "master"
+        # -- The name of the application whose configuration to fetch. If empty, Axelix Master uses its own
+        # application name ("axelix").
+        name: ""
+        # -- Username for HTTP Basic authentication against the Config Server, if it requires authentication.
+        username: ""
+        # -- Password for HTTP Basic authentication against the Config Server, if it requires authentication.
+        password: ""
+
+      # -- HashiCorp Vault settings. When enabled, Axelix Master fetches its configuration/secrets from HashiCorp
+      # Vault at startup. Only the most common connection options are exposed here as first-class values; any
+      # additional Spring Cloud Vault property (authentication-specific settings for approle/kubernetes, TLS/SSL,
+      # namespace, ...) can be supplied through the top-level 'extraEnv' using the
+      # AXELIX_MASTER_EXTERNAL_CONFIG_SPRING_CLOUD_VAULT_* prefix.
+      springCloudVault:
+        # -- Whether Axelix Master should fetch its configuration from HashiCorp Vault. Default is 'false'.
+        enabled: false
+        # -- Whether a failure to connect to Vault aborts Axelix Master startup. Default is 'true'.
+        failFast: true
+        # -- The Vault endpoint URI, e.g. "https://vault:8200". Required when enabled.
+        uri: ""
+        # -- The Vault authentication method, e.g. "TOKEN", "KUBERNETES", "APPROLE". When empty, Vault's own
+        # default ("TOKEN") is used.
+        authentication: ""
+        # -- The Vault token, used when the authentication method is "TOKEN".
+        token: ""
+        # -- Key-Value (KV) secrets engine settings.
+        kv:
+          # -- Whether the KV secrets backend is enabled. Default is 'true'.
+          enabled: true
+          # -- Name of the KV secrets engine mount. Default is 'secret'.
+          backend: "secret"
+          # -- The default context (path) under which to look up secrets. Default is 'application'.
+          defaultContext: "application"
+          # -- Separator between the application name and the active profile when composing secret paths. Default is '/'.
+          profileSeparator: "/"
+          # -- The application name used when composing secret paths. Defaults to the Axelix Master application name ("axelix").
+          applicationName: "axelix"
+
+    # -- Logical name of the environment Axelix Master runs in, e.g. "production" or "staging". When set and JSON
+    # logging is enabled, it is attached to the structured log output. Empty by default.
+    environment: ""
+
+    # -- Logging settings.
+    logging:
+      # -- Structured JSON logging settings.
+      json:
+        # -- Whether to emit logs as ECS-structured JSON to the console (useful for log aggregation systems).
+        # Default is 'false'.
+        enabled: false
+
+    # -- Observability / metrics export settings.
+    metrics:
+      # -- OpenTelemetry (OTLP) metrics export settings. When enabled, Axelix Master pushes its metrics to an
+      # OTLP-compatible collector over HTTP/protobuf.
+      otlp:
+        # -- Whether OTLP metrics export is enabled. Default is 'false'.
+        enabled: false
+        # -- Full URL of the OTLP HTTP/protobuf metrics endpoint, e.g. "http://otel-collector:4318/v1/metrics".
+        # Required when enabled.
+        url: ""
+        # -- Interval between metric exports. Default is '1m'.
+        step: "1m"
+        # -- Compression mode for export requests. One of 'none' or 'gzip'. Default is 'none'.
+        compressionMode: "none"
+        # -- Headers to add to every OTLP export request, as key/value pairs (e.g. for authenticating against the
+        # collector). Keys should be simple (letters, digits); for header names containing other characters use the
+        # top-level 'extraEnv' instead.
+        headers: {}
+
+      # -- Prometheus metrics settings. Exposes a Prometheus scrape endpoint for Axelix Master.
+      prometheus:
+        # -- Whether the Prometheus scrape endpoint is enabled. When enabled, metrics are exposed at
+        # '/api/actuator/prometheus'. Default is 'false'.
+        enabled: false
+        # -- Port of a dedicated HTTP server that serves the Prometheus scrape endpoint. If left unset, the endpoint
+        # is served via the main Axelix Master port ('axelix.master.port'). Must be between 1 and 65535 if set. When set,
+        # the chart also declares a matching container port named "prometheus".
+        port: "" # @schema type:[integer, string]
+        # -- Common tags (key/value pairs) to attach to every metric exposed via the Prometheus endpoint. Keys
+        # should be simple (letters, digits); for tag keys containing other characters use the top-level 'extraEnv'.
+        tags: {}
+
+    # -- Database migration settings. By default, migrations run with the same credentials as the 'database'
+    # settings above. Override these only if migrations must run as a different (e.g. more privileged) database user.
+    migrations:
+      # -- Username for running database migrations. If empty, falls back to 'axelix.master.database.username'.
+      username: ""
+      # -- Password for running database migrations. If empty, falls back to 'axelix.master.database.password'.
+      password: ""
