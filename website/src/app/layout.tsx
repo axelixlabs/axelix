@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Footer, Header, Metric } from "@/components";
+import { DESCRIPTION } from "@/content/overview";
 import { AxelixVersionProvider } from "@/hooks/useAxelixVersion";
 import { SITE_URL } from "@/utils";
 
@@ -46,8 +47,7 @@ export const metadata: Metadata = {
     // The grey snippet under the title in search results, and the fallback text for
     // social shares. Touch wisely.
     // EDIT:
-    description:
-        "Axelix streamlines the development of the Java Spring Boot ecosystems by ensuring the quality and observability across the entire Java fleet",
+    description: DESCRIPTION,
 
     // Product name; some browsers/PWAs surface it. Keep it the brand.
     applicationName: "Axelix",

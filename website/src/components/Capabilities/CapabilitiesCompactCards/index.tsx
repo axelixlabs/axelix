@@ -31,7 +31,7 @@ import sharedStyles from "../shared.module.css";
 
 import styles from "./styles.module.css";
 
-const cards = [
+export const cards = [
     {
         title: "Environment",
         description: "Every env source the JVM sees, ranked by precedence — with selective masking.",

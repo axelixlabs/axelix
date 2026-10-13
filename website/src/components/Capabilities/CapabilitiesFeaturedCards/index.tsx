@@ -22,7 +22,7 @@ import sharedStyles from "../shared.module.css";
 
 import styles from "./styles.module.css";
 
-const featuredCards = [
+export const featuredCards = [
     {
         title: "Transactional inspection",
         description: "Live transactions, durations, the SQL timeline of each one — the verbs your APM forgot.",

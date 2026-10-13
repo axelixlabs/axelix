@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { HERO_HEADLINE_SEGMENTS, HERO_INTRO_SEGMENTS } from "@/content/overview";
+
 import styles from "./styles.module.css";
 
 export const HeroHeadline = () => {
@@ -22,16 +24,28 @@ export const HeroHeadline = () => {
         <>
             <h1 className={styles.Title}>
                 <h1 className={styles.Title}>
-                    Make sure your <span className={styles.GreenText}>Java</span> microservices are ready for the{" "}
-                    <span className={styles.GreenText}>AI</span> era.
+                    {HERO_HEADLINE_SEGMENTS.map(({ text, highlighted }, index) =>
+                        highlighted ? (
+                            <span key={index} className={styles.GreenText}>
+                                {text}
+                            </span>
+                        ) : (
+                            text
+                        ),
+                    )}
                 </h1>
             </h1>
 
             <p className={styles.Lede}>
-                The <span className={styles.GreenTextBold}>AI-Native</span>, Open Core solution for the AI era: its
-                open-source core <span className={styles.GreenTextBold}>pinpoints</span> what holds your Java back,
-                while Axelix Enterprise <span className={styles.GreenTextBold}>enforces</span> optimization policies
-                across the whole ecosystem. <span className={styles.GreenTextBold}>At scale</span>.
+                {HERO_INTRO_SEGMENTS.map(({ text, highlighted }, index) =>
+                    highlighted ? (
+                        <span key={index} className={styles.GreenTextBold}>
+                            {text}
+                        </span>
+                    ) : (
+                        text
+                    ),
+                )}
             </p>
         </>
     );

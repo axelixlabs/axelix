@@ -18,7 +18,7 @@
 import { ResultMetricCard } from "./ResultMetricCard";
 import styles from "./styles.module.css";
 
-const metrics = [
+export const metrics = [
     {
         label: "Memory footprint · RSS Under Load",
         value: "−15%",

@@ -16,7 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { ComposeIcon, DockerIcon, K8sIcon, ServerIcon } from "@/assets";
-import { EInstallMethod, IInstallMethods, TInstallMethodData } from "@/models";
+import { EInstallMethod, IInstallMethods } from "@/models";
+
+import { INSTALLATION_METHODS } from "../installationMethods";
 
 import styles from "./styles.module.css";
 
@@ -43,29 +45,6 @@ const METHODS: IInstallMethods[] = [
     },
 ];
 
-const METHODS_DATA: TInstallMethodData = {
-    [EInstallMethod.K8S]: {
-        description:
-            "The Helm chart installs the master into your cluster. Apps discover it through cluster DNS — no extra wiring needed.",
-        href: "https://axelix.io/docs/start/configuring-master#run-on-kubernetes",
-    },
-    [EInstallMethod.COMPOSE]: {
-        description:
-            "Compose defines the master as a service in your stack. Bring it up once, then point your apps at it through the Compose network.",
-        href: "https://axelix.io/docs/start/configuring-master#run-with-docker-compose",
-    },
-    [EInstallMethod.DOCKER]: {
-        description:
-            "The docker installation involves pulling an image, running it, and then launching your Spring Boot microservices with the configured Axelix starter.",
-        href: "https://axelix.io/docs/start/configuring-master#run-with-docker",
-    },
-    [EInstallMethod.BARE]: {
-        description:
-            "Installing Axelix on bare metal or VMs without containerization is also possible by directly launching a JAR file",
-        href: "https://axelix.io/docs/start/configuring-master#run-as-a-jar",
-    },
-};
-
 interface IProps {
     installMethod: EInstallMethod;
     setInstallMethod: (method: EInstallMethod) => void;
@@ -87,10 +66,10 @@ export const InstallerMethods = ({ installMethod, setInstallMethod }: IProps) =>
             ))}
 
             <div className={styles.MethodFooter}>
-                <p className={styles.Description}>{METHODS_DATA[installMethod].description}</p>
+                <p className={styles.Description}>{INSTALLATION_METHODS[installMethod].description}</p>
                 <a
                     className={styles.Documentations}
-                    href={METHODS_DATA[installMethod].href}
+                    href={INSTALLATION_METHODS[installMethod].href}
                     target="_blank"
                     rel="noopener noreferrer"
                 >

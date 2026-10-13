@@ -19,7 +19,7 @@ import { ComplianceIcon, FleetIcon, OnPremIcon, RbacIcon, SsoIcon, SupportIcon }
 
 import styles from "./styles.module.css";
 
-const EXTENSIONS = [
+export const EXTENSIONS = [
     {
         title: "SSO & identity",
         description: "SAML / OIDC, SCIM provisioning, group → role mapping. Plug into your existing IdP.",

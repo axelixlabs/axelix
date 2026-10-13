@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:llms": "npm run build && node --test src/lib/llms.test.mjs",
     "start": "next start",
     "lint": "eslint .",
     "lint-css": "stylelint \"src/**/*.css\"",
