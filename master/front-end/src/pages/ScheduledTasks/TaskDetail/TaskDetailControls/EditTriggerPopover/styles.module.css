@@ -1,0 +1,14 @@
+.PopoverTrigger {
+    padding: 6px 12px;
+    font-weight: 600;
+    color: var(--prop-text-muted);
+    cursor: pointer;
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-border);
+    border-radius: var(--axelix-border-radius-large);
+}
+
+.PopoverTriggerOpen {
+    background-color: var(--prop-border-faint);
+    border-color: var(--prop-text-dim);
+}

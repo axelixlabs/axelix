@@ -1,0 +1,18 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--prop-surface);
+    border: 1px solid var(--prop-border-soft);
+    border-radius: var(--prop-radius);
+}
+
+.Header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px 40px;
+    flex-wrap: wrap;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--prop-border-faint);
+}

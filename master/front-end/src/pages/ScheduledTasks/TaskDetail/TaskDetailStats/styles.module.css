@@ -1,0 +1,32 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-bottom: 1px solid var(--prop-border-faint);
+}
+
+.Stat {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    padding: 14px 20px;
+    border-right: 1px solid var(--prop-border-faint);
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
+.StatLabel {
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--prop-text-faint);
+}
+
+.StatValue {
+    color: var(--prop-text);
+}
+
+.StatValueMuted {
+    color: var(--prop-text-dim);
+}

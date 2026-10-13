@@ -1,0 +1,70 @@
+.Row {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    background-color: var(--prop-surface);
+    border-radius: var(--axelix-border-radius-large);
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background-color: var(--prop-surface-sunken);
+    }
+}
+
+.Dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.DotOk {
+    background-color: var(--prop-accent);
+}
+
+.DotBad {
+    background-color: var(--axelix-primary-red);
+}
+
+.DotOff {
+    background-color: var(--prop-border);
+}
+
+.DotEmpty {
+    border: 1px solid var(--prop-text-dim);
+}
+
+.Labels {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.Method {
+    font-weight: 600;
+    color: var(--prop-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ClassName {
+    color: var(--prop-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Rate {
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.Selected,
+.Selected:hover {
+    background-color: var(--prop-accent-surface);
+    border-color: var(--prop-accent-border);
+}
